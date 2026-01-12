@@ -21,8 +21,8 @@ from simba.utils.enums import Formats
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.lookups import get_color_dict
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    find_core_cnt, get_fn_ext, read_df)
+from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, get_fn_ext, read_df)
+from simba.utils.data import terminate_cpu_pool
 
 STYLE_WIDTH = 'width'
 STYLE_HEIGHT = 'height'
@@ -234,8 +234,7 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
                     for cnt, result in enumerate(pool.imap(constants, frm_range, chunksize=self.multiprocess_chunksize)):
                         print(f"Core batch {result} complete...")
 
-                pool.join()
-                pool.terminate()
+                terminate_cpu_pool(pool=pool, force=False)
                 if self.video_setting:
                     print(f"Joining {self.video_name} multiprocessed video...")
                     concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_video_path)

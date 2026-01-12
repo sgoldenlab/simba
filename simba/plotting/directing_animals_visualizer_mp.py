@@ -19,7 +19,7 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_valid_rgb_tuple, check_int,
                                 check_valid_lst,
                                 check_video_and_data_frm_count_align)
-from simba.utils.data import create_color_palettes
+from simba.utils.data import create_color_palettes, terminate_cpu_pool
 from simba.utils.enums import OS, Formats, Keys, TextOptions
 from simba.utils.errors import (AnimalNumberError, InvalidInputError,
                                 NoFilesFoundError)
@@ -226,8 +226,7 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
             print(f"Joining {self.video_name} multi-processed video...")
             concatenate_videos_in_folder(in_folder=self.save_temp_path, save_path=self.save_path, video_format="mp4", remove_splits=True)
             self.timer.stop_timer()
-            pool.terminate()
-            pool.join()
+            terminate_cpu_pool(pool=pool, force=False)
             stdout_success(msg=f"Video {self.video_name} complete. Video saved in {self.directing_animals_video_output_path} directory", elapsed_time=self.timer.elapsed_time_str)
 
 

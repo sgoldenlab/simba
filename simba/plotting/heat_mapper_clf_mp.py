@@ -8,8 +8,6 @@ from typing import List, Union
 
 import cv2
 import numpy as np
-import pandas as pd
-from numba import jit, prange
 
 import simba.mixins.plotting_mixin
 from simba.mixins.config_reader import ConfigReader
@@ -25,6 +23,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_fn_ext, read_df,
                                     remove_a_folder)
+from simba.utils.data import terminate_cpu_pool
 
 
 def _heatmap_multiprocessor(data: np.array,
@@ -215,8 +214,7 @@ class HeatMapperClfMultiprocess(ConfigReader, PlottingMixin):
 
                     for cnt, batch in enumerate(pool.imap(constants, frm_per_core_w_batch, chunksize=self.multiprocess_chunksize)):
                         print(f'Batch core {batch+1}/{self.core_cnt} complete (Video {self.video_name})... ')
-                    pool.terminate()
-                    pool.join()
+                    terminate_cpu_pool(pool=pool, force=False)
 
                 if self.video_setting:
                     print(f"Joining {self.video_name} multiprocessed video...")

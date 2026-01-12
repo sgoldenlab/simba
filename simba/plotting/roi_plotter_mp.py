@@ -24,7 +24,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_boolean, check_valid_lst,
                                 check_video_and_data_frm_count_align)
 from simba.utils.data import (create_color_palettes, detect_bouts,
-                              slice_roi_dict_for_video)
+                              slice_roi_dict_for_video, terminate_cpu_pool)
 from simba.utils.enums import ROI_SETTINGS, Formats, Keys, Paths, TextOptions
 from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError,
                                 NoFilesFoundError, NoROIDataError,
@@ -389,8 +389,7 @@ class ROIPlotMultiprocess(ConfigReader):
                 print(f'Image batch {batch_cnt+1} / {self.core_cnt} complete...')
             print(f"Joining {self.video_name} multi-processed ROI video...")
             concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_path, video_format="mp4", remove_splits=True, gpu=self.gpu)
-            pool.terminate()
-            pool.join()
+            terminate_cpu_pool(pool=pool, force=False)
         video_timer.stop_timer()
         stdout_success(msg=f"Video {self.video_name} created. ROI video saved at {self.save_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__, )
 

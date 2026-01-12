@@ -15,15 +15,12 @@ from simba.utils.checks import (check_float, check_if_dir_exists,
                                 check_if_valid_rgb_tuple, check_instance,
                                 check_int, check_iterable_length, check_str,
                                 check_valid_boolean, check_valid_lst)
-from simba.utils.data import create_color_palettes
+from simba.utils.data import create_color_palettes, terminate_cpu_pool
 from simba.utils.enums import Defaults, Formats
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import get_color_dict
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    find_core_cnt, find_video_of_file,
-                                    get_fn_ext, get_video_meta_data,
-                                    remove_a_folder)
+from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, find_video_of_file, get_fn_ext, get_video_meta_data, remove_a_folder)
 from simba.utils.warnings import FrameRangeWarning
 
 ACCEPTED_TYPES = [Polygon, LineString, MultiPolygon, MultiLineString, Point]
@@ -219,7 +216,6 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
     def run(self):
         video_timer = SimbaTimer(start=True)
         data = pd.DataFrame(self.geometries).T
-        #data = data.head(100)
         data = np.array_split(data, self.core_cnt)
         data_splits = []
         for i in range(len(data)): data_splits.append((i, data[i]))
@@ -239,9 +235,8 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
                                           shape_opacity=self.shape_opacity)
             for cnt, result in enumerate(pool.imap(constants, data_splits, chunksize=1)):
                 print(f"Section {result}/{len(data_splits)} complete...")
-            pool.terminate()
-            pool.join()
 
+        terminate_cpu_pool(pool=pool, force=False)
         print(f"Joining {self.video_name} geometry video...")
         concatenate_videos_in_folder(in_folder=self.temp_dir, save_path=self.save_path, remove_splits=True)
         video_timer.stop_timer()

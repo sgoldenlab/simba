@@ -15,7 +15,7 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_instance, check_int,
                                 check_nvidea_gpu_available, check_str,
                                 check_that_column_exist, check_valid_boolean)
-from simba.utils.data import create_color_palette
+from simba.utils.data import create_color_palette, terminate_cpu_pool
 from simba.utils.enums import OS, Formats, Options
 from simba.utils.errors import CountError, InvalidFilepathError
 from simba.utils.printing import SimbaTimer, stdout_success
@@ -181,8 +181,7 @@ class PosePlotterMultiProcess():
                                               video_save_dir=self.temp_folder)
                 for cnt, result in enumerate(pool.imap(constants, pose_lst, chunksize=self.config.multiprocess_chunksize)):
                     print(f"Image {min(len(pose_df), obs_per_split*(cnt+1))}/{len(pose_df)}, Video {file_cnt+1}/{len(list(self.data.keys()))}...")
-            pool.terminate()
-            pool.join()
+            terminate_cpu_pool(pool=pool, force=False)
             print(f"Joining {video_name} multi-processed video...")
             concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=save_video_path, remove_splits=True, gpu=self.gpu)
             video_timer.stop_timer()

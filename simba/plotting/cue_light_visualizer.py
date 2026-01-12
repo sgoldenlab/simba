@@ -1,10 +1,9 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import functools
-import itertools
 import multiprocessing
 import os
-from typing import List, Optional, Union
+from typing import List, Union
 
 import cv2
 import numpy as np
@@ -16,14 +15,14 @@ from simba.utils.checks import (check_file_exist_and_readable, check_int,
                                 check_valid_boolean, check_valid_dataframe,
                                 check_valid_lst)
 from simba.utils.data import (create_color_palettes, detect_bouts,
-                              slice_roi_dict_from_attribute)
-from simba.utils.enums import Defaults, Formats, Keys, TextOptions
+                              slice_roi_dict_from_attribute, terminate_cpu_pool)
+from simba.utils.enums import Defaults, Formats, TextOptions
 from simba.utils.errors import NoROIDataError, NoSpecifiedOutputError
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     get_fn_ext, get_video_meta_data, read_df,
-                                    read_frm_of_video, remove_a_folder)
+                                    read_frm_of_video)
 
 
 def _plot_cue_light_data(frm_idxs: list,
@@ -197,8 +196,7 @@ class CueLightVisualizer(ConfigReader):
             for cnt, result in enumerate(pool.imap(constants, self.frame_chunks, chunksize=self.multiprocess_chunksize)):
                 if self.verbose:
                     print(f'Batch {int(result+1/self.core_cnt)} complete...')
-            pool.terminate()
-            pool.join()
+            terminate_cpu_pool(pool=pool, force=False)
         self.timer.stop_timer()
         if self.video_setting:
             print(f"Joining {self.video_name} multiprocessed video...")

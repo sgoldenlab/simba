@@ -20,7 +20,7 @@ from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_int, check_str,
     check_that_column_exist, check_valid_boolean, check_valid_lst)
-from simba.utils.data import create_color_palette, detect_bouts
+from simba.utils.data import create_color_palette, detect_bouts, terminate_cpu_pool
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, stdout_success
@@ -211,8 +211,7 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
                                                   hhmmss=self.hhmmss)
                     for cnt, result in enumerate(pool.imap(constants, frame_data, chunksize=self.multiprocess_chunksize)):
                         print(f'Batch {result+1/self.core_cnt} complete...')
-                pool.terminate()
-                pool.join()
+                terminate_cpu_pool(pool=pool, force=False)
                 if self.video_setting:
                     print(f"Joining {self.video_name} multiprocessed video...")
                     concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_video_path)

@@ -21,6 +21,7 @@ from simba.utils.printing import SimbaTimer, log_event, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_fn_ext, read_df,
                                     remove_a_folder)
+from simba.utils.data import terminate_cpu_pool
 
 STYLE_PALETTE = 'palette'
 STYLE_SHADING = 'shading'
@@ -211,8 +212,7 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
                                                   make_location_heatmap_plot=self.make_location_heatmap_plot)
                     for cnt, result in enumerate(pool.imap(constants,frame_arrays,chunksize=self.multiprocess_chunksize)):
                         print(f'Batch {result}/{self.core_cnt} complete... Video: {self.video_name} ({file_cnt+1}/{len(self.data_paths)})')
-                    pool.terminate()
-                    pool.join()
+                    terminate_cpu_pool(pool=pool, force=False)
 
                 if self.video_setting:
                     print(f"Joining {self.video_name} multiprocessed heatmap location video...")

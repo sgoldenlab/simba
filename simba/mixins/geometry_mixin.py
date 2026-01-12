@@ -1339,8 +1339,7 @@ class GeometryMixin(object):
             )
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
                 results.append(result)
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
         if data_ndim == 2:
             return [i for s in results for i in s]
         else:
@@ -1370,8 +1369,7 @@ class GeometryMixin(object):
                                           cap_style=cap_style)
             for cnt, mp_return in enumerate(pool.imap(constants, geomety_lst, chunksize=1)):
                 results.append(mp_return)
-            pool.join()
-            pool.terminate()
+            terminate_cpu_pool(pool=pool, force=False)
         return [l for ll in results for l in ll]
 
     def multiframe_bodyparts_to_circle(self,
@@ -1524,8 +1522,7 @@ class GeometryMixin(object):
             )
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
                 results.append(result)
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
         return results
 
     def multiframe_compute_pct_shape_overlap(self,
@@ -1798,8 +1795,7 @@ class GeometryMixin(object):
         timer.stop_timer()
         if verbose:
             stdout_success(msg="Rotated rectangles complete.", elapsed_time=timer.elapsed_time_str)
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
         return results
 
     @staticmethod
@@ -2003,8 +1999,7 @@ class GeometryMixin(object):
             )
             for cnt, result in enumerate(pool.imap(constants, shapes, chunksize=1)):
                 results.append(result)
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
         return results
 
     def multiframe_union(self, shapes: Iterable[Union[LineString, MultiLineString, Polygon]], core_cnt: int = -1) -> \
@@ -2043,8 +2038,7 @@ class GeometryMixin(object):
         with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
             for cnt, result in enumerate(pool.imap(GeometryMixin().union, shapes, chunksize=1)):
                 results.append(result)
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
         return results
 
     def multiframe_symmetric_difference(self, shapes: Iterable[Union[LineString, MultiLineString, Polygon]],
@@ -2084,8 +2078,7 @@ class GeometryMixin(object):
                     pool.imap(GeometryMixin().symmetric_difference, shapes, chunksize=1)
             ):
                 results.append(result)
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
         return results
 
     def multiframe_delaunay_triangulate_keypoints(self, data: np.ndarray, core_cnt: int = -1) -> List[List[Polygon]]:
@@ -2132,8 +2125,7 @@ class GeometryMixin(object):
             ):
                 results.append(result)
 
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
         return results
 
     def multiframe_difference(
@@ -2221,8 +2213,7 @@ class GeometryMixin(object):
             msg="Multi-frame difference compute complete",
             elapsed_time=timer.elapsed_time_str,
         )
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
         return results
 
     def multiframe_area(self,
@@ -2276,8 +2267,7 @@ class GeometryMixin(object):
 
         timer.stop_timer()
         stdout_success(msg="Multi-frame area compute complete", elapsed_time=timer.elapsed_time_str)
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
         return results
 
     def multiframe_bodyparts_to_multistring_skeleton(
@@ -2619,8 +2609,7 @@ class GeometryMixin(object):
                     pool.imap(GeometryMixin.is_shape_covered, shapes, chunksize=1)
             ):
                 results.append(mp_return)
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
         return results
 
     @staticmethod
@@ -3321,8 +3310,7 @@ class GeometryMixin(object):
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
                 if result[1] != -1:
                     img_arr[result[0], result[2] - 1, result[1] - 1] = 1
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
         timer.stop_timer()
         stdout_success(
             msg="Cumulative coordinates in geometries complete",
@@ -3415,8 +3403,7 @@ class GeometryMixin(object):
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
                 if result[1] != -1:
                     img_arr[result[0], result[2] - 1, result[1] - 1] = 1
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
         if fps is None:
             return np.cumsum(img_arr, axis=0)
         else:
@@ -3559,8 +3546,7 @@ class GeometryMixin(object):
             constants = functools.partial(GeometryMixin._compute_framewise_geometry_idx, grid=grid, verbose=verbose)
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
                 results.append(result)
-        pool.join();
-        pool.terminate();
+        terminate_cpu_pool(pool=pool, force=False)
         del data
 
         results = np.vstack(results)[:, 1:].astype(np.int32)

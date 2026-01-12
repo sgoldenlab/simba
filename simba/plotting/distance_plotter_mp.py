@@ -21,6 +21,7 @@ from simba.utils.lookups import get_color_dict
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_fn_ext, read_df)
+from simba.utils.data import terminate_cpu_pool
 
 
 def distance_plotter_mp(
@@ -302,8 +303,7 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
                     ):
                         print(f"Frame batch core {result} complete...")
                         pass
-                pool.join()
-                pool.terminate()
+                terminate_cpu_pool(pool=pool, force=False)
                 if self.video_setting:
                     concatenate_videos_in_folder(
                         in_folder=self.temp_folder,

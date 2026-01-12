@@ -18,9 +18,10 @@ from collections import ChainMap
 import cv2
 import pandas as pd
 from numba import float64, int64, jit, njit, prange, uint8
-from shapely.geometry import MultiPolygon, Polygon
+from shapely.geometry import Polygon
 from skimage.metrics import structural_similarity
 
+from simba.utils.data import terminate_cpu_pool
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_img,
                                 check_if_valid_rgb_tuple, check_instance,
@@ -28,15 +29,12 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_boolean, check_valid_lst,
                                 check_valid_tuple, is_img_bw, is_img_greyscale)
 from simba.utils.enums import Defaults, Formats, GeometryEnum, Options
-from simba.utils.errors import (ArrayError, FFMPEGCodecGPUError,
-                                FrameRangeError, InvalidInputError,
-                                NotDirectoryError)
+from simba.utils.errors import (ArrayError, FrameRangeError, InvalidInputError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data,
-                                    read_frm_of_video,
-                                    read_img_batch_from_video_gpu, write_df)
+                                    read_frm_of_video)
 
 
 class ImageMixin(object):
@@ -546,8 +544,8 @@ class ImageMixin(object):
                 pool.imap(constants, split_frm_idx, chunksize=1)
             ):
                 results.append(result)
-        pool.terminate()
-        pool.join()
+
+        terminate_cpu_pool(pool=pool, force=False)
         results = dict(ChainMap(*results))
 
         max_value, max_frm = -np.inf, None
@@ -876,8 +874,7 @@ class ImageMixin(object):
                 pool.imap(ImageMixin()._image_reader_helper, file_paths, chunksize=1)
             ):
                 imgs.update(result)
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
         return imgs
 
     @staticmethod
@@ -1027,8 +1024,7 @@ class ImageMixin(object):
             for cnt, result in enumerate(pool.imap(constants, frm_lst, chunksize=1)):
                 results.update(result)
 
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
         return results
 
     @staticmethod
@@ -1509,8 +1505,8 @@ class ImageMixin(object):
                 for cnt, result in enumerate(pool.imap(constants, shapes, chunksize=1)):
                     results.append(result)
                 results = dict(ChainMap(*results))
-        pool.join()
-        pool.terminate()
+
+        terminate_cpu_pool(pool=pool, force=False)
         results = dict(sorted(results.items(), key=lambda item: int(item[0])))
         timer.stop_timer()
         stdout_success(msg="Geometry image slicing complete.", elapsed_time=timer.elapsed_time_str, source=self.__class__.__name__)

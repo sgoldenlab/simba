@@ -14,7 +14,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
                                 check_valid_boolean, check_valid_dataframe,
                                 check_valid_lst, check_valid_tuple)
-from simba.utils.data import create_color_palette
+from simba.utils.data import create_color_palette, terminate_cpu_pool
 from simba.utils.enums import Defaults, Options
 from simba.utils.errors import (CountError, DataHeaderError, FrameRangeError,
                                 InvalidInputError, NoDataError)
@@ -25,7 +25,6 @@ from simba.utils.read_write import (concatenate_videos_in_folder,
                                     get_fn_ext, get_video_meta_data,
                                     read_frm_of_video, recursive_file_search,
                                     remove_a_folder)
-from simba.utils.warnings import InvalidValueWarning
 
 FRAME = 'FRAME'
 CLASS_ID = 'CLASS_ID'
@@ -206,6 +205,7 @@ class YOLOPoseVisualizer():
         self.timer = SimbaTimer(start=True)
 
     def run(self):
+        self.pool = multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value)
         for video_cnt, (video_name, data_path) in enumerate(self.data_paths.items()):
             video_timer = SimbaTimer(start=True)
             self.video_temp_dir = os.path.join(self.save_dir, video_name, "temp")
@@ -249,25 +249,23 @@ class YOLOPoseVisualizer():
             frm_batches = np.array_split(np.array(list(range(0, self.df_frm_cnt))), self.core_cnt)
             frm_batches = [(i, j) for i, j in enumerate(frm_batches)]
             if self.verbose: print(f'Visualizing video {self.video_meta_data["video_name"]} (frame count: {self.video_meta_data["frame_count"]})...')
-            with multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
-                constants = functools.partial(_yolo_keypoint_visualizer,
-                                          data=self.data_df,
-                                          threshold=self.threshold,
-                                          video_path=self.video_paths[video_name],
-                                          save_dir=self.video_temp_dir,
-                                          circle_size=circle_size,
-                                          thickness=thickness,
-                                          palettes=self.clrs,
-                                          bbox=self.bbox,
-                                          skeleton=self.skeleton)
-                for cnt, result in enumerate(pool.imap(constants, frm_batches, chunksize=1)):
-                    print(f'Video batch {result+1}/{self.core_cnt} complete...')
-            pool.terminate()
-            pool.join()
+            constants = functools.partial(_yolo_keypoint_visualizer,
+                                      data=self.data_df,
+                                      threshold=self.threshold,
+                                      video_path=self.video_paths[video_name],
+                                      save_dir=self.video_temp_dir,
+                                      circle_size=circle_size,
+                                      thickness=thickness,
+                                      palettes=self.clrs,
+                                      bbox=self.bbox,
+                                      skeleton=self.skeleton)
+            for cnt, result in enumerate(self.pool.imap(constants, frm_batches, chunksize=1)):
+                print(f'Video batch {result+1}/{self.core_cnt} complete...')
             video_timer.stop_timer()
             concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.save_path, gpu=True)
             stdout_success(msg=f'YOLO pose video saved at {self.save_path} (Video {video_cnt+1}/{len(list(self.data_paths.keys()))})', source=self.__class__.__name__, elapsed_time=video_timer.elapsed_time_str)
 
+        terminate_cpu_pool(pool=self.pool, force=False)
         self.timer.stop_timer()
         stdout_success(msg=f'{len(list(self.data_paths.keys()))} YOLO pose video saved in directory {self.save_dir}', source=self.__class__.__name__, elapsed_time=self.timer.elapsed_time_str)
 

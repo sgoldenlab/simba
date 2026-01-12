@@ -17,7 +17,7 @@ from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_float, check_if_dir_exists, check_int,
     check_that_column_exist, check_valid_boolean, check_valid_lst)
-from simba.utils.data import detect_bouts, slice_roi_dict_for_video
+from simba.utils.data import detect_bouts, slice_roi_dict_for_video, terminate_cpu_pool
 from simba.utils.enums import ROI_SETTINGS, Formats, Keys
 from simba.utils.errors import CountError, ROICoordinatesNotFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
@@ -297,8 +297,8 @@ class ROIAggregateStatisticsAnalyzerMultiprocess(ConfigReader, FeatureExtraction
                 self.results.append(result); self.detailed_dfs.append(detailed_dfs)
                 print(f"Data batch core {batch_id} / {self.core_cnt} complete...")
         self.results = pd.concat(self.results, axis=0).reset_index(drop=True)
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
+
 
     def save(self):
         self.__clean_results()

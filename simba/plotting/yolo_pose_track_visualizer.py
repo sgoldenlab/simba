@@ -25,6 +25,7 @@ from simba.utils.read_write import (concatenate_videos_in_folder,
                                     get_fn_ext, get_video_meta_data,
                                     read_frm_of_video, remove_a_folder)
 from simba.utils.warnings import FrameRangeWarning, MissingFileWarning
+from simba.utils.data import terminate_cpu_pool
 
 FRAME = 'FRAME'
 CLASS_ID = 'CLASS_ID'
@@ -159,6 +160,7 @@ class YOLOPoseTrackVisualizer():
         self.threshold, self.circle_size, self.thickness, self.show_bbox, self.overwrite = threshold, circle_size, thickness, bbox, overwrite
 
     def run(self):
+        self.pool, self.timer = multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value), SimbaTimer(start=True)
         for video_cnt, (video_name, data_path) in enumerate(self.data_paths.items()):
             print(f'Visualizing YOLO pose tracks in video {video_name} ({video_cnt+1}/{len(self.data_paths.keys())}) ...')
             video_timer = SimbaTimer(start=True)
@@ -189,23 +191,25 @@ class YOLOPoseTrackVisualizer():
 
             frm_batches = np.array_split(np.array(list(range(0, df_frm_cnt))), self.core_cnt)
             frm_batches = [(i, j) for i, j in enumerate(frm_batches)]
-            with multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
-                constants = functools.partial(_yolo_keypoint_track_visualizer,
-                                              data=self.data_df,
-                                              threshold=self.threshold,
-                                              video_path=self.video_paths[video_name],
-                                              save_dir=video_temp_dir,
-                                              circle_size=video_circle_size,
-                                              thickness=video_thickness,
-                                              palettes=video_palettes,
-                                              show_bbox=self.show_bbox)
-                for cnt, result in enumerate(pool.imap(constants, frm_batches, chunksize=1)):
-                    print(f'Video batch {result+1}/{self.core_cnt} complete...')
-            pool.terminate()
-            pool.join()
+            constants = functools.partial(_yolo_keypoint_track_visualizer,
+                                          data=self.data_df,
+                                          threshold=self.threshold,
+                                          video_path=self.video_paths[video_name],
+                                          save_dir=video_temp_dir,
+                                          circle_size=video_circle_size,
+                                          thickness=video_thickness,
+                                          palettes=video_palettes,
+                                          show_bbox=self.show_bbox)
+            for cnt, result in enumerate(self.pool.imap(constants, frm_batches, chunksize=1)):
+                print(f'Video batch {result+1}/{self.core_cnt} complete...')
             video_timer.stop_timer()
             concatenate_videos_in_folder(in_folder=video_temp_dir, save_path=save_path, gpu=True)
             stdout_success(msg=f'YOLO track pose video saved at {save_path}', source=self.__class__.__name__, elapsed_time=video_timer.elapsed_time_str)
+        terminate_cpu_pool(pool=self.pool, force=False)
+        self.timer.stop_timer()
+        stdout_success(msg=f'YOLO track pose video data for {len(self.data_paths.keys())} videos saved in {self.save_dir}', source=self.__class__.__name__,  elapsed_time=self.timer.elapsed_time_str)
+
+
 #
 # if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 #     parser = argparse.ArgumentParser(description="Visualize YOLO pose tracking CSV outputs on their source videos.")
@@ -247,13 +251,13 @@ class YOLOPoseTrackVisualizer():
 # #kp_vis.run()
 
 
-if __name__ == "__main__":
-    VIDEO_PATH = r"E:\netholabs_videos\primeintellect_100_videos"
-    DATA_PATH = r"E:\netholabs_videos\primeintellect_100_largest"
-    SAVE_DIR = r"E:\netholabs_videos\primeintellect_100_videos\out"
-    kp_vis = YOLOPoseTrackVisualizer(data_path=DATA_PATH,
-                                     video_path=VIDEO_PATH,
-                                     save_dir=SAVE_DIR,
-                                     core_cnt=8,
-                                     bbox=True)
-    kp_vis.run()
+# if __name__ == "__main__":
+#     VIDEO_PATH = r"E:\netholabs_videos\primeintellect_100_videos"
+#     DATA_PATH = r"E:\netholabs_videos\primeintellect_100_largest"
+#     SAVE_DIR = r"E:\netholabs_videos\primeintellect_100_videos\out"
+#     kp_vis = YOLOPoseTrackVisualizer(data_path=DATA_PATH,
+#                                      video_path=VIDEO_PATH,
+#                                      save_dir=SAVE_DIR,
+#                                      core_cnt=8,
+#                                      bbox=True)
+#     kp_vis.run()

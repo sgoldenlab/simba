@@ -67,7 +67,7 @@ from simba.utils.checks import (check_all_dfs_in_list_has_same_cols,
                                 check_valid_boolean, check_valid_dataframe,
                                 check_valid_lst, is_lxc_container)
 from simba.utils.data import (detect_bouts, detect_bouts_multiclass,
-                              get_library_version)
+                              get_library_version, terminate_cpu_pool)
 from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Formats, Links,
                                Methods, MLParamKeys, Options)
 from simba.utils.errors import (ClassifierInferenceError, CorruptedFileError,
@@ -1859,7 +1859,7 @@ class TrainModelMixin(object):
                     shap_raw.append(shap_data[result[1]][1].drop(clf_name, axis=1))
                     if verbose: print(f"Completed SHAP care batch (Batch {result[1] + 1}/{len(shap_data)}).")
 
-            pool.terminate(); pool.join()
+            terminate_cpu_pool(pool=pool, force=False)
             shap_df = pd.DataFrame(data=np.row_stack(shap_results), columns=list(x_names) + ["Expected_value", "Sum", "Prediction_probability", clf_name])
             raw_df = pd.DataFrame(data=np.row_stack(shap_raw), columns=list(x_names))
             out_shap_path, out_raw_path, img_save_path, df_save_paths, summary_dfs, img = None, None, None, None, None, None

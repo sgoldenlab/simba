@@ -20,7 +20,7 @@ from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_if_dir_exists, check_int,
     check_valid_boolean, check_valid_dataframe, check_valid_lst)
-from simba.utils.data import detect_bouts
+from simba.utils.data import detect_bouts, terminate_cpu_pool
 from simba.utils.enums import TagNames
 from simba.utils.errors import NoChoosenMeasurementError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
@@ -210,8 +210,7 @@ class AggregateClfCalculatorMultiprocess(ConfigReader):
                 self.bouts_df_lst.append(batch_bouts_df_lst)
                 print(f"Data batch core {batch_id+1} / {self.core_cnt} complete...")
         self.bouts_df_lst = [df for sub in self.bouts_df_lst for df in sub]
-        pool.join()
-        pool.terminate()
+        terminate_cpu_pool(pool=pool, force=False)
 
     def save(self) -> None:
         """
@@ -242,56 +241,56 @@ class AggregateClfCalculatorMultiprocess(ConfigReader):
         self.timer.stop_timer()
         stdout_success(msg=f"Data aggregate log saved at {self.save_path}", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
-if __name__ == "__main__" and not hasattr(sys, 'ps1'):
-    parser = argparse.ArgumentParser(description='Compute aggregate descriptive statistics from classification data.')
-    parser.add_argument('--config_path', type=str, required=True, help='Path to SimBA project config file')
-    parser.add_argument('--classifiers', type=str, nargs='+', required=True, help='List of classifier names to analyze')
-    parser.add_argument('--data_dir', type=str, default=None, help='Directory containing machine results CSV files (default: project machine_results directory)')
-    parser.add_argument('--detailed_bout_data', action='store_true', help='Save detailed bout data for each bout')
-    parser.add_argument('--transpose', action='store_true', help='Create output with one video per row')
-    parser.add_argument('--no_first_occurrence', action='store_true', help='Disable first occurrence calculation')
-    parser.add_argument('--no_event_count', action='store_true', help='Disable event count calculation')
-    parser.add_argument('--no_total_event_duration', action='store_true', help='Disable total event duration calculation')
-    parser.add_argument('--no_mean_event_duration', action='store_true', help='Disable mean event duration calculation')
-    parser.add_argument('--no_median_event_duration', action='store_true', help='Disable median event duration calculation')
-    parser.add_argument('--no_mean_interval_duration', action='store_true', help='Disable mean interval duration calculation')
-    parser.add_argument('--no_median_interval_duration', action='store_true', help='Disable median interval duration calculation')
-    parser.add_argument('--frame_count', action='store_true', help='Include frame count in output')
-    parser.add_argument('--video_length', action='store_true', help='Include video length in output')
+# if __name__ == "__main__" and not hasattr(sys, 'ps1'):
+#     parser = argparse.ArgumentParser(description='Compute aggregate descriptive statistics from classification data.')
+#     parser.add_argument('--config_path', type=str, required=True, help='Path to SimBA project config file')
+#     parser.add_argument('--classifiers', type=str, nargs='+', required=True, help='List of classifier names to analyze')
+#     parser.add_argument('--data_dir', type=str, default=None, help='Directory containing machine results CSV files (default: project machine_results directory)')
+#     parser.add_argument('--detailed_bout_data', action='store_true', help='Save detailed bout data for each bout')
+#     parser.add_argument('--transpose', action='store_true', help='Create output with one video per row')
+#     parser.add_argument('--no_first_occurrence', action='store_true', help='Disable first occurrence calculation')
+#     parser.add_argument('--no_event_count', action='store_true', help='Disable event count calculation')
+#     parser.add_argument('--no_total_event_duration', action='store_true', help='Disable total event duration calculation')
+#     parser.add_argument('--no_mean_event_duration', action='store_true', help='Disable mean event duration calculation')
+#     parser.add_argument('--no_median_event_duration', action='store_true', help='Disable median event duration calculation')
+#     parser.add_argument('--no_mean_interval_duration', action='store_true', help='Disable mean interval duration calculation')
+#     parser.add_argument('--no_median_interval_duration', action='store_true', help='Disable median interval duration calculation')
+#     parser.add_argument('--frame_count', action='store_true', help='Include frame count in output')
+#     parser.add_argument('--video_length', action='store_true', help='Include video length in output')
+#
+#     args = parser.parse_args()
+#
+#     clf_calculator = AggregateClfCalculatorMultiprocess(
+#         config_path=args.config_path,
+#         classifiers=args.classifiers,
+#         data_dir=args.data_dir,
+#         detailed_bout_data=args.detailed_bout_data,
+#         transpose=args.transpose,
+#         first_occurrence=not args.no_first_occurrence,
+#         event_count=not args.no_event_count,
+#         total_event_duration=not args.no_total_event_duration,
+#         mean_event_duration=not args.no_mean_event_duration,
+#         median_event_duration=not args.no_median_event_duration,
+#         mean_interval_duration=not args.no_mean_interval_duration,
+#         median_interval_duration=not args.no_median_interval_duration,
+#         frame_count=args.frame_count,
+#         video_length=args.video_length
+#     )
+#     clf_calculator.run()
+#     clf_calculator.save()
 
-    args = parser.parse_args()
-
-    clf_calculator = AggregateClfCalculatorMultiprocess(
-        config_path=args.config_path,
-        classifiers=args.classifiers,
-        data_dir=args.data_dir,
-        detailed_bout_data=args.detailed_bout_data,
-        transpose=args.transpose,
-        first_occurrence=not args.no_first_occurrence,
-        event_count=not args.no_event_count,
-        total_event_duration=not args.no_total_event_duration,
-        mean_event_duration=not args.no_mean_event_duration,
-        median_event_duration=not args.no_median_event_duration,
-        mean_interval_duration=not args.no_mean_interval_duration,
-        median_interval_duration=not args.no_median_interval_duration,
-        frame_count=args.frame_count,
-        video_length=args.video_length
-    )
-    clf_calculator.run()
-    clf_calculator.save()
-
-# if __name__ == "__main__":
-#     test = AggregateClfCalculatorMultiprocess(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
-#                                   classifiers=['attack'],
-#                                   transpose=True,
-#                                   mean_event_duration = True,
-#                                   median_event_duration = True,
-#                                   mean_interval_duration = True,
-#                                   median_interval_duration = True,
-#                                   detailed_bout_data=True,
-#                                   core_cnt=12)
-#     test.run()
-#     test.save()
+if __name__ == "__main__":
+    test = AggregateClfCalculatorMultiprocess(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
+                                  classifiers=['attack'],
+                                  transpose=True,
+                                  mean_event_duration = True,
+                                  median_event_duration = True,
+                                  mean_interval_duration = True,
+                                  median_interval_duration = True,
+                                  detailed_bout_data=True,
+                                  core_cnt=12)
+    test.run()
+    test.save()
 
 
 # test = AggregateClfCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",

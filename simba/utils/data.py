@@ -29,6 +29,7 @@ import multiprocessing
 
 from joblib import Parallel, delayed
 
+from simba.utils.lookups import get_current_time
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_df_field_is_boolean,
                                 check_if_dir_exists,
@@ -1814,12 +1815,14 @@ def fft_lowpass_filter(data: np.ndarray, cut_off: float = 0.1) -> np.ndarray:
 
 
 def terminate_cpu_pool(pool: Optional[multiprocessing.pool.Pool],
-                       force: bool = False) -> None:
+                       force: bool = False,
+                       verbose: bool = True,
+                       source: Optional[str] = None) -> None:
     """
     Safely terminates a multiprocessing.Pool instance.
 
     :param Optional[multiprocessing.pool.Pool] pool: The pool to terminate. If None, function returns without action.
-    :param bool force: If True, skips join() and immediately terminates. Default: False.
+    :param bool force: If True, skips join() and immediately terminates. Default: False, which tried graceful shutdown.
     :raises InvalidInputError: If pool is not a valid Pool instance.
 
     :example:
@@ -1835,6 +1838,7 @@ def terminate_cpu_pool(pool: Optional[multiprocessing.pool.Pool],
             pool.close()
             pool.join()
         pool.terminate()
+        if verbose: print(f'[{get_current_time()}] SimBA CPU pool {"" if source is None else source} terminated.')
     except (ValueError, AssertionError, AttributeError):
         pass
     gc.collect()

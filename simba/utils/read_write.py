@@ -75,6 +75,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.warnings import (
     FileExistWarning, FrameRangeWarning, GPUToolsWarning, InvalidValueWarning,
     NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning)
+from simba.utils.data import terminate_cpu_pool
 
 SIMBA_DIR = os.path.dirname(simba.__file__)
 
@@ -3236,8 +3237,7 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
                                       verbose=verbose)
         for cnt, result in enumerate(pool.imap(constants, frm_lst, chunksize=1)):
             results.update(result)
-    pool.join()
-    pool.terminate()
+    terminate_cpu_pool(pool=pool, force=False)
     return results
 
 def read_yolo_bp_names_file(file_path: Union[str, os.PathLike]) -> Tuple[str]:

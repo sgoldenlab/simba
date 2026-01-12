@@ -19,6 +19,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_files_of_filetypes_in_directory,
                                     get_video_meta_data)
+from simba.utils.data import terminate_cpu_pool
 
 
 def _light_dark_box_visualizer(pose_data: pd.DataFrame,
@@ -158,8 +159,7 @@ class LightDarkBoxPlotter():
                                               threshold=self.threshold)
                 for cnt, result in enumerate(pool.imap(constants, pose_data, chunksize=1)):
                     print(f"Section {result}/{len(pose_data)} complete...")
-            pool.terminate()
-            pool.join()
+            terminate_cpu_pool(pool=pool, force=False)
             concatenate_videos_in_folder(in_folder=self.temp_dir, save_path=self.video_save_path, gpu=False)
             video_timer.stop_timer()
             print(f"Video {self.video_save_path} complete (elapsed time: {video_timer.elapsed_time_str}s)...")

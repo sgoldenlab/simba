@@ -557,8 +557,8 @@ def clahe_enhance_video_mp(file_path: Union[str, os.PathLike],
                                       tile_grid_size=tile_grid_size)
         for cnt, result in enumerate(pool.imap(constants, frm_idx, chunksize=1)):
             print(f'Batch {(result + 1)} / {core_cnt} complete...')
-    pool.terminate()
-    pool.join()
+
+    terminate_cpu_pool(pool=pool, force=False)
     print(f"Joining {video_meta_data['video_name']} multiprocessed video...")
     concatenate_videos_in_folder(in_folder=tempdir, save_path=save_path, remove_splits=True, gpu=gpu)
     video_timer.stop_timer()
@@ -4844,8 +4844,7 @@ def get_video_slic(video_path: Union[str, os.PathLike],
                                       sigma=sigma)
         for cnt, core_batch in enumerate(pool.map(constants, frm_ranges, chunksize=1)):
             print(f'Core batch {core_batch} complete...')
-    pool.join()
-    pool.terminate()
+    terminate_cpu_pool(pool=pool, force=False)
     timer.stop_timer()
     concatenate_videos_in_folder(in_folder=temp_folder, save_path=save_path)
     stdout_success(msg=f'SLIC video saved at {save_path}', elapsed_time=timer.elapsed_time_str)

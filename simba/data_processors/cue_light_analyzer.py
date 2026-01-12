@@ -1,13 +1,9 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import functools
-import glob
-import itertools
 import multiprocessing
 import os
-import platform
-import time
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Union
 
 import cv2
 import numpy as np
@@ -17,9 +13,9 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.statistics_mixin import Statistics
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log, check_if_dir_exists,
-    check_if_valid_img, check_int, check_nvidea_gpu_available,
+    check_if_valid_img, check_int,
     check_valid_boolean, check_valid_lst)
-from simba.utils.data import detect_bouts, slice_roi_dict_from_attribute
+from simba.utils.data import detect_bouts, slice_roi_dict_from_attribute, terminate_cpu_pool
 from simba.utils.enums import Defaults, Keys
 from simba.utils.errors import NoROIDataError
 from simba.utils.printing import SimbaTimer, stdout_success
@@ -220,7 +216,7 @@ class CueLightAnalyzer(ConfigReader):
                         else: self.intensities[key] = subdict
                         if self.verbose:
                             print(f'Batch {int(np.ceil(cnt + 1 / self.core_cnt))} complete...')
-            pool.terminate(); pool.join()
+            terminate_cpu_pool(pool=pool, force=False)
             kmeans = self._get_kmeans(intensities=self.intensities)
             self.data_df = self._append_light_data(data_df=self.data_df, kmeans_data=kmeans)
             self.data_df = self._remove_outlier_events(data_df=self.data_df)

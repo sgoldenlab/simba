@@ -32,14 +32,14 @@ from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_str, check_valid_boolean,
                                 check_video_and_data_frm_count_align)
-from simba.utils.data import create_color_palette, plug_holes_shortest_bout
+from simba.utils.data import create_color_palette, plug_holes_shortest_bout, terminate_cpu_pool
 from simba.utils.enums import Options, TextOptions
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     get_fn_ext, get_video_meta_data, read_df,
                                     read_pickle, write_df)
-from simba.utils.warnings import FrameRangeWarning, NoDataFoundWarning
+from simba.utils.warnings import FrameRangeWarning
 
 
 def _validation_video_mp(data: pd.DataFrame,
@@ -370,8 +370,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
 
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
                 print(f"Image batch {result} complete, Video {self.feature_filename}...")
-        pool.terminate()
-        pool.join()
+        terminate_cpu_pool(pool=pool, force=False)
         concatenate_videos_in_folder(in_folder=self.temp_dir, save_path=self.video_save_path)
         self.timer.stop_timer()
         stdout_success(msg=f"Video complete, saved at {self.video_save_path}", elapsed_time=self.timer.elapsed_time_str)

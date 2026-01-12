@@ -12,7 +12,7 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_valid_boolean, check_valid_tuple)
 from simba.utils.data import (align_target_warpaffine_vectors,
                               center_rotation_warpaffine_vectors,
-                              egocentrically_align_pose)
+                              egocentrically_align_pose, terminate_cpu_pool)
 from simba.utils.enums import Defaults, Formats
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
@@ -167,9 +167,7 @@ class EgocentricVideoRotator():
             for cnt, result in enumerate(pool.imap(constants, frm_list, chunksize=1)):
                 if self.verbose:
                     print(f"Rotate batch {result}/{self.core_cnt} complete...")
-            pool.terminate()
-            pool.join()
-
+        terminate_cpu_pool(pool=pool, force=False)
         concatenate_videos_in_folder(in_folder=temp_dir, save_path=self.save_path, remove_splits=True, gpu=self.gpu, verbose=self.verbose)
         video_timer.stop_timer()
         stdout_success(msg=f"Egocentric rotation video {self.save_path} complete", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)

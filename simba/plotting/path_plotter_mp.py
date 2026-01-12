@@ -3,9 +3,8 @@ __author__ = "Simon Nilsson; sronilsson@gmail.com"
 import functools
 import multiprocessing
 import os
-import platform
 from copy import deepcopy
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 
 import cv2
 import numpy as np
@@ -21,7 +20,7 @@ from simba.utils.checks import (
     check_valid_dataframe, check_valid_lst,
     check_video_and_data_frm_count_align)
 from simba.utils.data import (find_frame_numbers_from_time_stamp,
-                              slice_roi_dict_for_video)
+                              slice_roi_dict_for_video, terminate_cpu_pool)
 from simba.utils.enums import Formats, TagNames
 from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 InvalidVideoFileError, NoSpecifiedOutputError)
@@ -350,9 +349,7 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
                                                   verbose=self.verbose)
                     for cnt, result in enumerate(pool.imap(constants, frm_range, chunksize=self.multiprocess_chunksize)):
                         print(f"Path batch {result+1}/{self.core_cnt} complete...")
-                pool.terminate()
-                pool.join()
-
+                terminate_cpu_pool(pool=pool, force=False)
                 if self.video_setting:
                     print(f"Joining {self.video_name} multi-processed video...")
                     print(self.video_temp_dir, self.video_save_path)

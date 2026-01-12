@@ -12,7 +12,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_valid_boolean,
                                 check_valid_dataframe, check_valid_lst,
                                 check_valid_tuple)
-from simba.utils.data import create_color_palette
+from simba.utils.data import create_color_palette, terminate_cpu_pool
 from simba.utils.enums import Defaults, Options
 from simba.utils.errors import CountError, DataHeaderError, FrameRangeError
 from simba.utils.printing import SimbaTimer, stdout_success
@@ -140,8 +140,7 @@ class YOLOSegmentationVisualizer():
                                           shape_opacity=self.shape_opacity)
             for cnt, result in enumerate(pool.imap(constants, frm_batches, chunksize=1)):
                 print(f'Video batch {result+1}/{self.core_cnt} complete...')
-        pool.terminate()
-        pool.join()
+        terminate_cpu_pool(pool=pool, force=False)
         video_timer.stop_timer()
         concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.save_path, gpu=True)
         stdout_success(msg=f'YOLO pose video saved at {self.save_path}', source=self.__class__.__name__, elapsed_time=video_timer.elapsed_time_str)

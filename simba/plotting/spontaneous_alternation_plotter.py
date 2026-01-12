@@ -14,7 +14,7 @@ from simba.data_processors.spontaneous_alternation_calculator import \
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_str, check_valid_lst)
-from simba.utils.data import detect_bouts
+from simba.utils.data import detect_bouts, terminate_cpu_pool
 from simba.utils.enums import Formats, Paths, TextOptions
 from simba.utils.errors import AnimalNumberError, InvalidInputError
 from simba.utils.printing import stdout_success
@@ -296,8 +296,7 @@ class SpontaneousAlternationsPlotter(ConfigReader):
                 pool.imap(constants, frm_index, chunksize=self.multiprocess_chunksize)
             ):
                 print(f"Section {cnt} complete...")
-        pool.terminate()
-        pool.join()
+        terminate_cpu_pool(pool=pool, force=False)
         print(f"Joining {sa_computer.video_name} multiprocessed video...")
         concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=save_path)
         self.timer.stop_timer()

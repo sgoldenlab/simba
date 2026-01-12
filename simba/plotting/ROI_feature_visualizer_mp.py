@@ -24,10 +24,9 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_valid_rgb_tuple, check_int, check_str,
                                 check_valid_boolean, check_valid_lst,
                                 check_video_and_data_frm_count_align)
-from simba.utils.data import slice_roi_dict_for_video
+from simba.utils.data import slice_roi_dict_for_video, terminate_cpu_pool
 from simba.utils.enums import Formats, TextOptions
-from simba.utils.errors import (BodypartColumnNotFoundError, NoFilesFoundError,
-                                ROICoordinatesNotFoundError)
+from simba.utils.errors import (BodypartColumnNotFoundError, NoFilesFoundError)
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_fn_ext,
@@ -315,8 +314,7 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
             print(f"Joining {self.video_name} multi-processed video...")
             concatenate_videos_in_folder(in_folder=self.save_temp_dir, save_path=self.save_path, video_format="mp4", remove_splits=True, gpu=self.gpu)
             self.timer.stop_timer()
-            pool.terminate()
-            pool.join()
+            terminate_cpu_pool(pool=pool, force=False)
             stdout_success(msg=f"Video {self.video_name} complete. Video saved in directory {self.roi_features_save_dir}.", elapsed_time=self.timer.elapsed_time_str)
 
 

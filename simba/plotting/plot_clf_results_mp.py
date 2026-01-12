@@ -20,7 +20,7 @@ from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
                                 check_str, check_that_column_exist,
                                 check_valid_boolean,
                                 check_video_and_data_frm_count_align)
-from simba.utils.data import create_color_palette, detect_bouts
+from simba.utils.data import create_color_palette, detect_bouts, terminate_cpu_pool
 from simba.utils.enums import ConfigKey, Dtypes, Options, TagNames, TextOptions
 from simba.utils.errors import (InvalidInputError, NoDataError,
                                 NoSpecifiedOutputError)
@@ -388,8 +388,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                 if self.verbose: print(f"Joining {self.video_name} multiprocessed video...")
                 concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.video_save_path, gpu=self.gpu, verbose=self.verbose)
                 video_timer.stop_timer()
-                pool.terminate()
-                pool.join()
+                terminate_cpu_pool(pool=pool, force=False)
                 print(f"Video {self.video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)...")
 
         self.timer.stop_timer()

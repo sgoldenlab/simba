@@ -14,9 +14,9 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
                                 check_int, check_str, check_that_column_exist,
                                 check_valid_lst)
-from simba.utils.data import detect_bouts
-from simba.utils.enums import Formats, TagNames, TextOptions
-from simba.utils.errors import NoFilesFoundError, NoSpecifiedOutputError
+from simba.utils.data import detect_bouts, terminate_cpu_pool
+from simba.utils.enums import Formats, TextOptions
+from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_fn_ext,
@@ -218,8 +218,7 @@ class ClassifierValidationClipsMultiprocess(ConfigReader):
                 for cnt, result in enumerate(
                     pool.imap(constants, clip_data, chunksize=self.multiprocess_chunksize)):
                     print(f"Bout {cnt+1} complete...")
-                pool.terminate()
-                pool.join()
+                terminate_cpu_pool(pool=pool, force=False)
 
             if self.concat_video:
                 print(f"Joining {file_name} multiprocessed video...")
