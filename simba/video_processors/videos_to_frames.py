@@ -13,10 +13,10 @@ import cv2
 
 from simba.utils.checks import (check_if_dir_exists, check_int, check_str,
                                 check_valid_boolean)
+from simba.utils.data import terminate_cpu_pool
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_core_cnt, get_video_meta_data,
                                     read_frm_of_video)
-from simba.utils.data import terminate_cpu_pool
 
 JPEG, PNG, WEBP = 'jpeg', 'png', 'webp'
 
