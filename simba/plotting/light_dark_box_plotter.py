@@ -13,13 +13,13 @@ from simba.data_processors.light_dark_box_analyzer import LightDarkBoxAnalyzer
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_float, check_if_dir_exists, check_str,
                                 check_video_and_data_frm_count_align)
+from simba.utils.data import terminate_cpu_pool
 from simba.utils.enums import Defaults, Formats, Options, TextOptions
 from simba.utils.errors import NoDataError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_files_of_filetypes_in_directory,
                                     get_video_meta_data)
-from simba.utils.data import terminate_cpu_pool
 
 
 def _light_dark_box_visualizer(pose_data: pd.DataFrame,

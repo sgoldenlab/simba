@@ -59,6 +59,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_valid_dataframe, check_valid_lst,
                                 check_valid_tuple, check_valid_url,
                                 is_video_color)
+from simba.utils.data import terminate_cpu_pool
 from simba.utils.enums import (ENV_VARS, OS, ConfigKey, Defaults, Dtypes,
                                Formats, Keys, Links, Options, Paths)
 from simba.utils.errors import (CorruptedFileError, DataHeaderError,

@@ -46,6 +46,7 @@ from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,
                                 NoFilesFoundError, NoROIDataError,
                                 SimBAModuleNotFoundError)
+from simba.utils.lookups import get_current_time
 from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import (find_video_of_file, get_fn_ext,
                                     get_video_meta_data, read_config_entry,
