@@ -79,13 +79,12 @@ sys.setrecursionlimit(10**7)
 
 class CLAHEPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="CLAHE VIDEO CONVERSION")
+        super().__init__(title="CLAHE VIDEO CONVERSION", icon='clahe')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', icon_link=Links.VIDEO_TOOLS.value)
         lbl = SimBALabel(parent=settings_frm, txt='For more control over CLAHE conversion, try "Interactively CLAHE enhance videos" \n in SimBA Tools->Remove color from videos.', font=Formats.FONT_REGULAR_ITALICS.value)
-        self.core_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, find_core_cnt()[0]+1)), label='CORE COUNT:', label_width=25, dropdown_width=20, value=1)
-        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=25, dropdown_width=20, value='FALSE')
-        if not check_nvidea_gpu_available():
-            self.gpu_dropdown.disable()
+        self.core_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, find_core_cnt()[0]+1)), label='CORE COUNT:', label_width=25, dropdown_width=20, value=1, img='cpu_small')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=25, dropdown_width=20, value='FALSE', img='gpu_3')
+        if not check_nvidea_gpu_available(): self.gpu_dropdown.disable()
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         lbl.grid(row=0, column=0, sticky=NW)
@@ -93,10 +92,10 @@ class CLAHEPopUp(PopUpMixin):
         self.gpu_dropdown.grid(row=2, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - Contrast Limited Adaptive Histogram Equalization", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25, lbl_icon='video_2')
         run_single_video_btn = SimbaButton(parent=single_video_frm, txt="Apply CLAHE on VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_single_video, width=160)
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOs - Contrast Limited Adaptive Histogram Equalization", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", lblwidth=25)
+        self.selected_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", lblwidth=25, lbl_icon='folder')
 
         run_multiple_btn = SimbaButton(parent=multiple_videos_frm, txt="Apply CLAHE on DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_directory, width=160)
         single_video_frm.grid(row=1, column=0, sticky=NW)
@@ -609,15 +608,18 @@ class ConvertVideoPopUp(PopUpMixin):
 
 class ExtractSpecificFramesPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="EXTRACT DEFINED FRAME RANGE FROM VIDEO", icon='frames')
+        PopUpMixin.__init__(self, title="EXTRACT DEFINED FRAME RANGE FROM SINGLE VIDEO", icon='frames')
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm,header="SETTINGS", icon_name=Keys.DOCUMENTATION.value,icon_link=Links.VIDEO_TOOLS.value)
-        self.video_file_selected = FileSelect(self.settings_frm , "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=40)
-        self.save_dir = FolderSelect(self.settings_frm, "SAVE DIRECTORY: ", lblwidth=40, tooltip_txt='Optional directory where to save the images. \n If None, images are saved in a folder with the suffix `_frames` \n within the same directory as the video file')
+        self.video_file_selected = FileSelect(self.settings_frm , "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=40, lbl_icon='video_2')
+        self.save_dir = FolderSelect(self.settings_frm, "SAVE DIRECTORY: ", lblwidth=40, tooltip_txt='Optional directory where to save the images. \n If None, images are saved in a folder with the suffix `_frames` \n within the same directory as the video file', lbl_icon='folder')
 
-        self.format_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['jpeg', 'png', 'webp'], label="FORMAT: ", label_width=40, dropdown_width=25, value='png')
-        self.grey_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=40, dropdown_width=25, value='FALSE')
-        self.clahe_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="CLAHE: ", label_width=40, dropdown_width=25, value='FALSE')
-        self.include_fn_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="INCLUDE VIDEO NAME IN IMAGE NAME: ", label_width=40, dropdown_width=25, value='FALSE')
+        self.format_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['jpeg', 'png', 'webp'], label="SAVE FORMAT: ", label_width=40, dropdown_width=25, value='png', img='file_type')
+        self.grey_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=40, dropdown_width=25, value='FALSE', img='grey')
+        self.clahe_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="CLAHE: ", label_width=40, dropdown_width=25, value='FALSE', img='clahe')
+        self.include_fn_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="INCLUDE VIDEO NAME IN IMAGE NAME: ", label_width=40, dropdown_width=25, value='FALSE', img='id_card_2')
+        self.start_frm = Entry_Box(parent=self.settings_frm, fileDescription="START FRAME NUMBER:", labelwidth=40, validation='numeric', width=25, img='play')
+        self.end_frm = Entry_Box(parent=self.settings_frm, fileDescription="END FRAME NUMBER:", labelwidth=40, validation='numeric', width=25, img='stop')
+
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         self.video_file_selected.grid(row=0, column=0, sticky=NW)
@@ -626,16 +628,11 @@ class ExtractSpecificFramesPopUp(PopUpMixin):
         self.grey_dropdown.grid(row=3, column=0, sticky=NW)
         self.clahe_dropdown.grid(row=4, column=0, sticky=NW)
         self.include_fn_dropdown.grid(row=5, column=0, sticky=NW)
+        self.start_frm.grid(row=6, column=0, sticky=NW)
+        self.end_frm.grid(row=7, column=0, sticky=NW)
 
-        select_frames_frm = LabelFrame(self.main_frm, text="FRAME RANGE TO BE EXTRACTED", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        self.start_frm = Entry_Box(select_frames_frm, "START FRAME NUMBER:", "40", validation='numeric')
-        self.end_frm = Entry_Box(select_frames_frm, "END FRAME NUMBER:", "40", validation='numeric')
-        run_btn = SimbaButton(parent=select_frames_frm, txt="RUN", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.start_frm_extraction)
-
-        select_frames_frm.grid(row=1, column=0, sticky=NW)
-        self.start_frm.grid(row=2, column=0, sticky=NW)
-        self.end_frm.grid(row=3, column=0, sticky=NW)
-        run_btn.grid(row=4, pady=5, sticky=NW)
+        run_btn = SimbaButton(parent=self.main_frm, txt="RUN", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.start_frm_extraction)
+        run_btn.grid(row=1, column=0, pady=5, sticky=NW)
         self.main_frm.mainloop()
 
     def start_frm_extraction(self):
@@ -848,30 +845,34 @@ class MergeFrames2VideoPopUp(PopUpMixin):
 
 class CreateGIFPopUP(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CREATE GIF FROM VIDEO", size=(600, 400), icon='gif')
-        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(settings_frm, "VIDEO PATH: ", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=40)
-        self.start_time_entry_box = Entry_Box(settings_frm, "START TIME (s):", "40", validation="numeric")
-        self.duration_entry_box = Entry_Box(settings_frm, "DURATION (s): ", "40", validation="numeric")
         resolution_widths = Options.RESOLUTION_OPTIONS_2.value
-        self.resolution_dropdown = DropDownMenu(settings_frm, "GIF WIDTH (ASPECT RATIO RETAINED):", resolution_widths, "40")
-        self.quality_dropdown = DropDownMenu(settings_frm, "GIF QUALITY (%):", list(range(1, 101, 1)), "40")
         fps_lst = list(range(1, 101, 1))
         fps_lst.insert(0, 'AUTO')
-        self.fps_dropdown = DropDownMenu(settings_frm, "GIF FPS:", fps_lst, "40")
-        gpu_cb, self.gpu_var = SimbaCheckbox(parent=settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+        gpu_state = NORMAL if check_nvidea_gpu_available(raise_error=False) else DISABLED
+        PopUpMixin.__init__(self, title="CREATE GIF FROM VIDEO", size=(600, 400), icon='gif')
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
 
-        self.quality_dropdown.setChoices(100)
-        self.resolution_dropdown.setChoices('AUTO')
-        self.fps_dropdown.setChoices('AUTO')
-        settings_frm.grid(row=0, sticky=NW)
+        info_lbl = SimBALabel(parent=self.main_frm, txt='Consider creating WEBM videos instead of creating GIFs.\n WEBM is optimized for web publish at \nconsiderbly smaller sizes than GIFs.', txt_clr='blue', font=Formats.FONT_REGULAR_ITALICS.value, justify='center')
+
+
+        self.selected_video = FileSelect(settings_frm, "VIDEO PATH: ", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=40, lbl_icon='video_2')
+        self.start_time_entry_box = Entry_Box(parent=settings_frm, fileDescription="START TIME (s):", labelwidth=40, validation="numeric", img='play', width=25)
+        self.duration_entry_box = Entry_Box(parent=settings_frm, fileDescription="DURATION (s):", labelwidth=40, validation="numeric", img='stop', width=25)
+
+        self.resolution_dropdown = SimBADropDown(parent=settings_frm, label="GIF WIDTH (ASPECT RATIO RETAINED):", dropdown_options=resolution_widths, label_width=40, dropdown_width=25, value='AUTO', img='monitor')
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, label="GIF QUALITY (%):", dropdown_options=list(range(1, 101, 1)), label_width=40, dropdown_width=25, value=100, img='pct_2')
+        self.fps_dropdown = SimBADropDown(parent=settings_frm, label="GIF FPS:", dropdown_options=fps_lst, label_width=40, dropdown_width=25, value='AUTO', img='fps')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], label_width=40, dropdown_width=25, value='FALSE', img='gpu_3', state=gpu_state)
+
+        info_lbl.grid(row=0, sticky=NW)
+        settings_frm.grid(row=1, sticky=NW)
         self.selected_video.grid(row=0, sticky=NW, pady=5)
         self.start_time_entry_box.grid(row=1, sticky=NW)
         self.duration_entry_box.grid(row=2, sticky=NW)
         self.resolution_dropdown.grid(row=3, sticky=NW)
         self.quality_dropdown.grid(row=4, sticky=NW)
         self.fps_dropdown.grid(row=5, sticky=NW)
-        gpu_cb.grid(row=6, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=6, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
 
@@ -882,7 +883,7 @@ class CreateGIFPopUP(PopUpMixin):
         duration = self.duration_entry_box.entry_get
         fps = self.fps_dropdown.getChoices()
         quality = int(self.quality_dropdown.getChoices())
-        gpu = self.gpu_var.get()
+        gpu = self.gpu_dropdown.get_value()
         check_ffmpeg_available()
         if gpu: check_nvidea_gpu_available()
         check_file_exist_and_readable(file_path=video_path)
@@ -892,7 +893,7 @@ class CreateGIFPopUP(PopUpMixin):
         if fps == 'AUTO': fps = int(video_meta_data['fps'])
         else: fps = int(fps)
         if fps > int(video_meta_data['fps']):
-            FrameRangeWarning(msg=f'The chosen FPS ({fps}) is higher than the video FPS ({video_meta_data["fps"]}). The video FPS will be used', source=self.__class__.__name__)
+            FrameRangeWarning(msg=f'The chosen FPS ({fps}) is higher than the video FPS ({video_meta_data["fps"]}). The video FPS will be used ({video_meta_data["fps"]})', source=self.__class__.__name__)
             fps = int(video_meta_data['fps'])
         max_duration = video_meta_data['video_length_s'] - int(start_time)
         check_int(name='start_time', value=start_time, max_value=video_meta_data['video_length_s'], min_value=0)
@@ -1765,16 +1766,16 @@ class BrightnessContrastPopUp(PopUpMixin):
        :align: center
     """
     def __init__(self):
-        super().__init__(title="CHANGE BRIGHTNESS / CONTRAST")
+        super().__init__(title="CHANGE BRIGHTNESS / CONTRAST", icon='brightness')
         self.datetime = datetime.now().strftime("%Y%m%d%H%M%S")
         setting_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
-        self.gpu_dropdown = SimBADropDown(parent=setting_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], dropdown_width=20, value='FALSE', state=gpu_available, img='gpu_3')
+        self.gpu_dropdown = SimBADropDown(parent=setting_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], dropdown_width=20, value='FALSE', state=gpu_available, img='gpu_3', label_width=25)
         setting_frm.grid(row=0, column=0, sticky="NW")
         self.gpu_dropdown.grid(row=0, column=0, sticky="NW")
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHANGE BRIGHTNESS / CONTRAST SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25, lbl_icon='video_2')
         run_video_btn = SimbaButton(parent=single_video_frm, txt="RUN SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_video)
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
@@ -1782,7 +1783,7 @@ class BrightnessContrastPopUp(PopUpMixin):
         run_video_btn.grid(row=1, column=0, sticky="NW")
 
         video_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHANGE BRIGHTNESS / CONTRAST MULTIPLE VIDEOS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_dir = FolderSelect(video_dir_frm, "VIDEO DIRECTORY PATH:", lblwidth=25)
+        self.selected_dir = FolderSelect(video_dir_frm, "VIDEO DIRECTORY PATH:", lblwidth=25, lbl_icon='folder')
 
         run_dir_btn = SimbaButton(parent=video_dir_frm, txt="RUN VIDEO DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_directory)
 
@@ -1837,11 +1838,11 @@ class InteractiveClahePopUp(PopUpMixin):
     """
 
     def __init__(self):
-        super().__init__(title="INTERACTIVE CLAHE")
+        super().__init__(title="INTERACTIVE CLAHE", icon='clahe')
         self.datetime = datetime.now().strftime("%Y%m%d%H%M%S")
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', icon_link=Links.VIDEO_TOOLS.value)
-        self.core_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, find_core_cnt()[0]+1)), label='CORE COUNT:', label_width=25, dropdown_width=20, value=1)
-        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=25, dropdown_width=20, value='FALSE')
+        self.core_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, find_core_cnt()[0]+1)), label='CORE COUNT:', label_width=25, dropdown_width=20, value=1, img='cpu_small')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=25, dropdown_width=20, value='FALSE', img='gpu_3')
         if not check_nvidea_gpu_available():
             self.gpu_dropdown.disable()
 
@@ -1852,7 +1853,7 @@ class InteractiveClahePopUp(PopUpMixin):
 
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="INTERACTIVE CLAHE - SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25, lbl_icon='video_2')
         run_video_btn = SimbaButton(parent=single_video_frm, txt="RUN SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_video, width=160)
 
 
@@ -1861,7 +1862,7 @@ class InteractiveClahePopUp(PopUpMixin):
         run_video_btn.grid(row=1, column=0, sticky="NW")
 
         video_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="INTERACTIVE CLAHE - MULTIPLE VIDEOS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_dir = FolderSelect(video_dir_frm, "VIDEO DIRECTORY PATH:", lblwidth=25)
+        self.selected_dir = FolderSelect(video_dir_frm, "VIDEO DIRECTORY PATH:", lblwidth=25, lbl_icon='folder')
         run_dir_btn = SimbaButton(parent=video_dir_frm, txt="RUN VIDEO DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_directory, width=160)
         video_dir_frm.grid(row=2, column=0, sticky="NW")
         self.selected_dir.grid(row=0, column=0, sticky="NW")
@@ -2048,16 +2049,15 @@ class DownsampleMultipleVideosPopUp(PopUpMixin):
 
 class Convert2jpegPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="CONVERT IMAGE DIRECTORY TO JPEG")
+        super().__init__(title="CONVERT IMAGES TO JPEG", icon='jpeg')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.quality_lbl = Label(settings_frm, text="JPEG OUTPUT QUALITY: ")
-        self.quality_scale = Scale(settings_frm, from_=1, to=100, orient=HORIZONTAL, length=200, label='JPEG OUTPUT QUALITY', fg='blue', font=Formats.FONT_REGULAR.value,)
-        self.quality_scale.set(95)
+
+        self.quality_scale = SimBAScaleBar(parent=settings_frm, label="JPEG OUTPUT QUALITY: ", orient=HORIZONTAL, length=200, value=95, label_width=25, lbl_img='pct_2')
         settings_frm.grid(row=0, column=0, sticky="NW")
         self.quality_scale.grid(row=0, column=0, sticky="NW")
 
         img_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE DIRECTORY TO JPEG", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_frame_dir = FolderSelect(img_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
+        self.selected_frame_dir = FolderSelect(img_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25, lbl_icon='folder')
 
         run_btn_dir = SimbaButton(parent=img_dir_frm, txt="RUN DIRECTORY JPEG CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.run_dir)
         img_dir_frm.grid(row=1, column=0, sticky="NW")
@@ -2065,7 +2065,7 @@ class Convert2jpegPopUp(PopUpMixin):
         run_btn_dir.grid(row=1, column=0, sticky="NW")
 
         img_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE TO JPEG", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_file = FileSelect(img_frm, "IMAGE PATH:", title="Select an image file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)])
+        self.selected_file = FileSelect(img_frm, "IMAGE PATH:", title="Select an image file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)], lbl_icon='frames')
 
         run_btn_img = SimbaButton(parent=img_frm, txt="RUN IMAGE JPEG CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.run_img)
         img_frm.grid(row=2, column=0, sticky="NW")
@@ -2075,19 +2075,19 @@ class Convert2jpegPopUp(PopUpMixin):
     def run_dir(self):
         folder_path = self.selected_frame_dir.folder_path
         check_if_dir_exists(in_dir=folder_path)
-        _ = convert_to_jpeg(path=folder_path, quality=int(self.quality_scale.get()), verbose=True)
+        _ = convert_to_jpeg(path=folder_path, quality=int(self.quality_scale.get_value()), verbose=True)
 
     def run_img(self):
         file_path = self.selected_file.file_path
         check_file_exist_and_readable(file_path)
-        _ = convert_to_jpeg(path=file_path, quality=int(self.quality_scale.get()), verbose=True)
+        _ = convert_to_jpeg(path=file_path, quality=int(self.quality_scale.get_value()), verbose=True)
 
 
 class Convert2bmpPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="CONVERT IMAGES TO BMP")
+        super().__init__(title="CONVERT IMAGES TO BMP", icon='bmp')
         img_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE DIRECTORY TO BMP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_frame_dir = FolderSelect(img_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
+        self.selected_frame_dir = FolderSelect(img_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25, lbl_icon='folder')
 
         run_btn_dir = SimbaButton(parent=img_dir_frm, txt="RUN DIRECTORY BMP CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.run_dir)
         img_dir_frm.grid(row=0, column=0, sticky="NW")
@@ -2095,7 +2095,7 @@ class Convert2bmpPopUp(PopUpMixin):
         run_btn_dir.grid(row=1, column=0, sticky="NW")
 
         img_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE TO BMP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_file = FileSelect(img_frm, "IMAGE PATH:", title="Select an image file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)])
+        self.selected_file = FileSelect(img_frm, "IMAGE PATH:", title="Select an image file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)], lbl_icon='bmp')
         run_btn_img = SimbaButton(parent=img_frm, txt="RUN IMAGE BMP CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run_img())
 
         img_frm.grid(row=1, column=0, sticky="NW")
@@ -2157,7 +2157,7 @@ class Convert2WEBPPopUp(PopUpMixin):
 
 class Convert2TIFFPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="CONVERT IMAGE DIRECTORY TO TIFF")
+        super().__init__(title="CONVERT IMAGE DIRECTORY TO TIFF", icon='tiff')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_frame_dir = FolderSelect(settings_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25, lbl_icon='browse')
         self.compression_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['raw', 'tiff_deflate', 'tiff_lzw'], label="COMPRESSION:", label_width=25, dropdown_width=25, value='raw', img='file_type')
@@ -2178,9 +2178,9 @@ class Convert2TIFFPopUp(PopUpMixin):
 
 class Convert2PNGPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="CONVERT IMAGE TO PNG")
+        super().__init__(title="CONVERT IMAGE TO PNG", icon='png')
         img_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE DIRECTORY TO PNG", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_frame_dir = FolderSelect(img_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
+        self.selected_frame_dir = FolderSelect(img_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25, lbl_icon='folder')
         run_btn_dir = SimbaButton(parent=img_dir_frm, txt="RUN DIRECTORY PNG CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run_dir())
 
         img_dir_frm.grid(row=0, column=0, sticky="NW")
@@ -2189,7 +2189,7 @@ class Convert2PNGPopUp(PopUpMixin):
 
         img_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE TO PNG", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_file_dir = FileSelect(img_frm, "IMAGE PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)], lbl_icon='file_type')
-        run_btn_img = SimbaButton(parent=img_frm, txt="RUN PNG CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run_img())
+        run_btn_img = SimbaButton(parent=img_frm, txt="RUN IMAGE PNG CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run_img())
 
         img_frm.grid(row=1, column=0, sticky="NW")
         self.selected_file_dir.grid(row=0, column=0, sticky="NW")

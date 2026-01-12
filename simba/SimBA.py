@@ -966,8 +966,8 @@ class App(object):
         video_process_menu.add_cascade(label="Drop body-parts from tracking data", compound="left", image=self.menu_icons["trash"]["img"], command=DropTrackingDataPopUp, font=Formats.FONT_REGULAR.value)
         extract_frames_menu = Menu(video_process_menu, font=Formats.FONT_REGULAR.value)
         extract_frames_menu.add_command(label="Extract defined frames", command=ExtractSpecificFramesPopUp, font=Formats.FONT_REGULAR.value, image=self.menu_icons["frames"]["img"], compound="left")
-        extract_frames_menu.add_command(label="Extract frames from single video", command=SingleVideo2FramesPopUp, font=Formats.FONT_REGULAR.value, image=self.menu_icons["video"]["img"], compound="left")
-        extract_frames_menu.add_command(label="Extract frames from multiple video", command=MultipleVideos2FramesPopUp, font=Formats.FONT_REGULAR.value, image=self.menu_icons["stack"]["img"], compound="left")
+        extract_frames_menu.add_command(label="Extract frames from single video", command=SingleVideo2FramesPopUp, font=Formats.FONT_REGULAR.value, image=self.menu_icons["frames_2"]["img"], compound="left")
+        extract_frames_menu.add_command(label="Extract frames from multiple videos", command=MultipleVideos2FramesPopUp, font=Formats.FONT_REGULAR.value, image=self.menu_icons["stack"]["img"], compound="left")
         extract_frames_menu.add_command(label="Extract frames from seq files", command=ExtractSEQFramesPopUp, font=Formats.FONT_REGULAR.value, image=self.menu_icons["fire"]["img"], compound="left")
         video_process_menu.add_cascade(label="Extract frames...", compound="left", image=self.menu_icons["frames"]["img"], menu=extract_frames_menu, font=Formats.FONT_REGULAR.value)
 

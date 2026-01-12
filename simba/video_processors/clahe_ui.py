@@ -1,4 +1,6 @@
 import os
+import threading
+import time
 from typing import Tuple, Union
 
 import cv2
@@ -32,29 +34,66 @@ def interactive_clahe_ui(data: Union[str, os.PathLike]) -> Tuple[float, int]:
     """
     global original_img, font_size, x_spacer, y_spacer, txt
 
+    callback_lock = threading.Lock()
+    last_update_time = [0]
+    update_delay = 0.05
+
     def _get_trackbar_values(v):
         global original_img, font_size, x_spacer, y_spacer, txt
-        clip_limit = cv2.getTrackbarPos(CLIP_LIMIT, WIN_NAME) / 10.0
-        tile_size = cv2.getTrackbarPos(TILE_SIZE, WIN_NAME)
-        if tile_size % 2 == 0: tile_size += 1
-        clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(tile_size, tile_size))
-        img_clahe = clahe.apply(original_img)
-        cv2.putText(img_clahe, txt,(TextOptions.BORDER_BUFFER_X.value, TextOptions.BORDER_BUFFER_Y.value + y_spacer), TextOptions.FONT.value, font_size, (255, 255, 255), 3)
-        cv2.imshow(WIN_NAME, img_clahe)
-        cv2.waitKey(100)
+        nonlocal callback_lock, last_update_time, update_delay
+        current_time = time.time()
+        if current_time - last_update_time[0] < update_delay:
+            return
+        
+        if not callback_lock.acquire(blocking=False):
+            return
+        
+        try:
+            if cv2.getWindowProperty(WIN_NAME, cv2.WND_PROP_VISIBLE) < 1:
+                return
+            try:
+                clip_limit = cv2.getTrackbarPos(CLIP_LIMIT, WIN_NAME) / 10.0
+                tile_size = cv2.getTrackbarPos(TILE_SIZE, WIN_NAME)
+                if tile_size % 2 == 0: tile_size += 1
+                clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(tile_size, tile_size))
+                img_clahe = clahe.apply(original_img)
+                cv2.putText(img_clahe, txt,(TextOptions.BORDER_BUFFER_X.value, TextOptions.BORDER_BUFFER_Y.value + y_spacer), TextOptions.FONT.value, font_size, (255, 255, 255), 3)
+                cv2.imshow(WIN_NAME, img_clahe)
+                cv2.waitKey(1)
+                last_update_time[0] = current_time
+            except cv2.error:
+                pass
+        finally:
+            callback_lock.release()
 
     def _change_img(v):
         global original_img, font_size, x_spacer, y_spacer, txt
-        new_frm_id = cv2.getTrackbarPos(SELECT_VIDEO_FRAME, WIN_NAME)
-        original_img = read_frm_of_video(video_path=data, frame_index=new_frm_id, greyscale=True)
-        clip_limit = cv2.getTrackbarPos(CLIP_LIMIT, WIN_NAME) / 10.0
-        tile_size = cv2.getTrackbarPos(TILE_SIZE, WIN_NAME)
-        if tile_size % 2 == 0: tile_size += 1
-        clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(tile_size, tile_size))
-        img_clahe = clahe.apply(original_img)
-        cv2.putText(img_clahe, txt,(TextOptions.BORDER_BUFFER_X.value, TextOptions.BORDER_BUFFER_Y.value + y_spacer), TextOptions.FONT.value, font_size, (255, 255, 255), 3)
-        cv2.imshow(WIN_NAME, img_clahe)
-        cv2.waitKey(100)
+        current_time = time.time()
+        if current_time - last_update_time[0] < update_delay:
+            return
+        
+        if not callback_lock.acquire(blocking=False):
+            return
+        
+        try:
+            if cv2.getWindowProperty(WIN_NAME, cv2.WND_PROP_VISIBLE) < 1:
+                return
+            try:
+                new_frm_id = cv2.getTrackbarPos(SELECT_VIDEO_FRAME, WIN_NAME)
+                original_img = read_frm_of_video(video_path=data, frame_index=new_frm_id, greyscale=True)
+                clip_limit = cv2.getTrackbarPos(CLIP_LIMIT, WIN_NAME) / 10.0
+                tile_size = cv2.getTrackbarPos(TILE_SIZE, WIN_NAME)
+                if tile_size % 2 == 0: tile_size += 1
+                clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(tile_size, tile_size))
+                img_clahe = clahe.apply(original_img)
+                cv2.putText(img_clahe, txt,(TextOptions.BORDER_BUFFER_X.value, TextOptions.BORDER_BUFFER_Y.value + y_spacer), TextOptions.FONT.value, font_size, (255, 255, 255), 3)
+                cv2.imshow(WIN_NAME, img_clahe)
+                cv2.waitKey(1)
+                last_update_time[0] = current_time
+            except cv2.error:
+                pass
+        finally:
+            callback_lock.release()
 
     check_instance(source=interactive_clahe_ui.__name__, instance=data, accepted_types=(np.ndarray, str))
     if isinstance(data, str):
@@ -80,14 +119,18 @@ def interactive_clahe_ui(data: Union[str, os.PathLike]) -> Tuple[float, int]:
             break
         k = cv2.waitKey(1) & 0xFF
         if k == 27:
-            clip_limit = cv2.getTrackbarPos(CLIP_LIMIT, WIN_NAME) / 10.0
-            tile_size = cv2.getTrackbarPos(TILE_SIZE, WIN_NAME)
-            if tile_size % 2 == 0: tile_size += 1
+            try:
+                clip_limit = cv2.getTrackbarPos(CLIP_LIMIT, WIN_NAME) / 10.0
+                tile_size = cv2.getTrackbarPos(TILE_SIZE, WIN_NAME)
+                if tile_size % 2 == 0: tile_size += 1
+            except cv2.error:
+                clip_limit = 1.0
+                tile_size = 8
             cv2.destroyAllWindows()
             return clip_limit, tile_size
 
 
-#interactive_clahe_ui(data=r"D:\EPM\sample_2\video_1.mp4")
+#interactive_clahe_ui(data=r"C:\troubleshooting\cue_light\t1\project_folder\videos\2025-05-21 16-10-06_cropped.mp4")
 
 # # Function to update CLAHE
 # def update_clahe(x):

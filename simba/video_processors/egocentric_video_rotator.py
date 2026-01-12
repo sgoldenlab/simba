@@ -35,7 +35,6 @@ def egocentric_video_aligner(frm_range: np.ndarray,
                              gpu: bool = True):
 
     video_meta = get_video_meta_data(video_path=video_path)
-
     batch, frm_range = frm_range[0], frm_range[1]
     save_path = os.path.join(temp_dir, f'{batch}.mp4')
     fourcc = cv2.VideoWriter_fourcc(*f'{Formats.MP4_CODEC.value}')
@@ -176,9 +175,9 @@ class EgocentricVideoRotator():
         stdout_success(msg=f"Egocentric rotation video {self.save_path} complete", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
 
 if __name__ == "__main__":
-    DATA_PATH = r"C:\Users\sroni\OneDrive\Desktop\rotate_ex\data\501_MA142_Gi_Saline_0513.csv"
-    VIDEO_PATH = r"C:\Users\sroni\OneDrive\Desktop\rotate_ex\videos\501_MA142_Gi_Saline_0513.mp4"
-    SAVE_PATH = r"C:\Users\sroni\OneDrive\Desktop\rotate_ex\videos\501_MA142_Gi_Saline_0513_rotated.mp4"
+    DATA_PATH = r"C:\Users\sroni\OneDrive\Desktop\desktop\rotate_ex\data\501_MA142_Gi_Saline_0513.csv"
+    VIDEO_PATH = r"C:\Users\sroni\OneDrive\Desktop\desktop\rotate_ex\videos\501_MA142_Gi_Saline_0513.mp4"
+    SAVE_PATH = r"C:\Users\sroni\OneDrive\Desktop\desktop\rotate_ex\videos\501_MA142_Gi_Saline_0513_rotated.mp4"
     ANCHOR_LOC = np.array([250, 250])
 
     df = read_df(file_path=DATA_PATH, file_type='csv')
@@ -186,5 +185,5 @@ if __name__ == "__main__":
     data = df[bp_cols].values.reshape(len(df), int(len(bp_cols)/2), 2).astype(np.int32)
 
     _, centers, rotation_vectors = egocentrically_align_pose(data=data, anchor_1_idx=5, anchor_2_idx=2, anchor_location=ANCHOR_LOC, direction=0)
-    rotater = EgocentricVideoRotator(video_path=VIDEO_PATH, centers=centers, rotation_vectors=rotation_vectors, anchor_location=(400, 100), save_path=SAVE_PATH, verbose=True)
+    rotater = EgocentricVideoRotator(video_path=VIDEO_PATH, centers=centers, rotation_vectors=rotation_vectors, anchor_location=(400, 100), save_path=SAVE_PATH, verbose=True, core_cnt=16)
     rotater.run()

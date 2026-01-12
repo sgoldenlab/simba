@@ -156,6 +156,7 @@ class SimBAScaleBar(Frame):
     def __init__(self,
                  parent: Union[Frame, Canvas, LabelFrame, Toplevel, Tk],
                  label: Optional[str] = None,
+                 label_width: Optional[int] = None,
                  orient: Literal['horizontal', 'vertical'] = HORIZONTAL,
                  length: int = 200,
                  value: Optional[int] = 95,
@@ -194,7 +195,7 @@ class SimBAScaleBar(Frame):
                            showvalue=showvalue)
 
         if label is not None:
-            self.lbl = SimBALabel(parent=self, txt=label, font=lbl_font, txt_clr=label_clr)
+            self.lbl = SimBALabel(parent=self, txt=label, font=lbl_font, txt_clr=label_clr, width=label_width)
             self.lbl.grid(row=0, column=1, sticky=SW)
 
         self.scale.grid(row=0, column=2, sticky=NW)
@@ -206,6 +207,11 @@ class SimBAScaleBar(Frame):
 
     def get_value(self) -> Union[int, float]:
         return self.scale.get()
+
+    def get(self) -> Union[int, float]:
+        ## Alternative for ``get_value`` for legacy reasons.
+        return self.scale.get()
+
 
 
 

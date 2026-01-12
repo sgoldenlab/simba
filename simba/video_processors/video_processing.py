@@ -166,7 +166,7 @@ def convert_to_jpeg(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]]
         dir, file_name, _ = get_fn_ext(filepath=file_path)
         save_path = os.path.join(save_dir, f'{file_name}.jpeg')
         if verbose:
-            print(f"Converting file {file_cnt+1}/{len(file_paths)} ...")
+            print(f"Converting file {file_cnt+1}/{len(file_paths)} ({file_name}) ...")
         img = Image.open(file_path)
         if img.mode in ('RGBA', 'LA'): img = img.convert('RGB')
         img.save(save_path, format='JPEG', quality=quality)
@@ -218,7 +218,7 @@ def convert_to_bmp(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]],
         dir, file_name, _ = get_fn_ext(filepath=file_path)
         save_path = os.path.join(save_dir, f'{file_name}.bmp')
         if verbose:
-            print(f"Converting file {file_cnt + 1}/{len(file_paths)} ...")
+            print(f"Converting file {file_cnt + 1}/{len(file_paths)} ({file_name}) ...")
         img = Image.open(file_path)
         if img.mode in ('RGBA', 'LA'): img = img.convert('RGB')
         img.save(save_path, format='BMP')

@@ -16,6 +16,7 @@ from simba.utils.checks import (check_if_dir_exists, check_int, check_str,
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_core_cnt, get_video_meta_data,
                                     read_frm_of_video)
+from simba.utils.data import terminate_cpu_pool
 
 JPEG, PNG, WEBP = 'jpeg', 'png', 'webp'
 
@@ -117,8 +118,8 @@ def video_to_frames(video_path: Union[str, os.PathLike],
         for cnt, batch_id in enumerate(pool.imap(constants, frm_ids, chunksize=1)):
             if verbose:
                 print(f'Video frame batch {batch_id} (of {core_cnt}) complete...')
-    pool.join()
-    pool.terminate()
+
+    terminate_cpu_pool(pool=pool, force=True)
     timer.stop_timer()
     if verbose:
         stdout_success(msg=f'All frames for video {video_path} saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
