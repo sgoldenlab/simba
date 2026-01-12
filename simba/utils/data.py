@@ -5,8 +5,8 @@ import configparser
 import gc
 import io
 import os
-import subprocess
 import platform
+import subprocess
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
@@ -39,20 +39,23 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_valid_rgb_tuple, check_instance,
                                 check_int, check_str, check_that_column_exist,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_array, check_valid_cpu_pool,
-                                check_valid_dataframe, check_valid_lst, check_valid_boolean)
-from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options, Defaults, OS
+                                check_valid_array, check_valid_boolean,
+                                check_valid_cpu_pool, check_valid_dataframe,
+                                check_valid_lst)
+from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Formats, Keys,
+                               Options)
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,
                                 NoFilesFoundError, NoROIDataError,
                                 SimBAModuleNotFoundError)
 from simba.utils.lookups import get_current_time
 from simba.utils.printing import stdout_success, stdout_warning
-from simba.utils.read_write import (find_video_of_file, get_fn_ext,
+from simba.utils.read_write import (find_core_cnt, find_video_of_file,
+                                    get_current_time, get_fn_ext,
                                     get_video_meta_data, read_config_entry,
                                     read_config_file, read_df,
                                     read_project_path_and_file_type,
-                                    read_roi_data, write_df, find_core_cnt, get_current_time)
+                                    read_roi_data, write_df)
 from simba.utils.warnings import DuplicateNamesWarning
 
 
