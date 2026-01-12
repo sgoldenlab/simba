@@ -6,6 +6,7 @@ import gc
 import io
 import os
 import subprocess
+import platform
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
@@ -29,7 +30,6 @@ import multiprocessing
 
 from joblib import Parallel, delayed
 
-from simba.utils.lookups import get_current_time
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_df_field_is_boolean,
                                 check_if_dir_exists,
@@ -40,8 +40,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_str, check_that_column_exist,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_array, check_valid_cpu_pool,
-                                check_valid_dataframe, check_valid_lst)
-from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
+                                check_valid_dataframe, check_valid_lst, check_valid_boolean)
+from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options, Defaults, OS
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,
                                 NoFilesFoundError, NoROIDataError,
@@ -51,7 +51,7 @@ from simba.utils.read_write import (find_video_of_file, get_fn_ext,
                                     get_video_meta_data, read_config_entry,
                                     read_config_file, read_df,
                                     read_project_path_and_file_type,
-                                    read_roi_data, write_df)
+                                    read_roi_data, write_df, find_core_cnt, get_current_time)
 from simba.utils.warnings import DuplicateNamesWarning
 
 
@@ -1814,25 +1814,30 @@ def fft_lowpass_filter(data: np.ndarray, cut_off: float = 0.1) -> np.ndarray:
     return results.astype(data.dtype)
 
 
-def terminate_cpu_pool(pool: Optional[multiprocessing.pool.Pool],
+def terminate_cpu_pool(pool: multiprocessing.pool.Pool,
                        force: bool = False,
                        verbose: bool = True,
                        source: Optional[str] = None) -> None:
     """
-    Safely terminates a multiprocessing.Pool instance.
+    Safely terminates a multiprocessing.Pool instance with optional graceful shutdown.
 
-    :param Optional[multiprocessing.pool.Pool] pool: The pool to terminate. If None, function returns without action.
-    :param bool force: If True, skips join() and immediately terminates. Default: False, which tried graceful shutdown.
-    :raises InvalidInputError: If pool is not a valid Pool instance.
+    .. note::
+       If pool is None or invalid, function returns without action. Exceptions during termination are silently caught.
+
+    :param multiprocessing.pool.Pool pool: The multiprocessing pool to terminate. If None, function returns without action.
+    :param bool force: If True, skips graceful shutdown (close/join) and immediately terminates. Default: False.
+    :param bool verbose: If True, prints termination message with timestamp. Default: True.
+    :param Optional[str] source: Optional identifier string for logging purposes (e.g., 'VideoProcessor'). Default: None.
 
     :example:
     >>> import multiprocessing
     >>> pool = multiprocessing.Pool(4)
-    >>> terminate_cpu_pool(pool)
+    >>> terminate_cpu_pool(pool=pool, force=False, verbose=True, source='FeatureExtractor')
     """
     if pool is None:
         return
-    check_valid_cpu_pool(value=pool, source=terminate_cpu_pool.__name__, raise_error=True)
+    if not check_valid_cpu_pool(value=pool, source=terminate_cpu_pool.__name__, raise_error=False):
+        return
     try:
         if not force:
             pool.close()
@@ -1844,6 +1849,69 @@ def terminate_cpu_pool(pool: Optional[multiprocessing.pool.Pool],
     gc.collect()
 
 
+
+def get_cpu_pool(core_cnt: int = -1,
+                 maxtasksperchild: int = Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value,
+                 context: Literal['fork', 'spawn', 'forkserver'] = None,
+                 verbose: bool = True,
+                 source: Optional[str] = None) -> multiprocessing.Pool:
+    """
+    Creates and returns a multiprocessing.Pool instance with platform-appropriate defaults and validation.
+
+    :param int core_cnt: Number of worker processes. -1 uses all available cores. Default: -1.
+    :param int maxtasksperchild: Maximum number of tasks a worker process can complete before being replaced. Default: From Defaults.MAXIMUM_MAX_TASK_PER_CHILD.
+    :param Optional[Literal['fork', 'spawn', 'forkserver']] context: Multiprocessing start method. None uses platform default. Default: None.
+    :param bool verbose: If True, prints pool creation message with timestamp. Default: True.
+    :param Optional[str] source: Optional identifier string for logging purposes (e.g., 'VideoProcessor'). Default: None.
+    :return: Configured multiprocessing.Pool instance.
+    :rtype: multiprocessing.Pool
+
+    :example:
+    >>> pool = get_cpu_pool(core_cnt=4, source='FeatureExtractor')
+    >>> pool = get_cpu_pool(core_cnt=-1, context='spawn', verbose=True)
+    >>> pool = get_cpu_pool(core_cnt=8, maxtasksperchild=100, source='VideoProcessor')
+    """
+
+    check_int(name=f'{get_cpu_pool.__name__} core_cnt', min_value=-1, unaccepted_vals=[0], value=core_cnt, raise_error=True)
+    check_int(name=f'{get_cpu_pool.__name__} maxtasksperchild', min_value=1, value=maxtasksperchild, raise_error=True)
+    check_valid_boolean(value=verbose, source=f'{get_cpu_pool.__name__} verbose', raise_error=True)
+    if source is not None: check_str(name=f'{get_cpu_pool.__name__} source', value=source, raise_error=True, allow_blank=True)
+    current_process = multiprocessing.current_process()
+    if current_process.name != 'MainProcess': core_cnt = 1
+    core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
+    if verbose: print(f'[{get_current_time()}] SimBA CPU pool {"" if source is None else source} started.')
+    if context is not None:
+        check_str(name=f'{get_cpu_pool.__name__} context', value=context, options=('fork', 'spawn', 'forkserver'), raise_error=True)
+    else:
+        existing_method = multiprocessing.get_start_method(allow_none=True)
+        if existing_method is not None:
+            context = existing_method
+        else:
+            system = platform.system()
+            if system == OS.WINDOWS.value: context = OS.SPAWN.value
+            elif system == OS.MAC.value: context = OS.SPAWN.value
+            else: context = OS.FORK.value
+
+    if context is not None:
+        try:
+            ctx = multiprocessing.get_context(context)
+        except ValueError:
+            system = platform.system()
+            if system == OS.WINDOWS.value: fallback_context = OS.SPAWN.value
+            elif system == OS.MAC.value: fallback_context = OS.SPAWN.value
+            else: fallback_context = OS.FORK.value
+            try:
+                ctx = multiprocessing.get_context(fallback_context)
+            except ValueError:
+                pool = multiprocessing.Pool(processes=core_cnt, maxtasksperchild=maxtasksperchild)
+                return pool
+        pool = ctx.Pool(processes=core_cnt, maxtasksperchild=maxtasksperchild)
+    else:
+        pool = multiprocessing.Pool(processes=core_cnt, maxtasksperchild=maxtasksperchild)
+    return pool
+
+
+#get_cpu_pool()
 # run_user_defined_feature_extraction_class(config_path='/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/project_config.ini', file_path='/Users/simon/Desktop/fish_feature_extractor_2023_version_5.py')
 
 

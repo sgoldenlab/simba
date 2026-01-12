@@ -127,6 +127,7 @@ class OS(Enum):
     LINUX = "Linux"
     MAC = "Darwin"
     SPAWN = 'spawn'
+    FORK = 'fork'
     PYTHON_VER = str(f"{sys.version_info.major}.{sys.version_info.minor}")
     try:
         SIMBA_VERSION = pkg_resources.get_distribution("simba-uw-tf-dev").version
