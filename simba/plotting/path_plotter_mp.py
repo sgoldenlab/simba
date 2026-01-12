@@ -1,7 +1,6 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import functools
-import multiprocessing
 import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Union
@@ -19,17 +18,11 @@ from simba.utils.checks import (
     check_that_hhmmss_start_is_before_end, check_valid_boolean,
     check_valid_dataframe, check_valid_lst,
     check_video_and_data_frm_count_align)
-from simba.utils.data import (find_frame_numbers_from_time_stamp,
-                              slice_roi_dict_for_video, terminate_cpu_pool)
+from simba.utils.data import (find_frame_numbers_from_time_stamp, slice_roi_dict_for_video, terminate_cpu_pool, get_cpu_pool)
 from simba.utils.enums import Formats, TagNames
-from simba.utils.errors import (FrameRangeError, InvalidInputError,
-                                InvalidVideoFileError, NoSpecifiedOutputError)
+from simba.utils.errors import (FrameRangeError, InvalidInputError, InvalidVideoFileError, NoSpecifiedOutputError)
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    create_directory, find_core_cnt,
-                                    find_video_of_file, get_fn_ext,
-                                    get_video_meta_data, read_df,
-                                    read_frm_of_video, remove_a_folder)
+from simba.utils.read_write import (concatenate_videos_in_folder, create_directory, find_core_cnt, find_video_of_file, get_fn_ext, read_df, read_frm_of_video, get_current_time)
 from simba.utils.warnings import ROIWarning
 
 STYLE_WIDTH = "width"
@@ -251,10 +244,13 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
                 video_styles[STYLE_BG] = video_path
         return video_styles
 
-
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
         print(f"Processing path plots for {len(self.data_paths)} video(s)...")
+        if self.video_setting or self.frame_setting:
+            self.pool = get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__, )
+        else:
+            self.pool = None
         for file_cnt, file_path in enumerate(self.data_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(file_path)
@@ -332,24 +328,22 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
                 frm_id_range = np.array_split(frm_numbers, self.core_cnt)
                 frm_range = [(cnt, x, y) for cnt, (x, y) in enumerate(zip(frm_cnt_range, frm_id_range))]
                 print(f"Creating path plots, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
-                with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
-                    constants = functools.partial(path_plot_mp,
-                                                  line_data=line_data,
-                                                  colors=self.colors,
-                                                  video_setting=self.video_setting,
-                                                  video_name=self.video_name,
-                                                  frame_setting=self.frame_setting,
-                                                  video_save_dir=self.video_temp_dir,
-                                                  frame_folder_dir=self.save_frm_dir,
-                                                  style_attr=video_styles,
-                                                  clf_attr=clf_attr,
-                                                  animal_names=self.animal_names,
-                                                  fps=self.fps,
-                                                  roi=video_rois,
-                                                  verbose=self.verbose)
-                    for cnt, result in enumerate(pool.imap(constants, frm_range, chunksize=self.multiprocess_chunksize)):
-                        print(f"Path batch {result+1}/{self.core_cnt} complete...")
-                terminate_cpu_pool(pool=pool, force=False)
+                constants = functools.partial(path_plot_mp,
+                                              line_data=line_data,
+                                              colors=self.colors,
+                                              video_setting=self.video_setting,
+                                              video_name=self.video_name,
+                                              frame_setting=self.frame_setting,
+                                              video_save_dir=self.video_temp_dir,
+                                              frame_folder_dir=self.save_frm_dir,
+                                              style_attr=video_styles,
+                                              clf_attr=clf_attr,
+                                              animal_names=self.animal_names,
+                                              fps=self.fps,
+                                              roi=video_rois,
+                                              verbose=self.verbose)
+                for cnt, result in enumerate(self.pool.imap(constants, frm_range, chunksize=self.multiprocess_chunksize)):
+                    print(f"[{get_current_time()}] Path batch {result+1}/{self.core_cnt} complete...")
                 if self.video_setting:
                     print(f"Joining {self.video_name} multi-processed video...")
                     print(self.video_temp_dir, self.video_save_path)
@@ -358,6 +352,7 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
                 print(f"Path plot video {self.video_name} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
 
         self.timer.stop_timer()
+        if self.pool is not None: terminate_cpu_pool(pool=self.pool, force=False, source=self.__class__.__name__)
         stdout_success(msg=f"Path plot visualizations for {len(self.data_paths)} video(s) created in {self.path_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 

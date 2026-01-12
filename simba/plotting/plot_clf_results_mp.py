@@ -21,7 +21,7 @@ from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
                                 check_valid_boolean,
                                 check_video_and_data_frm_count_align)
 from simba.utils.data import (create_color_palette, detect_bouts,
-                              terminate_cpu_pool)
+                              terminate_cpu_pool, get_cpu_pool)
 from simba.utils.enums import ConfigKey, Dtypes, Options, TagNames, TextOptions
 from simba.utils.errors import (InvalidInputError, NoDataError,
                                 NoSpecifiedOutputError)
@@ -148,7 +148,7 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                 frame_save_name = os.path.join(frame_save_dir, f"{current_frm}.png")
                 cv2.imwrite(frame_save_name, img)
             current_frm += 1
-            if verbose: print(f"Multi-processing video frame {current_frm} on core {batch}...")
+            if verbose: print(f"[{get_current_time()}] Multi-processing video frame {current_frm}/{video_meta_data['frame_count']} (core batch: {batch}, video name: {video_meta_data['video_name']})...")
         else:
             FrameRangeWarning(msg=f'Could not read frame {current_frm} in video {video_path}. Stopping video creation.')
             break
@@ -309,10 +309,11 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
 
     def run(self):
         if self.verbose: print(f'Creating {len(self.video_paths)} classification visualization(s) using {self.core_cnt} cores... ({get_current_time()})')
+        self.pool = get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__, )
         for video_cnt, video_path in enumerate(self.video_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(video_path)
-            if self.verbose: print(f"Creating classification visualization for video {self.video_name}... ({get_current_time()})")
+            if self.verbose: print(f"[{get_current_time()}] Creating classification visualization for video {self.video_name}...")
             self.data_path = os.path.join(self.machine_results_dir, f'{self.video_name}.{self.file_type}')
             self.data_df = read_df(self.data_path, self.file_type).reset_index(drop=True).fillna(0)
             if self.show_pose: check_that_column_exist(df=self.data_df, column_name=self.bp_col_names, file_name=self.data_path)
@@ -351,47 +352,46 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             data = np.array_split(self.data_df, self.core_cnt)
             data = [(cnt, x) for (cnt, x) in enumerate(data)]
 
-            with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
-                constants = functools.partial(_multiprocess_sklearn_video,
-                                              bp_dict=self.animal_bp_dict,
-                                              video_save_dir=self.video_temp_dir,
-                                              frame_save_dir=self.video_frame_dir,
-                                              clf_cumsum=self.clf_cumsums,
-                                              rotate=self.rotate,
-                                              video_path=video_path,
-                                              clf_confidence=self.clf_p,
-                                              print_timers=self.print_timers,
-                                              video_setting=self.video_setting,
-                                              frame_setting=self.frame_setting,
-                                              pose_threshold=self.pose_threshold,
-                                              show_pose=self.show_pose,
-                                              show_animal_names=self.animal_names,
-                                              circle_size=self.video_circle_size,
-                                              font_size=self.video_font_size,
-                                              space_size=self.video_space_size,
-                                              text_thickness=self.video_text_thickness,
-                                              text_opacity=self.video_text_opacity,
-                                              text_bg_clr=self.text_bg_color,
-                                              text_color=self.text_color,
-                                              pose_clr_lst=self.clr_lst,
-                                              show_bbox=self.show_bbox,
-                                              show_gantt=self.show_gantt,
-                                              bouts_df=self.bouts_df,
-                                              final_gantt=self.final_gantt_img,
-                                              gantt_clrs=self.gantt_clrs,
-                                              clf_names=self.clf_names,
-                                              verbose=self.verbose)
+            constants = functools.partial(_multiprocess_sklearn_video,
+                                          bp_dict=self.animal_bp_dict,
+                                          video_save_dir=self.video_temp_dir,
+                                          frame_save_dir=self.video_frame_dir,
+                                          clf_cumsum=self.clf_cumsums,
+                                          rotate=self.rotate,
+                                          video_path=video_path,
+                                          clf_confidence=self.clf_p,
+                                          print_timers=self.print_timers,
+                                          video_setting=self.video_setting,
+                                          frame_setting=self.frame_setting,
+                                          pose_threshold=self.pose_threshold,
+                                          show_pose=self.show_pose,
+                                          show_animal_names=self.animal_names,
+                                          circle_size=self.video_circle_size,
+                                          font_size=self.video_font_size,
+                                          space_size=self.video_space_size,
+                                          text_thickness=self.video_text_thickness,
+                                          text_opacity=self.video_text_opacity,
+                                          text_bg_clr=self.text_bg_color,
+                                          text_color=self.text_color,
+                                          pose_clr_lst=self.clr_lst,
+                                          show_bbox=self.show_bbox,
+                                          show_gantt=self.show_gantt,
+                                          bouts_df=self.bouts_df,
+                                          final_gantt=self.final_gantt_img,
+                                          gantt_clrs=self.gantt_clrs,
+                                          clf_names=self.clf_names,
+                                          verbose=self.verbose)
 
-                for cnt, result in enumerate(pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
-                    if self.verbose: print(f"Image batch {result} complete, Video {(video_cnt + 1)}/{len(self.video_paths)}...")
+            for cnt, result in enumerate(self.pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
+                if self.verbose: print(f"[{get_current_time()}] Image batch {result} complete, Video {(video_cnt + 1)}/{len(self.video_paths)}...")
 
             if self.video_setting:
                 if self.verbose: print(f"Joining {self.video_name} multiprocessed video...")
                 concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.video_save_path, gpu=self.gpu, verbose=self.verbose)
                 video_timer.stop_timer()
-                terminate_cpu_pool(pool=pool, force=False)
                 print(f"Video {self.video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)...")
 
+        terminate_cpu_pool(pool=self.pool, force=False)
         self.timer.stop_timer()
         if self.video_setting:
             stdout_success(msg=f"{len(self.video_paths)} video(s) saved in {self.sklearn_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
@@ -407,6 +407,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
 #                                                 video_paths=None,
 #                                                 print_timers=True,
 #                                                 rotate=False,
+#                                                 core_cnt=21,
 #                                                 animal_names=False,
 #                                                 show_bbox=True,
 #                                                 show_gantt=None)
