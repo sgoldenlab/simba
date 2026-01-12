@@ -29,7 +29,6 @@ import multiprocessing
 
 from joblib import Parallel, delayed
 
-from simba.utils.lookups import get_current_time
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_df_field_is_boolean,
                                 check_if_dir_exists,
@@ -46,6 +45,7 @@ from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,
                                 NoFilesFoundError, NoROIDataError,
                                 SimBAModuleNotFoundError)
+from simba.utils.lookups import get_current_time
 from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import (find_video_of_file, get_fn_ext,
                                     get_video_meta_data, read_config_entry,

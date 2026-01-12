@@ -16,7 +16,8 @@ from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_if_dir_exists, check_int,
     check_valid_boolean, check_valid_dataframe, check_valid_lst)
-from simba.utils.data import detect_bouts, slice_roi_dict_for_video, terminate_cpu_pool
+from simba.utils.data import (detect_bouts, slice_roi_dict_for_video,
+                              terminate_cpu_pool)
 from simba.utils.enums import ROI_SETTINGS, Keys
 from simba.utils.errors import InvalidInputError, NoROIDataError
 from simba.utils.lookups import get_current_time

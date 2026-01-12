@@ -20,7 +20,10 @@ from simba.utils.enums import Defaults, Formats
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import get_color_dict
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, find_video_of_file, get_fn_ext, get_video_meta_data, remove_a_folder)
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt, find_video_of_file,
+                                    get_fn_ext, get_video_meta_data,
+                                    remove_a_folder)
 from simba.utils.warnings import FrameRangeWarning
 
 ACCEPTED_TYPES = [Polygon, LineString, MultiPolygon, MultiLineString, Point]

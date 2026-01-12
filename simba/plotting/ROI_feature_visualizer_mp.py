@@ -26,7 +26,7 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_video_and_data_frm_count_align)
 from simba.utils.data import slice_roi_dict_for_video, terminate_cpu_pool
 from simba.utils.enums import Formats, TextOptions
-from simba.utils.errors import (BodypartColumnNotFoundError, NoFilesFoundError)
+from simba.utils.errors import BodypartColumnNotFoundError, NoFilesFoundError
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_fn_ext,
