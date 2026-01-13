@@ -13,10 +13,10 @@ from simba.data_processors.pybursts_calculator import kleinberg_burst_detection
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import (check_float, check_if_dir_exists,
                                 check_if_filepath_list_is_empty, check_int,
-                                check_that_column_exist, check_valid_lst)
+                                check_that_column_exist, check_valid_lst, check_valid_boolean)
 from simba.utils.enums import Paths, TagNames
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import get_fn_ext, read_df, write_df
+from simba.utils.read_write import get_fn_ext, read_df, write_df, get_current_time, find_files_of_filetypes_in_directory, remove_a_folder, copy_files_to_directory
 from simba.utils.warnings import KleinbergWarning
 
 
@@ -38,12 +38,13 @@ class KleinbergCalculator(ConfigReader):
 
     :param str config_path: path to SimBA project config file in Configparser format
     :param List[str] classifier_names: Classifier names to apply Kleinberg smoothing to.
-    :param float sigma: Burst detection sigma value. Higher sigma values and fewer, longer, behavioural bursts will be recognised. Default: 2.
-    :param float gamma: Burst detection gamma value. Higher gamma values and fewer behavioural bursts will be recognised. Default: 0.3.
-    :param int hierarchy: Burst detection hierarchy level. Higher hierarchy values and fewer behavioural bursts will to be recognised. Default: 1.
-    :param bool hierarchical_search: See `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/kleinberg_filter.md#hierarchical-search-example>`_ Default: False.
+    :param float sigma: State transition cost for moving to higher burst levels. Higher values (e.g., 2-3) produce fewer but longer bursts; lower values (e.g., 1.1-1.5) detect more frequent, shorter bursts. Must be > 1.01. Default: 2.
+    :param float gamma: State transition cost for moving to lower burst levels. Higher values (e.g., 0.5-1.0) reduce total burst count by making downward transitions costly; lower values (e.g., 0.1-0.3) allow more flexible state changes. Must be >= 0. Default: 0.3.
+    :param int hierarchy: Hierarchy level to extract bursts from (0=lowest, higher=more selective). Level 0 captures all bursts; level 1-2 typically filters noise; level 3+ selects only the most prominent, sustained bursts. Higher levels yield fewer but more confident detections. Must be >= 0. Default: 1.
+    :param bool hierarchical_search: If True, searches for target hierarchy level within detected burst periods, falling back to lower levels if target not found. If False, extracts only bursts at the exact specified hierarchy level. Recommended when target hierarchy may be sparse. Default: False.
     :param Optional[Union[str, os.PathLike]] input_dir: The directory with files to perform kleinberg smoothing on. If None, defaults to `project_folder/csv/machine_results`
     :param Optional[Union[str, os.PathLike]] output_dir: Location to save smoothened data in. If None, defaults to `project_folder/csv/machine_results`
+    :param Optional[bool] save_originals: If True, saves the original data in sub-directory of the ouput directory.`
 
     :example I:
     >>> kleinberg_calculator = KleinbergCalculator(config_path='MySimBAConfigPath', classifier_names=['Attack'], sigma=2, gamma=0.3, hierarchy=2, hierarchical_search=False)
@@ -68,10 +69,12 @@ class KleinbergCalculator(ConfigReader):
 
     def __init__(self,
                  config_path: Union[str, os.PathLike],
-                 classifier_names: List[str],
-                 sigma: Optional[int] = 2,
-                 gamma: Optional[float] = 0.3,
+                 classifier_names: Optional[List[str]] = None,
+                 sigma: float = 2,
+                 gamma: float = 0.3,
                  hierarchy: Optional[int] = 1,
+                 verbose: bool = True,
+                 save_originals: bool = True,
                  hierarchical_search: Optional[bool] = False,
                  input_dir: Optional[Union[str, os.PathLike]] = None,
                  output_dir: Optional[Union[str, os.PathLike]] = None):
@@ -81,25 +84,31 @@ class KleinbergCalculator(ConfigReader):
         check_float(value=sigma, name=f'{self.__class__.__name__} sigma', min_value=1.01)
         check_float(value=gamma, name=f'{self.__class__.__name__} gamma', min_value=0)
         check_int(value=hierarchy, name=f'{self.__class__.__name__} hierarchy', min_value=0)
-        check_valid_lst(data=classifier_names, source=f'{self.__class__.__name__} classifier_names', valid_dtypes=(str,), min_len=1)
+        if isinstance(classifier_names, list):
+            check_valid_lst(data=classifier_names, source=f'{self.__class__.__name__} classifier_names', valid_dtypes=(str,), min_len=1)
+        else:
+            classifier_names = deepcopy(self.clf_names)
+        check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose', raise_error=True)
+        check_valid_boolean(value=save_originals, source=f'{self.__class__.__name__} save_originals', raise_error=True)
         self.hierarchical_search, sigma, gamma, hierarchy, self.output_dir = (hierarchical_search, float(sigma), float(gamma), int(hierarchy), output_dir)
-        self.sigma, self.gamma, self.hierarchy, self.clfs = ( float(sigma), float(gamma), float(hierarchy), classifier_names)
+        self.sigma, self.gamma, self.hierarchy, self.clfs = ( float(sigma), float(gamma), int(hierarchy), classifier_names)
+        self.verbose, self.save_originals = verbose, save_originals
         if input_dir is None:
-            self.data_paths, self.output_dir = self.machine_results_paths, self.machine_results_dir
-            check_if_filepath_list_is_empty(filepaths=self.machine_results_paths, error_msg=f"SIMBA ERROR: No data files found in {self.machine_results_dir}. Cannot perform Kleinberg smoothing")
-            original_data_files_folder = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value, f"Pre_Kleinberg_{self.datetime}")
-            if not os.path.exists(original_data_files_folder):
-                os.makedirs(original_data_files_folder)
-            for file_path in self.machine_results_paths:
-                _, file_name, ext = get_fn_ext(file_path)
-                shutil.copyfile(file_path, os.path.join(original_data_files_folder, file_name + ext))
+            self.input_dir = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
         else:
             check_if_dir_exists(in_dir=input_dir)
-            self.data_paths = glob.glob(input_dir + f"/*.{self.file_type}")
-            check_if_filepath_list_is_empty(filepaths=self.data_paths, error_msg=f"SIMBA ERROR: No data files found in {input_dir}. Cannot perform Kleinberg smoothing")
-            if not os.path.isdir(output_dir):
-                os.makedirs(output_dir)
-        print(f"Processing Kleinberg burst detection for {len(self.data_paths)} file(s) and {len(classifier_names)} classifier(s)...")
+            self.input_dir = deepcopy(input_dir)
+        self.data_paths = find_files_of_filetypes_in_directory(directory=self.input_dir, extensions=[f'.{self.file_type}'], sort_alphabetically=True, raise_error=True)
+        if output_dir is None:
+            self.output_dir = deepcopy(self.input_dir)
+        else:
+            check_if_dir_exists(in_dir=output_dir)
+            self.output_dir = deepcopy(output_dir)
+        self.original_data_files_folder = os.path.join(self.output_dir, f"Pre_Kleinberg_{self.datetime}")
+        remove_a_folder(folder_dir=self.original_data_files_folder, ignore_errors=True)
+        os.makedirs(self.original_data_files_folder)
+        copy_files_to_directory(file_paths=self.data_paths, dir=self.original_data_files_folder, verbose=False, integer_save_names=False)
+        if self.verbose: print(f"Processing Kleinberg burst detection for {len(self.data_paths)} file(s) and {len(classifier_names)} classifier(s)...")
 
     def hierarchical_searcher(self):
         if (len(self.kleinberg_bouts["Hierarchy"]) == 1) and (int(self.kleinberg_bouts.at[0, "Hierarchy"]) == 0):
@@ -135,7 +144,7 @@ class KleinbergCalculator(ConfigReader):
         for file_cnt, file_path in enumerate(self.data_paths):
             _, video_name, _ = get_fn_ext(file_path)
             video_timer = SimbaTimer(start=True)
-            print(f"Performing Kleinberg burst detection for video {video_name}  (Video {file_cnt+1}/{len(self.data_paths)})...")
+            if self.verbose: print(f"[{get_current_time()}] Performing Kleinberg burst detection for video {video_name} (Video {file_cnt+1}/{len(self.data_paths)})...")
             data_df = read_df(file_path, self.file_type).reset_index(drop=True)
             video_out_df = deepcopy(data_df)
             check_that_column_exist(df=data_df, column_name=self.clfs, file_name=video_name)
@@ -150,7 +159,7 @@ class KleinbergCalculator(ConfigReader):
                     self.kleinberg_bouts.insert(loc=0, column="Video", value=video_name)
                     detailed_df_lst.append(self.kleinberg_bouts)
                     if self.hierarchical_search:
-                        print(f"Applying hierarchical search for video {video_name}...")
+                        if self.verbose: print(f"[{get_current_time()}] Applying hierarchical search for video {video_name}...")
                         self.hierarchical_searcher()
                     else:
                         self.clf_bouts_in_hierarchy = self.kleinberg_bouts[self.kleinberg_bouts["Hierarchy"] == self.hierarchy]
@@ -160,17 +169,36 @@ class KleinbergCalculator(ConfigReader):
                     video_out_df.loc[hierarchy_idx, clf] = 1
             write_df(video_out_df, self.file_type, save_path)
             video_timer.stop_timer()
-            print(f'Kleinberg analysis complete for video {video_name} (saved at {save_path}), elapsed time: {video_timer.elapsed_time_str}s.')
+            if self.verbose: print(f'[{get_current_time()}] Kleinberg analysis complete for video {video_name} (saved at {save_path}), elapsed time: {video_timer.elapsed_time_str}s.')
 
         self.timer.stop_timer()
+        if not self.save_originals:
+            remove_a_folder(folder_dir=self.original_data_files_folder, ignore_errors=False)
+        else:
+            if self.verbose: stdout_success(msg=f"Original, un-smoothened data, saved in {self.original_data_files_folder} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
         if len(detailed_df_lst) > 0:
             self.detailed_df = pd.concat(detailed_df_lst, axis=0)
             detailed_save_path = os.path.join(self.logs_path, f"Kleinberg_detailed_log_{self.datetime}.csv")
             self.detailed_df.to_csv(detailed_save_path)
-            stdout_success(msg=f"Kleinberg analysis complete. See {detailed_save_path} for details of detected bouts of all classifiers in all hierarchies", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+            if self.verbose:  stdout_success(msg=f"Kleinberg analysis complete for {len(self.data_paths)} files. Results stored in {self.output_dir} directory. See {detailed_save_path} for details of detected bouts of all classifiers in all hierarchies", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
         else:
-            print("Kleinberg analysis complete.")
+            if self.verbose: print(f"[{get_current_time()}] Kleinberg analysis complete for {len(self.data_paths)} files. Results stored in {self.output_dir} directory.")
             KleinbergWarning(msg="All behavior bouts removed following kleinberg smoothing", source=self.__class__.__name__)
+
+
+
+
+# test = KleinbergCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                            classifier_names=['straub_tail'],
+#                            sigma=1.1,
+#                            gamma=0.1,
+#                            hierarchy=1,
+#                            save_originals=False,
+#                            hierarchical_search=False)
+#
+# test.run()
+#
+
 
 
 # test = KleinbergCalculator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/levi/project_folder/project_config.ini',

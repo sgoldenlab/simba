@@ -229,6 +229,7 @@ class Entry_Box(Frame):
                  value: Optional[Any] = None,
                  label_font: tuple = Formats.FONT_REGULAR.value,
                  entry_font: tuple = Formats.FONT_REGULAR.value,
+                 tooltip_key: Optional[str] = None,
                  justify: Literal["left", "center", "right"] = 'left',
                  cmd: Optional[Callable] = None,
                  **kw):
@@ -249,6 +250,8 @@ class Entry_Box(Frame):
         self.filePath = StringVar()
         self.lblName = Label(self, text=fileDescription, width=labelwidth, anchor=W, font=label_font, bg=label_bg_clr)
         self.lblName.grid(row=0, column=1)
+        if tooltip_key in TOOLTIPS.keys():
+            CreateToolTip(widget=self.lblName, text=TOOLTIPS[tooltip_key])
         if not entry_box_width:
             self.entPath = Entry(self, textvariable=self.filePath, state=self.status,  validate="key", validatecommand=self.validation_methods.get(validation, None), font=entry_font, justify=justify, bg=entry_box_clr)
         else:

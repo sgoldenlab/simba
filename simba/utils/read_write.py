@@ -560,7 +560,11 @@ def get_video_info_ffmpeg(video_path: Union[str, os.PathLike]) -> Dict[str, Any]
 
 def remove_a_folder(folder_dir: Union[str, os.PathLike], ignore_errors: Optional[bool] = True) -> None:
     """Helper to remove a directory"""
-    check_if_dir_exists(in_dir=folder_dir, source=remove_a_folder.__name__)
+    valid_dir = check_if_dir_exists(in_dir=folder_dir, source=remove_a_folder.__name__, raise_error=False)
+    if not valid_dir and not ignore_errors:
+        raise NotDirectoryError(msg=f'Cannot delete directory {folder_dir}: The directory does not exist', source=remove_a_folder.__name__)
+    if not valid_dir and ignore_errors:
+        return
     try:
         shutil.rmtree(folder_dir, ignore_errors=ignore_errors)
     except Exception as e:
