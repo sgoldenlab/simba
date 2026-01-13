@@ -20,8 +20,8 @@ from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
                                 check_str, check_that_column_exist,
                                 check_valid_boolean,
                                 check_video_and_data_frm_count_align)
-from simba.utils.data import (create_color_palette, detect_bouts,
-                              terminate_cpu_pool, get_cpu_pool)
+from simba.utils.data import (create_color_palette, detect_bouts, get_cpu_pool,
+                              terminate_cpu_pool)
 from simba.utils.enums import ConfigKey, Dtypes, Options, TagNames, TextOptions
 from simba.utils.errors import (InvalidInputError, NoDataError,
                                 NoSpecifiedOutputError)
