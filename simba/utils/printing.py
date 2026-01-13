@@ -5,11 +5,10 @@ try:
 except:
     from typing_extensions import Literal
 
-
 import logging
 import time
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
 from simba.utils.enums import Defaults, TagNames
 
