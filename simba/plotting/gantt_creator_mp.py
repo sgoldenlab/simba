@@ -4,17 +4,18 @@ import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 import functools
+import gc
 import multiprocessing
 import os
 import platform
-from typing import List, Optional, Union
 from copy import deepcopy
+from typing import List, Optional, Union
 
-import gc
 import cv2
+import matplotlib
 import numpy as np
 import pandas as pd
-import matplotlib
+
 matplotlib.use('Agg')
 
 from simba.mixins.config_reader import ConfigReader
@@ -23,13 +24,14 @@ from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_int, check_str,
     check_that_column_exist, check_valid_boolean, check_valid_lst)
-from simba.utils.data import (create_color_palette, detect_bouts, terminate_cpu_pool, get_cpu_pool)
+from simba.utils.data import (create_color_palette, detect_bouts, get_cpu_pool,
+                              terminate_cpu_pool)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
-                                    get_fn_ext, read_df, get_current_time)
+                                    get_current_time, get_fn_ext, read_df)
 
 HEIGHT = "height"
 WIDTH = "width"

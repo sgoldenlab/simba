@@ -13,10 +13,11 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
                                 check_valid_boolean, check_valid_dataframe)
-from simba.utils.data import terminate_cpu_pool, get_cpu_pool
+from simba.utils.data import get_cpu_pool, terminate_cpu_pool
 from simba.utils.enums import Defaults, Formats
 from simba.utils.errors import InvalidFilepathError, NoFilesFoundError
-from simba.utils.lookups import get_random_color_palette, intermittent_palette, get_current_time
+from simba.utils.lookups import (get_current_time, get_random_color_palette,
+                                 intermittent_palette)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory,
