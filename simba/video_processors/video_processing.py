@@ -3857,6 +3857,18 @@ def create_average_frm(video_path: Union[str, os.PathLike],
     """
     Create an image representing the average frame of a segment in a video or an entire video.
 
+    .. seealso::
+       See :func:`simba.data_processors.cuda.image.create_average_frm_cupy`, :func:`simba.data_processors.cuda.image.create_average_frm_cuda` for GPU acceleration.
+       This one appears quicker than the GPU implementations...
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../docs/tables/create_average_frame.csv
+       :widths: 10, 45, 45
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
     .. video:: _static/img/create_average_frm_1.webm
        :width: 800
        :autoplay:
@@ -3881,10 +3893,6 @@ def create_average_frm(video_path: Union[str, os.PathLike],
        Useful helper for e.g., video background subtraction ``simba.video_processors.video_processing.video_bg_substraction()``
        Either pass ``start_frm`` and ``end_frm`` OR ``start_time`` and ``end_time`` OR pass all four arguments as None.
        If all are None, then the entire video will be used to create the average frame.
-
-    .. seealso:
-       See :func:`simba.data_processors.cuda.image.create_average_frm_cupy`, :func:`simba.data_processors.cuda.image.create_average_frm_cuda` for GPU acceleration.
-       This one appears quicker than the GPU implementations...
 
     :param Union[str, os.PathLike] video_path: The path to the video to create the average frame from. Default: None.
     :param Optional[int] start_frm: The first frame in the segment to create the average frame from. Default: None.
@@ -5156,6 +5164,10 @@ def change_playback_speed_dir(data_dir: Union[str, os.PathLike],
         stdout_success(msg=f'Changed video speed for {total_video_cnt} video(s) ({speed}x). Videos saved in {save_dir}.', elapsed_time=timer.elapsed_time_str, source=change_playback_speed_dir.__name__)
 
 
+
+
+
+#x = create_average_frm(video_path=r"D:\troubleshooting\mitra\project_folder\videos\average_cpu_test\20min.mp4", verbose=True)
 
 
 #change_playback_speed_dir(data_dir=r'E:\open_video\barnes_maze\test', speed=5)

@@ -9,6 +9,7 @@ except:
 import logging
 import time
 from typing import Optional
+from datetime import datetime
 
 from simba.utils.enums import Defaults, TagNames
 
@@ -25,9 +26,9 @@ def stdout_success(msg: str, source: Optional[str] = "", elapsed_time: Optional[
 
     log_event(logger_name=f"{source}.{stdout_success.__name__}", log_type=TagNames.COMPLETE.value, msg=msg)
     if elapsed_time:
-        print(f"SIMBA COMPLETE: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.COMPLETE.value}")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] SIMBA COMPLETE: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.COMPLETE.value}")
     else:
-        print(f"SIMBA COMPLETE: {msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.COMPLETE.value}")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] SIMBA COMPLETE: {msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.COMPLETE.value}")
 
 
 def stdout_warning(msg: str, elapsed_time: Optional[str] = None) -> None:
@@ -41,9 +42,9 @@ def stdout_warning(msg: str, elapsed_time: Optional[str] = None) -> None:
     """
 
     if elapsed_time:
-        print(f"SIMBA WARNING: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.WARNING.value}")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] SIMBA WARNING: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.WARNING.value}")
     else:
-        print(f"SIMBA WARNING: {msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.WARNING.value}")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] SIMBA WARNING: {msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.WARNING.value}")
 
 
 def stdout_trash(msg: str, source: Optional[str] = "", elapsed_time: Optional[str] = None) -> None:
@@ -58,9 +59,9 @@ def stdout_trash(msg: str, source: Optional[str] = "", elapsed_time: Optional[st
 
     log_event(logger_name=f"{source}.{stdout_trash.__name__}", log_type=TagNames.TRASH.value, msg=msg)
     if elapsed_time:
-        print(f"SIMBA COMPLETE: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.TRASH.value}")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] SIMBA COMPLETE: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.TRASH.value}")
     else:
-        print(f"SIMBA COMPLETE: {msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.TRASH.value}")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] SIMBA COMPLETE: {msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.TRASH.value}")
 
 
 def stdout_information(msg: str, source: Optional[str] = "", elapsed_time: Optional[str] = None) -> None:
@@ -75,9 +76,9 @@ def stdout_information(msg: str, source: Optional[str] = "", elapsed_time: Optio
 
     log_event(logger_name=f"{source}.{stdout_trash.__name__}", log_type=TagNames.INFORMATION.value, msg=msg)
     if elapsed_time:
-        print(f"SIMBA COMPLETE: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.INFORMATION.value}")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] SIMBA COMPLETE: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.INFORMATION.value}")
     else:
-        print(f"{msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.INFORMATION.value}")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.INFORMATION.value}")
 
 
 class SimbaTimer(object):

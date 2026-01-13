@@ -24,7 +24,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_boolean, check_valid_lst,
                                 check_video_and_data_frm_count_align)
 from simba.utils.data import (create_color_palettes, detect_bouts,
-                              slice_roi_dict_for_video, terminate_cpu_pool)
+                              slice_roi_dict_for_video, terminate_cpu_pool, get_cpu_pool)
 from simba.utils.enums import ROI_SETTINGS, Formats, Keys, Paths, TextOptions
 from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError,
                                 NoFilesFoundError, NoROIDataError,
@@ -32,7 +32,7 @@ from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError,
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_video_meta_data,
-                                    read_df)
+                                    read_df, get_current_time)
 from simba.utils.warnings import (DuplicateNamesWarning, FrameRangeWarning,
                                   GPUToolsWarning)
 
@@ -117,7 +117,7 @@ def _roi_plotter_mp(data: Tuple[int, pd.DataFrame],
 
             writer.write(img)
             current_frm += 1
-            if verbose: print(f"Multi-processing video frame {current_frm} on core {group_cnt}...")
+            if verbose: print(f"[{get_current_time()}] Multi-processing video frame {current_frm}/{video_meta_data['frame_count']} (core batch: {group_cnt}, video: {video_meta_data['video_name']})...")
         else:
             FrameRangeWarning(msg=f'Could not read frame {current_frm} in video {video_meta_data["video_name"]}', source=_roi_plotter_mp.__name__)
             break
@@ -363,33 +363,33 @@ class ROIPlotMultiprocess(ConfigReader):
         del self.data_df
         del self.roi_analyzer.logger
         if self.verbose: print(f"Creating ROI images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
-        with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
-            constants = functools.partial(_roi_plotter_mp,
-                                          loc_dict=self.loc_dict,
-                                          font_size=self.font_size,
-                                          circle_sizes=self.circle_sizes,
-                                          save_temp_directory=self.temp_folder,
-                                          body_part_dict=self.bp_dict,
-                                          input_video_path=self.video_path,
-                                          roi_dfs_dict=self.sliced_roi_dict,
-                                          roi_dict = self.roi_dict_,
-                                          video_shape_names=self.shape_names,
-                                          bp_colors=self.color_lst,
-                                          show_animal_name=self.show_animal_name,
-                                          show_pose=self.show_pose,
-                                          animal_ids=self.animal_names,
-                                          threshold=self.threshold,
-                                          outside_roi=self.outside_roi,
-                                          verbose=self.verbose,
-                                          border_bg_clr=self.border_bg_clr,
-                                          animal_bp_dict=self.animal_bp_dict,
-                                          show_bbox=self.show_bbox)
+        self.pool = get_cpu_pool(core_cnt=self.core_cnt, maxtasksperchild=self.maxtasksperchild, source=self.__class__.__name__, verbose=True)
+        constants = functools.partial(_roi_plotter_mp,
+                                      loc_dict=self.loc_dict,
+                                      font_size=self.font_size,
+                                      circle_sizes=self.circle_sizes,
+                                      save_temp_directory=self.temp_folder,
+                                      body_part_dict=self.bp_dict,
+                                      input_video_path=self.video_path,
+                                      roi_dfs_dict=self.sliced_roi_dict,
+                                      roi_dict = self.roi_dict_,
+                                      video_shape_names=self.shape_names,
+                                      bp_colors=self.color_lst,
+                                      show_animal_name=self.show_animal_name,
+                                      show_pose=self.show_pose,
+                                      animal_ids=self.animal_names,
+                                      threshold=self.threshold,
+                                      outside_roi=self.outside_roi,
+                                      verbose=self.verbose,
+                                      border_bg_clr=self.border_bg_clr,
+                                      animal_bp_dict=self.animal_bp_dict,
+                                      show_bbox=self.show_bbox)
 
-            for cnt, batch_cnt in enumerate(pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
-                print(f'Image batch {batch_cnt+1} / {self.core_cnt} complete...')
+        for cnt, batch_cnt in enumerate(self.pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
+            print(f'Image batch {batch_cnt+1} / {self.core_cnt} complete...')
             print(f"Joining {self.video_name} multi-processed ROI video...")
-            concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_path, video_format="mp4", remove_splits=True, gpu=self.gpu)
-            terminate_cpu_pool(pool=pool, force=False)
+        concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_path, video_format="mp4", remove_splits=True, gpu=self.gpu)
+        terminate_cpu_pool(pool=self.pool, force=False, source=self.__class__.__name__)
         video_timer.stop_timer()
         stdout_success(msg=f"Video {self.video_name} created. ROI video saved at {self.save_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__, )
 

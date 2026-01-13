@@ -1843,11 +1843,12 @@ def terminate_cpu_pool(pool: multiprocessing.pool.Pool,
     if not check_valid_cpu_pool(value=pool, source=terminate_cpu_pool.__name__, raise_error=False):
         return
     try:
+        core_cnt = pool._processes if hasattr(pool, '_processes') else None
         if not force:
             pool.close()
             pool.join()
         pool.terminate()
-        if verbose: print(f'[{get_current_time()}] SimBA CPU pool {"" if source is None else source} terminated.')
+        if verbose: print(f'[{get_current_time()}] {"" if source is None else f"{core_cnt} core"} SimBA CPU pool {"" if source is None else source} terminated.')
     except (ValueError, AssertionError, AttributeError):
         pass
     gc.collect()
@@ -1883,7 +1884,7 @@ def get_cpu_pool(core_cnt: int = -1,
     current_process = multiprocessing.current_process()
     if current_process.name != 'MainProcess': core_cnt = 1
     core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
-    if verbose: print(f'[{get_current_time()}] SimBA CPU pool {"" if source is None else source} started.')
+    if verbose: print(f'[{get_current_time()}] {core_cnt} core SimBA CPU pool {"" if source is None else source} started.')
     if context is not None:
         check_str(name=f'{get_cpu_pool.__name__} context', value=context, options=('fork', 'spawn', 'forkserver'), raise_error=True)
     else:

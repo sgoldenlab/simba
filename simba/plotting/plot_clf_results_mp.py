@@ -400,18 +400,18 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
 
 
 
-# if __name__ == "__main__":
-#     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
-#                                                 video_setting=True,
-#                                                 frame_setting=False,
-#                                                 video_paths=None,
-#                                                 print_timers=True,
-#                                                 rotate=False,
-#                                                 core_cnt=21,
-#                                                 animal_names=False,
-#                                                 show_bbox=True,
-#                                                 show_gantt=None)
-#     clf_plotter.run()
+if __name__ == "__main__":
+    clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
+                                                video_setting=True,
+                                                frame_setting=False,
+                                                video_paths=None,
+                                                print_timers=True,
+                                                rotate=False,
+                                                core_cnt=21,
+                                                animal_names=False,
+                                                show_bbox=True,
+                                                show_gantt=None)
+    clf_plotter.run()
 
 
 

@@ -13,10 +13,10 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
                                 check_valid_boolean, check_valid_dataframe)
-from simba.utils.data import terminate_cpu_pool
+from simba.utils.data import terminate_cpu_pool, get_cpu_pool
 from simba.utils.enums import Defaults, Formats
 from simba.utils.errors import InvalidFilepathError, NoFilesFoundError
-from simba.utils.lookups import get_random_color_palette, intermittent_palette
+from simba.utils.lookups import get_random_color_palette, intermittent_palette, get_current_time
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory,
@@ -54,13 +54,12 @@ def _yolo_keypoint_track_visualizer(frm_ids: np.ndarray,
     video_save_path = os.path.join(save_dir, f'{batch_id}.mp4')
     video_writer = cv2.VideoWriter(video_save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]))
     while current_frm <= end_frm:
-        print(f'Processing frame {current_frm}/{video_meta_data["frame_count"]} (batch: {batch_id})...')
+        print(f'[{get_current_time()}] Processing frame {current_frm}/{video_meta_data["frame_count"]} (batch: {batch_id}, video name: {video_meta_data["video_name"]})...')
         img = read_frm_of_video(video_path=video_path, frame_index=current_frm, raise_error=False)
         if img is not None:
             frm_data = data.loc[data[FRAME] == current_frm]
             frm_data = frm_data[frm_data[CONFIDENCE] > threshold]
             for cnt, (row, row_data) in enumerate(frm_data.iterrows()):
-
                 clrs = np.array(palettes[int(row_data[TRACK])]).astype(np.int32)
                 bbox_cords = row_data[BOX_CORD_FIELDS].values.astype(np.int32).reshape(-1, 2)
                 kp_coords = row_data.drop(EXPECTED_COLS).values.astype(np.int32).reshape(-1, 3)[:, :-1]
@@ -160,7 +159,8 @@ class YOLOPoseTrackVisualizer():
         self.threshold, self.circle_size, self.thickness, self.show_bbox, self.overwrite = threshold, circle_size, thickness, bbox, overwrite
 
     def run(self):
-        self.pool, self.timer = multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value), SimbaTimer(start=True)
+        self.pool = get_cpu_pool(core_cnt=self.core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value, source=self.__class__.__name__)
+        self.timer = SimbaTimer(start=True)
         for video_cnt, (video_name, data_path) in enumerate(self.data_paths.items()):
             print(f'Visualizing YOLO pose tracks in video {video_name} ({video_cnt+1}/{len(self.data_paths.keys())}) ...')
             video_timer = SimbaTimer(start=True)
@@ -201,11 +201,11 @@ class YOLOPoseTrackVisualizer():
                                           palettes=video_palettes,
                                           show_bbox=self.show_bbox)
             for cnt, result in enumerate(self.pool.imap(constants, frm_batches, chunksize=1)):
-                print(f'Video batch {result+1}/{self.core_cnt} complete...')
+                print(f'[{get_current_time()}] Video batch {result+1}/{self.core_cnt} complete...')
             video_timer.stop_timer()
             concatenate_videos_in_folder(in_folder=video_temp_dir, save_path=save_path, gpu=True)
             stdout_success(msg=f'YOLO track pose video saved at {save_path}', source=self.__class__.__name__, elapsed_time=video_timer.elapsed_time_str)
-        terminate_cpu_pool(pool=self.pool, force=False)
+        terminate_cpu_pool(pool=self.pool, force=False, source=self.__class__.__name__)
         self.timer.stop_timer()
         stdout_success(msg=f'YOLO track pose video data for {len(self.data_paths.keys())} videos saved in {self.save_dir}', source=self.__class__.__name__,  elapsed_time=self.timer.elapsed_time_str)
 

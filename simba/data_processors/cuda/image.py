@@ -213,7 +213,6 @@ def _average_3d_stack_cuda(image_stack: np.ndarray) -> np.ndarray:
     return results
 
 
-
 def create_average_frm_cuda(video_path: Union[str, os.PathLike],
                             start_frm: Optional[int] = None,
                             end_frm: Optional[int] = None,
@@ -1511,6 +1510,9 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
     if verbose:
         stdout_success(msg=f'Pose-estimation video saved at {save_path}.', elapsed_time=total_timer.elapsed_time_str)
 
+
+
+#x = create_average_frm_cuda(video_path=r"D:\troubleshooting\mitra\project_folder\videos\average_cpu_test\20min.mp4", verbose=True, batch_size=500, async_frame_read=False)
 
 # VIDEO_PATH = "/mnt/d/troubleshooting/maplight_ri/project_folder/blob/videos/Trial_1_C24_D1_1.mp4"
 # #

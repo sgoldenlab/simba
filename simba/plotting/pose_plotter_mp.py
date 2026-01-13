@@ -12,17 +12,15 @@ import pandas as pd
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (check_instance, check_int,
-                                check_nvidea_gpu_available, check_str,
-                                check_that_column_exist, check_valid_boolean)
-from simba.utils.data import create_color_palette, terminate_cpu_pool
+from simba.utils.checks import (check_instance, check_int, check_nvidea_gpu_available, check_str, check_that_column_exist, check_valid_boolean)
+from simba.utils.data import create_color_palette, terminate_cpu_pool, get_cpu_pool
 from simba.utils.enums import OS, Formats, Options
 from simba.utils.errors import CountError, InvalidFilepathError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt,
                                     find_files_of_filetypes_in_directory,
-                                    get_fn_ext, get_video_meta_data, read_df)
+                                    get_fn_ext, get_video_meta_data, read_df, get_current_time)
 from simba.utils.warnings import FrameRangeWarning
 
 
@@ -59,7 +57,7 @@ def pose_plotter_mp(data: pd.DataFrame,
                     img = cv2.polylines(img, [animal_bbox], True, colors_dict[animal_cnt][0], thickness=max(1, int(circle_size/1.5)), lineType=-1)
             writer.write(img)
             current_frm += 1
-            print(f"Multi-processing video frame {current_frm} on core {group_cnt}...")
+            print(f"[{get_current_time()}] Multi-processing video frame {current_frm} on core {group_cnt}...")
         else:
             print(f'Frame {current_frm} not found in video {video_path}, terminating video creation...')
             break
@@ -109,9 +107,8 @@ class PosePlotterMultiProcess():
         else:
             files_found = [data_path]
         self.animal_bp_dict = self.config.body_parts_lst
-        if circle_size is not None:
-            check_int(name='circle_size', value=circle_size, min_value=1)
-        check_int(name='core_cnt', value=core_cnt, min_value=-1)
+        if circle_size is not None: check_int(name='circle_size', value=circle_size, min_value=1)
+        check_int(name='core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
         if core_cnt == -1: core_cnt = find_core_cnt()[0]
         self.color_dict = {}
         if palettes is not None:
@@ -145,12 +142,12 @@ class PosePlotterMultiProcess():
             multiprocessing.set_start_method("spawn", force=True)
 
     def run(self):
+        self.pool = get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__)
         for file_cnt, (pose_path, video_path) in enumerate(self.data.items()):
             video_timer = SimbaTimer(start=True)
             video_name = get_fn_ext(pose_path)[1]
             self.temp_folder = os.path.join(self.out_dir, video_name, "temp")
-            if os.path.exists(self.temp_folder):
-                self.config.remove_a_folder(self.temp_folder)
+            if os.path.exists(self.temp_folder): self.config.remove_a_folder(self.temp_folder)
             os.makedirs(self.temp_folder, exist_ok=True)
             save_video_path = os.path.join(self.out_dir, f"{video_name}.mp4")
             pose_df = read_df(file_path=pose_path, file_type=self.config.file_type, check_multiindex=True)
@@ -170,34 +167,33 @@ class PosePlotterMultiProcess():
             pose_df = (pose_df.apply(pd.to_numeric, errors="coerce").fillna(0).reset_index(drop=True))
             pose_lst, obs_per_split = PlottingMixin().split_and_group_df(df=pose_df, splits=self.core_cnt)
             print(f"Creating pose videos, multiprocessing (chunksize: {self.config.multiprocess_chunksize}, cores: {self.core_cnt})...")
-            with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.config.maxtasksperchild) as pool:
-                constants = functools.partial(pose_plotter_mp,
-                                              video_meta_data=video_meta_data,
-                                              video_path=video_path,
-                                              bp_dict=self.config.animal_bp_dict,
-                                              colors_dict=self.color_dict,
-                                              circle_size=video_circle_size,
-                                              bbox=self.bbox,
-                                              video_save_dir=self.temp_folder)
-                for cnt, result in enumerate(pool.imap(constants, pose_lst, chunksize=self.config.multiprocess_chunksize)):
-                    print(f"Image {min(len(pose_df), obs_per_split*(cnt+1))}/{len(pose_df)}, Video {file_cnt+1}/{len(list(self.data.keys()))}...")
-            terminate_cpu_pool(pool=pool, force=False)
+            constants = functools.partial(pose_plotter_mp,
+                                          video_meta_data=video_meta_data,
+                                          video_path=video_path,
+                                          bp_dict=self.config.animal_bp_dict,
+                                          colors_dict=self.color_dict,
+                                          circle_size=video_circle_size,
+                                          bbox=self.bbox,
+                                          video_save_dir=self.temp_folder)
+            for cnt, result in enumerate(self.pool.imap(constants, pose_lst, chunksize=self.config.multiprocess_chunksize)):
+                print(f"[{get_current_time()}] Image {min(len(pose_df), obs_per_split*(cnt+1))}/{len(pose_df)}, Video {file_cnt+1}/{len(list(self.data.keys()))}...")
             print(f"Joining {video_name} multi-processed video...")
             concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=save_video_path, remove_splits=True, gpu=self.gpu)
             video_timer.stop_timer()
             stdout_success(msg=f"Pose video {video_name} complete and saved at {save_video_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
+        terminate_cpu_pool(pool=self.pool, force=False, source=self.__class__.__name__)
         self.config.timer.stop_timer()
         stdout_success(f"Pose visualizations for {len(list(self.data.keys()))} video(s) created in {self.out_dir} directory", elapsed_time=self.config.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
-if __name__ == "__main__":
-    test = PosePlotterMultiProcess(data_path=r"C:\troubleshooting\mitra\project_folder\csv\input_csv\501_MA142_Gi_DCZ_0603.csv",
-                                   out_dir=None,
-                                   circle_size=8,
-                                   core_cnt=18,
-                                   palettes=None,
-                                   bbox=True,)
-    test.run()
+# if __name__ == "__main__":
+#     test = PosePlotterMultiProcess(data_path=r"C:\troubleshooting\mitra\project_folder\csv\input_csv",
+#                                    out_dir=None,
+#                                    circle_size=8,
+#                                    core_cnt=18,
+#                                    palettes=None,
+#                                    bbox=True,)
+#     test.run()
 
 
 

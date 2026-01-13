@@ -1,6 +1,5 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
-import time
 import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -9,10 +8,14 @@ import multiprocessing
 import os
 import platform
 from typing import List, Optional, Union
+from copy import deepcopy
 
+import gc
 import cv2
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
@@ -20,14 +23,13 @@ from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_int, check_str,
     check_that_column_exist, check_valid_boolean, check_valid_lst)
-from simba.utils.data import (create_color_palette, detect_bouts,
-                              terminate_cpu_pool)
+from simba.utils.data import (create_color_palette, detect_bouts, terminate_cpu_pool, get_cpu_pool)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
-                                    get_fn_ext, read_df)
+                                    get_fn_ext, read_df, get_current_time)
 
 HEIGHT = "height"
 WIDTH = "width"
@@ -79,11 +81,17 @@ def gantt_creator_mp(data: np.array,
             cv2.imwrite(frame_save_path, plot)
         if video_setting:
             video_writer.write(plot)
-        print(f"Gantt frame created: {current_frm + 1}, Video: {video_name}, Processing core: {batch_id + 1}")
+        # Clear memory after each frame
+        del plot
+        if current_frm % 100 == 0:  # Periodic garbage collection to prevent memory buildup
+            gc.collect()
+        print(f"[{get_current_time()}] Gantt frame created: {current_frm + 1}, Video: {video_name}, Processing core: {batch_id + 1}")
 
     if video_setting:
         video_writer.release()
+        del video_writer
 
+    gc.collect()
     return batch_id
 
 
@@ -121,7 +129,7 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
 
     def __init__(self,
                  config_path: Union[str, os.PathLike],
-                 data_paths: List[Union[str, os.PathLike]],
+                 data_paths: Optional[Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]]] = None,
                  frame_setting: Optional[bool] = False,
                  video_setting: Optional[bool] = False,
                  last_frm_setting: Optional[bool] = True,
@@ -130,14 +138,13 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
                  font_size: int = 8,
                  font_rotation: int = 45,
                  palette: str = 'Set1',
-                 core_cnt: Optional[int] = -1,
+                 core_cnt: int = -1,
                  hhmmss: bool = False):
 
         check_file_exist_and_readable(file_path=config_path)
         if (not frame_setting) and (not video_setting) and (not last_frm_setting):
             raise NoSpecifiedOutputError(msg="SIMBA ERROR: Please select gantt videos, frames, and/or last frame.", source=self.__class__.__name__)
         check_file_exist_and_readable(file_path=config_path)
-        check_valid_lst(data=data_paths, source=f'{self.__class__.__name__} data_paths', valid_dtypes=(str,), min_len=1)
         check_int(value=width, min_value=1, name=f'{self.__class__.__name__} width')
         check_int(value=height, min_value=1, name=f'{self.__class__.__name__} height')
         check_int(value=font_size, min_value=1, name=f'{self.__class__.__name__} font_size')
@@ -145,11 +152,18 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
         check_valid_boolean(value=hhmmss, source=f'{self.__class__.__name__} hhmmss', raise_error=False)
         palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
         check_str(name=f'{self.__class__.__name__} palette', value=palette, options=palettes)
-        for file_path in data_paths: check_file_exist_and_readable(file_path=file_path)
         check_int(name=f"{self.__class__.__name__} core_cnt",value=core_cnt, min_value=-1, unaccepted_vals=[0], max_value=find_core_cnt()[0])
         self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
         self.width, self.height, self.font_size, self.font_rotation, self.hhmmss = width, height, font_size, font_rotation, hhmmss
         ConfigReader.__init__(self, config_path=config_path, create_logger=False)
+        if isinstance(data_paths, list):
+            check_valid_lst(data=data_paths, source=f'{self.__class__.__name__} data_paths', valid_dtypes=(str,), min_len=1)
+        elif isinstance(data_paths, str):
+            check_file_exist_and_readable(file_path=data_paths)
+            data_paths = [data_paths]
+        else:
+            data_paths = deepcopy(self.machine_results_paths)
+        for file_path in data_paths: check_file_exist_and_readable(file_path=file_path)
         PlottingMixin.__init__(self)
         self.clr_lst = create_color_palette(pallete_name=palette, increments=len(self.body_parts_lst) + 1, as_int=True, as_rgb_ratio=True)
         self.frame_setting, self.video_setting, self.data_paths, self.last_frm_setting = frame_setting, video_setting,data_paths, last_frm_setting
@@ -160,6 +174,10 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
 
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
+        if self.video_setting or self.frame_setting:
+            self.pool = get_cpu_pool(core_cnt=self.core_cnt, maxtasksperchild=self.maxtasksperchild, verbose=True, source=self.__class__.__name__)
+        else:
+            self.pool = None
         for file_cnt, file_path in enumerate(self.data_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(file_path)
@@ -193,32 +211,31 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
             if self.video_setting or self.frame_setting:
                 frame_data = np.array_split(list(range(0, len(self.data_df))), self.core_cnt)
                 frame_data = [(i, x) for i, x in enumerate(frame_data)]
-                print(f"Creating gantt, multiprocessing (chunksize: {(self.multiprocess_chunksize)}, cores: {self.core_cnt})...")
-                with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
-                    constants = functools.partial(gantt_creator_mp,
-                                                  video_setting=self.video_setting,
-                                                  frame_setting=self.frame_setting,
-                                                  video_save_dir=self.temp_folder,
-                                                  frame_folder_dir=self.save_frame_folder_dir,
-                                                  bouts_df=self.bouts_df,
-                                                  clf_names=self.clf_names,
-                                                  fps=self.fps,
-                                                  width=self.width,
-                                                  height=self.height,
-                                                  font_size=self.font_size,
-                                                  font_rotation=self.font_rotation,
-                                                  video_name=self.video_name,
-                                                  palette=self.clr_lst,
-                                                  hhmmss=self.hhmmss)
-                    for cnt, result in enumerate(pool.imap(constants, frame_data, chunksize=self.multiprocess_chunksize)):
-                        print(f'Batch {result+1/self.core_cnt} complete...')
-                terminate_cpu_pool(pool=pool, force=False)
+                print(f"[{get_current_time()}] Creating gantt, multiprocessing (chunksize: {(self.multiprocess_chunksize)}, cores: {self.core_cnt})...")
+                constants = functools.partial(gantt_creator_mp,
+                                              video_setting=self.video_setting,
+                                              frame_setting=self.frame_setting,
+                                              video_save_dir=self.temp_folder,
+                                              frame_folder_dir=self.save_frame_folder_dir,
+                                              bouts_df=self.bouts_df,
+                                              clf_names=self.clf_names,
+                                              fps=self.fps,
+                                              width=self.width,
+                                              height=self.height,
+                                              font_size=self.font_size,
+                                              font_rotation=self.font_rotation,
+                                              video_name=self.video_name,
+                                              palette=self.clr_lst,
+                                              hhmmss=self.hhmmss)
+                for cnt, result in enumerate(self.pool.imap(constants, frame_data, chunksize=self.multiprocess_chunksize)):
+                    print(f'[{get_current_time()}] Batch {result+1}/{self.core_cnt} complete...')
                 if self.video_setting:
-                    print(f"Joining {self.video_name} multiprocessed video...")
+                    print(f"[{get_current_time()}] Joining {self.video_name} multiprocessed video...")
                     concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_video_path)
                 video_timer.stop_timer()
                 print(f"Gantt video {self.video_name} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
 
+        terminate_cpu_pool(pool=self.pool, force=False, source=self.__class__.__name__)
         self.timer.stop_timer()
         stdout_success(msg=f"Gantt visualizations for {len(self.data_paths)} videos created in {self.gantt_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str)
 
@@ -235,7 +252,18 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
 #                                     font_rotation= 45)
 #     test.run()
 
-
+if __name__ == "__main__":
+    test = GanttCreatorMultiprocess(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
+                                    frame_setting=False,
+                                    video_setting=True,
+                                    data_paths=r"D:\troubleshooting\maplight_ri\project_folder\csv\machine_results\Trial_1_C24_D1_1.csv",
+                                    last_frm_setting=False,
+                                    width=640,
+                                    height= 480,
+                                    font_size=10,
+                                    font_rotation= 45,
+                                    core_cnt=16)
+    test.run()
 
 
 # test = GanttCreatorMultiprocess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',
