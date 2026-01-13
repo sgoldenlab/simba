@@ -7,11 +7,12 @@ from typing import Union
 from simba.data_processors.kleinberg_calculator import KleinbergCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, SimbaButton, SimBADropDown, SimBALabel)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        SimbaButton, SimBADropDown, SimBALabel)
 from simba.utils.checks import check_float, check_int
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import NoChoosenClassifierError, NoDataError
-from simba.utils.read_write import str_2_bool, get_current_time
+from simba.utils.read_write import get_current_time, str_2_bool
 
 INSTRUCTIONS_TXT = 'Results in the project_folder/csv/machine_results folder are overwritten.\n If saving the originals, the original un-smoothened data is saved in a subdirectory of \nthe project_folder/csv/machine_results folder'
 
