@@ -41,8 +41,8 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_valid_boolean, check_valid_codec,
                                 check_valid_cpu_pool, check_valid_lst,
                                 check_valid_tuple)
-from simba.utils.data import (find_frame_numbers_from_time_stamp,
-                              terminate_cpu_pool, get_cpu_pool)
+from simba.utils.data import (find_frame_numbers_from_time_stamp, get_cpu_pool,
+                              terminate_cpu_pool)
 from simba.utils.enums import OS, ConfigKey, Defaults, Formats, Options, Paths
 from simba.utils.errors import (CountError, DirectoryExistError,
                                 DuplicationError, FFMPEGCodecGPUError,
@@ -52,10 +52,11 @@ from simba.utils.errors import (CountError, DirectoryExistError,
                                 NoDataError, NoFilesFoundError,
                                 NotDirectoryError, ResolutionError,
                                 SimBAGPUError)
-from simba.utils.lookups import (get_ffmpeg_crossfade_methods, get_fonts,
+from simba.utils.lookups import (get_current_time,
+                                 get_ffmpeg_crossfade_methods, get_fonts,
                                  get_named_colors, percent_to_crf_lookup,
                                  percent_to_qv_lk, quality_pct_to_crf,
-                                 video_quality_to_preset_lookup, get_current_time)
+                                 video_quality_to_preset_lookup)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,

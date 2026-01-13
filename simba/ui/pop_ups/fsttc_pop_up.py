@@ -7,7 +7,8 @@ from typing import Union
 from simba.data_processors.fsttc_calculator import FSTTCCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, Entry_Box, SimbaCheckbox
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        SimbaCheckbox)
 from simba.utils.checks import check_int
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import CountError
