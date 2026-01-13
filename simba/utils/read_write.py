@@ -72,9 +72,7 @@ from simba.utils.errors import (CorruptedFileError, DataHeaderError,
                                 ParametersFileError, PermissionError,
                                 SimBAPAckageVersionError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.warnings import (
-    FileExistWarning, FrameRangeWarning, GPUToolsWarning, InvalidValueWarning,
-    NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning)
+from simba.utils.warnings import (FileExistWarning, FrameRangeWarning, GPUToolsWarning, InvalidValueWarning, NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning)
 
 SIMBA_DIR = os.path.dirname(simba.__file__)
 
@@ -2460,6 +2458,13 @@ def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
     """
     Reads a batch of frames from a video file using GPU acceleration.
 
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../docs/tables/read_img_batch_from_video_gpu.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
     This function uses FFmpeg with CUDA acceleration to read frames from a specified range in a video file. It supports both RGB and greyscale video formats. Frames are returned as a dictionary where the keys are
     frame indices and the values are NumPy arrays representing the image data.
 
@@ -2468,7 +2473,7 @@ def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
        If you expect that the video you are reading in is black and white, set ``black_and_white`` to True to round any of these wonly value sto 0 and 255.
 
     .. seealso::
-       For CPU multicore acceleration, see :func:`simba.mixins.image_mixin.ImageMixin.read_img_batch_from_video`
+       For CPU multicore acceleration, see :func:`simba.mixins.image_mixin.ImageMixin.read_img_batch_from_video` or :func:`simba.utils.read_write.read_img_batch_from_video`.
 
     :param video_path: Path to the video file. Can be a string or an os.PathLike object.
     :param start_frm: The starting frame index to read. If None, starts from the beginning of the video.
@@ -2479,6 +2484,7 @@ def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
     :return: A dictionary where keys are frame indices (integers) and values are NumPy arrays containing the image data of each frame.
     """
 
+    timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=video_path)
     video_meta_data = get_video_meta_data(video_path=video_path, fps_as_int=False)
     if start_frm is not None:
@@ -2550,6 +2556,10 @@ def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
             for frm_id in range(frames.shape[0]):
                 binary_frms[frm_id] = np.where(frames[frm_id] > 127, 255, 0).astype(np.uint8)
         frames = binary_frms
+
+    timer.stop_timer()
+    if verbose:
+        print(f'[{get_current_time()}] Read frames {start_frm}-{end_frm} (video: {video_name}, elapsed time: {timer.elapsed_time_str}s)')
 
     return frames
 
@@ -3156,7 +3166,7 @@ def _read_img_batch_from_video_helper(frm_idx: np.ndarray, video_path: Union[str
     cap.set(1, current_frm)
     while current_frm < end_frm:
         if verbose:
-            print(f'Reading frame {current_frm}/{video_meta_data["frame_count"]} ({video_meta_data["video_name"]})...')
+            print(f'[{get_current_time()}] Reading frame {current_frm} ({video_meta_data["video_name"]})...')
         img = cap.read()[1]
         if img is not None:
             if greyscale or black_and_white or clahe:
@@ -3188,6 +3198,14 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
     """
     Read a batch of frames from a video file. This method reads frames from a specified range of frames within a video file using multiprocessing.
 
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../docs/tables/read_img_batch_from_video.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+
     .. seealso::
        For GPU acceleration, see :func:`simba.utils.read_write.read_img_batch_from_video_gpu`
 
@@ -3209,6 +3227,8 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
     >>> read_img_batch_from_video(video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=50)
     """
 
+
+    timer = SimbaTimer(start=True)
     if platform.system() == "Darwin":
         if not multiprocessing.get_start_method(allow_none=True):
             multiprocessing.set_start_method("fork", force=True)
@@ -3230,19 +3250,22 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
     if end_frm <= start_frm:
         FrameRangeError(msg=f"Start frame ({start_frm}) has to be before end frame ({end_frm})", source=read_img_batch_from_video.__name__)
     frm_lst = np.array_split(np.arange(start_frm, end_frm + 1), core_cnt)
+    pool = multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value)
     results = {}
-    with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-        constants = functools.partial(_read_img_batch_from_video_helper,
-                                      video_path=video_path,
-                                      greyscale=greyscale,
-                                      black_and_white=black_and_white,
-                                      clahe=clahe,
-                                      verbose=verbose)
-        for cnt, result in enumerate(pool.imap(constants, frm_lst, chunksize=1)):
-            results.update(result)
-    pool.join()
+    constants = functools.partial(_read_img_batch_from_video_helper,
+                                  video_path=video_path,
+                                  greyscale=greyscale,
+                                  black_and_white=black_and_white,
+                                  clahe=clahe,
+                                  verbose=verbose)
+    for cnt, result in enumerate(pool.imap(constants, frm_lst, chunksize=1)):
+        results.update(result)
     pool.close()
-    #terminate_cpu_pool(pool=pool, force=False)
+    pool.join()
+    pool.terminate()
+    timer.stop_timer()
+    if verbose:
+        print(f'[{get_current_time()}] Read frames {start_frm}-{end_frm} (video: {video_meta_data["video_name"]}, elapsed time: {timer.elapsed_time_str}s)')
     return results
 
 def read_yolo_bp_names_file(file_path: Union[str, os.PathLike]) -> Tuple[str]:

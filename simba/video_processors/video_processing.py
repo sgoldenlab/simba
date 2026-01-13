@@ -42,7 +42,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_valid_cpu_pool, check_valid_lst,
                                 check_valid_tuple)
 from simba.utils.data import (find_frame_numbers_from_time_stamp,
-                              terminate_cpu_pool)
+                              terminate_cpu_pool, get_cpu_pool)
 from simba.utils.enums import OS, ConfigKey, Defaults, Formats, Options, Paths
 from simba.utils.errors import (CountError, DirectoryExistError,
                                 DuplicationError, FFMPEGCodecGPUError,
@@ -55,7 +55,7 @@ from simba.utils.errors import (CountError, DirectoryExistError,
 from simba.utils.lookups import (get_ffmpeg_crossfade_methods, get_fonts,
                                  get_named_colors, percent_to_crf_lookup,
                                  percent_to_qv_lk, quality_pct_to_crf,
-                                 video_quality_to_preset_lookup)
+                                 video_quality_to_preset_lookup, get_current_time)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
@@ -408,6 +408,9 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike],
     """
     Convert a single video file to clahe-enhanced greyscale .avi file.
 
+    .. seealso::
+       For multicore method, see :func:`simba.video_processors.video_processing.clahe_enhance_video_mp`.
+
     .. image:: _static/img/clahe_enhance_video.gif
        :width: 800
        :align: center
@@ -490,7 +493,7 @@ def _clahe_enhance_video_mp_helper(data: tuple,
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             clahe_frm = clahe_filter.apply(img)
             writer.write(clahe_frm)
-            print(f"CLAHE converted frame {current_frm}/{video_meta_data['frame_count']} (core batch: {batch_id}, video name: {video_meta_data['video_name']})...")
+            print(f"[{get_current_time()}] CLAHE converted frame {current_frm}/{video_meta_data['frame_count']} (core batch: {batch_id}, video name: {video_meta_data['video_name']})...")
         else:
             FrameRangeWarning(msg=f'Could not read frame {current_frm} in video {video_meta_data["video_name"]}', source=_clahe_enhance_video_mp_helper.__name__)
             break
@@ -508,9 +511,19 @@ def clahe_enhance_video_mp(file_path: Union[str, os.PathLike],
     """
     Convert a single video file to clahe-enhanced greyscale file using multiprocessing.
 
+    .. seealso::
+       For single core method, see :func:`simba.video_processors.video_processing.clahe_enhance_video`.
+
     .. image:: _static/img/clahe_enhance_video.gif
        :width: 800
        :align: center
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../docs/tables/clahe_enhance_video_mp.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
 
     :param Union[str, os.PathLike] file_path: Path to video file.
     :param Optional[int] clip_limit: CLAHE amplification limit. Inccreased clip limit reduce noise in output. Default: 2.
@@ -549,20 +562,20 @@ def clahe_enhance_video_mp(file_path: Union[str, os.PathLike],
     frm_idx = list(range(0, video_meta_data['frame_count']))
     frm_idx = np.array_split(frm_idx, core_cnt)
     frm_idx = [(i, list(j)) for i, j in enumerate(frm_idx)]
-    with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-        constants = functools.partial(_clahe_enhance_video_mp_helper,
-                                      video_path=file_path,
-                                      clip_limit=clip_limit,
-                                      temp_dir=tempdir,
-                                      tile_grid_size=tile_grid_size)
-        for cnt, result in enumerate(pool.imap(constants, frm_idx, chunksize=1)):
-            print(f'Batch {(result + 1)} / {core_cnt} complete...')
+    pool = get_cpu_pool(core_cnt=core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value, source=clahe_enhance_video_mp.__name__)
+    constants = functools.partial(_clahe_enhance_video_mp_helper,
+                                  video_path=file_path,
+                                  clip_limit=clip_limit,
+                                  temp_dir=tempdir,
+                                  tile_grid_size=tile_grid_size)
+    for cnt, result in enumerate(pool.imap(constants, frm_idx, chunksize=1)):
+        print(f'[{get_current_time()}] Batch {(result + 1)} / {core_cnt} complete...')
 
-    terminate_cpu_pool(pool=pool, force=False)
+    terminate_cpu_pool(pool=pool, force=False, source=clahe_enhance_video_mp.__name__)
     print(f"Joining {video_meta_data['video_name']} multiprocessed video...")
     concatenate_videos_in_folder(in_folder=tempdir, save_path=save_path, remove_splits=True, gpu=gpu)
     video_timer.stop_timer()
-    print(f"CLAHE video {video_meta_data['video_name']} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
+    print(f"[{get_current_time()}] CLAHE video {video_meta_data['video_name']} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
 
 
 #_ = clahe_enhance_video_mp(file_path= r"D:\EPM_4\original\1.mp4")
