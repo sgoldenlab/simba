@@ -307,7 +307,7 @@ def sliding_hjort_parameters_gpu(data: np.ndarray, window_sizes: np.ndarray, sam
     """
     Compute Hjorth parameters over sliding windows on the GPU.
 
-    .. seelalso::
+    .. seealso::
        For CPU implementation, see :`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.hjort_parameters`
 
     :param np.ndarray data: 1D numeric array of signal data.

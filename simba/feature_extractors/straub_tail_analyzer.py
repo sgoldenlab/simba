@@ -44,10 +44,10 @@ class StraubTailAnalyzer(ConfigReader):
     .. [1] Lazaro et al., Brainwide Genetic Capture for Conscious State Transitions, `biorxiv`, doi: https://doi.org/10.1101/2025.03.28.646066
 
     :example:
-    >>> runner = StraubTailAnalyzer(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-    >>>                            data_dir=r'C:\troubleshooting\mitra\project_folder\videos\additional\bg_removed\rotated',
-    >>>                            video_dir=r'C:\troubleshooting\mitra\project_folder\videos\additional\bg_removed\rotated',
-    >>>                            save_dir=r'C:\troubleshooting\mitra\project_folder\videos\additional\bg_removed\rotated\tail_features_additional',
+    >>> runner = StraubTailAnalyzer(config_path=r"C:/troubleshooting/mitra/project_folder/project_config.ini",
+    >>>                            data_dir=r'C:/troubleshooting/mitra/project_folder/videos/additional/bg_removed/rotated',
+    >>>                            video_dir=r'C:/troubleshooting/mitra/project_folder/videos/additional/bg_removed/rotated',
+    >>>                            save_dir=r'C:/troubleshooting/mitra/project_folder/videos/additional/bg_removed/rotated/tail_features_additional',
     >>>                            anchor_points=('tail_base', 'tail_center', 'tail_tip'),
     >>>                            body_parts=('nose', 'left_ear', 'right_ear', 'right_side', 'left_side', 'tail_base'))
     >>> runner.run()

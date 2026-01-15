@@ -1602,10 +1602,11 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
 # SAVE_PATH = "/mnt/c/troubleshooting/mitra/project_folder/frames/output/pose_ex/test.mp4"
 #
 #
-DATA_PATH = "/mnt/d/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/592_MA147_CNO1_0515.csv"
-VIDEO_PATH = "/mnt/d/troubleshooting/mitra/project_folder/videos/592_MA147_CNO1_0515.mp4"
-SAVE_PATH = "/mnt/d/troubleshooting/mitra/project_folder/videos/test_cuda.mp4"
-pose_plotter(data=DATA_PATH, video_path=VIDEO_PATH, save_path=SAVE_PATH, circle_size=10, batch_size=100)
+if __name__ == "__main__":
+    DATA_PATH = "/mnt/d/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/592_MA147_CNO1_0515.csv"
+    VIDEO_PATH = "/mnt/d/troubleshooting/mitra/project_folder/videos/592_MA147_CNO1_0515.mp4"
+    SAVE_PATH = "/mnt/d/troubleshooting/mitra/project_folder/videos/test_cuda.mp4"
+    pose_plotter(data=DATA_PATH, video_path=VIDEO_PATH, save_path=SAVE_PATH, circle_size=10, batch_size=100)
 
 
 

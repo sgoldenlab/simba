@@ -94,9 +94,9 @@ class EgocentricVideoRotator():
     :param Optional[Union[str, os.PathLike]] save_path: The location where to store the rotated video. If None, saves the video as the same dir as the input video with the `_rotated` suffix.
 
     :example:
-    >>> DATA_PATH = "C:\501_MA142_Gi_Saline_0513.csv"
-    >>> VIDEO_PATH = "C:\501_MA142_Gi_Saline_0513.mp4"
-    >>> SAVE_PATH = "C:\501_MA142_Gi_Saline_0513_rotated.mp4"
+    >>> DATA_PATH = "C:/501_MA142_Gi_Saline_0513.csv"
+    >>> VIDEO_PATH = "C:/501_MA142_Gi_Saline_0513.mp4"
+    >>> SAVE_PATH = "C:/501_MA142_Gi_Saline_0513_rotated.mp4"
     >>> ANCHOR_LOC = np.array([250, 250])
 
     >>> df = read_df(file_path=DATA_PATH, file_type='csv')

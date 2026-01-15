@@ -1785,8 +1785,8 @@ def fft_lowpass_filter(data: np.ndarray, cut_off: float = 0.1) -> np.ndarray:
 
     :example:
     >>> from simba.utils.read_write import read_df
-    >>> IN_PATH = r"C:\troubleshooting\RAT_NOR\project_folder\csv\outlier_corrected_movement_location\2022-06-20_NOB_DOT_4.csv"
-    >>> OUT_PATH = r"C:\troubleshooting\RAT_NOR\project_folder\csv\outlier_corrected_movement_location\2022-06-20_NOB_DOT_4_filtered.csv"
+    >>> IN_PATH = r"C:/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/2022-06-20_NOB_DOT_4.csv"
+    >>> OUT_PATH = r"C:/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/2022-06-20_NOB_DOT_4_filtered.csv"
     >>> df = read_df(file_path=IN_PATH)
     >>> data = df.values
     >>> x = fft_lowpass_filter(data=data, cut_off=0.1)

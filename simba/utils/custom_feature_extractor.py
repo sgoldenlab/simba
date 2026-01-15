@@ -30,7 +30,7 @@ class CustomFeatureExtractor(ConfigReader):
     4. Handle cases of multiple classes and missing configuration arguments.
     5. Invokes the feature extraction process if conditions are met.
 
-    .. notes::
+    .. note::
 
         `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/extractFeatures.md>`_.
 

@@ -1130,8 +1130,8 @@ def get_file_name_info_in_directory(directory: Union[str, os.PathLike], file_typ
     :return dict: All found files as values and file base names as keys.
 
     :example:
-    >>> get_file_name_info_in_directory(directory='C:\project_folder\csv\machine_results', file_type='csv')
-    >>> {'Video_1': 'C:\project_folder\csv\machine_results\Video_1'}
+    >>> get_file_name_info_in_directory(directory='C:/project_folder/csv/machine_results', file_type='csv')
+    >>> {'Video_1': 'C:/project_folder/csv/machine_results/Video_1'}
     """
 
     results = {}
@@ -2630,7 +2630,7 @@ def bento_file_reader(file_path: Union[str, os.PathLike],
     :rtype: Dict[str, pd.DataFrame]
 
     :example:
-    >>> bento_file_reader(file_path=r"C:\troubleshooting\bento_test\bento_files\20240812_crumpling3.annot")
+    >>> bento_file_reader(file_path=r"C:/troubleshooting/bento_test/bento_files/20240812_crumpling3.annot")
     """
 
     def _orient_columns_melt(df: pd.DataFrame) -> pd.DataFrame:

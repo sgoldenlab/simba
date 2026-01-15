@@ -5298,7 +5298,7 @@ class Statistics(FeatureExtractionMixin):
         """
         Compute one-way ANOVAs comparing each column (axis 1) on two arrays.
 
-        .. notes::
+        .. note::
            Use for computing and presenting aggregate statistics. Not suitable for featurization.
 
         .. seealso::
@@ -5336,7 +5336,7 @@ class Statistics(FeatureExtractionMixin):
         """
         Compute Kruskal-Wallis comparing each column (axis 1) on two arrays.
 
-        .. notes::
+        .. note::
            Use for computing and presenting aggregate statistics. Not suitable for featurization.
 
         .. seealso::
@@ -5373,7 +5373,7 @@ class Statistics(FeatureExtractionMixin):
         """
         Compute pairwise grouped Tukey-HSD tests.
 
-        .. notes::
+        .. note::
            Use for computing and presenting aggregate statistics. Not suitable for featurization.
 
         :param np.ndarray data: 2D array  with observations rowwise (axis 0) and features columnwise (axis 1)
