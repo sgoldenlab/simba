@@ -6,15 +6,17 @@ except:
     from typing_extensions import Literal
 
 import functools
-from datetime import datetime
 import os
+from datetime import datetime
 
 import cv2
 
-from simba.utils.checks import (check_if_dir_exists, check_int, check_str, check_valid_boolean)
-from simba.utils.data import terminate_cpu_pool, get_cpu_pool
+from simba.utils.checks import (check_if_dir_exists, check_int, check_str,
+                                check_valid_boolean)
+from simba.utils.data import get_cpu_pool, terminate_cpu_pool
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_core_cnt, get_video_meta_data, read_frm_of_video, get_fn_ext)
+from simba.utils.read_write import (find_core_cnt, get_fn_ext,
+                                    get_video_meta_data, read_frm_of_video)
 
 JPEG, PNG, WEBP = 'jpeg', 'png', 'webp'
 
