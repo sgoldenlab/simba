@@ -1,7 +1,8 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
-from tkinter import messagebox as mb
 from datetime import datetime
+from tkinter import messagebox as mb
+
 from simba.utils.enums import Defaults, TagNames
 from simba.utils.printing import log_event
 
