@@ -8,6 +8,8 @@ from sklearn.metrics import (adjusted_mutual_info_score, adjusted_rand_score,
                              fowlkes_mallows_score)
 from sklearn.neighbors import LocalOutlierFactor
 
+from simba.utils.printing import SimbaTimer
+
 try:
     from typing import Literal
 except:
@@ -538,7 +540,8 @@ class Statistics(FeatureExtractionMixin):
         sample_1: np.ndarray,
         sample_2: np.ndarray,
         fill_value: Optional[int] = 1,
-        bucket_method: Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"] = "auto") -> float:
+        bucket_method: Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"] = "auto",
+        verbose: bool = False) -> float:
 
         r"""
         Compute Kullback-Leibler divergence between two distributions.
@@ -562,6 +565,7 @@ class Statistics(FeatureExtractionMixin):
         :returns: Kullback-Leibler divergence between ``sample_1`` and ``sample_2``
         :rtype: float
         """
+        timer = SimbaTimer(start=True)
         check_valid_array(data=sample_1, source=Statistics.kullback_leibler_divergence.__name__, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_valid_array(data=sample_2, source=Statistics.kullback_leibler_divergence.__name__, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_str(name=f"{self.__class__.__name__} bucket_method", value=bucket_method, options=Options.BUCKET_METHODS.value)
@@ -573,7 +577,10 @@ class Statistics(FeatureExtractionMixin):
         sample_1_hist[sample_1_hist == 0] = fill_value
         sample_2_hist[sample_2_hist == 0] = fill_value
         sample_1_hist, sample_2_hist = sample_1_hist / np.sum(sample_1_hist), sample_2_hist / np.sum(sample_2_hist)
-        return stats.entropy(pk=sample_1_hist, qk=sample_2_hist)
+        kl = stats.entropy(pk=sample_1_hist, qk=sample_2_hist)
+        timer.stop_timer()
+        if verbose: print(f'KL divergence performed on {sample_1.shape[0]} observations (elapsed time: {timer.elapsed_time_str}s)')
+        return kl
 
     def rolling_kullback_leibler_divergence(
         self,

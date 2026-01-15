@@ -9,10 +9,10 @@ import numpy as np
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_if_valid_rgb_tuple,
                                 check_int, check_valid_array,
-                                check_valid_boolean, check_valid_tuple)
+                                check_valid_boolean, check_valid_tuple, check_valid_cpu_pool)
 from simba.utils.data import (align_target_warpaffine_vectors,
                               center_rotation_warpaffine_vectors,
-                              egocentrically_align_pose, terminate_cpu_pool)
+                              egocentrically_align_pose, terminate_cpu_pool, get_cpu_pool)
 from simba.utils.enums import Defaults, Formats
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
@@ -114,7 +114,8 @@ class EgocentricVideoRotator():
                  fill_clr: Tuple[int, int, int] = (0, 0, 0),
                  core_cnt: int = -1,
                  save_path: Optional[Union[str, os.PathLike]] = None,
-                 gpu: Optional[bool] = True):
+                 gpu: Optional[bool] = True,
+                 pool: bool = None):
 
         check_file_exist_and_readable(file_path=video_path)
         self.video_meta_data = get_video_meta_data(video_path=video_path)
@@ -125,10 +126,14 @@ class EgocentricVideoRotator():
         check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose')
         check_if_valid_rgb_tuple(data=fill_clr)
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
-        if core_cnt > find_core_cnt()[0] or core_cnt == -1:
-            self.core_cnt = find_core_cnt()[0]
+        if core_cnt > find_core_cnt()[0] or core_cnt == -1: self.core_cnt = find_core_cnt()[0]
+        else: self.core_cnt = core_cnt
+        if pool is not None:
+            check_valid_cpu_pool(value=pool, source=self.__class__.__name__, max_cores=find_core_cnt()[0], min_cores=2, raise_error=True)
+            self.pool_termination_flag = True
         else:
-            self.core_cnt = core_cnt
+            self.pool_termination_flag = False
+        self.pool = get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__) if pool is None else pool
         video_dir, self.video_name, _ = get_fn_ext(filepath=video_path)
         if save_path is not None:
             self.save_dir = os.path.dirname(save_path)
@@ -151,37 +156,35 @@ class EgocentricVideoRotator():
         frm_list = np.arange(0, self.video_meta_data['frame_count'])
         frm_list = np.array_split(frm_list, self.core_cnt)
         frm_list = [(cnt, x) for cnt, x in enumerate(frm_list)]
-        if self.verbose:
-            print(f"Creating rotated video {self.video_name}, multiprocessing (chunksize: {1}, cores: {self.core_cnt})...")
-        with multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(egocentric_video_aligner,
-                                          temp_dir=temp_dir,
-                                          video_name=self.video_name,
-                                          video_path=self.video_path,
-                                          centers=self.centers,
-                                          rotation_vectors=self.rotation_vectors,
-                                          target=self.anchor_loc,
-                                          verbose=self.verbose,
-                                          fill_clr=self.fill_clr,
-                                          gpu=self.gpu)
-            for cnt, result in enumerate(pool.imap(constants, frm_list, chunksize=1)):
-                if self.verbose:
-                    print(f"Rotate batch {result}/{self.core_cnt} complete...")
-        terminate_cpu_pool(pool=pool, force=False)
+        if self.verbose: print(f"Creating rotated video {self.video_name}, multiprocessing (chunksize: {1}, cores: {self.core_cnt})...")
+
+        constants = functools.partial(egocentric_video_aligner,
+                                      temp_dir=temp_dir,
+                                      video_name=self.video_name,
+                                      video_path=self.video_path,
+                                      centers=self.centers,
+                                      rotation_vectors=self.rotation_vectors,
+                                      target=self.anchor_loc,
+                                      verbose=self.verbose,
+                                      fill_clr=self.fill_clr,
+                                      gpu=self.gpu)
+        for cnt, result in enumerate(self.pool.imap(constants, frm_list, chunksize=1)):
+            if self.verbose: print(f"Rotate batch {result}/{self.core_cnt} complete...")
+        if self.pool_termination_flag: terminate_cpu_pool(pool=self.pool, force=False)
         concatenate_videos_in_folder(in_folder=temp_dir, save_path=self.save_path, remove_splits=True, gpu=self.gpu, verbose=self.verbose)
         video_timer.stop_timer()
         stdout_success(msg=f"Egocentric rotation video {self.save_path} complete", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
 
-if __name__ == "__main__":
-    DATA_PATH = r"C:\Users\sroni\OneDrive\Desktop\desktop\rotate_ex\data\501_MA142_Gi_Saline_0513.csv"
-    VIDEO_PATH = r"C:\Users\sroni\OneDrive\Desktop\desktop\rotate_ex\videos\501_MA142_Gi_Saline_0513.mp4"
-    SAVE_PATH = r"C:\Users\sroni\OneDrive\Desktop\desktop\rotate_ex\videos\501_MA142_Gi_Saline_0513_rotated.mp4"
-    ANCHOR_LOC = np.array([250, 250])
-
-    df = read_df(file_path=DATA_PATH, file_type='csv')
-    bp_cols = [x for x in df.columns if not x.endswith('_p')]
-    data = df[bp_cols].values.reshape(len(df), int(len(bp_cols)/2), 2).astype(np.int32)
-
-    _, centers, rotation_vectors = egocentrically_align_pose(data=data, anchor_1_idx=5, anchor_2_idx=2, anchor_location=ANCHOR_LOC, direction=0)
-    rotater = EgocentricVideoRotator(video_path=VIDEO_PATH, centers=centers, rotation_vectors=rotation_vectors, anchor_location=(400, 100), save_path=SAVE_PATH, verbose=True, core_cnt=16)
-    rotater.run()
+# if __name__ == "__main__":
+#     DATA_PATH = r"C:\Users\sroni\OneDrive\Desktop\desktop\rotate_ex\data\501_MA142_Gi_Saline_0513.csv"
+#     VIDEO_PATH = r"C:\Users\sroni\OneDrive\Desktop\desktop\rotate_ex\videos\501_MA142_Gi_Saline_0513.mp4"
+#     SAVE_PATH = r"C:\Users\sroni\OneDrive\Desktop\desktop\rotate_ex\videos\501_MA142_Gi_Saline_0513_rotated.mp4"
+#     ANCHOR_LOC = np.array([250, 250])
+#
+#     df = read_df(file_path=DATA_PATH, file_type='csv')
+#     bp_cols = [x for x in df.columns if not x.endswith('_p')]
+#     data = df[bp_cols].values.reshape(len(df), int(len(bp_cols)/2), 2).astype(np.int32)
+#
+#     _, centers, rotation_vectors = egocentrically_align_pose(data=data, anchor_1_idx=5, anchor_2_idx=2, anchor_location=ANCHOR_LOC, direction=0)
+#     rotater = EgocentricVideoRotator(video_path=VIDEO_PATH, centers=centers, rotation_vectors=rotation_vectors, anchor_location=(400, 100), save_path=SAVE_PATH, verbose=True, core_cnt=16)
+#     rotater.run()

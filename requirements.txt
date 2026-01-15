@@ -55,7 +55,7 @@ dash_html_components == 1.0.3
 h5py==2.9.0;python_version=="3.6"
 h5py==3.11.0;python_version>="3.9"
 numba==0.53.1;python_version=="3.6"
-numba==0.59.1;python_version>="3.9"
+numba==0.63.1;python_version>="3.9"
 numexpr==2.6.9;python_version=="3.6"
 numexpr==2.10.0;python_version>="3.9"
 plotly == 4.9.0

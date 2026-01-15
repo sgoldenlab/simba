@@ -154,11 +154,11 @@ class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
             self.within_animal_four_point_combs[animal] = np.array(list(combinations(animal_bps, 4)))
 
     def _get_two_point_bp_distances(self):
-        for c in self.two_point_combs:
+        for cnt, c in enumerate(self.two_point_combs):
             x1, y1, x2, y2 = list(sum([(f"{x}_x", f"{y}_y") for (x, y) in zip(c, c)], ()))
             bp1 = self.data_df[[x1, y1]].values
             bp2 = self.data_df[[x2, y2]].values
-            self.results[f"Distance (mm) {c[0]}-{c[1]}"] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=bp1.astype(np.float64), location_2=bp2.astype(np.float64), px_per_mm=np.float64(self.px_per_mm), centimeter=False)
+            self.results[f"Distance (mm) {c[0]}-{c[1]}"] = FeatureExtractionMixin.bodypart_distance(bp1_coords=bp1.astype(np.int32), bp2_coords=bp2.astype(np.int32), px_per_mm=np.float64(self.px_per_mm), in_centimeters=False)
 
     def __get_three_point_angles(self):
         for animal, points in self.within_animal_three_point_combs.items():
@@ -342,13 +342,20 @@ class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
 
 
 
-
-# test = FeatureSubsetsCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                                 feature_families=[ARENA_EDGE],
+# test = FeatureSubsetsCalculator(config_path=r"C:\troubleshooting\srami0619\project_folder\project_config.ini",
+#                                 feature_families=[TWO_POINT_BP_DISTANCES],
 #                                 append_to_features_extracted=False,
 #                                 file_checks=True,
-#                                 append_to_targets_inserted=False,
-#                                 save_dir=r"C:\troubleshooting\mitra\project_folder\csv\feature_subset")
+#                                 append_to_targets_inserted=False)
+# test.run()
+
+
+
+# test = FeatureSubsetsCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                                 feature_families=[TWO_POINT_BP_DISTANCES],
+#                                 append_to_features_extracted=False,
+#                                 file_checks=True,
+#                                 append_to_targets_inserted=False)
 # test.run()
 
 #

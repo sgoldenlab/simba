@@ -8,6 +8,7 @@ from numba import cuda, njit
 
 from simba.utils.checks import check_float, check_valid_array
 from simba.utils.enums import Formats
+from simba.utils.printing import SimbaTimer
 
 try:
     import cupy as cp
@@ -401,20 +402,21 @@ def find_midpoints(x: np.ndarray,
 
 
 @cuda.jit()
-def _directionality_to_static_targets_kernel(left_ear, right_ear, nose, target, results):
+def _directionality_to_static_targets_kernel(left_ear, right_ear, nose, target_x, target_y, results):
     i = cuda.grid(1)
-    if i > left_ear.shape[0]:
+    if i >= left_ear.shape[0]:
         return
     else:
-        LE, RE = left_ear[i], right_ear[i]
-        N, Tx, Ty = nose[i], target[0], target[1]
+        LE = left_ear[i]
+        RE = right_ear[i]
+        N = nose[i]
 
-        Px = abs(LE[0] - Tx)
-        Py = abs(LE[1] - Ty)
-        Qx = abs(RE[0] - Tx)
-        Qy = abs(RE[1] - Ty)
-        Nx = abs(N[0] - Tx)
-        Ny = abs(N[1] - Ty)
+        Px = abs(LE[0] - target_x)
+        Py = abs(LE[1] - target_y)
+        Qx = abs(RE[0] - target_x)
+        Qy = abs(RE[1] - target_y)
+        Nx = abs(N[0] - target_x)
+        Ny = abs(N[1] - target_y)
         Ph = math.sqrt(Px * Px + Py * Py)
         Qh = math.sqrt(Qx * Qx + Qy * Qy)
         Nh = math.sqrt(Nx * Nx + Ny * Ny)
@@ -438,7 +440,8 @@ def _directionality_to_static_targets_kernel(left_ear, right_ear, nose, target, 
 def directionality_to_static_targets(left_ear: np.ndarray,
                                      right_ear: np.ndarray,
                                      nose: np.ndarray,
-                                     target: np.ndarray) -> np.ndarray:
+                                     target: np.ndarray,
+                                     verbose: bool = False) -> np.ndarray:
     """
     GPU helper to calculate if an animal is directing towards a static location (e.g., ROI centroid), given the target location and the left ear, right ear, and nose coordinates of the observer.
 
@@ -487,32 +490,38 @@ def directionality_to_static_targets(left_ear: np.ndarray,
     >>> directionality_to_static_targets(left_ear=left_ear, right_ear=right_ear, nose=nose, target=target)
 
     """
-
+    timer = SimbaTimer(start=True)
     left_ear = np.ascontiguousarray(left_ear).astype(np.int32)
     right_ear = np.ascontiguousarray(right_ear).astype(np.int32)
     nose = np.ascontiguousarray(nose).astype(np.int32)
     target = np.ascontiguousarray(target).astype(np.int32)
 
+    target_x = int(target[0])
+    target_y = int(target[1])
+
     left_ear_dev = cuda.to_device(left_ear)
     right_ear_dev = cuda.to_device(right_ear)
     nose_dev = cuda.to_device(nose)
-    target_dev = cuda.to_device(target)
     results = cuda.device_array((left_ear.shape[0], 4), dtype=np.int32)
     bpg = (left_ear.shape[0] + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
-    _directionality_to_static_targets_kernel[bpg, THREADS_PER_BLOCK](left_ear_dev, right_ear_dev, nose_dev, target_dev, results)
+    _directionality_to_static_targets_kernel[bpg, THREADS_PER_BLOCK](left_ear_dev, right_ear_dev, nose_dev, target_x, target_y, results)
 
     results = results.copy_to_host()
+    timer.stop_timer()
+    if verbose: print(f'Directionality to static target computed in for {left_ear.shape[0]} observations (elapsed time: {timer.elapsed_time_str}s)')
     return results
 
 
 @cuda.jit()
 def _directionality_to_nonstatic_targets_kernel(left_ear, right_ear, nose, target, results):
     i = cuda.grid(1)
-    if i > left_ear.shape[0]:
+    if i >= left_ear.shape[0]:
         return
     else:
-        LE, RE = left_ear[i], right_ear[i]
-        N, T = nose[i], target[i]
+        LE = left_ear[i]
+        RE = right_ear[i]
+        N = nose[i]
+        T = target[i]
 
         Px = abs(LE[0] - T[0])
         Py = abs(LE[1] - T[1])
@@ -543,11 +552,19 @@ def _directionality_to_nonstatic_targets_kernel(left_ear, right_ear, nose, targe
 def directionality_to_nonstatic_target(left_ear: np.ndarray,
                                        right_ear: np.ndarray,
                                        nose: np.ndarray,
-                                       target: np.ndarray) -> np.ndarray:
+                                       target: np.ndarray,
+                                       verbose: bool = False) -> np.ndarray:
 
     """
     GPU method to calculate if an animal is directing towards a moving point location given the target location and the left ear, right ear, and nose coordinates of the observer.
 
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/directionality_to_nonstatic_target_cuda.csv
+       :widths: 30, 30, 20, 10, 10
+       :align: center
+       :class: simba-table
+       :header-rows: 1
 
     .. image:: _static/img/directing_moving_targets.png
        :width: 400
@@ -573,26 +590,27 @@ def directionality_to_nonstatic_target(left_ear: np.ndarray,
     >>> right_ear = np.random.randint(0, 500, (100, 2))
     >>> nose = np.random.randint(0, 500, (100, 2))
     >>> target = np.random.randint(0, 500, (100, 2))
-    >>> directionality_to_static_targets(left_ear=left_ear, right_ear=right_ear, nose=nose, target=target)
+    >>> directionality_to_nonstatic_target(left_ear=left_ear, right_ear=right_ear, nose=nose, target=target)
     """
 
-    left_ear = np.ascontiguousarray(left_ear).astype(np.int32)
-    right_ear = np.ascontiguousarray(right_ear).astype(np.int32)
-    nose = np.ascontiguousarray(nose).astype(np.int32)
-    target = np.ascontiguousarray(target).astype(np.int32)
+    timer = SimbaTimer(start=True)
+    left_ear = np.ascontiguousarray(left_ear).astype(np.int64)
+    right_ear = np.ascontiguousarray(right_ear).astype(np.int64)
+    nose = np.ascontiguousarray(nose).astype(np.int64)
+    target = np.ascontiguousarray(target).astype(np.int64)
 
     left_ear_dev = cuda.to_device(left_ear)
     right_ear_dev = cuda.to_device(right_ear)
     nose_dev = cuda.to_device(nose)
     target_dev = cuda.to_device(target)
-    results = cuda.device_array((left_ear.shape[0], 4), dtype=np.int32)
+    results = cuda.device_array((left_ear.shape[0], 4), dtype=np.int64)
     bpg = (left_ear.shape[0] + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
     _directionality_to_nonstatic_targets_kernel[bpg, THREADS_PER_BLOCK](left_ear_dev, right_ear_dev, nose_dev, target_dev, results)
 
     results = results.copy_to_host()
+    timer.stop_timer()
+    if verbose: print(f'Directionality to moving target computed in for {left_ear.shape[0]} observations (elapsed time: {timer.elapsed_time_str}s)')
     return results
-
-
 
 
 

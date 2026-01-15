@@ -9,8 +9,6 @@ try:
 except:
     from typing_extensions import Literal
 
-import functools
-import multiprocessing
 from copy import deepcopy
 
 import numpy as np

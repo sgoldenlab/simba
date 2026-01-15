@@ -7,16 +7,12 @@ import pandas as pd
 from simba.utils.checks import (check_if_dir_exists, check_if_valid_rgb_tuple,
                                 check_int, check_str, check_valid_boolean,
                                 check_valid_dataframe, check_valid_tuple)
-from simba.utils.data import egocentrically_align_pose_numba
+from simba.utils.data import egocentrically_align_pose_numba, terminate_cpu_pool, get_cpu_pool
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (bgr_to_rgb_tuple, find_core_cnt,
-                                    find_files_of_filetypes_in_directory,
-                                    find_video_of_file, get_fn_ext,
-                                    get_video_meta_data, read_df, write_df)
-from simba.video_processors.egocentric_video_rotator import \
-    EgocentricVideoRotator
+from simba.utils.read_write import (bgr_to_rgb_tuple, find_core_cnt, find_files_of_filetypes_in_directory, find_video_of_file, get_fn_ext, get_video_meta_data, read_df, write_df)
+from simba.video_processors.egocentric_video_rotator import EgocentricVideoRotator
 
 
 class EgocentricalAligner():
@@ -73,7 +69,7 @@ class EgocentricalAligner():
         check_str(name=f'{self.__class__.__name__} anchor_1', value=anchor_1, allow_blank=False)
         check_str(name=f'{self.__class__.__name__} anchor_2', value=anchor_2, allow_blank=False)
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], unaccepted_vals=[0])
-        if core_cnt == -1: self.core_cnt = find_core_cnt()[0]
+        self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
         check_int(name=f'{self.__class__.__name__} direction', value=direction, min_value=0, max_value=360)
         if isinstance(anchor_location, tuple):
             check_valid_tuple(x=anchor_location, source=f'{self.__class__.__name__} anchor_location', accepted_lengths=(2,), valid_dtypes=(int,))
@@ -98,6 +94,7 @@ class EgocentricalAligner():
 
     def run(self):
         timer = SimbaTimer(start=True)
+        self.pool = None if not self.rotate_video else get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__)
         for file_cnt, file_path in enumerate(self.data_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(filepath=file_path)
@@ -127,8 +124,7 @@ class EgocentricalAligner():
             if self.verbose:
                 print(f'{self.video_name} complete, saved at {save_path} (elapsed time: {video_timer.elapsed_time_str}s)')
             if self.rotate_video:
-                if self.verbose:
-                    print(f'Rotating video {self.video_name}...')
+                if self.verbose: print(f'Rotating video {self.video_name}...')
                 video_path = find_video_of_file(video_dir=self.videos_dir, filename=self.video_name, raise_error=False)
                 save_path = os.path.join(self.save_dir, f'{self.video_name}.mp4')
                 video_rotator = EgocentricVideoRotator(video_path=video_path,
@@ -139,11 +135,13 @@ class EgocentricalAligner():
                                                        gpu=self.gpu,
                                                        fill_clr=self.fill_clr,
                                                        core_cnt=self.core_cnt,
-                                                       save_path=save_path)
+                                                       save_path=save_path,
+                                                       pool=self.pool)
                 video_rotator.run()
             if self.verbose:
                 print(f'Rotated data for video {self.video_name} ({file_cnt+1}/{len(self.data_paths)}) saved in {self.save_dir}.')
         timer.stop_timer()
+        terminate_cpu_pool(pool=self.pool, source=self.__class__.__name__)
         stdout_success(msg=f'Egocentrically aligned data for {len(self.data_paths)} files saved in {self.save_dir}', elapsed_time=timer.elapsed_time_str)
 
 
@@ -156,8 +154,23 @@ class EgocentricalAligner():
 #                                   direction=0,
 #                                   gpu=True,
 #                                   anchor_location=(600, 300),
-#                                   fill_clr=(128,128,128))
+#                                   fill_clr=(128,128,128),
+#                                   core_cnt=18)
 #     aligner.run()
+
+
+if __name__ == "__main__":
+    aligner = EgocentricalAligner(anchor_1='butt/proximal tail',
+                                  anchor_2='snout',
+                                  data_dir=r'C:\troubleshooting\open_field_below\project_folder\csv\outlier_corrected_movement_location',
+                                  videos_dir=r'C:\troubleshooting\open_field_below\project_folder\videos',
+                                  save_dir=r"C:\troubleshooting\open_field_below\project_folder\videos\rotated",
+                                  direction=0,
+                                  gpu=True,
+                                  anchor_location=(600, 300),
+                                  fill_clr=(128,128,128),
+                                  core_cnt=18)
+    aligner.run()
 
 #     aligner = EgocentricalAligner(anchor_1='tail_base',
 #                                   anchor_2='nose',
