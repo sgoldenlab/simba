@@ -7,12 +7,17 @@ import pandas as pd
 from simba.utils.checks import (check_if_dir_exists, check_if_valid_rgb_tuple,
                                 check_int, check_str, check_valid_boolean,
                                 check_valid_dataframe, check_valid_tuple)
-from simba.utils.data import egocentrically_align_pose_numba, terminate_cpu_pool, get_cpu_pool
+from simba.utils.data import (egocentrically_align_pose_numba, get_cpu_pool,
+                              terminate_cpu_pool)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (bgr_to_rgb_tuple, find_core_cnt, find_files_of_filetypes_in_directory, find_video_of_file, get_fn_ext, get_video_meta_data, read_df, write_df)
-from simba.video_processors.egocentric_video_rotator import EgocentricVideoRotator
+from simba.utils.read_write import (bgr_to_rgb_tuple, find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
+                                    find_video_of_file, get_fn_ext,
+                                    get_video_meta_data, read_df, write_df)
+from simba.video_processors.egocentric_video_rotator import \
+    EgocentricVideoRotator
 
 
 class EgocentricalAligner():
