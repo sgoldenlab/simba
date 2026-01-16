@@ -97,13 +97,20 @@ def read_df(file_path: Union[str, os.PathLike],
     .. note::
        For improved runtime, defaults to :external:py:meth:`pyarrow.csv.write_cs` if file type is ``csv``.
 
-    :parameter str file_path: Path to data file
-    :parameter str file_type: Type of data. OPTIONS: 'parquet', 'csv', 'pickle'.
-    :parameter Optional[bool]: If the input file has an initial index column. Default: True.
-    :parameter Optional[List[str]] remove_columns: If not None, then remove columns in lits.
-    :parameter Optional[List[str]] usecols: If not None, then keep columns in list.
-    :parameter bool check_multiindex: check file is multi-index headers. Default: False.
-    :parameter int multi_index_headers_to_keep: If reading multi-index file, and we want to keep one of the dropped multi-index levels as the header in the output file, specify the index of the multiindex hader as int.
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../docs/tables/read_df.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    :param str file_path: Path to data file
+    :param str file_type: Type of data. OPTIONS: 'parquet', 'csv', 'pickle'.
+    :param Optional[bool]: If the input file has an initial index column. Default: True.
+    :param Optional[List[str]] remove_columns: If not None, then remove columns in lits.
+    :param Optional[List[str]] usecols: If not None, then keep columns in list.
+    :param bool check_multiindex: check file is multi-index headers. Default: False.
+    :param int multi_index_headers_to_keep: If reading multi-index file, and we want to keep one of the dropped multi-index levels as the header in the output file, specify the index of the multiindex hader as int.
     :return: Table data in pd.DataFrame format.
     :rtype: pd.DataFrame
 
@@ -207,11 +214,18 @@ def write_df(df: pd.DataFrame,
     .. note::
        For improved runtime, defaults to ``pyarrow.csv`` if file_type == ``csv``.
 
-    :parameter pd.DataFrame df: Pandas dataframe to save to disk.
-    :parameter str file_type: Type of data. OPTIONS: ``parquet``, ``csv``,  ``pickle``.
-    :parameter str save_path: Location where to store the data.
-    :parameter bool check_multiindex: check if input file is multi-index headers. Default: False.
-    :parameter bool verbose: Prints message on completion. Default: False.
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../docs/tables/write_df.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    :param pd.DataFrame df: Pandas dataframe to save to disk.
+    :param str file_type: Type of data. OPTIONS: ``parquet``, ``csv``,  ``pickle``.
+    :param str save_path: Location where to store the data.
+    :param bool check_multiindex: check if input file is multi-index headers. Default: False.
+    :param bool verbose: Prints message on completion. Default: False.
 
     :example:
     >>> write_df(df=df, file_type='csv', save_path='project_folder/csv/input_csv/Video_1.csv')

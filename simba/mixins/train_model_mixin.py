@@ -1387,6 +1387,12 @@ class TrainModelMixin(object):
                           verbose: bool = False) -> np.ndarray:
 
         """
+        Helper to predict class probabilities using a fitted random forest classifier.
+
+        Computes prediction probabilities for binary or multiclass classification using either
+        scikit-learn or cuML RandomForestClassifier. For binary classifiers, returns the
+        probability of the positive class (class 1). For multiclass classifiers, returns
+        probabilities for all classes.
 
         .. csv-table::
            :header: EXPECTED RUNTIMES
@@ -1395,13 +1401,18 @@ class TrainModelMixin(object):
            :align: center
            :header-rows: 1
 
-        :param RandomForestClassifier clf: Random forest classifier object in cuml or scikit.
-        :param Union[pd.DataFrame, np.ndarray] x_df: Features for data to predict as a dataframe or array of size (M,N).
-        :param bool multiclass: If True, the classifier predicts more than 2 targets. Else, boolean classifier.
-        :param Optional[str] model_name: Name of model
-        :param Optional[str] data_path: Path to model on disk
-        :return np.ndarray: 2D array with frame represented by rows and present/absent probabilities as columns
-        :raises FeatureNumberMismatchError: If shape of x_df and clf.n_features_ or n_features_in_ show mismatch
+        .. seealso::
+           To fit a classifier, see :func:`simba.mixins.train_model_mixin.TrainModelMixin.clf_fit`
+           To define a classifier, see :func:`simba.mixins.train_model_mixin.TrainModelMixin.clf_define`
+
+        :param Union[RandomForestClassifier, cuRF] clf: Fitted random forest classifier object from sklearn or cuml.
+        :param Union[pd.DataFrame, np.ndarray] x_df: Features for data to predict. DataFrame or array of shape (n_samples, n_features).
+        :param bool multiclass: If True, the classifier predicts more than 2 classes. If False, binary classifier (default: False).
+        :param Optional[str] model_name: Name of the model for error messages and logging. Default: None.
+        :param Optional[Union[str, os.PathLike]] data_path: Path to the data file being processed, used in error messages. Default: None.
+        :param bool verbose: If True, print inference progress and timing information. Default: False.
+        :return np.ndarray: Prediction probabilities. For binary classifiers: 1D array of shape (n_samples,) with probability of positive class. For multiclass: 2D array of shape (n_samples, n_classes) with probabilities for each class.
+
         """
 
         timer = SimbaTimer(start=True)
@@ -1594,9 +1605,7 @@ class TrainModelMixin(object):
         :rtype: Tuple[pd.DataFrame, List[int]]
 
         """
-        if (platform.system() == "Darwin") and (
-                multiprocessing.get_start_method() != "spawn"
-        ):
+        if (platform.system() == "Darwin") and (multiprocessing.get_start_method() != "spawn"):
             multiprocessing.set_start_method("spawn", force=True)
         cpu_cnt, _ = find_core_cnt()
         df_lst, frame_numbers_lst = [], []
@@ -1623,9 +1632,7 @@ class TrainModelMixin(object):
                         :, ~df_concat.columns.str.contains("^Unnamed")
                         ].astype(np.float32)
             memory_size = get_memory_usage_of_df(df=df_concat)
-            print(
-                f'Dataset size: {memory_size["megabytes"]}MB / {memory_size["gigabytes"]}GB'
-            )
+            print(f'Dataset size: {memory_size["megabytes"]}MB / {memory_size["gigabytes"]}GB')
 
             return df_concat, frame_numbers_lst
 
