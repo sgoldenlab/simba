@@ -80,7 +80,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_core_cnt, get_fn_ext,
                                     get_memory_usage_of_df, get_pkg_version,
                                     read_config_entry, read_df, read_meta_file,
-                                    str_2_bool)
+                                    str_2_bool, get_current_time)
 from simba.utils.warnings import (GPUToolsWarning, MissingUserInputWarning,
                                   MultiProcessingFailedWarning,
                                   NoModuleWarning, NotEnoughDataWarning,
@@ -1383,10 +1383,19 @@ class TrainModelMixin(object):
                           x_df: Union[pd.DataFrame, np.ndarray],
                           multiclass: bool = False,
                           model_name: Optional[str] = None,
-                          data_path: Optional[Union[str, os.PathLike]] = None) -> np.ndarray:
+                          data_path: Optional[Union[str, os.PathLike]] = None,
+                          verbose: bool = False) -> np.ndarray:
 
         """
-        :param RandomForestClassifier clf: Random forest classifier object
+
+        .. csv-table::
+           :header: EXPECTED RUNTIMES
+           :file: ../../docs/tables/clf_predict_proba.csv
+           :widths: 10, 45, 45
+           :align: center
+           :header-rows: 1
+
+        :param RandomForestClassifier clf: Random forest classifier object in cuml or scikit.
         :param Union[pd.DataFrame, np.ndarray] x_df: Features for data to predict as a dataframe or array of size (M,N).
         :param bool multiclass: If True, the classifier predicts more than 2 targets. Else, boolean classifier.
         :param Optional[str] model_name: Name of model
@@ -1395,6 +1404,7 @@ class TrainModelMixin(object):
         :raises FeatureNumberMismatchError: If shape of x_df and clf.n_features_ or n_features_in_ show mismatch
         """
 
+        timer = SimbaTimer(start=True)
         if hasattr(clf, "n_features_"):
             clf_n_features = clf.n_features_
         elif hasattr(clf, "n_features_in_"):
@@ -1420,6 +1430,8 @@ class TrainModelMixin(object):
         p_vals = clf.predict_proba(x_df)
         if multiclass and (clf.n_classes_ != p_vals.shape[1]):
             raise ClassifierInferenceError(msg=f"The classifier {model_name} (data path: {data_path}) is a multiclassifier expected to create {clf.n_classes_} behavior probabilities. However, it produced probabilities for {p_vals.shape[1]} behaviors. See The SimBA GitHub FAQ page or Gitter for more information and suggested fixes.", source=self.__class__.__name__)
+        timer.stop_timer()
+        if verbose: print(f'Inference for model {model_name} over {x_df.shape[0]} observations complete ({timer.elapsed_time_str}s).')
         if not multiclass:
             if isinstance(p_vals, pd.DataFrame):
                 return p_vals[1].values
@@ -1447,7 +1459,7 @@ class TrainModelMixin(object):
                    bootstrap: Optional[bool] = True,
                    verbose: Optional[int] = 1,
                    class_weight: Optional[dict] = None,
-                   cuda: Optional[bool] = False) -> RandomForestClassifier:
+                   cuda: Optional[bool] = False) -> Union[RandomForestClassifier, cuRF]:
 
         if not cuda:
             # NOTE: LOKY ISSUES ON WINDOWS WITH SCIKIT IF THE CORE COUNT EXCEEDS 61.
@@ -1482,20 +1494,32 @@ class TrainModelMixin(object):
                 clf: Union[RandomForestClassifier, cuRF],
                 x_df: pd.DataFrame,
                 y_df: pd.DataFrame,
-                ) -> RandomForestClassifier:
+                verbose: bool = False) -> Union[RandomForestClassifier, cuRF]:
 
         """
-        Helper to fit clf model
+        Helper to fit clf model.
 
-        :param clf: Un-fitted random forest classifier object
+        .. csv-table::
+           :header: EXPECTED RUNTIMES
+           :file: ../../docs/tables/clf_fit.csv
+           :widths: 20, 20, 30, 30
+           :align: center
+           :header-rows: 1
+
+        .. seealso::
+           To define a cuml/sklearn object, see :func:`simba.mixins.train_model_mixin.TrainModelMixin.clf_define`
+
+        :param clf: Un-fitted random forest classifier object, either from sklearn or cuml.
         :param pd.DataFrame x_df: Pandas dataframe with features.
         :param pd.DataFrame y_df: Pandas dataframe/Series with target
         :return: Fitted random forest classifier object
         :rtype: RandomForestClassifier
         """
 
+        timer = SimbaTimer(start=True)
         nan_features = x_df[~x_df.applymap(np.isreal).all(1)]
         nan_target = y_df.loc[pd.to_numeric(y_df).isna()]
+        using_cuda = True if CUML in str(clf.__class__.__module__).lower() else False
         if len(nan_features) > 0:
             raise FaultyTrainingSetError(
                 msg=f"{len(nan_features)} frame(s) in your project_folder/csv/targets_inserted directory contains FEATURES with non-numerical values",
@@ -1504,9 +1528,16 @@ class TrainModelMixin(object):
             raise FaultyTrainingSetError(
                 msg=f"{len(nan_target)} frame(s) in your project_folder/csv/targets_inserted directory contains ANNOTATIONS with non-numerical values",
                 source=self.__class__.__name__)
+        if verbose: print(f'[{get_current_time()}] Fitting classifier for {len(x_df)} observations (cuda: {"True" if using_cuda else "False"})...')
+        if using_cuda:
+            x_data = x_df.values if isinstance(x_df, pd.DataFrame) else x_df
+            y_data = y_df.values if isinstance(y_df, (pd.DataFrame, pd.Series)) else y_df
+            clf.fit(x_data, y_data)
+        else:
+            clf.fit(x_df, y_df)
 
-        clf.fit(x_df, y_df)
-
+        timer.stop_timer()
+        if verbose: print(f'[{get_current_time()}] Classifier fitted in {timer.elapsed_time_str}s.')
         return clf
 
     @staticmethod
