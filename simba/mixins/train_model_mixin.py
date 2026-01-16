@@ -77,10 +77,10 @@ from simba.utils.errors import (ClassifierInferenceError, CorruptedFileError,
                                 SamplingError, SimBAModuleNotFoundError)
 from simba.utils.lookups import get_meta_data_file_headers, get_table
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_core_cnt, get_fn_ext,
-                                    get_memory_usage_of_df, get_pkg_version,
-                                    read_config_entry, read_df, read_meta_file,
-                                    str_2_bool, get_current_time)
+from simba.utils.read_write import (find_core_cnt, get_current_time,
+                                    get_fn_ext, get_memory_usage_of_df,
+                                    get_pkg_version, read_config_entry,
+                                    read_df, read_meta_file, str_2_bool)
 from simba.utils.warnings import (GPUToolsWarning, MissingUserInputWarning,
                                   MultiProcessingFailedWarning,
                                   NoModuleWarning, NotEnoughDataWarning,
