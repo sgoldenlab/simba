@@ -331,10 +331,12 @@ def _digital(data, results):
 
 def img_stack_brightness(x: np.ndarray,
                          method: Optional[Literal['photometric', 'digital']] = 'digital',
-                         ignore_black: Optional[bool] = True) -> np.ndarray:
+                         ignore_black: bool = True,
+                         verbose: bool = False) -> np.ndarray:
     """
     Calculate the average brightness of a stack of images using a specified method.
 
+    Useful for analyzing light cues or brightness changes over time. For example, compute brightness in images containing a light cue ROI, then perform clustering (e.g., k-means) on brightness values to identify frames when the light cue is on vs off.
 
     - **Photometric Method**: The brightness is calculated using the formula:
 
@@ -346,7 +348,7 @@ def img_stack_brightness(x: np.ndarray,
     .. math::
        \text{brightness} = 0.299 \cdot R + 0.587 \cdot G + 0.114 \cdot B
 
-    .. selalso::
+    .. seealso::
        For CPU function see :func:`~simba.mixins.image_mixin.ImageMixin.brightness_intensity`.
 
     :param np.ndarray x: A 4D array of images with dimensions (N, H, W, C), where N is the number of images, H and W are the height and width, and C is the number of channels (RGB).
@@ -363,7 +365,7 @@ def img_stack_brightness(x: np.ndarray,
 
     check_instance(source=img_stack_brightness.__name__, instance=x, accepted_types=(np.ndarray,))
     check_if_valid_img(data=x[0], source=img_stack_brightness.__name__)
-    x = np.ascontiguousarray(x).astype(np.uint8)
+    x, timer = np.ascontiguousarray(x).astype(np.uint8), SimbaTimer(start=True)
     if x.ndim == 4:
         grid_x = (x.shape[1] + 16 - 1) // 16
         grid_y = (x.shape[2] + 16 - 1) // 16
@@ -383,7 +385,8 @@ def img_stack_brightness(x: np.ndarray,
     else:
         results = deepcopy(x)
         results = np.mean(results, axis=(1, 2))
-
+    timer.stop_timer()
+    if verbose: print(f'Brightness computed in {results.shape[0]} images (elapsed time {timer.elapsed_time_str}s)')
     return results
 
 

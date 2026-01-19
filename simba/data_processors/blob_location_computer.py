@@ -51,7 +51,7 @@ class BlobLocationComputer(object):
     :param Optional[bool] multiprocessing: If True, video background subtraction will be done using  multiprocessing. Default is False.
 
     :example:
-    >>> x = BlobLocationComputer(data_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", multiprocessing=True, gpu=True, batch_size=2000, save_dir=r"C:\blob_positions")
+    >>> x = BlobLocationComputer(data_path=r"C:/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", multiprocessing=True, gpu=True, batch_size=2000, save_dir=r"C:/blob_positions")
     >>> x.run()
     """
     def __init__(self,

@@ -2645,9 +2645,9 @@ class TrainModelMixin(object):
         :param bool plot: If True, create SHAP aggregation and plots.
 
         :example:
-        >>> CONFIG_PATH = r"C:\troubleshooting\mitra\project_folder\project_config.ini"
-        >>> RF_PATH = r"C:\troubleshooting\mitra\models\validations\straub_tail_5_new\straub_tail_5.sav"
-        >>> DATA_PATH = r"C:\troubleshooting\mitra\project_folder\csv\targets_inserted\new_straub\appended\501_MA142_Gi_CNO_0514.csv"
+        >>> CONFIG_PATH = r"C:/troubleshooting/mitra/project_folder/project_config.ini"
+        >>> RF_PATH = r"C:/troubleshooting/mitra/models/validations/straub_tail_5_new/straub_tail_5.sav"
+        >>> DATA_PATH = r"C:/troubleshooting/mitra/project_folder/csv/targets_inserted/new_straub/appended/501_MA142_Gi_CNO_0514.csv"
         >>> config = ConfigReader(config_path=CONFIG_PATH)
         >>> df = read_df(file_path=DATA_PATH, file_type='csv')
         >>> y = df['straub_tail']

@@ -58,11 +58,11 @@ class COCOKeypoints2YoloBbox:
     :return: None
 
     :example:
-    >>> runner = COCOKeypoints2Yolo(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\s1\annotations\s1.json", img_dir=r"D:\cvat_annotations\frames\simon", save_dir=r"D:\cvat_annotations\frames\yolo_keypoints", clahe=True)
+    >>> runner = COCOKeypoints2YoloBbox(coco_path=r"D:/cvat_annotations/frames/coco_keypoints_1/s1/annotations/s1.json", img_dir=r"D:/cvat_annotations/frames/simon", save_dir=r"D:/cvat_annotations/frames/yolo_keypoints", clahe=True)
     >>> runner.run()
 
     :example II:
-    >>> runner = COCOKeypoints2Yolo(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\merged.json", img_dir=r"D:\cvat_annotations\frames", save_dir=r"D:\cvat_annotations\frames\yolo", clahe=False)
+    >>> runner = COCOKeypoints2YoloBbox(coco_path=r"D:/cvat_annotations/frames/coco_keypoints_1/merged.json", img_dir=r"D:/cvat_annotations/frames", save_dir=r"D:/cvat_annotations/frames/yolo", clahe=False)
     >>> runner.run()
 
      :references:

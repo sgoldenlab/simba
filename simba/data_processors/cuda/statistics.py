@@ -3,7 +3,7 @@ __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import math
 from itertools import combinations
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 from simba.utils.printing import SimbaTimer
 
@@ -19,16 +19,20 @@ from scipy.spatial import ConvexHull
 from simba.utils.read_write import get_unique_values_in_iterable, read_df
 from simba.utils.warnings import GPUToolsWarning
 
+
 try:
     import cupy as cp
-    from cuml.metrics import kl_divergence as kl_divergence_gpu
-    #from cuml.metrics.cluster.adjusted_rand_index import adjusted_rand_score
-    #from cuml.metrics.cluster.silhouette_score import cython_silhouette_score
     from cupyx.scipy.spatial.distance import cdist
 except Exception as e:
     GPUToolsWarning(msg=f'GPU tools not detected, reverting to CPU: {e.args}')
     import numpy as cp
     from scipy.spatial.distance import cdist
+try:
+    from cuml.metrics import kl_divergence as kl_divergence_gpu
+    from cuml.metrics.cluster.adjusted_rand_index import adjusted_rand_score
+    from cuml.metrics.cluster.silhouette_score import cython_silhouette_score
+except Exception as e:
+    GPUToolsWarning(msg=f'GPU tools not detected, reverting to CPU: {e.args}')
     from scipy.stats import entropy as kl_divergence_gpu
     from sklearn.metrics import adjusted_rand_score
     from sklearn.metrics import silhouette_score as cython_silhouette_score
@@ -41,7 +45,7 @@ except:
 from simba.data_processors.cuda.utils import _cuda_are_rows_equal
 from simba.mixins.statistics_mixin import Statistics
 from simba.utils.checks import (check_int, check_str, check_valid_array,
-                                check_valid_tuple)
+                                check_valid_tuple, check_float)
 from simba.utils.data import bucket_data
 from simba.utils.enums import Formats
 
@@ -381,9 +385,10 @@ def sliding_min(x: np.ndarray, time_window: float, sample_rate: int) -> np.ndarr
 
 def sliding_spearmans_rank(x: np.ndarray,
                            y: np.ndarray,
-                           time_window: float,
-                           sample_rate: int,
-                           batch_size: Optional[int] = int(1.6e+7)) -> np.ndarray:
+                           time_window: Union[float, int],
+                           sample_rate: Union[float, int],
+                           batch_size: Optional[int] = int(1.6e+7),
+                           verbose: bool = False) -> np.ndarray:
     """
     Computes the Spearman's rank correlation coefficient between two 1D arrays `x` and `y`
     over sliding windows of size `time_window * sample_rate`. The computation is performed
@@ -414,7 +419,13 @@ def sliding_spearmans_rank(x: np.ndarray,
     >>> sliding_spearmans_rank(x, y, time_window=0.5, sample_rate=2)
     """
 
-    window_size = int(np.ceil(time_window * sample_rate))
+    timer = SimbaTimer(start=True)
+    check_valid_array(data=x, source=f'{sliding_spearmans_rank.__name__} x', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=y, source=f'{sliding_spearmans_rank.__name__} y', accepted_ndims=(1,), accepted_axis_0_shape=(x.shape[0],), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_spearmans_rank.__name__} time_window', value=time_window, allow_zero=False, allow_negative=False, raise_error=True)
+    check_float(name=f'{sliding_spearmans_rank.__name__} sample_rate', value=sample_rate, allow_zero=False, allow_negative=False, raise_error=True)
+    check_int(name=f'{sliding_spearmans_rank.__name__} batch_size', value=batch_size, allow_zero=False, allow_negative=False, raise_error=True)
+    window_size = np.int32(np.ceil(time_window * sample_rate))
     n = x.shape[0]
     results = cp.full(n, -1, dtype=cp.float32)
 
@@ -434,7 +445,11 @@ def sliding_spearmans_rank(x: np.ndarray,
 
         results[left + window_size - 1:right] = s
 
-    return cp.asnumpy(results)
+    r = cp.asnumpy(results)
+    timer.stop_timer()
+    if verbose: print(f'Sliding Spearmans rank for {x.shape[0]} observations computed (elapsed time: {timer.elapsed_time_str}s)')
+    return r
+
 
 
 
@@ -538,6 +553,12 @@ def euclidean_distance_to_static_point(data: np.ndarray,
                                        batch_size: Optional[int] = int(6.5e+7)) -> np.ndarray:
     """
     Computes the Euclidean distance between each point in a given 2D array `data` and a static point using GPU acceleration.
+
+    .. seealso::
+       For CPU-based distance to static point (ROI center), see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance_roi`
+       For CPU-based framewise Euclidean distance, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance`
+       For GPU CuPy solution for distance between two sets of points, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cupy`
+       For GPU numba CUDA solution for distance between two sets of points, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`
 
     :param data: A 2D array of shape (N, 2), where N is the number of points, and each point is represented by its (x, y) coordinates. The array can represent pixel coordinates.
     :param point: A tuple of two integers representing the static point (x, y) in the same space as `data`.
@@ -790,12 +811,30 @@ def xie_beni(x: np.ndarray, y: np.ndarray) -> float:
     return xb
 
 
-def i_index(x: np.ndarray, y: np.ndarray):
+def i_index(x: np.ndarray, y: np.ndarray, verbose: bool = False) -> float:
     """
     Calculate the I-Index for evaluating clustering quality.
 
     The I-Index is a metric that measures the compactness and separation of clusters.
     A higher I-Index indicates better clustering with compact and well-separated clusters.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/i_index_cuda.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    The I-Index is calculated as:
+
+    .. math::
+        I = \frac{SST}{k \times SWC}
+
+    where:
+
+    - :math:`SST = \sum_{i=1}^{n} \|x_i - \mu\|^2` is the total sum of squares (sum of squared distances from all points to the global centroid)
+    - :math:`k` is the number of clusters
+    - :math:`SWC = \sum_{c=1}^{k} \sum_{i \in c} \|x_i - \mu_c\|^2` is the within-cluster sum of squares (sum of squared distances from points to their cluster centroids)
 
     .. seealso::
        To compute Xie-Beni on the CPU, use :func:`~simba.mixins.statistics_mixin.Statistics.i_index`
@@ -807,17 +846,16 @@ def i_index(x: np.ndarray, y: np.ndarray):
 
     :references:
         .. [1] Zhao, Q., Xu, M., Fränti, P. (2009). Sum-of-Squares Based Cluster Validity Index and Significance Analysis.
-               In: Kolehmainen, M., Toivanen, P., Beliczynski, B. (eds) Adaptive and Natural Computing Algorithms. ICANNGA 2009.
-                Lecture Notes in Computer Science, vol 5495. Springer, Berlin, Heidelberg. https://doi.org/10.1007/978-3-642-04921-7_32
+               In: Kolehmainen, M., Toivanen, P., Beliczynski, B. (eds) Adaptive and Natural Computing Algorithms. ICANNGA 2009. Lecture Notes in Computer Science, vol 5495. Springer, Berlin, Heidelberg. https://doi.org/10.1007/978-3-642-04921-7_32
 
     :example:
     >>> X, y = make_blobs(n_samples=5000, centers=20, n_features=3, random_state=0, cluster_std=0.1)
     >>> i_index(x=X, y=y)
     """
+    timer = SimbaTimer(start=True)
     check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
-    check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value,
-                      accepted_axis_0_shape=[x.shape[0], ])
-    _ = get_unique_values_in_iterable(data=y, name=i_index.__name__, min=2)
+    check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0], ])
+    cluster_cnt = get_unique_values_in_iterable(data=y, name=i_index.__name__, min=2)
     x, y = cp.array(x), cp.array(y)
     unique_y = cp.unique(y)
     n_y = unique_y.shape[0]
@@ -831,9 +869,10 @@ def i_index(x: np.ndarray, y: np.ndarray):
         swc += cp.sum(cp.linalg.norm(cluster_obs - cluster_centroid, axis=1) ** 2)
 
     i_idx = sst / (n_y * swc)
-
+    i_idx = np.float32(i_idx.get()) if hasattr(i_idx, 'get') else np.float32(i_idx)
+    timer.stop_timer()
+    if verbose: print(f'I-index for {x.shape[0]} observations in {cluster_cnt} clusters computed (elapsed time: {timer.elapsed_time_str}s)')
     return i_idx
-
 
 def kullback_leibler_divergence_gpu(x: np.ndarray,
                                     y: np.ndarray,

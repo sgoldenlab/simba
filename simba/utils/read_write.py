@@ -2967,7 +2967,7 @@ def labelme_to_dlc(labelme_dir: Union[str, os.PathLike],
     :return: None
 
     :example:
-    >>> labelme_dir = r'D:\ts_annotations'
+    >>> labelme_dir = r'D:/ts_annotations'
     >>> labelme_to_dlc(labelme_dir=labelme_dir)
     """
 
@@ -3611,8 +3611,8 @@ def osf_download(project_id: str, save_dir: Union[str, os.PathLike], storage: st
     :param bool overwrite: If True, overwrite existing files. If False, skip existing files (default: False).
 
     :example:
-    >>> osf_download(project_id="7fgwn", save_dir=r'E:\rgb_white_vs_black_imgs')
-    >>> osf_download(project_id="kym42", save_dir=r'E:\crim13_imgs', overwrite=True)
+    >>> osf_download(project_id="7fgwn", save_dir=r'E:/rgb_white_vs_black_imgs')
+    >>> osf_download(project_id="kym42", save_dir=r'E:/crim13_imgs', overwrite=True)
     """
 
     _ = get_pkg_version(pkg='osfclient', raise_error=True)

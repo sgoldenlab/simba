@@ -3278,10 +3278,34 @@ class Statistics(FeatureExtractionMixin):
 
         Youden's J statistic is a measure of the overall performance of a binary classification test, taking into account both sensitivity (true positive rate) and specificity (true negative rate).
 
-        :param sample_1: The first binary array.
-        :param sample_2: The second binary array.
-        :return: Youden's J statistic.
+        The Youden's J statistic is calculated as:
+
+        .. math::
+            J = \text{sensitivity} + \text{specificity} - 1
+
+        where:
+
+        - :math:`\text{sensitivity} = \frac{TP}{TP + FN}` is the true positive rate
+        - :math:`\text{specificity} = \frac{TN}{TN + FP}` is the true negative rate
+
+        The statistic ranges from -1 to 1, where:
+        - :math:`J = 1` indicates perfect classification
+        - :math:`J = 0` indicates the test performs no better than random
+        - :math:`J < 0` indicates the test performs worse than random
+
+        :param sample_1: The first binary array (ground truth or reference).
+        :param sample_2: The second binary array (predictions or test results).
+        :return: Youden's J statistic. Returns NaN if either sensitivity or specificity cannot be calculated (division by zero).
         :rtype: float
+
+        :references:
+            .. [1] Youden, W. J. (1950). Index for rating diagnostic tests. Cancer, 3(1), 32-35.
+                   https://acsjournals.onlinelibrary.wiley.com/doi/abs/10.1002/1097-0142(1950)3:1%3C32::AID-CNCR2820030106%3E3.0.CO;2-3
+
+        :example:
+        >>> y_true = np.array([1, 1, 0, 0, 1, 0, 1, 1, 0, 0])
+        >>> y_pred = np.array([1, 1, 0, 1, 1, 0, 1, 0, 0, 0])
+        >>> j = Statistics.youden_j(sample_1=y_true, sample_2=y_pred)
         """
 
         check_valid_array(data=sample_1, source=f'{Statistics.youden_j.__name__} sample_1', accepted_ndims=(1,), accepted_values=[0, 1])
@@ -4257,7 +4281,7 @@ class Statistics(FeatureExtractionMixin):
         return separation_trace / compactness
 
     @staticmethod
-    def i_index(x: np.ndarray, y: np.ndarray):
+    def i_index(x: np.ndarray, y: np.ndarray, verbose: bool = False) -> float:
 
         """
         Calculate the I-Index for evaluating clustering quality.
@@ -4282,9 +4306,10 @@ class Statistics(FeatureExtractionMixin):
         >>> X, y = make_blobs(n_samples=5000, centers=20, n_features=3, random_state=0, cluster_std=0.1)
         >>> Statistics.i_index(x=X, y=y)
         """
+        timer = SimbaTimer(start=True)
         check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0], ])
-        _ = get_unique_values_in_iterable(data=y, name=Statistics.i_index.__name__, min=2)
+        cluster_cnt = get_unique_values_in_iterable(data=y, name=Statistics.i_index.__name__, min=2)
         unique_y = np.unique(y)
         n_y = unique_y.shape[0]
         global_centroid = np.mean(x, axis=0)
@@ -4296,7 +4321,12 @@ class Statistics(FeatureExtractionMixin):
             cluster_centroid = np.mean(cluster_obs, axis=0)
             swc += np.sum(np.linalg.norm(cluster_obs - cluster_centroid, axis=1) ** 2)
 
-        return sst / (n_y * swc)
+
+        i_index = np.float32(sst / (n_y * swc))
+        timer.stop_timer()
+        if verbose: print(f'I-index for {x.shape[0]} observations in {cluster_cnt} clusters computed (elapsed time: {timer.elapsed_time_str}s)')
+        return i_index
+
 
     @staticmethod
     def sd_index(x: np.ndarray, y: np.ndarray) -> float:

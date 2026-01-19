@@ -98,14 +98,14 @@ class HeatMapperClfMultiprocess(ConfigReader, PlottingMixin):
 
 
     :example II:
-    >>> test = HeatMapperClfMultiprocess(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini",
+    >>> test = HeatMapperClfMultiprocess(config_path=r"C:/troubleshooting/RAT_NOR/project_folder/project_config.ini",
     >>>                          style_attr = {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 50, 'max_scale': 'auto'},
     >>>                          final_img_setting=True,
     >>>                          video_setting=True,
     >>>                          frame_setting=True,
     >>>                          bodypart='Ear_left',
     >>>                          clf_name='straub_tail',
-    >>>                          data_paths=[r"C:\troubleshooting\RAT_NOR\project_folder\csv\test\2022-06-20_NOB_DOT_4.csv"])
+    >>>                          data_paths=[r"C:/troubleshooting/RAT_NOR/project_folder/csv/test/2022-06-20_NOB_DOT_4.csv"])
     >>> test.run()
     """
 

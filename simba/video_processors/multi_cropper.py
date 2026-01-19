@@ -49,7 +49,7 @@ class MultiCropper(object):
 
 
     :example:
-    >>> cropper = MultiCropper(file_type='mp4', input_folder=r'C:\troubleshooting\mitra\test', output_folder=r'C:\troubleshooting\mitra\test\cropped', crop_cnt=2, gpu=True)
+    >>> cropper = MultiCropper(file_type='mp4', input_folder=r'C:/troubleshooting/mitra/test', output_folder=r'C:/troubleshooting/mitra/test/cropped', crop_cnt=2, gpu=True)
     >>> cropper.run()
     """
 

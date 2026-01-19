@@ -64,7 +64,7 @@ class LabellingInterface(ConfigReader):
     :param bool continuing: Set True to resume annotations from an existing targets file. Defaults to False.
 
     :example:
-    >>> _ = LabellingInterface(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", file_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0521.mp4", thresholds=None, continuing=False)
+    >>> _ = LabellingInterface(config_path=r"C:/troubleshooting/mitra/project_folder/project_config.ini", file_path=r"C:/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4", thresholds=None, continuing=False)
     """
 
     def __init__(self,

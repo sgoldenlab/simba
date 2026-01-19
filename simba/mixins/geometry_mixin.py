@@ -1556,7 +1556,7 @@ class GeometryMixin(object):
         :rtype: List[float]
 
         :example:
-        >>> df = read_df(file_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\csv\outlier_corrected_movement_location\Together_2.csv", file_type='csv').astype(int)
+        >>> df = read_df(file_path=r"C:/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_2.csv", file_type='csv').astype(int)
         >>> animal_1_cols = [x for x in df.columns if '_1_' in x and not '_p' in x]
         >>> animal_2_cols = [x for x in df.columns if '_2_' in x and not '_p' in x]
         >>> animal_1_arr = df[animal_1_cols].values.reshape(len(df), int(len(animal_1_cols)/ 2), 2)
@@ -1622,7 +1622,7 @@ class GeometryMixin(object):
         :return List[float]: List of overlap between corresponding Polygons. If overlap 1, else 0.
 
         :example:
-        >>> df = read_df(file_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\csv\outlier_corrected_movement_location\Together_2.csv", file_type='csv').astype(int)
+        >>> df = read_df(file_path=r"C:/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_2.csv", file_type='csv').astype(int)
         >>> animal_1_cols = [x for x in df.columns if '_1_' in x and not '_p' in x]
         >>> animal_2_cols = [x for x in df.columns if '_2_' in x and not '_p' in x]
         >>> animal_1_arr = df[animal_1_cols].values.reshape(len(df), int(len(animal_1_cols)/ 2), 2)
@@ -1693,7 +1693,7 @@ class GeometryMixin(object):
         :rtype: List[float]
 
         :example:
-        >>> df = read_df(file_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\csv\outlier_corrected_movement_location\Together_2.csv", file_type='csv').astype(int)
+        >>> df = read_df(file_path=r"C:/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_2.csv", file_type='csv').astype(int)
         >>> animal_1_cols = [x for x in df.columns if '_1_' in x and not '_p' in x]
         >>> animal_2_cols = [x for x in df.columns if '_2_' in x and not '_p' in x]
         >>> animal_1_arr = df[animal_1_cols].values.reshape(len(df), int(len(animal_1_cols)/ 2), 2)
@@ -1763,7 +1763,7 @@ class GeometryMixin(object):
         :rtype: List[Polygon]
 
         :example:
-        >>> df = read_df(file_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\csv\outlier_corrected_movement_location\Together_2.csv", file_type='csv').astype(int)
+        >>> df = read_df(file_path=r"C:/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_2.csv", file_type='csv').astype(int)
         >>> animal_1_cols = [x for x in df.columns if '_1_' in x and not '_p' in x]
         >>> animal_1_arr = df[animal_1_cols].values.reshape(len(df), int(len(animal_1_cols)/ 2), 2)
         >>> animal_1_geo = GeometryMixin.bodyparts_to_polygon(data=animal_1_arr)
@@ -3525,10 +3525,10 @@ class GeometryMixin(object):
         :rtype: Tuple[Dict[Tuple[int, int], Dict[Tuple[int, int], float]], Dict[Tuple[int, int], Dict[Tuple[int, int], int]]]
 
         :example:
-        >>> video_meta_data = get_video_meta_data(video_path=r"C:\troubleshooting\mitra\project_folder\videos\708_MA149_Gq_CNO_0515.mp4")
+        >>> video_meta_data = get_video_meta_data(video_path=r"C:/troubleshooting/mitra/project_folder/videos/708_MA149_Gq_CNO_0515.mp4")
         >>> w, h = video_meta_data['width'], video_meta_data['height']
         >>> grid = GeometryMixin().bucket_img_into_grid_square(bucket_grid_size=(5, 5), bucket_grid_size_mm=None, img_size=(h, w), verbose=False)[0]
-        >>> data = read_df(file_path=r'C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\708_MA149_Gq_CNO_0515.csv', file_type='csv')[['Nose_x', 'Nose_y']].values
+        >>> data = read_df(file_path=r'C:/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/708_MA149_Gq_CNO_0515.csv', file_type='csv')[['Nose_x', 'Nose_y']].values
         >>> transition_probabilities, _ = geometry_transition_probabilities(data=data, grid=grid)
         """
 
@@ -3990,7 +3990,7 @@ class GeometryMixin(object):
         :rtype: np.ndarray
 
         :example:
-        >>> data_path = r"C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\FRR_gq_Saline_0624.csv"
+        >>> data_path = r"C:/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/FRR_gq_Saline_0624.csv"
         >>> animal_data = read_df(file_path=data_path, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y', 'Left_side_x', 'Left_side_y', 'Right_side_x', 'Right_side_y']).values.reshape(-1, 4, 2)[0:20].astype(np.int32)
         >>> animal_polygons = GeometryMixin().bodyparts_to_polygon(data=animal_data)
         >>> GeometryMixin.geometries_to_exterior_keypoints(geometries=animal_polygons)
@@ -4160,7 +4160,7 @@ class GeometryMixin(object):
          :rtype: Union[None, Dict[Any, dict]]
 
          :example I:
-             >>> results = GeometryMixin.sleap_csv_to_geometries(data=r"C:\troubleshooting\ants\pose_data\ant.csv")
+             >>> results = GeometryMixin.sleap_csv_to_geometries(data=r"C:/troubleshooting/ants/pose_data/ant.csv")
              >>> # Results structure: {track_id: {frame_idx: Polygon, ...}, ...}
 
         :example II

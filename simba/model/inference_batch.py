@@ -45,7 +45,7 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
     >>> inferencer.run()
 
     :example II:
-    >>> inferencer = InferenceBatch(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini", features_dir=r"D:\troubleshooting\mitra\project_folder\videos\bg_removed\rotated\tail_features\APPENDED")
+    >>> inferencer = InferenceBatch(config_path=r"D:/troubleshooting/mitra/project_folder/project_config.ini", features_dir=r"D:/troubleshooting/mitra/project_folder/videos/bg_removed/rotated/tail_features/APPENDED")
     >>> inferencer.run()
     """
 

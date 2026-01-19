@@ -57,17 +57,16 @@ class ImageMixin(object):
         pass
 
     @staticmethod
-    def brightness_intensity(imgs: List[np.ndarray], ignore_black: Optional[bool] = True) -> List[float]:
+    def brightness_intensity(imgs: Union[List[np.ndarray], np.ndarray], ignore_black: bool = True, verbose: bool = False) -> np.ndarray:
         """
         Compute the average brightness intensity within each image within a list.
 
         For example, (i) create a list of images containing a light cue ROI, (ii) compute brightness in each image, (iii) perform kmeans on brightness, and get the frames when the light cue is on vs off.
 
         .. seealso::
-           For GPU acceleration, see :func:`simba.data_processors.cuda.image.img_stack_brightness`.
-           For geometry based brightness, see :func:`simba.mixins.geometry_mixin.GeometryMixin.get_geometry_brightness_intensity`
+           For GPU acceleration, see :func:`simba.data_processors.cuda.image.img_stack_brightness`. For geometry based brightness, see :func:`simba.mixins.geometry_mixin.GeometryMixin.get_geometry_brightness_intensity`
 
-        :param List[np.ndarray] imgs: List of images as arrays to calculate average brightness intensity within.
+        :param Union[List[np.ndarray], np.ndarray] imgs: List of images as arrays or 3/4d array of images to calculate average brightness intensity within.
         :param Optional[bool] ignore_black: If True, ignores black pixels. If the images are sliced non-rectangular geometric shapes created by ``slice_shapes_in_img``, then pixels that don't belong to the shape has been masked in black.
         :returns: List of floats of size len(imgs) with brightness intensities.
         :rtype: List[float]
@@ -77,14 +76,12 @@ class ImageMixin(object):
         >>> ImageMixin.brightness_intensity(imgs=[img], ignore_black=False)
         >>> [159.0]
         """
-        results = []
-        check_instance(source=f"{ImageMixin().brightness_intensity.__name__} imgs", instance=imgs, accepted_types=list)
-        for cnt, img in enumerate(imgs):
-            check_instance(
-                source=f"{ImageMixin().brightness_intensity.__name__} img {cnt}",
-                instance=img,
-                accepted_types=np.ndarray,
-            )
+        results, timer = [], SimbaTimer(start=True)
+        check_instance(source=f"{ImageMixin().brightness_intensity.__name__} imgs", instance=imgs, accepted_types=(list, np.ndarray,))
+        if isinstance(imgs, np.ndarray): imgs = np.array(imgs)
+        for img_cnt in range(imgs.shape[0]):
+            img = imgs[img_cnt]
+            check_instance(source=f"{ImageMixin().brightness_intensity.__name__} img {img_cnt}", instance=img, accepted_types=np.ndarray)
             if len(img) == 0:
                 results.append(0)
             else:
@@ -92,7 +89,10 @@ class ImageMixin(object):
                     results.append(np.ceil(np.average(img[img != 0])))
                 else:
                     results.append(np.ceil(np.average(img)))
-        return results
+        b = np.array(results).astype(np.float32)
+        timer.stop_timer()
+        if verbose: print(f'Brightness computed in {b.shape[0]} images (elapsed time {timer.elapsed_time_str}s)')
+
 
     @staticmethod
     def gaussian_blur(img: np.ndarray, kernel_size: Optional[Tuple] = (9, 9)) -> np.ndarray:
@@ -1898,7 +1898,7 @@ class ImageMixin(object):
         :rtype: np.ndarray
 
         :example:
-        >>> VIDEO_PATH = r"D:\EPM_2\EPM_1.mp4"
+        >>> VIDEO_PATH = r"D:/EPM_2/EPM_1.mp4"
         >>> img = read_img_batch_from_video(video_path=VIDEO_PATH, greyscale=True, start_frm=0, end_frm=15, core_cnt=1)
         >>> imgs = np.stack(list(img.values()))
         >>> resized_img = resize_img_stack(imgs=imgs)

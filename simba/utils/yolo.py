@@ -47,6 +47,9 @@ def fit_yolo(weights_path: Union[str, os.PathLike],
        `Download initial weights <https://huggingface.co/Ultralytics>`__.
        `Example model_yaml <https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model.yaml>`__.
 
+    .. seealso::
+       For the recommended wrapper class with parameter validation, see :class:`simba.model.yolo_fit.FitYolo`.
+
     :param initial_weights: Path to the pre-trained YOLO model weights (usually a `.pt` file). Example weights can be found [here](https://huggingface.co/Ultralytics).
     :param model_yaml: YAML file containing paths to the training, validation, and testing datasets and the object class mappings. Example YAML file can be found [here](https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model.yaml).
     :param save_path: Directory path where the trained model, logs, and results will be saved.
@@ -55,7 +58,7 @@ def fit_yolo(weights_path: Union[str, os.PathLike],
     :return: None. The trained model and associated training logs are saved in the specified `project_path`.
 
     :example:
-    >>> fit_yolo(initial_weights=r"C:\troubleshooting\coco_data\weights\yolov8n-obb.pt", data=r"C:\troubleshooting\coco_data\model.yaml", save_path=r"C:\troubleshooting\coco_data\mdl", batch=16)
+    >>> fit_yolo(initial_weights=r"C:/troubleshooting/coco_data/weights/yolov8n-obb.pt", data=r"C:/troubleshooting/coco_data/model.yaml", save_path=r"C:/troubleshooting/coco_data/mdl", batch=16)
     """
 
     if not _is_cuda_available()[0]:
@@ -82,6 +85,9 @@ def load_yolo_model(weights_path: Union[str, os.PathLike],
 
     """
     Load a YOLO model.
+
+    .. seealso::
+       For recommended wrapper classes that use this function, see :class:`simba.model.yolo_fit.FitYolo`, :class:`simba.model.yolo_inference.YoloInference`, :class:`simba.model.yolo_pose_inference.YOLOPoseInference`, :class:`simba.model.yolo_seg_inference.YOLOSegmentationInference`, and :class:`simba.model.yolo_pose_track_inference.YOLOPoseTrackInference`.
 
     :param Union[str, os.PathLike] weights_path: Path to model weights (.pt, .engine, etc).
     :param bool verbose: Whether to print loading info.
@@ -168,6 +174,9 @@ def yolo_predict(model: YOLO,
 
     """
     Produce YOLO predictions.
+
+    .. seealso::
+       For recommended wrapper classes that use this function, see :class:`simba.model.yolo_inference.YoloInference`, :class:`simba.model.yolo_pose_inference.YOLOPoseInference`, and :class:`simba.model.yolo_seg_inference.YOLOSegmentationInference`.
 
     :param Union[str, os.PathLike] model: Loaded ultralytics.YOLO model. Returned by :func:`~simba.bounding_box_tools.yolo.model.load_yolo_model`.
     :param Union[str, os.PathLike, np.ndarray] source: Path to video, video stream, directory, image, or image as loaded array.

@@ -55,9 +55,9 @@ class YOLOSegmentationInference():
        To visualize the segmentation results, see :func:`simba.plotting.yolo_seg_visualizer.YOLOSegmentationVisualizer`
 
     :example:
-    >>> weights_path = r"D:\platea\yolo_071525\mdl\train3\weights\best.pt"
-    >>> video_path = r"D:\platea\platea_videos\videos\clipped\10B_Mouse_5-choice_MustTouchTrainingNEWFINAL_a7.mp4"
-    >>> save_dir=r"D:\platea\platea_videos\videos\yolo_results"
+    >>> weights_path = r"D:/platea/yolo_071525/mdl/train3/weights/best.pt"
+    >>> video_path = r"D:/platea/platea_videos/videos/clipped/10B_Mouse_5-choice_MustTouchTrainingNEWFINAL_a7.mp4"
+    >>> save_dir = r"D:/platea/platea_videos/videos/yolo_results"
     >>> runner = YOLOSegmentationInference(weights_path=weights_path, video_path=video_path, save_dir=save_dir, verbose=True, device=0, format=None, stream=True, batch_size=10, imgsz=320, interpolate=True, threshold=0.8, retina_msk=True)
     >>> runner.run()
 

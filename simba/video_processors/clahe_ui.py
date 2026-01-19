@@ -29,7 +29,7 @@ def interactive_clahe_ui(data: Union[str, os.PathLike]) -> Tuple[float, int]:
     :return Tuple[float, int]: Tuple containing the chosen clip limit and tile size.
 
     :example:
-    >>> video = cv2.imread(r"D:\EPM\sample_2\video_1.mp4")
+    >>> video = cv2.imread(r"D:/EPM/sample_2/video_1.mp4")
     >>> interactive_clahe_ui(data=video)
     """
     global original_img, font_size, x_spacer, y_spacer, txt

@@ -150,7 +150,7 @@ class ROIClfCalculatorMultiprocess(ConfigReader):
        'GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results`__.
 
     :example:
-    >>> analyzer = ROIClfCalculatorMultiprocess(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini", bp_names=['resident_NOSE'], clf_names=['attack'], clf_time=True, started_bout_cnt=True, ended_bout_cnt=False, bout_table=True, transpose=True, core_cnt=20)
+    >>> analyzer = ROIClfCalculatorMultiprocess(config_path=r"D:/troubleshooting/maplight_ri/project_folder/project_config.ini", bp_names=['resident_NOSE'], clf_names=['attack'], clf_time=True, started_bout_cnt=True, ended_bout_cnt=False, bout_table=True, transpose=True, core_cnt=20)
     >>> analyzer.run()
     >>> analyzer.save()
     """
