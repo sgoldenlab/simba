@@ -19,7 +19,6 @@ from scipy.spatial import ConvexHull
 from simba.utils.read_write import get_unique_values_in_iterable, read_df
 from simba.utils.warnings import GPUToolsWarning
 
-
 try:
     import cupy as cp
     from cupyx.scipy.spatial.distance import cdist
@@ -44,8 +43,8 @@ except:
 
 from simba.data_processors.cuda.utils import _cuda_are_rows_equal
 from simba.mixins.statistics_mixin import Statistics
-from simba.utils.checks import (check_int, check_str, check_valid_array,
-                                check_valid_tuple, check_float)
+from simba.utils.checks import (check_float, check_int, check_str,
+                                check_valid_array, check_valid_tuple)
 from simba.utils.data import bucket_data
 from simba.utils.enums import Formats
 
