@@ -332,7 +332,8 @@ def _digital(data, results):
 def img_stack_brightness(x: np.ndarray,
                          method: Optional[Literal['photometric', 'digital']] = 'digital',
                          ignore_black: bool = True,
-                         verbose: bool = False) -> np.ndarray:
+                         verbose: bool = False,
+                         batch_size: int = 2500) -> np.ndarray:
     """
     Calculate the average brightness of a stack of images using a specified method.
 
@@ -365,27 +366,41 @@ def img_stack_brightness(x: np.ndarray,
 
     check_instance(source=img_stack_brightness.__name__, instance=x, accepted_types=(np.ndarray,))
     check_if_valid_img(data=x[0], source=img_stack_brightness.__name__)
+    check_int(name=f'{img_stack_brightness.__name__} batch_size', value=batch_size, allow_zero=False, allow_negative=False, raise_error=True)
     x, timer = np.ascontiguousarray(x).astype(np.uint8), SimbaTimer(start=True)
+    results = []
     if x.ndim == 4:
-        grid_x = (x.shape[1] + 16 - 1) // 16
-        grid_y = (x.shape[2] + 16 - 1) // 16
-        grid_z = x.shape[0]
-        threads_per_block = (16, 16, 1)
-        blocks_per_grid = (grid_y, grid_x, grid_z)
-        x_dev = cuda.to_device(x)
-        results = cuda.device_array((x.shape[0], x.shape[1], x.shape[2]), dtype=np.uint8)
-        if method == PHOTOMETRIC:
-            _photometric[blocks_per_grid, threads_per_block](x_dev, results)
+        batch_results_dev = cuda.device_array((batch_size, x.shape[1], x.shape[2]), dtype=np.uint8)
+    for batch_cnt, l in enumerate(range(0, x.shape[0], batch_size)):
+        r = l + batch_size
+        batch_x = x[l:r]
+        if batch_x.ndim == 4:
+            grid_x = (batch_x.shape[1] + 16 - 1) // 16
+            grid_y = (batch_x.shape[2] + 16 - 1) // 16
+            grid_z = batch_x.shape[0]
+            threads_per_block = (16, 16, 1)
+            blocks_per_grid = (grid_y, grid_x, grid_z)
+            x_dev = cuda.to_device(batch_x)
+            if method == PHOTOMETRIC:
+                _photometric[blocks_per_grid, threads_per_block](x_dev, batch_results_dev)
+            else:
+                _digital[blocks_per_grid, threads_per_block](x_dev, batch_results_dev)
+            batch_results_host = batch_results_dev.copy_to_host()[:batch_x.shape[0]]
+            batch_results_cp = cp.asarray(batch_results_host)
+            if ignore_black:
+                mask = batch_results_cp != 0
+                batch_results_cp = cp.where(mask, batch_results_cp, cp.nan)
+                batch_results = cp.nanmean(batch_results_cp, axis=(1, 2))
+                batch_results = cp.where(cp.isnan(batch_results), 0, batch_results)
+                batch_results = batch_results.get()
+            else:
+                batch_results = cp.mean(batch_results_cp, axis=(1, 2)).get()
         else:
-            _digital[blocks_per_grid, threads_per_block](x_dev, results)
-        results = results.copy_to_host()
-        if ignore_black:
-            masked_array = np.ma.masked_equal(results, 0)
-            results = np.mean(masked_array, axis=(1, 2)).filled(0)
-    else:
-        results = deepcopy(x)
-        results = np.mean(results, axis=(1, 2))
+            batch_results = deepcopy(x)
+            batch_results = np.mean(batch_results, axis=(1, 2))
+        results.append(batch_results)
     timer.stop_timer()
+    results = np.concatenate(results) if len(results) > 0 else np.array([])
     if verbose: print(f'Brightness computed in {results.shape[0]} images (elapsed time {timer.elapsed_time_str}s)')
     return results
 

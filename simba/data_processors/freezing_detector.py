@@ -23,50 +23,69 @@ FREEZING = 'FREEZING'
 class FreezingDetector(ConfigReader):
 
     """
-    Detect freezing behavior using heuristic rules.
+    Detect freezing behavior using heuristic rules based on movement velocity thresholds.
+
+    Analyzes pose-estimation data to detect freezing episodes by computing the mean velocity
+    of key body parts (nape, nose, and tail-base) and identifying periods where movement falls below
+    a specified threshold for a minimum duration.
 
     .. important::
 
         Freezing is detected as `present` when **the velocity (computed from the mean movement of the nape, nose, and tail-base body-parts) falls below
-        the movement threshold for the duration (and longer) of the specied time-window**.
+        the movement threshold for the duration (and longer) of the specified time-window**.
 
         Freezing is detected as `absent` when not present.
 
     .. note::
 
-       We pass the names of the left and right ears, as the method will use body-parts to compute the `nape` location of the animal.
+       The method uses the left and right ear body-parts to compute the `nape` location of the animal
+       as the midpoint between the ears. The nape, nose, and tail-base movements are averaged to compute
+       overall animal movement velocity.
 
-    :param Union[str, os.PathLike] data_dir: Path to directory containing pose-estimated body-part data in CSV format.
-    :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
-    :param Optional[str] nose_name: The name of the pose-estimated nose body-part. Defaults to 'nose'.
-    :param Optional[str] left_ear_name: The name of the pose-estimated left ear body-part. Defaults to 'left_ear'.
-    :param Optional[str] right_ear_name: The name of the pose-estimated right ear body-part. Defaults to 'right_ear'.
-    :param Optional[str] tail_base_name: The name of the pose-estimated tail base body-part. Defaults to 'tail_base'.
-    :param Optional[int] time_window: The time window in preceding seconds in which to evaluate freezing. Default: 3.
-    :param Optional[int] movement_threshold: A movement threshold in millimeters per second. Defaults to 5.
-    :param Optional[Union[str, os.PathLike]] save_dir: Directory where to store the results. If None, then results are stored in the ``logs`` directory of the SimBA project.
+    :param Union[str, os.PathLike] data_dir: Path to directory containing pose-estimated body-part data in CSV format. Each CSV file should contain pose estimation data for one video.
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config file (`.ini` format) containing project settings and video information.
+    :param Optional[str] nose_name: The name of the pose-estimated nose body-part column (without _x/_y suffix). Defaults to 'nose'.
+    :param Optional[str] left_ear_name: The name of the pose-estimated left ear body-part column (without _x/_y suffix). Defaults to 'Left_ear'.
+    :param Optional[str] right_ear_name: The name of the pose-estimated right ear body-part column (without _x/_y suffix). Defaults to 'right_ear'.
+    :param Optional[str] tail_base_name: The name of the pose-estimated tail base body-part column (without _x/_y suffix). Defaults to 'tail_base'.
+    :param Optional[int] time_window: The minimum time window in seconds that movement must be below the threshold to be considered freezing. Only freezing bouts lasting at least this duration are retained. Defaults to 3.
+    :param Optional[int] movement_threshold: Movement threshold in millimeters per second. Frames with mean velocity below this threshold are considered potential freezing. Defaults to 5.
+    :param Optional[int] shortest_bout: Minimum duration in milliseconds for a freezing bout to be considered valid. Shorter bouts are filtered out. Defaults to 100.
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory where to store the results. If None, then results are stored in a timestamped subdirectory within the ``logs`` directory of the SimBA project.
+
+    :returns: None. Results are saved to CSV files in the specified save directory:
+        - Individual video results: One CSV file per video with freezing annotations added as a 'FREEZING' column (1 = freezing, 0 = not freezing)
+        - Aggregate results: `aggregate_freezing_results.csv` containing summary statistics for all videos
 
     :example:
-    >>> FreezingDetector(data_dir=r'D:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location', config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini")
+    >>> FreezingDetector(
+    ...     data_dir=r'D:\\troubleshooting\\mitra\\project_folder\\csv\\outlier_corrected_movement_location',
+    ...     config_path=r"D:\\troubleshooting\\mitra\\project_folder\\project_config.ini",
+    ...     time_window=3,
+    ...     movement_threshold=5,
+    ...     shortest_bout=100
+    ... ).run()
 
     References
     ----------
+    ..
     .. [1] Sabnis et al., Visual detection of seizures in mice using supervised machine learning, `biorxiv`, doi: https://doi.org/10.1101/2024.05.29.596520.
     .. [2] Lopez et al., Region-specific Nucleus Accumbens Dopamine Signals Encode Distinct Aspects of Avoidance Learning, `biorxiv`, doi: https://doi.org/10.1101/2024.08.28.610149
-    .. [3] Lopez, Gabriela C., Louis D. Van Camp, Ryan F. Kovaleski, et al. “Region-Specific Nucleus Accumbens Dopamine Signals Encode Distinct Aspects of Avoidance Learning.” `Cell Biology`, Volume 35, Issue 10p2433-2443.e5May 19, 2025. DOI: 10.1016/j.cub.2025.04.006
+    .. [3] Lopez, Gabriela C., Louis D. Van Camp, Ryan F. Kovaleski, et al. "Region-Specific Nucleus Accumbens Dopamine Signals Encode Distinct Aspects of Avoidance Learning." `Cell Biology`, Volume 35, Issue 10p2433-2443.e5May 19, 2025. DOI: 10.1016/j.cub.2025.04.006
     .. [4] Lazaro et al., Brainwide Genetic Capture for Conscious State Transitions, `biorxiv`, doi: https://doi.org/10.1101/2025.03.28.646066
+    .. [5] Sabnis et al., Visual detection of seizures in mice using supervised machine learning, 2025, Cell Reports Methods 5, 101242 December 15, 2025.
     """
 
     def __init__(self,
                  data_dir: Union[str, os.PathLike],
                  config_path: Union[str, os.PathLike],
-                 nose_name: Optional[str] = 'nose',
-                 left_ear_name: Optional[str] = 'Left_ear',
-                 right_ear_name: Optional[str] = 'right_ear',
-                 tail_base_name: Optional[str] = 'tail_base',
-                 time_window: Optional[int] = 3,
-                 movement_threshold: Optional[int] = 5,
-                 shortest_bout: Optional[int] = 100,
+                 nose_name: str = 'nose',
+                 left_ear_name: str = 'Left_ear',
+                 right_ear_name: str = 'right_ear',
+                 tail_base_name: str = 'tail_base',
+                 time_window: int = 3,
+                 movement_threshold: int = 5,
+                 shortest_bout: int = 100,
                  save_dir: Optional[Union[str, os.PathLike]] = None):
 
         check_if_dir_exists(in_dir=data_dir)
@@ -92,14 +111,15 @@ class FreezingDetector(ConfigReader):
 
     def run(self):
         agg_results = pd.DataFrame(columns=['VIDEO', 'FREEZING FRAMES', 'FREEZING TIME (S)', 'FREEZING BOUT COUNTS', 'FREEZING PCT OF SESSION', 'VIDEO TOTAL FRAMES', 'VIDEO TOTAL TIME (S)'])
-        agg_results_path = os.path.join(self.save_dir, 'aggregate_freezing_results.csv')
+        agg_results_path = os.path.join(self.save_dir, f'aggregate_freezing_results_{self.datetime}.csv')
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
         for file_cnt, file_path in enumerate(self.data_paths):
             video_name = get_fn_ext(filepath=file_path)[1]
-            print(f'Analyzing {video_name}...({file_cnt+1}/{len(self.data_paths)})')
+            print(f'[] Analyzing {video_name}...({file_cnt+1}/{len(self.data_paths)})')
             save_file_path = os.path.join(self.save_dir, f'{video_name}.csv')
             df = read_df(file_path=file_path, file_type='csv').reset_index(drop=True)
             _, px_per_mm, fps = read_video_info(vid_info_df=self.video_info_df, video_name=video_name)
+            px_per_mm, fps = 4, 30
             df.columns = [str(x).lower() for x in df.columns]
             check_valid_dataframe(df=df, valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=self.required_field)
             nose_shifted = FeatureExtractionMixin.create_shifted_df(df[self.nose_heads])
@@ -136,5 +156,5 @@ class FreezingDetector(ConfigReader):
         stdout_success(msg=f'Results saved in {self.save_dir} directory.')
 
 #
-# FreezingDetector(data_dir=r'C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location',
-#                  config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+# x = FreezingDetector(data_dir=r'/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location', config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/project_config.ini")
+# x.run()
