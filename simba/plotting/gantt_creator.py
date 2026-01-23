@@ -3,7 +3,7 @@ __author__ = "Simon Nilsson; sronilsson@gmail.com"
 import os
 import shutil
 from typing import List, Optional, Union
-
+from copy import deepcopy
 import cv2
 import numpy as np
 
@@ -16,7 +16,7 @@ from simba.utils.checks import (
 from simba.utils.data import create_color_palette, detect_bouts
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.lookups import get_named_colors
+from simba.utils.lookups import get_named_colors, get_fonts
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
 
@@ -60,16 +60,18 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
 
     def __init__(self,
                  config_path: Union[str, os.PathLike],
-                 data_paths: List[Union[str, os.PathLike]],
+                 data_paths: Optional[Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]]] = None,
                  width: int = 640,
                  height: int = 480,
                  font_size: int = 8,
                  font_rotation: int = 45,
+                 font: Optional[str] = None,
                  palette: str = 'Set1',
-                 frame_setting: Optional[bool] = False,
-                 video_setting: Optional[bool] = False,
-                 last_frm_setting: Optional[bool] = True,
-                 hhmmss: Optional[bool] = True):
+                 frame_setting: bool = False,
+                 video_setting: bool = False,
+                 last_frm_setting: bool = True,
+                 hhmmss: bool = True,
+                 clf_names: Optional[List[str]] = None):
 
         if ((frame_setting != True) and (video_setting != True) and (last_frm_setting != True)):
             raise NoSpecifiedOutputError(msg="SIMBA ERROR: Please select gantt videos, frames, and/or last frame.")
@@ -78,7 +80,13 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
         check_int(value=height, min_value=1, name=f'{self.__class__.__name__} height')
         check_int(value=font_size, min_value=1, name=f'{self.__class__.__name__} font_size')
         check_int(value=font_rotation, min_value=0, max_value=180, name=f'{self.__class__.__name__} font_rotation')
-        check_valid_lst(data=data_paths, source=f'{self.__class__.__name__} data_paths', valid_dtypes=(str,), min_len=1)
+        if isinstance(data_paths, list):
+            check_valid_lst(data=data_paths, source=f'{self.__class__.__name__} data_paths', valid_dtypes=(str,), min_len=1)
+        elif isinstance(data_paths, str):
+            check_file_exist_and_readable(file_path=data_paths)
+            data_paths = [data_paths]
+        else:
+            data_paths = deepcopy(self.machine_results_paths)
         check_valid_boolean(value=hhmmss, source=f'{self.__class__.__name__} hhmmss', raise_error=False)
         palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
         check_str(name=f'{self.__class__.__name__} palette', value=palette, options=palettes)
@@ -90,7 +98,12 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
         if not os.path.exists(self.gantt_plot_dir): os.makedirs(self.gantt_plot_dir)
         self.frame_setting, self.video_setting, self.last_frm_setting = frame_setting, video_setting, last_frm_setting
         self.width, self.height, self.font_size, self.font_rotation = width, height, font_size, font_rotation
-        self.data_paths, self.hhmmss = data_paths, hhmmss
+        if font is not None:
+            check_str(name=f'{self.__class__.__name__} font', value=font, options=list(get_fonts().keys()), raise_error=True)
+        if clf_names is not None:
+            check_valid_lst(data=clf_names, source=f'{self.__class__.__name__} clf_names', valid_dtypes=(str,), valid_values=self.clf_names, min_len=1, raise_error=True)
+            self.clf_names = clf_names
+        self.data_paths, self.hhmmss, self.font = data_paths, hhmmss, font
         self.colours = get_named_colors()
         self.colour_tuple_x = list(np.arange(3.5, 203.5, 5))
 
@@ -121,6 +134,7 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
                                      font_size=self.font_size,
                                      font_rotation=self.font_rotation,
                                      video_name=self.video_name,
+                                     font=self.font,
                                      save_path=os.path.join(self.gantt_plot_dir, f"{self.video_name }_final_image.png"),
                                      palette=self.clr_lst,
                                      hhmmss=self.hhmmss)
@@ -135,6 +149,7 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
                                                 width=self.width,
                                                 height=self.height,
                                                 font_size=self.font_size,
+                                                font=self.font,
                                                 font_rotation=self.font_rotation,
                                                 video_name=self.video_name,
                                                 palette=self.clr_lst,
@@ -156,13 +171,16 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
 # test = GanttCreatorSingleProcess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                                 frame_setting=False,
 #                                 video_setting=False,
-#                                 data_paths=[r"C:\troubleshooting\mitra\project_folder\csv\machine_results\592_MA147_Gq_CNO_0515.csv"],
+#                                 data_paths=[r"C:\troubleshooting\mitra\project_folder\csv\machine_results\501_MA142_Gi_CNO_0516.csv"],
 #                                 last_frm_setting=True,
 #                                 width=640,
 #                                 height= 480,
 #                                 font_size=10,
+#                                  font=None,
 #                                 font_rotation=45,
-#                                 palette='Set1')
+#                                 hhmmss=False,
+#                                 palette='Set1',
+#                                 clf_names=['straub_tail'])
 # test.run()
 
 

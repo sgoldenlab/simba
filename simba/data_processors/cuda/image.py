@@ -339,6 +339,15 @@ def img_stack_brightness(x: np.ndarray,
 
     Useful for analyzing light cues or brightness changes over time. For example, compute brightness in images containing a light cue ROI, then perform clustering (e.g., k-means) on brightness values to identify frames when the light cue is on vs off.
 
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/img_stack_brightness_gpu.csv
+       :widths: 10, 45, 45
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+
     - **Photometric Method**: The brightness is calculated using the formula:
 
     .. math::

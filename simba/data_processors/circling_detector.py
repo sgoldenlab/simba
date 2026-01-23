@@ -10,13 +10,12 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
 from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log, check_if_dir_exists,
-    check_int, check_str, check_valid_dataframe)
+    check_all_file_names_are_represented_in_video_log, check_if_dir_exists, check_str, check_valid_dataframe)
 from simba.utils.data import detect_bouts, plug_holes_shortest_bout
 from simba.utils.enums import Formats
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext, read_df, read_video_info)
+                                    get_fn_ext, read_df, read_video_info, get_current_time)
 
 CIRCLING = 'CIRCLING'
 
@@ -58,30 +57,34 @@ class CirclingDetector(ConfigReader):
     """
 
     def __init__(self,
-                 data_dir: Union[str, os.PathLike],
                  config_path: Union[str, os.PathLike],
                  nose_name: Optional[str] = 'nose',
+                 data_dir: Optional[Union[str, os.PathLike]] = None,
                  left_ear_name: Optional[str] = 'left_ear',
                  right_ear_name: Optional[str] = 'right_ear',
                  tail_base_name: Optional[str] = 'tail_base',
                  center_name: Optional[str] = 'center',
-                 time_threshold: Optional[int] = 10,
-                 circular_range_threshold: Optional[int] = 320,
+                 time_threshold: Optional[int] = 7,
+                 circular_range_threshold: Optional[int] = 350,
+                 shortest_bout: int = 100,
                  movement_threshold: Optional[int] = 60,
                  save_dir: Optional[Union[str, os.PathLike]] = None):
 
-        check_if_dir_exists(in_dir=data_dir)
         for bp_name in [nose_name, left_ear_name, right_ear_name, tail_base_name]: check_str(name='body part name', value=bp_name, allow_blank=False)
-        self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.csv'])
         ConfigReader.__init__(self, config_path=config_path, read_video_info=True, create_logger=False)
+        if data_dir is not None:
+            check_if_dir_exists(in_dir=data_dir)
+        else:
+            data_dir = self.outlier_corrected_dir
+        self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.csv'])
         self.nose_heads = [f'{nose_name}_x'.lower(), f'{nose_name}_y'.lower()]
         self.left_ear_heads = [f'{left_ear_name}_x'.lower(), f'{left_ear_name}_y'.lower()]
         self.right_ear_heads = [f'{right_ear_name}_x'.lower(), f'{right_ear_name}_y'.lower()]
         self.center_heads = [f'{center_name}_x'.lower(), f'{center_name}_y'.lower()]
         self.required_field = self.nose_heads + self.left_ear_heads + self.right_ear_heads
-        self.save_dir = save_dir
+        self.save_dir, self.shortest_bout = save_dir, shortest_bout
         if self.save_dir is None:
-            self.save_dir = os.path.join(self.logs_path, f'circling_data_{self.datetime}')
+            self.save_dir = os.path.join(self.logs_path, f'circling_data_{time_threshold}s_{circular_range_threshold}d_{movement_threshold}mm_{self.datetime}')
             os.makedirs(self.save_dir)
         else:
             check_if_dir_exists(in_dir=self.save_dir)
@@ -93,7 +96,7 @@ class CirclingDetector(ConfigReader):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
         for file_cnt, file_path in enumerate(self.data_paths):
             video_name = get_fn_ext(filepath=file_path)[1]
-            print(f'Analyzing {video_name} ({file_cnt+1}/{len(self.data_paths)})...')
+            print(f'[{get_current_time()}] Analyzing circling {video_name}... (video {file_cnt+1}/{len(self.data_paths)})')
             save_file_path = os.path.join(self.save_dir, f'{video_name}.csv')
             df = read_df(file_path=file_path, file_type='csv').reset_index(drop=True)
             _, px_per_mm, fps = read_video_info(video_info_df=self.video_info_df, video_name=video_name)
@@ -115,11 +118,24 @@ class CirclingDetector(ConfigReader):
             circling_idx = np.argwhere(sliding_circular_range >= self.circular_range_threshold).astype(np.int32).flatten()
             movement_idx = np.argwhere(movement_sum >= self.movement_threshold).astype(np.int32).flatten()
             circling_idx = [x for x in movement_idx if x in circling_idx]
+            df[f'Probability_{CIRCLING}'] = 0
             df[CIRCLING] = 0
             df.loc[circling_idx, CIRCLING] = 1
+            df.loc[circling_idx, f'Probability_{CIRCLING}'] = 1
+            df = plug_holes_shortest_bout(data_df=df, clf_name=CIRCLING, fps=fps, shortest_bout=self.shortest_bout)
             bouts = detect_bouts(data_df=df, target_lst=[CIRCLING], fps=fps)
-            df = plug_holes_shortest_bout(data_df=df, clf_name=CIRCLING, fps=fps, shortest_bout=100)
+            if len(bouts) > 0:
+                df[CIRCLING] = 0
+                circling_idx = list(bouts.apply(lambda x: list(range(int(x["Start_frame"]), int(x["End_frame"]) + 1)), 1))
+                circling_idx = [x for xs in circling_idx for x in xs]
+                df.loc[circling_idx, CIRCLING] = 1
+                df.loc[circling_idx, f'Probability_{CIRCLING}'] = 1
+            else:
+                df[CIRCLING] = 0
+                circling_idx = []
+
             df.to_csv(save_file_path)
+            #print(video_name, len(circling_idx), round(len(circling_idx) / fps, 4), df[CIRCLING].sum())
             agg_results.loc[len(agg_results)] = [video_name, len(circling_idx), round(len(circling_idx) / fps, 4), len(bouts), round((len(circling_idx) / len(df)) * 100, 4), len(df), round(len(df)/fps, 2) ]
 
         agg_results.to_csv(agg_results_path)
@@ -127,7 +143,6 @@ class CirclingDetector(ConfigReader):
 
 #
 #
-# detector = CirclingDetector(data_dir=r'C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location',
-#                             config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+# detector = CirclingDetector(config_path=r"E:\troubleshooting\mitra_emergence\project_folder\project_config.ini")
 # detector.run()
 

@@ -1191,7 +1191,7 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
     else:
         cmd = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -c:v {codec} -crf {quality_crf} "{save_name}" -loglevel error -stats -hide_banner -y'
     if verbose: print(f"Clipping video {file_name} between {start_time} and {end_time}... ")
-    subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+    subprocess.call(cmd, shell=True)
     timer.stop_timer()
     if verbose: stdout_success(msg=f"Video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str, source=clip_video_in_range.__name__)
 

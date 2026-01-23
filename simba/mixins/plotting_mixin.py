@@ -39,7 +39,7 @@ from simba.utils.data import create_color_palette, detect_bouts
 from simba.utils.enums import Formats, Keys, Options, Paths
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
-                                 get_named_colors)
+                                 get_named_colors, get_fonts)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data, read_df,
@@ -342,16 +342,28 @@ class PlottingMixin(object):
                         height: int = 480,
                         font_size: int = 8,
                         font_rotation: int = 45,
+                        font: Optional[str] = None,
                         save_path: Optional[str] = None,
+                        edge_clr: Optional[str] = 'black',
                         hhmmss: bool = False) -> Union[None, np.ndarray]:
 
         video_timer = SimbaTimer(start=True)
         colour_tuple_x = list(np.arange(3.5, 203.5, 5))
+        original_font_family = copy(plt.rcParams['font.family']) if isinstance(plt.rcParams['font.family'], list) else plt.rcParams['font.family']
+        
+        if font is not None:
+            available_fonts = get_fonts()
+            if font in available_fonts:
+                matplotlib.font_manager._get_font.cache_clear()
+                plt.rcParams['font.family'] = font
+            else:
+                matplotlib.font_manager._get_font.cache_clear()
+                plt.rcParams['font.family'] = [font, 'sans-serif']
+        
         fig, ax = plt.subplots()
-        fig.patch.set_facecolor('#fafafa')
-        ax.set_facecolor('#ffffff')
         fig.patch.set_facecolor('white')
-        plt.title(video_name, fontsize=font_size + 6, pad=15, fontweight='bold')
+        
+        plt.title(video_name, fontsize=font_size + 6, pad=25, fontweight='bold')
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
         ax.spines['left'].set_color('#666666')
@@ -367,7 +379,7 @@ class PlottingMixin(object):
                 if event[0] == x:
                     ix = clf_names.index(x)
                     data_event = event[1][["Start_time", "Bout_time"]]
-                    ax.broken_barh(data_event.values, (colour_tuple_x[ix], 3), facecolors=palette[ix])
+                    ax.broken_barh(data_event.values, (colour_tuple_x[ix], 3), facecolors=palette[ix], edgecolor=edge_clr, linewidth=0.5, alpha=0.9)
 
         x_ticks_seconds = np.round(np.linspace(0, x_length / fps, 6))
         x_ticks_locs = x_ticks_seconds
@@ -375,18 +387,19 @@ class PlottingMixin(object):
         if hhmmss:
             x_lbls = [seconds_to_timestamp(sec) for sec in x_ticks_seconds]
         else:
-            x_lbls = x_ticks_seconds
+            x_lbls = [int(x) for x in x_ticks_seconds]
 
-        #x_ticks_locs = x_lbls = np.round(np.linspace(0, x_length / fps, 6))
         ax.set_xticks(x_ticks_locs)
         ax.set_xticklabels(x_lbls)
         ax.set_ylim(0, colour_tuple_x[len(clf_names)])
         ax.set_yticks(np.arange(5, 5 * len(clf_names) + 1, 5))
-        ax.set_yticklabels(clf_names, rotation=font_rotation)
+        ax.set_yticklabels(clf_names, rotation=font_rotation, ha='right', va='center')
         ax.tick_params(axis="both", labelsize=font_size)
         plt.xlabel(x_label, fontsize=font_size + 3)
-        ax.yaxis.grid(True, linewidth=1.5, color='gray', alpha=0.4, linestyle='--')
-        #ax.yaxis.grid(True)
+        ax.grid(True, axis='both', linewidth=1.0, color='gray', alpha=0.2, linestyle='--', which='major')
+
+        plt.subplots_adjust(left=0.1, right=0.95, top=0.9, bottom=0.15)
+        plt.tight_layout()
         buffer_ = io.BytesIO()
         plt.savefig(buffer_, format="png")
         buffer_.seek(0)
@@ -397,6 +410,11 @@ class PlottingMixin(object):
         frame = np.uint8(open_cv_image)
         buffer_.close()
         plt.close('all')
+
+        if font is not None:
+            plt.rcParams['font.family'] = original_font_family
+            matplotlib.font_manager._get_font.cache_clear()
+        
         if save_path is not None:
             cv2.imwrite(save_path, frame)
             video_timer.stop_timer()

@@ -8,12 +8,12 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.gantt_creator import GanttCreatorSingleProcess
 from simba.plotting.gantt_creator_mp import GanttCreatorMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton,
-                                        SimbaCheckbox, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton, SimbaCheckbox, SimBADropDown)
 from simba.utils.checks import check_if_filepath_list_is_empty
 from simba.utils.enums import Formats, Links, Options
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.read_write import find_files_of_filetypes_in_directory
+from simba.utils.lookups import get_fonts
 
 
 class GanttPlotPopUp(PopUpMixin, ConfigReader):
@@ -29,7 +29,9 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         check_if_filepath_list_is_empty(filepaths=self.machine_results_paths,error_msg=f"SIMBA ERROR: Zero files found in the {self.machine_results_dir} directory. Create classification results before visualizing gantt charts",)
         palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
         self.data_paths = find_files_of_filetypes_in_directory(directory=self.machine_results_dir, extensions=[f'.{self.file_type}'], as_dict=True)
-        max_file_name_len = max(len(k) for k in self.data_paths) + 5
+        max_file_name_len, fonts = max(len(k) for k in self.data_paths) + 5, list(get_fonts(sort_alphabetically=True).keys())
+        fonts.insert(0, 'AUTO')
+        default_font = 'Arial' if 'Arial' in fonts else 'AUTO'
         PopUpMixin.__init__(self, config_path=config_path, title="VISUALIZE GANTT PLOTS", icon='gantt_small')
 
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name='settings', icon_link=Links.GANTT_PLOTS.value, relief='solid', padx=5, pady=5)
@@ -39,6 +41,15 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         self.palette_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=palettes, label='COLOR PALETTE: ', label_width=30, dropdown_width=30, value='Set1', img='palette_small')
         self.time_format_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=['SECONDS', 'HH:MM:SS'], label='X-AXIS TIME FORMAT: ', label_width=30, dropdown_width=30, value='SECONDS', img='timer_2')
         self.core_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, self.cpu_cnt+1)), label='CPU CORES: ', label_width=30, dropdown_width=30, value=int(self.cpu_cnt/2), img='cpu_small')
+        self.font_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=fonts, label='FONT: ', label_width=30, dropdown_width=30, value=default_font, img='font')
+
+
+        self.clf_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BEHAVIORS", icon_name='forest', icon_link=Links.GANTT_PLOTS.value, relief='solid', padx=5, pady=5)
+        self.clf_choices = {}
+        for cnt, clf_name in enumerate(self.clf_names):
+            gantt_frames_cb, self.gantt_frames_var = SimbaCheckbox(parent=self.clf_frm, txt=clf_name, val=True)
+            self.clf_choices[clf_name] = self.gantt_frames_var
+            gantt_frames_cb.grid(row=cnt, column=0, sticky=NW)
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZATION SETTINGS", icon_name='eye', icon_link=Links.GANTT_PLOTS.value, relief='solid', padx=5, pady=5)
         gantt_frames_cb, self.gantt_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames', val=False)
@@ -57,18 +68,20 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         self.font_rotation_dropdown.grid(row=2, sticky=NW)
         self.palette_dropdown.grid(row=3, sticky=NW)
         self.time_format_dropdown.grid(row=4, sticky=NW)
-        self.core_dropdown.grid(row=5, sticky=NW)
+        self.font_dropdown.grid(row=5, sticky=NW)
+        self.core_dropdown.grid(row=6, sticky=NW)
 
-        self.settings_frm.grid(row=1, sticky=NW, padx=10, pady=10)
+        self.clf_frm.grid(row=1, sticky=NW, padx=10, pady=10)
+        self.settings_frm.grid(row=2, sticky=NW, padx=10, pady=10)
         gantt_videos_cb.grid(row=0, sticky=NW)
         gantt_frames_cb.grid(row=1, sticky=W)
         gantt_last_frame_cb.grid(row=2, sticky=NW)
 
-        self.run_single_video_frm.grid(row=2, sticky=NW)
+        self.run_single_video_frm.grid(row=3, sticky=NW)
         self.run_single_video_btn.grid(row=0, sticky=NW)
         self.single_video_dropdown.grid(row=0, column=1, sticky=NW)
 
-        self.run_multiple_videos.grid(row=3, sticky=NW)
+        self.run_multiple_videos.grid(row=4, sticky=NW)
         self.run_multiple_video_btn.grid(row=0, sticky=NW)
 
         self.main_frm.mainloop()
@@ -85,8 +98,14 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         video_setting = self.gantt_videos_var.get()
         last_frm_setting = self.gantt_last_frame_var.get()
         palette = self.palette_dropdown.get_value()
+        font = self.font_dropdown.get_value()
+        font = None if font == 'AUTO' else font
         hhmmss = True if self.time_format_dropdown.get_value() == 'HH:MM:SS' else False
-
+        clf_names = []
+        for clf_name, clf_val in self.clf_choices.items():
+            if clf_val.get(): clf_names.append(clf_name)
+        if len(clf_names) < 1:
+            raise NoSpecifiedOutputError(msg="Select AT LEAST one behavior name.")
         if not frame_setting and not video_setting and not last_frm_setting:
             raise NoSpecifiedOutputError(msg="SIMBA ERROR: Please select gantt videos, frames, and/or last frame.")
 
@@ -103,6 +122,8 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
                                                      data_paths=data_paths,
                                                      width=width,
                                                      height=height,
+                                                     font=font,
+                                                     clf_names=clf_names,
                                                      font_size=font_size,
                                                      font_rotation=font_rotation,
                                                      core_cnt=core_cnt,
@@ -116,7 +137,9 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
                                                       last_frm_setting=last_frm_setting,
                                                       data_paths=data_paths,
                                                       width=width,
+                                                      font=font,
                                                       height=height,
+                                                      clf_names=clf_names,
                                                       font_size=font_size,
                                                       font_rotation=font_rotation,
                                                       palette=palette)
@@ -124,6 +147,7 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
 
 
 #_ = GanttPlotPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
+#_ = GanttPlotPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 # _ = GanttPlotPopUp(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini")
 
  # _ = GanttPlotPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")

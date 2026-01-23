@@ -42,7 +42,7 @@ from simba.utils.read_write import (find_core_cnt, get_all_clf_names,
                                     read_project_path_and_file_type, write_df)
 from simba.utils.warnings import (BodypartColumnNotFoundWarning,
                                   InvalidValueWarning, NoDataFoundWarning,
-                                  NoFileFoundWarning)
+                                  NoFileFoundWarning, DuplicateNamesWarning)
 
 
 class ConfigReader(object):
@@ -610,10 +610,13 @@ class ConfigReader(object):
         >>> config_reader.get_bp_headers()
         """
 
+        duplicates = list({x for x in self.body_parts_lst if self.body_parts_lst.count(x) > 1})
+        if len(duplicates) > 0: DuplicateNamesWarning(msg=f'The pose configuration file at {self.body_parts_path} contains duplicate entries: {duplicates}', source=self.__class__.__name__)
         self.bp_headers = []
         for bp in self.body_parts_lst:
             c1, c2, c3 = (f"{bp}_x", f"{bp}_y", f"{bp}_p")
             self.bp_headers.extend((c1, c2, c3))
+
 
     def read_config_entry(
         self,

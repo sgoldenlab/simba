@@ -28,7 +28,7 @@ RIGHT_EAR = 'right_ear'
 CENTER = 'center'
 TAIL_BASE = 'tail_base'
 TAIL_CENTER = 'tail_center'
-TAIL_TIP = 'tail_tip'
+TAIL_TIP = 'tail_end'
 
 TIME_WINDOWS = np.array([0.25, 0.5, 1.0, 2.0])
 
@@ -207,7 +207,7 @@ class MitraFeatureExtractor(ConfigReader,
 
 
 
-# feature_extractor = MitraFeatureExtractor(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini")
+# feature_extractor = MitraFeatureExtractor(config_path=r"E:\troubleshooting\mitra_emergence\project_folder\project_config.ini")
 # feature_extractor.run()
 
 

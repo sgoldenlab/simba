@@ -12,11 +12,33 @@ from copy import deepcopy
 from typing import List, Optional, Union
 
 import cv2
-import matplotlib
+import os
+import sys
+
+is_pycharm_ipython = True
+try:
+    module_names = list(sys.modules.keys())
+    if any('pydev' in str(mod).lower() for mod in module_names):
+        is_pycharm_ipython = True
+    elif 'IPython' in sys.modules or 'ipython' in sys.modules:
+        is_pycharm_ipython = True
+    else:
+        is_pycharm_ipython = False
+except Exception:
+    is_pycharm_ipython = True
+
+if not is_pycharm_ipython:
+    if 'MPLBACKEND' not in os.environ:  os.environ['MPLBACKEND'] = 'Agg'
+    try:
+        import matplotlib
+        matplotlib.use('Agg', force=False)
+    except (RecursionError, RuntimeError, ValueError, SystemError):
+        import matplotlib
+else:
+    import matplotlib
+
 import numpy as np
 import pandas as pd
-
-matplotlib.use('Agg')
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
@@ -32,6 +54,8 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     get_current_time, get_fn_ext, read_df)
+from simba.utils.lookups import get_fonts
+
 
 HEIGHT = "height"
 WIDTH = "width"
@@ -51,6 +75,7 @@ def gantt_creator_mp(data: np.array,
                      width: int,
                      height: int,
                      font_size: int,
+                     font: str,
                      font_rotation: int,
                      palette: np.ndarray,
                      hhmmss: bool):
@@ -72,6 +97,7 @@ def gantt_creator_mp(data: np.array,
                                                width=width,
                                                height=height,
                                                font_size=font_size,
+                                               font=font,
                                                font_rotation=font_rotation,
                                                video_name=video_name,
                                                save_path=None,
@@ -139,9 +165,11 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
                  height: int = 480,
                  font_size: int = 8,
                  font_rotation: int = 45,
+                 font: Optional[str] = None,
                  palette: str = 'Set1',
                  core_cnt: int = -1,
-                 hhmmss: bool = False):
+                 hhmmss: bool = False,
+                 clf_names: Optional[List[str]] = None):
 
         check_file_exist_and_readable(file_path=config_path)
         if (not frame_setting) and (not video_setting) and (not last_frm_setting):
@@ -157,6 +185,8 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
         check_int(name=f"{self.__class__.__name__} core_cnt",value=core_cnt, min_value=-1, unaccepted_vals=[0], max_value=find_core_cnt()[0])
         self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
         self.width, self.height, self.font_size, self.font_rotation, self.hhmmss = width, height, font_size, font_rotation, hhmmss
+        if font is not None:
+            check_str(name=f'{self.__class__.__name__} font', value=font, options=list(get_fonts().keys()), raise_error=True)
         ConfigReader.__init__(self, config_path=config_path, create_logger=False)
         if isinstance(data_paths, list):
             check_valid_lst(data=data_paths, source=f'{self.__class__.__name__} data_paths', valid_dtypes=(str,), min_len=1)
@@ -166,9 +196,12 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
         else:
             data_paths = deepcopy(self.machine_results_paths)
         for file_path in data_paths: check_file_exist_and_readable(file_path=file_path)
+        if clf_names is not None:
+            check_valid_lst(data=clf_names, source=f'{self.__class__.__name__} clf_names', valid_dtypes=(str,), valid_values=self.clf_names, min_len=1, raise_error=True)
+            self.clf_names = clf_names
         PlottingMixin.__init__(self)
         self.clr_lst = create_color_palette(pallete_name=palette, increments=len(self.body_parts_lst) + 1, as_int=True, as_rgb_ratio=True)
-        self.frame_setting, self.video_setting, self.data_paths, self.last_frm_setting = frame_setting, video_setting,data_paths, last_frm_setting
+        self.frame_setting, self.video_setting, self.data_paths, self.last_frm_setting, self.font = frame_setting, video_setting,data_paths, last_frm_setting, font
         if not os.path.exists(self.gantt_plot_dir): os.makedirs(self.gantt_plot_dir)
         if platform.system() == "Darwin":
             multiprocessing.set_start_method("spawn", force=True)
@@ -206,6 +239,7 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
                                      font_size=self.font_size,
                                      font_rotation=self.font_rotation,
                                      video_name=self.video_name,
+                                     font=self.font,
                                      save_path=os.path.join(self.gantt_plot_dir, f"{self.video_name}_final_image.png"),
                                      palette=self.clr_lst,
                                      hhmmss=self.hhmmss)
@@ -225,6 +259,7 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
                                               width=self.width,
                                               height=self.height,
                                               font_size=self.font_size,
+                                              font=self.font,
                                               font_rotation=self.font_rotation,
                                               video_name=self.video_name,
                                               palette=self.clr_lst,
@@ -254,18 +289,18 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
 #                                     font_rotation= 45)
 #     test.run()
 
-if __name__ == "__main__":
-    test = GanttCreatorMultiprocess(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
-                                    frame_setting=False,
-                                    video_setting=True,
-                                    data_paths=r"D:\troubleshooting\maplight_ri\project_folder\csv\machine_results\Trial_1_C24_D1_1.csv",
-                                    last_frm_setting=False,
-                                    width=640,
-                                    height= 480,
-                                    font_size=10,
-                                    font_rotation= 45,
-                                    core_cnt=16)
-    test.run()
+# if __name__ == "__main__":
+#     test = GanttCreatorMultiprocess(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
+#                                     frame_setting=False,
+#                                     video_setting=True,
+#                                     data_paths=r"D:\troubleshooting\maplight_ri\project_folder\csv\machine_results\Trial_1_C24_D1_1.csv",
+#                                     last_frm_setting=False,
+#                                     width=640,
+#                                     height= 480,
+#                                     font_size=10,
+#                                     font_rotation= 45,
+#                                     core_cnt=16)
+#     test.run()
 
 
 # test = GanttCreatorMultiprocess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',
