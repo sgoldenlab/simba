@@ -117,12 +117,15 @@ class SimBA2Yolo:
         annotations, timer, body_part_headers = [], SimbaTimer(start=True), []
         for file_cnt, video_name in enumerate(self.data_w_video):
             data = read_df(file_path=self.data_paths[video_name], file_type=self.config.file_type)
+            data.columns = [x.lower() for x in list(data.columns)]
+            bp_header_names = [x.lower() for x in self.config.bp_headers]
             check_valid_dataframe(df=data, source=f'{self.__class__.__name__} {self.data_paths[video_name]}', valid_dtypes=Formats.NUMERIC_DTYPES.value)
             video_path = self.video_paths[video_name]
             check_video_and_data_frm_count_align(video=video_path, data=data, name=self.data_paths[video_name], raise_error=True)
             p_data = data[data.columns[list(data.columns.str.endswith('_p'))]]
             data = data.loc[:, ~data.columns.str.endswith('_p')].reset_index(drop=True)
             data = data.iloc[(p_data[(p_data > self.threshold).all(axis=1)].index)]
+            data = data[[x for x in bp_header_names if not x.endswith('_p')]]
             body_part_headers = data.columns
             data['video'], frm_cnt = video_name, len(data)
             if self.sample_size is None:
@@ -155,7 +158,7 @@ class SimBA2Yolo:
             if frm_idx in train_idx:
                 img_save_path, lbl_save_path = os.path.join(self.img_train_dir, f'{file_name}.png'), os.path.join(self.lbl_train_dir, f'{file_name}.txt')
             else:
-                img_save_path, lbl_save_path = os.path.join(self.img_train_dir, f'{file_name}.png'), os.path.join(self.lb_val_dir, f'{file_name}.txt')
+                img_save_path, lbl_save_path = os.path.join(self.img_val_dir, f'{file_name}.png'), os.path.join(self.lb_val_dir, f'{file_name}.txt')
             img = read_frm_of_video(video_path=vid_path, frame_index=frm_idx, greyscale=self.greyscale, clahe=self.clahe)
             img_h, img_w = img.shape[0], img.shape[1]
             keypoints_with_id = {}
@@ -181,8 +184,8 @@ class SimBA2Yolo:
         timer.stop_timer()
         stdout_success(msg=f'YOLO formated data saved in {self.save_dir} directory', source=self.__class__.__name__, elapsed_time=timer.elapsed_time_str)
 
-
-# SAVE_DIR = r'D:\troubleshooting\mitra\mitra_yolo'
-# CONFIG_PATH = r"C:\troubleshooting\mitra\project_folder\project_config.ini"
-# runner = SimBA2Yolo(config_path=CONFIG_PATH, save_dir=SAVE_DIR, sample_size=10, verbose=True, names=('animal_1',))
+#
+# SAVE_DIR = r'E:\troubleshooting\mitra\yolo_0126\yolo_train_0126'
+# CONFIG_PATH = r"E:\troubleshooting\mitra\project_folder\project_config.ini"
+# runner = SimBA2Yolo(config_path=CONFIG_PATH, save_dir=SAVE_DIR, sample_size=50, verbose=True, names=('animal_1',), threshold=0.5)
 # runner.run()

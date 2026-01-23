@@ -1,5 +1,6 @@
 import os
 import sys
+from contextlib import redirect_stderr, redirect_stdout
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import argparse
@@ -16,13 +17,12 @@ except ModuleNotFoundError:
     YOLO = None
 
 from simba.data_processors.cuda.utils import _is_cuda_available
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists, check_int, check_str,
-                                check_valid_boolean, check_valid_device)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_int, check_str, check_valid_boolean, check_valid_device)
 from simba.utils.enums import Options
 from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
-from simba.utils.read_write import find_core_cnt
+from simba.utils.read_write import find_core_cnt, get_current_time
 from simba.utils.yolo import load_yolo_model
+from simba.utils.printing import stdout_information
 
 
 class FitYolo():
@@ -108,20 +108,25 @@ class FitYolo():
 
 
     def run(self):
-        model = load_yolo_model(weights_path=self.weights_path,
-                                verbose=self.verbose,
-                                format=self.format,
-                                device=self.device)
+        # Temporarily redirect stdout/stderr to terminal to ensure ultralytics output goes to terminal
+        # sys.__stdout__ and sys.__stderr__ are the original terminal streams
+        stdout_information(msg=f'[{get_current_time()}] Please follow the YOLO pose model training in the terminal from where SimBA was launched ...', source=self.__class__.__name__)
+        stdout_information(msg=f'[{get_current_time()}] Results will be stored in the {self.save_path} directory ..', source=self.__class__.__name__)
+        with redirect_stdout(sys.__stdout__), redirect_stderr(sys.__stderr__):
+            model = load_yolo_model(weights_path=self.weights_path,
+                                    verbose=self.verbose,
+                                    format=self.format,
+                                    device=self.device)
 
-        model.train(data=self.model_yaml,
-                    epochs=self.epochs,
-                    project=self.save_path,
-                    batch=self.batch,
-                    plots=self.plots,
-                    imgsz=self.imgsz,
-                    workers=self.workers,
-                    device=self.device,
-                    patience=self.patience)
+            model.train(data=self.model_yaml,
+                        epochs=self.epochs,
+                        project=self.save_path,
+                        batch=self.batch,
+                        plots=self.plots,
+                        imgsz=self.imgsz,
+                        workers=self.workers,
+                        device=self.device,
+                        patience=self.patience)
 
 
 if __name__ == "__main__" and not hasattr(sys, 'ps1'):

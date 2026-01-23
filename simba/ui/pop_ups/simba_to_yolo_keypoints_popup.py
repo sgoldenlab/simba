@@ -63,7 +63,7 @@ class SimBA2YoloKeypointsPopUp(PopUpMixin):
         animal_names = list(config.animal_bp_dict.keys())
         bps = [x[:-2] for x in config.animal_bp_dict[animal_names[0]]['X_bps']]
         flip_idx = get_yolo_keypoint_flip_idx(x=bps)
-        map_dict = {c: k for c, k in enumerate(animal_names)}
+        #map_dict = {c: k for c, k in enumerate(animal_names)}
         bp_id_idx = None
         if len(animal_names) > 1:
             bp_id_idx = get_yolo_keypoint_bp_id_idx(animal_bp_dict=config.animal_bp_dict)
@@ -85,7 +85,7 @@ class SimBA2YoloKeypointsPopUp(PopUpMixin):
                             greyscale=grey,
                             padding=padding,
                             flip_idx=flip_idx,
-                            names=map_dict,
+                            names=tuple(animal_names),
                             sample_size=sample_size,
                             bp_id_idx=bp_id_idx,
                             clahe=clahe)

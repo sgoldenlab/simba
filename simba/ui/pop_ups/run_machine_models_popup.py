@@ -8,7 +8,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.model.inference_batch import InferenceBatch
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
-                                        FileSelect, SimbaButton, SimBADropDown,
+                                        FileSelect, SimbaButton, SimBASeperator,
                                         SimBALabel)
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int)
@@ -31,34 +31,34 @@ class RunMachineModelsPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         PopUpMixin.__init__(self, title="SET MODEL PARAMETERS", icon='equation_small')
+        padx, self.config_path = (0, 25), config_path
         self.clf_table_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.SET_RUN_ML_PARAMETERS.value)
-        clf_header = SimBALabel(parent=self.clf_table_frm, txt="CLASSIFIER", font=Formats.FONT_HEADER.value)
-        mdl_path_header = SimBALabel(parent=self.clf_table_frm, txt="MODEL PATH (.SAV)", font=Formats.FONT_HEADER.value)
-        threshold_header = SimBALabel(parent=self.clf_table_frm, txt="THRESHOLD (0.0 - 1.0)", font=Formats.FONT_HEADER.value)
-        min_bout_header = SimBALabel(parent=self.clf_table_frm, txt="MINIMUM BOUT LENGTH (MS)", font=Formats.FONT_HEADER.value)
-        clf_header.grid(row=0, column=0, sticky=W, padx=(0, 10))
-        mdl_path_header.grid(row=0, column=1, sticky=NW)
-        threshold_header.grid(row=0, column=2, sticky=NW)
-        min_bout_header.grid(row=0, column=3, sticky=NW)
+        clf_header = SimBALabel(parent=self.clf_table_frm, txt="CLASSIFIER", font=Formats.FONT_HEADER.value, img='label')
+        mdl_path_header = SimBALabel(parent=self.clf_table_frm, txt="MODEL PATH (.SAV)", font=Formats.FONT_HEADER.value, img='file_type', justify='center')
+        threshold_header = SimBALabel(parent=self.clf_table_frm, txt="THRESHOLD (0.0 - 1.0)", font=Formats.FONT_HEADER.value, img='threshold', justify='center')
+        min_bout_header = SimBALabel(parent=self.clf_table_frm, txt="MINIMUM BOUT LENGTH (MS)", font=Formats.FONT_HEADER.value, img='timer_2', justify='center')
+        clf_header.grid(row=0, column=0, sticky=NW, padx=padx)
+        mdl_path_header.grid(row=0, column=1, sticky=NW, padx=padx)
+        threshold_header.grid(row=0, column=2, sticky=NW, padx=padx)
+        min_bout_header.grid(row=0, column=3, sticky=NW, padx=padx)
+
+        seperator = SimBASeperator(parent=self.clf_table_frm, color='grey', orient='horizontal', borderwidth=1)
+        seperator.grid(row=1, column=0, columnspan=4, rowspan=1, sticky="ew", pady=(0, 10))
 
         self.clf_data = {}
         for clf_cnt, clf_name in enumerate(self.clf_names):
             self.clf_data[clf_name] = {}
-            SimBALabel(parent=self.clf_table_frm, txt=clf_name, font=Formats.FONT_REGULAR_ITALICS.value).grid(row=clf_cnt + 1, column=0, sticky=W, padx=(0, 10))
+            SimBALabel(parent=self.clf_table_frm, txt=clf_name, font=Formats.FONT_REGULAR_ITALICS.value).grid(row=clf_cnt + 2, column=0, sticky=W, padx=padx)
             mdl_path = read_config_entry(config=self.config, section=ConfigKey.SML_SETTINGS.value, option=f"model_path_{clf_cnt + 1}", default_value='Select model (.sav) file', data_type=Dtypes.STR.value)
             self.clf_data[clf_name][PATH] = FileSelect(self.clf_table_frm, title="Select model (.sav) file", initialdir=self.project_path, file_types=[("SimBA Classifier", "*.sav")], initial_path=mdl_path)
             threshold = read_config_entry(config=self.config, section=ConfigKey.THRESHOLD_SETTINGS.value, option=f"threshold_{clf_cnt + 1}", default_value='', data_type=Dtypes.STR.value)
-            self.clf_data[clf_name][THRESHOLD] = Entry_Box(parent=self.clf_table_frm, fileDescription='', labelwidth=0, entry_box_width=20, value=threshold)
+            self.clf_data[clf_name][THRESHOLD] = Entry_Box(parent=self.clf_table_frm, fileDescription='', labelwidth=0, entry_box_width=20, value=threshold, justify='center')
             bout_length = read_config_entry(config=self.config, section=ConfigKey.MIN_BOUT_LENGTH.value, option=f"min_bout_{clf_cnt + 1}", default_value='', data_type=Dtypes.STR.value)
-            self.clf_data[clf_name][MIN_BOUT] = Entry_Box(parent=self.clf_table_frm, fileDescription='', labelwidth=0, entry_box_width=20, value=bout_length)
-            self.clf_data[clf_name][PATH].grid(row=clf_cnt + 1, column=1, sticky=NW, padx=(0, 5))
-            self.clf_data[clf_name][THRESHOLD].grid(row=clf_cnt + 1, column=2, sticky=NW, padx=(0, 5))
-            self.clf_data[clf_name][MIN_BOUT].grid(row=clf_cnt + 1, column=3, sticky=NW, padx=(0, 5))
+            self.clf_data[clf_name][MIN_BOUT] = Entry_Box(parent=self.clf_table_frm, fileDescription='', labelwidth=0, entry_box_width=20, value=bout_length, justify='center')
+            self.clf_data[clf_name][PATH].grid(row=clf_cnt + 2, column=1, sticky=NW, padx=padx)
+            self.clf_data[clf_name][THRESHOLD].grid(row=clf_cnt + 2, column=2, sticky=NW, padx=padx)
+            self.clf_data[clf_name][MIN_BOUT].grid(row=clf_cnt + 2, column=3, sticky=NW, padx=padx)
         self.clf_table_frm.grid(row=0, sticky=W, pady=5, padx=5)
-        # self.runtime_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="RUNTIME SETTINGS", icon_name='run', icon_link=Links.SET_RUN_ML_PARAMETERS.value)
-        # self.core_cnt_dropdown = SimBADropDown(parent=self.runtime_settings_frm, dropdown_options=CORE_CNT_OPTIONS, label='CPU CORE COUNT:', label_width=30, dropdown_width=20, value=int(find_core_cnt()[0]/3))
-        # self.runtime_settings_frm.grid(row=1, sticky=W, pady=5, padx=5)
-        # self.core_cnt_dropdown.grid(row=0, sticky=W, pady=5, padx=5)
         run_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header=f"ANALYZE {len(self.feature_file_paths)} FILES(S)", icon_name='rocket')
         run_btn = SimbaButton(parent=run_frm, txt="RUN", img='rocket', txt_clr='red', font=Formats.FONT_REGULAR.value, hover_font=Formats.FONT_REGULAR.value, cmd=self.run)
         run_frm.grid(row=2, sticky=W, pady=5, padx=5)
@@ -95,7 +95,7 @@ class RunMachineModelsPopUp(PopUpMixin, ConfigReader):
         with open(self.config_path, "w") as f:
             self.config.write(f)
 
-        stdout_success(msg="Model paths/settings saved in project_config.ini", source=self.__class__.__name__)
+        stdout_success(msg=f"Model paths/settings saved in project_config.ini ({self.config_path})", source=self.__class__.__name__)
 
         if len(self.feature_file_paths) == 0:
             raise NoDataError(msg=f'Cannot run machine model predictions: No data files found in {self.features_dir} directory', source=self.__class__.__name__)
@@ -103,4 +103,4 @@ class RunMachineModelsPopUp(PopUpMixin, ConfigReader):
         inferencer = InferenceBatch(config_path=self.config_path, features_dir=None, save_dir=None, minimum_bout_length=None)
         inferencer.run()
 
-#_ = RunMachineModelsPopUp(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini")
+#_ = RunMachineModelsPopUp(config_path=r"E:\troubleshooting\mitra_emergence\project_folder\project_config.ini")

@@ -30,7 +30,7 @@ SMOOTHING_OPTIONS = ['None', 50, 100, 200, 300, 400, 500]
 
 YOLO_FORMATS = Options.VALID_YOLO_FORMATS.value + ['None']
 devices = ['CPU']
-THRESHOLD_OPTIONS = list(np.arange(0.1, 1.1, 0.1).astype(np.float32))
+THRESHOLD_OPTIONS = list(np.arange(0.05, 1.05, 0.05).astype(np.float32))
 
 simba_dir = os.path.dirname(simba.__file__)
 YOLO_SCHEMATICS_DIR = os.path.join(simba_dir, Paths.YOLO_SCHEMATICS_DIR.value)

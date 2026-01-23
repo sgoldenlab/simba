@@ -1133,7 +1133,7 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
                         end_time: str,
                         out_dir: Optional[Union[str, os.PathLike]] = None,
                         save_path: Optional[Union[str, os.PathLike]] = None,
-                        codec: str = 'libvpx-vp9',
+                        codec: str = 'libx264',
                         quality: int = 60,
                         verbose: bool = True,
                         overwrite: Optional[bool] = False,
@@ -1176,6 +1176,7 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
     check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=end_time, video_path=file_path)
     quality = 60 if not check_int(name='quality', value=quality, min_value=0, max_value=100, raise_error=False)[0] else int(quality)
     quality_crf = quality_pct_to_crf(pct=quality)
+    codec = 'libvpx-vp9' if ext.lower() == '.webm' else codec
     if not include_clip_time_in_filename:
         save_name = os.path.join(dir, file_name + "_clipped.mp4")
     else:
@@ -1185,7 +1186,6 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
         save_name = deepcopy(save_path)
     if os.path.isfile(save_name) and (not overwrite):
         raise FileExistError(msg=f"SIMBA ERROR: The outfile file already exist: {save_name}.", source=clip_video_in_range.__name__)
-
     if gpu:
         cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -c:v h264_nvenc -rc vbr -cq {quality_crf} "{save_name}" -loglevel error -stats -hide_banner -y'
     else:

@@ -24,7 +24,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         FileSelect, FolderSelect, SimbaButton,
                                         SimbaCheckbox, SimBADropDown,
                                         SimBALabel, SimBARadioButton,
-                                        SimBAScaleBar)
+                                        SimBAScaleBar, SimBASeperator)
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable,
                                 check_if_dir_exists,
@@ -1505,23 +1505,23 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
         max_video_name_len = len(max(list(self.video_paths.keys())))
         super().__init__(title="CLIP MULTIPLE VIDEOS BY FRAME NUMBERS", icon='clip')
         self.save_dir = save_dir
+        padx = (0, 25)
         data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        data_frm.grid(row=2, column=0, sticky=NW)
+        SimBALabel(parent=data_frm, font=Formats.FONT_REGULAR.value, txt="VIDEO NAME", justify='center', img='video').grid(row=0, column=0, padx=padx, sticky=NW)
+        SimBALabel(parent=data_frm, font=Formats.FONT_REGULAR.value, txt="START FRAME", justify='center', img='play').grid(row=0, column=2, padx=padx)
+        SimBALabel(parent=data_frm, font=Formats.FONT_REGULAR.value, txt="END FRAME", justify='center', img='stop').grid(row=0, column=3, padx=padx)
 
-
-
-        SimBALabel(parent=data_frm, width=max_video_name_len+20, font=Formats.FONT_REGULAR.value, txt="VIDEO NAME", justify='center').grid(row=0, column=0)
-        SimBALabel(parent=data_frm, width=max_video_name_len+20, font=Formats.FONT_REGULAR.value, txt="START FRAME", justify='center').grid(row=0, column=2)
-        SimBALabel(parent=data_frm, width=max_video_name_len+20, font=Formats.FONT_REGULAR.value, txt="END FRAME", justify='center').grid(row=0, column=3)
+        seperator = SimBASeperator(parent=data_frm, color=None, orient='horizontal', borderwidth=1)
+        seperator.grid(row=1, column=0, columnspan=4, rowspan=1, sticky="ew")
 
         self.entry_boxes = {}
         for cnt, video_name in enumerate(self.video_paths.keys()):
             self.entry_boxes[video_name] = {}
-            SimBALabel(parent=data_frm, width=max_video_name_len + 20, font=Formats.FONT_REGULAR.value, txt=video_name + ' ' + f'({ self.video_meta_data[cnt]})', justify='center').grid(row=cnt + 1, column=0)
-            self.entry_boxes[video_name]["start"] = Entry_Box(data_frm, "", 0, validation="numeric")
-            self.entry_boxes[video_name]["end"] = Entry_Box(data_frm, "", 0, validation="numeric")
-            self.entry_boxes[video_name]["start"].grid(row=cnt + 1, column=2, sticky=NW)
-            self.entry_boxes[video_name]["end"].grid(row=cnt + 1, column=3, sticky=NW)
+            SimBALabel(parent=data_frm, font=Formats.FONT_REGULAR.value, txt=video_name + f' (frames: { self.video_meta_data[cnt]})', justify='left').grid(row=cnt + 2, column=0, padx=padx, sticky=NW)
+            self.entry_boxes[video_name]["start"] = Entry_Box(data_frm, fileDescription="", labelwidth=0, validation="numeric", justify='center')
+            self.entry_boxes[video_name]["end"] = Entry_Box(data_frm, fileDescription="", labelwidth=0, validation="numeric", justify='center')
+            self.entry_boxes[video_name]["start"].grid(row=cnt + 2, column=2, sticky=NW, padx=padx)
+            self.entry_boxes[video_name]["end"].grid(row=cnt + 2, column=3, sticky=NW, padx=padx)
 
         gpu_state = NORMAL if check_nvidea_gpu_available(raise_error=False) else DISABLED
         batch_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BATCH SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
@@ -1531,6 +1531,7 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
         batch_end_btn = SimbaButton(parent=batch_settings_frm, txt='SET', img='tick', cmd=self._batch_set_val, cmd_kwargs={'text': lambda: batch_end_entry.entry_get.strip(), 'box_type': lambda: 'end'})
         self.gpu_dropdown = SimBADropDown(parent=batch_settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=25, dropdown_width=12, tooltip_key='USE_GPU', img='gpu_3', state=gpu_state, value='FALSE')
         self.quality_dropdown = SimBADropDown(parent=batch_settings_frm, dropdown_options=list(range(10, 110, 10)), label='OUT VIDEO QUALITY:', label_width=25, dropdown_width=12, tooltip_key='OUTPUT_VIDEO_QUALITY', img='pct_2', value=60)
+        data_frm.grid(row=2, column=0, sticky=NW)
         batch_settings_frm.grid(row=1, column=0, sticky=NW)
         batch_start_entry.grid(row=0, column=0, sticky=NW)
         batch_start_btn.grid(row=0, column=1, sticky=NW)
@@ -1590,6 +1591,9 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
 
 
 #ClipMultipleVideosByFrameNumbersPopUp(data_dir=r'E:\netholabs_videos\terry\mp4s\4_02_001_exp_2025_12_02_15_22_00\videos\Camera2', save_dir=r'E:\netholabs_videos\terry\mp4s\4_02_001_exp_2025_12_02_15_22_00\videos\Camera2\test')
+#ClipMultipleVideosByFrameNumbersPopUp(data_dir=r"E:\maplight_videos\test_0126", save_dir=r"E:\maplight_videos\clip_test")
+
+
 
 class InitiateClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
     def __init__(self):
@@ -1636,6 +1640,8 @@ class InitiateClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
         )
 
 
+
+
 class ClipMultipleVideosByTimestamps(PopUpMixin):
     """
     :example:
@@ -1648,13 +1654,12 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         check_if_dir_exists(in_dir=save_dir, source=self.__class__.__name__, create_if_not_exist=True)
         self.video_paths = find_all_videos_in_directory(directory=data_dir, as_dict=True, raise_error=True)
         self.video_meta_data = [get_video_meta_data(video_path=x) for x in list(self.video_paths.values())]
-        max_video_name_len = len(max(list(self.video_paths.keys()))) + 25
         super().__init__(title="CLIP MULTIPLE VIDEOS BY TIME-STAMPS", icon='clip')
         self.save_dir = save_dir
         batch_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BATCH SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        batch_start_entry = Entry_Box(parent=batch_settings_frm, fileDescription='START TIME (HH:MM:SS):', labelwidth=25, entry_box_width=12, img='play')
+        batch_start_entry = Entry_Box(parent=batch_settings_frm, fileDescription='START TIME (HH:MM:SS):', labelwidth=25, entry_box_width=12, img='play', justify='center')
         batch_start_btn = SimbaButton(parent=batch_settings_frm, txt='SET', img='tick', cmd=self._batch_set_val, cmd_kwargs={'text': lambda: batch_start_entry.entry_get.strip(), 'box_type': lambda: 'start'})
-        batch_end_entry = Entry_Box(parent=batch_settings_frm, fileDescription='END TIME (HH:MM:SS):', labelwidth=25, entry_box_width=12, img='stop')
+        batch_end_entry = Entry_Box(parent=batch_settings_frm, fileDescription='END TIME (HH:MM:SS):', labelwidth=25, entry_box_width=12, img='stop', justify='center')
         batch_end_btn = SimbaButton(parent=batch_settings_frm, txt='SET', img='tick', cmd=self._batch_set_val, cmd_kwargs={'text': lambda: batch_end_entry.entry_get.strip(), 'box_type': lambda: 'end'})
         batch_settings_frm.grid(row=0, column=0, sticky=NW)
         batch_start_entry.grid(row=0, column=0, sticky=NW)
@@ -1667,25 +1672,28 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         self.gpu_dropdown.grid(row=2, column=0, sticky=NW)
         self.quality_dropdown.grid(row=3, column=0, sticky=NW)
         self.save_dir = save_dir
+        padx = (0, 30)
         data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO SETTINGS", icon_name='video', icon_link=Links.VIDEO_TOOLS.value)
-        data_frm.grid(row=1, column=0, sticky=NW)
-        Label(data_frm, text="VIDEO NAME", width=max_video_name_len).grid(row=0, column=0, sticky=NW)
-        Label(data_frm, text="VIDEO LENGTH", width=12).grid(row=0, column=1)
-        Label(data_frm, text="START TIME (HH:MM:SS)", width=18).grid(row=0, column=2)
-        Label(data_frm, text="END TIME (HH:MM:SS)", width=18).grid(row=0, column=3)
+
+        SimBALabel(data_frm, txt="VIDEO NAME", justify='center', font=Formats.FONT_REGULAR_BOLD.value, img='video').grid(row=0, column=0, sticky=NW, padx=padx)
+        SimBALabel(data_frm, txt="VIDEO LENGTH", justify='center', font=Formats.FONT_REGULAR_BOLD.value, img='timer_2').grid(row=0, column=1, sticky=NW, padx=padx)
+        SimBALabel(data_frm, txt="START TIME (HH:MM:SS)", justify='center', font=Formats.FONT_REGULAR_BOLD.value, img='play').grid(row=0, column=2, sticky=NW, padx=padx)
+        SimBALabel(data_frm, txt="END TIME (HH:MM:SS)", justify='center', font=Formats.FONT_REGULAR_BOLD.value, img='stop').grid(row=0, column=3, sticky=NW, padx=padx)
+        seperator = SimBASeperator(parent=data_frm, color=None, orient='horizontal', borderwidth=1)
+        seperator.grid(row=1, column=0, columnspan=4, rowspan=1, sticky="ew")
 
         self.entry_boxes = {}
         for cnt, video_name in enumerate(self.video_paths.keys()):
             self.entry_boxes[video_name] = {}
-            SimBALabel(parent=data_frm, txt=video_name, width=max_video_name_len, justify='center').grid(row=cnt + 1, column=0, sticky=NW)
+            SimBALabel(parent=data_frm, txt=video_name, justify='center').grid(row=cnt + 2, column=0, sticky=NW, padx=padx)
             video_length = self.video_meta_data[cnt]["video_length_s"]
             video_length_hhmmss = seconds_to_timestamp(seconds=video_length)
-            Label(data_frm, text=video_length_hhmmss, width=max_video_name_len).grid(row=cnt + 1, column=1, sticky=NW)
-            self.entry_boxes[video_name]["start"] = Entry_Box(data_frm, "", 5)
-            self.entry_boxes[video_name]["end"] = Entry_Box(data_frm, "", 5)
-            self.entry_boxes[video_name]["start"].grid(row=cnt + 1, column=2, sticky=NW)
-            self.entry_boxes[video_name]["end"].grid(row=cnt + 1, column=3, sticky=NW)
-
+            SimBALabel(data_frm, txt=video_length_hhmmss, justify='center').grid(row=cnt + 2, column=1, sticky=NW, padx=padx)
+            self.entry_boxes[video_name]["start"] = Entry_Box(data_frm,  fileDescription="", labelwidth=0, justify='center')
+            self.entry_boxes[video_name]["end"] = Entry_Box(data_frm, fileDescription="", labelwidth=0, justify='center')
+            self.entry_boxes[video_name]["start"].grid(row=cnt + 2, column=2, sticky=NW, padx=padx)
+            self.entry_boxes[video_name]["end"].grid(row=cnt + 2, column=3, sticky=NW, padx=padx)
+        data_frm.grid(row=1, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run, btn_txt_clr="blue")
         self.main_frm.mainloop()
 
@@ -1712,7 +1720,7 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         timer.stop_timer()
         stdout_success(msg=f"{len(self.entry_boxes)} videos clipped by time-stamps and saved in {self.save_dir}", elapsed_time=timer.elapsed_time_str,)
 
-#ClipMultipleVideosByTimestamps(data_dir=r"C:\troubleshooting\mitra\project_folder\videos", save_dir=r"C:\troubleshooting\mitra\project_folder\videos\temp_3")
+#ClipMultipleVideosByTimestamps(data_dir=r"E:\maplight_videos\test_0126", save_dir=r"E:\maplight_videos\clip_test")
 
 
 class InitiateClipMultipleVideosByTimestampsPopUp(PopUpMixin):
