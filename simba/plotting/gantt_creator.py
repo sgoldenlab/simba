@@ -2,8 +2,9 @@ __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import os
 import shutil
-from typing import List, Optional, Union
 from copy import deepcopy
+from typing import List, Optional, Union
+
 import cv2
 import numpy as np
 
@@ -16,7 +17,7 @@ from simba.utils.checks import (
 from simba.utils.data import create_color_palette, detect_bouts
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.lookups import get_named_colors, get_fonts
+from simba.utils.lookups import get_fonts, get_named_colors
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
 

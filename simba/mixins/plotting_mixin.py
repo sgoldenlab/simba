@@ -39,7 +39,7 @@ from simba.utils.data import create_color_palette, detect_bouts
 from simba.utils.enums import Formats, Keys, Options, Paths
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
-                                 get_named_colors, get_fonts)
+                                 get_fonts, get_named_colors)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data, read_df,

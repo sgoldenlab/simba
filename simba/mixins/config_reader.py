@@ -41,8 +41,8 @@ from simba.utils.read_write import (find_core_cnt, get_all_clf_names,
                                     get_fn_ext, read_config_file, read_df,
                                     read_project_path_and_file_type, write_df)
 from simba.utils.warnings import (BodypartColumnNotFoundWarning,
-                                  InvalidValueWarning, NoDataFoundWarning,
-                                  NoFileFoundWarning, DuplicateNamesWarning)
+                                  DuplicateNamesWarning, InvalidValueWarning,
+                                  NoDataFoundWarning, NoFileFoundWarning)
 
 
 class ConfigReader(object):

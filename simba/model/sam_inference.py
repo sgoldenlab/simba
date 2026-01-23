@@ -14,11 +14,15 @@ try:
 except:
     SAM2VideoPredictor = None
 
-from simba.utils.checks import (check_file_exist_and_readable, check_float, check_if_dir_exists, check_instance, check_int, check_valid_array, check_valid_tuple)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists, check_instance, check_int,
+                                check_valid_array, check_valid_tuple)
 from simba.utils.data import resample_geometry_vertices
 from simba.utils.enums import Formats, Options
-from simba.utils.errors import (InvalidInputError, SimBAGPUError, SimBAPAckageVersionError)
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data, write_df)
+from simba.utils.errors import (InvalidInputError, SimBAGPUError,
+                                SimBAPAckageVersionError)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, get_video_meta_data, write_df)
 
 
 class SamInference():
