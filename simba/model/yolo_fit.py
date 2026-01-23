@@ -17,12 +17,14 @@ except ModuleNotFoundError:
     YOLO = None
 
 from simba.data_processors.cuda.utils import _is_cuda_available
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_int, check_str, check_valid_boolean, check_valid_device)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists, check_int, check_str,
+                                check_valid_boolean, check_valid_device)
 from simba.utils.enums import Options
 from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
+from simba.utils.printing import stdout_information
 from simba.utils.read_write import find_core_cnt, get_current_time
 from simba.utils.yolo import load_yolo_model
-from simba.utils.printing import stdout_information
 
 
 class FitYolo():
