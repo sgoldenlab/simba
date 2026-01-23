@@ -8,12 +8,11 @@ import gc
 import multiprocessing
 import os
 import platform
+import sys
 from copy import deepcopy
 from typing import List, Optional, Union
 
 import cv2
-import os
-import sys
 
 is_pycharm_ipython = True
 try:
@@ -50,12 +49,11 @@ from simba.utils.data import (create_color_palette, detect_bouts, get_cpu_pool,
                               terminate_cpu_pool)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
+from simba.utils.lookups import get_fonts
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     get_current_time, get_fn_ext, read_df)
-from simba.utils.lookups import get_fonts
-
 
 HEIGHT = "height"
 WIDTH = "width"

@@ -14,7 +14,9 @@
     from simba.utils.data import detect_bouts, plug_holes_shortest_bout
     from simba.utils.enums import Formats
     from simba.utils.printing import stdout_success
-    from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, read_df, read_video_info, get_current_time)
+    from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                        get_current_time, get_fn_ext, read_df,
+                                        read_video_info)
 
     NAPE_X, NAPE_Y = 'nape_x', 'nape_y'
     FREEZING = 'FREEZING'
