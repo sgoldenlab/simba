@@ -34,7 +34,7 @@ from simba.utils.errors import (CountError, InvalidFilepathError,
                                 InvalidFileTypeError, SimBAGPUError,
                                 SimBAPAckageVersionError)
 from simba.utils.lookups import get_current_time
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_video_meta_data, recursive_file_search)
 from simba.utils.warnings import FileExistWarning, NoDataFoundWarning
@@ -182,7 +182,12 @@ class YOLOPoseInference():
         results = {}
         class_dict = self.model.names
         timer = SimbaTimer(start=True)
-        print(f'Starting tracking inference for {len(self.video_path)} video(s) ({get_current_time()})... ')
+        if self.save_dir is not None:
+            msg = f'[{get_current_time()}] Starting tracking inference for {len(self.video_path)} video(s). Results will be saved in {self.save_dir} ... '
+        else:
+            msg = f'[{get_current_time()}] Starting tracking inference for {len(self.video_path)} video(s) ... '
+        stdout_information(msg=msg, source=self.__class__.__name__)
+        stdout_information(msg='Follow progress in OS terminal window ...', source=self.__class__.__name__)
         for video_cnt, path in enumerate(self.video_path):
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(filepath=path)

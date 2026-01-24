@@ -56,7 +56,7 @@ from simba.utils.lookups import (get_current_time,
                                  get_ffmpeg_crossfade_methods, get_fonts,
                                  get_named_colors, percent_to_crf_lookup,
                                  percent_to_qv_lk, quality_pct_to_crf,
-                                 video_quality_to_preset_lookup)
+                                 video_quality_to_preset_lookup, get_ffmpeg_codec)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
@@ -704,12 +704,9 @@ def change_single_video_fps(file_path: Union[str, os.PathLike],
     quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     if verbose: print(f"Converting the FPS {video_meta_data['fps']} -> {fps} for video {file_name} ...")
     if codec is None:
-        if ext.lower() == '.webm':
-            codec = 'libvpx-vp9'
-        elif ext.lower() == '.avi':
-            codec = 'mpeg4'
-        else:
-            codec = 'libx264'
+        codec = get_ffmpeg_codec(file_name=file_path)
+    else:
+        check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
     if os.path.isfile(save_path):
         FileExistWarning(msg=f"Overwriting existing file at {save_path}...", source=change_single_video_fps.__name__,)
     if gpu:
@@ -800,7 +797,8 @@ def change_fps_of_multiple_videos(path: Union[str, os.PathLike, List[Union[str, 
     if verbose: stdout_success(msg=f"SIMBA COMPLETE: FPS of {len(video_paths)} video(s) changed to {fps}", elapsed_time=timer.elapsed_time_str, source=change_fps_of_multiple_videos.__name__,)
 
 
-def convert_video_powerpoint_compatible_format(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
+def convert_video_powerpoint_compatible_format(file_path: Union[str, os.PathLike],
+                                               gpu: Optional[bool] = False) -> None:
     """
     Create MS PowerPoint compatible copy of a video file.
 
@@ -846,7 +844,7 @@ def convert_video_powerpoint_compatible_format(file_path: Union[str, os.PathLike
 
 def video_to_greyscale(file_path: Union[str, os.PathLike],
                        gpu: Optional[bool] = False,
-                       codec: str = 'libx264',
+                       codec: Optional[str] = None,
                        verbose: bool = True,
                        quality: int = 23,
                        save_path: Optional[Union[str, os.PathLike]] = None) -> None:
@@ -890,6 +888,10 @@ def video_to_greyscale(file_path: Union[str, os.PathLike],
         check_if_dir_exists(in_dir=os.path.dirname(save_path))
         save_name = deepcopy(save_path)
     quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
+    if codec is None:
+        codec = get_ffmpeg_codec(file_name=file_path)
+    else:
+        check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
     if gpu:
         cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "hwupload_cuda, hwdownload, format=nv12, format=gray" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy "{save_name}" -loglevel error -stats -hide_banner -y'
     else:
@@ -971,7 +973,7 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
                             font: Optional[str] = 'Arial',
                             font_color: Optional[str] = 'black',
                             bg_color: Optional[str] = 'white',
-                            codec: Optional[str] = 'libx264',
+                            codec: Optional[str] = None,
                             quality: Optional[int] = None,
                             verbose: bool = True,
                             save_path: Optional[Union[str, os.PathLike]] = None,
@@ -1037,7 +1039,10 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
             print(len(file_paths), file_path)
     else:
         raise InvalidInputError(msg=f'{file_path} is not a valid file path or file directory.', source=superimpose_frame_count.__name__)
-
+    if codec is None:
+        codec = get_ffmpeg_codec(file_name=file_path)
+    else:
+        check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
     quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     for video_cnt, file_path in enumerate(file_paths):
         dir, file_name, ext = get_fn_ext(filepath=file_path)
@@ -1133,7 +1138,7 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
                         end_time: str,
                         out_dir: Optional[Union[str, os.PathLike]] = None,
                         save_path: Optional[Union[str, os.PathLike]] = None,
-                        codec: str = 'libx264',
+                        codec: Optional[str] = None,
                         quality: int = 60,
                         verbose: bool = True,
                         overwrite: Optional[bool] = False,
@@ -1176,7 +1181,10 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
     check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=end_time, video_path=file_path)
     quality = 60 if not check_int(name='quality', value=quality, min_value=0, max_value=100, raise_error=False)[0] else int(quality)
     quality_crf = quality_pct_to_crf(pct=quality)
-    codec = 'libvpx-vp9' if ext.lower() == '.webm' else codec
+    if codec is None:
+        codec = get_ffmpeg_codec(file_name=file_path)
+    else:
+        check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
     if not include_clip_time_in_filename:
         save_name = os.path.join(dir, file_name + "_clipped.mp4")
     else:
@@ -1200,7 +1208,7 @@ def downsample_video(file_path: Union[str, os.PathLike],
                      video_height: int,
                      video_width: int,
                      gpu: bool = False,
-                     codec: str = 'libx264',
+                     codec: Optional[str] = None,
                      quality: int = 23,
                      save_path: Optional[Union[str, os.PathLike]] = None,
                      verbose: bool = True) -> None:
@@ -1240,6 +1248,10 @@ def downsample_video(file_path: Union[str, os.PathLike],
     if os.path.isfile(save_name):
         raise FileExistError("SIMBA ERROR: The outfile file already exist: {}.".format(save_name), source=downsample_video.__name__)
     quality = 23 if not check_int(name=f'{downsample_video.__name__} quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
+    if codec is None:
+        codec = get_ffmpeg_codec(file_name=file_path)
+    else:
+        check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
     if gpu:
         command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "scale=w={video_width}:h={video_height}" -c:v h264_nvenc -rc vbr -cq {quality} "{save_name}" -hide_banner -loglevel error -stats -y'
         #command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "scale_cuda=w={video_width}:h={video_height}:force_original_aspect_ratio=decrease:flags=bicubic" -c:v h264_nvenc -rc vbr -cq {quality} "{save_name}" -loglevel error -stats -hide_banner -y'
@@ -3757,7 +3769,7 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
 
 def reverse_videos(path: Union[str, os.PathLike],
                    save_dir: Optional[Union[str, os.PathLike]] = None,
-                   codec: Literal['libx265', 'libx264', 'vp9'] = 'libx265',
+                   codec: Optional[str] = None,
                    quality: Optional[int] = 60,
                    gpu: Optional[bool] = False) -> None:
 
@@ -3803,6 +3815,10 @@ def reverse_videos(path: Union[str, os.PathLike],
             os.makedirs(save_dir)
     else:
         raise InvalidInputError(msg=f'Path is not a valid file or directory path.', source=reverse_videos.__name__)
+    if codec is None:
+        codec = get_ffmpeg_codec(file_name=path)
+    else:
+        check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
     for file_cnt, file_path in enumerate(file_paths):
         _, video_name, ext = get_fn_ext(filepath=file_path)
         print(f'Reversing video {video_name} (Video {file_cnt+1}/{len(file_paths)})...')
@@ -5080,7 +5096,7 @@ def change_playback_speed(video_path: Union[str, os.PathLike],
                           quality: int = 60,
                           gpu: bool = False,
                           verbose: bool = True,
-                          codec: str = 'libx264'):
+                          codec: Optional[str] = None):
     """
     Change the playback speed of a video file. Speed > 1.0 makes the video faster, speed < 1.0 makes it slower.
 
@@ -5123,6 +5139,10 @@ def change_playback_speed(video_path: Union[str, os.PathLike],
     else:
         save_path = os.path.join(dir, f'{video_name}_playback_speed_{speed}{ext}')
     video_pts = 1.0 / speed
+    if codec is None:
+        codec = get_ffmpeg_codec(file_name=video_path)
+    else:
+        check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
     if gpu:
         cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf "setpts={video_pts:.6f}*PTS" -an -c:v h264_nvenc -rc vbr -cq {quality_code} "{save_path}" -hide_banner -loglevel error -stats -y'
     else:
@@ -5140,7 +5160,7 @@ def change_playback_speed_dir(data_dir: Union[str, os.PathLike],
                               quality: int = 60,
                               gpu: bool = False,
                               verbose: bool = True,
-                              codec: str = 'libx264'):
+                              codec: Optional[str] = None):
     """
     Change the playback speed of all video files in a directory. Speed > 1.0 makes videos faster, speed < 1.0 makes them slower.
 
@@ -5186,6 +5206,10 @@ def change_playback_speed_dir(data_dir: Union[str, os.PathLike],
         raise DuplicationError(msg=f'The video directory and the save directory cannot be the same folder: {save_dir}', source=change_playback_speed_dir.__name__)
     for video_cnt, (video_name, video_path) in enumerate(video_dict.items()):
         _, _, ext = get_fn_ext(filepath=video_path)
+        if codec is None:
+            codec = get_ffmpeg_codec(file_name=video_path)
+        else:
+            check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
         save_path = os.path.join(save_dir, f'{video_name}{ext}')
         if verbose: print(f'Changing video speed for video {video_name} ({video_cnt+1}/{total_video_cnt})...')
         change_playback_speed(video_path=video_path, speed=speed, save_path=save_path, quality=quality, codec=codec, verbose=False)

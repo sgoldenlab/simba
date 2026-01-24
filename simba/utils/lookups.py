@@ -1202,3 +1202,69 @@ def check_for_updates(time_out: int = 2):
         msg = (f'NEW SimBA VERSION AVAILABLE. \nYou have SimBA version {env_simba_version}. \nThe latest version is {latest_simba_version}. '
                f'\nYou can update using "pip install simba-uw-tf-dev --upgrade"')
     stdout_information(msg=msg, source=check_for_updates.__name__)
+
+
+def get_ext_codec_map() -> Dict[str, str]:
+    """
+    Get a dictionary mapping video file extensions to their recommended FFmpeg codecs.
+    Automatically falls back to alternative codecs if the preferred codec is not available.
+
+    :return: Dictionary mapping file extensions (without leading dot) to codec names.
+    :rtype: Dict[str, str]
+
+    :example:
+    >>> codec_map = get_ext_codec_map()
+    >>> codec = codec_map.get('webm', 'libx264')  # Returns 'libvpx-vp9' or fallback
+    """
+    codecs_available = get_ffmpeg_encoders(raise_error=False)
+    if not codecs_available: codecs_available = []
+
+    common_codecs = ['libx264', 'mpeg4', 'h264', 'mjpeg', 'libx265']
+    fallback_codec = None
+    for codec in common_codecs:
+        if codec in codecs_available:
+            fallback_codec = codec
+            break
+
+    # If no common codec found, use first available or default to mpeg4 (most universal)
+    if fallback_codec is None:
+        fallback_codec = codecs_available[0] if codecs_available else 'mpeg4'
+    
+    def get_codec(preferred: str, alternative: str = None) -> str:
+        if preferred in codecs_available:
+            return preferred
+        alt = alternative if alternative else fallback_codec
+        return alt if alt in codecs_available else preferred
+    
+    return {
+        'webm': get_codec(preferred='libvpx-vp9', alternative='libvpx'),
+        'avi': get_codec(preferred='mpeg4', alternative='libx264'),
+        'mp4': get_codec(preferred='libx264', alternative='mpeg4'),
+        'mov': get_codec(preferred='libx264', alternative='mpeg4'),
+        'mkv': get_codec(preferred='libx264', alternative='mpeg4'),
+        'flv': get_codec(preferred='libx264', alternative='mpeg4'),
+        'm4v': get_codec(preferred='libx264', alternative='mpeg4'),
+        'h264': get_codec(preferred='libx264', alternative='h264'),
+    }
+
+def get_ffmpeg_codec(file_name: Union[str, os.PathLike],
+                     fallback: str = 'mpeg4') -> str:
+    """
+    Get the recommended FFmpeg codec for a video file based on its extension.
+
+    :param Union[str, os.PathLike] file_name: Path to video file or file extension.
+    :param str fallback: Codec to return if file extension is not recognized. Default: 'mpeg4'.
+    :return: Recommended FFmpeg codec name for the video file.
+    :rtype: str
+
+    :example:
+    >>> codec = get_ffmpeg_codec(file_name='video.mp4')
+    >>> codec = get_ffmpeg_codec(file_name='video.webm', fallback='libx264')
+    >>> codec = get_ffmpeg_codec(file_name=r'C:/videos/my_video.avi')
+    """
+    codec_map = get_ext_codec_map()
+    _, file_name, ext = get_fn_ext(filepath=file_name)
+    if ext[1:] in codec_map.keys():
+        return codec_map[ext[1:]]
+    else:
+        return fallback

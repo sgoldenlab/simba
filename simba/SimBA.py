@@ -223,7 +223,14 @@ sys.setrecursionlimit(10**6)
 currentPlatform = platform.system()
 ENV = read_sys_env()
 load_timer.stop_timer()
-print(f'SimBA environment variables: {ENV}. Load time: {load_timer.elapsed_time_str}s')
+
+try:
+    import multiprocessing
+    is_worker_process = multiprocessing.current_process().name != 'MainProcess'
+except (ImportError, AttributeError):
+    is_worker_process = False
+if not is_worker_process:
+    print(f'SimBA environment variables: {ENV}. Load time: {load_timer.elapsed_time_str}s')
 
 class LoadProjectPopUp(object):
     def __init__(self):
