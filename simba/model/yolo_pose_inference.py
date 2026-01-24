@@ -34,7 +34,7 @@ from simba.utils.errors import (CountError, InvalidFilepathError,
                                 InvalidFileTypeError, SimBAGPUError,
                                 SimBAPAckageVersionError)
 from simba.utils.lookups import get_current_time
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_video_meta_data, recursive_file_search)
 from simba.utils.warnings import FileExistWarning, NoDataFoundWarning
