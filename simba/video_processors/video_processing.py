@@ -57,7 +57,7 @@ from simba.utils.lookups import (get_current_time,
                                  get_named_colors, percent_to_crf_lookup,
                                  percent_to_qv_lk, quality_pct_to_crf,
                                  video_quality_to_preset_lookup, get_ffmpeg_codec)
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     concatenate_videos_in_folder, create_directory,
@@ -739,6 +739,9 @@ def change_fps_of_multiple_videos(path: Union[str, os.PathLike, List[Union[str, 
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :param bool verbose: If True, prints conversion progress. Default True.
     :returns: None.
+    
+    .. note::
+       Codec is automatically selected based on file extension: libvpx-vp9 for .webm, mpeg4 for .avi, libx264 for others.
 
     :example:
     >>> _ = change_fps_of_multiple_videos(path='project_folder/videos/Video_1.mp4', fps=15)
@@ -805,6 +808,9 @@ def convert_video_powerpoint_compatible_format(file_path: Union[str, os.PathLike
     :param Union[str, os.PathLike] file_path: Path to video file.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :returns: None. The result is stored in the same directory as the input file with the ``_powerpointready`` suffix.
+    
+    .. note::
+       Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
 
     :example:
     >>> _ = convert_video_powerpoint_compatible_format(file_path='project_folder/videos/Video_1.mp4')
@@ -891,7 +897,7 @@ def video_to_greyscale(file_path: Union[str, os.PathLike],
     if codec is None:
         codec = get_ffmpeg_codec(file_name=file_path)
     else:
-        check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
+        check_valid_codec(codec=codec, raise_error=True, source=video_to_greyscale.__name__)
     if gpu:
         cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "hwupload_cuda, hwdownload, format=nv12, format=gray" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy "{save_name}" -loglevel error -stats -hide_banner -y'
     else:
@@ -926,6 +932,9 @@ def batch_video_to_greyscale(path: Union[str, os.PathLike, List[Union[str, os.Pa
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :raise FFMPEGCodecGPUError: If no GPU is found and ``gpu == True``.
     :returns: None.
+    
+    .. note::
+       Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
 
     :example:
     >>> _ = batch_video_to_greyscale(path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test_2')
@@ -1039,14 +1048,13 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
             print(len(file_paths), file_path)
     else:
         raise InvalidInputError(msg=f'{file_path} is not a valid file path or file directory.', source=superimpose_frame_count.__name__)
-    if codec is None:
-        codec = get_ffmpeg_codec(file_name=file_path)
-    else:
-        check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
+    if codec is not None: check_valid_codec(codec=codec, raise_error=True, source=superimpose_frame_count.__name__)
     quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     for video_cnt, file_path in enumerate(file_paths):
         dir, file_name, ext = get_fn_ext(filepath=file_path)
-        if verbose: print(f'Superimposing frame count video {video_cnt+1}/{len(file_paths)}...')
+        if verbose:
+            stdout_information(msg=f'Superimposing frame count video {video_cnt+1}/{len(file_paths)}...', source=change_single_video_fps.__name__)
+        codec = get_ffmpeg_codec(file_name=file_path) if codec is None else codec
         if save_path is None:
             save_name = os.path.join(dir, f"{file_name}_frame_no.mp4")
         elif os.path.isdir(save_path):
@@ -1099,6 +1107,9 @@ def remove_beginning_of_video(file_path: Union[str, os.PathLike],
     :param Optional[Union[str, os.PathLike]] save_path: Optional save location for the shortened video. If None, then the new video is saved in the same directory as the input video with the ``_shortened`` suffix.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :returns: None. If save_path is not passed, the result is stored in the same directory as the input file with the ``_shorten.mp4`` suffix.
+    
+    .. note::
+       Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
 
     :example:
     >>> _ = remove_beginning_of_video(file_path='project_folder/videos/Video_1.avi', time=10)
@@ -1152,7 +1163,7 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
     :param str end_time: End time in HH:MM:SS format.
     :param Optional[Union[str, os.PathLike]] out_dir: If None, then the clip will be stored in the same dir as the input video. If directory, then the location of the output files.
     :param Optional[Union[str, os.PathLike]] save_path: Optional save path for the clipped video. If provided, overrides out_dir and filename generation. Default None.
-    :param str codec: Video codec to use for CPU encoding. Default 'libvpx-vp9'. Ignored if gpu=True.
+    :param Optional[str] codec: Video codec to use for CPU encoding. If None, automatically selects based on file extension (libvpx-vp9 for .webm, mpeg4 for .avi, libx264 for others). Default None. Ignored if gpu=True.
     :param int quality: Video quality percentage (0-100). Higher values = higher quality. Default 60.
     :param bool verbose: If True, prints conversion progress. Default True.
     :param Optional[bool] overwrite: If True, overwrite output file if path already exists. If False, then raise FileExistError. Default False.
@@ -1184,7 +1195,7 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
     if codec is None:
         codec = get_ffmpeg_codec(file_name=file_path)
     else:
-        check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
+        check_valid_codec(codec=codec, raise_error=True, source=clip_video_in_range.__name__)
     if not include_clip_time_in_filename:
         save_name = os.path.join(dir, file_name + "_clipped.mp4")
     else:
@@ -1251,7 +1262,7 @@ def downsample_video(file_path: Union[str, os.PathLike],
     if codec is None:
         codec = get_ffmpeg_codec(file_name=file_path)
     else:
-        check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
+        check_valid_codec(codec=codec, raise_error=True, source=downsample_video.__name__)
     if gpu:
         command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "scale=w={video_width}:h={video_height}" -c:v h264_nvenc -rc vbr -cq {quality} "{save_name}" -hide_banner -loglevel error -stats -y'
         #command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "scale_cuda=w={video_width}:h={video_height}:force_original_aspect_ratio=decrease:flags=bicubic" -c:v h264_nvenc -rc vbr -cq {quality} "{save_name}" -loglevel error -stats -hide_banner -y'
@@ -1344,6 +1355,9 @@ def batch_convert_video_format(directory: Union[str, os.PathLike],
     :parameter str output_format: Format of the output files (e.g., mp4).
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :returns: None. The results are stored in the same directory as the input files.
+    
+    .. note::
+       Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
 
     :example:
     >>> _ = batch_convert_video_format(directory='project_folder/videos', input_format='avi', output_format='mp4')
@@ -1499,6 +1513,7 @@ def multi_split_video(file_path: Union[str, os.PathLike],
                       end_times: List[str],
                       out_dir: Optional[Union[str, os.PathLike]] = None,
                       quality: Optional[int] = None,
+                      codec: Optional[str] = None,
                       include_clip_time_in_filename: Optional[bool] = False,
                       gpu: Optional[bool] = False) -> None:
     """
@@ -1511,6 +1526,7 @@ def multi_split_video(file_path: Union[str, os.PathLike],
     :param Optional[int] quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. If None, defaults to 23. Default None.
     :param Optional[bool] include_clip_time_in_filename: If True, include the clip start and end in HH-MM-SS format as suffix in the filename. If False, then use integer suffic representing the count.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param Optional[str] codec: Video codec to use for CPU encoding. If None, automatically selects based on file extension (libvpx-vp9 for .webm, mpeg4 for .avi, libx264 for others). Default None. Ignored if gpu=True.
     :returns: None.
 
     :example:
@@ -1522,6 +1538,8 @@ def multi_split_video(file_path: Union[str, os.PathLike],
     check_file_exist_and_readable(file_path=file_path)
     dir_name, file_name, ext = get_fn_ext(filepath=file_path)
     quality = 23 if not check_int(name=f'{multi_split_video.__name__} quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
+    if codec is not None: check_valid_codec(codec=codec, raise_error=True, source=multi_split_video.__name__)
+    codec = get_ffmpeg_codec(file_name=file_name) if codec is None else codec
     if out_dir is not None:
         if not os.path.isdir(out_dir):
             os.makedirs(out_dir)
@@ -1567,7 +1585,7 @@ def multi_split_video(file_path: Union[str, os.PathLike],
                 )
             command = f'ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i "{file_path}" -ss {start_time} -to {end_time} -c:v h264_nvenc -rc vbr -cq {quality} "{save_path}" -hide_banner -loglevel error -stats -y'
         else:
-            command = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -crf {quality} "{save_path}" -loglevel error -stats -hide_banner -y'
+            command = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -c:v {codec} -async 1 -crf {quality} "{save_path}" -loglevel error -stats -hide_banner -y'
         clip_timer = SimbaTimer(start=True)
         subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         clip_timer.stop_timer()
@@ -1635,6 +1653,7 @@ def crop_single_video(file_path: Union[str, os.PathLike],
 def crop_multiple_videos(directory_path: Union[str, os.PathLike],
                          output_path: Union[str, os.PathLike],
                          gpu: Optional[bool] = False,
+                         codec: Optional[str] = None,
                          quality: int = 60) -> None:
     """
     Crop multiple videos in a folder according to crop-coordinates defined in the **first** video.
@@ -1648,6 +1667,8 @@ def crop_multiple_videos(directory_path: Union[str, os.PathLike],
     :param Union[str, os.PathLike] directory_path: Directory containing input videos.
     :param Union[str, os.PathLike] output_path: Directory where to save the cropped videos.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param Optional[str] codec: Video codec to use for CPU encoding. If None, automatically selects based on file extension (libvpx-vp9 for .webm, mpeg4 for .avi, libx264 for others). Default None. Ignored if gpu=True.
+    :param int quality: Video quality percentage (1-100). Higher values = higher quality. Default 60.
     :returns: None. Results are stored in passed ``output_path``.
 
     :example:
@@ -1673,15 +1694,18 @@ def crop_multiple_videos(directory_path: Union[str, os.PathLike],
     if ((roi_selector.top_left[0] < 0) or (roi_selector.top_left[1] < 0) or (roi_selector.bottom_right[0] < 0) or (roi_selector.bottom_right[1] < 1)):
         raise CountError(msg=f"CROP FAILED: Cannot use negative crop coordinates. Got top_left: {roi_selector.top_left}, bottom_right: {roi_selector.bottom_right}", source=crop_multiple_videos.__name__)
     timer = SimbaTimer(start=True)
+    if codec is not None: check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
+
     for file_cnt, file_path in enumerate(video_paths):
         video_timer = SimbaTimer(start=True)
         dir_name, file_name, ext = get_fn_ext(filepath=file_path)
+        video_codec = Formats.BATCH_CODEC.value if codec is None else get_ffmpeg_codec(file_name=file_path)
         print(f"Cropping video {file_name} ({file_cnt+1}/{len(video_paths)})...")
         video_meta_data = get_video_meta_data(file_path)
         if (roi_selector.bottom_right[0] > video_meta_data["width"]) or (roi_selector.bottom_right[1] > video_meta_data["height"]):
             raise InvalidInputError(msg=f'Cannot crop video {file_name} of size {video_meta_data["resolution_str"]} at location top left: {roi_selector.top_left}, bottom right: {roi_selector.bottom_right}', source=crop_multiple_videos.__name__)
         save_path = os.path.join(output_path, f"{file_name}_cropped.mp4")
-        crop_video(video_path=file_path, save_path=save_path, size=(roi_selector.width, roi_selector.height), top_left=(roi_selector.top_left[0], roi_selector.top_left[1]), gpu=gpu, verbose=False, quality=quality)
+        crop_video(video_path=file_path, save_path=save_path, size=(roi_selector.width, roi_selector.height), top_left=(roi_selector.top_left[0], roi_selector.top_left[1]), gpu=gpu, verbose=False, quality=quality, codec=video_codec)
         video_timer.stop_timer()
         print(f"Video {file_name} cropped (Video {file_cnt+1}/{len(video_paths)}, elapsed time: {video_timer.elapsed_time_str})")
     timer.stop_timer()
@@ -1704,6 +1728,9 @@ def frames_to_movie(directory: Union[str, os.PathLike],
     :param out_format: Format of the output video. One of: 'mp4', 'avi', 'webm'. Default is 'mp4'.
     :param gpu: If True, use NVIDIA GPU codecs (if available). Default is False.
     :return: None. Video is saved to disk.
+    
+    .. note::
+       Codec is automatically selected based on out_format: libvpx-vp9 for 'webm', mpeg4 for 'avi', libx264 for 'mp4' (ignored if gpu=True).
     """
 
     import re
@@ -1788,6 +1815,9 @@ def video_concatenator(video_one_path: Union[str, os.PathLike],
     :param Optional[int] quality: Integer (1-100) representing output video quality. Higher = better quality + bigger size. If None, defaults to 60. Default None.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :returns: None. The video is stored in the same directory as the ``video_one_path`` using the video names concatenated as filename.
+    
+    .. note::
+       Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
 
     :example:
     >>> video_concatenator(video_one_path='project_folder/videos/Video_1.mp4', video_two_path='project_folder/videos/Video_2.mp4', resolution=800, horizontal=True)
@@ -2412,6 +2442,7 @@ def resize_videos_by_height(video_paths: List[Union[str, os.PathLike]],
                             gpu: Optional[bool] = False,
                             quality: Optional[int] = None,
                             suffix: Optional[str] = None,
+                            codec: Optional[str] = None,
                             verbose: Optional[bool] = True) -> Union[None, List[Union[None, str, os.PathLike]]]:
     """
     Re-size a list of videos to a specified height while retaining their aspect ratios.
@@ -2454,10 +2485,13 @@ def resize_videos_by_height(video_paths: List[Union[str, os.PathLike]],
         for i in video_paths:
             video_heights.append(get_video_meta_data(video_path=i)["height"])
         height = video_heights[int(height)]
+    if codec is not None: check_valid_codec(codec=codec, raise_error=True, source=resize_videos_by_height.__name__)
+
     for cnt, video_path in enumerate(video_paths):
         dir_name, video_name, ext = get_fn_ext(video_path)
+        video_codec = get_ffmpeg_codec(file_name=video_path) if codec is None else codec
         if verbose:
-            print(f"Resizing height video {video_name} (Video {cnt+1}/{len(video_paths)})...")
+            stdout_information(msg=f"Resizing height video {video_name} (Video {cnt+1}/{len(video_paths)})...", source=resize_videos_by_height.__name__)
         if overwrite:
             dt = datetime.now().strftime("%Y%m%d%H%M%S")
             save_path = os.path.join(dir_name, f"{video_name}_{dt}.mp4")
@@ -2471,7 +2505,7 @@ def resize_videos_by_height(video_paths: List[Union[str, os.PathLike]],
         if gpu:
             cmd = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf scale_npp=-2:{height} -c:v h264_nvenc -rc vbr -cq {quality} "{save_path}" -hide_banner -loglevel error -y'
         else:
-            cmd = f'ffmpeg -y -i "{video_path}" -vf scale=-2:{height} -crf {quality} "{save_path}" -hide_banner -loglevel error -stats -y'
+            cmd = f'ffmpeg -y -i "{video_path}" -vf scale=-2:{height} -c:v {video_codec} -crf {quality} "{save_path}" -hide_banner -loglevel error -stats -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         if overwrite:
             shutil.copy(save_path, video_path)
@@ -2489,6 +2523,7 @@ def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
                            overwrite: Optional[bool] = False,
                            save_dir: Optional[Union[str, os.PathLike]] = None,
                            gpu: Optional[bool] = False,
+                           codec: Optional[str] = None,
                            quality: Optional[int] = None,
                            suffix: Optional[str] = None,
                            verbose: Optional[bool] = True) -> Union[None, List[Union[None, str, os.PathLike]]]:
@@ -2539,12 +2574,12 @@ def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
         for i in video_paths:
             video_widths.append(get_video_meta_data(video_path=i)["width"])
         width = video_widths[int(width)]
+    if codec is not None: check_valid_codec(codec=codec, raise_error=True, source=resize_videos_by_width.__name__)
     for cnt, video_path in enumerate(video_paths):
         dir_name, video_name, ext = get_fn_ext(video_path)
+        video_codec = get_ffmpeg_codec(file_name=video_path) if codec is None else codec
         if verbose:
-            print(
-                f"Resizing width video {video_name} (Video {cnt+1}/{len(video_paths)})..."
-            )
+            stdout_information(msg=f"Resizing width video {video_name} (Video {cnt+1}/{len(video_paths)})...", source=resize_videos_by_height.__name__)
         if overwrite:
             dt = datetime.now().strftime("%Y%m%d%H%M%S")
             save_path = os.path.join(dir_name, f"{video_name}_{dt}.mp4")
@@ -2558,7 +2593,7 @@ def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
         if gpu:
             cmd = f'ffmpeg -y -hwaccel auto -i "{video_path}" -vf "scale={width}:-2" -c:v h264_nvenc -rc vbr -cq {quality} "{save_path}" -hide_banner -loglevel error -stats -y'
         else:
-            cmd = f'ffmpeg -y -i "{video_path}" -vf scale={width}:-2 -crf {quality} "{save_path}" -hide_banner -loglevel error -stats -y'
+            cmd = f'ffmpeg -y -i "{video_path}" -vf scale={width}:-2 -c:v {video_codec} -crf {quality} "{save_path}" -hide_banner -loglevel error -stats -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         if overwrite:
             shutil.copy(save_path, video_path)
@@ -2696,7 +2731,6 @@ def vertical_video_concatenator(video_paths: List[Union[str, os.PathLike]],
     .. image:: _static/img/vertical_video_concatenator.png
        :width: 300
        :align: center
-
 
     .. seealso::
        :func:`simba.video_processors.video_processing.horizontal_video_concatenator`
@@ -3003,6 +3037,7 @@ def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]],
                              frm_ids: List[List[int]],
                              save_dir: Optional[Union[str, os.PathLike]] = None,
                              gpu: Optional[bool] = False,
+                             codec: Optional[str] = None,
                              quality: Optional[int] = None):
 
     """
@@ -3045,13 +3080,14 @@ def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]],
         video_timer = SimbaTimer(start=True)
         dir, video_name, ext = get_fn_ext(filepath=file_path)
         s_f, e_f = frm_ids[cnt][0], frm_ids[cnt][1]
-        print(f"Trimming {video_name} from frame {s_f} to frame {e_f} (Video {cnt+1}/{len(file_paths)})...")
+        stdout_information(msg=f"Trimming {video_name} from frame {s_f} to frame {e_f} (Video {cnt+1}/{len(file_paths)})...", source=clip_videos_by_frame_ids.__name__)
+        video_codec = get_ffmpeg_codec(file_name=file_path) if codec is None else codec
         if save_dir is not None:
             out_path = os.path.join(save_dir, os.path.basename(file_path))
         else:
             out_path = os.path.join(dir, f"{video_name}_{s_f}_{e_f}{ext}")
         if not gpu:
-            cmd = f'ffmpeg -i "{file_path}" -vf trim=start_frame={s_f}:end_frame={e_f} -an -crf {quality} "{out_path}" -loglevel error -stats -y'
+            cmd = f'ffmpeg -i "{file_path}" -vf trim=start_frame={s_f}:end_frame={e_f} -c:v {video_codec} -an -crf {quality} "{out_path}" -loglevel error -stats -y'
         else:
             cmd = f'ffmpeg -hwaccel auto -i "{file_path}" -vf trim=start_frame={s_f}:end_frame={e_f} -c:v h264_nvenc -rc vbr -cq {quality} -an "{out_path}" -loglevel error -stats -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
@@ -3321,6 +3357,7 @@ def convert_to_mov(path: Union[str, os.PathLike],
 def superimpose_video_progressbar(video_path: Union[str, os.PathLike],
                                   bar_height: Optional[int] = 10,
                                   color: Optional[str] = 'red',
+                                  codec: Optional[str] = None,
                                   position: Optional[Literal['top', 'bottom']] = 'bottom',
                                   save_dir: Optional[Union[str, os.PathLike]] = None,
                                   gpu: Optional[bool] = False) -> None:
@@ -3357,28 +3394,30 @@ def superimpose_video_progressbar(video_path: Union[str, os.PathLike],
         video_path = find_all_videos_in_directory(directory=video_path, as_dict=True, raise_error=True)
         video_paths = list(video_path.values())
     else:
-        raise InvalidInputError(msg='{} is not a valid file path or directory path.', source=superimpose_video_progressbar.__name__)
+        raise InvalidInputError(msg=f'{video_path} is not a valid file path or directory path.', source=superimpose_video_progressbar.__name__)
     if save_dir is not None:
         check_if_dir_exists(in_dir=save_dir)
     else:
         save_dir, _, _ = get_fn_ext(filepath=video_paths[0])
+    if codec is not None: check_valid_codec(codec=codec, raise_error=True, source=superimpose_video_progressbar.__name__)
     for cnt, video_path in enumerate(video_paths):
         video_meta_data = get_video_meta_data(video_path=video_path)
         video_length = video_meta_data['video_length_s']
         width, height = video_meta_data['width'], video_meta_data['height']
         bar_height = int(height * (bar_height/100))
         _, video_name, ext = get_fn_ext(filepath=video_path)
-        print(f'Inserting progress bar on video {video_name}...')
+        video_codec = get_ffmpeg_codec(file_name=video_path) if codec is None else codec
+        stdout_information(msg=f'Inserting progress bar on video {video_name}...', source=superimpose_video_progressbar.__name__)
         save_path = os.path.join(save_dir, f'{video_name}_progress_bar{ext}')
         check_int(name=f'{superimpose_video_progressbar} height', value=bar_height, max_value=height, min_value=1)
         if position == 'bottom':
             if not gpu:
-                cmd = f'ffmpeg -i "{video_path}" -filter_complex "color=c={color}:s={width}x{bar_height}[bar];[0][bar]overlay=-w+(w/{video_length})*t:H-h:shortest=1" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+                cmd = f'ffmpeg -i "{video_path}" -filter_complex "color=c={color}:s={width}x{bar_height}[bar];[0][bar]overlay=-w+(w/{video_length})*t:H-h:shortest=1" -c:v {video_codec} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
             else:
                 cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -filter_complex "color=c={color}:s={width}x{bar_height}[bar];[0][bar]overlay=-w+(w/{video_length})*t:H-h:shortest=1" -c:v h264_nvenc -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         else:
             if not gpu:
-                cmd = f'ffmpeg -i "{video_path}" -filter_complex "color=c={color}:s={width}x{bar_height}[bar];[0][bar]overlay=-w+(w/{video_length})*t:{bar_height}-h:shortest=1" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+                cmd = f'ffmpeg -i "{video_path}" -filter_complex "color=c={color}:s={width}x{bar_height}[bar];[0][bar]overlay=-w+(w/{video_length})*t:{bar_height}-h:shortest=1" -c:a copy -c:v {video_codec} "{save_path}" -loglevel error -stats -hide_banner -y'
             else:
                 cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{video_path}" -filter_complex "color=c={color}:s={width}x{bar_height}[bar];[0][bar]overlay=-w+(w/{video_length})*t:{bar_height}-h:shortest=1" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
@@ -3815,17 +3854,15 @@ def reverse_videos(path: Union[str, os.PathLike],
             os.makedirs(save_dir)
     else:
         raise InvalidInputError(msg=f'Path is not a valid file or directory path.', source=reverse_videos.__name__)
-    if codec is None:
-        codec = get_ffmpeg_codec(file_name=path)
-    else:
-        check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
+    if codec is not None: check_valid_codec(codec=codec, raise_error=True, source=reverse_videos.__name__)
     for file_cnt, file_path in enumerate(file_paths):
         _, video_name, ext = get_fn_ext(filepath=file_path)
-        print(f'Reversing video {video_name} (Video {file_cnt+1}/{len(file_paths)})...')
+        stdout_information(msg=f'Reversing video {video_name} (Video {file_cnt+1}/{len(file_paths)})...', source=reverse_videos.__name__)
+        video_codec = get_ffmpeg_codec(file_name=file_path) if codec is None else codec
         _ = get_video_meta_data(video_path=file_path)
         out_path = os.path.join(save_dir, f'{video_name}{ext}')
         if not gpu:
-            cmd = f'ffmpeg -i "{file_path}" -vf reverse -af areverse -c:v {codec} -crf {crf} "{out_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{file_path}" -vf reverse -af areverse -c:v {video_codec} -crf {crf} "{out_path}" -loglevel error -stats -hide_banner -y'
         else:
             cmd = f'ffmpeg -hwaccel auto -i "{file_path}" -vf reverse -af areverse -c:v h264_nvenc -crf {crf} "{out_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
@@ -5142,7 +5179,7 @@ def change_playback_speed(video_path: Union[str, os.PathLike],
     if codec is None:
         codec = get_ffmpeg_codec(file_name=video_path)
     else:
-        check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
+        check_valid_codec(codec=codec, raise_error=True, source=change_playback_speed.__name__)
     if gpu:
         cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf "setpts={video_pts:.6f}*PTS" -an -c:v h264_nvenc -rc vbr -cq {quality_code} "{save_path}" -hide_banner -loglevel error -stats -y'
     else:
@@ -5194,7 +5231,7 @@ def change_playback_speed_dir(data_dir: Union[str, os.PathLike],
     check_float(name=f'{change_playback_speed.__name__} speed', value=speed, min_value=0.000001, max_value=100, raise_error=True)
     check_int(name=f'{change_playback_speed.__name__} quality', value=quality, min_value=1, max_value=100, raise_error=True)
     check_if_dir_exists(in_dir=data_dir, source=f'{change_playback_speed.__name__} data_dir')
-    check_valid_codec(codec=codec, raise_error=True, source=change_playback_speed_dir.__name__)
+    if codec is not None: check_valid_codec(codec=codec, raise_error=True, source=change_playback_speed_dir.__name__)
     video_dict = find_all_videos_in_directory(directory=data_dir, as_dict=True, raise_error=True, sort_alphabetically=True)
     total_video_cnt = len(list(video_dict.keys()))
     if save_dir is not None:
@@ -5206,13 +5243,10 @@ def change_playback_speed_dir(data_dir: Union[str, os.PathLike],
         raise DuplicationError(msg=f'The video directory and the save directory cannot be the same folder: {save_dir}', source=change_playback_speed_dir.__name__)
     for video_cnt, (video_name, video_path) in enumerate(video_dict.items()):
         _, _, ext = get_fn_ext(filepath=video_path)
-        if codec is None:
-            codec = get_ffmpeg_codec(file_name=video_path)
-        else:
-            check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
+        video_codec = get_ffmpeg_codec(file_name=video_path) if codec is None else codec
         save_path = os.path.join(save_dir, f'{video_name}{ext}')
         if verbose: print(f'Changing video speed for video {video_name} ({video_cnt+1}/{total_video_cnt})...')
-        change_playback_speed(video_path=video_path, speed=speed, save_path=save_path, quality=quality, codec=codec, verbose=False)
+        change_playback_speed(video_path=video_path, speed=speed, save_path=save_path, quality=quality, codec=video_codec, verbose=False)
 
     timer.stop_timer()
     if verbose:
