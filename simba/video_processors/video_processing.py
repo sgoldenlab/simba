@@ -1101,6 +1101,9 @@ def remove_beginning_of_video(file_path: Union[str, os.PathLike],
     """
     Remove N seconds from the beginning of a video file.
 
+    .. seealso::
+       To remove N seconds from the end of the video, see :func:`simba.video_processors.video_processing.remove_end_of_video`.
+
     :param Union[str, os.PathLike] file_path: Path to video file
     :param int time: Number of seconds to remove from the beginning of the video.
     :param int quality: Video quality percentage (1-100). Higher values = higher quality. Default 60.
@@ -1142,6 +1145,66 @@ def remove_beginning_of_video(file_path: Union[str, os.PathLike],
     subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str, source=remove_beginning_of_video.__name__)
+
+
+def remove_end_of_video(file_path: Union[str, os.PathLike],
+                        time: int,
+                        quality: int = 60,
+                        save_path: Optional[Union[str, os.PathLike]] = None,
+                        gpu: Optional[bool] = False) -> None:
+    """
+    Remove N seconds from the end of a video file.
+
+    .. seealso::
+       To remove N seconds from the beginning of the video, see :func:`simba.video_processors.video_processing.remove_beginning_of_video`
+
+    :param Union[str, os.PathLike] file_path: Path to video file
+    :param int time: Number of seconds to remove from the end of the video.
+    :param int quality: Video quality percentage (1-100). Higher values = higher quality. Default 60.
+    :param Optional[Union[str, os.PathLike]] save_path: Optional save location for the shortened video. If None, then the new video is saved in the same directory as the input video with the ``_shortened`` suffix.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :returns: None. If save_path is not passed, the result is stored in the same directory as the input file with the ``_shorten.mp4`` suffix.
+
+    .. note::
+       Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
+
+    :example:
+    >>> _ = remove_end_of_video(file_path='project_folder/videos/Video_1.avi', time=10)
+    >>> remove_end_of_video(file_path=f'/Users/simon/Desktop/imgs_4/test/blahhhh.mp4', save_path='/Users/simon/Desktop/imgs_4/test/CUT.mp4', time=3)
+    """
+
+    check_ffmpeg_available(raise_error=True)
+    if gpu and not check_nvidea_gpu_available():
+        raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)",
+                                  source=remove_end_of_video.__name__)
+    timer = SimbaTimer(start=True)
+    check_file_exist_and_readable(file_path=file_path)
+    video_meta_data = get_video_meta_data(video_path=file_path)
+    check_int(name="Cut time", value=time, min_value=1)
+    check_int(name=f'{remove_end_of_video.__name__} quality', value=quality, min_value=1, max_value=100,
+              raise_error=True)
+    quality_crf = quality_pct_to_crf(pct=int(quality))
+    time = int(time)
+    dir, file_name, ext = get_fn_ext(filepath=file_path)
+    if video_meta_data['video_length_s'] <= time:
+        raise InvalidInputError(
+            msg=f"The cut time {time}s is invalid for video {file_name} with length {video_meta_data['video_length_s']}s",
+            source=remove_end_of_video.__name__)
+    if save_path is None:
+        save_name = os.path.join(dir, f"{file_name}_shorten.mp4")
+    else:
+        check_if_dir_exists(in_dir=os.path.dirname(save_path), source=f'{remove_end_of_video.__name__} save_path',
+                            create_if_not_exist=True)
+        save_name = save_path
+    duration = video_meta_data['video_length_s'] - time
+    if gpu:
+        cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -t {duration} -rc vbr -cq {quality_crf} -c:v h264_nvenc -c:a aac "{save_name}" -loglevel error -stats -hide_banner -y'
+    else:
+        cmd = f'ffmpeg -i "{file_path}" -t {duration} -c:v libx264 -crf {quality_crf} -c:a aac "{save_name}" -loglevel error -stats -hide_banner -y'
+    print(f"Removing final {time}s from {file_name}... ")
+    subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+    timer.stop_timer()
+    stdout_success(msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str, source=remove_end_of_video.__name__)
 
 
 def clip_video_in_range(file_path: Union[str, os.PathLike],

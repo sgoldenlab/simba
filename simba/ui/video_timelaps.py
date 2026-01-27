@@ -78,10 +78,8 @@ class TimelapseSlider():
         self.size, self.padding, self.crop_ratio, self.frame_cnt = ruler_width, padding, crop_ratio, frame_cnt
         self.ruler_height, self.video_path, self.show_ruler, self.ruler_divisions = ruler_height, video_path, show_ruler, ruler_divisions
         self.img_width, self.img_height = img_width, img_height
-        self.frm_name = f'{self.video_meta["video_name"]} - TIMELAPSE VIEWER - hit "X" or ESC t close'
-        self.video_capture = None
-        self._pending_frame_update = None
-        self._frame_debounce_ms = 50
+        self.frm_name = f'{self.video_meta["video_name"]} - TIMELAPSE VIEWER - hit "X" or ESC to close'
+        self.video_capture, self._pending_frame_update, self._frame_debounce_ms = None, None, 50
 
     def _draw_img(self, img: np.ndarray, lbl: SimBALabel):
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

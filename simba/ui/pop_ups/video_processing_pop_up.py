@@ -75,7 +75,7 @@ from simba.video_processors.video_processing import (
     superimpose_overlay_video, superimpose_video_names,
     superimpose_video_progressbar, temporal_concatenation, upsample_fps,
     video_bg_subtraction, video_bg_subtraction_mp, video_concatenator,
-    video_to_bw, video_to_greyscale, watermark_video)
+    video_to_bw, video_to_greyscale, watermark_video, remove_end_of_video)
 
 sys.setrecursionlimit(10**7)
 
@@ -179,11 +179,10 @@ class ClipVideoPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CLIP VIDEO", icon='clip')
         selected_video_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="Video path", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        selected_video = FileSelect(selected_video_frm, "FILE PATH: ", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-        selected_video.grid(row=0, column=0, sticky="NW")
+        self.selected_video = FileSelect(selected_video_frm, "FILE PATH: ", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='video_2', lblwidth=35)
+        self.selected_video.grid(row=0, column=0, sticky="NW")
 
-
-        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GPU", icon_name='gpu_3', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5)
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5)
         gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
         self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=35, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_available, tooltip_key='USE_GPU')
         self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 101, 1)), label='OUTPUT VIDEO QUALITY: ', label_width=35, dropdown_width=20, value=60, img='pct_2', tooltip_key='OUPUT_VIDEO_QUALITY')
@@ -192,28 +191,72 @@ class ClipVideoPopUp(PopUpMixin):
 
         method_1_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="METHOD 1", icon_name='circle_black', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5)
         label_set_time_1 = SimBALabel(parent=method_1_frm, txt="Please enter the time frame in HH:MM:SS format", font=Formats.FONT_REGULAR_ITALICS.value)
-        start_time = Entry_Box(method_1_frm,  fileDescription="Start at (HH:MM:SS):", labelwidth=22, img='play', justify='center')
-        end_time = Entry_Box(method_1_frm, fileDescription="End at (HH:MM:SS):", labelwidth=22, img='stop', justify='center')
+        self.start_time = Entry_Box(method_1_frm,  fileDescription="START AT (HH:MM:SS):", labelwidth=35, img='play', justify='center')
+        self.end_time = Entry_Box(method_1_frm, fileDescription="END AT (HH:MM:SS):", labelwidth=35, img='stop', justify='center')
         CreateToolTip(method_1_frm, "Method 1 will retrieve the specified time input. (eg: input of Start at: 00:00:00, End at: 00:01:00, will create a new video from the chosen video from the very start till it reaches the first minute of the video)")
-
+        button_cutvideo_method_1 = SimbaButton(parent=method_1_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=clip_video_in_range, cmd_kwargs={'file_path': lambda: self.selected_video.file_path, 'quality': lambda: self.quality_dropdown.get_value(), 'start_time': lambda:self.start_time.entry_get.strip(), 'end_time': lambda:self.end_time.entry_get.strip(), 'gpu': lambda: str_2_bool(self.gpu_dropdown.get_value())})
+        button_cutvideo_method_1.grid(row=3, column=0, sticky=NW)
+        clipper_ui_btn = SimbaButton(parent=method_1_frm, txt="TIMELAPSE VIEWER", img='monitor', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.initiate_clipper)
+        clipper_ui_btn.grid(row=4, column=0, sticky=NW)
         method_2_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="METHOD 2", icon_name='circle_black', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5)
-        method_2_time = Entry_Box(method_2_frm, "Seconds:", "22", validation="numeric", img='timer', justify='center')
-        label_method_2 = SimBALabel(parent=method_2_frm, txt="Method 2 will retrieve from the end of the video (e.g.,: an input of 3 seconds will get rid of the first 3 seconds of the video).", font=Formats.FONT_REGULAR_ITALICS.value)
-        button_cutvideo_method_1 = SimbaButton(parent=method_1_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=clip_video_in_range, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'quality': lambda: self.quality_dropdown.get_value(), 'start_time': lambda:start_time.entry_get.strip(), 'end_time': lambda:end_time.entry_get.strip(), 'gpu': lambda: str_2_bool(self.gpu_dropdown.get_value())})
-        button_cutvideo_method_2 = SimbaButton(parent=method_2_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=remove_beginning_of_video, cmd_kwargs={'file_path': lambda:selected_video.file_path, 'time': lambda:method_2_time.entry_get, 'gpu': lambda: str_2_bool(self.gpu_dropdown.get_value()), 'quality': lambda: self.quality_dropdown.get_value()})
+        method_2_time = Entry_Box(method_2_frm, "SECONDS:", labelwidth=35, validation="numeric", img='timer', justify='center')
+        label_method_2 = SimBALabel(parent=method_2_frm, txt="Retrieve from the END of the video (e.g.,: an input of 3 will get rid of the FIRST 3 seconds of the video).", font=Formats.FONT_REGULAR_ITALICS.value)
+        button_cutvideo_method_2 = SimbaButton(parent=method_2_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=remove_beginning_of_video, cmd_kwargs={'file_path': lambda:self.selected_video.file_path, 'time': lambda:method_2_time.entry_get, 'gpu': lambda: str_2_bool(self.gpu_dropdown.get_value()), 'quality': lambda: self.quality_dropdown.get_value()})
         selected_video_frm.grid(row=0, sticky=NW)
         settings_frm.grid(row=1, column=0, sticky=NW)
         method_1_frm.grid(row=2, sticky=NW, pady=5)
         label_set_time_1.grid(row=0, sticky=NW)
-        start_time.grid(row=1, sticky=NW)
-        end_time.grid(row=2, sticky=NW)
-        button_cutvideo_method_1.grid(row=3, sticky=NW)
+        self.start_time.grid(row=1, sticky=NW)
+        self.end_time.grid(row=2, sticky=NW)
         method_2_frm.grid(row=3, sticky=NW, pady=5)
         label_method_2.grid(row=0, sticky=NW)
         method_2_time.grid(row=2, sticky=NW)
         button_cutvideo_method_2.grid(row=3, sticky=NW)
 
-#_ = ClipVideoPopUp()
+        method_3_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="METHOD 3", icon_name='circle_black', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5)
+        method_3_time = Entry_Box(method_3_frm, "SECONDS:", labelwidth=35, validation="numeric", img='timer_2', justify='center')
+        label_method_3 = SimBALabel(parent=method_3_frm, txt="Retrieve from the BEGINNING of the video (e.g.,: an input of 3 will get rid of the LAST 3 seconds of the video).", font=Formats.FONT_REGULAR_ITALICS.value)
+        button_cutvideo_method_3 = SimbaButton(parent=method_3_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=remove_end_of_video, cmd_kwargs={'file_path': lambda:self.selected_video.file_path, 'time': lambda:method_3_time.entry_get, 'gpu': lambda: str_2_bool(self.gpu_dropdown.get_value()), 'quality': lambda: self.quality_dropdown.get_value()})
+
+        method_3_frm.grid(row=4, column=0, sticky=NW)
+        label_method_3.grid(row=0, column=0, sticky=NW)
+        method_3_time.grid(row=1, column=0, sticky=NW)
+        button_cutvideo_method_3.grid(row=2, column=0, sticky=NW)
+
+    def initiate_clipper(self):
+        check_file_exist_and_readable(file_path=self.selected_video.file_path, raise_error=True)
+        _ = get_video_meta_data(video_path=self.selected_video.file_path)
+        def exit_click(event):
+            self.click_event.set(True)
+            interactive_ui.img_window.unbind(TkBinds.ESCAPE.value)
+            self.main_frm.unbind(TkBinds.ESCAPE.value)
+            interactive_ui.close()
+
+        def window_closed():
+            if interactive_ui.img_window.winfo_exists(): interactive_ui.img_window.unbind(TkBinds.ESCAPE.value)
+            self.main_frm.unbind(TkBinds.ESCAPE.value)
+            if interactive_ui.img_window.winfo_exists(): interactive_ui.close()
+            self.click_event.set(True)
+
+        interactive_ui = TimelapseSlider(video_path=self.selected_video.file_path)
+        interactive_ui.run()
+        self.click_event = BooleanVar(value=False)
+        interactive_ui.img_window.protocol("WM_DELETE_WINDOW", window_closed)
+        interactive_ui.img_window.bind(TkBinds.ESCAPE.value, exit_click); self.main_frm.bind(TkBinds.ESCAPE.value, exit_click)
+        self.main_frm.wait_variable(self.click_event)
+
+        try:
+            if interactive_ui.img_window.winfo_exists(): interactive_ui.img_window.unbind(TkBinds.ESCAPE.value)
+        except: pass
+        try:
+            self.main_frm.unbind(TkBinds.ESCAPE.value)
+        except:
+            pass
+
+        if not interactive_ui.img_window.winfo_exists(): pass
+        start_time, end_time = interactive_ui.get_start_time_str(), interactive_ui.get_end_time_str()
+        self.start_time.entry_set(start_time)
+        self.end_time.entry_set(end_time)
 
 class GreyscaleSingleVideoPopUp(PopUpMixin):
     def __init__(self):
@@ -1445,7 +1488,14 @@ class ClipSingleVideoByFrameNumbers(PopUpMixin):
         self.end_frm_eb.grid(row=2, column=0, sticky=NW)
         self.gpu_dropdown.grid(row=3, column=0, sticky=NW)
         self.quality_dropdown.grid(row=4, column=0, sticky=NW)
-        self.create_run_frm(run_function=self.run)
+
+        run_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="RUN", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        run_btn = SimbaButton(parent=run_frm, txt='RUN', img='rocket', cmd=self.run)
+        interactive_btn = SimbaButton(parent=run_frm, txt='TIMELAPSE VIEWER', img='rocket', cmd=self._init_interactive_timeslider)
+
+        run_frm.grid(row=1, column=0, sticky=NW)
+        run_btn.grid(row=0, column=0, sticky=NW, padx=(0, 10))
+        interactive_btn.grid(row=0, column=1, sticky=NW)
 
     def run(self):
         check_file_exist_and_readable(file_path=self.selected_video.file_path)
@@ -1482,6 +1532,43 @@ class ClipSingleVideoByFrameNumbers(PopUpMixin):
         frm_ids = [[start_frame, end_frame]]
         _ = clip_videos_by_frame_ids(file_paths=[self.selected_video.file_path], frm_ids=frm_ids, save_dir=None, gpu=gpu, quality=quality)
 
+    def _init_interactive_timeslider(self):
+        check_file_exist_and_readable(file_path=self.selected_video.file_path, raise_error=True)
+        _ = get_video_meta_data(video_path=self.selected_video.file_path)
+
+        def exit_click(event):
+            self.click_event.set(True)
+            interactive_ui.img_window.unbind(TkBinds.ESCAPE.value)
+            self.main_frm.unbind(TkBinds.ESCAPE.value)
+            interactive_ui.close()
+
+        def window_closed():
+            if interactive_ui.img_window.winfo_exists(): interactive_ui.img_window.unbind(TkBinds.ESCAPE.value)
+            self.main_frm.unbind(TkBinds.ESCAPE.value)
+            if interactive_ui.img_window.winfo_exists(): interactive_ui.close()
+            self.click_event.set(True)
+
+        interactive_ui = TimelapseSlider(video_path=self.selected_video.file_path)
+        interactive_ui.run()
+        self.click_event = BooleanVar(value=False)
+        interactive_ui.img_window.protocol("WM_DELETE_WINDOW", window_closed)
+        interactive_ui.img_window.bind(TkBinds.ESCAPE.value, exit_click);
+        self.main_frm.bind(TkBinds.ESCAPE.value, exit_click)
+        self.main_frm.wait_variable(self.click_event)
+
+        try:
+            if interactive_ui.img_window.winfo_exists(): interactive_ui.img_window.unbind(TkBinds.ESCAPE.value)
+        except:
+            pass
+        try:
+            self.main_frm.unbind(TkBinds.ESCAPE.value)
+        except:
+            pass
+
+        if not interactive_ui.img_window.winfo_exists(): pass
+        start_frm, end_frm = interactive_ui.get_start_frame(), interactive_ui.get_end_frame()
+        self.start_frm_eb.entry_set(start_frm)
+        self.end_frm_eb.entry_set(end_frm)
 
 #ClipSingleVideoByFrameNumbers()
 
@@ -1630,7 +1717,7 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
 
 
 #ClipMultipleVideosByFrameNumbersPopUp(data_dir=r'E:\netholabs_videos\terry\mp4s\4_02_001_exp_2025_12_02_15_22_00\videos\Camera2', save_dir=r'E:\netholabs_videos\terry\mp4s\4_02_001_exp_2025_12_02_15_22_00\videos\Camera2\test')
-ClipMultipleVideosByFrameNumbersPopUp(data_dir=r"E:\maplight_videos\test_0126", save_dir=r"E:\maplight_videos\clip_test")
+#ClipMultipleVideosByFrameNumbersPopUp(data_dir=r"E:\maplight_videos\test_0126", save_dir=r"E:\maplight_videos\clip_test")
 
 
 
