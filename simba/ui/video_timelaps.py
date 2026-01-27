@@ -5,11 +5,11 @@ import cv2
 import numpy as np
 from simba.utils.checks import check_file_exist_and_readable, check_int, check_valid_boolean
 from simba.utils.read_write import get_video_meta_data, seconds_to_timestamp, read_frm_of_video
-from simba.utils.lookups import get_fonts, get_monitor_info
-from simba.utils.enums import Formats
-from simba.ui.tkinter_functions import SimBAScaleBar, SimBALabel
+from simba.utils.lookups import get_monitor_info, get_icons_paths
+from simba.utils.enums import Formats, TkBinds
+from simba.ui.tkinter_functions import SimBAScaleBar, SimBALabel, SimbaButton
 from tkinter import *
-from PIL import Image, ImageDraw, ImageFont, ImageTk
+from PIL import Image, ImageTk
 
 class TimelapseSlider():
 
@@ -68,7 +68,7 @@ class TimelapseSlider():
         if img_width is not None:  check_int(name='img_width', value=img_width, min_value=1, raise_error=True)
         else: img_width = int(self.monitor_width * 0.5)
         if img_height is not None:  check_int(name='img_height', value=img_height, min_value=1, raise_error=True)
-        else: img_height = int(self.monitor_height * 0.25)
+        else: img_height = int(self.monitor_height * 0.5)
 
 
         check_int(name='padding', value=padding, min_value=1, raise_error=True)
@@ -78,7 +78,10 @@ class TimelapseSlider():
         self.size, self.padding, self.crop_ratio, self.frame_cnt = ruler_width, padding, crop_ratio, frame_cnt
         self.ruler_height, self.video_path, self.show_ruler, self.ruler_divisions = ruler_height, video_path, show_ruler, ruler_divisions
         self.img_width, self.img_height = img_width, img_height
-        self.frm_name = f'{self.video_meta["video_name"]} - TIMELAPSE VIEWER'
+        self.frm_name = f'{self.video_meta["video_name"]} - TIMELAPSE VIEWER - hit "X" or ESC t close'
+        self.video_capture = None
+        self._pending_frame_update = None
+        self._frame_debounce_ms = 50
 
     def _draw_img(self, img: np.ndarray, lbl: SimBALabel):
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -112,17 +115,53 @@ class TimelapseSlider():
         self.selected_start_frame[0] = start_frame
         self.selected_end_frame[0] = end_frame
 
-        self.start_time_label.config(text=seconds_to_timestamp(start_sec), fg='blue')
+        self.start_time_label.config(text=seconds_to_timestamp(start_sec), fg='green')
         self.end_time_label.config(text=seconds_to_timestamp(end_sec), fg='red')
 
         if self.video_meta['video_length_s'] > 0:
             self._highlight_segment(start_sec, end_sec)
-            self._update_frame_display(slider_type=slider_type)
+            self._schedule_frame_update(slider_type=slider_type)
+
+    def _move_start_frame(self, direction: int):
+        current_seconds = self.selected_start[0]
+        new_seconds = current_seconds + direction
+        new_seconds = max(0, min(new_seconds, int(self.video_meta['video_length_s'])))
+        self.start_scale.set_value(int(new_seconds))
+        self._update_selection(slider_type='start')
+        if self._pending_frame_update is not None:
+            if hasattr(self, 'img_window') and self.img_window.winfo_exists():
+                self.img_window.after_cancel(self._pending_frame_update)
+        self._update_frame_display(slider_type='start')
+
+    def _move_end_frame(self, direction: int):
+        current_seconds = self.selected_end[0]
+        new_seconds = current_seconds + direction
+        new_seconds = max(0, min(new_seconds, int(self.video_meta['video_length_s'])))
+        self.end_scale.set_value(int(new_seconds))
+        self._update_selection(slider_type='end')
+        if self._pending_frame_update is not None:
+            if hasattr(self, 'img_window') and self.img_window.winfo_exists():
+                self.img_window.after_cancel(self._pending_frame_update)
+        self._update_frame_display(slider_type='end')
+
+    def _schedule_frame_update(self, slider_type: str):
+        """Schedule frame preview update with debouncing.
+        
+        Cancels any pending frame update and schedules a new one. If the slider
+        moves again before the delay expires, the update is cancelled and rescheduled.
+        This prevents expensive frame reads during fast slider dragging.
+        """
+        if not hasattr(self, 'img_window') or not self.img_window.winfo_exists():
+            return
+
+        if self._pending_frame_update is not None: self.img_window.after_cancel(self._pending_frame_update)
+
+        self._pending_frame_update = self.img_window.after(self._frame_debounce_ms, lambda: self._update_frame_display(slider_type=slider_type))
 
     def _update_frame_display(self, slider_type: str):
         if slider_type == 'start':
             seconds = self.selected_start[0]
-            self.frame_label.config(text=f"Start Frame Preview ({seconds_to_timestamp(seconds)})", font=Formats.FONT_LARGE_BOLD.value, fg='blue')
+            self.frame_label.config(text=f"Start Frame Preview ({seconds_to_timestamp(seconds)})", font=Formats.FONT_LARGE_BOLD.value, fg='green')
         else:
             seconds = self.selected_end[0]
             self.frame_label.config(text=f"End Frame Preview ({seconds_to_timestamp(seconds)})", font=Formats.FONT_LARGE_BOLD.value, fg='red')
@@ -130,56 +169,17 @@ class TimelapseSlider():
         frame_index = int(seconds * self.video_meta['fps'])
         if frame_index >= self.video_meta['frame_count']: frame_index = self.video_meta['frame_count'] - 1
         if frame_index < 0: frame_index = 0
-        frame = read_frm_of_video(video_path=self.video_path, frame_index=frame_index, raise_error=False, size=(self.img_width, self.img_height), keep_aspect_ratio=True)
-        if frame is not None:
-            self._draw_img(img=frame, lbl=self.frame_display_lbl)
 
-    def _create_time_ruler(self, width: int, height: int, num_divisions: int) -> np.ndarray:
-        total_width = width + (2 * self.padding)
-        bg_color, line_color, text_color = (255, 255, 255), (128, 128, 128), (0, 0, 0)
-        img = Image.new('RGB', (total_width, height), color=bg_color)
-        draw = ImageDraw.Draw(img)
-        font_dict = get_fonts()
-        try:
-            font_path = font_dict['Algerian']
-            pil_font = ImageFont.truetype(font_path, size=12)
-        except (KeyError, OSError):
-            pil_font = ImageFont.load_default()
-        major_tick_height, half_tick_height = height * 0.6, height * 0.4
-        quarter_tick_height, eighth_tick_height = height * 0.25, height * 0.15
-
-        for i in range(num_divisions + 1):
-            x = self.padding + int(i * width / num_divisions)
-            draw.line([(x, 0), (x, major_tick_height)], fill=line_color, width=2)
-            if self.video_meta['video_length_s'] is not None:
-                seconds_at_division = i * self.video_meta['video_length_s'] / num_divisions
-                label = seconds_to_timestamp(seconds=seconds_at_division)
-            elif self.video_meta['frame_count'] is not None:
-                label = str(int(i * self.video_meta['frame_count'] / num_divisions))
-            else:
-                label = str(i)
-            bbox = draw.textbbox((0, 0), label, font=pil_font)
-            text_width = bbox[2] - bbox[0]
-            if i == 0:
-                draw.text((x, major_tick_height + 5), label, fill=text_color, font=pil_font)
-            elif i == num_divisions:
-                draw.text((x - text_width, major_tick_height + 5), label, fill=text_color, font=pil_font)
-            else:
-                draw.text((x - text_width // 2, major_tick_height + 5), label, fill=text_color, font=pil_font)
-            if i < num_divisions:
-                x_half = self.padding + int((i + 0.5) * width / num_divisions)
-                draw.line([(x_half, 0), (x_half, half_tick_height)], fill=line_color, width=1)
-                for q in [0.25, 0.75]:
-                    x_quarter = self.padding + int((i + q) * width / num_divisions)
-                    draw.line([(x_quarter, 0), (x_quarter, quarter_tick_height)], fill=line_color, width=1)
-                for e in [0.125, 0.375, 0.625, 0.875]:
-                    x_eighth = self.padding + int((i + e) * width / num_divisions)
-                    draw.line([(x_eighth, 0), (x_eighth, eighth_tick_height)], fill=line_color, width=1)
-
-        draw.line([(0, height - 1), (total_width, height - 1)], fill=line_color, width=1)
-        img_array = np.array(img)
-        img_bgr = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
-        return img_bgr
+        if self.video_capture is not None and self.video_capture.isOpened():
+            self.video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
+            ret, frame = self.video_capture.read()
+            if ret and frame is not None:
+                h, w = frame.shape[:2]
+                target_w, target_h = self.img_width, self.img_height
+                scale = min(target_w / w, target_h / h)
+                new_w, new_h = int(w * scale), int(h * scale)
+                frame = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+                self._draw_img(img=frame, lbl=self.frame_display_lbl)
 
     def _highlight_segment(self, start_sec: int, end_sec: int):
         timelapse_width = self.original_timelapse.shape[1]
@@ -195,12 +195,16 @@ class TimelapseSlider():
         self._draw_img(img=highlighted, lbl=self.img_lbl)
 
     def run(self):
+        self.video_capture = cv2.VideoCapture(self.video_path)
+        if not self.video_capture.isOpened():
+            raise ValueError(f"Failed to open video file: {self.video_path}")
+        
         self.timelapse_img = ImageMixin.get_timelapse_img(video_path=self.video_path, frame_cnt=self.frame_cnt, size=self.size, crop_ratio=self.crop_ratio)
         if self.show_ruler:
             timelapse_height, timelapse_width = self.timelapse_img.shape[0], self.timelapse_img.shape[1]
             padded_timelapse = np.zeros((timelapse_height, timelapse_width + (2 * self.padding), 3), dtype=np.uint8)
             padded_timelapse[:, self.padding:self.padding + timelapse_width] = self.timelapse_img
-            ruler = self._create_time_ruler(width=timelapse_width, height=self.ruler_height, num_divisions=self.ruler_divisions)
+            ruler = ImageMixin.create_time_ruler(video_path=self.video_path, width=timelapse_width, height=self.ruler_height, num_divisions=self.ruler_divisions)
             self.timelapse_img = cv2.vconcat([padded_timelapse, ruler])
 
         self.original_timelapse = self.timelapse_img.copy()
@@ -208,6 +212,8 @@ class TimelapseSlider():
         self.img_window.resizable(True, True)
         self.img_window.title(self.frm_name)
         self.img_window.protocol("WM_DELETE_WINDOW", self.close)
+        # Bind Escape key to close window
+        self.img_window.bind(TkBinds.ESCAPE.value, lambda event: self.close())
 
 
         self.img_lbl = SimBALabel(parent=self.img_window, txt='')
@@ -224,14 +230,21 @@ class TimelapseSlider():
         self.slider_frame.columnconfigure(index=0, weight=1)
         self.slider_frame.columnconfigure(index=1, weight=0)
         self.slider_frame.columnconfigure(index=2, weight=0)
-        self.slider_frame.columnconfigure(index=3, weight=1)
+        self.slider_frame.columnconfigure(index=3, weight=0)
+        self.slider_frame.columnconfigure(index=4, weight=0)
+        self.slider_frame.columnconfigure(index=5, weight=1)
     
-        self.start_scale = SimBAScaleBar(parent=self.slider_frame, label="START TIME:", from_=0, to=self.video_meta['video_length_s'], orient=HORIZONTAL, length=400, resolution=1, value=0, showvalue=False, label_width=15, sliderrelief='raised', troughcolor='white', activebackground='blue', lbl_font=Formats.FONT_LARGE_BOLD.value)
+        self.start_scale = SimBAScaleBar(parent=self.slider_frame, label="START TIME:", from_=0, to=self.video_meta['video_length_s'], orient=HORIZONTAL, length=400, resolution=1, value=0, showvalue=False, label_width=15, sliderrelief='raised', troughcolor='white', activebackground='green', lbl_font=Formats.FONT_LARGE_BOLD.value)
         self.start_scale.grid(row=0, column=1, padx=5)
         self.start_scale.scale.config(command=lambda x: self._update_selection(slider_type='start'))
     
-        self.start_time_label = SimBALabel(parent=self.slider_frame, txt="00:00:00", font=Formats.FONT_LARGE_BOLD.value, width=10, txt_clr='blue')
+        self.start_time_label = SimBALabel(parent=self.slider_frame, txt="00:00:00", font=Formats.FONT_LARGE_BOLD.value, width=10, txt_clr='green')
         self.start_time_label.grid(row=0, column=2, padx=5)
+
+        self.start_frame_left_btn = SimbaButton(parent=self.slider_frame, txt="-1s", tooltip_txt="Previous second", cmd=self._move_start_frame, cmd_kwargs={'direction': -1}, font=Formats.FONT_REGULAR_BOLD.value, img='left_arrow_green')
+        self.start_frame_left_btn.grid(row=0, column=3, padx=2)
+        self.start_frame_right_btn = SimbaButton(parent=self.slider_frame, txt="+1s", tooltip_txt="Next second", cmd=self._move_start_frame, cmd_kwargs={'direction': 1}, font=Formats.FONT_REGULAR_BOLD.value, img='right_arrow_green')
+        self.start_frame_right_btn.grid(row=0, column=4, padx=2)
 
         self.end_scale = SimBAScaleBar(parent=self.slider_frame, label="END TIME:", from_=0, to=int(self.video_meta['video_length_s']), orient=HORIZONTAL, length=400, resolution=1, value=int(self.video_meta['video_length_s']), showvalue=False, label_width=15, sliderrelief='raised', troughcolor='white', activebackground='red',  lbl_font=Formats.FONT_LARGE_BOLD.value)
         self.end_scale.grid(row=1, column=1, padx=5)
@@ -239,6 +252,11 @@ class TimelapseSlider():
 
         self.end_time_label = SimBALabel(parent=self.slider_frame, txt=seconds_to_timestamp(int(self.video_meta['video_length_s'])), font=Formats.FONT_LARGE_BOLD.value, width=10, txt_clr='red')
         self.end_time_label.grid(row=1, column=2, padx=5)
+
+        self.end_frame_left_btn = SimbaButton(parent=self.slider_frame, txt="-1s", tooltip_txt="Previous second", cmd=self._move_end_frame, cmd_kwargs={'direction': -1}, font=Formats.FONT_REGULAR_BOLD.value, img='left_arrow_red')
+        self.end_frame_left_btn.grid(row=1, column=3, padx=2)
+        self.end_frame_right_btn = SimbaButton(parent=self.slider_frame, txt="+1s", tooltip_txt="Next second", cmd=self._move_end_frame, cmd_kwargs={'direction': 1}, font=Formats.FONT_REGULAR_BOLD.value, img='right_arrow_red')
+        self.end_frame_right_btn.grid(row=1, column=4, padx=2)
 
         self.selected_start = [0]
         self.selected_end = [int(self.video_meta['video_length_s'])]
@@ -249,9 +267,17 @@ class TimelapseSlider():
         
         self.img_window.update_idletasks()
         self.img_window.update()
+        
         req_width, req_height = self.img_window.winfo_reqwidth(), self.img_window.winfo_reqheight()
         min_width = max(self.timelapse_img.shape[1] + 60, req_width + 20)
-        min_height = max(self.timelapse_img.shape[0] + 800, req_height + 200)
+        timelapse_height = self.timelapse_img.shape[0]
+        frame_preview_height = self.img_height
+        slider_height, padding_total = 150, 50
+        calculated_min_height = timelapse_height + frame_preview_height + slider_height + padding_total
+        min_height = max(calculated_min_height, req_height + 50, timelapse_height + 400)
+        max_height = int(self.monitor_height * 0.95)
+        if min_height > max_height: min_height = max_height
+        
         self.img_window.minsize(min_width, min_height)
         self.img_window.geometry(f"{min_width}x{min_height}")
         self._update_frame_display(slider_type='start')
@@ -275,15 +301,29 @@ class TimelapseSlider():
         return self.selected_end_frame[0]
 
     def close(self):
+        if self._pending_frame_update is not None:
+            if hasattr(self, 'img_window') and self.img_window.winfo_exists():
+                self.img_window.after_cancel(self._pending_frame_update)
+            self._pending_frame_update = None
+
+        # Unbind Escape key if window still exists
+        if hasattr(self, 'img_window') and self.img_window.winfo_exists():
+            try:
+                self.img_window.unbind(TkBinds.ESCAPE.value)
+            except:
+                pass
+
+        if self.video_capture is not None:
+            self.video_capture.release()
+            self.video_capture = None
+
         if hasattr(self, 'img_window') and self.img_window.winfo_exists():
             self.img_window.destroy()
 
 
 
-
+#
 # x = TimelapseSlider(video_path=r"E:\troubleshooting\mitra_emergence\project_folder\clip_test\Box1_180mISOcontrol_Females_clipped_progress_bar.mp4",
 #         frame_cnt=25,
-#         crop_ratio=75,
-#         size=100)
-#
+#         crop_ratio=75)
 # x.run()

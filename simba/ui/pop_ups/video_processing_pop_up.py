@@ -1511,11 +1511,12 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
         SimBALabel(parent=data_frm, font=Formats.FONT_REGULAR.value, txt="VIDEO NAME", justify='center', img='video').grid(row=0, column=0, padx=padx, sticky=NW)
         SimBALabel(parent=data_frm, font=Formats.FONT_REGULAR.value, txt="START FRAME", justify='center', img='play').grid(row=0, column=2, padx=padx)
         SimBALabel(parent=data_frm, font=Formats.FONT_REGULAR.value, txt="END FRAME", justify='center', img='stop').grid(row=0, column=3, padx=padx)
+        SimBALabel(data_frm, txt="TIMELAPSE VIEWER", justify='center', font=Formats.FONT_REGULAR_BOLD.value,img='monitor').grid(row=0, column=4, sticky=NW, padx=padx)
 
         seperator = SimBASeperator(parent=data_frm, color=None, orient='horizontal', borderwidth=1)
-        seperator.grid(row=1, column=0, columnspan=4, rowspan=1, sticky="ew")
+        seperator.grid(row=1, column=0, columnspan=5, rowspan=1, sticky="ew")
 
-        self.entry_boxes = {}
+        self.entry_boxes, self.interactive_btns = {}, {}
         for cnt, video_name in enumerate(self.video_paths.keys()):
             self.entry_boxes[video_name] = {}
             SimBALabel(parent=data_frm, font=Formats.FONT_REGULAR.value, txt=video_name + f' (frames: { self.video_meta_data[cnt]})', justify='left').grid(row=cnt + 2, column=0, padx=padx, sticky=NW)
@@ -1523,6 +1524,9 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
             self.entry_boxes[video_name]["end"] = Entry_Box(data_frm, fileDescription="", labelwidth=0, validation="numeric", justify='center')
             self.entry_boxes[video_name]["start"].grid(row=cnt + 2, column=2, sticky=NW, padx=padx)
             self.entry_boxes[video_name]["end"].grid(row=cnt + 2, column=3, sticky=NW, padx=padx)
+            kwargs = {'video_path': self.video_paths[video_name], 'frame_cnt': 25, 'crop_ratio': 50, 'size': 100, 'video_name': video_name}
+            self.interactive_btns[video_name] = SimbaButton(parent=data_frm, txt='SELECT FRAMES', cmd=self._start_interactive_ui, cmd_kwargs=kwargs, img='monitor')
+            self.interactive_btns[video_name].grid(row=cnt + 2, column=4, sticky=NW, padx=padx)
 
         gpu_state = NORMAL if check_nvidea_gpu_available(raise_error=False) else DISABLED
         batch_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BATCH SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
@@ -1542,7 +1546,40 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
         self.quality_dropdown.grid(row=3, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run, btn_txt_clr="blue")
 
-        #self.main_frm.mainloop()
+    def _start_interactive_ui(self, **kwargs):
+        def exit_click(event):
+            self.click_event.set(True)
+            interactive_ui.img_window.unbind(TkBinds.ESCAPE.value)
+            self.main_frm.unbind(TkBinds.ESCAPE.value)
+            interactive_ui.close()
+
+        def window_closed():
+            if interactive_ui.img_window.winfo_exists(): interactive_ui.img_window.unbind(TkBinds.ESCAPE.value)
+            self.main_frm.unbind(TkBinds.ESCAPE.value)
+            if interactive_ui.img_window.winfo_exists(): interactive_ui.close()
+            self.click_event.set(True)
+
+        interactive_ui = TimelapseSlider(video_path=kwargs['video_path'], frame_cnt=kwargs['frame_cnt'], crop_ratio=kwargs['crop_ratio'])
+        interactive_ui.run()
+        self.click_event = BooleanVar(value=False)
+        interactive_ui.img_window.protocol("WM_DELETE_WINDOW", window_closed)
+        interactive_ui.img_window.bind(TkBinds.ESCAPE.value, exit_click); self.main_frm.bind(TkBinds.ESCAPE.value, exit_click)
+        self.main_frm.wait_variable(self.click_event)
+
+        try:
+            if interactive_ui.img_window.winfo_exists(): interactive_ui.img_window.unbind(TkBinds.ESCAPE.value)
+        except:
+            pass
+        try:
+            self.main_frm.unbind(TkBinds.ESCAPE.value)
+        except:
+            pass
+
+        if not interactive_ui.img_window.winfo_exists():
+            pass
+        start_frm, end_frm = interactive_ui.get_start_frame(), interactive_ui.get_end_frame()
+        self.entry_boxes[kwargs['video_name']]["start"].entry_set(start_frm)
+        self.entry_boxes[kwargs['video_name']]["end"].entry_set(end_frm)
 
     def run(self):
         video_paths, frame_ids = [], []
@@ -1592,7 +1629,7 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
 
 
 #ClipMultipleVideosByFrameNumbersPopUp(data_dir=r'E:\netholabs_videos\terry\mp4s\4_02_001_exp_2025_12_02_15_22_00\videos\Camera2', save_dir=r'E:\netholabs_videos\terry\mp4s\4_02_001_exp_2025_12_02_15_22_00\videos\Camera2\test')
-#ClipMultipleVideosByFrameNumbersPopUp(data_dir=r"E:\maplight_videos\test_0126", save_dir=r"E:\maplight_videos\clip_test")
+ClipMultipleVideosByFrameNumbersPopUp(data_dir=r"E:\maplight_videos\test_0126", save_dir=r"E:\maplight_videos\clip_test")
 
 
 
@@ -1683,7 +1720,7 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         SimBALabel(data_frm, txt="VIDEO LENGTH", justify='center', font=Formats.FONT_REGULAR_BOLD.value, img='timer_2').grid(row=0, column=1, sticky=NW, padx=padx)
         SimBALabel(data_frm, txt="START TIME (HH:MM:SS)", justify='center', font=Formats.FONT_REGULAR_BOLD.value, img='play').grid(row=0, column=2, sticky=NW, padx=padx)
         SimBALabel(data_frm, txt="END TIME (HH:MM:SS)", justify='center', font=Formats.FONT_REGULAR_BOLD.value, img='stop').grid(row=0, column=3, sticky=NW, padx=padx)
-        SimBALabel(data_frm, txt="INTERACTIVE INTERFACE", justify='center', font=Formats.FONT_REGULAR_BOLD.value, img='monitor').grid(row=0, column=4, sticky=NW, padx=padx)
+        SimBALabel(data_frm, txt="TIMELAPSE VIEWER", justify='center', font=Formats.FONT_REGULAR_BOLD.value, img='monitor').grid(row=0, column=4, sticky=NW, padx=padx)
         seperator = SimBASeperator(parent=data_frm, color=None, orient='horizontal', borderwidth=1)
         seperator.grid(row=1, column=0, columnspan=5, rowspan=1, sticky="ew")
 
@@ -1699,7 +1736,7 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
             self.entry_boxes[video_name]["start"].grid(row=cnt + 2, column=2, sticky=NW, padx=padx)
             self.entry_boxes[video_name]["end"].grid(row=cnt + 2, column=3, sticky=NW, padx=padx)
             kwargs = {'video_path': self.video_paths[video_name], 'frame_cnt': 25, 'crop_ratio': 50, 'size': 100, 'video_name': video_name}
-            self.interactive_btns[video_name] = SimbaButton(parent=data_frm, txt='INTERACTIVE SLIDER', cmd=self._start_interactive_ui, cmd_kwargs=kwargs, img='monitor')
+            self.interactive_btns[video_name] = SimbaButton(parent=data_frm, txt='SELECT TIMES', cmd=self._start_interactive_ui, cmd_kwargs=kwargs, img='monitor')
             self.interactive_btns[video_name].grid(row=cnt + 2, column=4, sticky=NW, padx=padx)
 
         data_frm.grid(row=1, column=0, sticky=NW)
@@ -1719,11 +1756,10 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
             interactive_ui.close()
 
         def window_closed():
-            if interactive_ui.img_window.winfo_exists():
-                interactive_ui.close()
-            self.click_event.set(True)
-            interactive_ui.img_window.unbind(TkBinds.ESCAPE.value)
+            if interactive_ui.img_window.winfo_exists(): interactive_ui.img_window.unbind(TkBinds.ESCAPE.value)
             self.main_frm.unbind(TkBinds.ESCAPE.value)
+            if interactive_ui.img_window.winfo_exists(): interactive_ui.close()
+            self.click_event.set(True)
 
         interactive_ui = TimelapseSlider(video_path=kwargs['video_path'],
                                          frame_cnt=kwargs['frame_cnt'],
@@ -1733,6 +1769,16 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         interactive_ui.img_window.protocol("WM_DELETE_WINDOW", window_closed)
         interactive_ui.img_window.bind(TkBinds.ESCAPE.value, exit_click); self.main_frm.bind(TkBinds.ESCAPE.value, exit_click)
         self.main_frm.wait_variable(self.click_event)
+
+        try:
+            if interactive_ui.img_window.winfo_exists(): interactive_ui.img_window.unbind(TkBinds.ESCAPE.value)
+        except:
+            pass
+        try:
+            self.main_frm.unbind(TkBinds.ESCAPE.value)
+        except:
+            pass
+        
         if not interactive_ui.img_window.winfo_exists():
             pass
         start_time, end_time  = interactive_ui.get_start_time_str(),  interactive_ui.get_end_time_str()
@@ -1754,8 +1800,7 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         timer.stop_timer()
         stdout_success(msg=f"{len(self.entry_boxes)} videos clipped by time-stamps and saved in {self.save_dir}", elapsed_time=timer.elapsed_time_str,)
 
-# ClipMultipleVideosByTimestamps(data_dir=r"E:\maplight_videos\test_0126",
-#                                save_dir=r"E:\maplight_videos\clip_test")
+#ClipMultipleVideosByTimestamps(data_dir=r"E:\maplight_videos\test_0126", save_dir=r"E:\maplight_videos\clip_test")
 
 
 class InitiateClipMultipleVideosByTimestampsPopUp(PopUpMixin):
