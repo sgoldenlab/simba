@@ -17,8 +17,8 @@ from PIL import ImageTk
 from scipy.spatial.distance import cdist
 from shapely.geometry import Polygon
 
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_int, check_str, check_valid_array,
+from simba.utils.checks import (check_file_exist_and_readable, check_int,
+                                check_str, check_valid_array,
                                 check_valid_dataframe, check_valid_tuple,
                                 check_video_and_data_frm_count_align)
 from simba.utils.enums import (ROI_SETTINGS, ConfigKey, Formats, Keys, Options,

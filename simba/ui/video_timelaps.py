@@ -1,15 +1,20 @@
-from typing import Union, Optional
 import os
-from simba.mixins.image_mixin import ImageMixin
+from tkinter import *
+from typing import Optional, Union
+
 import cv2
 import numpy as np
-from simba.utils.checks import check_file_exist_and_readable, check_int, check_valid_boolean
-from simba.utils.read_write import get_video_meta_data, seconds_to_timestamp, read_frm_of_video
-from simba.utils.lookups import get_fonts, get_monitor_info
-from simba.utils.enums import Formats
-from simba.ui.tkinter_functions import SimBAScaleBar, SimBALabel
-from tkinter import *
 from PIL import Image, ImageDraw, ImageFont, ImageTk
+
+from simba.mixins.image_mixin import ImageMixin
+from simba.ui.tkinter_functions import SimBALabel, SimBAScaleBar
+from simba.utils.checks import (check_file_exist_and_readable, check_int,
+                                check_valid_boolean)
+from simba.utils.enums import Formats
+from simba.utils.lookups import get_fonts, get_monitor_info
+from simba.utils.read_write import (get_video_meta_data, read_frm_of_video,
+                                    seconds_to_timestamp)
+
 
 class TimelapseSlider():
 
