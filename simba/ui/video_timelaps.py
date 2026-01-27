@@ -37,6 +37,7 @@ class TimelapseSlider():
     :param int ruler_divisions: Number of major divisions on time ruler. Default 6.
     :param bool show_ruler: If True, display time ruler below timelapse. Default True.
     :param int ruler_height: Height of ruler in pixels. Default 60.
+    :param bool use_timestamps: If True, display timestamps (HH:MM:SS) in labels and ruler. If False, display frame numbers. Default True.
 
     :example:
     >>> slider = TimelapseSlider(video_path='path/to/video.mp4', frame_cnt=25, crop_ratio=75)
@@ -61,7 +62,8 @@ class TimelapseSlider():
                  ruler_height: Optional[int] = None,
                  ruler_width: Optional[int] = None,
                  img_width: Optional[int] = None,
-                 img_height: Optional[int] = None):
+                 img_height: Optional[int] = None,
+                 use_timestamps: bool = True):
 
         check_file_exist_and_readable(file_path=video_path)
         check_int(name='frame_cnt', value=frame_cnt, min_value=1, raise_error=True)
@@ -80,9 +82,11 @@ class TimelapseSlider():
         check_valid_boolean(value=show_ruler, source=f'{self.__class__.__name__} show_ruler', raise_error=True)
         self.video_meta = get_video_meta_data(video_path=video_path, raise_error=True)
         if show_ruler: check_int(name='ruler_divisions', value=ruler_divisions, min_value=1, raise_error=True)
+        check_valid_boolean(value=use_timestamps, source=f'{self.__class__.__name__} use_timestamps', raise_error=True)
         self.size, self.padding, self.crop_ratio, self.frame_cnt = ruler_width, padding, crop_ratio, frame_cnt
         self.ruler_height, self.video_path, self.show_ruler, self.ruler_divisions = ruler_height, video_path, show_ruler, ruler_divisions
         self.img_width, self.img_height = img_width, img_height
+        self.use_timestamps = use_timestamps
         self.frm_name = f'{self.video_meta["video_name"]} - TIMELAPSE VIEWER - hit "X" or ESC to close'
         self.video_capture, self._pending_frame_update, self._frame_debounce_ms = None, None, 50
 
@@ -94,16 +98,26 @@ class TimelapseSlider():
         lbl.image = self.tk_image
 
     def _update_selection(self, slider_type: str):
-        start_sec = int(self.start_scale.get_value())
-        end_sec = int(self.end_scale.get_value())
+        start_sec = self.start_scale.get_value()
+        end_sec = self.end_scale.get_value()
         max_sec = int(self.video_meta['video_length_s'])
+        
+        # Convert to int for timestamp mode, keep float for frame mode to preserve precision
+        if self.use_timestamps:
+            start_sec = int(start_sec)
+            end_sec = int(end_sec)
+        else:
+            # In frame mode, use float precision but ensure we're within bounds
+            start_sec = max(0.0, min(float(start_sec), float(max_sec)))
+            end_sec = max(0.0, min(float(end_sec), float(max_sec)))
+        
         if slider_type == 'start':
             if start_sec >= end_sec:
-                end_sec = min(start_sec + 1, max_sec)
+                end_sec = min(start_sec + (1.0 if self.use_timestamps else 1.0/self.video_meta['fps']), max_sec)
                 self.end_scale.set_value(end_sec)
         else:
             if end_sec <= start_sec:
-                start_sec = max(end_sec - 1, 0)
+                start_sec = max(end_sec - (1.0 if self.use_timestamps else 1.0/self.video_meta['fps']), 0)
                 self.start_scale.set_value(start_sec)
 
         self.selected_start[0] = start_sec
@@ -118,34 +132,118 @@ class TimelapseSlider():
         self.selected_start_frame[0] = start_frame
         self.selected_end_frame[0] = end_frame
 
-        self.start_time_label.config(text=seconds_to_timestamp(start_sec), fg='green')
-        self.end_time_label.config(text=seconds_to_timestamp(end_sec), fg='red')
+        if self.use_timestamps:
+            self.start_time_label.config(text=seconds_to_timestamp(start_sec), fg='green')
+            self.end_time_label.config(text=seconds_to_timestamp(end_sec), fg='red')
+        else:
+            start_frame = int(start_sec * self.video_meta['fps'])
+            end_frame = int(end_sec * self.video_meta['fps'])
+            self.start_time_label.config(text=str(start_frame), fg='green')
+            self.end_time_label.config(text=str(end_frame), fg='red')
 
         if self.video_meta['video_length_s'] > 0:
             self._highlight_segment(start_sec, end_sec)
             self._schedule_frame_update(slider_type=slider_type)
 
     def _move_start_frame(self, direction: int):
-        current_seconds = self.selected_start[0]
-        new_seconds = current_seconds + direction
-        new_seconds = max(0, min(new_seconds, int(self.video_meta['video_length_s'])))
-        self.start_scale.set_value(int(new_seconds))
-        self._update_selection(slider_type='start')
-        if self._pending_frame_update is not None:
-            if hasattr(self, 'img_window') and self.img_window.winfo_exists():
-                self.img_window.after_cancel(self._pending_frame_update)
-        self._update_frame_display(slider_type='start')
+        # Temporarily unbind the callback to avoid conflicts
+        original_cmd = self.start_scale.scale.cget('command')
+        self.start_scale.scale.config(command='')
+        
+        try:
+            if self.use_timestamps:
+                current_seconds = self.selected_start[0]
+                new_seconds = current_seconds + direction
+                # Ensure start doesn't exceed end
+                end_seconds = self.selected_end[0]
+                new_seconds = max(0, min(new_seconds, int(self.video_meta['video_length_s']), end_seconds - 1))
+                self.start_scale.set_value(int(new_seconds))
+                self.selected_start[0] = int(new_seconds)
+                # Recalculate frame from seconds
+                new_frame = int(new_seconds * self.video_meta['fps'])
+                new_frame = max(0, min(new_frame, self.video_meta['frame_count'] - 1))
+                self.selected_start_frame[0] = new_frame
+            else:
+                # Get current frame from the selected_start_frame
+                current_frame = self.selected_start_frame[0]
+                new_frame = current_frame + direction
+                # Ensure start doesn't exceed end
+                end_frame = self.selected_end_frame[0]
+                new_frame = max(0, min(new_frame, self.video_meta['frame_count'] - 1, end_frame - 1))
+                # Convert frame to seconds for the slider
+                new_seconds = new_frame / self.video_meta['fps']
+                # Update the slider value
+                self.start_scale.set_value(new_seconds)
+                # Directly update both frame and seconds
+                self.selected_start_frame[0] = new_frame
+                self.selected_start[0] = new_seconds
+            
+            # Update the display labels and highlights
+            if self.use_timestamps:
+                self.start_time_label.config(text=seconds_to_timestamp(self.selected_start[0]), fg='green')
+            else:
+                self.start_time_label.config(text=str(self.selected_start_frame[0]), fg='green')
+            
+            # Update highlights and frame preview
+            if self.video_meta['video_length_s'] > 0:
+                self._highlight_segment(self.selected_start[0], self.selected_end[0])
+                if self._pending_frame_update is not None:
+                    if hasattr(self, 'img_window') and self.img_window.winfo_exists():
+                        self.img_window.after_cancel(self._pending_frame_update)
+                self._update_frame_display(slider_type='start')
+        finally:
+            # Rebind the callback
+            self.start_scale.scale.config(command=original_cmd)
 
     def _move_end_frame(self, direction: int):
-        current_seconds = self.selected_end[0]
-        new_seconds = current_seconds + direction
-        new_seconds = max(0, min(new_seconds, int(self.video_meta['video_length_s'])))
-        self.end_scale.set_value(int(new_seconds))
-        self._update_selection(slider_type='end')
-        if self._pending_frame_update is not None:
-            if hasattr(self, 'img_window') and self.img_window.winfo_exists():
-                self.img_window.after_cancel(self._pending_frame_update)
-        self._update_frame_display(slider_type='end')
+        # Temporarily unbind the callback to avoid conflicts
+        original_cmd = self.end_scale.scale.cget('command')
+        self.end_scale.scale.config(command='')
+        
+        try:
+            if self.use_timestamps:
+                current_seconds = self.selected_end[0]
+                new_seconds = current_seconds + direction
+                # Ensure end doesn't go below start
+                start_seconds = self.selected_start[0]
+                new_seconds = max(start_seconds + 1, min(new_seconds, int(self.video_meta['video_length_s'])))
+                self.end_scale.set_value(int(new_seconds))
+                self.selected_end[0] = int(new_seconds)
+                # Recalculate frame from seconds
+                new_frame = int(new_seconds * self.video_meta['fps'])
+                new_frame = max(0, min(new_frame, self.video_meta['frame_count'] - 1))
+                self.selected_end_frame[0] = new_frame
+            else:
+                # Get current frame from the selected_end_frame
+                current_frame = self.selected_end_frame[0]
+                new_frame = current_frame + direction
+                # Ensure end doesn't go below start
+                start_frame = self.selected_start_frame[0]
+                new_frame = max(start_frame + 1, min(new_frame, self.video_meta['frame_count'] - 1))
+                # Convert frame to seconds for the slider
+                new_seconds = new_frame / self.video_meta['fps']
+                # Update the slider value
+                self.end_scale.set_value(new_seconds)
+                # Directly update both frame and seconds
+                self.selected_end_frame[0] = new_frame
+                self.selected_end[0] = new_seconds
+            
+            # Update the display labels and highlights
+            if self.use_timestamps:
+                self.end_time_label.config(text=seconds_to_timestamp(self.selected_end[0]), fg='red')
+            else:
+                self.end_time_label.config(text=str(self.selected_end_frame[0]), fg='red')
+            
+            # Update highlights and frame preview
+            if self.video_meta['video_length_s'] > 0:
+                self._highlight_segment(self.selected_start[0], self.selected_end[0])
+                if self._pending_frame_update is not None:
+                    if hasattr(self, 'img_window') and self.img_window.winfo_exists():
+                        self.img_window.after_cancel(self._pending_frame_update)
+                self._update_frame_display(slider_type='end')
+        finally:
+            # Rebind the callback
+            self.end_scale.scale.config(command=original_cmd)
 
     def _schedule_frame_update(self, slider_type: str):
         """Schedule frame preview update with debouncing.
@@ -164,10 +262,20 @@ class TimelapseSlider():
     def _update_frame_display(self, slider_type: str):
         if slider_type == 'start':
             seconds = self.selected_start[0]
-            self.frame_label.config(text=f"Start Frame Preview ({seconds_to_timestamp(seconds)})", font=Formats.FONT_LARGE_BOLD.value, fg='green')
+            if self.use_timestamps:
+                label_text = f"Start Frame Preview ({seconds_to_timestamp(seconds)})"
+            else:
+                frame_num = int(seconds * self.video_meta['fps'])
+                label_text = f"Start Frame Preview (Frame {frame_num})"
+            self.frame_label.config(text=label_text, font=Formats.FONT_LARGE_BOLD.value, fg='green')
         else:
             seconds = self.selected_end[0]
-            self.frame_label.config(text=f"End Frame Preview ({seconds_to_timestamp(seconds)})", font=Formats.FONT_LARGE_BOLD.value, fg='red')
+            if self.use_timestamps:
+                label_text = f"End Frame Preview ({seconds_to_timestamp(seconds)})"
+            else:
+                frame_num = int(seconds * self.video_meta['fps'])
+                label_text = f"End Frame Preview (Frame {frame_num})"
+            self.frame_label.config(text=label_text, font=Formats.FONT_LARGE_BOLD.value, fg='red')
 
         frame_index = int(seconds * self.video_meta['fps'])
         if frame_index >= self.video_meta['frame_count']: frame_index = self.video_meta['frame_count'] - 1
@@ -207,7 +315,7 @@ class TimelapseSlider():
             timelapse_height, timelapse_width = self.timelapse_img.shape[0], self.timelapse_img.shape[1]
             padded_timelapse = np.zeros((timelapse_height, timelapse_width + (2 * self.padding), 3), dtype=np.uint8)
             padded_timelapse[:, self.padding:self.padding + timelapse_width] = self.timelapse_img
-            ruler = ImageMixin.create_time_ruler(video_path=self.video_path, width=timelapse_width, height=self.ruler_height, num_divisions=self.ruler_divisions)
+            ruler = ImageMixin.create_time_ruler(video_path=self.video_path, width=timelapse_width, height=self.ruler_height, num_divisions=self.ruler_divisions, show_time=self.use_timestamps)
             self.timelapse_img = cv2.vconcat([padded_timelapse, ruler])
 
         self.original_timelapse = self.timelapse_img.copy()
@@ -241,24 +349,37 @@ class TimelapseSlider():
         self.start_scale.grid(row=0, column=1, padx=5)
         self.start_scale.scale.config(command=lambda x: self._update_selection(slider_type='start'))
     
-        self.start_time_label = SimBALabel(parent=self.slider_frame, txt="00:00:00", font=Formats.FONT_LARGE_BOLD.value, width=10, txt_clr='green')
+        initial_start_text = "00:00:00" if self.use_timestamps else "0"
+        self.start_time_label = SimBALabel(parent=self.slider_frame, txt=initial_start_text, font=Formats.FONT_LARGE_BOLD.value, width=10, txt_clr='green')
         self.start_time_label.grid(row=0, column=2, padx=5)
 
-        self.start_frame_left_btn = SimbaButton(parent=self.slider_frame, txt="-1s", tooltip_txt="Previous second", cmd=self._move_start_frame, cmd_kwargs={'direction': -1}, font=Formats.FONT_REGULAR_BOLD.value, img='left_arrow_green')
+        start_btn_txt = "Previous second" if self.use_timestamps else "Previous frame"
+        start_btn_tooltip = "Move start time back by 1 second" if self.use_timestamps else "Move start frame back by 1 frame"
+        self.start_frame_left_btn = SimbaButton(parent=self.slider_frame, txt=start_btn_txt, tooltip_txt=start_btn_tooltip, cmd=self._move_start_frame, cmd_kwargs={'direction': -1}, font=Formats.FONT_REGULAR_BOLD.value, img='left_arrow_green')
         self.start_frame_left_btn.grid(row=0, column=3, padx=2)
-        self.start_frame_right_btn = SimbaButton(parent=self.slider_frame, txt="+1s", tooltip_txt="Next second", cmd=self._move_start_frame, cmd_kwargs={'direction': 1}, font=Formats.FONT_REGULAR_BOLD.value, img='right_arrow_green')
+        start_btn_txt_right = "Next second" if self.use_timestamps else "Next frame"
+        start_btn_tooltip_right = "Move start time forward by 1 second" if self.use_timestamps else "Move start frame forward by 1 frame"
+        self.start_frame_right_btn = SimbaButton(parent=self.slider_frame, txt=start_btn_txt_right, tooltip_txt=start_btn_tooltip_right, cmd=self._move_start_frame, cmd_kwargs={'direction': 1}, font=Formats.FONT_REGULAR_BOLD.value, img='right_arrow_green')
         self.start_frame_right_btn.grid(row=0, column=4, padx=2)
 
         self.end_scale = SimBAScaleBar(parent=self.slider_frame, label="END TIME:", from_=0, to=int(self.video_meta['video_length_s']), orient=HORIZONTAL, length=400, resolution=1, value=int(self.video_meta['video_length_s']), showvalue=False, label_width=15, sliderrelief='raised', troughcolor='white', activebackground='red',  lbl_font=Formats.FONT_LARGE_BOLD.value)
         self.end_scale.grid(row=1, column=1, padx=5)
         self.end_scale.scale.config(command=lambda x: self._update_selection(slider_type='end'))
 
-        self.end_time_label = SimBALabel(parent=self.slider_frame, txt=seconds_to_timestamp(int(self.video_meta['video_length_s'])), font=Formats.FONT_LARGE_BOLD.value, width=10, txt_clr='red')
+        if self.use_timestamps:
+            initial_end_text = seconds_to_timestamp(int(self.video_meta['video_length_s']))
+        else:
+            initial_end_text = str(self.video_meta['frame_count'] - 1)
+        self.end_time_label = SimBALabel(parent=self.slider_frame, txt=initial_end_text, font=Formats.FONT_LARGE_BOLD.value, width=10, txt_clr='red')
         self.end_time_label.grid(row=1, column=2, padx=5)
 
-        self.end_frame_left_btn = SimbaButton(parent=self.slider_frame, txt="-1s", tooltip_txt="Previous second", cmd=self._move_end_frame, cmd_kwargs={'direction': -1}, font=Formats.FONT_REGULAR_BOLD.value, img='left_arrow_red')
+        end_btn_txt = "Previous second" if self.use_timestamps else "Previous frame"
+        end_btn_tooltip = "Move end time back by 1 second" if self.use_timestamps else "Move end frame back by 1 frame"
+        self.end_frame_left_btn = SimbaButton(parent=self.slider_frame, txt=end_btn_txt, tooltip_txt=end_btn_tooltip, cmd=self._move_end_frame, cmd_kwargs={'direction': -1}, font=Formats.FONT_REGULAR_BOLD.value, img='left_arrow_red')
         self.end_frame_left_btn.grid(row=1, column=3, padx=2)
-        self.end_frame_right_btn = SimbaButton(parent=self.slider_frame, txt="+1s", tooltip_txt="Next second", cmd=self._move_end_frame, cmd_kwargs={'direction': 1}, font=Formats.FONT_REGULAR_BOLD.value, img='right_arrow_red')
+        end_btn_txt_right = "Next second" if self.use_timestamps else "Next frame"
+        end_btn_tooltip_right = "Move end time forward by 1 second" if self.use_timestamps else "Move end frame forward by 1 frame"
+        self.end_frame_right_btn = SimbaButton(parent=self.slider_frame, txt=end_btn_txt_right, tooltip_txt=end_btn_tooltip_right, cmd=self._move_end_frame, cmd_kwargs={'direction': 1}, font=Formats.FONT_REGULAR_BOLD.value, img='right_arrow_red')
         self.end_frame_right_btn.grid(row=1, column=4, padx=2)
 
         self.selected_start = [0]
@@ -325,8 +446,9 @@ class TimelapseSlider():
 
 
 
-#
+
 # x = TimelapseSlider(video_path=r"E:\troubleshooting\mitra_emergence\project_folder\clip_test\Box1_180mISOcontrol_Females_clipped_progress_bar.mp4",
 #         frame_cnt=25,
-#         crop_ratio=75)
+#         crop_ratio=75,
+#                     use_timestamps=False)
 # x.run()

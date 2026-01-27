@@ -1548,7 +1548,7 @@ class ClipSingleVideoByFrameNumbers(PopUpMixin):
             if interactive_ui.img_window.winfo_exists(): interactive_ui.close()
             self.click_event.set(True)
 
-        interactive_ui = TimelapseSlider(video_path=self.selected_video.file_path)
+        interactive_ui = TimelapseSlider(video_path=self.selected_video.file_path, use_timestamps=False)
         interactive_ui.run()
         self.click_event = BooleanVar(value=False)
         interactive_ui.img_window.protocol("WM_DELETE_WINDOW", window_closed)
@@ -1647,7 +1647,7 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
             if interactive_ui.img_window.winfo_exists(): interactive_ui.close()
             self.click_event.set(True)
 
-        interactive_ui = TimelapseSlider(video_path=kwargs['video_path'], frame_cnt=kwargs['frame_cnt'], crop_ratio=kwargs['crop_ratio'])
+        interactive_ui = TimelapseSlider(video_path=kwargs['video_path'], frame_cnt=kwargs['frame_cnt'], crop_ratio=kwargs['crop_ratio'], use_timestamps=False)
         interactive_ui.run()
         self.click_event = BooleanVar(value=False)
         interactive_ui.img_window.protocol("WM_DELETE_WINDOW", window_closed)
