@@ -69,13 +69,14 @@ from simba.video_processors.video_processing import (
     crop_single_video, crop_single_video_circle, crop_single_video_polygon,
     crossfade_two_videos, downsample_video, extract_frame_range,
     extract_frames_single_video, flip_videos, frames_to_movie, gif_creator,
-    multi_split_video, remove_beginning_of_video, resize_videos_by_height,
-    resize_videos_by_width, reverse_videos, roi_blurbox, rotate_video,
-    superimpose_elapsed_time, superimpose_frame_count, superimpose_freetext,
-    superimpose_overlay_video, superimpose_video_names,
-    superimpose_video_progressbar, temporal_concatenation, upsample_fps,
-    video_bg_subtraction, video_bg_subtraction_mp, video_concatenator,
-    video_to_bw, video_to_greyscale, watermark_video, remove_end_of_video)
+    multi_split_video, remove_beginning_of_video, remove_end_of_video,
+    resize_videos_by_height, resize_videos_by_width, reverse_videos,
+    roi_blurbox, rotate_video, superimpose_elapsed_time,
+    superimpose_frame_count, superimpose_freetext, superimpose_overlay_video,
+    superimpose_video_names, superimpose_video_progressbar,
+    temporal_concatenation, upsample_fps, video_bg_subtraction,
+    video_bg_subtraction_mp, video_concatenator, video_to_bw,
+    video_to_greyscale, watermark_video)
 
 sys.setrecursionlimit(10**7)
 
