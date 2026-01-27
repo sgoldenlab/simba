@@ -34,7 +34,8 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_str,
                                 check_that_hhmmss_start_is_before_end)
 from simba.utils.data import convert_roi_definitions
-from simba.utils.enums import Dtypes, Formats, Keys, Links, Options, Paths, TkBinds
+from simba.utils.enums import (Dtypes, Formats, Keys, Links, Options, Paths,
+                               TkBinds)
 from simba.utils.errors import (CountError, DuplicationError,
                                 FFMPEGCodecGPUError, FrameRangeError,
                                 InvalidInputError, MixedMosaicError,
@@ -42,8 +43,8 @@ from simba.utils.errors import (CountError, DuplicationError,
                                 NoFilesFoundError, NotDirectoryError,
                                 ResolutionError)
 from simba.utils.lookups import (get_color_dict, get_ffmpeg_crossfade_methods,
-                                 get_fonts, percent_to_crf_lookup,
-                                 quality_pct_to_crf, get_monitor_info)
+                                 get_fonts, get_monitor_info,
+                                 percent_to_crf_lookup, quality_pct_to_crf)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
