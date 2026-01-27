@@ -814,6 +814,7 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
                       frame_index: Optional[int] = 0,
                       opacity: Optional[float] = None,
                       size: Optional[Tuple[int, int]] = None,
+                      keep_aspect_ratio: bool = False,
                       greyscale: Optional[bool] = False,
                       black_and_white: Optional[bool] = False,
                       clahe: Optional[bool] = False,
@@ -831,7 +832,8 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
     :param Union[str, os.PathLike, cv2.VideoCapture] video_path: Path to video file, or cv2.VideoCapture object.
     :param Optional[int] frame_index: The frame index to return (0-based). Default: 0. If -1 is passed, the last frame of the video is read.
     :param Optional[float] opacity: Value between 0 and 100 or None. If float value, returns image with opacity. 100 fully opaque. 0.0 fully transparent.
-    :param Optional[Tuple[int, int]] size: If tuple, resizes the image to size. Else, returns original image size.
+    :param Optional[Tuple[int, int]] size: If tuple (width, height), resizes the image. If None, returns original image size. When used with keep_aspect_ratio=True, the image is resized to fit within the target size while maintaining aspect ratio.
+    :param bool keep_aspect_ratio: If True and size is provided, resizes the image to fit within the target size while maintaining aspect ratio. If False, resizes to exact size (may distort aspect ratio). Default False.
     :param Optional[bool] greyscale: If True, returns the greyscale image. Default False.
     :param Optional[bool] black_and_white: If True, returns black and white image at threshold 127. Default False.
     :param Optional[bool] clahe: If True, returns CLAHE enhanced image. Default False.
@@ -906,8 +908,14 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
         h, w, clr = img.shape[:3]
         opacity_image = np.ones((h, w, clr), dtype=np.uint8) * int(255 * opacity)
         img = cv2.addWeighted( img.astype(np.uint8), 1 - opacity, opacity_image.astype(np.uint8), opacity, 0)
-    if size:
+    if size is not None and not keep_aspect_ratio:
         img = cv2.resize(img, size, interpolation=cv2.INTER_LINEAR)
+    elif size is not None and keep_aspect_ratio:
+        target_w, target_h = size
+        h, w = img.shape[:2]
+        scale = min(target_w / w, target_h / h)
+        new_w, new_h = int(w * scale), int(h * scale)
+        img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
     if greyscale or black_and_white:
         if len(img.shape) > 2:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -3759,7 +3767,6 @@ def find_closest_readable_frame(video_path: Union[str, os.PathLike],
                 return img, test_frame
 
     return None, None
-
 
 
 #copy_multiple_videos_to_project(config_path=r"C:\troubleshooting\multi_animal_dlc_two_c57\project_folder\project_config.ini", source=r'E:\maplight_videos\video_test', file_type='mp4', recursive_search=False)

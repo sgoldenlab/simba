@@ -28,14 +28,15 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_boolean, check_valid_lst,
                                 check_valid_tuple, is_img_bw, is_img_greyscale)
 from simba.utils.data import terminate_cpu_pool
+from simba.utils.lookups import get_fonts
 from simba.utils.enums import Defaults, Formats, GeometryEnum, Options
 from simba.utils.errors import ArrayError, FrameRangeError, InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data,
-                                    read_frm_of_video)
-
+                                    read_frm_of_video, seconds_to_timestamp)
+from PIL import Image, ImageDraw, ImageFont
 
 class ImageMixin(object):
     """
@@ -2052,18 +2053,141 @@ class ImageMixin(object):
 
         return denoised_img
 
+    @staticmethod
+    def get_timelapse_img(video_path: Union[str, os.PathLike],
+                          frame_cnt: int = 25,
+                          size: Optional[int] = None,
+                          crop_ratio: int = 50) -> np.ndarray:
+
+        """
+        Creates timelapse image from video.
+
+        .. image:: _static/img/get_timelapse_img.png
+           :width: 600
+           :align: center
+
+        :param Union[str, os.PathLike] video_path: Path to the video to cerate the timelapse image from.
+        :param int frame_cnt: Number of frames to grab from the video. There will be an even interval between each frame.
+        :param Optional[int] size: The total width in pixels of the final timelapse image. If None, uses the video width (adjusted for crop_ratio).
+        :param int crop_ratio: The percent of each original video (from the left) to show.
+        :return np.ndarray: The timelapse image as a numpy array
+
+        :example:
+        >>> img = ImageMixin.get_timelapse_img(video_path=r"E:\troubleshooting\mitra_emergence\project_folder\clip_test\Box1_180mISOcontrol_Females_clipped_progress_bar.mp4", size=100)
+        """
+
+        video_meta = get_video_meta_data(video_path=video_path, raise_error=True)
+        frm_ids = [int(i * video_meta['frame_count'] / frame_cnt) for i in range(frame_cnt)]
+        cap = cv2.VideoCapture(video_path)
+        frms = [read_frm_of_video(video_path=cap, frame_index=x, use_ffmpeg=False) for x in frm_ids]
+
+        effective_video_width = int(video_meta['width'] * (crop_ratio / 100))
+        if size is None:
+            size = effective_video_width
+        per_frame_width_after_crop = size / frame_cnt
+        per_frame_width_before_crop = per_frame_width_after_crop / (crop_ratio / 100)
+        scale_factor = per_frame_width_before_crop / frms[0].shape[1]
+        scaled_frms = [cv2.resize(x, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_LINEAR) for x in frms]
+        if crop_ratio is not None:
+            scaled_frms = [ImageMixin.segment_img_vertical(img=x, pct=crop_ratio, left=True) for x in scaled_frms]
+        
+        return cv2.hconcat(scaled_frms)
+
+    @staticmethod
+    def create_time_ruler(width: int,
+                          video_path: Union[str, os.PathLike],
+                          height: int = 60,
+                          num_divisions: int = 6,
+                          font: str = 'Arial',
+                          bg_color: Tuple[int, int, int] = (255, 255, 255),
+                          line_color: Tuple[int, int, int] = (128, 128, 128),
+                          text_color: Tuple[int, int, int] = (0, 0, 0),
+                          padding: int = 60,
+                          show_time: bool = True) -> np.ndarray:
+        """
+        Create a horizontal ruler/scale bar with tick marks and labels.
+
+        .. image:: _static/img/create_time_ruler.png
+           :width: 600
+           :align: center
+
+        :param int width: Width of the ruler in pixels (should match timelapse image width if one is used)
+        :param Union[str, os.PathLike] video_path: Path to video file to get metadata from
+        :param int height: Height of the ruler in pixels. Default 60.
+        :param int num_divisions: Number of major divisions on the ruler. Default 6.
+        :param str font: Font name to use for labels. Default 'Algerian'.
+        :param Tuple[int, int, int] bg_color: Background color (R, G, B). Default white.
+        :param Tuple[int, int, int] line_color: Color for tick marks and lines (R, G, B). Default grey.
+        :param Tuple[int, int, int] text_color: Color for text labels (R, G, B). Default black.
+        :param bool show_time: If True, show time labels, else show frame numbers. Default True.
+        :return: Ruler image as numpy array (BGR format for OpenCV compatibility)
+        :rtype: np.ndarray
+
+        :example:
+        >>> ruler = ImageMixin.create_time_ruler(width=1920, video_path='path/to/video.mp4', height=60, num_divisions=6)
+        """
+
+        check_file_exist_and_readable(file_path=video_path)
+        check_int(name='width', value=width, min_value=1, raise_error=True)
+        check_int(name='height', value=height, min_value=1, raise_error=True)
+        check_int(name='num_divisions', value=num_divisions, min_value=1, raise_error=True)
+        check_int(name='padding', value=padding, min_value=0, raise_error=True)
+        check_str(name='font', value=font, allow_blank=False, raise_error=True)
+        check_if_valid_rgb_tuple(data=bg_color, raise_error=True, source=ImageMixin.create_time_ruler.__name__)
+        check_if_valid_rgb_tuple(data=line_color, raise_error=True, source=ImageMixin.create_time_ruler.__name__)
+        check_if_valid_rgb_tuple(data=text_color, raise_error=True, source=ImageMixin.create_time_ruler.__name__)
+
+        video_meta = get_video_meta_data(video_path=video_path, raise_error=True)
+        total_width = width + (2 * padding)
+
+        img = Image.new('RGB', (total_width, height), color=bg_color)
+        draw = ImageDraw.Draw(img)
+        font_dict = get_fonts()
+        try:
+            font_path = font_dict[font]
+            pil_font = ImageFont.truetype(font_path, size=12)
+        except (KeyError, OSError):
+            pil_font = ImageFont.load_default()
+        major_tick_height, half_tick_height = height * 0.6, height * 0.4
+        quarter_tick_height, eighth_tick_height = height * 0.25, height * 0.15
+
+        for i in range(num_divisions + 1):
+            x = padding + int(i * width / num_divisions)
+            draw.line([(x, 0), (x, major_tick_height)], fill=line_color, width=2)
+            if show_time and video_meta['video_length_s'] is not None:
+                seconds_at_division = i * video_meta['video_length_s'] / num_divisions
+                label = seconds_to_timestamp(seconds=seconds_at_division)
+            elif video_meta['frame_count'] is not None:
+                label = str(int(i * video_meta['frame_count'] / num_divisions))
+            else:
+                label = str(i)
+            bbox = draw.textbbox((0, 0), label, font=pil_font)
+            text_width = bbox[2] - bbox[0]
+            if i == 0:
+                draw.text((x, major_tick_height + 5), label, fill=text_color, font=pil_font)
+            elif i == num_divisions:
+                draw.text((x - text_width, major_tick_height + 5), label, fill=text_color, font=pil_font)
+            else:
+                draw.text((x - text_width // 2, major_tick_height + 5), label, fill=text_color, font=pil_font)
+            if i < num_divisions:
+                x_half = padding + int((i + 0.5) * width / num_divisions)
+                draw.line([(x_half, 0), (x_half, half_tick_height)], fill=line_color, width=1)
+                for q in [0.25, 0.75]:
+                    x_quarter = padding + int((i + q) * width / num_divisions)
+                    draw.line([(x_quarter, 0), (x_quarter, quarter_tick_height)], fill=line_color, width=1)
+                for e in [0.125, 0.375, 0.625, 0.875]:
+                    x_eighth = padding + int((i + e) * width / num_divisions)
+                    draw.line([(x_eighth, 0), (x_eighth, eighth_tick_height)], fill=line_color, width=1)
+
+        draw.line([(0, height - 1), (total_width, height - 1)], fill=line_color, width=1)
+        img_bgr = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+        return img_bgr
 
 
-
-
-
-
-
-
-
-
-
-
+# img = ImageMixin.create_time_ruler(width=1920, video_path=r"E:\troubleshooting\mitra_emergence\project_folder\clip_test\Box1_180mISOcontrol_Females_clipped_progress_bar.mp4", height=60, num_divisions=6)
+#
+# cv2.imshow('sadasdas', img)
+# cv2.waitKey(40000)
 
 #x = ImageMixin.get_blob_locations(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", gpu=True)
 # imgs = ImageMixin().read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples')

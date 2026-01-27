@@ -25,6 +25,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         SimbaCheckbox, SimBADropDown,
                                         SimBALabel, SimBARadioButton,
                                         SimBAScaleBar, SimBASeperator)
+from simba.ui.video_timelaps import TimelapseSlider
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable,
                                 check_if_dir_exists,
@@ -33,7 +34,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_str,
                                 check_that_hhmmss_start_is_before_end)
 from simba.utils.data import convert_roi_definitions
-from simba.utils.enums import Dtypes, Formats, Keys, Links, Options, Paths
+from simba.utils.enums import Dtypes, Formats, Keys, Links, Options, Paths, TkBinds
 from simba.utils.errors import (CountError, DuplicationError,
                                 FFMPEGCodecGPUError, FrameRangeError,
                                 InvalidInputError, MixedMosaicError,
@@ -42,7 +43,7 @@ from simba.utils.errors import (CountError, DuplicationError,
                                 ResolutionError)
 from simba.utils.lookups import (get_color_dict, get_ffmpeg_crossfade_methods,
                                  get_fonts, percent_to_crf_lookup,
-                                 quality_pct_to_crf)
+                                 quality_pct_to_crf, get_monitor_info)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
@@ -1655,6 +1656,7 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         self.video_paths = find_all_videos_in_directory(directory=data_dir, as_dict=True, raise_error=True)
         self.video_meta_data = [get_video_meta_data(video_path=x) for x in list(self.video_paths.values())]
         super().__init__(title="CLIP MULTIPLE VIDEOS BY TIME-STAMPS", icon='clip')
+
         self.save_dir = save_dir
         batch_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BATCH SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         batch_start_entry = Entry_Box(parent=batch_settings_frm, fileDescription='START TIME (HH:MM:SS):', labelwidth=25, entry_box_width=12, img='play', justify='center')
@@ -1672,6 +1674,8 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         self.gpu_dropdown.grid(row=2, column=0, sticky=NW)
         self.quality_dropdown.grid(row=3, column=0, sticky=NW)
         self.save_dir = save_dir
+
+
         padx = (0, 30)
         data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO SETTINGS", icon_name='video', icon_link=Links.VIDEO_TOOLS.value)
 
@@ -1679,10 +1683,11 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         SimBALabel(data_frm, txt="VIDEO LENGTH", justify='center', font=Formats.FONT_REGULAR_BOLD.value, img='timer_2').grid(row=0, column=1, sticky=NW, padx=padx)
         SimBALabel(data_frm, txt="START TIME (HH:MM:SS)", justify='center', font=Formats.FONT_REGULAR_BOLD.value, img='play').grid(row=0, column=2, sticky=NW, padx=padx)
         SimBALabel(data_frm, txt="END TIME (HH:MM:SS)", justify='center', font=Formats.FONT_REGULAR_BOLD.value, img='stop').grid(row=0, column=3, sticky=NW, padx=padx)
+        SimBALabel(data_frm, txt="INTERACTIVE INTERFACE", justify='center', font=Formats.FONT_REGULAR_BOLD.value, img='monitor').grid(row=0, column=4, sticky=NW, padx=padx)
         seperator = SimBASeperator(parent=data_frm, color=None, orient='horizontal', borderwidth=1)
-        seperator.grid(row=1, column=0, columnspan=4, rowspan=1, sticky="ew")
+        seperator.grid(row=1, column=0, columnspan=5, rowspan=1, sticky="ew")
 
-        self.entry_boxes = {}
+        self.entry_boxes, self.interactive_btns = {}, {}
         for cnt, video_name in enumerate(self.video_paths.keys()):
             self.entry_boxes[video_name] = {}
             SimBALabel(parent=data_frm, txt=video_name, justify='center').grid(row=cnt + 2, column=0, sticky=NW, padx=padx)
@@ -1693,17 +1698,46 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
             self.entry_boxes[video_name]["end"] = Entry_Box(data_frm, fileDescription="", labelwidth=0, justify='center')
             self.entry_boxes[video_name]["start"].grid(row=cnt + 2, column=2, sticky=NW, padx=padx)
             self.entry_boxes[video_name]["end"].grid(row=cnt + 2, column=3, sticky=NW, padx=padx)
+            kwargs = {'video_path': self.video_paths[video_name], 'frame_cnt': 25, 'crop_ratio': 50, 'size': 100, 'video_name': video_name}
+            self.interactive_btns[video_name] = SimbaButton(parent=data_frm, txt='INTERACTIVE SLIDER', cmd=self._start_interactive_ui, cmd_kwargs=kwargs, img='monitor')
+            self.interactive_btns[video_name].grid(row=cnt + 2, column=4, sticky=NW, padx=padx)
+
         data_frm.grid(row=1, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run, btn_txt_clr="blue")
         self.main_frm.mainloop()
 
     def _batch_set_val(self, text: str, box_type: str):
         for cnt, video_name in enumerate(self.video_paths.keys()):
-            if box_type == 'start':
-                self.entry_boxes[video_name]["start"].entry_set(text)
-            else:
-                self.entry_boxes[video_name]["end"].entry_set(text)
+            if box_type == 'start': self.entry_boxes[video_name]["start"].entry_set(text)
+            else: self.entry_boxes[video_name]["end"].entry_set(text)
 
+    def _start_interactive_ui(self, **kwargs):
+        def exit_click(event):
+            self.click_event.set(True)
+            interactive_ui.img_window.unbind(TkBinds.ESCAPE.value)
+            self.main_frm.unbind(TkBinds.ESCAPE.value)
+            interactive_ui.close()
+
+        def window_closed():
+            if interactive_ui.img_window.winfo_exists():
+                interactive_ui.close()
+            self.click_event.set(True)
+            interactive_ui.img_window.unbind(TkBinds.ESCAPE.value)
+            self.main_frm.unbind(TkBinds.ESCAPE.value)
+
+        interactive_ui = TimelapseSlider(video_path=kwargs['video_path'],
+                                         frame_cnt=kwargs['frame_cnt'],
+                                         crop_ratio=kwargs['crop_ratio'])
+        interactive_ui.run()
+        self.click_event = BooleanVar(value=False)
+        interactive_ui.img_window.protocol("WM_DELETE_WINDOW", window_closed)
+        interactive_ui.img_window.bind(TkBinds.ESCAPE.value, exit_click); self.main_frm.bind(TkBinds.ESCAPE.value, exit_click)
+        self.main_frm.wait_variable(self.click_event)
+        if not interactive_ui.img_window.winfo_exists():
+            pass
+        start_time, end_time  = interactive_ui.get_start_time_str(),  interactive_ui.get_end_time_str()
+        self.entry_boxes[kwargs['video_name']]["start"].entry_set(start_time)
+        self.entry_boxes[kwargs['video_name']]["end"].entry_set(end_time)
 
     def run(self):
         timer = SimbaTimer(start=True)
@@ -1720,7 +1754,8 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         timer.stop_timer()
         stdout_success(msg=f"{len(self.entry_boxes)} videos clipped by time-stamps and saved in {self.save_dir}", elapsed_time=timer.elapsed_time_str,)
 
-#ClipMultipleVideosByTimestamps(data_dir=r"E:\maplight_videos\test_0126", save_dir=r"E:\maplight_videos\clip_test")
+# ClipMultipleVideosByTimestamps(data_dir=r"E:\maplight_videos\test_0126",
+#                                save_dir=r"E:\maplight_videos\clip_test")
 
 
 class InitiateClipMultipleVideosByTimestampsPopUp(PopUpMixin):

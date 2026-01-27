@@ -170,6 +170,7 @@ class SimBAScaleBar(Frame):
                  to: int = 100,
                  tickinterval: Optional[int] = None,
                  troughcolor: Optional[str] = None,
+                 activebackground: Optional[str] = None,
                  sliderrelief: Literal["raised", "sunken", "flat", "ridge", "solid", "groove"] = 'flat'):
 
         super().__init__(master=parent)
@@ -192,7 +193,8 @@ class SimBAScaleBar(Frame):
                            troughcolor=troughcolor,
                            tickinterval=tickinterval,
                            resolution=resolution,
-                           showvalue=showvalue)
+                           showvalue=showvalue,
+                           activebackground=activebackground)
 
         if label is not None:
             self.lbl = SimBALabel(parent=self, txt=label, font=lbl_font, txt_clr=label_clr, width=label_width)
