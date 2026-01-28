@@ -17,7 +17,7 @@ from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_filepaths_in_iterable_exist, check_int, check_str,
     check_valid_boolean, check_valid_dataframe, check_valid_dict)
-from simba.utils.data import terminate_cpu_pool, get_cpu_pool
+from simba.utils.data import get_cpu_pool, terminate_cpu_pool
 from simba.utils.enums import Formats
 from simba.utils.errors import InvalidInputError, NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, stdout_success

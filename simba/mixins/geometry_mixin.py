@@ -42,7 +42,7 @@ from simba.utils.checks import (check_float,
                                 check_valid_cpu_pool, check_valid_dict,
                                 check_valid_lst, check_valid_tuple)
 from simba.utils.data import (create_color_palette, create_color_palettes,
-                              terminate_cpu_pool, get_cpu_pool)
+                              get_cpu_pool, terminate_cpu_pool)
 from simba.utils.enums import Defaults, Formats, GeometryEnum, Options
 from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.read_write import (SimbaTimer, find_core_cnt,

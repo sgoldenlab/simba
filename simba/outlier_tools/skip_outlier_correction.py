@@ -5,7 +5,7 @@ from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import check_if_filepath_list_is_empty
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df, write_df
 
 
