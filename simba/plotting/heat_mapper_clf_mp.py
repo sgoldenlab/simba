@@ -264,11 +264,11 @@ class HeatMapperClfMultiprocess(ConfigReader, PlottingMixin):
 #     x = HeatMapperClfMultiprocess(config_path=r"E:\troubleshooting\mitra_emergence\project_folder\project_config.ini",
 #                               bodypart='nose',
 #                               clf_name='GROOMING',
-#                               style_attr={'palette': 'jet', 'shading': 'gouraud', 'bin_size': 50, 'max_scale': 'auto'},
+#                               style_attr={'palette': 'jet', 'shading': 'gouraud', 'bin_size': 25, 'max_scale': 'auto'},
 #                               final_img_setting=True,
-#                               video_setting=True,
+#                               video_setting=False,
 #                               frame_setting=False,
-#                               core_cnt=10,
+#                               core_cnt=12,
 #                               data_paths=[r"E:\troubleshooting\mitra_emergence\project_folder\csv\machine_results\Box1_180mISOcontrol_Females.csv"])
 #
 #     x.run()
