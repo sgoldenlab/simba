@@ -17,7 +17,7 @@ from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_filepaths_in_iterable_exist, check_int, check_str,
     check_valid_boolean, check_valid_dataframe, check_valid_dict)
-from simba.utils.data import terminate_cpu_pool
+from simba.utils.data import terminate_cpu_pool, get_cpu_pool
 from simba.utils.enums import Formats
 from simba.utils.errors import InvalidInputError, NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, stdout_success
@@ -149,6 +149,7 @@ class HeatMapperClfMultiprocess(ConfigReader, PlottingMixin):
     def run(self):
         print(f"Processing {len(self.data_paths)} video(s)...")
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
+        pool = get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__)
         for file_cnt, file_path in enumerate(self.data_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(file_path)
@@ -173,7 +174,8 @@ class HeatMapperClfMultiprocess(ConfigReader, PlottingMixin):
             if len(np.unique(clf_data)) == 1:
                 raise InvalidInputError(msg=f'Cannot plot heatmap for behavior {self.clf_name} in video {self.video_name}. The behavior is classified as {np.unique(clf_data)} in every single frame.')
             grid, aspect_ratio = GeometryMixin.bucket_img_into_grid_square(img_size=(self.width, self.height), bucket_grid_size_mm=self.bin_size, px_per_mm=self.px_per_mm, add_correction=False, verbose=False)
-            clf_data = GeometryMixin().cumsum_bool_geometries(data=bp_data, geometries=grid, bool_data=clf_data, fps=self.fps, verbose=False)
+
+            clf_data = GeometryMixin().cumsum_bool_geometries(data=bp_data, geometries=grid, bool_data=clf_data, fps=self.fps, verbose=False, core_cnt=self.core_cnt, pool=pool)
             if self.max_scale == "auto":
                 self.max_scale = max(1, self.__calculate_max_scale(clf_array=clf_data))
             if self.final_img_setting:
@@ -197,32 +199,29 @@ class HeatMapperClfMultiprocess(ConfigReader, PlottingMixin):
                     frm_per_core_w_batch.append((batch_cnt, frm_range, frame_arrays[batch_cnt]))
                 del frame_arrays
                 print(f"Creating heatmaps, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
-                with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
-                    constants = functools.partial(_heatmap_multiprocessor,
-                                                  video_setting=self.video_setting,
-                                                  frame_setting=self.frame_setting,
-                                                  style_attr=self.style_attr,
-                                                  fps=self.fps,
-                                                  video_temp_dir=self.temp_folder,
-                                                  frame_dir=self.frames_save_dir,
-                                                  max_scale=self.max_scale,
-                                                  aspect_ratio=aspect_ratio,
-                                                  clf_name=self.clf_name,
-                                                  size=(self.width, self.height),
-                                                  video_name=self.video_name,
-                                                  make_clf_heatmap_plot=self.make_clf_heatmap_plot)
+                constants = functools.partial(_heatmap_multiprocessor,
+                                              video_setting=self.video_setting,
+                                              frame_setting=self.frame_setting,
+                                              style_attr=self.style_attr,
+                                              fps=self.fps,
+                                              video_temp_dir=self.temp_folder,
+                                              frame_dir=self.frames_save_dir,
+                                              max_scale=self.max_scale,
+                                              aspect_ratio=aspect_ratio,
+                                              clf_name=self.clf_name,
+                                              size=(self.width, self.height),
+                                              video_name=self.video_name,
+                                              make_clf_heatmap_plot=self.make_clf_heatmap_plot)
 
-                    for cnt, batch in enumerate(pool.imap(constants, frm_per_core_w_batch, chunksize=self.multiprocess_chunksize)):
-                        print(f'Batch core {batch+1}/{self.core_cnt} complete (Video {self.video_name})... ')
-                    terminate_cpu_pool(pool=pool, force=False)
 
+                for cnt, batch in enumerate(pool.imap(constants, frm_per_core_w_batch, chunksize=self.multiprocess_chunksize)):
+                    print(f'Batch core {batch+1}/{self.core_cnt} complete (Video {self.video_name})... ')
                 if self.video_setting:
                     print(f"Joining {self.video_name} multiprocessed video...")
                     concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_video_path)
-
                 video_timer.stop_timer()
                 print(f"Heatmap video {self.video_name} complete, (elapsed time: {video_timer.elapsed_time_str}s) ...")
-
+        terminate_cpu_pool(pool=pool, force=False, source=self.__class__.__name__)
         self.timer.stop_timer()
         stdout_success(msg=f"Heatmap visualizations for {len(self.data_paths)} video(s) created in {self.heatmap_clf_location_dir} directory", elapsed_time=self.timer.elapsed_time_str)
 
@@ -261,3 +260,26 @@ class HeatMapperClfMultiprocess(ConfigReader, PlottingMixin):
 #                                core_cnt=5,
 #                      files_found=['/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv'])
 # test.create_heatmaps()
+# if __name__ == "__main__":
+#     x = HeatMapperClfMultiprocess(config_path=r"E:\troubleshooting\mitra_emergence\project_folder\project_config.ini",
+#                               bodypart='nose',
+#                               clf_name='GROOMING',
+#                               style_attr={'palette': 'jet', 'shading': 'gouraud', 'bin_size': 50, 'max_scale': 'auto'},
+#                               final_img_setting=True,
+#                               video_setting=True,
+#                               frame_setting=False,
+#                               core_cnt=10,
+#                               data_paths=[r"E:\troubleshooting\mitra_emergence\project_folder\csv\machine_results\Box1_180mISOcontrol_Females.csv"])
+#
+#     x.run()
+
+    # def __init__(self,
+    #              config_path: Union[str, os.PathLike],
+    #              bodypart: str,
+    #              clf_name: str,
+    #              data_paths: List[str],
+    #              style_attr: dict,
+    #              final_img_setting: bool = True,
+    #              video_setting: bool = False,
+    #              frame_setting: bool = False,
+    #              core_cnt: int = -1):

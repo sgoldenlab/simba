@@ -236,7 +236,8 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
                             self.add_spacer += 1
                         if self.show_confidence:
                             col_name = f'Probability_{clf_name}'
-                            conf_txt = f'{clf_name} CONFIDENCE {self.data_df.loc[frm_idx, col_name]}'
+                            conf = round(self.data_df.loc[frm_idx, col_name], 4)
+                            conf_txt = f'{clf_name} CONFIDENCE {conf:.4f}'
                             self.frame = PlottingMixin().put_text(img=self.frame, text=conf_txt, pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.video_space_size * self.add_spacer)), font_size=self.video_font_size, font_thickness=self.video_text_thickness, font=self.font, text_bg_alpha=self.video_text_opacity, text_color_bg=self.text_bg_color, text_color=self.text_color)
                             self.add_spacer += 1
                     self.frame = PlottingMixin().put_text(img=self.frame, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.video_space_size * self.add_spacer)), font_size=self.video_font_size, font_thickness=self.video_text_thickness, font=self.font, text_bg_alpha=self.video_text_opacity, text_color_bg=self.text_bg_color, text_color=self.text_color)

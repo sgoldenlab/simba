@@ -1,6 +1,6 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_warning
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_warning, stdout_information
 
 load_timer = SimbaTimer(start=True)
 import os.path
@@ -786,14 +786,15 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         _ = MachineModelSettingsPopUp(config_path=self.config_path)
 
     def run_feature_extraction(self):
-        print(f"Running feature extraction... start time: {get_current_time()}")
         feature_extractor_classes = get_bp_config_code_class_pairs()
         if self.user_defined_var.get():
+            check_file_exist_and_readable(file_path=self.scriptfile.file_path, raise_error=True)
+            stdout_information(msg=f"Running feature extraction from file {self.scriptfile.file_path}...")
             custom_feature_extractor = CustomFeatureExtractor(extractor_file_path=self.scriptfile.file_path,config_path=self.config_path)
             custom_feature_extractor.run()
             stdout_success(msg="Custom feature extraction complete!",source=self.__class__.__name__)
         else:
-            print(f"Pose-estimation body part setting for feature extraction: {str(self.animal_cnt)} animals {str(self.pose_setting)} body-parts...")
+            stdout_information(msg=f"Pose-estimation body part setting for feature extraction: {str(self.animal_cnt)} animals {str(self.pose_setting)} body-parts...")
             if self.pose_setting not in feature_extractor_classes.keys():
                 raise InvalidInputError(msg=f"The project pose-configuration key is set to {self.pose_setting} which is invalid. OPTIONS: {list(feature_extractor_classes.keys())}. Check the pose-estimation setting in the project_config.ini", source=self.__class__.__name__)
             if self.pose_setting == "8":

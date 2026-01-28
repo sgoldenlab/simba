@@ -132,7 +132,8 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                     img = PlottingMixin().put_text(img=img, text=f"{clf_name} {clf_time}",pos=(TextOptions.BORDER_BUFFER_Y.value, ((video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer)), font_size=font_size,  font_thickness=text_thickness, font=font, text_bg_alpha=text_opacity, text_color_bg=text_bg_clr, text_color=text_color)
                     add_spacer += 1
                 if clf_confidence is not None:
-                    frm_clf_conf_txt = f'{clf_name} CONFIDENCE {clf_confidence[clf_name][current_frm]}'
+                    conf = round(clf_confidence[clf_name][current_frm], 4)
+                    frm_clf_conf_txt = f'{clf_name} CONFIDENCE: {conf:.4f}'
                     img = PlottingMixin().put_text(img=img, text=frm_clf_conf_txt,pos=(TextOptions.BORDER_BUFFER_Y.value, ((video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer)), font_size=font_size,  font_thickness=text_thickness, font=font, text_bg_alpha=text_opacity, text_color_bg=text_bg_clr, text_color=text_color)
                     add_spacer += 1
 

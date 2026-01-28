@@ -42,7 +42,7 @@ from simba.utils.checks import (check_float,
                                 check_valid_cpu_pool, check_valid_dict,
                                 check_valid_lst, check_valid_tuple)
 from simba.utils.data import (create_color_palette, create_color_palettes,
-                              terminate_cpu_pool)
+                              terminate_cpu_pool, get_cpu_pool)
 from simba.utils.enums import Defaults, Formats, GeometryEnum, Options
 from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.read_write import (SimbaTimer, find_core_cnt,
@@ -1225,9 +1225,16 @@ class GeometryMixin(object):
            To convert single frame animal body-part coordinates to polygon, use  single core method :func:`simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_polygon`
 
         :param np.ndarray data: NumPy array of body part coordinates. Each subarray represents the coordinates of a geometry in a frame.
+        :param Optional[str] video_name: Optional video name for progress messages.
+        :param Optional[str] animal_name: Optional animal name for progress messages.
+        :param Optional[bool] verbose: If True, prints progress messages. Default False.
         :param Literal['round', 'square', 'flat'] cap_style: Style of line cap for parallel offset. Options: 'round', 'square', 'flat'.
         :param int parallel_offset: Offset distance for parallel lines. Default is 1.
+        :param Optional[float] pixels_per_mm: Pixels per millimeter conversion factor.
         :param float simplify_tolerance: Tolerance parameter for simplifying geometries. Default is 2.
+        :param bool preserve_topology: If True, preserves topology during simplification. Default True.
+        :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores. Ignored if pool is provided.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
         :returns: A list of polygons with length data.shape[0]
         :rtype: List[Polygon]
 
@@ -1266,7 +1273,7 @@ class GeometryMixin(object):
 
         pool_terminate_flag = False if pool is not None else True
         if pool is not None:
-            check_valid_cpu_pool(value=pool, source=f'{self.__class__.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+            check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_bodyparts_to_polygon.__name__} pool', raise_error=True, accepted_cores=core_cnt)
         else:
             pool = multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value)
         constants = functools.partial(GeometryMixin.bodyparts_to_polygon,
@@ -1289,14 +1296,15 @@ class GeometryMixin(object):
         timer.stop_timer()
         if verbose:
             stdout_success(msg="Polygons complete.", elapsed_time=timer.elapsed_time_str)
-        if pool_terminate_flag: terminate_cpu_pool(pool=pool)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_bodyparts_to_polygon.__name__)
         return [l for ll in results for l in ll]
 
     @staticmethod
     def multiframe_bodypart_to_point(data: np.ndarray,
                                      core_cnt: Optional[int] = -1,
                                      buffer: Optional[int] = None,
-                                     px_per_mm: Optional[int] = None) -> Union[List[Point], List[List[Point]]]:
+                                     px_per_mm: Optional[int] = None,
+                                     pool: Optional[multiprocessing.Pool] = None) -> Union[List[Point], List[List[Point]]]:
         """
         Process multiple frames of body part data in parallel and convert them to shapely Points.
 
@@ -1306,10 +1314,10 @@ class GeometryMixin(object):
            For non-parallized call, use :func:`simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_points`
 
         :param np.ndarray data: 2D or 3D array with body-part coordinates where rows are frames and columns are x and y coordinates.
-        :param Optional[int] core_cnt: The number of cores to use. If -1, then all available cores.
-        :param Optional[int] px_per_mm: Pixels ro millimeter convertion factor. Required if buffer is not None.
+        :param Optional[int] core_cnt: The number of cores to use. If -1, then all available cores. Ignored if pool is provided.
         :param Optional[int] buffer: If not None, then the area of the Point. Thus, if not None, then returns Polygons representing the Points.
         :param Optional[int] px_per_mm: Pixels to millimeter convertion factor. Required if buffer is not None.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
         :returns Union[List[Point], List[List[Point]]]: If input is a 2D array, then list of Points. If 3D array, then list of list of Points.
 
         .. note::
@@ -1331,15 +1339,13 @@ class GeometryMixin(object):
         data_ndim = data.ndim
         if data_ndim == 2:
             data = np.array_split(data, core_cnt)
-        with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            constants = functools.partial(
-                GeometryMixin.bodyparts_to_points, buffer=buffer, px_per_mm=px_per_mm
-            )
-            for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
-                results.append(result)
-        terminate_cpu_pool(pool=pool, force=False)
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin.multiframe_bodypart_to_point.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin.multiframe_bodypart_to_point.__name__)
+        constants = functools.partial(GeometryMixin.bodyparts_to_points, buffer=buffer, px_per_mm=px_per_mm)
+        for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
+            results.append(result)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin.multiframe_bodypart_to_point.__name__)
         if data_ndim == 2:
             return [i for s in results for i in s]
         else:
@@ -1350,26 +1356,38 @@ class GeometryMixin(object):
                                  size_mm: int,
                                  pixels_per_mm: float,
                                  core_cnt: int = -1,
-                                 cap_style: Literal["round", "square", "flat"] = "round") -> List[Polygon]:
+                                 cap_style: Literal["round", "square", "flat"] = "round",
+                                 pool: Optional[multiprocessing.Pool] = None) -> List[Polygon]:
+        """
+        Buffer shapes by a specified size using multiprocessing.
 
-        check_valid_lst(data=geometries, source=f'{GeometryMixin.multiframe_buffer_shapes.__name__} geometries',
-                        valid_dtypes=(Polygon, LineString,), min_len=1, raise_error=True)
+        .. seealso::
+           For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.buffer_shape`
+
+        :param List[Union[Polygon, LineString]] geometries: List of geometries to buffer.
+        :param int size_mm: Buffer size in millimeters.
+        :param float pixels_per_mm: Pixels per millimeter conversion factor.
+        :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores. Ignored if pool is provided.
+        :param Literal["round", "square", "flat"] cap_style: Style of line cap for buffering. Options: 'round', 'square', 'flat'. Default 'round'.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
+        :return: List of buffered polygons.
+        :rtype: List[Polygon]
+        """
+
+        check_valid_lst(data=geometries, source=f'{GeometryMixin.multiframe_buffer_shapes.__name__} geometries', valid_dtypes=(Polygon, LineString,), min_len=1, raise_error=True)
         check_int(name=f'{GeometryMixin.multiframe_buffer_shapes.__name__} size_mm', value=size_mm, min_value=1)
-        check_float(name=f'{GeometryMixin.multiframe_buffer_shapes.__name__} pixels_per_mm', value=pixels_per_mm,
-                    min_value=10e-6)
-        check_int(name=f'{GeometryMixin.multiframe_buffer_shapes.__name__} core_cnt', value=core_cnt, min_value=-1,
-                  unaccepted_vals=[0])
+        check_float(name=f'{GeometryMixin.multiframe_buffer_shapes.__name__} pixels_per_mm', value=pixels_per_mm, allow_zero=False, allow_negative=False)
+        check_int(name=f'{GeometryMixin.multiframe_buffer_shapes.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
         core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
         geomety_lst = lambda lst, core_cnt: [lst[i::core_cnt] for i in range(core_cnt)]
         results = []
-        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(GeometryMixin.buffer_shape,
-                                          size_mm=size_mm,
-                                          pixels_per_mm=pixels_per_mm,
-                                          cap_style=cap_style)
-            for cnt, mp_return in enumerate(pool.imap(constants, geomety_lst, chunksize=1)):
-                results.append(mp_return)
-            terminate_cpu_pool(pool=pool, force=False)
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin.multiframe_buffer_shapes.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin.multiframe_buffer_shapes.__name__)
+        constants = functools.partial(GeometryMixin.buffer_shape, size_mm=size_mm, pixels_per_mm=pixels_per_mm, cap_style=cap_style)
+        for cnt, mp_return in enumerate(pool.imap(constants, geomety_lst, chunksize=1)):
+            results.append(mp_return)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin.multiframe_buffer_shapes.__name__)
         return [l for ll in results for l in ll]
 
     def multiframe_bodyparts_to_circle(self,
@@ -1386,11 +1404,13 @@ class GeometryMixin(object):
            For non-parallized call, use :func:`simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_circle`
 
         :param np.ndarray data: The body-part coordinates xy as a 2d array where rows are frames and columns represent x and y coordinates . E.g., np.array([[364, 308], [369, 309]])
-        :param int data: The radius of the resultant circle in millimeters.
-        :param int core_cnt: Number of CPU cores to use. Defaults to -1 meaning all available cores will be used.
+        :param int parallel_offset: The radius of the resultant circle in millimeters.
+        :param int core_cnt: Number of CPU cores to use. Defaults to -1 meaning all available cores will be used. Ignored if pool is provided.
+        :param bool verbose: If True, prints progress messages. Default True.
         :param int pixels_per_mm: The pixels per millimeter of the video. If not passed, 1 will be used meaning revert to radius in pixels rather than millimeters.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
         :returns: List of shapely Polygons of circular shape of size data.shape[0].
-        :rtype: Polygon
+        :rtype: List[Polygon]
 
         :example:
         >>> data = np.random.randint(0, 100, (100, 2))
@@ -1405,7 +1425,7 @@ class GeometryMixin(object):
         core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
         pool_terminate_flag = False if pool is not None else True
         if pool is not None:
-            check_valid_cpu_pool(value=pool, source=f'{self.__class__.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+            check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_bodyparts_to_circle.__name__} pool', raise_error=True, accepted_cores=core_cnt)
         else:
             pool = multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value)
         constants = functools.partial(GeometryMixin.bodyparts_to_circle, parallel_offset=parallel_offset, pixels_per_mm=pixels_per_mm, verbose=verbose)
@@ -1413,7 +1433,7 @@ class GeometryMixin(object):
         data = np.array_split(data, core_cnt)
         for cnt, mp_return in enumerate(pool.imap(constants, data, chunksize=1)):
             results.extend((mp_return))
-        if pool_terminate_flag: terminate_cpu_pool(pool=pool)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_bodyparts_to_circle.__name__)
         timer.stop_timer()
         if verbose: stdout_success(msg="Multiframe body-parts to circle complete", source=GeometryMixin.multiframe_bodyparts_to_circle.__name__, elapsed_time=timer.elapsed_time_str )
         return results
@@ -1468,7 +1488,8 @@ class GeometryMixin(object):
                                      data: np.ndarray,
                                      buffer: Optional[int] = None,
                                      px_per_mm: Optional[float] = None,
-                                     core_cnt: Optional[int] = -1) -> List[LineString]:
+                                     core_cnt: Optional[int] = -1,
+                                     pool: Optional[multiprocessing.Pool] = None) -> List[LineString]:
         """
         Convert multiframe body-parts data to a list of LineString objects using multiprocessing.
 
@@ -1477,8 +1498,9 @@ class GeometryMixin(object):
 
         :param np.ndarray data: Input array representing multiframe body-parts data. It should be a 3D array with dimensions (frames, points, coordinates).
         :param Optional[int] buffer: If not None, then the linestring will be expanded into a 2D geometry polygon with area ``buffer``.
-        :param Optional[int] px_per_mm: If ``buffer`` if not None, then provide the pixels to millimeter
-        :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. If set to -1, the function will automatically determine the available core count.
+        :param Optional[float] px_per_mm: If ``buffer`` if not None, then provide the pixels to millimeter conversion factor.
+        :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. If set to -1, the function will automatically determine the available core count. Ignored if pool is provided.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
         :return: A list of LineString objects representing the body-parts trajectories.
         :rtype: List[LineString]
 
@@ -1514,15 +1536,13 @@ class GeometryMixin(object):
                 min_value=1,
             )
         results = []
-        with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            constants = functools.partial(
-                GeometryMixin.bodyparts_to_line, buffer=buffer, px_per_mm=px_per_mm
-            )
-            for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
-                results.append(result)
-        terminate_cpu_pool(pool=pool, force=False)
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_bodyparts_to_line.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().multiframe_bodyparts_to_line.__name__)
+        constants = functools.partial(GeometryMixin.bodyparts_to_line, buffer=buffer, px_per_mm=px_per_mm)
+        for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
+            results.append(result)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_bodyparts_to_line.__name__)
         return results
 
     def multiframe_compute_pct_shape_overlap(self,
@@ -1547,13 +1567,14 @@ class GeometryMixin(object):
 
         :param List[Polygon] shape_1: List of Polygons.
         :param List[Polygon] shape_2: List of Polygons with the same length as shape_1.
-        :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores.
+        :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores. Ignored if pool is provided.
         :param Optional[str] video_name: If not None, then the name of the video being processed for interpretable progress msgs.
-        :param Optional[bool] video_name: If True, then prints interpretable progress msgs.
+        :param Optional[bool] verbose: If True, then prints interpretable progress msgs.
         :param Optional[Tuple[str]] animal_names: If not None, then a two-tuple of animal names (or alternative shape names) interpretable progress msgs.
         :param Optional[Literal["difference", "shape_1", "shape_2"]] denominator: Denominator for percentage calculation. "difference" uses union minus intersection, "shape_1" uses shape_1 area, "shape_2" uses shape_2 area. Default: "difference".
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
         :return: List of length ``shape_1`` with percentage overlap between corresponding Polygons.
-        :rtype: List[float]
+        :rtype: np.ndarray
 
         :example:
         >>> df = read_df(file_path=r"C:/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_2.csv", file_type='csv').astype(int)
@@ -1578,7 +1599,7 @@ class GeometryMixin(object):
         data = np.array_split(data, core_cnt)
         pool_terminate_flag = False if pool is not None else True
         if pool is not None:
-            check_valid_cpu_pool(value=pool, source=f'{self.__class__.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+            check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_compute_pct_shape_overlap.__name__} pool', raise_error=True, accepted_cores=core_cnt)
         else:
             pool = multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value)
         constants = functools.partial(GeometryMixin.compute_pct_shape_overlap, denominator=denominator)
@@ -1594,7 +1615,7 @@ class GeometryMixin(object):
             results.append(result)
         timer.stop_timer()
         stdout_success(msg="Compute overlap complete.", elapsed_time=timer.elapsed_time_str)
-        if pool_terminate_flag: terminate_cpu_pool(pool=pool)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_compute_pct_shape_overlap.__name__)
         return np.hstack(results).astype(np.float32)
 
     def multiframe_compute_shape_overlap(self,
@@ -1616,10 +1637,13 @@ class GeometryMixin(object):
         .. seealso:
            :func:`simba.mixins.geometry_mixin.GeometryMixin.compute_shape_overlap`, :func:`simba.mixins.geometry_mixin.GeometryMixin.compute_pct_shape_overlap`, :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_compute_pct_shape_overlap`
 
-        :param List[Polygon] shape_1: List of Polygons.
-        :param List[Polygon] shape_2: List of Polygons with the same length as shape_1.
-        :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores.
-        :return List[float]: List of overlap between corresponding Polygons. If overlap 1, else 0.
+        :param List[Union[Polygon, LineString, None]] shape_1: List of Polygons, LineStrings, or None.
+        :param List[Union[Polygon, LineString, None]] shape_2: List of Polygons, LineStrings, or None with the same length as shape_1.
+        :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores. Ignored if pool is provided.
+        :param Optional[bool] verbose: If True, prints progress messages. Default False.
+        :param Optional[Tuple[str]] names: Optional tuple of names for progress messages.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
+        :return List[int]: List of overlap between corresponding Polygons. If overlap 1, else 0.
 
         :example:
         >>> df = read_df(file_path=r"C:/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_2.csv", file_type='csv').astype(int)
@@ -1645,7 +1669,7 @@ class GeometryMixin(object):
         data = np.array_split(data, core_cnt)
         pool_terminate_flag = False if pool is not None else True
         if pool is not None:
-            check_valid_cpu_pool(value=pool, source=f'{self.__class__.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+            check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_compute_shape_overlap.__name__} pool', raise_error=True, accepted_cores=core_cnt)
         else:
             pool = multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value)
         for cnt, result in enumerate(pool.imap(GeometryMixin.compute_shape_overlap, data, chunksize=1)):
@@ -1654,7 +1678,7 @@ class GeometryMixin(object):
                 else:
                     print(f"Computing overlap {cnt + 1}/{len(data)} (Shape 1: {names[0]}, Shape 2: {names[1]}, Video: {names[2]}...)")
             results.extend((result))
-        if pool_terminate_flag: terminate_cpu_pool(pool=pool)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_compute_shape_overlap.__name__)
         return results
 
     def multiframe_shape_distance(self,
@@ -1682,7 +1706,7 @@ class GeometryMixin(object):
 
         :param List[Union[LineString, Polygon]] shapes_a: List of LineString or Polygon geometries.
         :param List[Union[LineString, Polygon]] shapes_b: List of LineString or Polygon geometries with the same length as shapes_a.
-        :param float pixels_per_mm: Conversion factor from pixels to millimeters. Default 1.
+        :param Optional[float] pixels_per_mm: Conversion factor from pixels to millimeters. Default 1.
         :param Literal['mm', 'cm', 'dm', 'm'] unit: Unit of measurement for the result. Options: 'mm', 'cm', 'dm', 'm'. Default: 'mm'.
         :param bool verbose: If True, prints progress information during computation. Default False.
         :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores. Ignored if pool is provided.
@@ -1719,7 +1743,7 @@ class GeometryMixin(object):
         data = np.array_split(data, core_cnt)
         pool_terminate_flag = False if pool is not None else True
         if pool is not None:
-            check_valid_cpu_pool(value=pool, source=f'{self.__class__.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+            check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_shape_distance.__name__} pool', raise_error=True, accepted_cores=core_cnt)
         else:
             pool = multiprocessing.Pool(core_cnt, maxtasksperchild=maxchildpertask)
         results = []
@@ -1738,7 +1762,7 @@ class GeometryMixin(object):
         if verbose and shape_names is None:
             print(f'Shape distances computed for {len(shapes_a)} comparisons (elapsed time: {timer.elapsed_time_str}s)')
         if pool_terminate_flag:
-            terminate_cpu_pool(pool=pool)
+            terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_shape_distance.__name__)
         return results
 
     def multiframe_minimum_rotated_rectangle(self,
@@ -1746,7 +1770,8 @@ class GeometryMixin(object):
                                              video_name: Optional[str] = None,
                                              verbose: Optional[bool] = False,
                                              animal_name: Optional[bool] = None,
-                                             core_cnt: int = -1) -> List[Polygon]:
+                                             core_cnt: int = -1,
+                                             pool: Optional[multiprocessing.Pool] = None) -> List[Polygon]:
 
         """
         Compute the minimum rotated rectangle for each Polygon in a list using multiprocessing.
@@ -1758,8 +1783,9 @@ class GeometryMixin(object):
         :param Optional[str] video_name: Optional video name to print (if verbose is True).
         :param Optional[str] animal_name: Optional animal name to print (if verbose is True).
         :param Optional[bool] verbose: If True, prints progress.
-        :param core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores.
-        :returns: A list of rotated rectangle sof size len(shapes).
+        :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores. Ignored if pool is provided.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
+        :returns: A list of rotated rectangles of size len(shapes).
         :rtype: List[Polygon]
 
         :example:
@@ -1773,29 +1799,31 @@ class GeometryMixin(object):
         check_int(name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
         if core_cnt == -1: core_cnt = find_core_cnt()[0]
         results, timer = [], SimbaTimer(start=True)
-        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            for cnt, result in enumerate(pool.imap(GeometryMixin.minimum_rotated_rectangle, shapes, chunksize=1)):
-                if verbose:
-                    if not video_name and not animal_name:
-                        print(f"Rotating polygon {cnt + 1}/{len(shapes)}...")
-                    elif not video_name and animal_name:
-                        print(
-                            f"Rotating polygon {cnt + 1}/{len(shapes)} (Animal: {animal_name})..."
-                        )
-                    elif video_name and not animal_name:
-                        print(
-                            f"Rotating polygon {cnt + 1}/{len(shapes)} (Video: {video_name})..."
-                        )
-                    else:
-                        print(
-                            f"Rotating polygon {cnt + 1}/{len(shapes)} (Video: {video_name}, Animal: {animal_name})..."
-                        )
-                results.append(result)
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_minimum_rotated_rectangle.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().multiframe_minimum_rotated_rectangle.__name__)
+        for cnt, result in enumerate(pool.imap(GeometryMixin.minimum_rotated_rectangle, shapes, chunksize=1)):
+            if verbose:
+                if not video_name and not animal_name:
+                    print(f"Rotating polygon {cnt + 1}/{len(shapes)}...")
+                elif not video_name and animal_name:
+                    print(
+                        f"Rotating polygon {cnt + 1}/{len(shapes)} (Animal: {animal_name})..."
+                    )
+                elif video_name and not animal_name:
+                    print(
+                        f"Rotating polygon {cnt + 1}/{len(shapes)} (Video: {video_name})..."
+                    )
+                else:
+                    print(
+                        f"Rotating polygon {cnt + 1}/{len(shapes)} (Video: {video_name}, Animal: {animal_name})..."
+                    )
+            results.append(result)
 
         timer.stop_timer()
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_minimum_rotated_rectangle.__name__)
         if verbose:
             stdout_success(msg="Rotated rectangles complete.", elapsed_time=timer.elapsed_time_str)
-        terminate_cpu_pool(pool=pool, force=False)
         return results
 
     @staticmethod
@@ -1965,12 +1993,21 @@ class GeometryMixin(object):
                           shapes: List[Union[LineString, MultiLineString]],
                           pixels_per_mm: float,
                           core_cnt: int = -1,
-                          unit: Literal["mm", "cm", "dm", "m"] = "mm") -> List[float]:
+                          unit: Literal["mm", "cm", "dm", "m"] = "mm",
+                          pool: Optional[multiprocessing.Pool] = None) -> List[float]:
         """
         Calculate the length of LineStrings using multiprocessing.
 
         .. seealso::
            For single core process, see :func:`simba.mixins.geometry_mixin.GeometryMixin.length`
+
+        :param List[Union[LineString, MultiLineString]] shapes: List of LineString or MultiLineString geometries.
+        :param float pixels_per_mm: Pixels per millimeter conversion factor.
+        :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores. Ignored if pool is provided.
+        :param Literal["mm", "cm", "dm", "m"] unit: Unit of measurement for the result. Options: 'mm', 'cm', 'dm', 'm'. Default: 'mm'.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
+        :return: List of lengths in the specified unit.
+        :rtype: List[float]
 
         :example:
         >>> data = np.random.randint(0, 100, (5000, 2))
@@ -1991,19 +2028,19 @@ class GeometryMixin(object):
         check_float(name="PIXELS PER MM", value=pixels_per_mm, min_value=0.0)
         check_if_valid_input(name="UNIT", input=unit, options=["mm", "cm", "dm", "m"])
         results = []
-        with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            constants = functools.partial(
-                GeometryMixin.length, pixels_per_mm=pixels_per_mm, unit=unit
-            )
-            for cnt, result in enumerate(pool.imap(constants, shapes, chunksize=1)):
-                results.append(result)
-        terminate_cpu_pool(pool=pool, force=False)
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_length.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().multiframe_length.__name__)
+        constants = functools.partial(GeometryMixin.length, pixels_per_mm=pixels_per_mm, unit=unit)
+        for cnt, result in enumerate(pool.imap(constants, shapes, chunksize=1)):
+            results.append(result)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_length.__name__)
         return results
 
-    def multiframe_union(self, shapes: Iterable[Union[LineString, MultiLineString, Polygon]], core_cnt: int = -1) -> \
-    Iterable[Union[LineString, MultiLineString, Polygon]]:
+    def multiframe_union(self,
+                         shapes: Iterable[Union[LineString, MultiLineString, Polygon]],
+                         core_cnt: int = -1,
+                         pool: Optional[multiprocessing.Pool] = None) -> Iterable[Union[LineString, MultiLineString, Polygon]]:
         """
         Join multiple shapes frame-wise into a single shape/
         
@@ -2017,8 +2054,9 @@ class GeometryMixin(object):
         .. seealso::
            For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.union`
 
-        :param shapes: Iterable collection of shapes (`LineString`, `MultiLineString`, or `Polygon`) to be merged. E.g, of size NxM where N is the number of frames and M is the number of shapes in each frame.
-        :param core_cnt: The number of CPU cores to use for parallel processing; defaults to -1, which uses all available cores.
+        :param Iterable[Union[LineString, MultiLineString, Polygon]] shapes: Iterable collection of shapes (`LineString`, `MultiLineString`, or `Polygon`) to be merged. E.g, of size NxM where N is the number of frames and M is the number of shapes in each frame.
+        :param int core_cnt: The number of CPU cores to use for parallel processing; defaults to -1, which uses all available cores. Ignored if pool is provided.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
         :return: An iterable of merged shapes, where each frame is combined into a single shape.
         :rtype: List[Union[LineString, MultiLineString, Polygon]]
 
@@ -2035,16 +2073,19 @@ class GeometryMixin(object):
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
         results = []
-        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            for cnt, result in enumerate(pool.imap(GeometryMixin().union, shapes, chunksize=1)):
-                results.append(result)
-        terminate_cpu_pool(pool=pool, force=False)
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_union.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().multiframe_union.__name__)
+        for cnt, result in enumerate(pool.imap(GeometryMixin().union, shapes, chunksize=1)):
+            results.append(result)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_union.__name__)
         return results
 
     def multiframe_symmetric_difference(self, shapes: Iterable[Union[LineString, MultiLineString, Polygon]],
-                                        core_cnt: int = -1):
+                                        core_cnt: int = -1,
+                                        pool: Optional[multiprocessing.Pool] = None):
         """
-        Compute the symmetric differences between corresponding LineString or MultiLineString geometries usng multiprocessing.
+        Compute the symmetric differences between corresponding LineString or MultiLineString geometries using multiprocessing.
 
         Computes a new geometry consisting of the parts that are exclusive to each input geometry.
 
@@ -2052,6 +2093,12 @@ class GeometryMixin(object):
 
         .. seealso::
            For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.symmetric_difference`
+
+        :param Iterable[Union[LineString, MultiLineString, Polygon]] shapes: Iterable collection of shapes where each element is a list containing two geometries.
+        :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores. Ignored if pool is provided.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
+        :return: List of symmetric difference geometries.
+        :rtype: List[Union[LineString, MultiLineString, Polygon]]
 
         :example:
         >>> data_1 = np.random.randint(0, 100, (5000, 2)).reshape(1000,-1, 2)
@@ -2071,23 +2118,31 @@ class GeometryMixin(object):
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
         results = []
-        with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            for cnt, result in enumerate(
-                    pool.imap(GeometryMixin().symmetric_difference, shapes, chunksize=1)
-            ):
-                results.append(result)
-        terminate_cpu_pool(pool=pool, force=False)
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_symmetric_difference.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().multiframe_symmetric_difference.__name__)
+        for cnt, result in enumerate(pool.imap(GeometryMixin().symmetric_difference, shapes, chunksize=1)):
+            results.append(result)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_symmetric_difference.__name__)
         return results
 
-    def multiframe_delaunay_triangulate_keypoints(self, data: np.ndarray, core_cnt: int = -1) -> List[List[Polygon]]:
+    def multiframe_delaunay_triangulate_keypoints(self,
+                                                  data: np.ndarray,
+                                                  core_cnt: int = -1,
+                                                  pool: Optional[multiprocessing.Pool] = None) -> List[List[Polygon]]:
         """
-        Triangulates a set of 2D keypoints. E.g., can be used to polygonize animal hull, or triangulate a gridpoint areana.
+        Triangulates a set of 2D keypoints. E.g., can be used to polygonize animal hull, or triangulate a gridpoint arena.
 
         .. seealso::
            For single core process, see :func:`simba.mixins.geometry_mixin.GeometryMixin.delaunay_triangulate_keypoints`
 
+        :param np.ndarray data: 3D array of keypoints where shape is (frames, keypoints, coordinates).
+        :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores. Ignored if pool is provided.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
+        :return: List of lists of Polygon objects representing triangles.
+        :rtype: List[List[Polygon]]
+
+        :example:
         >>> data_path = '/Users/simon/Desktop/envs/troubleshooting/Rat_NOR/project_folder/csv/machine_results/08102021_DOT_Rat7_8(2).csv'
         >>> data = pd.read_csv(data_path, index_col=0).head(1000).iloc[:, 0:21]
         >>> data = data[data.columns.drop(list(data.filter(regex='_p')))]
@@ -2115,17 +2170,12 @@ class GeometryMixin(object):
                 source=GeometryMixin.multiframe_delaunay_triangulate_keypoints.__name__,
             )
         results = []
-        with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            for cnt, result in enumerate(
-                    pool.imap(
-                        GeometryMixin().delaunay_triangulate_keypoints, data, chunksize=1
-                    )
-            ):
-                results.append(result)
-
-        terminate_cpu_pool(pool=pool, force=False)
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_delaunay_triangulate_keypoints.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().multiframe_delaunay_triangulate_keypoints.__name__)
+        for cnt, result in enumerate(pool.imap(GeometryMixin().delaunay_triangulate_keypoints, data, chunksize=1)):
+            results.append(result)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_delaunay_triangulate_keypoints.__name__)
         return results
 
     def multiframe_difference(
@@ -2135,7 +2185,7 @@ class GeometryMixin(object):
             verbose: Optional[bool] = False,
             animal_names: Optional[str] = None,
             video_name: Optional[str] = None,
-    ) -> List[Union[Polygon, MultiPolygon]]:
+            pool: Optional[multiprocessing.Pool] = None) -> List[Union[Polygon, MultiPolygon]]:
         """
         Compute the multi-frame difference for a collection of shapes using parallel processing.
 
@@ -2143,10 +2193,11 @@ class GeometryMixin(object):
            For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.difference`
 
         :param Iterable[Union[LineString, Polygon, MultiPolygon]] shapes: A collection of shapes, where each shape is a list containing two geometries.
-        :param int core_cnt: The number of CPU cores to use for parallel processing. Default is -1, which automatically detects the available cores.
+        :param int core_cnt: The number of CPU cores to use for parallel processing. Default is -1, which automatically detects the available cores. Ignored if pool is provided.
         :param Optional[bool] verbose: If True, print progress messages during computation. Default is False.
         :param Optional[str] animal_names: Optional string representing the names of animals for informative messages.
-        :param Optional[str]video_name: Optional string representing the name of the video for informative messages.
+        :param Optional[str] video_name: Optional string representing the name of the video for informative messages.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
         :return: A list of geometries representing the multi-frame difference.
         :rtype: List[Union[Polygon, MultiPolygon]]
         """
@@ -2183,37 +2234,32 @@ class GeometryMixin(object):
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
         results, timer = [], SimbaTimer(start=True)
-        with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            for cnt, result in enumerate(
-                    pool.imap(GeometryMixin().difference, shapes, chunksize=1)
-            ):
-                if verbose:
-                    if not video_name and not animal_names:
-                        print(
-                            f"Computing geometry difference {cnt + 1}/{len(shapes)}..."
-                        )
-                    elif not video_name and animal_names:
-                        print(
-                            f"Computing geometry difference {cnt + 1}/{len(shapes)} (Animals: {animal_names})..."
-                        )
-                    elif video_name and not animal_names:
-                        print(
-                            f"Computing geometry difference {cnt + 1}/{len(shapes)} (Video: {video_name})..."
-                        )
-                    else:
-                        print(
-                            f"Computing geometry difference {cnt + 1}/{len(shapes)} (Video: {video_name}, Animals: {animal_names})..."
-                        )
-                results.append(result)
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_difference.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().multiframe_difference.__name__)
+        for cnt, result in enumerate(pool.imap(GeometryMixin().difference, shapes, chunksize=1)):
+            if verbose:
+                if not video_name and not animal_names:
+                    print(
+                        f"Computing geometry difference {cnt + 1}/{len(shapes)}..."
+                    )
+                elif not video_name and animal_names:
+                    print(
+                        f"Computing geometry difference {cnt + 1}/{len(shapes)} (Animals: {animal_names})..."
+                    )
+                elif video_name and not animal_names:
+                    print(
+                        f"Computing geometry difference {cnt + 1}/{len(shapes)} (Video: {video_name})..."
+                    )
+                else:
+                    print(
+                        f"Computing geometry difference {cnt + 1}/{len(shapes)} (Video: {video_name}, Animals: {animal_names})..."
+                    )
+            results.append(result)
 
         timer.stop_timer()
-        stdout_success(
-            msg="Multi-frame difference compute complete",
-            elapsed_time=timer.elapsed_time_str,
-        )
-        terminate_cpu_pool(pool=pool, force=False)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_difference.__name__)
+        stdout_success(msg="Multi-frame difference compute complete", elapsed_time=timer.elapsed_time_str)
         return results
 
     def multiframe_area(self,
@@ -2222,7 +2268,8 @@ class GeometryMixin(object):
                         core_cnt: Optional[int] = -1,
                         verbose: Optional[bool] = False,
                         video_name: Optional[bool] = False,
-                        animal_names: Optional[bool] = False) -> List[float]:
+                        animal_names: Optional[bool] = False,
+                        pool: Optional[multiprocessing.Pool] = None) -> List[float]:
 
         """
         Calculate the area of geometries in square millimeters using multiprocessing.
@@ -2232,10 +2279,11 @@ class GeometryMixin(object):
 
         :param List[Union[MultiPolygon, Polygon]] shapes: List of polygons of Multipolygons.
         :param float pixels_per_mm: Pixel per millimeter conversion factor. Default: 1.0.
-        :param Optional[int] core_cnt: The number of CPU cores to use for parallel processing. Default is -1, which automatically detects the available cores.
+        :param Optional[int] core_cnt: The number of CPU cores to use for parallel processing. Default is -1, which automatically detects the available cores. Ignored if pool is provided.
         :param Optional[bool] verbose: If True, prints progress.
-        :param Optional[bool] video_name: If string, prints video name string during progress if verbose.
-        :param Optional[bool] animal_names: If string, prints animal name during progress if verbose.
+        :param Optional[str] video_name: If string, prints video name string during progress if verbose.
+        :param Optional[str] animal_names: If string, prints animal name during progress if verbose.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
         :return: List of length ``len(shapes)`` with area values.
         :rtype: List[float]
         """
@@ -2250,24 +2298,26 @@ class GeometryMixin(object):
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
         results, timer = [], SimbaTimer(start=True)
-        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(GeometryMixin.area, pixels_per_mm=pixels_per_mm)
-            for cnt, result in enumerate(pool.imap(constants, shapes, chunksize=1)):
-                if verbose:
-                    if not video_name and not animal_names:
-                        print(f"Computing area {cnt + 1}/{len(shapes)}...")
-                    elif not video_name and animal_names:
-                        print(f"Computing % area {cnt + 1}/{len(shapes)} (Animals: {animal_names})...")
-                    elif video_name and not animal_names:
-                        print(f"Computing % area {cnt + 1}/{len(shapes)} (Video: {video_name})...")
-                    else:
-                        print(
-                            f"Computing % area {cnt + 1}/{len(shapes)} (Video: {video_name}, Animals: {animal_names})...")
-                results.append(result)
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_area.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().multiframe_area.__name__)
+        constants = functools.partial(GeometryMixin.area, pixels_per_mm=pixels_per_mm)
+        for cnt, result in enumerate(pool.imap(constants, shapes, chunksize=1)):
+            if verbose:
+                if not video_name and not animal_names:
+                    print(f"Computing area {cnt + 1}/{len(shapes)}...")
+                elif not video_name and animal_names:
+                    print(f"Computing % area {cnt + 1}/{len(shapes)} (Animals: {animal_names})...")
+                elif video_name and not animal_names:
+                    print(f"Computing % area {cnt + 1}/{len(shapes)} (Video: {video_name})...")
+                else:
+                    print(
+                        f"Computing % area {cnt + 1}/{len(shapes)} (Video: {video_name}, Animals: {animal_names})...")
+            results.append(result)
 
         timer.stop_timer()
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_area.__name__)
         stdout_success(msg="Multi-frame area compute complete", elapsed_time=timer.elapsed_time_str)
-        terminate_cpu_pool(pool=pool, force=False)
         return results
 
     def multiframe_bodyparts_to_multistring_skeleton(
@@ -2278,7 +2328,8 @@ class GeometryMixin(object):
             verbose: Optional[bool] = False,
             video_name: Optional[bool] = False,
             animal_names: Optional[bool] = False,
-    ) -> List[Union[LineString, MultiLineString]]:
+            pool: Optional[multiprocessing.Pool] = None) -> List[Union[LineString, MultiLineString]]:
+
         """
         Convert body parts to LineString skeleton representations in a videos using multiprocessing.
 
@@ -2287,10 +2338,11 @@ class GeometryMixin(object):
 
         :param pd.DataFrame data_df: Pose-estimation data.
         :param Iterable[str] skeleton: Iterable of body part pairs defining the skeleton structure. Eg., [['Center', 'Lat_left'], ['Center', 'Lat_right'], ['Center', 'Nose'], ['Center', 'Tail_base']]
-        :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores.
+        :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores. Ignored if pool is provided.
         :param Optional[bool] verbose: If True, print progress information during computation. Default is False.
-        :param Optional[bool] video_name: If True, include video name in progress information. Default is False.
-        :param Optional[bool] animal_names: If True, include animal names in progress information. Default is False.
+        :param Optional[str] video_name: If string, include video name in progress information.
+        :param Optional[str] animal_names: If string, include animal names in progress information.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
         :return: List of LineString or MultiLineString objects representing the computed skeletons.
         :rtype: List[Union[LineString, MultiLineString]]
 
@@ -2341,33 +2393,27 @@ class GeometryMixin(object):
             else:
                 skeleton_data = np.concatenate((skeleton_data, line), axis=1)
         skeleton_data = skeleton_data.reshape(len(data_df), len(skeleton), 2, -1)
-        with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            for cnt, result in enumerate(
-                    pool.imap(
-                        GeometryMixin.bodyparts_to_multistring_skeleton,
-                        skeleton_data,
-                        chunksize=1,
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_bodyparts_to_multistring_skeleton.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().multiframe_bodyparts_to_multistring_skeleton.__name__)
+        for cnt, result in enumerate(pool.imap(GeometryMixin.bodyparts_to_multistring_skeleton, skeleton_data, chunksize=1)):
+            if verbose:
+                if not video_name and not animal_names:
+                    print(f"Computing skeleton {cnt + 1}/{len(data_df)}...")
+                elif not video_name and animal_names:
+                    print(
+                        f"Computing skeleton {cnt + 1}/{len(data_df)} (Animals: {animal_names})..."
                     )
-            ):
-                if verbose:
-                    if not video_name and not animal_names:
-                        print(f"Computing skeleton {cnt + 1}/{len(data_df)}...")
-                    elif not video_name and animal_names:
-                        print(
-                            f"Computing skeleton {cnt + 1}/{len(data_df)} (Animals: {animal_names})..."
-                        )
-                    elif video_name and not animal_names:
-                        print(
-                            f"Computing skeleton {cnt + 1}/{len(data_df)} (Video: {video_name})..."
-                        )
-                    else:
-                        print(
-                            f"Computing skeleton {cnt + 1}/{len(data_df)} (Video: {video_name}, Animals: {animal_names})..."
-                        )
-                results.append(result)
-
+                elif video_name and not animal_names:
+                    print(
+                        f"Computing skeleton {cnt + 1}/{len(data_df)} (Video: {video_name})..."
+                    )
+                else:
+                    print(
+                        f"Computing skeleton {cnt + 1}/{len(data_df)} (Video: {video_name}, Animals: {animal_names})..."
+                    )
+            results.append(result)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_bodyparts_to_multistring_skeleton.__name__)
         timer.stop_timer()
         stdout_success(
             msg="Multistring skeleton complete.",
@@ -2551,7 +2597,8 @@ class GeometryMixin(object):
     def multiframe_is_shape_covered(self,
                                     shape_1: List[Polygon],
                                     shape_2: List[Polygon],
-                                    core_cnt: Optional[int] = -1) -> List[bool]:
+                                    core_cnt: Optional[int] = -1,
+                                    pool: Optional[multiprocessing.Pool] = None) -> List[bool]:
         """
         For each shape in time-series of shapes, check if another shape in the same time-series fully covers the
         first shape.
@@ -2562,6 +2609,13 @@ class GeometryMixin(object):
 
         .. seealso::
            For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.is_shape_covered`
+
+        :param List[Union[LineString, Polygon, MultiPolygon]] shape_1: List of geometries to check if covered.
+        :param List[Union[LineString, Polygon, MultiPolygon]] shape_2: List of geometries that may cover shape_1.
+        :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores. Ignored if pool is provided.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
+        :return: List of booleans indicating if each shape_1 is covered by corresponding shape_2.
+        :rtype: List[bool]
 
         :example:
         >>> shape_1 = GeometryMixin().multiframe_bodyparts_to_polygon(data=np.random.randint(0, 200, (100, 6, 2)))
@@ -2602,14 +2656,12 @@ class GeometryMixin(object):
             core_cnt = find_core_cnt()[0]
         shapes = [list(x) for x in zip(shape_1, shape_2)]
         results = []
-        with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            for cnt, mp_return in enumerate(
-                    pool.imap(GeometryMixin.is_shape_covered, shapes, chunksize=1)
-            ):
-                results.append(mp_return)
-        terminate_cpu_pool(pool=pool, force=False)
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_is_shape_covered.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().multiframe_is_shape_covered.__name__)
+        for cnt, mp_return in enumerate(pool.imap(GeometryMixin.is_shape_covered, shapes, chunksize=1)):
+            results.append(mp_return)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_is_shape_covered.__name__)
         return results
 
     @staticmethod
@@ -2774,7 +2826,8 @@ class GeometryMixin(object):
                                           lag: Optional[int] = 2,
                                           core_cnt: Optional[int] = -1,
                                           pixels_per_mm: int = 1,
-                                          parallel_offset: int = 1) -> np.ndarray:
+                                          parallel_offset: int = 1,
+                                          pool: Optional[multiprocessing.Pool] = None) -> np.ndarray:
 
         """
         Perform geometry histocomparison on multiple video frames using multiprocessing.
@@ -2788,11 +2841,12 @@ class GeometryMixin(object):
 
         :param Union[str, os.PathLike] video_path: Path to the video file.
         :param np.ndarray data: Input data, typically containing coordinates of one or several body-parts.
-        :param Literal['rectangle', 'circle'] shape_type: Type of shape for comparison.
+        :param Literal['rectangle', 'circle', 'line'] shape_type: Type of shape for comparison.
         :param Optional[int] lag: Number of frames to lag between comparisons. Default is 2.
-        :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1 which is all available cores.
-        :param Optional[int] pixels_per_mm: Pixels per millimeter for conversion. Default is 1.
-        :param Optional[int] parallel_offset: Size of the geometry ROI in millimeters. Default 1.
+        :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1 which is all available cores. Ignored if pool is provided.
+        :param int pixels_per_mm: Pixels per millimeter for conversion. Default is 1.
+        :param int parallel_offset: Size of the geometry ROI in millimeters. Default 1.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
         :returns: The difference between the successive geometry histograms.
         :rtype: np.ndarray
 
@@ -2821,22 +2875,13 @@ class GeometryMixin(object):
             for i in range(core_cnt)
         ]
         results = [[0] * lag]
-        with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            constants = functools.partial(
-                GeometryMixin()._multifrm_geometry_histocomparison_helper,
-                video_path=video_path,
-                data=data,
-                shape_type=shape_type,
-                pixels_per_mm=pixels_per_mm,
-                parallel_offset=parallel_offset,
-            )
-            for cnt, result in enumerate(
-                    pool.imap(constants, split_frm_idx, chunksize=1)
-            ):
-                results.append(result)
-
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multifrm_geometry_histocomparison.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().multifrm_geometry_histocomparison.__name__)
+        constants = functools.partial(GeometryMixin()._multifrm_geometry_histocomparison_helper,video_path=video_path,data=data,shape_type=shape_type,pixels_per_mm=pixels_per_mm,parallel_offset=parallel_offset)
+        for cnt, result in enumerate(pool.imap(constants, split_frm_idx, chunksize=1)):
+            results.append(result)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multifrm_geometry_histocomparison.__name__)
         return [item for sublist in results for item in sublist]
 
     @staticmethod
@@ -3258,7 +3303,8 @@ class GeometryMixin(object):
                                 geometries: Dict[Tuple[int, int], Polygon],
                                 fps: Optional[int] = None,
                                 core_cnt: Optional[int] = -1,
-                                verbose: Optional[bool] = True) -> np.ndarray:
+                                verbose: Optional[bool] = True,
+                                pool: Optional[multiprocessing.Pool] = None) -> np.ndarray:
 
         """
         Compute the cumulative time a body-part has spent inside a grid of geometries using multiprocessing.
@@ -3269,9 +3315,11 @@ class GeometryMixin(object):
         :param np.ndarray data: Input data array where rows represent frames and columns represent body-part x and y coordinates.
         :param Dict[Tuple[int, int], Polygon] geometries: Dictionary of polygons representing spatial regions. E.g., created by :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
         :param Optional[int] fps: Frames per second (fps) for time normalization. If None, cumulative sum of frame count is returned.
-        :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1 which is all available cores.
+        :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1 which is all available cores. Ignored if pool is provided.
         :param Optional[bool] verbose: If True, prints progress.
-        :returns:
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
+        :returns: Matrix of size (frames x horizontal bins x vertical bins) with cumulative time values.
+        :rtype: np.ndarray
 
         :example:
         >>> img_geometries = GeometryMixin.bucket_img_into_grid_square(img_size=(640, 640), bucket_grid_size=(10, 10), px_per_mm=1)
@@ -3299,18 +3347,14 @@ class GeometryMixin(object):
         frm_id = np.arange(0, data.shape[0]).reshape(-1, 1)
         data = np.hstack((frm_id, data))
         img_arr = np.zeros((data.shape[0], h + 1, w + 1))
-        with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            constants = functools.partial(
-                self._cumsum_coord_geometries_helper,
-                geometries=geometries,
-                verbose=verbose,
-            )
-            for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
-                if result[1] != -1:
-                    img_arr[result[0], result[2] - 1, result[1] - 1] = 1
-        terminate_cpu_pool(pool=pool, force=False)
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().cumsum_coord_geometries.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().cumsum_coord_geometries.__name__)
+        constants = functools.partial(self._cumsum_coord_geometries_helper, geometries=geometries, verbose=verbose)
+        for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
+            if result[1] != -1:
+                img_arr[result[0], result[2] - 1, result[1] - 1] = 1
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().cumsum_coord_geometries.__name__)
         timer.stop_timer()
         stdout_success(
             msg="Cumulative coordinates in geometries complete",
@@ -3340,7 +3384,8 @@ class GeometryMixin(object):
                                bool_data: np.ndarray,
                                fps: Optional[float] = None,
                                verbose: bool = True,
-                               core_cnt: Optional[int] = -1) -> np.ndarray:
+                               core_cnt: Optional[int] = -1,
+                               pool: Optional[multiprocessing.Pool] = None) -> np.ndarray:
         """
         Compute the cumulative sums of boolean events within polygon geometries over time using multiprocessing. For example, compute the cumulative bout count of classified events within spatial locations at all time-points of the video.
 
@@ -3359,8 +3404,10 @@ class GeometryMixin(object):
         :param np.ndarray bool_data: Boolean array with shape (data.shape[0],) or (data.shape[0], 1) indicating the presence or absence in each frame.
         :param Optional[float] fps: Frames per second. If provided, the result is normalized by the frame rate.
         :param bool verbose: If true, prints progress. Default: True.
-        :param Optional[float] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which means using all available cores.
-        :returns: Matrix of size (frames x horizontal bins x verical bins) with times in seconds (if fps passed) or frames (if fps not passed)
+        :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which means using all available cores. Ignored if pool is provided.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
+        :returns: Matrix of size (frames x horizontal bins x vertical bins) with times in seconds (if fps passed) or frames (if fps not passed)
+        :rtype: np.ndarray
         :rtype: np.ndarray
 
         :example:
@@ -3396,14 +3443,14 @@ class GeometryMixin(object):
         data = np.hstack((frm_id, data))
         img_arr = np.zeros((data.shape[0], h + 1, w + 1))
         data = data[np.argwhere((data[:, 3] == 1))].reshape(-1, 4)
-        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(self._cumsum_bool_helper,
-                                          geometries=geometries,
-                                          verbose=verbose)
-            for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
-                if result[1] != -1:
-                    img_arr[result[0], result[2] - 1, result[1] - 1] = 1
-        terminate_cpu_pool(pool=pool, force=False)
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().cumsum_bool_geometries.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().cumsum_bool_geometries.__name__)
+        constants = functools.partial(self._cumsum_bool_helper, geometries=geometries, verbose=verbose)
+        for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
+            if result[1] != -1:
+                img_arr[result[0], result[2] - 1, result[1] - 1] = 1
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().cumsum_bool_geometries.__name__)
         if fps is None:
             return np.cumsum(img_arr, axis=0)
         else:
@@ -3430,7 +3477,8 @@ class GeometryMixin(object):
                                       grid: Dict[Tuple[int, int], Polygon],
                                       fps: Optional[int] = None,
                                       core_cnt: Optional[int] = -1,
-                                      verbose: Optional[bool] = True) -> np.ndarray:
+                                      verbose: Optional[bool] = True,
+                                      pool: Optional[multiprocessing.Pool] = None) -> np.ndarray:
         """
         Compute the cumulative time the animal has spent in each geometry.
 
@@ -3447,10 +3495,12 @@ class GeometryMixin(object):
 
         :param List[Polygon] data: List of polygons where every index represent a frame and every value the animal convex hull
         :param Dict[Tuple[int, int], Polygon] grid: Dictionary of polygons representing spatial regions. E.g., created by :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
-        :param Optional[float] fps: Frames per second. If provided, the result is normalized by the frame rate.
-        :param Optional[float] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which means using all available cores.
+        :param Optional[int] fps: Frames per second. If provided, the result is normalized by the frame rate.
+        :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which means using all available cores. Ignored if pool is provided.
         :param Optional[bool] verbose: If True, then prints progress.
-        :returns: Matrix of size (frames x horizontal bins x verical bins) with values representing time in seconds (if fps passed) or frames (if fps not passed)
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
+        :returns: Matrix of size (frames x horizontal bins x vertical bins) with values representing time in seconds (if fps passed) or frames (if fps not passed)
+        :rtype: np.ndarray
         :rtype: np.ndarray
         """
 
@@ -3467,12 +3517,13 @@ class GeometryMixin(object):
         frm_id = np.arange(0, len(data)).reshape(-1, 1)
         data = np.hstack((frm_id, np.array(data).reshape(-1, 1)))
         img_arr = np.zeros((data.shape[0], h + 1, w + 1))
-        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(self._cumsum_animal_geometries_grid_helper, grid=grid, size=(h, w),
-                                          verbose=verbose)
-            for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
-                img_arr[cnt] = result
-
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().cumsum_animal_geometries_grid.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().cumsum_animal_geometries_grid.__name__)
+        constants = functools.partial(self._cumsum_animal_geometries_grid_helper, grid=grid, size=(h, w), erbose=verbose)
+        for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
+            img_arr[cnt] = result
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().cumsum_animal_geometries_grid.__name__)
         timer.stop_timer()
         stdout_success(msg="Cumulative animal geometries in grid complete", elapsed_time=timer.elapsed_time_str, )
         if fps is None:
@@ -3501,8 +3552,8 @@ class GeometryMixin(object):
     def geometry_transition_probabilities(data: np.ndarray,
                                           grid: Dict[Tuple[int, int], Polygon],
                                           core_cnt: Optional[int] = -1,
-                                          verbose: Optional[bool] = False) -> (
-    Dict[Tuple[int, int], float], Dict[Tuple[int, int], int]):
+                                          verbose: Optional[bool] = False,
+                                          pool: Optional[multiprocessing.Pool] = None) -> (Dict[Tuple[int, int], float], Dict[Tuple[int, int], int]):
         """
         Calculate geometry transition probabilities based on spatial transitions between grid cells.
 
@@ -3515,8 +3566,9 @@ class GeometryMixin(object):
         :param np.ndarray data: A 2D array where each row represents a point in space with two coordinates [x, y].
         :param Dict[Tuple[int, int], Polygon] grid: A dictionary mapping grid cell identifiers (tuple of int, int) to their corresponding polygon objects.
                                                     Each grid cell is represented by a tuple key (e.g., (row, col)) and its spatial boundaries as a `Polygon`. Can be computed with E.g., created by :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
-        :param Optional[int] core_cnt: The number of cores to use for parallel processing. Default is -1, which uses the maximum available cores.
+        :param Optional[int] core_cnt: The number of cores to use for parallel processing. Default is -1, which uses the maximum available cores. Ignored if pool is provided.
         :param Optional[bool] verbose: If True, the function will print additional information, including the elapsed time for processing.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
         :return: A tuple containing two dictionaries:
                  - A dictionary of transition probabilities between grid cells, where each key is a grid cell tuple (row, col),
                    and each value is another dictionary representing the transition probabilities to other cells.
@@ -3533,20 +3585,20 @@ class GeometryMixin(object):
         """
 
         timer = SimbaTimer(start=True)
-        check_valid_array(data=data, source=GeometryMixin.geometry_transition_probabilities.__name__,
-                          accepted_ndims=(2,), accepted_axis_1_shape=[2, ],
-                          accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=data, source=GeometryMixin.geometry_transition_probabilities.__name__, accepted_ndims=(2,), accepted_axis_1_shape=[2, ], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_valid_dict(x=grid, valid_key_dtypes=(tuple,), valid_values_dtypes=(Polygon,))
         check_int(name="core_cnt", value=core_cnt, min_value=-1, unaccepted_vals=[0])
         if core_cnt == -1 or core_cnt > find_core_cnt()[0]: core_cnt = find_core_cnt()[0]
         frm_id = np.arange(0, data.shape[0]).reshape(-1, 1)
         data = np.hstack((frm_id, data)).reshape(-1, 3).astype(np.int32)
         data, results = np.array_split(data, core_cnt), []
-        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(GeometryMixin._compute_framewise_geometry_idx, grid=grid, verbose=verbose)
-            for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
-                results.append(result)
-        terminate_cpu_pool(pool=pool, force=False)
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin.geometry_transition_probabilities.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin.geometry_transition_probabilities.__name__)
+        constants = functools.partial(GeometryMixin._compute_framewise_geometry_idx, grid=grid, verbose=verbose)
+        for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
+            results.append(result)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin.geometry_transition_probabilities.__name__)
         del data
 
         results = np.vstack(results)[:, 1:].astype(np.int32)
@@ -3618,7 +3670,8 @@ class GeometryMixin(object):
                                       geometries: List[Union[Polygon, LineString]],
                                       lag: Optional[Union[float, int]] = 1,
                                       sample_rate: Optional[Union[float, int]] = 1,
-                                      core_cnt: Optional[int] = -1) -> List[float]:
+                                      core_cnt: Optional[int] = -1,
+                                      pool: Optional[multiprocessing.Pool] = None) -> List[float]:
         """
         The Hausdorff distance measure of the similarity between sequential time-series  geometries.
 
@@ -3628,9 +3681,10 @@ class GeometryMixin(object):
         :param List[Union[Polygon, LineString]] geometries: List of geometries.
         :param Optional[Union[float, int]] lag: If int, then the number of frames preceeding the current frame to compare the geometry with. Eg., 1 compares the geometry to the immediately preceeding geometry. If float, then evaluated as seconds. E.g., 1 compares the geometry to the geometry 1s prior in the geometries list.
         :param Optional[Union[float, int]] sample_rate: The FPS of the recording. Used as conversion factor if lag is a float.
-        :param Optional[int] core_cnt: The number of cores to use for parallel processing. Default is -1, which uses the maximum available cores.
+        :param Optional[int] core_cnt: The number of cores to use for parallel processing. Default is -1, which uses the maximum available cores. Ignored if pool is provided.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
         :returns: List of Hausdorff distance measures.
-        :rtype: List[float].
+        :rtype: List[float]
 
         :example:
         >>> df = read_df(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/outlier_corrected_movement_location/SI_DAY3_308_CD1_PRESENT.csv', file_type='csv')
@@ -3669,15 +3723,12 @@ class GeometryMixin(object):
         for i in range(lag, len(geometries)):
             reshaped_geometries.append([[geometries[i - lag], geometries[i]]])
         results = []
-        with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            for cnt, mp_return in enumerate(
-                    pool.imap(
-                        GeometryMixin.hausdorff_distance, reshaped_geometries, chunksize=1
-                    )
-            ):
-                results.append(mp_return[0])
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().multiframe_hausdorff_distance.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().multiframe_hausdorff_distance.__name__)
+        for cnt, mp_return in enumerate(pool.imap(GeometryMixin.hausdorff_distance, reshaped_geometries, chunksize=1)):
+            results.append(mp_return[0])
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().multiframe_hausdorff_distance.__name__)
         return results
 
     @staticmethod
@@ -3976,7 +4027,9 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def geometries_to_exterior_keypoints(geometries: List[Polygon], core_cnt: Optional[int] = -1) -> np.ndarray:
+    def geometries_to_exterior_keypoints(geometries: List[Polygon],
+                                         core_cnt: Optional[int] = -1,
+                                         pool: Optional[multiprocessing.Pool] = None) -> np.ndarray:
         """
         Extract exterior keypoints from a list of Polygon geometries in parallel, with optional core count specification for multiprocessing.
 
@@ -3985,7 +4038,8 @@ class GeometryMixin(object):
            :align: center
 
         :param List[Polygon] geometries: A list of Shapely `Polygon` objects representing geometries whose exterior keypoints will be extracted.
-        :param Optional[int] core_cnt: The number of CPU cores to use for multiprocessing. If -1, it uses the maximum number of available cores.
+        :param Optional[int] core_cnt: The number of CPU cores to use for multiprocessing. If -1, it uses the maximum number of available cores. Ignored if pool is provided.
+        :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
         :return: A numpy array of exterior keypoints extracted from the input geometries.
         :rtype: np.ndarray
 
@@ -3997,15 +4051,16 @@ class GeometryMixin(object):
         """
         check_int(name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
         if core_cnt == -1: core_cnt = find_core_cnt()[0]
-        check_valid_lst(data=geometries, source=GeometryMixin.geometries_to_exterior_keypoints.__name__,
-                        valid_dtypes=(Polygon,), min_len=1)
+        check_valid_lst(data=geometries, source=GeometryMixin.geometries_to_exterior_keypoints.__name__, valid_dtypes=(Polygon,), min_len=1)
         results = []
         geometries = np.array_split(geometries, 3)
-        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            for cnt, mp_return in enumerate(
-                    pool.imap(GeometryMixin._geometries_to_exterior_keypoints_helper, geometries, chunksize=1)):
-                results.append(mp_return)
+        pool_terminate_flag = False if pool is not None else True
+        if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin.geometries_to_exterior_keypoints.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+        else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin.geometries_to_exterior_keypoints.__name__)
+        for cnt, mp_return in enumerate(pool.imap(GeometryMixin._geometries_to_exterior_keypoints_helper, geometries, chunksize=1)):
+            results.append(mp_return)
         results = [i for xs in results for i in xs]
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin.geometries_to_exterior_keypoints.__name__)
         return np.ascontiguousarray(np.array(results)).astype(np.int32)
 
     @staticmethod

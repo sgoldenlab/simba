@@ -5,7 +5,7 @@ from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import check_if_filepath_list_is_empty
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import get_fn_ext, read_df, write_df
 
 
@@ -43,7 +43,7 @@ class OutlierCorrectionSkipper(ConfigReader):
             save_path = os.path.join(self.outlier_corrected_dir, f"{video_name}.{self.file_type}")
             write_df(df=data_df, file_type=self.file_type, save_path=save_path)
             video_timer.stop_timer()
-            print(f"Skipped outlier correction for video {video_name} (elapsed time {video_timer.elapsed_time_str}s)...")
+            stdout_information(msg=f"Skipped outlier correction for video {video_name} (Video {file_cnt+1}/{len(self.input_csv_paths)})", elapsed_time=video_timer.elapsed_time_str)
         self.timer.stop_timer()
         stdout_success(msg=f"Skipped outlier correction for {len(self.input_csv_paths)} files", elapsed_time=self.timer.elapsed_time_str)
 

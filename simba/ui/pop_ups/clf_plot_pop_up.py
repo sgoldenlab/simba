@@ -57,7 +57,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.bp_threshold_lbl.grid(row=0, column=0, sticky=NW)
         self.bp_threshold_entry.grid(row=1, column=0, sticky=NW)
 
-        self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='style', icon_link=Links.SKLEARN_PLOTS.value, padx=5, pady=5, relief='solid')
+        self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="TEXT SETTINGS", icon_name='style', icon_link=Links.SKLEARN_PLOTS.value, padx=5, pady=5, relief='solid')
         self.text_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='TEXT SIZE: ', label_width=40, dropdown_width=15, value='AUTO', img='text')
         self.text_spacing_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='TEXT SPACING: ', label_width=40, dropdown_width=15, value='AUTO', img='text_spacing')
         self.text_thickness_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='TEXT THICKNESS: ', label_width=40, dropdown_width=15, value='AUTO', img='bold')

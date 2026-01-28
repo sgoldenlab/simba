@@ -82,7 +82,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
             Label(self.import_tracking_frm, text="Please CREATE PROJECT CONFIG before importing tracking data \n", font=Formats.FONT_REGULAR.value).grid(row=0, column=0, sticky=NW)
         else:
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
-            self.data_type_dropdown = SimBADropDown(parent=self.import_tracking_frm, dropdown_options=Options.IMPORT_TYPE_OPTIONS.value, label="DATA TYPE: ", label_width=25, command=self.create_import_menu, dropdown_width=25, value=Options.IMPORT_TYPE_OPTIONS.value[0])
+            self.data_type_dropdown = SimBADropDown(parent=self.import_tracking_frm, dropdown_options=Options.IMPORT_TYPE_OPTIONS.value, label="DATA TYPE: ", label_width=25, command=self.create_import_menu, dropdown_width=25, value=Options.IMPORT_TYPE_OPTIONS.value[0], img='file_type')
             self.data_type_dropdown.grid(row=0, column=0, sticky=NW)
             self.create_import_menu(data_type_choice=Options.IMPORT_TYPE_OPTIONS.value[0])
             self.import_tracking_frm.grid(row=idx_row, column=idx_column, sticky=NW)
@@ -91,7 +91,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
 
     def __show_smoothing_entry_box_from_dropdown(self, choice: str):
         if (choice == GAUSSIAN) or (choice == SAVITZKY_GOLAY):
-            self.smoothing_time_eb.grid(row=0, column=1, sticky=E)
+            self.smoothing_time_eb.grid(row=1, column=0, sticky=E)
         else:
             self.smoothing_time_eb.grid_forget()
 
@@ -265,21 +265,21 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
         self.animal_name_entry_boxes = None
 
         self.interpolation_frm = CreateLabelFrameWithIcon(parent=self.choice_frm, header="INTERPOLATION METHOD", pady=5, padx=5,font=Formats.FONT_HEADER.value, icon_name='fill', relief='groove')
-        self.interpolation_dropdown = SimBADropDown(parent=self.interpolation_frm, dropdown_options=Options.INTERPOLATION_OPTIONS_W_NONE.value, label='INTERPOLATION METHOD: ', label_width=25, dropdown_width=35, value=Options.INTERPOLATION_OPTIONS_W_NONE.value[0])
+        self.interpolation_dropdown = SimBADropDown(parent=self.interpolation_frm, dropdown_options=Options.INTERPOLATION_OPTIONS_W_NONE.value, label='INTERPOLATION METHOD: ', label_width=25, dropdown_width=35, value=Options.INTERPOLATION_OPTIONS_W_NONE.value[0], img='fill')
         self.interpolation_frm.grid(row=0, column=0, sticky=NW)
         self.interpolation_dropdown.grid(row=0, column=0, sticky=NW)
 
         self.smoothing_frm = CreateLabelFrameWithIcon(parent=self.choice_frm, header="SMOOTHING METHOD", pady=5, padx=5, font=Formats.FONT_HEADER.value, icon_name='smooth', relief='groove')
-        self.smoothing_dropdown = SimBADropDown(parent=self.smoothing_frm, dropdown_options=Options.SMOOTHING_OPTIONS_W_NONE.value, label='SMOOTHING: ', label_width=25, dropdown_width=35, value=Options.SMOOTHING_OPTIONS_W_NONE.value[0], command=self.__show_smoothing_entry_box_from_dropdown)
-        self.smoothing_time_eb = Entry_Box(self.smoothing_frm, "SMOOTHING PERIOD (MS):", labelwidth=30,  validation="numeric", entry_box_width=10)
+        self.smoothing_dropdown = SimBADropDown(parent=self.smoothing_frm, dropdown_options=Options.SMOOTHING_OPTIONS_W_NONE.value, label='SMOOTHING: ', label_width=25, dropdown_width=35, value=Options.SMOOTHING_OPTIONS_W_NONE.value[0], command=self.__show_smoothing_entry_box_from_dropdown, img='smooth')
+        self.smoothing_time_eb = Entry_Box(self.smoothing_frm, "SMOOTHING PERIOD (MS):", labelwidth=25,  validation="numeric", entry_box_width=35, img='timer_2')
         self.smoothing_frm.grid(row=1, column=0, sticky=NW)
         self.smoothing_dropdown.grid(row=0, column=0, sticky=NW)
 
         if data_type_choice in ["CSV (DLC/DeepPoseKit)", "MAT (DANNCE 3D)", "JSON (BENTO)", "CSV (SimBA BLOB)", 'H5 (FaceMap)', 'CSV (SimBA YOLO)']: # DATA TYPES WHERE NO TRACKS HAVE TO BE SPECIFIED
             self.import_directory_frm = LabelFrame(self.choice_frm, text=FRAME_DIR_IMPORT_TITLES[data_type_choice], pady=5, padx=5, font=Formats.FONT_HEADER.value,)
-            self.import_directory_select = FolderSelect(self.import_directory_frm, "Input data DIRECTORY:", lblwidth=25, initialdir=self.project_path)
+            self.import_directory_select = FolderSelect(self.import_directory_frm, "Input data DIRECTORY:", lblwidth=25, initialdir=self.project_path, lbl_icon='folder')
             self.import_single_frm = LabelFrame(self.choice_frm, text=FRAME_FILE_IMPORT_TITLES[data_type_choice], pady=5, padx=5, font=Formats.FONT_HEADER.value,)
-            self.import_file_select = FileSelect(self.import_single_frm, "Input data FILE:", lblwidth=25, file_types=[("Pose data file", FILE_TYPES[data_type_choice])])
+            self.import_file_select = FileSelect(self.import_single_frm, "Input data FILE:", lblwidth=25, file_types=[("Pose data file", FILE_TYPES[data_type_choice])], lbl_icon='file_type')
 
             if data_type_choice == "CSV (DLC/DeepPoseKit)":
                 self.import_dir_btn = Button(self.import_directory_frm, fg="blue", font=Formats.FONT_REGULAR.value, text="Import DLC CSV DIRECTORY to SimBA project", command=lambda: self.__import_dlc_csv_data(interpolation_settings=self.interpolation_dropdown.getChoices(),
@@ -342,7 +342,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
                 self.dlc_data_type_option_dropdown.setChoices(Options.MULTI_DLC_TYPE_IMPORT_OPTION.value[1])
                 self.tracking_type_frm.grid(row=5, column=0, sticky=NW)
                 self.dlc_data_type_option_dropdown.grid(row=0, column=0, sticky=NW)
-                self.data_dir_select = FolderSelect(self.data_dir_frm, "H5 DLC DIRECTORY: ", lblwidth=25)
+                self.data_dir_select = FolderSelect(self.data_dir_frm, "H5 DLC DIRECTORY: ", lblwidth=25, lbl_icon='folder')
                 self.instructions_lbl = Label(self.data_dir_frm, text="Please import videos BEFORE importing the \n multi animal DLC tracking data", font=Formats.FONT_REGULAR.value)
                 self.run_btn = Button(self.import_frm, text="IMPORT DLC .H5", fg="blue", command=lambda: self.__multi_animal_run_call(pose_estimation_tool=data_type_choice,
                                                                                                                                       interpolation_settings=self.interpolation_dropdown.getChoices(),
@@ -352,7 +352,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
                                                                                                                                       data_path=self.data_dir_select.folder_path,
                                                                                                                                       tracking_data_type=self.dlc_data_type_option_dropdown.getChoices()))
             elif data_type_choice == "SLP (SLEAP)":
-                self.data_dir_select = FolderSelect(self.data_dir_frm, "SLP SLEAP DIRECTORY: ", lblwidth=25)
+                self.data_dir_select = FolderSelect(self.data_dir_frm, "SLP SLEAP DIRECTORY: ", lblwidth=25, lbl_icon='folder')
                 self.instructions_lbl = Label(self.data_dir_frm, font=Formats.FONT_REGULAR.value, text="Please import videos before importing the \n multi animal SLEAP tracking data if you are tracking more than ONE animal")
                 self.run_btn = Button(self.import_frm, text="IMPORT SLEAP .SLP", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.__multi_animal_run_call(pose_estimation_tool=data_type_choice,
                                                                                                                                          interpolation_settings=self.interpolation_dropdown.getChoices(),
@@ -362,7 +362,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
                                                                                                                                          data_path=self.data_dir_select.folder_path))
 
             elif data_type_choice == "TRK (multi-animal APT)":
-                self.data_dir_select = FolderSelect(self.data_dir_frm, "TRK APT DIRECTORY: ", lblwidth=25)
+                self.data_dir_select = FolderSelect(self.data_dir_frm, "TRK APT DIRECTORY: ", lblwidth=25, lbl_icon='folder')
                 self.instructions_lbl = Label(self.data_dir_frm, text="Please import videos before importing the \n multi animal TRK tracking data", font=Formats.FONT_REGULAR.value,)
                 self.run_btn = Button(self.import_frm, text="IMPORT APT .TRK", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: self.__multi_animal_run_call(pose_estimation_tool=data_type_choice,
                                                                                                                                        interpolation_settings=self.interpolation_dropdown.getChoices(),
@@ -372,7 +372,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
                                                                                                                                        data_path=self.data_dir_select.folder_path))
 
             elif data_type_choice == "CSV (SLEAP)":
-                self.data_dir_select = FolderSelect(self.data_dir_frm, "CSV SLEAP DIRECTORY:", lblwidth=25)
+                self.data_dir_select = FolderSelect(self.data_dir_frm, "CSV SLEAP DIRECTORY:", lblwidth=25, lbl_icon='folder')
                 self.instructions_lbl = Label(self.data_dir_frm, font=Formats.FONT_REGULAR.value, text="Please import videos before importing the SLEAP tracking data \n IF you are tracking more than ONE animal")
                 self.run_btn = Button(self.import_frm, text="IMPORT SLEAP .CSV", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.__multi_animal_run_call(pose_estimation_tool=data_type_choice,
                                                                                                                                          interpolation_settings=self.interpolation_dropdown.getChoices(),
@@ -382,7 +382,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
                                                                                                                                          data_path=self.data_dir_select.folder_path))
 
             elif data_type_choice == "H5 (SLEAP)":
-                self.data_dir_select = FolderSelect(self.data_dir_frm, "H5 SLEAP DIRECTORY", lblwidth=25)
+                self.data_dir_select = FolderSelect(self.data_dir_frm, "H5 SLEAP DIRECTORY", lblwidth=25, lbl_icon='folder')
                 self.instructions_lbl = Label(self.data_dir_frm, font=Formats.FONT_REGULAR.value, text="Please import videos before importing the SLEAP H5 tracking data \n IF you are tracking more than ONE animal")
                 self.run_btn = Button(self.import_frm, text="IMPORT SLEAP H5", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: self.__multi_animal_run_call(pose_estimation_tool=data_type_choice,
                                                                                                                                        interpolation_settings=self.interpolation_dropdown.getChoices(),
@@ -391,7 +391,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
                                                                                                                                        animal_names=self.animal_name_entry_boxes,
                                                                                                                                        data_path=self.data_dir_select.folder_path))
             elif data_type_choice == "H5 (SuperAnimal-TopView)":
-                self.data_dir_select = FolderSelect(self.data_dir_frm, "H5 SuperAnimal DIRECTORY:", lblwidth=25)
+                self.data_dir_select = FolderSelect(self.data_dir_frm, "H5 SuperAnimal DIRECTORY:", lblwidth=25, lbl_icon='folder')
                 self.instructions_lbl = Label(self.data_dir_frm, font=Formats.FONT_REGULAR.value, text="Please import videos before importing the H5 SuperAnimal tracking data \n IF you are tracking more than ONE animal")
                 self.run_btn = Button(self.import_frm, text="IMPORT SuperAnimal-Mouse-TopView H5", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.__multi_animal_run_call(pose_estimation_tool=data_type_choice,
                                                                                                                                                                            interpolation_settings=self.interpolation_dropdown.getChoices(),
