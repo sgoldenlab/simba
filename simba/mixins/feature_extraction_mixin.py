@@ -603,8 +603,6 @@ class FeatureExtractionMixin(object):
                     else:
                         pass
 
-
-
         for cord in [nose_cords, ear_left_cords, ear_right_cords]:
             if len(cord) != len(self.animal_bp_dict.keys()) * 2:
                 direction_viable = False

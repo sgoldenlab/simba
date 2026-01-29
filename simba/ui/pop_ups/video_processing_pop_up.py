@@ -2495,7 +2495,7 @@ class Convert2WEBMPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CONVERT VIDEOS TO WEBM", icon='webm')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.WEBM_CODEC_LK = {'VP8': 'vp8', 'VP9': 'vp9'}
+        self.WEBM_CODEC_LK = {'VP8': 'vp8', 'VP9': 'vp9', 'AV1': 'av1'}
 
         self.quality_dropdown = SimBADropDown(parent=settings_frm, label="OUTPUT VIDEO QUALITY:", dropdown_options=list(range(10, 110, 10)), label_width=25, value=60, img='pct', dropdown_width=30)
         self.codec_dropdown = SimBADropDown(parent=settings_frm, label="COMPRESSION CODEC:", dropdown_options=list(self.WEBM_CODEC_LK.keys()), label_width=25, value='VP9', img='file_type', dropdown_width=30)

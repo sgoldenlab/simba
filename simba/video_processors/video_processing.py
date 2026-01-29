@@ -56,7 +56,7 @@ from simba.utils.lookups import (get_current_time, get_ffmpeg_codec,
                                  get_ffmpeg_crossfade_methods, get_fonts,
                                  get_named_colors, percent_to_crf_lookup,
                                  percent_to_qv_lk, quality_pct_to_crf,
-                                 video_quality_to_preset_lookup)
+                                 video_quality_to_preset_lookup, get_ffmpeg_encoders)
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
@@ -440,10 +440,11 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike],
     dir, file_name, file_ext = get_fn_ext(filepath=file_path)
     if out_path is None:
         save_path = os.path.join(dir, f"CLAHE_{file_name}.avi")
+        fourcc = cv2.VideoWriter_fourcc(*Formats.AVI_CODEC.value)
     else:
         check_if_dir_exists(in_dir=os.path.dirname(out_path), source=f'{clahe_enhance_video.__name__} out_path')
+        fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         save_path = out_path
-    fourcc = cv2.VideoWriter_fourcc(*Formats.AVI_CODEC.value)
     if verbose: print(f"Applying CLAHE on video {file_name}, this might take awhile...")
     cap = cv2.VideoCapture(file_path)
     writer = cv2.VideoWriter( save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]), 0)
@@ -3265,6 +3266,9 @@ def convert_to_avi(path: Union[str, os.PathLike],
     timer = SimbaTimer(start=True)
     check_ffmpeg_available(raise_error=True)
     check_str(name=f'{convert_to_avi.__name__} codec', value=codec, options=('xvid', 'divx', 'mjpeg'))
+    CODEC_LK = {'mpeg4': 'mpeg4', 'divx': 'libxvid', 'mjpeg': 'mjpeg'}
+    codec = CODEC_LK[codec]
+    check_valid_codec(codec=codec, raise_error=True, source=f'{convert_to_avi.__name__} codec')
     check_instance(source=f'{convert_to_avi.__name__} path', instance=path, accepted_types=(str,))
     check_int(name=f'{convert_to_avi.__name__} quality', value=quality)
     datetime_ = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -3292,18 +3296,18 @@ def convert_to_avi(path: Union[str, os.PathLike],
         _ = get_video_meta_data(video_path=file_path)
         out_path = os.path.join(save_dir, f'{video_name}.avi')
         if codec == 'divx':
-            cmd = f'ffmpeg -i "{file_path}" -c:v mpeg4 -crf {crf} -vtag DIVX "{out_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{file_path}" -c:v {codec} -crf {crf} -vtag DIVX "{out_path}" -loglevel error -stats -hide_banner -y'
         elif codec == 'xvid':
-            cmd = f'ffmpeg -i "{file_path}" -c:v libxvid -q:v {qv} "{out_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{file_path}" -c:v {codec} -q:v {qv} "{out_path}" -loglevel error -stats -hide_banner -y'
         else:
-            cmd = f'ffmpeg -i "{file_path}" -c:v mjpeg -q:v {qv} "{out_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{file_path}" -c:v {codec} -q:v {qv} "{out_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f"{len(file_paths)} video(s) converted to AVI and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=convert_to_avi.__name__,)
 
 
 def convert_to_webm(path: Union[str, os.PathLike],
-                    codec: Literal['vp8', 'vp9'] = 'vp9',
+                    codec: Literal['vp8', 'vp9', 'av1'] = 'vp9',
                     save_dir: Optional[Union[str, os.PathLike]] = None,
                     quality: Optional[int] = 60) -> None:
 
@@ -3326,7 +3330,10 @@ def convert_to_webm(path: Union[str, os.PathLike],
 
     timer = SimbaTimer(start=True)
     check_ffmpeg_available(raise_error=True)
-    check_str(name=f'{convert_to_webm.__name__} codec', value=codec, options=('vp8', 'vp9'))
+    check_str(name=f'{convert_to_webm.__name__} codec', value=codec, options=('vp8', 'vp9', 'av1'))
+    CODEC_LK = {'vp8': 'libvpx', 'vp9': 'libvpx-vp9', 'av1': 'libaom-av1'}
+    codec = CODEC_LK[codec]
+    check_valid_codec(codec=codec, raise_error=True, source=f'{convert_to_webm.__name__} codec')
     check_instance(source=f'{convert_to_webm.__name__} path', instance=path, accepted_types=(str,))
     check_int(name=f'{convert_to_webm.__name__} quality', value=quality)
     datetime_ = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -3346,17 +3353,13 @@ def convert_to_webm(path: Union[str, os.PathLike],
         os.makedirs(save_dir)
     else:
         raise InvalidInputError(msg=f'Paths is not a valid file or directory path.', source=convert_to_webm.__name__)
+
     for file_cnt, file_path in enumerate(file_paths):
         _, video_name, _ = get_fn_ext(filepath=file_path)
         print(f'Converting video {video_name} to WEBM (Video {file_cnt+1}/{len(file_paths)})...')
         _ = get_video_meta_data(video_path=file_path)
         out_path = os.path.join(save_dir, f'{video_name}.webm')
-        if codec == 'vp8':
-            cmd = f'ffmpeg -i "{file_path}" -c:v libvpx -crf {crf} "{out_path}" -loglevel error -stats -hide_banner -y'
-        elif codec == 'vp9':
-            cmd = f'ffmpeg -i "{file_path}" -c:v libvpx-vp9 -crf {crf} "{out_path}" -loglevel error -stats -hide_banner -y'
-        else:
-            cmd = f'ffmpeg -i "{file_path}" -c:v libaom-av1 -crf {crf} "{out_path}" -loglevel error -stats -hide_banner -y'
+        cmd = f'ffmpeg -i "{file_path}" -c:v {codec} -crf {crf} "{out_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f"{len(file_paths)} video(s) converted to WEBM and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=convert_to_webm.__name__,)
@@ -3381,6 +3384,10 @@ def convert_to_mov(path: Union[str, os.PathLike],
     timer = SimbaTimer(start=True)
     check_ffmpeg_available(raise_error=True)
     check_str(name=f'{convert_to_mov.__name__} codec', value=codec, options=('prores', 'animation', 'cineform', 'dnxhd'))
+
+
+
+
     check_instance(source=f'{convert_to_mov.__name__} path', instance=path, accepted_types=(str,))
     check_int(name=f'{convert_to_mov.__name__} quality', value=quality)
     datetime_ = datetime.now().strftime("%Y%m%d%H%M%S")
