@@ -1,6 +1,7 @@
 import os
 import sys
 from contextlib import redirect_stderr, redirect_stdout
+import urllib.request
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import argparse
@@ -19,13 +20,14 @@ except ModuleNotFoundError:
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_int, check_str,
-                                check_valid_boolean, check_valid_device)
+                                check_valid_boolean, check_valid_device, check_valid_url)
 from simba.utils.enums import Options
 from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
 from simba.utils.printing import stdout_information
 from simba.utils.read_write import find_core_cnt, get_current_time
 from simba.utils.yolo import load_yolo_model
 
+YOLO_X_PATH = "https://huggingface.co/Ultralytics/YOLO11/resolve/main/yolo11x-pose.pt"
 
 class FitYolo():
 
@@ -74,9 +76,9 @@ class FitYolo():
     """
 
     def __init__(self,
-                 weights_path: Union[str, os.PathLike],
                  model_yaml: Union[str, os.PathLike],
                  save_path: Union[str, os.PathLike],
+                 weights_path: Optional[Union[str, os.PathLike]] = None,
                  epochs: int = 200,
                  batch: Union[int, float] = 16,
                  plots: bool = True,
@@ -92,7 +94,11 @@ class FitYolo():
             raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
         if YOLO is None:
             raise SimBAPAckageVersionError(msg='Ultralytics package not detected.', source=self.__class__.__name__)
-        check_file_exist_and_readable(file_path=weights_path)
+        if weights_path is not None:
+            check_file_exist_and_readable(file_path=weights_path)
+            self.weights_path = weights_path
+        else:
+            self._download_start_weights()
         check_file_exist_and_readable(file_path=model_yaml)
         check_valid_boolean(value=verbose, source=f'{__class__.__name__} verbose', raise_error=True)
         check_valid_boolean(value=plots, source=f'{__class__.__name__} plots', raise_error=True)
@@ -106,14 +112,22 @@ class FitYolo():
         check_valid_device(device=device)
         self.model_yaml, self.epochs, self.batch  = model_yaml, epochs, batch
         self.imgsz, self.device, self.workers, self.format = imgsz, device, workers, format
-        self.plots, self.save_path, self.verbose, self.weights_path, self.patience = plots, save_path, verbose, weights_path, patience
+        self.plots, self.save_path, self.verbose, self.patience = plots, save_path, verbose, patience
+
+    def _download_start_weights(self, url: str = YOLO_X_PATH, save_path: Union[str, os.PathLike] = "yolo11x-pose.pt"):
+        print(f'No start weights provided, downloading {save_path} from {url}...')
+        check_valid_url(url=url, raise_error=True, source=self.__class__.__name__)
+        if not os.path.isfile(save_path):
+            urllib.request.urlretrieve(url, save_path)
+            stdout_information(msg=f'Downloaded initial weights from {url}', source=self.__class__.__name__)
+        self.weights_path = save_path
+        print(self.weights_path)
 
 
     def run(self):
-        # Temporarily redirect stdout/stderr to terminal to ensure ultralytics output goes to terminal
-        # sys.__stdout__ and sys.__stderr__ are the original terminal streams
         stdout_information(msg=f'[{get_current_time()}] Please follow the YOLO pose model training in the terminal from where SimBA was launched ...', source=self.__class__.__name__)
         stdout_information(msg=f'[{get_current_time()}] Results will be stored in the {self.save_path} directory ..', source=self.__class__.__name__)
+        print(self.weights_path)
         with redirect_stdout(sys.__stdout__), redirect_stderr(sys.__stderr__):
             model = load_yolo_model(weights_path=self.weights_path,
                                     verbose=self.verbose,
@@ -133,7 +147,7 @@ class FitYolo():
 
 if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     parser = argparse.ArgumentParser(description="Fit YOLO model using ultralytics package.")
-    parser.add_argument('--weights_path', type=str, required=True, help='Path to the trained YOLO model weights (e.g., yolo11n-pose.pt)')
+    parser.add_argument('--weights_path', type=str, default=None, help='Path to the trained YOLO model weights (e.g., yolo11n-pose.pt). Omit to download default starter weights.')
     parser.add_argument('--model_yaml', type=str, required=True, help='Path to map.yaml (model structure and label definitions)')
     parser.add_argument('--save_path', type=str, required=True, help='Directory where trained model and logs will be saved')
     parser.add_argument('--epochs', type=int, default=25, help='Number of epochs to train the model. Default is 25')
@@ -145,7 +159,6 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     parser.add_argument('--verbose', type=lambda x: str(x).lower() == 'true', default=True, help='Print verbose messages. Use "True" or "False". Default is True')
     parser.add_argument('--workers', type=int, default=8, help='Number of data loader workers. Default is 8. Use -1 for max cores')
     parser.add_argument('--patience', type=int, default=100, help='Number of epochs to wait without improvement in validation metrics before early stopping the training. Default is 100')
-
 
     args = parser.parse_args()
 
@@ -159,8 +172,24 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
                           format=args.format,
                           device=int(args.device) if args.device != 'cpu' else 'cpu',
                           verbose=args.verbose,
-                          workers=args.workers)
+                          workers=args.workers,
+                          patience=args.patience)
     yolo_fitter.run()
+
+
+
+
+
+# fitter = FitYolo(weights_path=r"D:\maplight_tg2576_yolo\yolo_mdl\original_weight_oct\best.pt",
+#                  model_yaml=r"D:\maplight_tg2576_yolo\yolo_mdl\map.yaml",
+#                  save_path=r"D:\maplight_tg2576_yolo\yolo_mdl\mdl",
+#                  epochs=1500,
+#                  batch=22,
+#                  format=None,
+#                  device=0,
+#                  imgsz=640)
+# fitter.run()
+
 
 
 

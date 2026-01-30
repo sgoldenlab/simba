@@ -788,8 +788,15 @@ def check_valid_hex_color(color_hex: str, raise_error: Optional[bool] = True) ->
     else:
         return True
 
-def check_valid_url(url: str) -> bool:
-    """ Helper to check if a string is a valid url"""
+def check_valid_url(url: str, raise_error: bool = False, source: str = '') -> bool:
+    """
+    Check if a string is a valid URL (http, https, or ftp).
+
+    :param str url: The string to validate as a URL.
+    :param bool raise_error: If True, raises InvalidInputError when the URL is invalid. Default: False.
+    :param str source: Source identifier for error messages when raise_error=True. Default: ''.
+    :return: True if the string is a valid URL, False otherwise.
+    """
     regex = re.compile(
         r'^(https?|ftp)://'  # protocol
         r'(\S+(:\S*)?@)?'  # user:password (optional)
@@ -798,7 +805,13 @@ def check_valid_url(url: str) -> bool:
         r'(:\d+)?'  # port (optional)
         r'(/[\S]*)?$',  # path (optional)
         re.IGNORECASE)
-    return re.match(regex, url) is not None
+    is_valid = re.match(regex, url) is not None
+    if not is_valid and raise_error:
+        raise InvalidInputError(
+            msg=f"Invalid URL: {url}",
+            source=source or check_valid_url.__name__
+        )
+    return is_valid
 
 
 def check_if_2d_array_has_min_unique_values(data: np.ndarray, min: int) -> bool:

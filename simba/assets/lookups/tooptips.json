@@ -5,7 +5,7 @@
   "batch_dropdown": "Number of frames processed at once. Larger batches speed up inference but require more GPU RAM.",
   "verbose_dropdown": "Toggle console printouts for progress and timings. Keep TRUE while tuning, FALSE for quiet runs.",
   "workers_dropdown": "How many CPU worker threads to use for pre/post-processing. Set <= available cores.",
-  "format_dropdown": "Model serialization format (None = auto-detect from file extension). Match the format used when exporting the weights.",
+  "format_dropdown": "Export/serialization format. Training: export the trained model to this format after training (None = PyTorch .pt only). Inference: match the format of your weights file, or None to auto-detect from file extension. Options: onnx, engine, torchscript, onnxsimplify, coreml, openvino, pb, tf, tflite, torch.",
   "img_size_dropdown": "Resize shorter image side to this many pixels before inference. Larger sizes improve accuracy but slow down processing.",
   "devices_dropdown": "Compute device to run on. Select CUDA device ID for GPU or CPU.",
   "interpolate_dropdown": "Fill missing detections by interpolating coordinates over time. Recommended for cleaner trajectories.",
@@ -43,5 +43,10 @@
   "KLEINBERG_GAMMA": "Higher values (e.g., 0.5-1.0) reduce total burst count by making downward transitions costly; lower values (e.g., 0.1-0.3) allow more flexible state changes",
   "KLEINBERG_HIERARCHY": "Hierarchy level to extract bursts from (0=lowest, higher=more selective).\n Level 0 captures all bursts; level 1-2 typically filters noise; level 3+ selects only the most prominent, sustained bursts.\nHigher levels yield fewer but more confident detections",
   "KLEINBERG_HIERARCHY_SEARCH": "If True, searches for target hierarchy level within detected burst periods,\n falling back to lower levels if target not found. If False, extracts only bursts at the exact specified hierarchy level.\n Recommended when target hierarchy may be sparse.",
-  "KLEINBERG_SAVE_ORIGINALS": "If True, saves the original data in a new sub-directory of \nthe project_folder/csv/machine_results directory"
+  "KLEINBERG_SAVE_ORIGINALS": "If True, saves the original data in a new sub-directory of \nthe project_folder/csv/machine_results directory",
+  "yolo_map_path": "Path to the YOLO dataset YAML file. Defines class names, paths to train/val images and labels, and number of keypoints.",
+  "yolo_initial_weights_path": "Optional path to pretrained weights (.pt) to start training from (e.g. yolo11n-pose.pt). Leave blank to train from scratch.",
+  "epochs_dropdown": "Number of training epochs. More epochs can improve accuracy but increase overfitting risk and training time.",
+  "plots_dropdown": "If TRUE, generate and save training curves (loss, mAP, etc.) in the save directory.",
+  "patience_dropdown": "Early-stopping patience: training stops if validation metric does not improve for this many epochs."
 }

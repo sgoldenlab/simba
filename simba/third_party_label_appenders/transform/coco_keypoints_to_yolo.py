@@ -75,7 +75,7 @@ class COCOKeypoints2Yolo:
                  img_dir: Union[str, os.PathLike],
                  save_dir: Union[str, os.PathLike],
                  train_size: float = 0.7,
-                 flip_idx: Tuple[int, ...] = (0, 2, 1, 3, 5, 4, 6, 7, 8),
+                 flip_idx: Tuple[int, ...] = (0, 2, 1, 5, 4, 3, 6),
                  verbose: bool = True,
                  greyscale: bool = False,
                  clahe: bool = False,
@@ -175,7 +175,6 @@ class COCOKeypoints2Yolo:
         missing = [x for x in list(range(shapes[0])) if x not in self.flip_idx]
         if len(missing) > 0:
             raise InvalidInputError(msg=f'keypoints contains index values not in flip_idx ({missing}).', source=self.__class__.__name__)
-
         create_yolo_keypoint_yaml(path=self.save_dir, train_path=self.train_img_dir, val_path=self.val_img_dir, names=self.map_dict, save_path=self.map_path, kpt_shape=(int(shapes[0]), 3), flip_idx=self.flip_idx)
         timer.stop_timer()
         if self.verbose: stdout_success(msg=f'COCO keypoints to YOLO conversion complete. Data saved in directory {self.save_dir}.', elapsed_time=timer.elapsed_time_str)

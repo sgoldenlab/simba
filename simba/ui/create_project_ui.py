@@ -66,7 +66,7 @@ class ProjectCreatorPopUp():
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.create_project_tab, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CREATE_PROJECT.value)
         self.general_settings_frm = CreateLabelFrameWithIcon(parent=self.settings_frm, header="GENERAL PROJECT SETTINGS", icon_name='settings', icon_link=Links.CREATE_PROJECT.value, padx=5, pady=5, relief='solid')
         self.project_dir_select = FolderSelect(self.general_settings_frm, "PROJECT DIRECTORY:", lblwidth=35, entry_width=35, font=Formats.FONT_REGULAR.value, lbl_icon='browse')
-        self.project_name_eb = Entry_Box(self.general_settings_frm, "PROJECT NAME:", labelwidth=35, entry_box_width=35, img='id_card_2')
+        self.project_name_eb = Entry_Box(self.general_settings_frm, "PROJECT NAME:", labelwidth=35, entry_box_width=35, img='id_card_2', justify='center')
         self.file_type_dropdown = SimBADropDown(parent=self.general_settings_frm, dropdown_options=Options.WORKFLOW_FILE_TYPE_OPTIONS.value, label='WORKFLOW FILE TYPE:', label_width=35, dropdown_width=35, value=Options.WORKFLOW_FILE_TYPE_OPTIONS.value[0], img='file_type')
 
         self.ml_settings_frm = GetMLSettingsFrame(parent=self.create_project_tab, lbl_width=35, bx_width=22)

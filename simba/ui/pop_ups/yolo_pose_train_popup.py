@@ -1,9 +1,11 @@
-
+import os
+import sys
+import subprocess
 from tkinter import *
+from tkinter import messagebox
 
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.model.yolo_fit import FitYolo
 from simba.third_party_label_appenders.transform.utils import \
     check_valid_yolo_map
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
@@ -17,10 +19,13 @@ from simba.utils.read_write import find_core_cnt, get_pkg_version, str_2_bool
 EPOCH_OPTIONS = list(range(100, 5750, 250))
 PATIENCE_OPTIONS = list(range(50, 1050, 50))
 IMG_SIZE_OPTIONS = [256, 320, 416, 480, 512, 640, 720, 768, 960, 1280]
-CORE_CNT_OPTIONS = list(range(1, find_core_cnt()[0]))
+# On Windows, PyTorch DataLoader often deadlocks with workers > 8; cap options to avoid hang
+_max_workers = min(find_core_cnt()[0], 8) if sys.platform == 'win32' else find_core_cnt()[0]
+CORE_CNT_OPTIONS = list(range(1, _max_workers + 1))
 BATCH_SIZE_OPTIONS =  [2, 4, 8, 16, 32, 64, 128]
 devices = ['CPU']
-
+FORMAT_OPTIONS =  Options.VALID_YOLO_FORMATS.value
+FORMAT_OPTIONS.insert(0, 'None')
 class YOLOPoseTrainPopUP(PopUpMixin):
     def __init__(self):
         gpu_available, gpus = _is_cuda_available()
@@ -33,19 +38,19 @@ class YOLOPoseTrainPopUP(PopUpMixin):
         PopUpMixin.__init__(self, title="TRAIN YOLO POSE ESTIMATION MODEL", icon='ultralytics_2')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
         devices.extend([f'{x} : {y["model"]}' for x, y in gpus.items()])
-        self.yolo_map_path = FileSelect(parent=settings_frm, fileDescription='YOLO MAP FILE (YAML):', lblwidth=35, entry_width=45, file_types=[("YOLO MODEL FILE", ".yaml")], lbl_icon='file')
-        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=45, lbl_icon='save')
-        self.weights_path = FileSelect(parent=settings_frm, fileDescription='INITIAL WEIGHT FILE (E.G., .PT):', lblwidth=35, entry_width=45, lbl_icon='file')
+        self.yolo_map_path = FileSelect(parent=settings_frm, fileDescription='YOLO MAP FILE (YAML):', lblwidth=35, entry_width=45, file_types=[("YOLO MODEL FILE", ".yaml")], lbl_icon='file', tooltip_key='yolo_map_path')
+        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=45, lbl_icon='save', tooltip_key='SAVE_DIR')
+        self.weights_path = FileSelect(parent=settings_frm, fileDescription='INITIAL WEIGHT FILE (E.G., .PT):', lblwidth=35, entry_width=45, lbl_icon='file', tooltip_key='yolo_initial_weights_path')
 
-        self.epochs_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=EPOCH_OPTIONS, label="EPOCHS: ", label_width=35, dropdown_width=40, value=500, img='rotate')
-        self.batch_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=BATCH_SIZE_OPTIONS, label="BATCH SIZE: ", label_width=35, dropdown_width=40, value=16, img='weight')
-        self.plots_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="PLOTS:", label_width=35, dropdown_width=40, value='TRUE', img='plot')
-        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE:", label_width=35, dropdown_width=40, value='TRUE', img='verbose')
-        self.workers_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=CORE_CNT_OPTIONS, label="CPU WORKERS:", label_width=35, dropdown_width=40, value=int(max(CORE_CNT_OPTIONS)/2), img='cpu_small')
-        self.format_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=Options.VALID_YOLO_FORMATS.value, label="FORMAT:", label_width=35, dropdown_width=40, value='engine', img='file_type')
-        self.img_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=IMG_SIZE_OPTIONS, label="IMAGE SIZE:", label_width=35, dropdown_width=40, value=640, img='resize')
-        self.patience_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=PATIENCE_OPTIONS, label="PATIENCE:", label_width=35, dropdown_width=40, value=100, img='timer')
-        self.devices_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=devices, label="DEVICE:", label_width=35, dropdown_width=40, value=devices[1], img='gpu_3')
+        self.epochs_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=EPOCH_OPTIONS, label="EPOCHS: ", label_width=35, dropdown_width=40, value=500, img='rotate', tooltip_key='epochs_dropdown')
+        self.batch_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=BATCH_SIZE_OPTIONS, label="BATCH SIZE: ", label_width=35, dropdown_width=40, value=16, img='weight', tooltip_key='batch_dropdown')
+        self.plots_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="PLOTS:", label_width=35, dropdown_width=40, value='TRUE', img='plot', tooltip_key='plots_dropdown')
+        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE:", label_width=35, dropdown_width=40, value='TRUE', img='verbose', tooltip_key='verbose_dropdown')
+        self.workers_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=CORE_CNT_OPTIONS, label="CPU WORKERS:", label_width=35, dropdown_width=40, value=int(max(CORE_CNT_OPTIONS)/2), img='cpu_small', tooltip_key='workers_dropdown')
+        self.format_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=FORMAT_OPTIONS, label="FORMAT:", label_width=35, dropdown_width=40, value='None', img='file_type', tooltip_key='format_dropdown')
+        self.img_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=IMG_SIZE_OPTIONS, label="IMAGE SIZE:", label_width=35, dropdown_width=40, value=640, img='resize', tooltip_key='img_size_dropdown')
+        self.patience_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=PATIENCE_OPTIONS, label="PATIENCE:", label_width=35, dropdown_width=40, value=100, img='timer', tooltip_key='patience_dropdown')
+        self.devices_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=devices, label="DEVICE:", label_width=35, dropdown_width=40, value=devices[1], img='gpu_3', tooltip_key='devices_dropdown')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.yolo_map_path.grid(row=0, column=0, sticky=NW)
@@ -74,16 +79,54 @@ class YOLOPoseTrainPopUP(PopUpMixin):
         workers = int(self.workers_dropdown.get_value())
         batch_size = int(self.batch_dropdown.get_value())
         device = self.devices_dropdown.get_value()
-        device = 'cpu' if device == 'CPU' else int(device.split(':', 1)[0])
-        format = self.format_dropdown.get_value()
+        device_str = 'cpu' if device == 'CPU' else device.split(':', 1)[0]
+        format_val = None if self.format_dropdown.get_value() == 'None' else self.format_dropdown.get_value()
         imgsz = int(self.img_size_dropdown.get_value())
         patience = int(self.patience_dropdown.get_value())
-
         check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} SAVE DIRECTORY')
-        check_file_exist_and_readable(file_path=weights_path, raise_error=True)
+        if not check_file_exist_and_readable(file_path=weights_path, raise_error=False):
+            weights_path = None
         check_file_exist_and_readable(file_path=yolo_map_path, raise_error=True)
         check_valid_yolo_map(yolo_map=yolo_map_path)
-        runner = FitYolo(weights_path=weights_path, model_yaml=yolo_map_path, save_path=save_dir, epochs=epochs, batch=batch_size, plots=plots, format=format, device=device, verbose=verbose, workers=workers, imgsz=imgsz, patience=patience)
-        runner.run()
 
-#YOLOPoseTrainPopUP()
+        # On Windows, PyTorch DataLoader with workers > 8 often deadlocks after train cache scan
+        workers_for_subprocess = min(workers, 8) if sys.platform == 'win32' else workers
+
+        # Run training in a separate process to avoid GUI + YOLO sharing memory (prevents OOM)
+        cmd = [
+            sys.executable, '-m', 'simba.model.yolo_fit',
+            '--model_yaml', yolo_map_path,
+            '--save_path', save_dir,
+            '--epochs', str(epochs),
+            '--batch', str(batch_size),
+            '--plots', 'True' if plots else 'False',
+            '--imgsz', str(imgsz),
+            '--device', str(device_str),
+            '--verbose', 'True' if verbose else 'False',
+            '--workers', str(workers_for_subprocess),
+            '--patience', str(patience),
+        ]
+        if weights_path is not None:
+            cmd.extend(['--weights_path', weights_path])
+        if format_val is not None:
+            cmd.extend(['--format', format_val])
+
+        creationflags = subprocess.CREATE_NEW_CONSOLE if sys.platform == 'win32' else 0
+        # Use non-interactive matplotlib backend so label plots save to file without opening GUI (avoids hang)
+        env = os.environ.copy()
+        env['MPLBACKEND'] = 'Agg'
+        try:
+            subprocess.Popen(cmd, creationflags=creationflags, env=env)
+        except Exception as e:
+            messagebox.showerror('YOLO training', f'Failed to start training process: {e}')
+            return
+        msg = (
+            'YOLO training has been started in a separate process to avoid memory issues.\n\n'
+            'On Windows a new console window will show training progress. '
+            'On other platforms, check the terminal from which SimBA was launched.\n\n'
+            f'Results will be saved to:\n{save_dir}'
+        )
+        messagebox.showinfo('YOLO training started', msg)
+
+
+#@YOLOPoseTrainPopUP()
