@@ -1,7 +1,7 @@
 import os
 import sys
-from contextlib import redirect_stderr, redirect_stdout
 import urllib.request
+from contextlib import redirect_stderr, redirect_stdout
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import argparse
@@ -20,7 +20,8 @@ except ModuleNotFoundError:
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_int, check_str,
-                                check_valid_boolean, check_valid_device, check_valid_url)
+                                check_valid_boolean, check_valid_device,
+                                check_valid_url)
 from simba.utils.enums import Options
 from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
 from simba.utils.printing import stdout_information

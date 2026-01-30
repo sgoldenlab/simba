@@ -1,6 +1,6 @@
 import os
-import sys
 import subprocess
+import sys
 from tkinter import *
 from tkinter import messagebox
 
