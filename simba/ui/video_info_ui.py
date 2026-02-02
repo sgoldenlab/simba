@@ -10,7 +10,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.px_to_mm_ui import GetPixelsPerMillimeterInterface
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
-                                        SimbaButton, SimBALabel)
+                                        SimbaButton, SimBALabel, SimBASeperator)
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int)
 from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links,
@@ -69,6 +69,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
 
     def _get_video_table_rows(self):
         self.videos = {}
+        padx = (0, 12)
         for cnt, (video_name, video_path) in enumerate(self.video_paths.items()):
             self.videos[video_name] = {}
             if video_name in self.prior_videos:
@@ -81,31 +82,32 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
             else:
                 fps, width, height = self.video_meta_data[video_name]['fps'], self.video_meta_data[video_name]['width'], self.video_meta_data[video_name]['height']
                 distance, pixels_per_mm = self.distance_mm, 'None'
-            self.videos[video_name]["video_idx_lbl"] = Label(self.video_frm, text=str(cnt), font=Formats.FONT_REGULAR.value,  width=6)
-            self.videos[video_name]["video_name_lbl"] = Label(self.video_frm, text=video_name, font=Formats.FONT_REGULAR.value,  width=self.max_char_vid_name)
+
+            self.videos[video_name]["video_idx_lbl"] = SimBALabel(parent=self.video_frm, txt=str(cnt+1), font=Formats.FONT_REGULAR_BOLD.value)
+            self.videos[video_name]["video_name_lbl"] = SimBALabel(parent=self.video_frm, txt=video_name, font=Formats.FONT_REGULAR_BOLD.value)
             self.videos[video_name]["video_name_w_ext"] = os.path.basename(video_path)
-            self.videos[video_name]["video_fps_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=fps, entry_box_width=20, justify='center')
-            self.videos[video_name]["video_width_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=width, entry_box_width=20, justify='center', validation='numeric')
-            self.videos[video_name]["video_height_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=height, entry_box_width=20, justify='center', validation='numeric')
-            self.videos[video_name]["video_known_distance_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=distance, entry_box_width=20, justify='center')
-            #self.videos[video_name]["find_dist_btn"] = Button(self.video_frm, text="CALCULATE DISTANCE", fg="black", command=lambda k=video_name: self._initate_find_distance(k))
-            self.videos[video_name]["find_dist_btn"] = SimbaButton(parent=self.video_frm, txt="CALCULATE DISTANCE", txt_clr='black', img='calipher', font=Formats.FONT_HEADER.value, cmd=lambda k=video_name: self._initate_find_distance(k), hover_font=Formats.FONT_HEADER.value)
-            self.videos[video_name]["video_px_per_mm"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=pixels_per_mm, entry_box_width=20, justify='center')
-            self.videos[video_name]["video_idx_lbl"].grid(row=cnt+2, column=0, sticky=NW)
-            self.videos[video_name]["video_name_lbl"].grid(row=cnt+2, column=1, sticky=NW)
-            self.videos[video_name]["video_fps_eb"].grid(row=cnt+2, column=2, sticky=NW)
-            self.videos[video_name]["video_width_eb"].grid(row=cnt+2, column=3, sticky=NW)
-            self.videos[video_name]["video_height_eb"].grid(row=cnt+2, column=4, sticky=NW)
-            self.videos[video_name]["find_dist_btn"].grid(row=cnt + 2, column=5, sticky=NW)
-            self.videos[video_name]["video_known_distance_eb"].grid(row=cnt+2, column=6, sticky=NW)
-            self.videos[video_name]["video_px_per_mm"].grid(row=cnt+2, column=7, sticky=NW)
+
+            self.videos[video_name]["video_fps_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=fps, entry_box_width=12, justify='center')
+            self.videos[video_name]["video_width_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=width, entry_box_width=12, justify='center', validation='numeric')
+            self.videos[video_name]["video_height_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=height, entry_box_width=12, justify='center', validation='numeric')
+            self.videos[video_name]["video_known_distance_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=distance, entry_box_width=12, justify='center')
+            self.videos[video_name]["find_dist_btn"] = SimbaButton(parent=self.video_frm, txt="CALCULATE DISTANCE", txt_clr='black', img='calipher', font=Formats.FONT_REGULAR_BOLD.value, cmd=lambda k=video_name: self._initate_find_distance(k), hover_font=Formats.FONT_REGULAR_BOLD.value)
+            self.videos[video_name]["video_px_per_mm"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=pixels_per_mm, entry_box_width=12, justify='center')
+            self.videos[video_name]["video_idx_lbl"].grid(row=cnt+4, column=0, sticky=NW, padx=padx)
+            self.videos[video_name]["video_name_lbl"].grid(row=cnt+4, column=1, sticky=W, padx=padx)
+            self.videos[video_name]["video_fps_eb"].grid(row=cnt+4, column=2, sticky=W, padx=padx)
+            self.videos[video_name]["video_width_eb"].grid(row=cnt+4, column=3, sticky=W, padx=padx)
+            self.videos[video_name]["video_height_eb"].grid(row=cnt+4, column=4, sticky=W, padx=padx)
+            self.videos[video_name]["find_dist_btn"].grid(row=cnt + 4, column=5, sticky=W, padx=padx)
+            self.videos[video_name]["video_known_distance_eb"].grid(row=cnt+4, column=6, sticky=W, padx=padx)
+            self.videos[video_name]["video_px_per_mm"].grid(row=cnt+4, column=7, sticky=W, padx=padx)
 
     def _get_quick_set(self):
         self.quick_set_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BATCH QUICK SET", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_PARAMETERS.value)
-        self.quick_set_frm_known_distance_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='KNOWN DISTANCE:', labelwidth=30, value='', entry_box_width=10)
-        self.quick_set_frm_known_distance_btn = SimbaButton(parent=self.quick_set_frm, txt="APPLY", txt_clr='black', img='tick', font=Formats.FONT_HEADER.value, cmd=self._set_known_distance, cmd_kwargs={'distance': lambda: self.quick_set_frm_known_distance_eb.entry_get})
-        self.quick_set_px_mm_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='PIXEL PER MILLIMETER:', labelwidth=30, value='', entry_box_width=10)
-        self.quick_set_px_mm_btn = SimbaButton(parent=self.quick_set_frm, txt="APPLY", txt_clr='black', img='tick', font=Formats.FONT_HEADER.value, cmd=self._set_px_per_mm, cmd_kwargs={'px_per_mm': lambda: self.quick_set_px_mm_eb.entry_get})
+        self.quick_set_frm_known_distance_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='KNOWN DISTANCE:', labelwidth=30, value='', entry_box_width=10, img='distance_red', justify='center')
+        self.quick_set_frm_known_distance_btn = SimbaButton(parent=self.quick_set_frm, txt="APPLY", txt_clr='black', img='tick', font=Formats.FONT_REGULAR_BOLD.value, cmd=self._set_known_distance, cmd_kwargs={'distance': lambda: self.quick_set_frm_known_distance_eb.entry_get})
+        self.quick_set_px_mm_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='PIXEL PER MILLIMETER:', labelwidth=30, value='', entry_box_width=10, img='ruler', justify='center')
+        self.quick_set_px_mm_btn = SimbaButton(parent=self.quick_set_frm, txt="APPLY", txt_clr='black', img='tick', font=Formats.FONT_REGULAR_BOLD.value, cmd=self._set_px_per_mm, cmd_kwargs={'px_per_mm': lambda: self.quick_set_px_mm_eb.entry_get})
         self.quick_set_frm.grid(row=1, column=0, sticky=NW)
         self.quick_set_frm_known_distance_eb.grid(row=0, column=0, sticky=NW)
         self.quick_set_frm_known_distance_btn.grid(row=0, column=1, sticky=NW)
@@ -155,9 +157,9 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
 
     def _get_instructions_frm(self):
         self.instructions_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="INSTRUCTIONS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_PARAMETERS.value)
-        self.instructions_label_1 = SimBALabel(parent=self.instructions_frm, txt='1. Enter the known distance (mm) in "DISTANCE IN MM." Use "autopopulate" or "batch quick set" for similar videos.', font=Formats.FONT_REGULAR.value)
-        self.instructions_label_2 = SimBALabel(parent=self.instructions_frm, txt='2. Click on "CALCULTE DISTANCE" button(s) to calculate pixels/mm for each video.', font=Formats.FONT_REGULAR.value)
-        self.instructions_label_3 = SimBALabel(parent=self.instructions_frm, txt="3. Click <SAVE PIXEL PER MILLIMETER DATA> when all the data are filled in.", font=Formats.FONT_REGULAR.value)
+        self.instructions_label_1 = SimBALabel(parent=self.instructions_frm, txt='1. Enter the known distance (mm) in "DISTANCE IN MM." Use "autopopulate" or "batch quick set" for similar videos.', font=Formats.FONT_REGULAR_ITALICS.value)
+        self.instructions_label_2 = SimBALabel(parent=self.instructions_frm, txt='2. Click on "CALCULATE DISTANCE" button(s) to calculate pixels/mm for each video.', font=Formats.FONT_REGULAR_ITALICS.value)
+        self.instructions_label_3 = SimBALabel(parent=self.instructions_frm, txt="3. Click <SAVE PIXEL PER MILLIMETER DATA> when all the data are filled in.", font=Formats.FONT_REGULAR_ITALICS.value)
         self.instructions_frm.grid(row=0, column=0, sticky=W)
         self.instructions_label_1.grid(row=0, column=0, sticky=W)
         self.instructions_label_2.grid(row=1, column=0, sticky=W)
@@ -170,18 +172,49 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         self.save_data_btn.grid(row=0, column=0, sticky=NW)
 
     def _get_video_table(self):
+        padx = (0, 12)
         self.video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="PROJECT VIDEOS", icon_name='video_large', icon_link=Links.VIDEO_PARAMETERS.value, font=Formats.FONT_HEADER.value)
-        for cnt, (col_name, col_width) in enumerate(zip(TABLE_HEADERS, self.TABLE_COL_WIDTHS)):
-            col_header_label = Label( self.video_frm, text=col_name, width=col_width, font=Formats.FONT_HEADER.value)
-            col_header_label.grid(row=0, column=cnt, sticky=W)
-        self.video_frm.grid(row=3, column=0, sticky=NW)
+
+        idx_header = SimBALabel(parent=self.video_frm, txt="INDEX", font=Formats.FONT_HEADER.value, justify='center', img='list')
+        idx_header.grid(row=0, column=0, sticky=NW, padx=padx)
+
+        video_name_header = SimBALabel(parent=self.video_frm, txt="VIDEO NAME", font=Formats.FONT_HEADER.value, justify='center', img='video_2')
+        video_name_header.grid(row=0, column=1, sticky=W, padx=padx)
+
+        fps_header = SimBALabel(parent=self.video_frm, txt="FPS", font=Formats.FONT_HEADER.value, justify='center', img='camera')
+        fps_header.grid(row=0, column=2, sticky=W, padx=padx)
+
+        width_header = SimBALabel(parent=self.video_frm, txt="VIDEO WIDTH", font=Formats.FONT_HEADER.value, justify='center', img='width')
+        width_header.grid(row=0, column=3, sticky=W, padx=padx)
+
+        height_header = SimBALabel(parent=self.video_frm, txt="VIDEO HEIGHT", font=Formats.FONT_HEADER.value, justify='center', img='height')
+        height_header.grid(row=0, column=4, sticky=W, padx=padx)
+
+        find_dist_header = SimBALabel(parent=self.video_frm, txt="FIND DISTANCE", font=Formats.FONT_HEADER.value, justify='center')
+        find_dist_header.grid(row=0, column=5, sticky=W, padx=padx)
+
+        dist_header = SimBALabel(parent=self.video_frm, txt="DISTANCE IN MM", font=Formats.FONT_HEADER.value, justify='center', img='distance_red')
+        dist_header.grid(row=0, column=6, sticky=W, padx=padx)
+
+        px_mm_header = SimBALabel(parent=self.video_frm, txt="PIXELS PER MM", font=Formats.FONT_HEADER.value, justify='center', img='ruler')
+        px_mm_header.grid(row=0, column=7, sticky=W)
+
+        seperator = SimBASeperator(parent=self.video_frm, color=None, orient='horizontal', borderwidth=1)
+        seperator.grid(row=1, column=0, columnspan=15, rowspan=1, sticky="ew")
+
+
+
+        self.video_frm.grid(row=3, column=0, sticky=W)
         self._get_video_table_rows()
 
     def _get_duplicate_btns(self):
         self.duplicate_distance_btn = SimbaButton(parent=self.video_frm, txt="DUPLICATE INDEX 1", txt_clr='red', img='danger', font=Formats.FONT_REGULAR.value, cmd=self._duplicate_idx_1_distance)
-        self.duplicate_distance_btn.grid(row=1, column=6, sticky=W, padx=5)
+        self.duplicate_distance_btn.grid(row=2, column=6, sticky=W, padx=12)
         self.duplicate_btn = SimbaButton(parent=self.video_frm, txt="DUPLICATE INDEX 1", txt_clr='red', img='danger', font=Formats.FONT_REGULAR.value, cmd=self._duplicate_idx_1_px_mm)
-        self.duplicate_btn.grid(row=1, column=7, sticky=W, padx=5)
+        self.duplicate_btn.grid(row=2, column=7, sticky=W, padx=12)
+        sep = SimBASeperator(parent=self.video_frm, orient='horizontal', height=2, color="#ccc")
+        sep.grid(row=3, column=0, columnspan=15, sticky="ew")
+
 
 
     def _save(self):
@@ -216,7 +249,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         self._get_save_frm(index=4)
 
 
-# ui = VideoInfoTable(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+# ui = VideoInfoTable(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini")
 # ui.run()
 
 
