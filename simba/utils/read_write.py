@@ -885,7 +885,7 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
         ret, img = capture.read()
         if not ret:
             if raise_error:
-                raise FrameRangeError(msg=f"Frame {frame_index} for video {video_path} could not be read.")
+                raise FrameRangeError(msg=f"Frame {frame_index} for video {video_path} could not be read.", source=read_frm_of_video.__name__)
             else:
                 return None
     else:

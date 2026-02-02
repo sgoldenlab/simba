@@ -19,8 +19,8 @@ class InitializeBlobTrackerPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="BLOB TRACKER: SELECT INPUT AND OUTPUT DIRECTORIES", size=(500, 500), icon='bubble_green')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="DATA DIRECTORY SETTINGS", icon_name='settings')
-        self.input_dir_select = FolderSelect(parent=settings_frm, folderDescription= 'INPUT VIDEO DIRECTORY:', lblwidth=30, entry_width=20, lbl_icon='folder', tooltip_key='VIDEO_DIR')
-        self.save_dir_select = FolderSelect(parent=settings_frm, folderDescription='SAVE DATA DIRECTORY:', lblwidth=30, entry_width=20, lbl_icon='folder', tooltip_key='SAVE_DIR')
+        self.input_dir_select = FolderSelect(parent=settings_frm, folderDescription= 'INPUT VIDEO DIRECTORY:', lblwidth=30, entry_width=20, lbl_icon='folder_video', tooltip_key='VIDEO_DIR')
+        self.save_dir_select = FolderSelect(parent=settings_frm, folderDescription='SAVE DATA DIRECTORY:', lblwidth=30, entry_width=20, lbl_icon='folder_2', tooltip_key='SAVE_DIR')
         self.create_run_frm(run_function=self.run)
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.input_dir_select.grid(row=0, column=0, sticky=NW)

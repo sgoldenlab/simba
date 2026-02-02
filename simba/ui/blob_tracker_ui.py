@@ -26,7 +26,7 @@ from simba.utils.read_write import (find_all_videos_in_directory,
                                     find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     get_video_meta_data, remove_files,
-                                    save_json, str_2_bool, write_pickle)
+                                    save_json, str_2_bool, write_pickle, read_frm_of_video)
 from simba.video_processors.blob_tracking_executor import BlobTrackingExecutor
 
 ABSOLUTE = 'absolute'
@@ -101,15 +101,15 @@ class BlobTrackingUI(PopUpMixin):
     def get_quick_settings(self):
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', padx=15, pady=15)
         self.quick_settings_frm = CreateLabelFrameWithIcon(parent=self.settings_frm, header="QUICK SETTINGS", icon_name='clock', padx=15, pady=15, relief='solid')
-        self.quick_setting_threshold_dropdown = SimBADropDown(parent=self.quick_settings_frm, dropdown_options=list(range(1, 101)), label="THRESHOLD:", label_width=30, dropdown_width=10, value=DEFAULT_THRESHOLD, img='threshold')
+        self.quick_setting_threshold_dropdown = SimBADropDown(parent=self.quick_settings_frm, dropdown_options=list(range(1, 101)), label="THRESHOLD:", label_width=30, dropdown_width=10, value=DEFAULT_THRESHOLD, img='threshold', tooltip_key='BLOB_THRESHOLD')
         self.quick_setting_threshold_btn = SimbaButton(parent=self.quick_settings_frm, txt='APPLY', img='tick',cmd=self._set_threshold, cmd_kwargs={'threshold': lambda: self.quick_setting_threshold_dropdown.getChoices()})
-        self.set_smoothing_time_dropdown = SimBADropDown(parent=self.quick_settings_frm, dropdown_options=SMOOTHING_TIMES, label="SMOOTHING TIME (S):", label_width=30, dropdown_width=10, value=SMOOTHING_TIMES[0], img='smooth')
+        self.set_smoothing_time_dropdown = SimBADropDown(parent=self.quick_settings_frm, dropdown_options=SMOOTHING_TIMES, label="SMOOTHING TIME (S):", label_width=30, dropdown_width=10, value=SMOOTHING_TIMES[0], img='smooth', tooltip_key='BLOB_SMOOTHING_TIME')
         self.set_smoothing_time_btn = SimbaButton(parent=self.quick_settings_frm, txt='APPLY', img='tick', cmd=self._set_smoothing_time, cmd_kwargs={'time': lambda: self.set_smoothing_time_dropdown.getChoices()})
-        self.set_buffer_dropdown = SimBADropDown(parent=self.quick_settings_frm, dropdown_options=BUFFER_SIZES, label="BUFFER (PIXELS):", label_width=30, dropdown_width=10, value=BUFFER_SIZES[0], img='resize')
+        self.set_buffer_dropdown = SimBADropDown(parent=self.quick_settings_frm, dropdown_options=BUFFER_SIZES, label="BUFFER (PIXELS):", label_width=30, dropdown_width=10, value=BUFFER_SIZES[0], img='resize', tooltip_key='BLOB_BUFFER')
         self.set_buffer_btn = SimbaButton(parent=self.quick_settings_frm, txt='APPLY', img='tick', cmd=self._set_buffer_size, cmd_kwargs={'size': lambda: self.set_buffer_dropdown.getChoices()})
-        self.closing_kernal_size_dropdown = SimBADropDown(parent=self.quick_settings_frm, dropdown_options=KERNEL_SIZES, label="GAP FILL FILTER SIZE (%):", label_width=30, dropdown_width=10, value=BUFFER_SIZES[0], img='pct')
+        self.closing_kernal_size_dropdown = SimBADropDown(parent=self.quick_settings_frm, dropdown_options=KERNEL_SIZES, label="GAP FILL FILTER SIZE (%):", label_width=30, dropdown_width=10, value=BUFFER_SIZES[0], img='pct', tooltip_key='BLOB_GAP_FILL_SIZE')
         self.set_closing_kernel_btn = SimbaButton(parent=self.quick_settings_frm, txt='APPLY', img='tick', cmd=self._set_close_kernel_dropdown, cmd_kwargs={'size': lambda: self.closing_kernal_size_dropdown.getChoices()})
-        self.opening_kernal_size_dropdown = SimBADropDown(parent=self.quick_settings_frm, dropdown_options=KERNEL_SIZES, label="NOISE REMOVAL FILTER SIZE (%):", label_width=30, dropdown_width=10, value=BUFFER_SIZES[0], img='pct_2')
+        self.opening_kernal_size_dropdown = SimBADropDown(parent=self.quick_settings_frm, dropdown_options=KERNEL_SIZES, label="NOISE REMOVAL FILTER SIZE (%):", label_width=30, dropdown_width=10, value=BUFFER_SIZES[0], img='pct_2', tooltip_key='BLOB_NOISE_REMOVAL_SIZE')
         self.opening_kernel_btn = SimbaButton(parent=self.quick_settings_frm, txt='APPLY', img='tick', cmd=self._set_open_kernel_dropdown, cmd_kwargs={'size': lambda: self.opening_kernal_size_dropdown.getChoices()})
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
@@ -126,19 +126,17 @@ class BlobTrackingUI(PopUpMixin):
         self.opening_kernel_btn.grid(row=6, column=1, sticky=NW)
 
         self.run_time_settings_frm = CreateLabelFrameWithIcon(parent=self.settings_frm, header="RUN-TIME SETTINGS", icon_name='run', padx=15, pady=15, relief='solid')
-        self.bg_dir = FolderSelect(parent=self.run_time_settings_frm, folderDescription='BACKGROUND DIRECTORY:', lblwidth=30, initialdir=self.input_dir, lbl_icon='video_2')
+        self.bg_dir = FolderSelect(parent=self.run_time_settings_frm, folderDescription='BACKGROUND DIRECTORY:', lblwidth=30, initialdir=self.input_dir, lbl_icon='video_2', tooltip_key='BLOB_BACKGROUND_DIRECTORY')
         self.bg_dir_apply = SimbaButton(parent=self.run_time_settings_frm, txt='APPLY', img='tick',  cmd=self._apply_bg_dir, cmd_kwargs={'bg_dir': lambda: self.bg_dir.folder_path})
-        self.use_gpu_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU:", label_width=30, dropdown_width=10, value='FALSE', img='gpu_3')
-        #if not self.gpu_available: self.use_gpu_dropdown.disable()
-        #else: self.use_gpu_dropdown.set_value(value='TRUE')
+        self.use_gpu_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU:", label_width=30, dropdown_width=10, value='FALSE', img='gpu_3', tooltip_key='USE_GPU')
         self.use_gpu_dropdown.disable()
-        self.core_cnt_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(range(1, self.core_cnt+1)), label="CPU CORE COUNT:", label_width=30, dropdown_width=10, value=int(self.core_cnt / 2), img='cpu_small')
+        self.core_cnt_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(range(1, self.core_cnt+1)), label="CPU CORE COUNT:", label_width=30, dropdown_width=10, value=int(self.core_cnt / 2), img='cpu_small', tooltip_key='CORE_COUNT')
 
-        self.vertice_cnt_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(range(10, 501)), label="VERTICE COUNT:", label_width=30, dropdown_width=10, value=30, img='polygon')
-        self.save_videos_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SAVE BACKGROUND VIDEOS:", label_width=30, dropdown_width=10, value='TRUE', img='save_small')
-        self.close_iterations_dropdown_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(range(1, 20)), label="GAP FILLING ITERATIONS:", label_width=30, dropdown_width=10, value=3, img='abacus')
-        self.open_iterations_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(range(1, 20)), label="NOISE REMOVAL ITERATIONS:", label_width=30, dropdown_width=10, value=3, img='abacus_2')
-        self.duplicate_inclusion_zones_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(self.in_videos.keys()), label="DUPLICATE INCLUSION ZONES:", label_width=30, dropdown_width=self.len_max_char, value=list(self.in_videos.keys())[0], img='duplicate')
+        self.vertice_cnt_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(range(10, 501)), label="VERTICE COUNT:", label_width=30, dropdown_width=10, value=30, img='polygon', tooltip_key='BLOB_VERTICE_COUNT')
+        self.save_videos_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SAVE BACKGROUND VIDEOS:", label_width=30, dropdown_width=10, value='TRUE', img='save_small', tooltip_key='BLOB_SAVE_BG_VIDEOS')
+        self.close_iterations_dropdown_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(range(1, 20)), label="GAP FILLING ITERATIONS:", label_width=30, dropdown_width=10, value=3, img='abacus', tooltip_key='BLOB_GAP_FILL_ITERATIONS')
+        self.open_iterations_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(range(1, 20)), label="NOISE REMOVAL ITERATIONS:", label_width=30, dropdown_width=10, value=3, img='abacus_2', tooltip_key='BLOB_NOISE_REMOVAL_ITERATIONS')
+        self.duplicate_inclusion_zones_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(self.in_videos.keys()), label="DUPLICATE INCLUSION ZONES:", label_width=30, dropdown_width=self.len_max_char, value=list(self.in_videos.keys())[0], img='duplicate', tooltip_key='BLOB_DUPLICATE_INCLUSION')
         self.duplicate_inclusion_zones_btn = SimbaButton(parent=self.run_time_settings_frm, txt='APPLY', img='tick', cmd=self._duplicate_inclusion_zones, cmd_kwargs={'video_name': lambda: self.duplicate_inclusion_zones_dropdown.getChoices()})
         self.run_time_settings_frm.grid(row=0, column=1, sticky=NW, padx=(0, 15))
 
@@ -162,16 +160,16 @@ class BlobTrackingUI(PopUpMixin):
     def get_main_table(self):
         self.headings = {}
         self.videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEOS", icon_name='video', pady=5, padx=15, relief='solid')
-        self.headings['video_name'] = SimBALabel(parent=self.videos_frm, txt='VIDEO NAME', width=self.len_max_char, font=Formats.FONT_HEADER.value)
+        self.headings['video_name'] = SimBALabel(parent=self.videos_frm, txt='VIDEO NAME', width=self.len_max_char, font=Formats.FONT_HEADER.value, tooltip_key='BLOB_HEADER_VIDEO_NAME')
         self.headings['vertical_seperator'] = SimBASeperator(parent=self.videos_frm, color='black', orient='vertical', relief='flat')
-        self.headings['bg_path'] = SimBALabel(parent=self.videos_frm, txt='BACKGROUND \n REFERENCE', font=Formats.FONT_HEADER.value, justify='center', img='video_2')
-        self.headings['threshold'] = SimBALabel(parent=self.videos_frm, txt='THRESHOLD', font=Formats.FONT_HEADER.value, justify='center', img='threshold')
-        self.headings['inclusion_zones'] = SimBALabel(parent=self.videos_frm, txt='INCLUSION \n ZONES', font=Formats.FONT_HEADER.value, img='shapes_small')
-        self.headings['smoothing_time'] = SimBALabel(parent=self.videos_frm, txt='SMOOTHING \n TIME (S)', font=Formats.FONT_HEADER.value, img='smooth', justify='center')
-        self.headings['buffer_size'] = SimBALabel(parent=self.videos_frm, txt='BUFFER \n SIZE (PX)', font=Formats.FONT_HEADER.value, img='resize')
-        self.headings['closing_kernel_size'] = SimBALabel(parent=self.videos_frm, txt='GAP FILL \n SIZE (%)', font=Formats.FONT_HEADER.value, img='pct')
-        self.headings['opening_kernel_size'] = SimBALabel(parent=self.videos_frm, txt='NOISE \n FILL SIZE (%)', font=Formats.FONT_HEADER.value, img='pct_2')
-        self.headings['quick_check'] = SimBALabel(parent=self.videos_frm, txt='QUICK \n CHECK', font=Formats.FONT_HEADER.value, img='eye')
+        self.headings['bg_path'] = SimBALabel(parent=self.videos_frm, txt='BACKGROUND \n REFERENCE', font=Formats.FONT_HEADER.value, justify='center', img='video_2', tooltip_key='BLOB_HEADER_BACKGROUND_REFERENCE')
+        self.headings['threshold'] = SimBALabel(parent=self.videos_frm, txt='THRESHOLD', font=Formats.FONT_HEADER.value, justify='center', img='threshold', tooltip_key='BLOB_HEADER_THRESHOLD')
+        self.headings['inclusion_zones'] = SimBALabel(parent=self.videos_frm, txt='INCLUSION \n ZONES', font=Formats.FONT_HEADER.value, img='shapes_small', tooltip_key='BLOB_HEADER_INCLUSION_ZONES')
+        self.headings['smoothing_time'] = SimBALabel(parent=self.videos_frm, txt='SMOOTHING \n TIME (S)', font=Formats.FONT_HEADER.value, img='smooth', justify='center', tooltip_key='BLOB_HEADER_SMOOTHING_TIME')
+        self.headings['buffer_size'] = SimBALabel(parent=self.videos_frm, txt='BUFFER \n SIZE (PX)', font=Formats.FONT_HEADER.value, img='resize', tooltip_key='BLOB_HEADER_BUFFER')
+        self.headings['closing_kernel_size'] = SimBALabel(parent=self.videos_frm, txt='GAP FILL \n SIZE (%)', font=Formats.FONT_HEADER.value, img='pct', tooltip_key='BLOB_HEADER_GAP_FILL_SIZE')
+        self.headings['opening_kernel_size'] = SimBALabel(parent=self.videos_frm, txt='NOISE \n FILL SIZE (%)', font=Formats.FONT_HEADER.value, img='pct_2', tooltip_key='BLOB_HEADER_NOISE_REMOVAL_SIZE')
+        self.headings['quick_check'] = SimBALabel(parent=self.videos_frm, txt='QUICK \n CHECK', font=Formats.FONT_HEADER.value, img='eye', tooltip_key='BLOB_HEADER_QUICK_CHECK')
         col_cnt = 0
         for k, v in self.headings.items():
             if k == 'vertical_seperator':
@@ -190,7 +188,8 @@ class BlobTrackingUI(PopUpMixin):
         for video_cnt, (video_name, video_path) in enumerate(self.in_videos.items()):
             row_cnt = video_cnt * 2 + 2
             self.videos[video_name] = {}
-            self.videos[video_name]['name_lbl'] = SimBALabel(parent=self.videos_frm, txt=video_name, width=self.len_max_char, font=Formats.FONT_HEADER.value)
+            img = read_frm_of_video(video_path=video_path, frame_index=0, size=(420, 280), keep_aspect_ratio=True, raise_error=False)
+            self.videos[video_name]['name_lbl'] = SimBALabel(parent=self.videos_frm, txt=video_name, width=self.len_max_char, font=Formats.FONT_HEADER.value, hover_img=img)
             self.videos[video_name]["threshold_dropdown"] = SimBADropDown(parent=self.videos_frm, dropdown_options=list(range(1, 100)), label="", label_width=0, dropdown_width=15, value=DEFAULT_THRESHOLD)
             self.videos[video_name]["inclusion_btn"] = SimbaButton(parent=self.videos_frm, txt="SET INCLUSION ZONES", cmd=lambda k=self.videos[video_name]['name_lbl']["text"]: self._launch_set_inclusion_zones(k), img='shapes_small')
             self.videos[video_name]["bg_file"] = FileSelect(parent=self.videos_frm, width=25)

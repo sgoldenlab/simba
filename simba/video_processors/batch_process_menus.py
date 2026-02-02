@@ -67,7 +67,8 @@ class BatchProcessFrame(PopUpMixin):
 
     """
 
-    def __init__(self, input_dir: Union[str, os.PathLike],
+    def __init__(self,
+                 input_dir: Union[str, os.PathLike],
                  output_dir: Union[str, os.PathLike]):
 
         if not check_ffmpeg_available(raise_error=False):
