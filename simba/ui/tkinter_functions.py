@@ -21,10 +21,10 @@ import numpy as np
 import PIL.Image
 from PIL import ImageTk
 
+from simba.utils.checks import check_if_valid_img
 from simba.utils.enums import Defaults, Formats, TkBinds
 from simba.utils.lookups import get_icons_paths, get_tooltips
 from simba.utils.read_write import get_fn_ext
-from simba.utils.checks import check_if_valid_img
 
 MENU_ICONS = get_icons_paths()
 TOOLTIPS = get_tooltips()

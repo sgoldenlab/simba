@@ -28,7 +28,9 @@ from simba.utils.lookups import (get_color_dict, get_ffmpeg_encoders,
                                  percent_to_crf_lookup,
                                  video_quality_to_preset_lookup)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, get_video_meta_data, str_2_bool, read_frm_of_video)
+from simba.utils.read_write import (
+    check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
+    get_video_meta_data, read_frm_of_video, str_2_bool)
 from simba.video_processors.batch_process_create_ffmpeg_commands import \
     FFMPEGCommandCreator
 from simba.video_processors.roi_selector import ROISelector
