@@ -63,7 +63,7 @@ class YoloPoseVisualizerPopUp(PopUpMixin):
 
         multiple_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="PLOT MULTIPLE VIDEOS", icon_name='stack')
         self.data_dir_path = FolderSelect(parent=multiple_video_frm, folderDescription='DATA DIRECTORY:', lblwidth=35,  entry_width=45, lbl_icon='folder', tooltip_key='yolo_plot_data_dir')
-        self.video_dir_path = FolderSelect(parent=multiple_video_frm, folderDescription='VIDEO DIRECTORY:', lblwidth=35,  entry_width=45, lbl_icon='folder', tooltip_key='VIDEO_DIR')
+        self.video_dir_path = FolderSelect(parent=multiple_video_frm, folderDescription='VIDEO DIRECTORY:', lblwidth=35,  entry_width=45, lbl_icon='folder_video', tooltip_key='VIDEO_DIR')
         multiple_video_btn = SimbaButton(parent=multiple_video_frm, txt='CREATE MULTIPLE VIDEOS', img='rocket', cmd=self.run, cmd_kwargs={'multiple': True})
 
         multiple_video_frm.grid(row=2, column=0, sticky=NW)

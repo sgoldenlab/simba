@@ -89,11 +89,7 @@ class YOLOPoseTrainPopUP(PopUpMixin):
             weights_path = None
         check_file_exist_and_readable(file_path=yolo_map_path, raise_error=True)
         check_valid_yolo_map(yolo_map=yolo_map_path)
-
-        # On Windows, PyTorch DataLoader with workers > 8 often deadlocks after train cache scan
         workers_for_subprocess = min(workers, 8) if sys.platform == 'win32' else workers
-
-        # Run training in a separate process to avoid GUI + YOLO sharing memory (prevents OOM)
         cmd = [
             sys.executable, '-m', 'simba.model.yolo_fit',
             '--model_yaml', yolo_map_path,
@@ -113,12 +109,10 @@ class YOLOPoseTrainPopUP(PopUpMixin):
             cmd.extend(['--format', format_val])
 
         creationflags = subprocess.CREATE_NEW_CONSOLE if sys.platform == 'win32' else 0
-        # Use non-interactive matplotlib backend so label plots save to file without opening GUI (avoids hang)
         env = os.environ.copy()
         env['MPLBACKEND'] = 'Agg'
         try:
             if sys.platform == 'win32':
-                # Run via a temp .bat so a visible console opens and stays open (pause) after exit
                 cmd_line = subprocess.list2cmdline(cmd)
                 with tempfile.NamedTemporaryFile(mode='w', suffix='.bat', delete=False, newline='') as f:
                     f.write('@echo off\n' + cmd_line + '\npause\n')

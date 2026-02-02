@@ -20,8 +20,9 @@ from simba.utils.read_write import (find_files_of_filetypes_in_directory,
 TRAIN_SIZE_OPTIONS = list(np.arange(10, 110, 10))
 SAMPLE_SIZE_OPTIONS = list(np.arange(50, 650, 50))
 
-PADDING_OPTIONS = list(np.round(np.arange(0.01, 10.05, 0.05),2).astype(str))
-PADDING_OPTIONS = list(np.insert(PADDING_OPTIONS, 0, 'None'))
+_padding_arr = np.concatenate([[0.01], np.arange(0.05, 10.05, 0.05)])
+PADDING_OPTIONS = [f"{x:.2f}" for x in np.round(_padding_arr, 2)]
+PADDING_OPTIONS = ['None'] + PADDING_OPTIONS
 
 
 
@@ -37,26 +38,28 @@ class SLEAPAnnotations2YoloPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="SLEAP ANNOTATIONS TO YOLO POSE ESTIMATION ANNOTATIONS", icon='sleap_small')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
-        self.sleap_dir = FolderSelect(settings_frm, folderDescription="SLEAP DATA DIRECTORY (.SLP):", lblwidth=35, entry_width=40, initialdir=r"D:\troubleshooting\two_animals_sleap\import_data", lbl_icon='folder')
-        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=40, initialdir=r"D:\troubleshooting\two_animals_sleap\yolo_kpts_2", lbl_icon='folder')
+        self.sleap_dir = FolderSelect(settings_frm, folderDescription="SLEAP DATA DIRECTORY (.SLP):", lblwidth=35, entry_width=40, lbl_icon='folder', tooltip_key='SLEAP_SLP_DATA_DIR')
+        self.video_dir = FolderSelect(settings_frm, folderDescription="VIDEO DIRECTORY:", lblwidth=35, entry_width=40, lbl_icon='folder_video', tooltip_key='VIDEO_DIR')
+        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=40, initialdir=r"D:\troubleshooting\two_animals_sleap\yolo_kpts_2", lbl_icon='folder', tooltip_key='SAVE_DIR')
 
-        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE: ", label_width=35, dropdown_width=40, value='TRUE', img='verbose')
-        self.train_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=TRAIN_SIZE_OPTIONS, label="TRAIN SIZE (%): ", label_width=35, dropdown_width=40, value=70, img='pct_2')
-        self.grey_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=35, dropdown_width=40, value='FALSE', img='grey')
-        self.padding_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=PADDING_OPTIONS, label="PADDING: ", label_width=35, dropdown_width=40, value='None', img='size_black')
-        self.clahe_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="CLAHE: ", label_width=35, dropdown_width=40, value='FALSE', img='clahe')
-        self.single_id_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="REMOVE ANIMAL ID'S", label_width=35, dropdown_width=40, value='FALSE', img='mouse_head')
+        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE: ", label_width=35, dropdown_width=40, value='TRUE', img='verbose', tooltip_key='verbose_dropdown')
+        self.train_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=TRAIN_SIZE_OPTIONS, label="TRAIN SIZE (%): ", label_width=35, dropdown_width=40, value=70, img='pct_2', tooltip_key='simba2yolo_train_size')
+        self.grey_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=35, dropdown_width=40, value='FALSE', img='grey', tooltip_key='simba2yolo_grey')
+        self.padding_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=PADDING_OPTIONS, label="PADDING: ", label_width=35, dropdown_width=40, value='None', img='size_black', tooltip_key='simba2yolo_padding')
+        self.clahe_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="CLAHE: ", label_width=35, dropdown_width=40, value='FALSE', img='clahe', tooltip_key='simba2yolo_clahe')
+        self.single_id_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="REMOVE ANIMAL ID'S", label_width=35, dropdown_width=40, value='FALSE', img='mouse_head', tooltip_key='sleap_remove_animal_ids')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.sleap_dir .grid(row=0, column=0, sticky=NW)
-        self.save_dir.grid(row=1, column=0, sticky=NW)
+        self.video_dir.grid(row=1, column=0, sticky=NW)
+        self.save_dir.grid(row=2, column=0, sticky=NW)
 
-        self.verbose_dropdown.grid(row=2, column=0, sticky=NW)
-        self.train_size_dropdown.grid(row=3, column=0, sticky=NW)
-        self.grey_dropdown.grid(row=4, column=0, sticky=NW)
-        self.clahe_dropdown.grid(row=5, column=0, sticky=NW)
-        self.padding_dropdown.grid(row=6, column=0, sticky=NW)
-        self.single_id_dropdown.grid(row=7, column=0, sticky=NW)
+        self.verbose_dropdown.grid(row=3, column=0, sticky=NW)
+        self.train_size_dropdown.grid(row=4, column=0, sticky=NW)
+        self.grey_dropdown.grid(row=5, column=0, sticky=NW)
+        self.clahe_dropdown.grid(row=6, column=0, sticky=NW)
+        self.padding_dropdown.grid(row=7, column=0, sticky=NW)
+        self.single_id_dropdown.grid(row=8, column=0, sticky=NW)
 
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
@@ -65,9 +68,12 @@ class SLEAPAnnotations2YoloPopUp(PopUpMixin):
     def run(self):
         sleap_dir = self.sleap_dir.folder_path
         save_dir = self.save_dir.folder_path
+        video_dir = self.video_dir.folder_path
 
         check_if_dir_exists(in_dir=sleap_dir, source=f'{self.__class__.__name__} SLEAP DATA DIRECTORY', raise_error=True)
         check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} SAVE DIRECTORY', raise_error=True)
+        video_dir_exist = check_if_dir_exists(in_dir=video_dir, source=f'{self.__class__.__name__} VIDEO DIRECTORY', raise_error=False)
+        video_dir = video_dir if video_dir_exist else None
         _ = find_files_of_filetypes_in_directory(directory=sleap_dir, extensions=['.slp'], raise_error=True)
 
         grey = str_2_bool(self.grey_dropdown.get_value())
@@ -77,7 +83,15 @@ class SLEAPAnnotations2YoloPopUp(PopUpMixin):
         padding = float(self.padding_dropdown.get_value()) if self.padding_dropdown.get_value() != 'None' else 0.0
         single_id = 'animal_1' if str_2_bool(self.single_id_dropdown.get_value()) else None
 
-        runner = SleapAnnotations2Yolo(sleap_dir=sleap_dir, save_dir=save_dir, padding=padding, train_size=train_size, verbose=verbose, greyscale=grey, clahe=clahe, single_id=single_id)
+        runner = SleapAnnotations2Yolo(sleap_dir=sleap_dir,
+                                       save_dir=save_dir,
+                                       video_dir=video_dir,
+                                       padding=padding,
+                                       train_size=train_size,
+                                       verbose=verbose,
+                                       greyscale=grey,
+                                       clahe=clahe,
+                                       single_id=single_id)
         runner.run()
 
 

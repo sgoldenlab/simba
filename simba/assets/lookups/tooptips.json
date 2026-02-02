@@ -64,5 +64,6 @@
   "SLEAP_DATA_DIR": "Directory containing SLEAP CSV prediction files. Each CSV should match a video filename (without extension).",
   "ANIMAL_COUNT": "Number of animals (tracks) in the videos. Used to name classes (e.g. animal_1, animal_2) in the YOLO dataset.",
   "sleap_remove_animal_ids": "If TRUE, merge all tracks into a single identity (animal_1). Use when animal IDs are not meaningful or for single-animal data.",
-  "sleap_threshold": "Minimum SLEAP instance confidence (the instance.score column in the CSV). Only pose predictions with score ≥ this value are used when building the YOLO dataset. E.g. 90 means keep instances where instance.score ≥ 0.9; lower values include more frames but may add noisy predictions."
+  "sleap_threshold": "Minimum SLEAP instance confidence (the instance.score column in the CSV). Only pose predictions with score ≥ this value are used when building the YOLO dataset. E.g. 90 means keep instances where instance.score ≥ 0.9; lower values include more frames but may add noisy predictions.",
+  "SLEAP_SLP_DATA_DIR": "Directory containing SLEAP .SLP project/annotation files. Each .SLP file is converted to YOLO pose format."
 }
