@@ -11,15 +11,11 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.px_to_mm_ui import GetPixelsPerMillimeterInterface
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         SimbaButton, SimBALabel, SimBASeperator)
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_int)
-from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links,
-                               Options, TagNames)
+from simba.utils.checks import (check_file_exist_and_readable, check_float, check_if_dir_exists, check_int)
+from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links, Options, TagNames)
 from simba.utils.errors import InvalidInputError, PermissionError
 from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_video_meta_data, read_config_entry,
-                                    read_video_info_csv)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_video_meta_data, read_config_entry, read_video_info_csv, read_frm_of_video)
 
 TABLE_HEADERS = ["INDEX", "VIDEO", "FPS", "RESOLUTION WIDTH", "RESOLUTION HEIGHT", "FIND DISTANCE", "DISTANCE IN MM", "PIXELS PER MM"]
 
@@ -72,6 +68,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         padx = (0, 12)
         for cnt, (video_name, video_path) in enumerate(self.video_paths.items()):
             self.videos[video_name] = {}
+            row = cnt * 2 + 2 + 4
             if video_name in self.prior_videos:
                 try:
                     prior_data = self.read_video_info(video_name=video_name, raise_error=False)[0].reset_index(drop=True).iloc[0].to_dict()
@@ -82,25 +79,30 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
             else:
                 fps, width, height = self.video_meta_data[video_name]['fps'], self.video_meta_data[video_name]['width'], self.video_meta_data[video_name]['height']
                 distance, pixels_per_mm = self.distance_mm, 'None'
-
+            try:
+                img = read_frm_of_video(video_path=video_path, frame_index=0, raise_error=False, size=(280, 120), keep_aspect_ratio=True)
+            except:
+                img = None
             self.videos[video_name]["video_idx_lbl"] = SimBALabel(parent=self.video_frm, txt=str(cnt+1), font=Formats.FONT_REGULAR_BOLD.value)
-            self.videos[video_name]["video_name_lbl"] = SimBALabel(parent=self.video_frm, txt=video_name, font=Formats.FONT_REGULAR_BOLD.value)
+            self.videos[video_name]["video_name_lbl"] = SimBALabel(parent=self.video_frm, txt=video_name, font=Formats.FONT_REGULAR_BOLD.value, hover_img=img)
             self.videos[video_name]["video_name_w_ext"] = os.path.basename(video_path)
-
             self.videos[video_name]["video_fps_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=fps, entry_box_width=12, justify='center')
             self.videos[video_name]["video_width_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=width, entry_box_width=12, justify='center', validation='numeric')
             self.videos[video_name]["video_height_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=height, entry_box_width=12, justify='center', validation='numeric')
             self.videos[video_name]["video_known_distance_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=distance, entry_box_width=12, justify='center')
             self.videos[video_name]["find_dist_btn"] = SimbaButton(parent=self.video_frm, txt="CALCULATE DISTANCE", txt_clr='black', img='calipher', font=Formats.FONT_REGULAR_BOLD.value, cmd=lambda k=video_name: self._initate_find_distance(k), hover_font=Formats.FONT_REGULAR_BOLD.value)
             self.videos[video_name]["video_px_per_mm"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=pixels_per_mm, entry_box_width=12, justify='center')
-            self.videos[video_name]["video_idx_lbl"].grid(row=cnt+4, column=0, sticky=NW, padx=padx)
-            self.videos[video_name]["video_name_lbl"].grid(row=cnt+4, column=1, sticky=W, padx=padx)
-            self.videos[video_name]["video_fps_eb"].grid(row=cnt+4, column=2, sticky=W, padx=padx)
-            self.videos[video_name]["video_width_eb"].grid(row=cnt+4, column=3, sticky=W, padx=padx)
-            self.videos[video_name]["video_height_eb"].grid(row=cnt+4, column=4, sticky=W, padx=padx)
-            self.videos[video_name]["find_dist_btn"].grid(row=cnt + 4, column=5, sticky=W, padx=padx)
-            self.videos[video_name]["video_known_distance_eb"].grid(row=cnt+4, column=6, sticky=W, padx=padx)
-            self.videos[video_name]["video_px_per_mm"].grid(row=cnt+4, column=7, sticky=W, padx=padx)
+            self.videos[video_name]["video_idx_lbl"].grid(row=row, column=0, sticky=NW, padx=padx)
+            self.videos[video_name]["video_name_lbl"].grid(row=row, column=1, sticky=W, padx=padx)
+            self.videos[video_name]["video_fps_eb"].grid(row=row, column=2, sticky=W, padx=padx)
+            self.videos[video_name]["video_width_eb"].grid(row=row, column=3, sticky=W, padx=padx)
+            self.videos[video_name]["video_height_eb"].grid(row=row, column=4, sticky=W, padx=padx)
+            self.videos[video_name]["find_dist_btn"].grid(row=row, column=5, sticky=W, padx=padx)
+            self.videos[video_name]["video_known_distance_eb"].grid(row=row, column=6, sticky=W, padx=padx)
+            self.videos[video_name]["video_px_per_mm"].grid(row=row, column=7, sticky=W, padx=padx)
+            if cnt != len(self.video_paths.keys()) -1:
+                sep = SimBASeperator(parent=self.video_frm, orient='horizontal', height=1, color="#ccc")
+                sep.grid(row=row + 1, column=0, columnspan=15, sticky="ew")
 
     def _get_quick_set(self):
         self.quick_set_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BATCH QUICK SET", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_PARAMETERS.value)
