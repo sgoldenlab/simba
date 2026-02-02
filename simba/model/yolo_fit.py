@@ -27,7 +27,11 @@ from simba.utils.printing import stdout_information
 from simba.utils.read_write import find_core_cnt, get_current_time
 from simba.utils.yolo import load_yolo_model
 
-YOLO_X_PATH = "https://huggingface.co/Ultralytics/YOLO11/resolve/main/yolo11x-pose.pt"
+#YOLO_X_PATH = "https://huggingface.co/Ultralytics/YOLO11/resolve/main/yolo11x-pose.pt"
+
+YOLO_M_PATH = "https://huggingface.co/Ultralytics/YOLO11/resolve/main/yolo11m-pose.pt"
+
+
 
 class FitYolo():
 
@@ -114,7 +118,7 @@ class FitYolo():
         self.imgsz, self.device, self.workers, self.format = imgsz, device, workers, format
         self.plots, self.save_path, self.verbose, self.patience = plots, save_path, verbose, patience
 
-    def _download_start_weights(self, url: str = YOLO_X_PATH, save_path: Union[str, os.PathLike] = "yolo11x-pose.pt"):
+    def _download_start_weights(self, url: str = YOLO_M_PATH, save_path: Union[str, os.PathLike] = "yolo11m-pose.pt"):
         print(f'No start weights provided, downloading {save_path} from {url}...')
         check_valid_url(url=url, raise_error=True, source=self.__class__.__name__)
         if not os.path.isfile(save_path):

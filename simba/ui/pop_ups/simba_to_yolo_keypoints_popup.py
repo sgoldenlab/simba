@@ -17,7 +17,7 @@ from simba.utils.read_write import str_2_bool
 TRAIN_SIZE_OPTIONS = np.arange(10, 110, 10)
 SAMPLE_SIZE_OPTIONS = list(np.arange(50, 650, 50))
 
-THRESHOLD_OPTIONS = list(np.arange(0.1, 1.1, 0.1))
+THRESHOLD_OPTIONS = [round(x, 2) for x in np.arange(0.1, 1.1, 0.1)]
 
 PADDING_OPTIONS = list(np.round(np.arange(0.01, 10.05, 0.05),2).astype(str))
 PADDING_OPTIONS = list(np.insert(PADDING_OPTIONS, 0, 'None'))
@@ -31,15 +31,15 @@ class SimBA2YoloKeypointsPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="SIMBA TO YOLO KEYPOINTS", icon='SimBA_logo_3_small')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
-        self.config_select = FileSelect(parent=settings_frm, fileDescription='SIMBA PROJECT CONFIG (.INI): ', lblwidth=35, file_types=[("INI FILE", (".ini", ".INI",))], entry_width=40, initialdir=r"C:\troubleshooting\mitra\project_folder", lbl_icon='ini')
-        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=40, initialdir=r'C:\troubleshooting\mitra\yolo', lbl_icon='folder')
-        self.train_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=TRAIN_SIZE_OPTIONS, label="TRAIN SIZE (%): ", label_width=35, dropdown_width=40, value=70, img='pct_2')
-        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE: ", label_width=35, dropdown_width=40, value='TRUE', img='verbose')
-        self.padding_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=PADDING_OPTIONS, label="PADDING: ", label_width=35, dropdown_width=40, value='None', img='size_black')
-        self.sample_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=SAMPLE_SIZE_OPTIONS, label="FRAME SAMPLES PER VIDEO: ", label_width=35, dropdown_width=40, value=100, img='frames')
-        self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTIONS, label="CONFIDENCE THRESHOLD: ", label_width=35, dropdown_width=40, value='None', img='threshold')
-        self.grey_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=35, dropdown_width=40, value='FALSE', img='grey')
-        self.clahe_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="CLAHE: ", label_width=35, dropdown_width=40, value='FALSE', img='clahe')
+        self.config_select = FileSelect(parent=settings_frm, fileDescription='SIMBA PROJECT CONFIG (.INI): ', lblwidth=35, file_types=[("INI FILE", (".ini", ".INI",))], entry_width=40, initialdir=r"C:\troubleshooting\mitra\project_folder", lbl_icon='ini', tooltip_key='simba2yolo_config')
+        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=40, initialdir=r'C:\troubleshooting\mitra\yolo', lbl_icon='folder', tooltip_key='SAVE_DIR')
+        self.train_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=TRAIN_SIZE_OPTIONS, label="TRAIN SIZE (%): ", label_width=35, dropdown_width=40, value=70, img='pct_2', tooltip_key='simba2yolo_train_size')
+        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE: ", label_width=35, dropdown_width=40, value='TRUE', img='verbose', tooltip_key='verbose_dropdown')
+        self.padding_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=PADDING_OPTIONS, label="PADDING: ", label_width=35, dropdown_width=40, value='None', img='size_black', tooltip_key='simba2yolo_padding')
+        self.sample_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=SAMPLE_SIZE_OPTIONS, label="FRAME SAMPLES PER VIDEO: ", label_width=35, dropdown_width=40, value=100, img='frames', tooltip_key='simba2yolo_sample_size')
+        self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTIONS, label="CONFIDENCE THRESHOLD: ", label_width=35, dropdown_width=40, value='None', img='threshold', tooltip_key='threshold_dropdown')
+        self.grey_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=35, dropdown_width=40, value='FALSE', img='grey', tooltip_key='simba2yolo_grey')
+        self.clahe_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="CLAHE: ", label_width=35, dropdown_width=40, value='FALSE', img='clahe', tooltip_key='simba2yolo_clahe')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.config_select.grid(row=0, column=0, sticky=NW)

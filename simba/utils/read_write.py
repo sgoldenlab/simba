@@ -71,7 +71,7 @@ from simba.utils.errors import (CorruptedFileError, DataHeaderError,
                                 NoFilesFoundError, NotDirectoryError,
                                 ParametersFileError, PermissionError,
                                 SimBAPAckageVersionError)
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.warnings import (
     FileExistWarning, FrameRangeWarning, GPUToolsWarning, InvalidValueWarning,
     NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning)
@@ -572,7 +572,9 @@ def get_video_info_ffmpeg(video_path: Union[str, os.PathLike]) -> Dict[str, Any]
         print(e.args)
         raise InvalidVideoFileError(msg=f'Cannot use FFMPEG to extract video meta data for video {video_name}, try OpenCV?', source=get_video_info_ffmpeg.__name__)
 
-def remove_a_folder(folder_dir: Union[str, os.PathLike], ignore_errors: Optional[bool] = True) -> None:
+def remove_a_folder(folder_dir: Union[str, os.PathLike],
+                    ignore_errors: Optional[bool] = True,
+                    verbose: bool = False) -> None:
     """Helper to remove a directory"""
     valid_dir = check_if_dir_exists(in_dir=folder_dir, source=remove_a_folder.__name__, raise_error=False)
     if not valid_dir and not ignore_errors:
@@ -580,6 +582,7 @@ def remove_a_folder(folder_dir: Union[str, os.PathLike], ignore_errors: Optional
     if not valid_dir and ignore_errors:
         return
     try:
+        if verbose: stdout_information(msg=f'Removing directory {folder_dir}...')
         shutil.rmtree(folder_dir, ignore_errors=ignore_errors)
     except Exception as e:
         raise PermissionError(msg=f'Could not delete directory: {folder_dir}. is the directory or its content beeing used by anothe process?', source=remove_a_folder.__name__)
@@ -1759,7 +1762,9 @@ def read_roi_data(roi_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, pd.D
 
 
 
-def create_directory(paths: Union[str, os.PathLike, bytes, List[str], Tuple[str]], overwrite: bool = False) -> None:
+def create_directory(paths: Union[str, os.PathLike, bytes, List[str], Tuple[str]],
+                     overwrite: bool = False,
+                     verbose: bool = False) -> None:
 
     """
     Create one or multiple directories.
@@ -1779,15 +1784,17 @@ def create_directory(paths: Union[str, os.PathLike, bytes, List[str], Tuple[str]
         path = os.path.abspath(path)
         if not os.path.exists(path):
             try:
+                if verbose: stdout_information(msg=f'Creating directory {path}...')
                 os.makedirs(path)
             except Exception as e:
-                raise PermissionError(f'SimBA is not allowed to create the directory {path} ({e})')
+                raise PermissionError(f'SimBA is not allowed to create the directory {path} ({e}). Is a file in this directory open in another process?')
         elif overwrite:
             try:
                 remove_a_folder(folder_dir=path)
+                if verbose: stdout_information(msg=f'Creating directory {path}...')
                 os.makedirs(path)
             except Exception as e:
-                raise PermissionError(f'SimBA is not allowed to overwrite the directory {path} ({e})')
+                raise PermissionError(f'SimBA is not allowed to overwrite the directory {path} ({e}). Is a file in this directory open in another process?')
 
 
 def find_max_vertices_coordinates(shapes: List[Union[Polygon, LineString, MultiPolygon, Point]], buffer: Optional[int] = None) -> Tuple[int, int]:
@@ -1935,7 +1942,8 @@ def read_dlc_superanimal_h5(path: Union[str, os.PathLike], col_names: List[str])
     return data
 
 
-def clean_sleap_filenames_in_directory(dir: Union[str, os.PathLike]) -> None:
+def clean_sleap_filenames_in_directory(dir: Union[str, os.PathLike],
+                                       verbose: bool = False) -> None:
     """
     Clean up SLEAP input filenames in the specified directory by removing a prefix
     and a suffix, and renaming the files to match the names of the original video files.
@@ -1949,23 +1957,17 @@ def clean_sleap_filenames_in_directory(dir: Union[str, os.PathLike]) -> None:
     >>> clean_sleap_filenames_in_directory(dir='/Users/simon/Desktop/envs/troubleshooting/Hornet_SLEAP/import/')
     """
 
-    SLEAP_CSV_SUBSTR = ".analysis"
     check_if_dir_exists(in_dir=dir)
-    for file_path in glob.glob(
-        dir + f"/*.{Formats.CSV.value}" + f"/*.{Formats.H5.value}"
-    ):
-        file_name = os.path.basename(p=file_path)
-        if (SLEAP_CSV_SUBSTR in file_name) and ("_" in file_name):
-            new_name = os.path.join(
-                dir,
-                file_name.replace(file_name.split("_")[0] + "_", "").replace(
-                    SLEAP_CSV_SUBSTR, ""
-                ),
-            )
-            os.rename(file_path, new_name)
+    data_paths = find_files_of_filetypes_in_directory(directory=dir, extensions=[f'.{Formats.H5.value}', f'.{Formats.CSV.value}'], raise_error=True, sort_alphabetically=True, as_dict=False)
+    for file_path in data_paths:
+        directory, file_name, ext = get_fn_ext(filepath=file_path)
+        if verbose: print(f'Renaming {file_name} ...')
+        new_name = clean_sleap_file_name(filename=file_name)
+        new_path = os.path.join(directory, f'{new_name}{ext}')
+        if new_path != file_path:
+            os.rename(file_path, new_path)
         else:
             pass
-
 
 def copy_files_in_directory(in_dir: Union[str, os.PathLike],
                             out_dir: Union[str, os.PathLike],

@@ -48,5 +48,21 @@
   "yolo_initial_weights_path": "Optional path to pretrained weights (.pt) to start training from (e.g. yolo11n-pose.pt). Leave blank to train from scratch.",
   "epochs_dropdown": "Number of training epochs. More epochs can improve accuracy but increase overfitting risk and training time.",
   "plots_dropdown": "If TRUE, generate and save training curves (loss, mAP, etc.) in the save directory.",
-  "patience_dropdown": "Early-stopping patience: training stops if validation metric does not improve for this many epochs."
+  "patience_dropdown": "Early-stopping patience: training stops if validation metric does not improve for this many epochs.",
+  "simba2yolo_config": "Path to the SimBA project configuration file (.ini). Defines project paths, body-parts, and animals.",
+  "simba2yolo_train_size": "Percentage of sampled frames to use for the YOLO training set. The remainder is used for validation. E.g. 70 means 70% train, 30% val.",
+  "simba2yolo_padding": "Extra margin (as a fraction of image size) added around the keypoint bounding box. Use a small value (e.g. 0.05–0.2) if the tight box cuts off body parts or you want more context in each crop; None or 0 = no padding.",
+  "simba2yolo_sample_size": "Maximum number of frames to sample per video for creating YOLO images and labels. Higher values give more data but increase processing time.",
+  "simba2yolo_grey": "If TRUE, extracted video frames are saved in greyscale. If FALSE, frames are saved in color.",
+  "simba2yolo_clahe": "If TRUE, apply CLAHE (Contrast Limited Adaptive Histogram Equalization) to frames before saving. Can improve keypoint visibility in low-contrast videos.",
+  "yolo_plot_line_thickness": "Thickness of the lines drawn between keypoints (skeleton). AUTO lets the plotter choose based on video size; or set 1–20 pixels.",
+  "yolo_plot_circle_size": "Radius of the circles drawn at each keypoint. AUTO lets the plotter choose based on video size; or set 1–20 pixels.",
+  "yolo_plot_tracks": "If TRUE, draw trajectory paths (tracks) for each detected instance over time. If FALSE, draw only keypoints and skeleton per frame.",
+  "yolo_plot_data_path": "Path to a single YOLO pose result CSV (output from YOLO pose inference). Must match the video you select.",
+  "yolo_plot_video_path": "Path to the video file to overlay pose results onto. Filename should match the data CSV (without extension).",
+  "yolo_plot_data_dir": "Directory containing YOLO pose result CSV files. Used for batch plotting; each CSV is matched to a video of the same name in the video directory.",
+  "SLEAP_DATA_DIR": "Directory containing SLEAP CSV prediction files. Each CSV should match a video filename (without extension).",
+  "ANIMAL_COUNT": "Number of animals (tracks) in the videos. Used to name classes (e.g. animal_1, animal_2) in the YOLO dataset.",
+  "sleap_remove_animal_ids": "If TRUE, merge all tracks into a single identity (animal_1). Use when animal IDs are not meaningful or for single-animal data.",
+  "sleap_threshold": "Minimum SLEAP instance confidence (the instance.score column in the CSV). Only pose predictions with score ≥ this value are used when building the YOLO dataset. E.g. 90 means keep instances where instance.score ≥ 0.9; lower values include more frames but may add noisy predictions."
 }

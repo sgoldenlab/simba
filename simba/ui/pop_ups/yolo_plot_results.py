@@ -30,23 +30,16 @@ SIZE_OPTIONS.insert(0, 'AUTO')
 class YoloPoseVisualizerPopUp(PopUpMixin):
 
     def __init__(self):
-        gpu_available, gpus = _is_cuda_available()
-        if not gpu_available:
-            raise SimBAGPUError(msg=f'Cannot train YOLO pose-estimation model. No NVIDA GPUs detected on machine', source=self.__class__.__name__)
-        ultralytics_version = get_pkg_version(pkg=PackageNames.ULTRALYTICS.value)
-        if ultralytics_version is None:
-            raise SimBAPAckageVersionError(msg=f'Cannot train YOLO pose-estimation model: Could not find ultralytics package in python environment',  source=self.__class__.__name__)
-
         PopUpMixin.__init__(self, title="PLOT YOLO POSE ESTIMATION RESULTS", icon='ultralytics_2')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
-        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=45, lbl_icon='folder')
-        self.core_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=CORE_CNT_OPTIONS, label="CPU CORE COUNT:", label_width=35, dropdown_width=40, value=int(max(CORE_CNT_OPTIONS) / 3), img='cpu_small')
-        self.bbox_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SHOW BOUNDING BOXES:",  label_width=35, dropdown_width=40, value='TRUE', img='rectangle_small')
-        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE:",  label_width=35, dropdown_width=40, value='TRUE', img='verbose')
-        self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTIONS, label="THRESHOLD:",  label_width=35, dropdown_width=40, value=0.0, img='threshold')
-        self.thickness_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=SIZE_OPTIONS, label="LINE THICKNESS:",  label_width=35, dropdown_width=40, value='AUTO', img='line')
-        self.circle_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=SIZE_OPTIONS, label="CIRCLE SIZE:", label_width=35, dropdown_width=40, value='AUTO', img='circle_small')
-        self.tracks_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="PLOT TRACKS:", label_width=35, dropdown_width=40, value='FALSE', img='path_2')
+        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=45, lbl_icon='folder', tooltip_key='SAVE_DIR')
+        self.core_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=CORE_CNT_OPTIONS, label="CPU CORE COUNT:", label_width=35, dropdown_width=40, value=int(max(CORE_CNT_OPTIONS) / 3), img='cpu_small', tooltip_key='CORE_COUNT')
+        self.bbox_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SHOW BOUNDING BOXES:",  label_width=35, dropdown_width=40, value='TRUE', img='rectangle_small', tooltip_key='SHOW_ANIMAL_BBOX')
+        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE:",  label_width=35, dropdown_width=40, value='TRUE', img='verbose', tooltip_key='verbose_dropdown')
+        self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTIONS, label="THRESHOLD:",  label_width=35, dropdown_width=40, value=0.0, img='threshold', tooltip_key='threshold_dropdown')
+        self.thickness_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=SIZE_OPTIONS, label="LINE THICKNESS:",  label_width=35, dropdown_width=40, value='AUTO', img='line', tooltip_key='yolo_plot_line_thickness')
+        self.circle_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=SIZE_OPTIONS, label="CIRCLE SIZE:", label_width=35, dropdown_width=40, value='AUTO', img='circle_small', tooltip_key='yolo_plot_circle_size')
+        self.tracks_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="PLOT TRACKS:", label_width=35, dropdown_width=40, value='FALSE', img='path_2', tooltip_key='yolo_plot_tracks')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.save_dir.grid(row=0, column=0, sticky=NW)
@@ -59,8 +52,8 @@ class YoloPoseVisualizerPopUp(PopUpMixin):
         self.circle_dropdown.grid(row=7, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="PLOT SINGLE VIDEO", icon_name='video')
-        self.data_path = FileSelect(parent=single_video_frm, fileDescription='DATA PATH (CSV):', lblwidth=35,  entry_width=45, file_types=[("YOLO CSV RESULT", ".csv")], lbl_icon='csv_grey')
-        self.video_path = FileSelect(parent=single_video_frm, fileDescription='VIDEO PATH:', lblwidth=35,  entry_width=45, file_types=[("YOLO CSV RESULT", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lbl_icon='video_2')
+        self.data_path = FileSelect(parent=single_video_frm, fileDescription='DATA PATH (CSV):', lblwidth=35,  entry_width=45, file_types=[("YOLO CSV RESULT", ".csv")], lbl_icon='csv_grey', tooltip_key='yolo_plot_data_path')
+        self.video_path = FileSelect(parent=single_video_frm, fileDescription='VIDEO PATH:', lblwidth=35,  entry_width=45, file_types=[("YOLO CSV RESULT", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lbl_icon='video_2', tooltip_key='yolo_plot_video_path')
         single_video_btn = SimbaButton(parent=single_video_frm, txt='CREATE SINGLE VIDEO', img='rocket', cmd=self.run, cmd_kwargs={'multiple': False})
 
         single_video_frm.grid(row=1, column=0, sticky=NW)
@@ -69,8 +62,8 @@ class YoloPoseVisualizerPopUp(PopUpMixin):
         single_video_btn.grid(row=2, column=0, sticky=NW)
 
         multiple_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="PLOT MULTIPLE VIDEOS", icon_name='stack')
-        self.data_dir_path = FolderSelect(parent=multiple_video_frm, folderDescription='DATA DIRECTORY:', lblwidth=35,  entry_width=45, lbl_icon='folder')
-        self.video_dir_path = FolderSelect(parent=multiple_video_frm, folderDescription='VIDEO DIRECTORY:', lblwidth=35,  entry_width=45, lbl_icon='folder')
+        self.data_dir_path = FolderSelect(parent=multiple_video_frm, folderDescription='DATA DIRECTORY:', lblwidth=35,  entry_width=45, lbl_icon='folder', tooltip_key='yolo_plot_data_dir')
+        self.video_dir_path = FolderSelect(parent=multiple_video_frm, folderDescription='VIDEO DIRECTORY:', lblwidth=35,  entry_width=45, lbl_icon='folder', tooltip_key='VIDEO_DIR')
         multiple_video_btn = SimbaButton(parent=multiple_video_frm, txt='CREATE MULTIPLE VIDEOS', img='rocket', cmd=self.run, cmd_kwargs={'multiple': True})
 
         multiple_video_frm.grid(row=2, column=0, sticky=NW)
@@ -87,7 +80,7 @@ class YoloPoseVisualizerPopUp(PopUpMixin):
         bbox = str_2_bool(self.bbox_dropdown.get_value())
         verbose = str_2_bool(self.verbose_dropdown.get_value())
         threshold = float(self.threshold_dropdown.get_value())
-        thickness = None if self.thickness_dropdown.get_value() == 'AUTO' else int(self.threshold_dropdown.get_value())
+        thickness = None if self.thickness_dropdown.get_value() == 'AUTO' else int(self.thickness_dropdown.get_value())
         circle_size = None if self.circle_dropdown.get_value() == 'AUTO' else int(self.circle_dropdown.get_value())
         tracks = str_2_bool(self.tracks_dropdown.get_value())
 

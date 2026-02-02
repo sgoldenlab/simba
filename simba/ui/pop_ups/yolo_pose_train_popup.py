@@ -1,6 +1,7 @@
 import os
 import sys
 import subprocess
+import tempfile
 from tkinter import *
 from tkinter import messagebox
 
@@ -116,7 +117,15 @@ class YOLOPoseTrainPopUP(PopUpMixin):
         env = os.environ.copy()
         env['MPLBACKEND'] = 'Agg'
         try:
-            subprocess.Popen(cmd, creationflags=creationflags, env=env)
+            if sys.platform == 'win32':
+                # Run via a temp .bat so a visible console opens and stays open (pause) after exit
+                cmd_line = subprocess.list2cmdline(cmd)
+                with tempfile.NamedTemporaryFile(mode='w', suffix='.bat', delete=False, newline='') as f:
+                    f.write('@echo off\n' + cmd_line + '\npause\n')
+                    bat_path = f.name
+                subprocess.Popen([bat_path], creationflags=creationflags, env=env)
+            else:
+                subprocess.Popen(cmd, creationflags=creationflags, env=env)
         except Exception as e:
             messagebox.showerror('YOLO training', f'Failed to start training process: {e}')
             return
