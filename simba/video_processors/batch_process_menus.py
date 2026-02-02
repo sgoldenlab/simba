@@ -20,7 +20,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_int, check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end)
-from simba.utils.enums import Formats, Keys, Links, Options, TextOptions
+from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.errors import (FFMPEGCodecGPUError, FFMPEGNotFoundError,
                                 NoFilesFoundError)
 from simba.utils.lookups import (get_color_dict, get_ffmpeg_encoders,
@@ -28,9 +28,7 @@ from simba.utils.lookups import (get_color_dict, get_ffmpeg_encoders,
                                  percent_to_crf_lookup,
                                  video_quality_to_preset_lookup)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (
-    check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
-    get_video_meta_data, str_2_bool)
+from simba.utils.read_write import (check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, get_video_meta_data, str_2_bool, read_frm_of_video)
 from simba.video_processors.batch_process_create_ffmpeg_commands import \
     FFMPEGCommandCreator
 from simba.video_processors.roi_selector import ROISelector
@@ -76,12 +74,15 @@ class BatchProcessFrame(PopUpMixin):
             raise FFMPEGNotFoundError(msg='Cannot perform batch video processing: FFMPEG not found', source=self.__class__.__name__)
 
 
-        PopUpMixin.__init__(self, title="BATCH PRE-PROCESS VIDEOS IN SIMBA", size=(2000, 600), icon='factory')
+
         self.input_dir, self.output_dir = input_dir, output_dir
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
         self.videos_in_dir_dict, self.crop_dict = {}, {}
         self.get_input_files()
+        if len(list(self.videos_in_dir_dict.keys())) == 0:
+            raise NoFilesFoundError(msg=f"The input directory {self.input_dir} contains ZERO video files in either .avi, .mp4, .mov, .flv, or m4v format", source=self.__class__.__name__)
+        PopUpMixin.__init__(self, title="BATCH PRE-PROCESS VIDEOS IN SIMBA", size=(2000, 600), icon='factory')
         self.red_drop_img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS["crop_red"]["icon_path"]))
         self.black_crop_img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS["crop"]["icon_path"]))
         self.percent_to_crf_lookup = percent_to_crf_lookup()
@@ -91,8 +92,7 @@ class BatchProcessFrame(PopUpMixin):
         self.video_quality_to_preset_lookup = video_quality_to_preset_lookup()
         self.clrs = get_color_dict()
         self.gpu_available_state = NORMAL if check_nvidea_gpu_available() else DISABLED
-        if len(list(self.videos_in_dir_dict.keys())) == 0:
-            raise NoFilesFoundError(msg=f"The input directory {self.input_dir} contains ZERO video files in either .avi, .mp4, .mov, .flv, or m4v format", source=self.__class__.__name__)
+
         self.max_char_vid_name = len(max(list(self.videos_in_dir_dict.keys()), key=len))
         self.root.lift()
         self.root.attributes("-topmost", True)
@@ -124,24 +124,24 @@ class BatchProcessFrame(PopUpMixin):
         self.quick_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm,header="QUICK SETTINGS",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.BATCH_PREPROCESS.value)
 
         self.clip_video_settings_frm = CreateLabelFrameWithIcon(parent=self.quick_settings_frm, header='CLIP VIDEOS SETTING', icon_name='clip', padx=5, pady=5)
-        self.quick_clip_start_entry_box = Entry_Box(parent=self.clip_video_settings_frm, fileDescription='START TIME: ', labelwidth=15, value="00:00:00", justify='center', img='play', entry_box_width=12)
-        self.quick_clip_end_entry_box = Entry_Box(parent=self.clip_video_settings_frm, fileDescription='END TIME: ', labelwidth=15, value="00:00:00", justify='center', img='finish', entry_box_width=12)
+        self.quick_clip_start_entry_box = Entry_Box(parent=self.clip_video_settings_frm, fileDescription='START TIME: ', labelwidth=15, value="00:00:00", justify='center', img='play', entry_box_width=12, tooltip_key='BATCH_CLIP_START_TIME')
+        self.quick_clip_end_entry_box = Entry_Box(parent=self.clip_video_settings_frm, fileDescription='END TIME: ', labelwidth=15, value="00:00:00", justify='center', img='finish', entry_box_width=12, tooltip_key='BATCH_CLIP_END_TIME')
         self.quick_clip_apply = SimbaButton(parent=self.clip_video_settings_frm, txt='APPLY', img='arrow_down_green_2', cmd=self.apply_trim_to_all)
 
         self.quick_downsample_frm = CreateLabelFrameWithIcon(parent=self.quick_settings_frm, header='DOWNSAMPLE VIDEOS', icon_name='resize', padx=5, pady=5)
-        self.quick_downsample_width = Entry_Box(parent=self.quick_downsample_frm, fileDescription='WIDTH: ', labelwidth=15, value=400, justify='center', img='width', entry_box_width=12)
-        self.quick_downsample_height = Entry_Box(parent=self.quick_downsample_frm, fileDescription='HEIGHT: ', labelwidth=15, value=600, justify='center', img='height', entry_box_width=12)
+        self.quick_downsample_width = Entry_Box(parent=self.quick_downsample_frm, fileDescription='WIDTH: ', labelwidth=15, value=400, justify='center', img='width', entry_box_width=12, tooltip_key='BATCH_DOWNSAMPLE_WIDTH')
+        self.quick_downsample_height = Entry_Box(parent=self.quick_downsample_frm, fileDescription='HEIGHT: ', labelwidth=15, value=600, justify='center', img='height', entry_box_width=12, tooltip_key='BATCH_DOWNSAMPLE_HEIGHT')
         self.quick_downsample_apply = SimbaButton(parent=self.quick_downsample_frm, txt='APPLY', img='arrow_down_green_2', cmd=self.apply_resolution_to_all)
 
 
         self.quick_set_fps = CreateLabelFrameWithIcon(parent=self.quick_settings_frm, header="CHANGE FPS", icon_name='camera', padx=5, pady=12)
-        self.quick_fps_entry_box = Entry_Box(parent=self.quick_set_fps, fileDescription='FPS: ', labelwidth=15, value=15.0, justify='center', img='camera', entry_box_width=12)
+        self.quick_fps_entry_box = Entry_Box(parent=self.quick_set_fps, fileDescription='FPS: ', labelwidth=15, value=15.0, justify='center', img='camera', entry_box_width=12, tooltip_key='BATCH_FPS')
         self.quick_fps_apply = SimbaButton(parent=self.quick_set_fps, txt='APPLY', img='arrow_down_green_2', cmd=self.apply_fps_to_all)
 
 
         self.quick_set_quality = CreateLabelFrameWithIcon(parent=self.quick_settings_frm, header="OUTPUT VIDEO QUALITY", icon_name='star', padx=5, pady=12)
-        self.use_gpu_dropdown = SimBADropDown(parent=self.quick_set_quality, label="USE GPU", label_width=20, dropdown_options=['TRUE', 'FALSE'], value='FALSE', img='gpu_3', state=self.gpu_available_state, dropdown_width=15)
-        self.quick_set_quality_dropdown = SimBADropDown(parent=self.quick_set_quality, label='VIDEO QUALITY %', label_width=20, dropdown_options=self.cpu_video_quality, value=60, img='star', dropdown_width=15)
+        self.use_gpu_dropdown = SimBADropDown(parent=self.quick_set_quality, label="USE GPU", label_width=20, dropdown_options=['TRUE', 'FALSE'], value='FALSE', img='gpu_3', state=self.gpu_available_state, dropdown_width=15, tooltip_key='USE_GPU')
+        self.quick_set_quality_dropdown = SimBADropDown(parent=self.quick_set_quality, label='VIDEO QUALITY %', label_width=20, dropdown_options=self.cpu_video_quality, value=60, img='star', dropdown_width=15, tooltip_key='OUTPUT_VIDEO_QUALITY')
         self.quick_set_quality_apply = SimbaButton(parent=self.quick_set_quality, txt='APPLY', img='arrow_down_green_2', cmd=self.apply_quality_to_all)
 
         self.quick_settings_frm.grid(row=0, column=0, sticky=W, padx=10)
@@ -224,15 +224,15 @@ class BatchProcessFrame(PopUpMixin):
         self.headings["start_time_col_head"] = SimBALabel(parent=self.videos_frm, txt='START \n TIME', font=Formats.FONT_REGULAR_BOLD.value, justify='center', padx=12, img='play')
         self.headings["end_time_col_head"] = SimBALabel(parent=self.videos_frm, txt='END \n TIME', font=Formats.FONT_REGULAR_BOLD.value, justify='center', img='stop', padx=12)
         self.headings["video_quality_head"] = SimBALabel(parent=self.videos_frm, txt='QUALITY', font=Formats.FONT_REGULAR_BOLD.value, justify='center', padx=12, img='star')
-        self.headings["shorten_all_videos_cbox"], self.headings["clip_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='APPLY \n CLIP', txt_img='clip', cmd=lambda: self.inverse_all_cb_ticks(variable_name="clip_cb_var"))
+        self.headings["shorten_all_videos_cbox"], self.headings["clip_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='APPLY \n CLIP', txt_img='clip', cmd=lambda: self.inverse_all_cb_ticks(variable_name="clip_cb_var"), tooltip_key='BATCH_APPLY_CLIP')
         self.headings["video_width_col_head"] = SimBALabel(parent=self.videos_frm, txt='WIDTH', img='width', font=Formats.FONT_REGULAR_BOLD.value, justify='center', padx=12)
         self.headings["video_height_col_head"] = SimBALabel(parent=self.videos_frm, txt='HEIGHT', img='height', font=Formats.FONT_REGULAR_BOLD.value, justify='center', padx=12)
-        self.headings["downsample_all_videos_cbox"], self.headings["downsample_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='APPLY \n DOWNSAMPLE', cmd=lambda: self.inverse_all_cb_ticks(variable_name="downsample_cb_var"))
+        self.headings["downsample_all_videos_cbox"], self.headings["downsample_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='APPLY \n DOWNSAMPLE', cmd=lambda: self.inverse_all_cb_ticks(variable_name="downsample_cb_var"), tooltip_key='BATCH_APPLY_DOWNSAMPLE')
         self.headings["fps_col_head"] = SimBALabel(parent=self.videos_frm, txt='FPS', img='camera', font=Formats.FONT_REGULAR_BOLD.value, justify='center', padx=12)
-        self.headings["change_fps_all_videos_cbox"], self.headings["fps_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='APPLY \n VIDEO FPS', cmd=lambda: self.inverse_all_cb_ticks(variable_name="fps_cb_var"))
-        self.headings["grayscale_cbox"], self.headings["grayscale_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='APPLY \n GREYSCALE', cmd=lambda: self.inverse_all_cb_ticks(variable_name="grayscale_cb_var"))
-        self.headings["frame_cnt_cbox"], self.headings["frame_cnt_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='APPLY \n FRAME COUNT', cmd=lambda: self.inverse_all_cb_ticks(variable_name="frame_cnt_cb_var"))
-        self.headings["apply_clahe_cbox"], self.headings["apply_clahe_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='APPLY \n CLAHE', cmd=lambda: self.inverse_all_cb_ticks(variable_name="apply_clahe_cb_var"))
+        self.headings["change_fps_all_videos_cbox"], self.headings["fps_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='APPLY \n VIDEO FPS', cmd=lambda: self.inverse_all_cb_ticks(variable_name="fps_cb_var"), tooltip_key='BATCH_APPLY_FPS')
+        self.headings["grayscale_cbox"], self.headings["grayscale_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='APPLY \n GREYSCALE', cmd=lambda: self.inverse_all_cb_ticks(variable_name="grayscale_cb_var"), tooltip_key='BATCH_APPLY_GREYSCALE')
+        self.headings["frame_cnt_cbox"], self.headings["frame_cnt_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='APPLY \n FRAME COUNT', cmd=lambda: self.inverse_all_cb_ticks(variable_name="frame_cnt_cb_var"), tooltip_key='BATCH_APPLY_FRAME_COUNT')
+        self.headings["apply_clahe_cbox"], self.headings["apply_clahe_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='APPLY \n CLAHE', cmd=lambda: self.inverse_all_cb_ticks(variable_name="apply_clahe_cb_var"), tooltip_key='BATCH_APPLY_CLAHE')
 
         self.videos_frm.grid(row=1, column=0, sticky=W, padx=5, pady=15)
         self.headings["video_name_col_head"].grid(row=0, column=0, sticky=NW)
@@ -270,12 +270,12 @@ class BatchProcessFrame(PopUpMixin):
         for w in self.videos_frm.grid_slaves():
             if int(w.grid_info()["row"]) > 1:
                 w.destroy()
-
         for video_cnt, (name, data) in enumerate(self.videos_in_dir_dict.items()):
             self.videos[name] = {}
             row = video_cnt * 2 + 2
             row_color = '#f8f8f8' if video_cnt % 2 == 0 else '#e5e5e5'
-            self.videos[name]["video_name_lbl"] = SimBALabel(parent=self.videos_frm, txt=name, font=Formats.FONT_REGULAR_BOLD.value, width=self.max_char_vid_name, justify='center', bg_clr=row_color)
+            img = read_frm_of_video(video_path=data['file_path'], frame_index=0, raise_error=False, size=(420, 280), keep_aspect_ratio=True)
+            self.videos[name]["video_name_lbl"] = SimBALabel(parent=self.videos_frm, txt=name, font=Formats.FONT_REGULAR_BOLD.value, width=self.max_char_vid_name, justify='center', bg_clr=row_color, hover_img=img)
             self.videos[name]["crop_btn"] = SimbaButton(parent=self.videos_frm, txt='CROP', txt_clr='black', cmd=lambda k=self.videos[name]["video_name_lbl"]["text"]: self.batch_process_crop_function(k), img='crop_2')
             self.videos[name]["start_entry"] = Entry_Box(parent=self.videos_frm, fileDescription='', value="00:00:00", justify='center', entry_font=Formats.FONT_REGULAR_BOLD.value, entry_box_width=12)
             self.videos[name]["end_entry"] = Entry_Box(parent=self.videos_frm, fileDescription='', value=data["video_length"], justify='center', entry_font=Formats.FONT_REGULAR_BOLD.value, entry_box_width=12)

@@ -17,12 +17,14 @@ try:
 except:
     from typing_extensions import Literal
 
+import numpy as np
 import PIL.Image
 from PIL import ImageTk
 
 from simba.utils.enums import Defaults, Formats, TkBinds
 from simba.utils.lookups import get_icons_paths, get_tooltips
 from simba.utils.read_write import get_fn_ext
+from simba.utils.checks import check_if_valid_img
 
 MENU_ICONS = get_icons_paths()
 TOOLTIPS = get_tooltips()
@@ -593,7 +595,8 @@ def SimbaCheckbox(parent: Union[Frame, Toplevel, LabelFrame, Canvas],
                   state: Literal["disabled", 'normal'] = NORMAL,
                   indicatoron: bool = True,
                   cmd: Optional[Callable] = None,
-                  tooltip_txt: Optional[str] = None):
+                  tooltip_txt: Optional[str] = None,
+                  tooltip_key: Optional[str] = None):
 
     var = BooleanVar(value=False)
     if val: var.set(True)
@@ -610,6 +613,8 @@ def SimbaCheckbox(parent: Union[Frame, Toplevel, LabelFrame, Canvas],
 
     if isinstance(tooltip_txt, str):
         CreateToolTip(widget=cb, text=tooltip_txt)
+    elif isinstance(tooltip_key, str) and tooltip_key in TOOLTIPS.keys():
+        CreateToolTip(widget=cb, text=TOOLTIPS[tooltip_key])
 
     return cb, var
 
@@ -630,14 +635,56 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                cursor: Optional[str] = None,
                img: Optional[str] = None,
                anchor: Optional[str] = None,
-               tooltip_key: Optional[str] = None):
+               tooltip_key: Optional[str] = None,
+               hover_img: Optional[np.ndarray] = None):
 
+
+    def _hover_enter(e):
+        w = e.widget
+        if hover_img is not None and check_if_valid_img(data=hover_img, raise_error=False):
+            arr = np.asarray(hover_img, dtype=np.uint8)
+            if arr.ndim == 3 and arr.shape[2] == 3:
+                arr = arr[:, :, ::-1]
+            pil_img = PIL.Image.fromarray(arr)
+            photo = ImageTk.PhotoImage(pil_img)
+            tw = Toplevel(w)
+            tw.wm_overrideredirect(True)
+            tw.attributes("-topmost", True)
+            tw.wm_geometry("+%d+%d" % (w.winfo_rootx() + w.winfo_width() + 4, w.winfo_rooty()))
+            frm = Frame(tw, relief="solid", bd=2, bg="#f0f0f0")
+            frm.pack(padx=2, pady=2)
+            lbl_hover = Label(frm, image=photo, bg="#f0f0f0")
+            lbl_hover.image = photo
+            lbl_hover.pack(padx=4, pady=(4, 2))
+            caption_lbl = Label(frm, text=txt, font=font, fg=txt_clr, bg=bg_clr)
+            caption_lbl.pack(pady=(0, 4))
+            tw.lift()
+            w._hover_toplevel = tw
+        elif hover_fg_clr is not None or hover_font is not None:
+            w.config(fg=hover_fg_clr, font=hover_font)
+
+    def _hover_leave(e):
+        w = e.widget
+        if getattr(w, "_hover_toplevel", None) is not None:
+            try:
+                w._hover_toplevel.destroy()
+            except tkinter.TclError:
+                pass
+            w._hover_toplevel = None
+        if hover_fg_clr is not None or hover_font is not None:
+            w.config(fg=txt_clr, bg=bg_clr, font=font)
 
     def on_enter(e):
-        e.widget.config(fg=hover_fg_clr, font=hover_font)
+        if hover_img is not None:
+            _hover_enter(e)
+        else:
+            e.widget.config(fg=hover_fg_clr, font=hover_font)
 
     def on_leave(e):
-        e.widget.config(fg=txt_clr, bg=bg_clr, font=font)
+        if hover_img is not None:
+            _hover_leave(e)
+        else:
+            e.widget.config(fg=txt_clr, bg=bg_clr, font=font)
 
     anchor = 'w' if anchor is None else anchor
     if isinstance(img, str) and img in MENU_ICONS.keys():
@@ -673,7 +720,7 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
     elif tooltip_key in TOOLTIPS.keys():
         CreateToolTip(widget=lbl, text=TOOLTIPS[tooltip_key])
 
-    if hover_font is not None or hover_fg_clr is not None:
+    if hover_font is not None or hover_fg_clr is not None or hover_img is not None:
         lbl.bind(TkBinds.ENTER.value, on_enter)
         lbl.bind(TkBinds.LEAVE.value, on_leave)
 

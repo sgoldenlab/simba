@@ -65,5 +65,16 @@
   "ANIMAL_COUNT": "Number of animals (tracks) in the videos. Used to name classes (e.g. animal_1, animal_2) in the YOLO dataset.",
   "sleap_remove_animal_ids": "If TRUE, merge all tracks into a single identity (animal_1). Use when animal IDs are not meaningful or for single-animal data.",
   "sleap_threshold": "Minimum SLEAP instance confidence (the instance.score column in the CSV). Only pose predictions with score ≥ this value are used when building the YOLO dataset. E.g. 90 means keep instances where instance.score ≥ 0.9; lower values include more frames but may add noisy predictions.",
-  "SLEAP_SLP_DATA_DIR": "Directory containing SLEAP .SLP project/annotation files. Each .SLP file is converted to YOLO pose format."
+  "SLEAP_SLP_DATA_DIR": "Directory containing SLEAP .SLP project/annotation files. Each .SLP file is converted to YOLO pose format.",
+  "BATCH_CLIP_START_TIME": "Start time for clipping all videos. Use HH:MM:SS (e.g. 00:00:10). Click APPLY to copy this value to every video row.",
+  "BATCH_CLIP_END_TIME": "End time for clipping all videos. Use HH:MM:SS (e.g. 00:01:30). Must be after start time. Click APPLY to copy this value to every video row.",
+  "BATCH_DOWNSAMPLE_WIDTH": "Output width in pixels when downsampling all videos. Must be even. Click APPLY to copy to every video row.",
+  "BATCH_DOWNSAMPLE_HEIGHT": "Output height in pixels when downsampling all videos. Must be even. Click APPLY to copy to every video row.",
+  "BATCH_FPS": "Target frames per second for all videos. Click APPLY to copy this value to every video row.",
+  "BATCH_APPLY_DOWNSAMPLE": "Tick to check the downsample box for all videos (all will be downsampled on execute). Untick to uncheck all. Set width and height in the DOWNSAMPLE VIDEOS panel, then click APPLY there to copy those values to every row.",
+  "BATCH_APPLY_FPS": "Tick to enable FPS change for all videos.\nUntick to disable for all.\nSet FPS in CHANGE FPS panel, then APPLY there.",
+  "BATCH_APPLY_GREYSCALE": "Tick to enable greyscale for all videos.\nUntick to disable for all.",
+  "BATCH_APPLY_FRAME_COUNT": "Tick to superimpose frame numbers on all videos.\nUntick to disable for all.",
+  "BATCH_APPLY_CLAHE": "Tick to apply CLAHE (contrast) to all videos.\nUntick to disable for all.",
+  "BATCH_APPLY_CLIP": "Tick to enable clipping for all videos.\nUntick to disable for all.\nSet start/end in CLIP VIDEOS SETTING, then APPLY there."
 }

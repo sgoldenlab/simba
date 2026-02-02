@@ -51,7 +51,7 @@ from simba.utils.read_write import (
     concatenate_videos_in_folder, find_all_videos_in_directory, find_core_cnt,
     find_files_of_filetypes_in_directory, find_video_of_file, get_fn_ext,
     get_video_meta_data, seconds_to_timestamp, str_2_bool,
-    timestamp_to_seconds)
+    timestamp_to_seconds, read_frm_of_video)
 from simba.utils.warnings import FrameRangeWarning
 from simba.video_processors.brightness_contrast_ui import BrightnessContrastUI
 from simba.video_processors.clahe_ui import interactive_clahe_ui
@@ -1590,7 +1590,6 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
         check_if_dir_exists(in_dir=data_dir, source=self.__class__.__name__, create_if_not_exist=False )
         check_if_dir_exists(in_dir=save_dir, source=self.__class__.__name__, create_if_not_exist=True)
         self.video_paths = find_all_videos_in_directory(directory=data_dir, as_dict=True, raise_error=True)
-        print(self.video_paths)
         self.video_meta_data = [get_video_meta_data(video_path=x)["frame_count"]for x in list(self.video_paths.values())]
         max_video_name_len = len(max(list(self.video_paths.keys())))
         super().__init__(title="CLIP MULTIPLE VIDEOS BY FRAME NUMBERS", icon='clip')
@@ -1606,9 +1605,10 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
         seperator.grid(row=1, column=0, columnspan=5, rowspan=1, sticky="ew")
 
         self.entry_boxes, self.interactive_btns = {}, {}
-        for cnt, video_name in enumerate(self.video_paths.keys()):
+        for cnt, (video_name, video_path) in enumerate(self.video_paths.items()):
             self.entry_boxes[video_name] = {}
-            SimBALabel(parent=data_frm, font=Formats.FONT_REGULAR.value, txt=video_name + f' (frames: { self.video_meta_data[cnt]})', justify='left').grid(row=cnt + 2, column=0, padx=padx, sticky=NW)
+            img = read_frm_of_video(video_path=video_path, frame_index=0, size=(420, 280), keep_aspect_ratio=True, raise_error=False)
+            SimBALabel(parent=data_frm, font=Formats.FONT_REGULAR_BOLD.value, txt=video_name + f' (frames: { self.video_meta_data[cnt]})', justify='left', hover_img=img).grid(row=cnt + 2, column=0, padx=padx, sticky=NW)
             self.entry_boxes[video_name]["start"] = Entry_Box(data_frm, fileDescription="", labelwidth=0, validation="numeric", justify='center')
             self.entry_boxes[video_name]["end"] = Entry_Box(data_frm, fileDescription="", labelwidth=0, validation="numeric", justify='center')
             self.entry_boxes[video_name]["start"].grid(row=cnt + 2, column=2, sticky=NW, padx=padx)
@@ -1732,7 +1732,7 @@ class InitiateClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
             icon_link=Links.VIDEO_TOOLS.value,
         )
         self.input_folder = FolderSelect(
-            data_frm, "VIDEO DIRECTORY:", title="Select Folder with videos", lblwidth=30, lbl_icon='folder'
+            data_frm, "VIDEO DIRECTORY:", title="Select Folder with videos", lblwidth=30, lbl_icon='folder_video'
         )
         self.output_folder = FolderSelect(
             data_frm,
@@ -1814,9 +1814,10 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         seperator.grid(row=1, column=0, columnspan=5, rowspan=1, sticky="ew")
 
         self.entry_boxes, self.interactive_btns = {}, {}
-        for cnt, video_name in enumerate(self.video_paths.keys()):
+        for cnt, (video_name, video_path) in enumerate(self.video_paths.items()):
             self.entry_boxes[video_name] = {}
-            SimBALabel(parent=data_frm, txt=video_name, justify='center').grid(row=cnt + 2, column=0, sticky=NW, padx=padx)
+            img = read_frm_of_video(video_path=video_path, frame_index=0, size=(420, 280), keep_aspect_ratio=True, raise_error=False)
+            SimBALabel(parent=data_frm, txt=video_name, justify='center', hover_img=img, font=Formats.FONT_REGULAR_BOLD.value).grid(row=cnt + 2, column=0, sticky=NW, padx=padx)
             video_length = self.video_meta_data[cnt]["video_length_s"]
             video_length_hhmmss = seconds_to_timestamp(seconds=video_length)
             SimBALabel(data_frm, txt=video_length_hhmmss, justify='center').grid(row=cnt + 2, column=1, sticky=NW, padx=padx)
