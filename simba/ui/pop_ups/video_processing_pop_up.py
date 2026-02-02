@@ -50,8 +50,8 @@ from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     concatenate_videos_in_folder, find_all_videos_in_directory, find_core_cnt,
     find_files_of_filetypes_in_directory, find_video_of_file, get_fn_ext,
-    get_video_meta_data, seconds_to_timestamp, str_2_bool,
-    timestamp_to_seconds, read_frm_of_video)
+    get_video_meta_data, read_frm_of_video, seconds_to_timestamp, str_2_bool,
+    timestamp_to_seconds)
 from simba.utils.warnings import FrameRangeWarning
 from simba.video_processors.brightness_contrast_ui import BrightnessContrastUI
 from simba.video_processors.clahe_ui import interactive_clahe_ui
