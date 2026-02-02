@@ -71,7 +71,7 @@ from simba.utils.errors import (CorruptedFileError, DataHeaderError,
                                 NoFilesFoundError, NotDirectoryError,
                                 ParametersFileError, PermissionError,
                                 SimBAPAckageVersionError)
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.warnings import (
     FileExistWarning, FrameRangeWarning, GPUToolsWarning, InvalidValueWarning,
     NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning)

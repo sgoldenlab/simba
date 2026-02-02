@@ -19,10 +19,12 @@ from simba.utils.checks import (check_float, check_if_dir_exists, check_int,
                                 check_valid_dataframe, check_valid_tuple)
 from simba.utils.enums import Options
 from simba.utils.errors import NoFilesFoundError
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
-from simba.utils.read_write import (create_directory,
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
+from simba.utils.read_write import (clean_sleap_filenames_in_directory,
+                                    copy_files_to_directory, create_directory,
                                     find_files_of_filetypes_in_directory,
-                                    get_video_meta_data, read_frm_of_video, copy_files_to_directory, clean_sleap_filenames_in_directory, remove_a_folder)
+                                    get_video_meta_data, read_frm_of_video,
+                                    remove_a_folder)
 from simba.utils.yolo import keypoint_array_to_yolo_annotation_str
 
 
