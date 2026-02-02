@@ -25,8 +25,9 @@ from simba.utils.errors import (InvalidInputError, InvalidVideoFileError,
 from simba.utils.read_write import (find_all_videos_in_directory,
                                     find_core_cnt,
                                     find_files_of_filetypes_in_directory,
-                                    get_video_meta_data, remove_files,
-                                    save_json, str_2_bool, write_pickle, read_frm_of_video)
+                                    get_video_meta_data, read_frm_of_video,
+                                    remove_files, save_json, str_2_bool,
+                                    write_pickle)
 from simba.video_processors.blob_tracking_executor import BlobTrackingExecutor
 
 ABSOLUTE = 'absolute'
