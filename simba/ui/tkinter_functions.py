@@ -227,6 +227,7 @@ class Entry_Box(Frame):
                  label_bg_clr: Optional[str] = None,
                  status: Literal["normal", "disabled", "readonly"] = 'normal',
                  validation: Optional[Union[Callable, str]] = None,
+                 trace: Optional[Callable] = None,
                  entry_box_width: Union[int, str] = None,
                  entry_box_clr: Optional[str] = 'white',
                  img: Optional[str] = None,
@@ -236,6 +237,7 @@ class Entry_Box(Frame):
                  tooltip_key: Optional[str] = None,
                  justify: Literal["left", "center", "right"] = 'left',
                  cmd: Optional[Callable] = None,
+                 allow_blank: bool = False,
                  **kw):
 
         super(Entry_Box, self).__init__(master=parent)
@@ -266,6 +268,10 @@ class Entry_Box(Frame):
         if cmd is not None:
             self.bind_combobox_keys()
             self.cmd = cmd
+        self.allow_blank = allow_blank
+        if trace is not None:
+            self.filePath.trace_add('write', lambda *a: trace(self))
+
 
     def bind_combobox_keys(self):
         self.entPath.bind("<KeyRelease>", self.run_cmd)

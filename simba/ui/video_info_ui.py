@@ -22,7 +22,9 @@ from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_video_meta_data, read_config_entry,
                                     read_frm_of_video, read_video_info_csv)
 
-TABLE_HEADERS = ["INDEX", "VIDEO", "FPS", "RESOLUTION WIDTH", "RESOLUTION HEIGHT", "FIND DISTANCE", "DISTANCE IN MM", "PIXELS PER MM"]
+
+VALID_CLR = 'white'
+INVALID_CLR = 'lightsalmon'
 
 
 class VideoInfoTable(ConfigReader, PopUpMixin):
@@ -67,6 +69,24 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         self.max_char_vid_name = len(max(self.video_paths.keys(), key=len))
         PopUpMixin.__init__(self, title="VIDEO INFO", size=(1550, 800), icon='video')
 
+    def _check_float_bg(self, entry_box: Entry_Box, allow_blank: bool = False):
+        allow_blank = allow_blank or getattr(entry_box, 'allow_blank', False)
+        value = entry_box.entry_get
+        if value.strip() == '' and allow_blank:
+            entry_box.set_bg_clr(clr=VALID_CLR)
+        else:
+            bg_clr = VALID_CLR if check_float(value=value, name='', allow_zero=False, allow_negative=False, raise_error=False)[0] else INVALID_CLR
+            entry_box.set_bg_clr(clr=bg_clr)
+
+    def _check_int_bg(self, entry_box: Entry_Box, allow_blank: bool = False):
+        allow_blank = allow_blank or getattr(entry_box, 'allow_blank', False)
+        value = entry_box.entry_get
+        if value.strip() == '' and allow_blank:
+            entry_box.set_bg_clr(clr=VALID_CLR)
+        else:
+            bg_clr = VALID_CLR if check_int(value=value, name='', allow_zero=False, allow_negative=False, raise_error=False)[0] else INVALID_CLR
+            entry_box.set_bg_clr(clr=bg_clr)
+
 
     def _get_video_table_rows(self):
         self.videos = {}
@@ -92,12 +112,12 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
             self.videos[video_name]["video_idx_lbl"] = SimBALabel(parent=self.video_frm, txt=str(cnt+1), font=Formats.FONT_REGULAR_BOLD.value)
             self.videos[video_name]["video_name_lbl"] = SimBALabel(parent=self.video_frm, txt=video_name, font=Formats.FONT_REGULAR_BOLD.value, hover_img=img)
             self.videos[video_name]["video_name_w_ext"] = os.path.basename(video_path)
-            self.videos[video_name]["video_fps_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=fps, entry_box_width=12, justify='center')
-            self.videos[video_name]["video_width_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=width, entry_box_width=12, justify='center', validation='numeric')
-            self.videos[video_name]["video_height_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=height, entry_box_width=12, justify='center', validation='numeric')
-            self.videos[video_name]["video_known_distance_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=distance, entry_box_width=12, justify='center')
+            self.videos[video_name]["video_fps_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=fps, entry_box_width=12, justify='center', trace=self._check_float_bg)
+            self.videos[video_name]["video_width_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=width, entry_box_width=12, justify='center', validation='numeric', trace=self._check_int_bg)
+            self.videos[video_name]["video_height_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=height, entry_box_width=12, justify='center', validation='numeric', trace=self._check_int_bg)
+            self.videos[video_name]["video_known_distance_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=distance, entry_box_width=12, justify='center', trace=self._check_float_bg)
             self.videos[video_name]["find_dist_btn"] = SimbaButton(parent=self.video_frm, txt="CALCULATE DISTANCE", txt_clr='black', img='calipher', font=Formats.FONT_REGULAR_BOLD.value, cmd=lambda k=video_name: self._initate_find_distance(k), hover_font=Formats.FONT_REGULAR_BOLD.value)
-            self.videos[video_name]["video_px_per_mm"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=pixels_per_mm, entry_box_width=12, justify='center')
+            self.videos[video_name]["video_px_per_mm"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=pixels_per_mm, entry_box_width=12, justify='center', trace=self._check_float_bg)
             self.videos[video_name]["video_idx_lbl"].grid(row=row, column=0, sticky=NW, padx=padx)
             self.videos[video_name]["video_name_lbl"].grid(row=row, column=1, sticky=W, padx=padx)
             self.videos[video_name]["video_fps_eb"].grid(row=row, column=2, sticky=W, padx=padx)
@@ -106,15 +126,21 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
             self.videos[video_name]["find_dist_btn"].grid(row=row, column=5, sticky=W, padx=padx)
             self.videos[video_name]["video_known_distance_eb"].grid(row=row, column=6, sticky=W, padx=padx)
             self.videos[video_name]["video_px_per_mm"].grid(row=row, column=7, sticky=W, padx=padx)
+            # Apply initial background from current value (e.g. None -> invalid color)
+            self._check_float_bg(self.videos[video_name]["video_fps_eb"])
+            self._check_int_bg(self.videos[video_name]["video_width_eb"])
+            self._check_int_bg(self.videos[video_name]["video_height_eb"])
+            self._check_float_bg(self.videos[video_name]["video_known_distance_eb"])
+            self._check_float_bg(self.videos[video_name]["video_px_per_mm"])
             if cnt != len(self.video_paths.keys()) -1:
                 sep = SimBASeperator(parent=self.video_frm, orient='horizontal', height=1, color="#ccc")
                 sep.grid(row=row + 1, column=0, columnspan=15, sticky="ew")
 
     def _get_quick_set(self):
         self.quick_set_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BATCH QUICK SET", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_PARAMETERS.value)
-        self.quick_set_frm_known_distance_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='KNOWN DISTANCE:', labelwidth=30, value='', entry_box_width=10, img='distance_red', justify='center', tooltip_key='VIDEO_INFO_KNOWN_DISTANCE')
+        self.quick_set_frm_known_distance_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='KNOWN DISTANCE (MM):', labelwidth=30, value='', entry_box_width=10, img='distance_red', justify='center', tooltip_key='VIDEO_INFO_KNOWN_DISTANCE', trace=self._check_float_bg, allow_blank=True)
         self.quick_set_frm_known_distance_btn = SimbaButton(parent=self.quick_set_frm, txt="APPLY", txt_clr='black', img='tick', font=Formats.FONT_REGULAR_BOLD.value, cmd=self._set_known_distance, cmd_kwargs={'distance': lambda: self.quick_set_frm_known_distance_eb.entry_get})
-        self.quick_set_px_mm_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='PIXEL PER MILLIMETER:', labelwidth=30, value='', entry_box_width=10, img='ruler', justify='center', tooltip_key='VIDEO_INFO_PIXEL_PER_MM')
+        self.quick_set_px_mm_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='PIXEL PER MILLIMETER:', labelwidth=30, value='', entry_box_width=10, img='ruler', justify='center', tooltip_key='VIDEO_INFO_PIXEL_PER_MM', trace=self._check_float_bg, allow_blank=True)
         self.quick_set_px_mm_btn = SimbaButton(parent=self.quick_set_frm, txt="APPLY", txt_clr='black', img='tick', font=Formats.FONT_REGULAR_BOLD.value, cmd=self._set_px_per_mm, cmd_kwargs={'px_per_mm': lambda: self.quick_set_px_mm_eb.entry_get})
         self.quick_set_frm.grid(row=1, column=0, sticky=NW)
         self.quick_set_frm_known_distance_eb.grid(row=0, column=0, sticky=NW)
@@ -123,15 +149,22 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         self.quick_set_px_mm_btn.grid(row=1, column=1, sticky=NW)
 
 
+
+
+
     def _set_known_distance(self, distance: str):
         check_float(name=f'{self.__class__.__name__} KNOWN DISTANCE', value=distance, allow_negative=False, allow_zero=False, raise_error=True)
         for cnt, (video_name, video_path) in enumerate(self.video_paths.items()):
-            self.videos[video_name]["video_known_distance_eb"].entry_set(val=distance)
+            eb = self.videos[video_name]["video_known_distance_eb"]
+            eb.entry_set(val=distance)
+            self._check_float_bg(eb)
 
     def _set_px_per_mm(self, px_per_mm: str):
         check_float(name=f'{self.__class__.__name__} PIXEL PER MILLIMETER', value=px_per_mm, allow_negative=False, allow_zero=False,  raise_error=True)
         for cnt, (video_name, video_path) in enumerate(self.video_paths.items()):
-            self.videos[video_name]["video_px_per_mm"].entry_set(val=px_per_mm)
+            eb = self.videos[video_name]["video_px_per_mm"]
+            eb.entry_set(val=px_per_mm)
+            self._check_float_bg(eb)
 
     def _get_video_meta_data(self):
         self.video_meta_data = {}
@@ -141,18 +174,24 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
     def _duplicate_idx_1_distance(self):
         first_key = list(self.video_paths.keys())[0]
         first_val = self.videos[first_key]["video_known_distance_eb"].entry_get
-        if not check_float(name=self.__class__.__name__, value=first_val, allow_negative=False, allow_zero=False, raise_error=False)[0]:
+        is_none_or_empty = first_val is None or (isinstance(first_val, str) and first_val.strip().lower() in ('', 'none'))
+        if not is_none_or_empty and not check_float(name=self.__class__.__name__, value=first_val, allow_negative=False, allow_zero=False, raise_error=False)[0]:
             raise InvalidInputError(msg=f'Distance for {first_key} cannot be duplicated. Not a valid distance value: {first_val}', source=self.__class__.__name__)
         for cnt, (video_name, video_path) in enumerate(self.video_paths.items()):
-            self.videos[video_name]["video_known_distance_eb"].entry_set(val=first_val)
+            eb = self.videos[video_name]["video_known_distance_eb"]
+            eb.entry_set(val=first_val)
+            self._check_float_bg(eb)
 
     def _duplicate_idx_1_px_mm(self):
         first_key = list(self.video_paths.keys())[0]
         first_val = self.videos[first_key]["video_px_per_mm"].entry_get
-        if not check_float(name=self.__class__.__name__, value=first_val, allow_negative=False, allow_zero=False, raise_error=False)[0]:
+        is_none_or_empty = first_val is None or (isinstance(first_val, str) and first_val.strip().lower() in ('', 'none'))
+        if not is_none_or_empty and not check_float(name=self.__class__.__name__, value=first_val, allow_negative=False, allow_zero=False, raise_error=False)[0]:
             raise InvalidInputError(msg=f'Pixel per millimeter for {first_key} cannot be duplicated. Not a valid distance value: {first_val}', source=self.__class__.__name__)
         for cnt, (video_name, video_path) in enumerate(self.video_paths.items()):
-            self.videos[video_name]["video_px_per_mm"].entry_set(val=first_val)
+            eb = self.videos[video_name]["video_px_per_mm"]
+            eb.entry_set(val=first_val)
+            self._check_float_bg(eb)
 
     def _initate_find_distance(self, video_name: str):
         video_path = self.video_paths[video_name]
@@ -160,7 +199,9 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         check_float(name=f'{video_name} known distance', value=known_distance, allow_negative=False, allow_zero=False, raise_error=True)
         px_per_mm_interface = GetPixelsPerMillimeterInterface(video_path=video_path, known_metric_mm=float(known_distance))
         px_per_mm_interface.run()
-        self.videos[video_name]["video_px_per_mm"].entry_set(str(round(px_per_mm_interface.ppm, 4)))
+        eb = self.videos[video_name]["video_px_per_mm"]
+        eb.entry_set(str(round(px_per_mm_interface.ppm, 4)))
+        self._check_float_bg(eb)
 
 
     def _get_instructions_frm(self):
