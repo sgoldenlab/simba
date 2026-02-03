@@ -10,12 +10,17 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.px_to_mm_ui import GetPixelsPerMillimeterInterface
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
-                                        SimbaButton, SimBALabel, SimBASeperator)
-from simba.utils.checks import (check_file_exist_and_readable, check_float, check_if_dir_exists, check_int)
-from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links, Options, TagNames)
+                                        SimbaButton, SimBALabel,
+                                        SimBASeperator)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists, check_int)
+from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links,
+                               Options, TagNames)
 from simba.utils.errors import InvalidInputError, PermissionError
 from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_video_meta_data, read_config_entry, read_video_info_csv, read_frm_of_video)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_video_meta_data, read_config_entry,
+                                    read_frm_of_video, read_video_info_csv)
 
 TABLE_HEADERS = ["INDEX", "VIDEO", "FPS", "RESOLUTION WIDTH", "RESOLUTION HEIGHT", "FIND DISTANCE", "DISTANCE IN MM", "PIXELS PER MM"]
 
