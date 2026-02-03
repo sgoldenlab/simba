@@ -1897,7 +1897,7 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         timer.stop_timer()
         stdout_success(msg=f"{len(self.entry_boxes)} videos clipped by time-stamps and saved in {self.save_dir}", elapsed_time=timer.elapsed_time_str,)
 
-ClipMultipleVideosByTimestamps(data_dir=r"E:\maplight_videos\test_0126", save_dir=r"E:\maplight_videos\clip_test")
+#ClipMultipleVideosByTimestamps(data_dir=r"E:\maplight_videos\test_0126", save_dir=r"E:\maplight_videos\clip_test")
 
 
 class InitiateClipMultipleVideosByTimestampsPopUp(PopUpMixin):
