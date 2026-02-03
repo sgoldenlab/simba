@@ -22,7 +22,6 @@ from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_video_meta_data, read_config_entry,
                                     read_frm_of_video, read_video_info_csv)
 
-
 VALID_CLR = 'white'
 INVALID_CLR = 'lightsalmon'
 
