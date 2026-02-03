@@ -28,7 +28,7 @@ class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
 
         self.choose_threshold_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PART THRESHOLD", icon_name='green_dice', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        self.probability_entry = Entry_Box(parent=self.choose_threshold_frm, fileDescription='THRESHOLD: ', labelwidth=20, entry_box_width=20, value=0.0, justify='center', img='green_dice')
+        self.probability_entry = Entry_Box(parent=self.choose_threshold_frm, fileDescription='THRESHOLD: ', labelwidth=20, entry_box_width=20, value=0.0, justify='center', img='green_dice', trace=self._entrybox_bg_check_float)
         self.choose_threshold_frm.grid(row=1, column=0, sticky=NW)
         self.probability_entry.grid(row=0, column=0, sticky=NW)
 
@@ -50,6 +50,12 @@ class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
 
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
+
+
+    def _entrybox_bg_check_float(self, entry_box: Entry_Box, valid_clr: str = 'white', invalid_clr: str = 'lightsalmon'):
+        valid_value = check_float(name='', allow_negative=False, allow_zero=True, value=entry_box.entry_get, raise_error=False, min_value=0.0, max_value=1.0)[0]
+        entry_box.set_bg_clr(clr=valid_clr if valid_value else invalid_clr)
+
 
     def create_settings_frm(self, animal_cnt):
         if hasattr(self, "bp_frm"):
@@ -83,7 +89,6 @@ class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
                                                 transpose=transpose)
         movement_processor.run()
         movement_processor.save()
-
 
 #_ = MovementAnalysisPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 # MovementAnalysisPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")

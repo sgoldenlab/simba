@@ -271,7 +271,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
 
         self.smoothing_frm = CreateLabelFrameWithIcon(parent=self.choice_frm, header="SMOOTHING METHOD", pady=5, padx=5, font=Formats.FONT_HEADER.value, icon_name='smooth', relief='groove')
         self.smoothing_dropdown = SimBADropDown(parent=self.smoothing_frm, dropdown_options=Options.SMOOTHING_OPTIONS_W_NONE.value, label='SMOOTHING: ', label_width=25, dropdown_width=35, value=Options.SMOOTHING_OPTIONS_W_NONE.value[0], command=self.__show_smoothing_entry_box_from_dropdown, img='smooth')
-        self.smoothing_time_eb = Entry_Box(self.smoothing_frm, "SMOOTHING PERIOD (MS):", labelwidth=25,  validation="numeric", entry_box_width=35, img='timer_2')
+        self.smoothing_time_eb = Entry_Box(self.smoothing_frm, "SMOOTHING PERIOD (MS):", labelwidth=25,  validation="numeric", entry_box_width=35, img='timer_2', justify='center')
         self.smoothing_frm.grid(row=1, column=0, sticky=NW)
         self.smoothing_dropdown.grid(row=0, column=0, sticky=NW)
 

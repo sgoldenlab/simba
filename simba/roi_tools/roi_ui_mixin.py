@@ -378,9 +378,9 @@ class ROI_mixin(ConfigReader):
                              row_idx: int):
 
         self.shape_attr_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE ATTRIBUTES", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='attributes_large', relief='solid')
-        self.thickness_dropdown = SimBADropDown(parent=self.shape_attr_panel, dropdown_options=ROI_SETTINGS.SHAPE_THICKNESS_OPTIONS.value, label="SHAPE THICKNESS: ", label_width=17, value=5, dropdown_width=5)
-        self.color_dropdown = SimBADropDown(parent=self.shape_attr_panel, dropdown_options=list(self.color_option_dict.keys()), label="SHAPE COLOR: ", label_width=17, value='Red', dropdown_width=20)
-        self.ear_tag_size_dropdown = SimBADropDown(parent=self.shape_attr_panel, dropdown_options=ROI_SETTINGS.EAR_TAG_SIZE_OPTIONS.value, label="EAR TAG SIZE: ", label_width=17, value=15, dropdown_width=5)
+        self.thickness_dropdown = SimBADropDown(parent=self.shape_attr_panel, dropdown_options=ROI_SETTINGS.SHAPE_THICKNESS_OPTIONS.value, label="SHAPE THICKNESS: ", label_width=17, value=5, dropdown_width=5, img='width')
+        self.color_dropdown = SimBADropDown(parent=self.shape_attr_panel, dropdown_options=list(self.color_option_dict.keys()), label="SHAPE COLOR: ", label_width=17, value='Red', dropdown_width=20, img='palette_small')
+        self.ear_tag_size_dropdown = SimBADropDown(parent=self.shape_attr_panel, dropdown_options=ROI_SETTINGS.EAR_TAG_SIZE_OPTIONS.value, label="EAR TAG SIZE: ", label_width=17, value=15, dropdown_width=5, img='circle_small')
 
 
         self.shape_attr_panel.grid(row=row_idx, sticky=W, pady=10)
@@ -388,12 +388,18 @@ class ROI_mixin(ConfigReader):
         self.ear_tag_size_dropdown.grid(row=0, column=2, sticky=W, pady=10, padx=(0, 10))
         self.color_dropdown.grid(row=0, column=3, sticky=W, pady=10, padx=(0, 10))
 
+
+    def _set_shape_name_eb_bg_clr(self, entry_box: Entry_Box, clr: str = 'white'):
+        entry_box.set_bg_clr(clr=clr)
+
+
+
     def get_shape_name_panel(self,
                              parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                              row_idx: int):
 
         self.shape_name_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE NAME", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='label_large', relief='solid')
-        self.shape_name_eb = Entry_Box(parent=self.shape_name_panel, fileDescription="SHAPE NAME: ", labelwidth=15, entry_box_width=55)
+        self.shape_name_eb = Entry_Box(parent=self.shape_name_panel, fileDescription="SHAPE NAME: ", labelwidth=15, entry_box_width=55, img='label_yellow', trace=self._set_shape_name_eb_bg_clr)
         self.shape_name_panel.grid(row=row_idx, sticky=W, pady=10)
         self.shape_name_eb.grid(row=0, column=0, sticky=W, pady=10)
 
@@ -487,13 +493,15 @@ class ROI_mixin(ConfigReader):
         if not check_str(name=f'shape name', value=shape_name, allow_blank=False, raise_error=False)[0]:
             msg = f"Invalid shape name: {shape_name}. Type a shape name before drawing."
             self.set_status_bar_panel(text=msg, fg='red')
+            self._set_shape_name_eb_bg_clr(entry_box=self.shape_name_eb, clr='lightsalmon')
             raise InvalidInputError(msg=msg, source=f'{self.__class__.__name__} draw')
         elif shape_name in self.roi_names:
-            msg = f'Cannot draw ROI named {shape_name}. An ROI named {shape_name} already exist in for the video.'
+            msg = f'Cannot draw ROI named "{shape_name}". An ROI named "{shape_name}" already exist in for the video.'
             self.set_status_bar_panel(text=msg, fg='red')
+            self._set_shape_name_eb_bg_clr(entry_box=self.shape_name_eb, clr='lightsalmon')
             raise InvalidInputError(msg=msg, source=f'{self.__class__.__name__} draw')
         else:
-            msg = f'Draw {self.selected_shape_type} ROI {shape_name}.'
+            msg = f'Draw {self.selected_shape_type} ROI "{shape_name}".'
             self.set_status_bar_panel(text=msg, fg='blue')
         self.set_btn_clrs(btn=self.draw_btn)
         if PLATFORM == OS.WINDOWS.value:
@@ -704,7 +712,7 @@ class ROI_mixin(ConfigReader):
 
     def add_roi(self, shape_entry: dict):
         if shape_entry['Name'] in self.roi_names:
-            error_txt = f'Cannot add ROI named {shape_entry["Name"]} to video {self.video_meta["video_name"]}. An ROI named {shape_entry["Name"]} already exist'
+            error_txt = f'Cannot add ROI named "{shape_entry["Name"]}" to video {self.video_meta["video_name"]}. An ROI named "{shape_entry["Name"]}" already exist'
             #self.status_bar['txt'] = error_txt
             DuplicateNamesWarning(msg=error_txt, source=self.__class__.__name__)
         else:
@@ -767,7 +775,7 @@ class ROI_mixin(ConfigReader):
             self.set_status_bar_panel(text=msg, fg="red")
             raise NoROIDataError(msg=msg, source=self.__class__.__name__)
         elif (new_name in self.roi_names) and (new_name != name):
-            msg = f'Cannot change ROI name from {name} to {new_name}: an ROI named {new_name} already exist.'
+            msg = f'Cannot change ROI name from "{name}" to {new_name}: an ROI named "{new_name}" already exist.'
             self.set_status_bar_panel(text=msg, fg="red")
             raise NoROIDataError(msg=msg, source=self.__class__.__name__)
 
@@ -985,7 +993,7 @@ class ROI_mixin(ConfigReader):
         valid, error_msg = check_str(name='COLOR', value=self.fixed_roi_clr_drpdwn.getChoices(), raise_error=False)
         if not valid: self.fixed_roi_status_bar['text'] = error_msg; raise InvalidInputError(msg=error_msg, source=self.__class__.__name__)
         if self.fixed_roi_name in self.roi_names:
-            error_msg = f'An ROI named {self.fixed_roi_name} already exist for video {self.video_meta["video_name"]}. PLease choose a different name'
+            error_msg = f'An ROI named "{self.fixed_roi_name}" already exist for video {self.video_meta["video_name"]}. Please choose a different name'
             self.fixed_roi_status_bar['text'] = error_msg
             raise InvalidInputError(error_msg, source=self.__class__.__name__)
         self.clr_name = self.fixed_roi_clr_drpdwn.getChoices()

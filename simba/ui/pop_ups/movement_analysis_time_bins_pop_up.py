@@ -44,7 +44,7 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         self.plots_cb.grid(row=0, column=0, sticky=NW)
 
         self.time_bin_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="TIME BIN", icon_name='timer_2', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        self.time_bin_entry = Entry_Box(parent=self.time_bin_frm, fileDescription='TIME BIN SIZE (S): ', labelwidth=30, entry_box_width=20, justify='center', img='timer_2')
+        self.time_bin_entry = Entry_Box(parent=self.time_bin_frm, fileDescription='TIME BIN SIZE (S): ', labelwidth=30, entry_box_width=20, justify='center', img='timer_2', trace=self._entrybox_bg_check_float)
         self.time_bin_frm.grid(row=2, column=0, sticky=NW, padx=5, pady=5)
         self.time_bin_entry.grid(row=0, column=0, sticky=NW)
 
@@ -86,6 +86,10 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
             self.body_parts_dropdowns[cnt].grid(row=cnt, column=0, sticky=NW)
         self.bp_frm.grid(row=4, column=0, sticky=NW, padx=5, pady=5)
 
+    def _entrybox_bg_check_float(self, entry_box: Entry_Box, valid_clr: str = 'white', invalid_clr: str = 'lightsalmon'):
+        valid_value = check_float(name='', allow_negative=False, allow_zero=False, value=entry_box.entry_get, raise_error=False)[0]
+        entry_box.set_bg_clr(clr=valid_clr if valid_value else invalid_clr)
+
     def _run(self):
         check_float(name="Time bin", value=str(self.time_bin_entry.entry_get), min_value=10e-6)
         self.config.set(ConfigKey.PROCESS_MOVEMENT_SETTINGS.value, ConfigKey.ROI_ANIMAL_CNT.value, str(self.animal_cnt_dropdown.getChoices()))
@@ -122,5 +126,5 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         time_bin_movement_analyzer.run()
         time_bin_movement_analyzer.save()
 
-#_ =  MovementAnalysisTimeBinsPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+#_ =  MovementAnalysisTimeBinsPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 #_ = MovementAnalysisTimeBinsPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
