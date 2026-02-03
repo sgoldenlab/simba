@@ -1821,8 +1821,8 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
             video_length = self.video_meta_data[cnt]["video_length_s"]
             video_length_hhmmss = seconds_to_timestamp(seconds=video_length)
             SimBALabel(data_frm, txt=video_length_hhmmss, justify='center').grid(row=cnt + 2, column=1, sticky=NW, padx=padx)
-            self.entry_boxes[video_name]["start"] = Entry_Box(data_frm,  fileDescription="", labelwidth=0, justify='center')
-            self.entry_boxes[video_name]["end"] = Entry_Box(data_frm, fileDescription="", labelwidth=0, justify='center')
+            self.entry_boxes[video_name]["start"] = Entry_Box(data_frm,  fileDescription="", labelwidth=0, justify='center', trace=self._hhmmss_validation)
+            self.entry_boxes[video_name]["end"] = Entry_Box(data_frm, fileDescription="", labelwidth=0, justify='center', trace=self._hhmmss_validation)
             self.entry_boxes[video_name]["start"].grid(row=cnt + 2, column=2, sticky=NW, padx=padx)
             self.entry_boxes[video_name]["end"].grid(row=cnt + 2, column=3, sticky=NW, padx=padx)
             kwargs = {'video_path': self.video_paths[video_name], 'frame_cnt': 25, 'crop_ratio': 50, 'size': 100, 'video_name': video_name}
@@ -1837,6 +1837,12 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         for cnt, video_name in enumerate(self.video_paths.keys()):
             if box_type == 'start': self.entry_boxes[video_name]["start"].entry_set(text)
             else: self.entry_boxes[video_name]["end"].entry_set(text)
+
+
+    def _hhmmss_validation(self, entry_box: Entry_Box):
+        valid_value = check_if_string_value_is_valid_video_timestamp(value=entry_box.entry_get, name="", raise_error=False)
+        bg_clr = 'lightgreen' if valid_value else 'white'
+        entry_box.set_bg_clr(clr=bg_clr)
 
     def _start_interactive_ui(self, **kwargs):
         def exit_click(event):
@@ -1868,12 +1874,13 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
             self.main_frm.unbind(TkBinds.ESCAPE.value)
         except:
             pass
-        
         if not interactive_ui.img_window.winfo_exists():
             pass
         start_time, end_time  = interactive_ui.get_start_time_str(),  interactive_ui.get_end_time_str()
         self.entry_boxes[kwargs['video_name']]["start"].entry_set(start_time)
         self.entry_boxes[kwargs['video_name']]["end"].entry_set(end_time)
+        self._hhmmss_validation(entry_box=self.entry_boxes[kwargs['video_name']]["start"])
+        self._hhmmss_validation(entry_box=self.entry_boxes[kwargs['video_name']]["end"])
 
     def run(self):
         timer = SimbaTimer(start=True)
@@ -1890,7 +1897,7 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         timer.stop_timer()
         stdout_success(msg=f"{len(self.entry_boxes)} videos clipped by time-stamps and saved in {self.save_dir}", elapsed_time=timer.elapsed_time_str,)
 
-#ClipMultipleVideosByTimestamps(data_dir=r"E:\maplight_videos\test_0126", save_dir=r"E:\maplight_videos\clip_test")
+ClipMultipleVideosByTimestamps(data_dir=r"E:\maplight_videos\test_0126", save_dir=r"E:\maplight_videos\clip_test")
 
 
 class InitiateClipMultipleVideosByTimestampsPopUp(PopUpMixin):

@@ -584,7 +584,7 @@ def check_if_headers_in_dfs_are_unique(dfs: List[pd.DataFrame]) -> List[str]:
     return duplicates
 
 
-def check_if_string_value_is_valid_video_timestamp(value: str, name: str) -> None:
+def check_if_string_value_is_valid_video_timestamp(value: str, name: str, raise_error: bool = True) -> bool:
     """
     Helper to check if a string is in a valid HH:MM:SS format
 
@@ -599,13 +599,12 @@ def check_if_string_value_is_valid_video_timestamp(value: str, name: str) -> Non
     """
     r = re.compile(r"^\d{2}:\d{2}:\d{2}(\.\d+)?$")
     if not r.match(value):
-        raise InvalidInputError(
-            msg=f"{name} should be in the format XX:XX:XX:XXXX or XX:XX:XX where X is an integer between 0-9. Got: {value}",
-            source=check_if_string_value_is_valid_video_timestamp.__name__,
-        )
+        if raise_error:
+            raise InvalidInputError(msg=f"{name} should be in the format XX:XX:XX:XXXX or XX:XX:XX where X is an integer between 0-9. Got: {value}", source=check_if_string_value_is_valid_video_timestamp.__name__)
+        else:
+            return False
     else:
-        pass
-
+        return True
 
 def check_that_hhmmss_start_is_before_end(
     start_time: str, end_time: str, name: str
