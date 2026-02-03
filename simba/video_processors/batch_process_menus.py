@@ -4,7 +4,7 @@ import json
 import os
 from copy import deepcopy
 from tkinter import *
-from typing import Union, List
+from typing import List, Union
 
 import cv2
 import PIL

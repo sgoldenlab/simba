@@ -1,7 +1,7 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import os
-from typing import Union, Optional
+from typing import Optional, Union
 
 import cv2
 import numpy as np
@@ -9,7 +9,7 @@ import numpy as np
 from simba.mixins.image_mixin import ImageMixin
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import check_file_exist_and_readable, check_float
-from simba.utils.enums import TextOptions, ROI_SETTINGS
+from simba.utils.enums import ROI_SETTINGS, TextOptions
 from simba.utils.read_write import get_fn_ext, get_video_meta_data
 
 PIXEL_SENSITIVITY = ROI_SETTINGS.CLICK_SENSITIVITY.value
