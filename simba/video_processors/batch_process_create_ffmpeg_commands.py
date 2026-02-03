@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Union
+from typing import Tuple, Union
 
 try:
     from typing import Literal
@@ -23,6 +23,7 @@ from simba.video_processors.video_processing import (change_single_video_fps,
                                                      downsample_video,
                                                      superimpose_frame_count,
                                                      video_to_greyscale)
+from simba.utils.printing import stdout_information
 
 
 class FFMPEGCommandCreator(object):
@@ -122,13 +123,14 @@ class FFMPEGCommandCreator(object):
         self.videos_to_downsample = self.find_relevant_videos(variable="downsample")
         self.create_process_dir()
         for cnt, (video, video_data) in enumerate(self.videos_to_downsample.items()):
-            print(f"Down-sampling {video} to {video_data['settings']['width']}x{video_data['settings']['height']} ({cnt+1}/{len(list(self.videos_to_downsample.keys()))})... ({get_current_time()})")
+            msg = f"Down-sampling {video} to {video_data['settings']['width']}x{video_data['settings']['height']} ({cnt+1}/{len(list(self.videos_to_downsample.keys()))}) ... "
+            stdout_information(msg=msg)
             if video_data["last_operation"] == "downsample":
                 self.quality = video_data["output_quality"]
             in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
             downsample_video(file_path=in_path, save_path=out_path, gpu=self.gpu, quality=self.quality, verbose=False, codec=self.batch_codec, video_width=int(video_data["settings"]["width"]), video_height=int(video_data["settings"]["height"]))
         self.replace_files_in_temp()
-        print(f"Downsampling complete... ({get_current_time()})")
+        stdout_information(msg="Down-sampling complete...")
 
     def clip_videos(self):
         self.videos_to_clip = self.find_relevant_videos(variable="clip")
@@ -138,62 +140,68 @@ class FFMPEGCommandCreator(object):
                 self.quality = video_data["output_quality"]
             in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
             start_time, end_time = str(video_data["settings"]["start"]).replace(" ", ""), str(video_data["settings"]["stop"]).replace(" ", "")
-            print(f"Clipping {video} between {start_time} and {end_time} ({cnt+1}/{len(list(self.videos_to_clip.keys()))})...  ({get_current_time()})")
+            msg = f"Clipping {video} between {start_time} and {end_time} ({cnt+1}/{len(list(self.videos_to_clip.keys()))})..."
+            stdout_information(msg=msg)
             clip_video_in_range(file_path=in_path, start_time=start_time, end_time=end_time, out_dir=None, overwrite=True, include_clip_time_in_filename=False, gpu=self.gpu, save_path=out_path, verbose=False)
         self.replace_files_in_temp()
-        print(f"Clipping complete... ({get_current_time()})")
+        stdout_information(msg="Clipping complete...")
 
     def apply_fps(self):
         self.videos_to_change_fps = self.find_relevant_videos(variable="fps")
         self.create_process_dir()
         for cnt, (video, video_data) in enumerate(self.videos_to_change_fps.items()):
-            print(f"Changing FPS of {video} to {video_data['settings']['fps']} ({cnt+1}/{len(list(self.videos_to_change_fps.keys()))})... ({get_current_time()})")
+            msg = f"Changing FPS of {video} to {video_data['settings']['fps']} ({cnt+1}/{len(list(self.videos_to_change_fps.keys()))}) ..."
+            stdout_information(msg=msg)
             if video_data["last_operation"] == "fps":
                 self.quality = video_data["output_quality"]
             in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
             change_single_video_fps(file_path=in_path, fps=video_data["settings"]["fps"], gpu=self.gpu, quality=self.quality, verbose=False, save_path=out_path)
         self.replace_files_in_temp()
-        print(f"FPS conversion complete... ({get_current_time()})")
+        stdout_information(msg="FPS conversion complete...")
 
     def apply_grayscale(self):
         self.videos_to_greyscale = self.find_relevant_videos(variable="grayscale")
         self.create_process_dir()
         for cnt, (video, video_data) in enumerate(self.videos_to_greyscale.items()):
-            print(f"Applying grayscale {video} ({cnt+1}/{len(list(self.videos_to_greyscale.keys()))})... ({get_current_time()})")
+            msg = f"Applying grayscale {video} ({cnt+1}/{len(list(self.videos_to_greyscale.keys()))})..."
+            stdout_information(msg=msg)
             if video_data["last_operation"] == "grayscale":
                 self.quality = video_data["output_quality"]
             in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
             video_to_greyscale(file_path=in_path, gpu=self.gpu, codec=self.batch_codec, verbose=False, quality=self.quality, save_path=out_path)
         self.replace_files_in_temp()
-        print(f"Grayscale complete... ({get_current_time()})")
+        stdout_information(msg=f"Grayscale complete...")
 
     def apply_frame_count(self, font_size: int = 25, font: str = 'Arial', loc: Literal['top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right'] = 'bottom_middle'):
         self.videos_to_frm_cnt = self.find_relevant_videos(variable="frame_cnt")
         self.create_process_dir()
         for cnt, (video, video_data) in enumerate(self.videos_to_frm_cnt.items()):
-            print(f"Applying frame count print {video} ({cnt+1}/{len(list(self.videos_to_frm_cnt.keys()))})... ({get_current_time()})")
+            msg = f"Applying frame count print {video} ({cnt+1}/{len(list(self.videos_to_frm_cnt.keys()))})..."
+            stdout_information(msg=msg)
             if video_data["last_operation"] == "frame_cnt":
                 self.quality = video_data["output_quality"]
             in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
             superimpose_frame_count(file_path=in_path, gpu=self.gpu, font=font, save_path=out_path, loc=loc, fontsize=font_size, codec=self.batch_codec, quality=self.quality, verbose=False)
         self.replace_files_in_temp()
-        print(f"Applying frame count complete... ({get_current_time()})")
+        stdout_information(msg="Applying frame count complete...")
 
     def apply_clahe(self, tile_size: Tuple[int, int] = (16, 16), clip_limit: int = 2):
         self.videos_to_frm_cnt = self.find_relevant_videos(variable="clahe")
         self.create_process_dir()
         for cnt, (video, video_data) in enumerate(self.videos_to_frm_cnt.items()):
-            print(f"Applying CLAHE {video} ({cnt+1}/{len(list(self.videos_to_frm_cnt.keys()))})... (note: process can be slow for long videos) ({get_current_time()})")
+            msg = f"Applying CLAHE {video} ({cnt+1}/{len(list(self.videos_to_frm_cnt.keys()))})... (note: process can be slow for long videos)"
+            stdout_information(msg=msg)
             in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
             clahe_enhance_video(file_path=in_path, clip_limit=clip_limit, tile_grid_size=tile_size, out_path=out_path, verbose=False)
         self.replace_files_in_temp()
-        print(f"Applying CLAHE complete... ({get_current_time()})")
+        stdout_information(msg=f"Applying CLAHE complete...")
 
     def crop_videos(self):
         self.videos_to_crop = self.find_relevant_videos(variable="crop")
         self.create_process_dir()
         for cnt, (video, video_data) in enumerate(self.videos_to_crop.items()):
-            print(f"Applying crop {video} ({cnt+1}/{len(list(self.videos_to_crop.keys()))})... ({get_current_time()})")
+            msg = f"Applying crop {video} ({cnt+1}/{len(list(self.videos_to_crop.keys()))}) ... "
+            stdout_information(msg=msg)
             if video_data["last_operation"] == "crop":
                 self.quality = video_data["output_quality"]
             in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
@@ -209,12 +217,12 @@ class FFMPEGCommandCreator(object):
                 else:
                     raise CropError(msg=f'Could not crop video {video} at width: {width}, height: {height} top_left_x: {top_left_x}, top_left_y: {top_left_y}', source=self.__class__.__name__)
         self.replace_files_in_temp()
-        print(f"Applying crop complete... ({get_current_time()})")
-
+        stdout_information(msg="Applying crop complete...")
     def copy_videos_to_temp_dir(self):
         for video, video_data in self.video_dict["video_data"].items():
             source = video_data["video_info"]["file_path"]
-            print(f"Making a copy of {os.path.basename(source)} ... ({get_current_time()})")
+            msg = f"Making a copy of {os.path.basename(source)} ..."
+            stdout_information(msg=msg)
             destination = os.path.join(self.temp_dir, os.path.basename(source))
             shutil.copyfile(source, destination)
 

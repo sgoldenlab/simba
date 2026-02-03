@@ -1271,7 +1271,7 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
     if os.path.isfile(save_name) and (not overwrite):
         raise FileExistError(msg=f"SIMBA ERROR: The outfile file already exist: {save_name}.", source=clip_video_in_range.__name__)
     if gpu:
-        cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -c:v h264_nvenc -rc vbr -cq {quality_crf} "{save_name}" -loglevel error -stats -hide_banner -y'
+        cmd = f'ffmpeg -hwaccel auto -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -c:v h264_nvenc -rc vbr -cq {quality_crf} "{save_name}" -loglevel error -stats -hide_banner -y'
     else:
         cmd = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -c:v {codec} -crf {quality_crf} "{save_name}" -loglevel error -stats -hide_banner -y'
     if verbose: print(f"Clipping video {file_name} between {start_time} and {end_time}... ")

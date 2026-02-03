@@ -96,5 +96,17 @@
   "BLOB_HEADER_GAP_FILL_SIZE": "Gap-fill filter size (% of frame) for this video.",
   "BLOB_HEADER_NOISE_REMOVAL_SIZE": "Noise-removal filter size (% of frame) for this video.",
   "BLOB_HEADER_INCLUSION_ZONES": "Draw regions where the animal must stay. Tracking is ignored outside these zones.",
-  "BLOB_HEADER_QUICK_CHECK": "Preview blob tracking for this video with current settings."
+  "BLOB_HEADER_QUICK_CHECK": "Preview blob tracking for this video with current settings.",
+  "VIDEO_INFO_KNOWN_DISTANCE": "Real-world length in millimeters (e.g. of an object in the video).\nEnter a value, then click APPLY to fill the DISTANCE IN MM column for all videos.",
+  "VIDEO_INFO_PIXEL_PER_MM": "Calibration: how many pixels equal one millimeter in the video.\nEnter a value, then click APPLY to fill the PIXELS PER MM column for all videos.",
+  "VIDEO_INFO_HEADER_INDEX": "Row number for this video in the table.",
+  "VIDEO_INFO_HEADER_VIDEO_NAME": "Name of the video file.",
+  "VIDEO_INFO_HEADER_FPS": "Frames per second. Should match the actual video frame rate.",
+  "VIDEO_INFO_HEADER_VIDEO_WIDTH": "Width of the video in pixels.",
+  "VIDEO_INFO_HEADER_VIDEO_HEIGHT": "Height of the video in pixels.",
+  "VIDEO_INFO_HEADER_FIND_DISTANCE": "Click the button in this column to draw a line in the video and compute pixels per mm from the known distance.",
+  "VIDEO_INFO_HEADER_DISTANCE_IN_MM": "Real-world length in millimeters (e.g. of an object you can measure in the video). Used to calculate pixels per mm.",
+  "VIDEO_INFO_HEADER_PIXELS_PER_MM": "Calibration for this video: how many pixels equal one millimeter. SimBA uses this to convert distances to real units.",
+  "VIDEO_INFO_DUPLICATE_DISTANCE": "Copy the DISTANCE IN MM value from the first video (top row) to all other videos. Use when all videos share the same known distance.",
+  "VIDEO_INFO_DUPLICATE_PX_PER_MM": "Copy the PIXELS PER MM value from the first video (top row) to all other videos. Use when all videos have the same calibration."
 }

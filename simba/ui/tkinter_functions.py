@@ -228,7 +228,7 @@ class Entry_Box(Frame):
                  status: Literal["normal", "disabled", "readonly"] = 'normal',
                  validation: Optional[Union[Callable, str]] = None,
                  entry_box_width: Union[int, str] = None,
-                 entry_box_clr: Optional[str] = None,
+                 entry_box_clr: Optional[str] = 'white',
                  img: Optional[str] = None,
                  value: Optional[Any] = None,
                  label_font: tuple = Formats.FONT_REGULAR.value,
@@ -291,6 +291,10 @@ class Entry_Box(Frame):
 
     def run_cmd(self, x):
         self.cmd(self.entry_get.strip())
+
+
+    def set_bg_clr(self, clr: str):
+        self.entPath.configure(bg=clr)
 
 
 
@@ -522,7 +526,8 @@ def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                 enabled: Optional[bool] = True,
                 anchor: str = 'w',
                 thread: Optional[bool] = False,
-                tooltip_txt: Optional[str] = None) -> Button:
+                tooltip_txt: Optional[str] = None,
+                tooltip_key: Optional[str] = None) -> Button:
     def on_enter(e):
         e.widget.config(bg=hover_bg_clr, font=hover_font)
 
@@ -580,6 +585,8 @@ def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
 
     if tooltip_txt is not None:
         CreateToolTip(widget=btn, text=tooltip_txt)
+    elif tooltip_key is not None and tooltip_key in TOOLTIPS.keys():
+        CreateToolTip(widget=btn, text=TOOLTIPS[tooltip_key])
 
     return btn
 
@@ -610,7 +617,6 @@ def SimbaCheckbox(parent: Union[Frame, Toplevel, LabelFrame, Canvas],
         cb.image = txt_img
     if state == DISABLED:
         cb.configure(state=DISABLED)
-
     if isinstance(tooltip_txt, str):
         CreateToolTip(widget=cb, text=tooltip_txt)
     elif isinstance(tooltip_key, str) and tooltip_key in TOOLTIPS.keys():

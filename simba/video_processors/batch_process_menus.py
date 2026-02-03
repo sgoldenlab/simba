@@ -4,7 +4,7 @@ import json
 import os
 from copy import deepcopy
 from tkinter import *
-from typing import Union
+from typing import Union, List
 
 import cv2
 import PIL
@@ -87,6 +87,7 @@ class BatchProcessFrame(PopUpMixin):
             raise NoFilesFoundError(msg=f"The input directory {self.input_dir} contains ZERO video files in either .avi, .mp4, .mov, .flv, or m4v format", source=self.__class__.__name__)
         PopUpMixin.__init__(self, title="BATCH PRE-PROCESS VIDEOS IN SIMBA", size=(2000, 600), icon='factory')
         self.red_drop_img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS["crop_red"]["icon_path"]))
+        self.green_drop_img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS["crop_green"]["icon_path"]))
         self.black_crop_img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS["crop"]["icon_path"]))
         self.percent_to_crf_lookup = percent_to_crf_lookup()
         self.cpu_video_quality = list(range(10, 110, 10))
@@ -175,25 +176,35 @@ class BatchProcessFrame(PopUpMixin):
 
 
     def inverse_all_cb_ticks(self, variable_name=None):
-        if self.headings[variable_name].get():
-            for video_name in self.videos.keys():
-                self.videos[video_name][variable_name].set(True)
-        if not self.headings[variable_name].get():
-            for video_name in self.videos.keys():
-                self.videos[video_name][variable_name].set(False)
+        for video_name in self.videos.keys():
+            self.videos[video_name][variable_name].set(self.headings[variable_name].get())
+        for name, video_data in self.videos.items():
+            if variable_name == 'clip_cb_var':
+                entry_boxes = [self.videos[name]["start_entry"], self.videos[name]["end_entry"]]
+                cboxes = [self.videos[name]["clip_cb"]]
+                self._set_entry_boxes_bg_clr(state=self.headings[variable_name].get(), entry_boxes=entry_boxes, cboxes=cboxes)
+            elif variable_name == 'downsample_cb_var':
+                cboxes = [self.videos[name]["downsample_cb"]]
+                entry_boxes = [self.videos[name]["width_entry"], self.videos[name]["height_entry"]]
+                self._set_entry_boxes_bg_clr(state=self.headings[variable_name].get(), entry_boxes=entry_boxes, cboxes=cboxes)
+            elif variable_name == 'fps_cb_var':
+                cboxes = [self.videos[name]["fps_cb"]]
+                entry_boxes = [self.videos[name]["fps_entry"]]
+                self._set_entry_boxes_bg_clr(state=self.headings[variable_name].get(), entry_boxes=entry_boxes, cboxes=cboxes)
+            elif variable_name == 'grayscale_cb_var':
+                cboxes = [self.videos[name]["grayscale_cbox"]]
+                self._set_entry_boxes_bg_clr(state=self.headings[variable_name].get(), cboxes=cboxes)
+            elif variable_name == 'frame_cnt_cb_var':
+                cboxes = [self.videos[name]["frame_cnt_cbox"]]
+                self._set_entry_boxes_bg_clr(state=self.headings[variable_name].get(), cboxes=cboxes)
+            elif variable_name == 'apply_clahe_cb_var':
+                cboxes = [self.videos[name]["apply_clahe_cbox"]]
+                self._set_entry_boxes_bg_clr(state=self.headings[variable_name].get(), cboxes=cboxes)
 
-    def change_quality_options_cpu_gpu(self, x):
-        gpu_state = str_2_bool(self.use_gpu_dropdown.get_value())
-        if not gpu_state:
-            self.quick_set_quality_dropdown.change_options(values=self.cpu_video_quality, set_str='100', auto_change_width=False)
-        else:
-            self.quick_set_quality_dropdown.change_options(values=["Low", "Medium", "High"], set_str='Medium', auto_change_width=False)
-        #self.quick_set_quality_dropdown.grid(row=1, column=0, sticky=NW)
-        for video_cnt, video_name in enumerate(self.videos.keys()):
-            if not gpu_state:
-                self.videos[video_name]["video_quality_dropdown"].change_options(values=self.cpu_video_quality, set_str='100', auto_change_width=False)
-            else:
-                self.videos[video_name]["video_quality_dropdown"].change_options(values=["Low", "Medium", "High"], set_str='Medium', auto_change_width=False)
+
+
+
+
 
     def apply_resolution_to_all(self):
         check_int(value=self.quick_downsample_width.entry_get, min_value=0, name=f"Quick set downsample WIDTH {self.quick_downsample_width.entry_get}",)
@@ -218,6 +229,9 @@ class BatchProcessFrame(PopUpMixin):
     def apply_quality_to_all(self):
         for video_name in self.videos.keys():
             self.videos[video_name]["video_quality_dropdown"].setChoices(self.quick_set_quality_dropdown.getChoices())
+
+
+
 
     def create_video_table_headings(self):
         self.headings = {}
@@ -268,6 +282,14 @@ class BatchProcessFrame(PopUpMixin):
         self.root.config(menu=menu)
 
 
+    def _set_entry_boxes_bg_clr(self, state: bool, entry_boxes: List[Entry_Box] = (),  cboxes: List[SimbaCheckbox] = ()):
+        clr = 'white' if not state else 'lightgreen'
+        for entry_box in entry_boxes:
+            entry_box.set_bg_clr(clr=clr)
+        for cbox in cboxes:
+            cbox.configure(selectcolor=clr)
+
+
     def create_video_rows(self):
         self.videos = {}
         for w in self.videos_frm.grid_slaves():
@@ -282,15 +304,15 @@ class BatchProcessFrame(PopUpMixin):
             self.videos[name]["crop_btn"] = SimbaButton(parent=self.videos_frm, txt='CROP', txt_clr='black', cmd=lambda k=self.videos[name]["video_name_lbl"]["text"]: self.batch_process_crop_function(k), img='crop_2')
             self.videos[name]["start_entry"] = Entry_Box(parent=self.videos_frm, fileDescription='', value="00:00:00", justify='center', entry_font=Formats.FONT_REGULAR_BOLD.value, entry_box_width=12)
             self.videos[name]["end_entry"] = Entry_Box(parent=self.videos_frm, fileDescription='', value=data["video_length"], justify='center', entry_font=Formats.FONT_REGULAR_BOLD.value, entry_box_width=12)
-            self.videos[name]["clip_cb"], self.videos[name]["clip_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='', cmd=None)
+            self.videos[name]["clip_cb"], self.videos[name]["clip_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='', cmd=lambda _name=name: self._set_entry_boxes_bg_clr(entry_boxes=[self.videos[_name]["start_entry"], self.videos[_name]["end_entry"]], state=self.videos[_name]["clip_cb_var"].get(), cboxes=[self.videos[_name]["clip_cb"]]))
             self.videos[name]["width_entry"] = Entry_Box(parent=self.videos_frm, fileDescription='', value=data["width"], justify='center', entry_font=Formats.FONT_REGULAR_BOLD.value, entry_box_width=10)
             self.videos[name]["height_entry"] = Entry_Box(parent=self.videos_frm, fileDescription='', value=data["height"], justify='center', entry_font=Formats.FONT_REGULAR_BOLD.value, entry_box_width=10)
-            self.videos[name]["downsample_cb"], self.videos[name]["downsample_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='', cmd=None)
+            self.videos[name]["downsample_cb"], self.videos[name]["downsample_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='', cmd=lambda _name=name: self._set_entry_boxes_bg_clr(entry_boxes=[self.videos[_name]["width_entry"], self.videos[_name]["height_entry"]], state=self.videos[_name]["downsample_cb_var"].get(), cboxes=[self.videos[_name]["downsample_cb"]]))
             self.videos[name]["fps_entry"] = Entry_Box(parent=self.videos_frm, fileDescription='', value=round(data["fps"], 4), justify='center', entry_font=Formats.FONT_REGULAR_BOLD.value, entry_box_width=8)
-            self.videos[name]["fps_cb"], self.videos[name]["fps_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='', cmd=None)
-            self.videos[name]["grayscale_cbox"], self.videos[name]["grayscale_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='', cmd=None)
-            self.videos[name]["frame_cnt_cbox"], self.videos[name]["frame_cnt_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='', cmd=None)
-            self.videos[name]["apply_clahe_cbox"], self.videos[name]["apply_clahe_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='', cmd=None)
+            self.videos[name]["fps_cb"], self.videos[name]["fps_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='', cmd=lambda _name=name: self._set_entry_boxes_bg_clr(entry_boxes=[self.videos[_name]["fps_entry"]], state=self.videos[_name]["fps_cb_var"].get(), cboxes=[self.videos[_name]["fps_cb"]]))
+            self.videos[name]["grayscale_cbox"], self.videos[name]["grayscale_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='', cmd=lambda _name=name: self._set_entry_boxes_bg_clr(state=self.videos[_name]["grayscale_cb_var"].get(), cboxes=[self.videos[_name]["grayscale_cbox"]]))
+            self.videos[name]["frame_cnt_cbox"], self.videos[name]["frame_cnt_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='', cmd=lambda _name=name: self._set_entry_boxes_bg_clr(state=self.videos[_name]["frame_cnt_cb_var"].get(), cboxes=[self.videos[_name]["frame_cnt_cbox"]]))
+            self.videos[name]["apply_clahe_cbox"], self.videos[name]["apply_clahe_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='', cmd=lambda _name=name: self._set_entry_boxes_bg_clr(state=self.videos[_name]["apply_clahe_cb_var"].get(), cboxes=[self.videos[_name]["apply_clahe_cbox"]]))
             self.videos[name]["video_quality_dropdown"] = SimBADropDown(parent=self.videos_frm, label="", dropdown_options=self.cpu_video_quality, value=60, dropdown_width=10)
 
             self.videos[name]["video_name_lbl"].grid(row=row, column=0, sticky=W, pady=(3, 3))
@@ -348,8 +370,8 @@ class BatchProcessFrame(PopUpMixin):
         self.crop_dict[video_name]["bottom_right_y"] = roi_selector.bottom_right[1]
         k = cv2.waitKey(20) & 0xFF
         cv2.destroyAllWindows()
-        self.videos[video_name]["crop_btn"].configure(fg="red", font=('Arial', 14, 'bold'))
-        self.videos[video_name]["crop_btn"].configure(image=self.red_drop_img, compound='left')
+        self.videos[video_name]["crop_btn"].configure(fg="darkgreen", font=('Arial', 14, 'bold'), bg='darkgrey')
+        self.videos[video_name]["crop_btn"].configure(image=self.green_drop_img, compound='left')
 
     def preferences_pop_up(self):
         if hasattr(self, 'preferences_frm'):
@@ -524,6 +546,14 @@ class BatchProcessFrame(PopUpMixin):
 
 
 # test = BatchProcessFrame(input_dir=r'D:\troubleshooting\maplight_ri\project_folder\blob\videos', output_dir=r"D:\troubleshooting\maplight_ri\project_folder\blob\batch_out_6")
+# test.create_main_window()
+# test.create_video_table_headings()
+# test.create_video_rows()
+# test.create_execute_btn()
+# test.main_frm.mainloop()
+
+#
+# test = BatchProcessFrame(input_dir=r'D:\troubleshooting\batch_fps', output_dir=r"D:\troubleshooting\batch_fps\out")
 # test.create_main_window()
 # test.create_video_table_headings()
 # test.create_video_rows()

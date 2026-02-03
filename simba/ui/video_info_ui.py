@@ -57,10 +57,10 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         else:
             self.video_info_df, self.prior_videos = None, []
         self.distance_mm = read_config_entry(self.config, ConfigKey.FRAME_SETTINGS.value, ConfigKey.DISTANCE_MM.value, Dtypes.FLOAT.value,0.00)
+        self.distance_mm = 'None' if self.distance_mm == 0.0 else self.distance_mm
         self.video_paths = find_files_of_filetypes_in_directory(directory=self.video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True, as_dict=True)
         self.max_char_vid_name = len(max(self.video_paths.keys(), key=len))
         PopUpMixin.__init__(self, title="VIDEO INFO", size=(1550, 800), icon='video')
-        self.TABLE_COL_WIDTHS = ["5", self.max_char_vid_name + 5, "18", "18", "18", "18", "18", "18"]
 
 
     def _get_video_table_rows(self):
@@ -72,7 +72,8 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
             if video_name in self.prior_videos:
                 try:
                     prior_data = self.read_video_info(video_name=video_name, raise_error=False)[0].reset_index(drop=True).iloc[0].to_dict()
-                    fps, width, height, distance, pixels_per_mm = prior_data['fps'], prior_data['Resolution_width'], prior_data['Resolution_height'], prior_data['Distance_in_mm'], prior_data['pixels/mm']
+
+                    fps, width, height, distance, pixels_per_mm = prior_data['fps'], prior_data['Resolution_width'], prior_data['Resolution_height'], round(prior_data['Distance_in_mm'], 4), round(prior_data['pixels/mm'], 4)
                 except:
                     fps, width, height = self.video_meta_data[video_name]['fps'], self.video_meta_data[video_name]['width'], self.video_meta_data[video_name]['height']
                     distance, pixels_per_mm = self.distance_mm, 'None'
@@ -106,9 +107,9 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
 
     def _get_quick_set(self):
         self.quick_set_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BATCH QUICK SET", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_PARAMETERS.value)
-        self.quick_set_frm_known_distance_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='KNOWN DISTANCE:', labelwidth=30, value='', entry_box_width=10, img='distance_red', justify='center')
+        self.quick_set_frm_known_distance_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='KNOWN DISTANCE:', labelwidth=30, value='', entry_box_width=10, img='distance_red', justify='center', tooltip_key='VIDEO_INFO_KNOWN_DISTANCE')
         self.quick_set_frm_known_distance_btn = SimbaButton(parent=self.quick_set_frm, txt="APPLY", txt_clr='black', img='tick', font=Formats.FONT_REGULAR_BOLD.value, cmd=self._set_known_distance, cmd_kwargs={'distance': lambda: self.quick_set_frm_known_distance_eb.entry_get})
-        self.quick_set_px_mm_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='PIXEL PER MILLIMETER:', labelwidth=30, value='', entry_box_width=10, img='ruler', justify='center')
+        self.quick_set_px_mm_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='PIXEL PER MILLIMETER:', labelwidth=30, value='', entry_box_width=10, img='ruler', justify='center', tooltip_key='VIDEO_INFO_PIXEL_PER_MM')
         self.quick_set_px_mm_btn = SimbaButton(parent=self.quick_set_frm, txt="APPLY", txt_clr='black', img='tick', font=Formats.FONT_REGULAR_BOLD.value, cmd=self._set_px_per_mm, cmd_kwargs={'px_per_mm': lambda: self.quick_set_px_mm_eb.entry_get})
         self.quick_set_frm.grid(row=1, column=0, sticky=NW)
         self.quick_set_frm_known_distance_eb.grid(row=0, column=0, sticky=NW)
@@ -118,12 +119,12 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
 
 
     def _set_known_distance(self, distance: str):
-        check_float(name=f'{self.__class__.__name__} KNOWN DISTANCE', value=distance, min_value=10e-6, raise_error=True)
+        check_float(name=f'{self.__class__.__name__} KNOWN DISTANCE', value=distance, allow_negative=False, allow_zero=False, raise_error=True)
         for cnt, (video_name, video_path) in enumerate(self.video_paths.items()):
             self.videos[video_name]["video_known_distance_eb"].entry_set(val=distance)
 
     def _set_px_per_mm(self, px_per_mm: str):
-        check_float(name=f'{self.__class__.__name__} PIXEL PER MILLIMETER', value=px_per_mm, min_value=10e-6, raise_error=True)
+        check_float(name=f'{self.__class__.__name__} PIXEL PER MILLIMETER', value=px_per_mm, allow_negative=False, allow_zero=False,  raise_error=True)
         for cnt, (video_name, video_path) in enumerate(self.video_paths.items()):
             self.videos[video_name]["video_px_per_mm"].entry_set(val=px_per_mm)
 
@@ -135,7 +136,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
     def _duplicate_idx_1_distance(self):
         first_key = list(self.video_paths.keys())[0]
         first_val = self.videos[first_key]["video_known_distance_eb"].entry_get
-        if not check_float(name=self.__class__.__name__, value=first_val, min_value=10e-6, raise_error=False)[0]:
+        if not check_float(name=self.__class__.__name__, value=first_val, allow_negative=False, allow_zero=False, raise_error=False)[0]:
             raise InvalidInputError(msg=f'Distance for {first_key} cannot be duplicated. Not a valid distance value: {first_val}', source=self.__class__.__name__)
         for cnt, (video_name, video_path) in enumerate(self.video_paths.items()):
             self.videos[video_name]["video_known_distance_eb"].entry_set(val=first_val)
@@ -143,7 +144,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
     def _duplicate_idx_1_px_mm(self):
         first_key = list(self.video_paths.keys())[0]
         first_val = self.videos[first_key]["video_px_per_mm"].entry_get
-        if not check_float(name=self.__class__.__name__, value=first_val, min_value=10e-6, raise_error=False)[0]:
+        if not check_float(name=self.__class__.__name__, value=first_val, allow_negative=False, allow_zero=False, raise_error=False)[0]:
             raise InvalidInputError(msg=f'Pixel per millimeter for {first_key} cannot be duplicated. Not a valid distance value: {first_val}', source=self.__class__.__name__)
         for cnt, (video_name, video_path) in enumerate(self.video_paths.items()):
             self.videos[video_name]["video_px_per_mm"].entry_set(val=first_val)
@@ -151,15 +152,15 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
     def _initate_find_distance(self, video_name: str):
         video_path = self.video_paths[video_name]
         known_distance = self.videos[video_name]['video_known_distance_eb'].entry_get
-        check_float(name=f'{video_name} known distance', value=known_distance, min_value=10e-16, raise_error=True)
+        check_float(name=f'{video_name} known distance', value=known_distance, allow_negative=False, allow_zero=False, raise_error=True)
         px_per_mm_interface = GetPixelsPerMillimeterInterface(video_path=video_path, known_metric_mm=float(known_distance))
         px_per_mm_interface.run()
-        self.videos[video_name]["video_px_per_mm"].entry_set(str(round(px_per_mm_interface.ppm, 5)))
+        self.videos[video_name]["video_px_per_mm"].entry_set(str(round(px_per_mm_interface.ppm, 4)))
 
 
     def _get_instructions_frm(self):
         self.instructions_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="INSTRUCTIONS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_PARAMETERS.value)
-        self.instructions_label_1 = SimBALabel(parent=self.instructions_frm, txt='1. Enter the known distance (mm) in "DISTANCE IN MM." Use "autopopulate" or "batch quick set" for similar videos.', font=Formats.FONT_REGULAR_ITALICS.value)
+        self.instructions_label_1 = SimBALabel(parent=self.instructions_frm, txt='1. Enter the known distance (mm) in "DISTANCE IN MM" column. Use "autopopulate" or "BATCH QUICK SET" for similar videos.', font=Formats.FONT_REGULAR_ITALICS.value)
         self.instructions_label_2 = SimBALabel(parent=self.instructions_frm, txt='2. Click on "CALCULATE DISTANCE" button(s) to calculate pixels/mm for each video.', font=Formats.FONT_REGULAR_ITALICS.value)
         self.instructions_label_3 = SimBALabel(parent=self.instructions_frm, txt="3. Click <SAVE PIXEL PER MILLIMETER DATA> when all the data are filled in.", font=Formats.FONT_REGULAR_ITALICS.value)
         self.instructions_frm.grid(row=0, column=0, sticky=W)
@@ -177,47 +178,36 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         padx = (0, 12)
         self.video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="PROJECT VIDEOS", icon_name='video_large', icon_link=Links.VIDEO_PARAMETERS.value, font=Formats.FONT_HEADER.value)
 
-        idx_header = SimBALabel(parent=self.video_frm, txt="INDEX", font=Formats.FONT_HEADER.value, justify='center', img='list')
-        idx_header.grid(row=0, column=0, sticky=NW, padx=padx)
-
-        video_name_header = SimBALabel(parent=self.video_frm, txt="VIDEO NAME", font=Formats.FONT_HEADER.value, justify='center', img='video_2')
-        video_name_header.grid(row=0, column=1, sticky=W, padx=padx)
-
-        fps_header = SimBALabel(parent=self.video_frm, txt="FPS", font=Formats.FONT_HEADER.value, justify='center', img='camera')
-        fps_header.grid(row=0, column=2, sticky=W, padx=padx)
-
-        width_header = SimBALabel(parent=self.video_frm, txt="VIDEO WIDTH", font=Formats.FONT_HEADER.value, justify='center', img='width')
-        width_header.grid(row=0, column=3, sticky=W, padx=padx)
-
-        height_header = SimBALabel(parent=self.video_frm, txt="VIDEO HEIGHT", font=Formats.FONT_HEADER.value, justify='center', img='height')
-        height_header.grid(row=0, column=4, sticky=W, padx=padx)
-
-        find_dist_header = SimBALabel(parent=self.video_frm, txt="FIND DISTANCE", font=Formats.FONT_HEADER.value, justify='center')
-        find_dist_header.grid(row=0, column=5, sticky=W, padx=padx)
-
-        dist_header = SimBALabel(parent=self.video_frm, txt="DISTANCE IN MM", font=Formats.FONT_HEADER.value, justify='center', img='distance_red')
-        dist_header.grid(row=0, column=6, sticky=W, padx=padx)
-
-        px_mm_header = SimBALabel(parent=self.video_frm, txt="PIXELS PER MM", font=Formats.FONT_HEADER.value, justify='center', img='ruler')
-        px_mm_header.grid(row=0, column=7, sticky=W)
-
+        idx_header = SimBALabel(parent=self.video_frm, txt="INDEX", font=Formats.FONT_HEADER.value, justify='center', img='list', tooltip_key='VIDEO_INFO_HEADER_INDEX')
+        video_name_header = SimBALabel(parent=self.video_frm, txt="VIDEO NAME", font=Formats.FONT_HEADER.value, justify='center', img='video_2', tooltip_key='VIDEO_INFO_HEADER_VIDEO_NAME')
+        fps_header = SimBALabel(parent=self.video_frm, txt="FPS", font=Formats.FONT_HEADER.value, justify='center', img='camera', tooltip_key='VIDEO_INFO_HEADER_FPS')
+        width_header = SimBALabel(parent=self.video_frm, txt="VIDEO WIDTH", font=Formats.FONT_HEADER.value, justify='center', img='width', tooltip_key='VIDEO_INFO_HEADER_VIDEO_WIDTH')
+        height_header = SimBALabel(parent=self.video_frm, txt="VIDEO HEIGHT", font=Formats.FONT_HEADER.value, justify='center', img='height', tooltip_key='VIDEO_INFO_HEADER_VIDEO_HEIGHT')
+        find_dist_header = SimBALabel(parent=self.video_frm, txt="FIND DISTANCE", font=Formats.FONT_HEADER.value, justify='center', tooltip_key='VIDEO_INFO_HEADER_FIND_DISTANCE')
+        dist_header = SimBALabel(parent=self.video_frm, txt="DISTANCE IN MM", font=Formats.FONT_HEADER.value, justify='center', img='distance_red', tooltip_key='VIDEO_INFO_HEADER_DISTANCE_IN_MM')
+        px_mm_header = SimBALabel(parent=self.video_frm, txt="PIXELS PER MM", font=Formats.FONT_HEADER.value, justify='center', img='ruler', tooltip_key='VIDEO_INFO_HEADER_PIXELS_PER_MM')
         seperator = SimBASeperator(parent=self.video_frm, color=None, orient='horizontal', borderwidth=1)
+
         seperator.grid(row=1, column=0, columnspan=15, rowspan=1, sticky="ew")
-
-
+        px_mm_header.grid(row=0, column=7, sticky=W)
+        dist_header.grid(row=0, column=6, sticky=W, padx=padx)
+        find_dist_header.grid(row=0, column=5, sticky=W, padx=padx)
+        height_header.grid(row=0, column=4, sticky=W, padx=padx)
+        width_header.grid(row=0, column=3, sticky=W, padx=padx)
+        fps_header.grid(row=0, column=2, sticky=W, padx=padx)
+        video_name_header.grid(row=0, column=1, sticky=W, padx=padx)
+        idx_header.grid(row=0, column=0, sticky=NW, padx=padx)
 
         self.video_frm.grid(row=3, column=0, sticky=W)
         self._get_video_table_rows()
 
     def _get_duplicate_btns(self):
-        self.duplicate_distance_btn = SimbaButton(parent=self.video_frm, txt="DUPLICATE INDEX 1", txt_clr='red', img='danger', font=Formats.FONT_REGULAR.value, cmd=self._duplicate_idx_1_distance)
+        self.duplicate_distance_btn = SimbaButton(parent=self.video_frm, txt="DUPLICATE INDEX 1", txt_clr='red', img='danger', font=Formats.FONT_REGULAR_ITALICS.value, cmd=self._duplicate_idx_1_distance, tooltip_key='VIDEO_INFO_DUPLICATE_DISTANCE')
         self.duplicate_distance_btn.grid(row=2, column=6, sticky=W, padx=12)
-        self.duplicate_btn = SimbaButton(parent=self.video_frm, txt="DUPLICATE INDEX 1", txt_clr='red', img='danger', font=Formats.FONT_REGULAR.value, cmd=self._duplicate_idx_1_px_mm)
+        self.duplicate_btn = SimbaButton(parent=self.video_frm, txt="DUPLICATE INDEX 1", txt_clr='red', img='danger', font=Formats.FONT_REGULAR_ITALICS.value, cmd=self._duplicate_idx_1_px_mm, tooltip_key='VIDEO_INFO_DUPLICATE_PX_PER_MM')
         self.duplicate_btn.grid(row=2, column=7, sticky=W, padx=12)
         sep = SimBASeperator(parent=self.video_frm, orient='horizontal', height=2, color="#ccc")
         sep.grid(row=3, column=0, columnspan=15, sticky="ew")
-
-
 
     def _save(self):
         self.video_info_df = pd.DataFrame(columns=Formats.EXPECTED_VIDEO_INFO_COLS.value)
@@ -227,11 +217,11 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
             height = self.videos[video_name]["video_height_eb"].entry_get
             known_distance = self.videos[video_name]["video_known_distance_eb"].entry_get
             px_per_mm = self.videos[video_name]["video_px_per_mm"].entry_get
-            check_float(name=f'{video_name} fps', value=fps, min_value=10e-16)
+            check_float(name=f'{video_name} fps', value=fps, allow_zero=False, allow_negative=False,)
             check_int(name=f'{video_name} width', value=width, min_value=1, raise_error=True)
             check_int(name=f'{video_name} height', value=height, min_value=1, raise_error=True)
-            check_float(name=f'{video_name} known_distance', value=known_distance, min_value=10e-16, raise_error=True)
-            check_float(name=f'{video_name} px_per_mm', value=px_per_mm, min_value=10e-16, raise_error=True)
+            check_float(name=f'{video_name} known_distance', value=known_distance, allow_zero=False, allow_negative=False, raise_error=True)
+            check_float(name=f'{video_name} px_per_mm', value=px_per_mm, allow_zero=False, allow_negative=False, raise_error=True)
             self.video_info_df.loc[len(self.video_info_df)] = [video_name, fps, width, height, known_distance, px_per_mm]
         self.video_info_df.drop_duplicates(subset=["Video"], inplace=True)
         self.video_info_df = self.video_info_df.set_index("Video")

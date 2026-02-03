@@ -763,9 +763,9 @@ class ConfigReader(object):
                 raise ParametersFileError(msg=f'Pixels per millimeter for video {video_name} in the {video_info_df_path} file is not a valid number.')
             if math.isnan(fps):
                 raise ParametersFileError(msg=f'The FPS for video {video_name} in the {video_info_df_path} file is not a valid number.')
-            check_float(name='px_per_mm', value=px_per_mm)
-            check_float(name='fps', value=fps)
-            px_per_mm, fps = float(px_per_mm), float(fps)
+            check_float(name=f'Pixels per millimeter for video {video_name} in {video_info_df_path}', value=px_per_mm, allow_negative=False, allow_zero=False)
+            check_float(name=f'FPS for video {video_name} in {video_info_df_path}', value=fps, allow_negative=False, allow_zero=False)
+            px_per_mm, fps = float(round(px_per_mm, 4)), float(fps)
             if px_per_mm <= 0:
                 InvalidValueWarning(msg=f"Video {video_name} has a pixel per millimeter conversion factor of 0 or less. Correct the pixel/mm conversion factor values inside the {video_info_df_path} file", source=ConfigReader.read_video_info.__name__)
             if fps <= 1:
