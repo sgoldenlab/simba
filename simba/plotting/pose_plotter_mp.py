@@ -3,30 +3,31 @@ import multiprocessing
 import os
 import platform
 from pathlib import Path
-from typing import Dict, Optional, Union, Tuple
+from typing import Dict, Optional, Tuple, Union
 
 import cv2
 import numpy as np
 import pandas as pd
 
+from simba.feature_extractors.perimeter_jit import jitted_centroid
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (check_instance, check_int,
-                                check_nvidea_gpu_available, check_str,
-                                check_that_column_exist, check_valid_boolean, check_if_valid_rgb_tuple)
+from simba.utils.checks import (check_if_valid_rgb_tuple, check_instance,
+                                check_int, check_nvidea_gpu_available,
+                                check_str, check_that_column_exist,
+                                check_valid_boolean)
 from simba.utils.data import (create_color_palette, get_cpu_pool,
                               terminate_cpu_pool)
 from simba.utils.enums import OS, Formats, Options
 from simba.utils.errors import CountError, InvalidFilepathError
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     get_current_time, get_fn_ext,
                                     get_video_meta_data, read_df)
 from simba.utils.warnings import FrameRangeWarning
-from simba.feature_extractors.perimeter_jit import jitted_centroid
 
 
 def pose_plotter_mp(data: pd.DataFrame,

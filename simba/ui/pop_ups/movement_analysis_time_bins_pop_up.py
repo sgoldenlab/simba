@@ -4,14 +4,18 @@ import os
 from tkinter import *
 from typing import Union
 
-from simba.data_processors.timebins_movement_calculator import TimeBinsMovementCalculator
-from simba.data_processors.timebins_movement_calculator_mp import TimeBinsMovementCalculatorMultiprocess
+from simba.data_processors.timebins_movement_calculator import \
+    TimeBinsMovementCalculator
+from simba.data_processors.timebins_movement_calculator_mp import \
+    TimeBinsMovementCalculatorMultiprocess
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, SimbaCheckbox, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        SimbaCheckbox, SimBADropDown)
 from simba.utils.checks import check_float
 from simba.utils.enums import ConfigKey, Keys, Links
 from simba.utils.errors import NoDataError
+
 
 class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
     """
