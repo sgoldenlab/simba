@@ -12,8 +12,9 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_int)
 from simba.utils.enums import Formats, Keys, Links, Options
-from simba.utils.read_write import find_core_cnt, get_desktop_path, str_2_bool, bgr_to_rgb_tuple
 from simba.utils.lookups import get_color_dict
+from simba.utils.read_write import (bgr_to_rgb_tuple, find_core_cnt,
+                                    get_desktop_path, str_2_bool)
 
 ENTIRE_VIDEOS = "ENTIRE VIDEO(S)"
 AUTO = 'AUTO'
