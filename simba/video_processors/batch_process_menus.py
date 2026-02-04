@@ -124,22 +124,48 @@ class BatchProcessFrame(PopUpMixin):
                 )
                 self.videos_in_dir_dict[video_name]["file_path"] = file_path
 
+
+    def _check_int_eb(self, entry_box: Entry_Box, valid_clr: str = 'white', invalid_clr: str = 'lightsalmon'):
+        value = entry_box.entry_get
+        valid_value = check_int(name='', value=value, allow_zero=False, allow_negative=False, raise_error=False)[0]
+        if not valid_value:
+            entry_box.set_bg_clr(clr=invalid_clr)
+        else:
+            entry_box.set_bg_clr(clr=valid_clr)
+
+    def _check_float_eb(self, entry_box: Entry_Box, valid_clr: str = 'white', invalid_clr: str = 'lightsalmon'):
+        value = entry_box.entry_get
+        valid_value = check_float(name='', value=value, allow_zero=False, allow_negative=False, raise_error=False)[0]
+        if not valid_value:
+            entry_box.set_bg_clr(clr=invalid_clr)
+        else:
+            entry_box.set_bg_clr(clr=valid_clr)
+
+    def _check_valid_hhmmss(self, entry_box: Entry_Box, valid_clr: str = 'white', invalid_clr: str = 'lightsalmon'):
+        value = entry_box.entry_get
+        valid_value = check_if_string_value_is_valid_video_timestamp(value=value, raise_error=False, name='')
+        if not valid_value:
+            entry_box.set_bg_clr(clr=invalid_clr)
+        else:
+            entry_box.set_bg_clr(clr=valid_clr)
+
+
     def create_main_window(self):
         self.quick_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm,header="QUICK SETTINGS",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.BATCH_PREPROCESS.value)
 
         self.clip_video_settings_frm = CreateLabelFrameWithIcon(parent=self.quick_settings_frm, header='CLIP VIDEOS SETTING', icon_name='clip', padx=5, pady=5)
-        self.quick_clip_start_entry_box = Entry_Box(parent=self.clip_video_settings_frm, fileDescription='START TIME: ', labelwidth=15, value="00:00:00", justify='center', img='play', entry_box_width=12, tooltip_key='BATCH_CLIP_START_TIME')
-        self.quick_clip_end_entry_box = Entry_Box(parent=self.clip_video_settings_frm, fileDescription='END TIME: ', labelwidth=15, value="00:00:00", justify='center', img='finish', entry_box_width=12, tooltip_key='BATCH_CLIP_END_TIME')
+        self.quick_clip_start_entry_box = Entry_Box(parent=self.clip_video_settings_frm, fileDescription='START TIME: ', labelwidth=15, value="00:00:00", justify='center', img='play', entry_box_width=12, tooltip_key='BATCH_CLIP_START_TIME', trace=self._check_valid_hhmmss)
+        self.quick_clip_end_entry_box = Entry_Box(parent=self.clip_video_settings_frm, fileDescription='END TIME: ', labelwidth=15, value="00:00:00", justify='center', img='finish', entry_box_width=12, tooltip_key='BATCH_CLIP_END_TIME', trace=self._check_valid_hhmmss)
         self.quick_clip_apply = SimbaButton(parent=self.clip_video_settings_frm, txt='APPLY', img='arrow_down_green_2', cmd=self.apply_trim_to_all)
 
         self.quick_downsample_frm = CreateLabelFrameWithIcon(parent=self.quick_settings_frm, header='DOWNSAMPLE VIDEOS', icon_name='resize', padx=5, pady=5)
-        self.quick_downsample_width = Entry_Box(parent=self.quick_downsample_frm, fileDescription='WIDTH: ', labelwidth=15, value=400, justify='center', img='width', entry_box_width=12, tooltip_key='BATCH_DOWNSAMPLE_WIDTH')
-        self.quick_downsample_height = Entry_Box(parent=self.quick_downsample_frm, fileDescription='HEIGHT: ', labelwidth=15, value=600, justify='center', img='height', entry_box_width=12, tooltip_key='BATCH_DOWNSAMPLE_HEIGHT')
+        self.quick_downsample_width = Entry_Box(parent=self.quick_downsample_frm, fileDescription='WIDTH: ', labelwidth=15, value=400, justify='center', img='width', entry_box_width=12, tooltip_key='BATCH_DOWNSAMPLE_WIDTH', trace=self._check_int_eb)
+        self.quick_downsample_height = Entry_Box(parent=self.quick_downsample_frm, fileDescription='HEIGHT: ', labelwidth=15, value=600, justify='center', img='height', entry_box_width=12, tooltip_key='BATCH_DOWNSAMPLE_HEIGHT', trace=self._check_int_eb)
         self.quick_downsample_apply = SimbaButton(parent=self.quick_downsample_frm, txt='APPLY', img='arrow_down_green_2', cmd=self.apply_resolution_to_all)
 
 
         self.quick_set_fps = CreateLabelFrameWithIcon(parent=self.quick_settings_frm, header="CHANGE FPS", icon_name='camera', padx=5, pady=12)
-        self.quick_fps_entry_box = Entry_Box(parent=self.quick_set_fps, fileDescription='FPS: ', labelwidth=15, value=15.0, justify='center', img='camera', entry_box_width=12, tooltip_key='BATCH_FPS')
+        self.quick_fps_entry_box = Entry_Box(parent=self.quick_set_fps, fileDescription='FPS: ', labelwidth=15, value=15.0, justify='center', img='camera', entry_box_width=12, tooltip_key='BATCH_FPS', trace=self._check_float_eb)
         self.quick_fps_apply = SimbaButton(parent=self.quick_set_fps, txt='APPLY', img='arrow_down_green_2', cmd=self.apply_fps_to_all)
 
 

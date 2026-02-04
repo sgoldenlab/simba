@@ -11,6 +11,10 @@ from simba.utils.enums import Formats
 
 @njit("(float32[:,:], int64[:], int64, int64)")
 def process(S, P, a, b):
+    """
+    One step of the quickhull algorithm: partition points by signed distance to line (a,b), recurse on the subset above the line.
+    Uses 2D cross product for signed distance; farthest point becomes new hull vertex. Returns hull vertex indices from a to b (excluding b).
+    """
     signed_dist = cross2d(S[P] - S[a], S[b] - S[a])
     K = np.array(
         [i for s, i in zip(signed_dist, P) if s > 0 and i != a and i != b],
@@ -25,51 +29,18 @@ def process(S, P, a, b):
 @njit("(float32[:, :, :], types.unicode_type)", fastmath=True)
 def jitted_hull(points: np.ndarray, target: str = "perimeter") -> np.ndarray:
     """
-    Compute attributes (e.g., perimeter or area) of a polygon.
+    Convex hull perimeter or area per frame from body-part (x,y) coordinates.
 
-    :param array points: 3d array FRAMESxBODY-PARTxCOORDINATE
-    :param str target: Options [perimeter, area]
-    :return: 1d np.array representing perimeter length or area of polygon on each frame
+    For each frame, builds the 2D convex hull (quickhull), then:
+    - **perimeter**: sum of edge lengths \|v_{i+1} - v_i\| (with wrap).
+    - **area**: shoelace formula, 0.5 * |Σ(x_i y_{i+1} - y_i x_{i+1})|.
 
-    .. note::
-       Modified from `Jérôme Richard <https://stackoverflow.com/questions/74812556/computing-quick-convex-hull-using-numba/74817179#74817179>`_
-
-    .. image:: _static/img/jitted_hull.png
-       :width: 400
-       :align: center
-
-    .. image:: _static/img/simba.data_processors.cuda.geometry.poly_area_cuda.webp
-       :width: 400
-       :align: center
-
-    .. note::
-       Modified from `Jérôme Richard <https://stackoverflow.com/questions/74812556/computing-quick-convex-hull-using-numba/74817179#74817179>`_.
-       The convex hull represents the smallest convex polygon that contains all the input points, providing a measure of the overall spatial extent of the tracked body parts.
+    :param points: (n_frames, n_body_parts, 2) float32, [x, y] per point.
+    :param target: ``'perimeter'`` or ``'area'``.
+    :return: (n_frames,) float64; NaN where hull fails.
 
     .. seealso::
-       For multicore based acceleration and Shapeley objects, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_polygon`.
-       For numba CUDA based acceleration, use :func:`simba.data_processors.cuda.geometry.get_convex_hull`.
-       For non-numba based compute of single convex hull area or perimeter, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.convex_hull_calculator_mp`.
-       For wrapper function (ensuring data validity), see :func:`simba.feature_extractors.perimeter_jit.get_hull_sizes`
-
-    .. csv-table::
-       :header: EXPECTED RUNTIMES
-       :file: ../../../docs/tables/get_hull_sizes.csv
-       :widths: 10, 45, 45
-       :align: center
-       :header-rows: 1
-
-    :param np.ndarray points: 3D array with shape (n_frames, n_body_parts, 2) containing [x, y] coordinates of body parts for each frame. Must be float32 dtype.
-    :param str target: Geometric attribute to compute. Options are:
-        - 'perimeter': Calculate the perimeter (circumference) of the convex hull
-        - 'area': Calculate the area enclosed by the convex hull
-        Default is 'perimeter'.
-    :return: 1D array with shape (n_frames,) containing the computed geometric attribute  or each frame. Contains NaN values for frames where computation fails.
-    :rtype: np.ndarray
-
-    :example:
-    >>> points = np.random.randint(1, 50, size=(50, 5, 2)).astype(np.float32)
-    >>> results = jitted_hull(points, target='area')
+       :func:`simba.feature_extractors.perimeter_jit.get_hull_sizes` (wrapper with validation).
     """
 
     def perimeter(xy):
@@ -113,17 +84,17 @@ def jitted_hull(points: np.ndarray, target: str = "perimeter") -> np.ndarray:
 @jit(nopython=True)
 def jitted_centroid(points: np.ndarray) -> np.ndarray:
     """
-    Compute the centroid of polygons.
+    Centroid of the convex hull per frame (mean of hull vertex coordinates).
 
-    :param array points: 3d array FRAMESxBODY-PARTxCOORDINATE
-    :param str target: Options [perimeter, area]
-    :return 1d np.array
+    For each frame: quickhull → hull vertex indices → centroid = (mean(x), mean(y)) of those vertices.
+
+    :param points: (n_frames, n_body_parts, 2) [x, y] coordinates.
+    :return: (n_frames, 2) int32; centroid (x, y) per frame; NaN where hull fails.
 
     :example:
-    >>> points = np.random.randint(1, 50, size=(50, 5, 2)).astype(float)
-    >>> results = jitted_centroid(points)
+    >>> points = np.random.randint(1, 50, size=(50, 5, 2)).astype(np.float32)
+    >>> centroids = jitted_centroid(points)
     """
-
     results = np.full(shape=(points.shape[0], 2), fill_value=np.nan, dtype=np.int32)
     for i in range(points.shape[0]):
         S = points[i, :, :]
@@ -135,9 +106,10 @@ def jitted_centroid(points: np.ndarray) -> np.ndarray:
         )
         perimeter_points = np.full((len(idx), 2), np.nan)
         for j in prange(len(idx)):
-            perimeter_points[j] = points[i][j]
-        results[i][0] = np.int32(np.mean(perimeter_points[:, 0].flatten()))
-        results[i][1] = np.int32(np.mean(perimeter_points[:, 1].flatten()))
+            perimeter_points[j, 0] = S[idx[j], 0]
+            perimeter_points[j, 1] = S[idx[j], 1]
+        results[i][0] = np.int32(np.mean(perimeter_points[:, 0]))
+        results[i][1] = np.int32(np.mean(perimeter_points[:, 1]))
     return results
 
 
@@ -145,36 +117,20 @@ def jitted_centroid(points: np.ndarray) -> np.ndarray:
 def get_hull_sizes(points: np.ndarray,
                    target: str = "perimeter",
                    pixels_per_mm: Optional[float] = None):
-
     """
-    Calculate convex hull geometric properties (perimeter or area) for sets of 2D points across multiple frames.
+    Convex hull perimeter or area per frame, with validation and optional conversion to mm.
 
-    This function computes convex hull attributes for body part coordinates across video frames, providing
-    a measure of the overall spatial extent and shape of tracked points. The convex hull represents the
-    smallest convex polygon that contains all input points for each frame.
+    Calls :func:`jitted_hull` after checking array shape/dtype; if ``pixels_per_mm`` is given, divides result to get mm.
 
-    .. seealso::
-       Wrapper function (ensuring data validity) for the underlying numba-accelerated implementation, see :func:`simba.feature_extractors.perimeter_jit.jitted_hull`.
-
-    .. image:: _static/img/simba.data_processors.cuda.geometry.poly_area_cuda.webp
-       :width: 400
-       :align: center
-
-    .. csv-table::
-       :header: EXPECTED RUNTIMES
-       :file: ../../../docs/tables/get_hull_sizes.csv
-       :widths: 10, 45, 45
-       :align: center
-       :header-rows: 1
-
-    :param np.ndarray points: 3D array with shape (n_frames, n_body_parts, 2) containing [x, y] coordinates of body parts for each frame. Must contain non-negative pixel coordinates.
-    :param str target: Geometric property to calculate. Options: - 'perimeter': Calculate the perimeter (circumference) of the convex hull - 'area': Calculate the area enclosed by the convex hull. Default: 'perimeter'.
-    :return: Array with shape (n_frames,) containing the computed geometric property for each frame. Contains NaN values for frames where computation fails.
-    :rtype: np.ndarray
+    :param points: (n_frames, n_body_parts, 2) non-negative numeric [x, y] in pixels.
+    :param target: ``'perimeter'`` or ``'area'``.
+    :param pixels_per_mm: If set, result is divided by this (output in mm).
+    :return: (n_frames,) float32; hull size per frame (pixels or mm); NaN where hull fails.
 
     :example:
-    >>> points = np.random.randint(0, 500, size=(1000, 7, 2))
-    >>> get_hull_sizes(points=points)
+    >>> points = np.random.randint(0, 500, size=(100, 7, 2)).astype(np.float32)
+    >>> get_hull_sizes(points, target='perimeter')
+    >>> get_hull_sizes(points, target='area', pixels_per_mm=2.5)
     """
     if pixels_per_mm is not None:
         check_float(name=f'{get_hull_sizes.__name__} pixels_per_mm', value=pixels_per_mm, min_value=1e-16, raise_error=True)
