@@ -3,7 +3,7 @@ import multiprocessing
 import os
 import platform
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, Tuple
 
 import cv2
 import numpy as np
@@ -14,18 +14,19 @@ from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_instance, check_int,
                                 check_nvidea_gpu_available, check_str,
-                                check_that_column_exist, check_valid_boolean)
+                                check_that_column_exist, check_valid_boolean, check_if_valid_rgb_tuple)
 from simba.utils.data import (create_color_palette, get_cpu_pool,
                               terminate_cpu_pool)
 from simba.utils.enums import OS, Formats, Options
 from simba.utils.errors import CountError, InvalidFilepathError
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     get_current_time, get_fn_ext,
                                     get_video_meta_data, read_df)
 from simba.utils.warnings import FrameRangeWarning
+from simba.feature_extractors.perimeter_jit import jitted_centroid
 
 
 def pose_plotter_mp(data: pd.DataFrame,
@@ -34,6 +35,8 @@ def pose_plotter_mp(data: pd.DataFrame,
                     bp_dict: dict,
                     colors_dict: dict,
                     circle_size: int,
+                    center_of_mass: Optional[dict],
+                    center_of_mass_clr: tuple,
                     bbox: bool,
                     video_save_dir: Union[str, os.PathLike],):
 
@@ -45,6 +48,7 @@ def pose_plotter_mp(data: pd.DataFrame,
     writer = cv2.VideoWriter(save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]))
     cap = cv2.VideoCapture(video_path)
     cap.set(1, start_frm)
+
     while current_frm < end_frm:
         ret, img = cap.read()
         if ret:
@@ -59,11 +63,15 @@ def pose_plotter_mp(data: pd.DataFrame,
                 if bbox and len(animal_bbox) > 4:
                     animal_bbox = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=np.array(animal_bbox).reshape(-1, len(animal_bbox), 2).astype(np.int32))
                     img = cv2.polylines(img, [animal_bbox], True, colors_dict[animal_cnt][0], thickness=max(1, int(circle_size/1.5)), lineType=-1)
+                if center_of_mass is not None:
+                    center_point = center_of_mass[animal_name][current_frm]
+                    center_point_tuple = (int(center_point[0]), int(center_point[1]))
+                    img = cv2.circle(img, center_point_tuple, circle_size+2, center_of_mass_clr, -1)
             writer.write(img)
             current_frm += 1
-            print(f"[{get_current_time()}] Multi-processing video frame {current_frm} on core {group_cnt}...")
+            stdout_information(msg=f"[{get_current_time()}] Multi-processing video frame {current_frm} on core {group_cnt}...")
         else:
-            print(f'Frame {current_frm} not found in video {video_path}, terminating video creation...')
+            FrameRangeWarning(msg=f'Frame {current_frm} not found in video {video_path}, terminating video creation...')
             break
     cap.release()
     writer.release()
@@ -95,7 +103,9 @@ class PosePlotterMultiProcess():
                  core_cnt: Optional[int] = -1,
                  gpu: Optional[bool] = False,
                  bbox: Optional[bool] = False,
-                 sample_time: Optional[int] = None) -> None:
+                 center_of_mass: Optional[Tuple[int, int, int]] = None,
+                 sample_time: Optional[int] = None,
+                 verbose: bool = True) -> None:
 
         if os.path.isdir(data_path):
             config_path = os.path.join(Path(data_path).parents[1], 'project_config.ini')
@@ -126,24 +136,34 @@ class PosePlotterMultiProcess():
             for cnt, (k, v) in enumerate(self.config.animal_bp_dict.items()):
                 self.color_dict[cnt] = self.config.animal_bp_dict[k]["colors"]
         check_valid_boolean(value=bbox, source=f'{self.__class__.__name__} bbox')
+        check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose', raise_error=True)
         if sample_time is not None:
             check_int(name='sample_time', value=sample_time, min_value=1)
         if out_dir is None:
             out_dir = os.path.join(os.path.dirname(files_found[0]), f'pose_videos_{self.config.datetime}')
-        self.circle_size, self.core_cnt, self.out_dir, self.sample_time, self.bbox = (circle_size, core_cnt, out_dir, sample_time, bbox)
+        self.circle_size, self.core_cnt, self.out_dir, self.sample_time, self.bbox, self.verbose = (circle_size, core_cnt, out_dir, sample_time, bbox, verbose)
         if not os.path.exists(self.out_dir):
             os.makedirs(self.out_dir)
-        self.data = {}
-        check_valid_boolean(value=[gpu])
 
-        if gpu and check_nvidea_gpu_available():
-            self.gpu = True
-        else:
-            self.gpu = False
+        check_valid_boolean(value=gpu, source=f'{self.__class__.__name__} gpu', raise_error=True)
+        if center_of_mass is not None:
+            check_if_valid_rgb_tuple(data=center_of_mass, raise_error=True, source=f'{self.__class__.__name__} center_of_mass')
+        self.data, self.center_of_mass = {}, center_of_mass
+        self.gpu = True if gpu and check_nvidea_gpu_available() else False
         for file in files_found:
             self.data[file] = self.config.find_video_of_file(video_dir=self.config.video_dir, filename=get_fn_ext(file)[1])
         if platform.system() == OS.MAC.value:
             multiprocessing.set_start_method("spawn", force=True)
+
+    def _get_center_of_mass(self):
+        if self.verbose: stdout_information(msg='Computing animal centroids...')
+        center_of_mass_data = {}
+        for animal_cnt, (animal_name, animal_data) in enumerate(self.config.animal_bp_dict.items()):
+            animal_data_cols = [x for pair in zip(animal_data["X_bps"], animal_data["Y_bps"]) for x in pair]
+            animal_df = self.pose_df[animal_data_cols]
+            center_of_mass_data[animal_name] = jitted_centroid(points=np.reshape(animal_df.values, (len(animal_df / 2), -1, 2)).astype(np.float32))
+        return center_of_mass_data
+
 
     def run(self):
         self.pool = get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__)
@@ -168,9 +188,10 @@ class PosePlotterMultiProcess():
                 pose_df = pose_df.iloc[0:sample_frm_cnt]
             if 'input_csv' in os.path.dirname(pose_path):
                 pose_df = self.config.insert_column_headers_for_outlier_correction(data_df=pose_df, new_headers=self.config.bp_headers, filepath=pose_path)
-            pose_df = (pose_df.apply(pd.to_numeric, errors="coerce").fillna(0).reset_index(drop=True))
+            self.pose_df = (pose_df.apply(pd.to_numeric, errors="coerce").fillna(0).reset_index(drop=True))
+            self.centroid_data = self._get_center_of_mass() if self.center_of_mass is not None else None
             pose_lst, obs_per_split = PlottingMixin().split_and_group_df(df=pose_df, splits=self.core_cnt)
-            print(f"Creating pose videos, multiprocessing (chunksize: {self.config.multiprocess_chunksize}, cores: {self.core_cnt})...")
+            if self.verbose: stdout_information(msg=f"Creating pose videos, multiprocessing (chunksize: {self.config.multiprocess_chunksize}, cores: {self.core_cnt})...")
             constants = functools.partial(pose_plotter_mp,
                                           video_meta_data=video_meta_data,
                                           video_path=video_path,
@@ -178,10 +199,12 @@ class PosePlotterMultiProcess():
                                           colors_dict=self.color_dict,
                                           circle_size=video_circle_size,
                                           bbox=self.bbox,
+                                          center_of_mass=self.centroid_data,
+                                          center_of_mass_clr=self.center_of_mass,
                                           video_save_dir=self.temp_folder)
             for cnt, result in enumerate(self.pool.imap(constants, pose_lst, chunksize=self.config.multiprocess_chunksize)):
-                print(f"[{get_current_time()}] Image {min(len(pose_df), obs_per_split*(cnt+1))}/{len(pose_df)}, Video {file_cnt+1}/{len(list(self.data.keys()))}...")
-            print(f"Joining {video_name} multi-processed video...")
+                if self.verbose: stdout_information(msg=f"Image {min(len(pose_df), obs_per_split*(cnt+1))}/{len(pose_df)}, Video {file_cnt+1}/{len(list(self.data.keys()))}...")
+            if self.verbose: stdout_information(msg=f"Joining {video_name} multi-processed video...")
             concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=save_video_path, remove_splits=True, gpu=self.gpu)
             video_timer.stop_timer()
             stdout_success(msg=f"Pose video {video_name} complete and saved at {save_video_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
@@ -189,14 +212,14 @@ class PosePlotterMultiProcess():
         self.config.timer.stop_timer()
         stdout_success(f"Pose visualizations for {len(list(self.data.keys()))} video(s) created in {self.out_dir} directory", elapsed_time=self.config.timer.elapsed_time_str, source=self.__class__.__name__)
 
-
 # if __name__ == "__main__":
-#     test = PosePlotterMultiProcess(data_path=r"C:\troubleshooting\mitra\project_folder\csv\input_csv",
+#     test = PosePlotterMultiProcess(data_path=r"E:\troubleshooting\mitra_emergence\project_folder\csv\outlier_corrected_movement_location\Box1_180mISOcontrol_Females.csv",
 #                                    out_dir=None,
 #                                    circle_size=8,
-#                                    core_cnt=18,
+#                                    core_cnt=12,
 #                                    palettes=None,
-#                                    bbox=True,)
+#                                    bbox=True,
+#                                    center_of_mass=True)
 #     test.run()
 
 

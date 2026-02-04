@@ -124,7 +124,7 @@ def jitted_centroid(points: np.ndarray) -> np.ndarray:
     >>> results = jitted_centroid(points)
     """
 
-    results = np.full((points.shape[0], 2), np.nan)
+    results = np.full(shape=(points.shape[0], 2), fill_value=np.nan, dtype=np.int32)
     for i in range(points.shape[0]):
         S = points[i, :, :]
         a, b = np.argmin(S[:, 0]), np.argmax(S[:, 0])
@@ -136,8 +136,8 @@ def jitted_centroid(points: np.ndarray) -> np.ndarray:
         perimeter_points = np.full((len(idx), 2), np.nan)
         for j in prange(len(idx)):
             perimeter_points[j] = points[i][j]
-        results[i][0] = np.int(np.mean(perimeter_points[:, 0].flatten()))
-        results[i][1] = np.int(np.mean(perimeter_points[:, 1].flatten()))
+        results[i][0] = np.int32(np.mean(perimeter_points[:, 0].flatten()))
+        results[i][1] = np.int32(np.mean(perimeter_points[:, 1].flatten()))
     return results
 
 

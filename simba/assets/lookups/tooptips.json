@@ -108,5 +108,12 @@
   "VIDEO_INFO_HEADER_DISTANCE_IN_MM": "Real-world length in millimeters (e.g. of an object you can measure in the video). Used to calculate pixels per mm.",
   "VIDEO_INFO_HEADER_PIXELS_PER_MM": "Calibration for this video: how many pixels equal one millimeter. SimBA uses this to convert distances to real units.",
   "VIDEO_INFO_DUPLICATE_DISTANCE": "Copy the DISTANCE IN MM value from the first video (top row) to all other videos. Use when all videos share the same known distance.",
-  "VIDEO_INFO_DUPLICATE_PX_PER_MM": "Copy the PIXELS PER MM value from the first video (top row) to all other videos. Use when all videos have the same calibration."
+  "VIDEO_INFO_DUPLICATE_PX_PER_MM": "Copy the PIXELS PER MM value from the first video (top row) to all other videos. Use when all videos have the same calibration.",
+  "POSE_VIZ_KEYPOINT_SIZE": "Size of the circles drawn at each body-part. AUTO lets SimBA choose; or pick 1–100 pixels.",
+  "POSE_VIZ_VIDEO_SECTION": "How much of each video to draw poses on. ENTIRE VIDEO(S) = full video; or pick a length in seconds (e.g. first 30 sec).",
+  "POSE_VIZ_CENTER_OF_MASS": "If on, draw a dot at the center of mass for each animal. Pick a color for the dot, or FALSE to hide.",
+  "POSE_VIZ_NUMBER_OF_ANIMALS": "Number of animals in your pose data. Used to assign colors and options per animal.",
+  "POSE_VIZ_ANIMAL_COLOR": "Color palette for this animal's keypoints and tracks. AUTO picks a default.",
+  "POSE_VIZ_DATA_FILE": "Pick one pose CSV or Parquet file from project_folder/csv (or a subfolder). SimBA will create a video with poses drawn on it.",
+  "POSE_VIZ_DATA_DIR": "Pick a folder of pose CSV/Parquet files (e.g. a subfolder of project_folder/csv). SimBA will create videos for all files in the folder."
 }

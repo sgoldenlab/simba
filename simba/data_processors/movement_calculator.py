@@ -16,9 +16,8 @@ from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log, check_float, check_str,
     check_that_column_exist, check_valid_boolean, check_valid_lst)
 from simba.utils.errors import InvalidInputError, NoDataError
-from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext, read_df)
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, read_df)
 
 
 class MovementCalculator(ConfigReader, FeatureExtractionMixin):
@@ -111,7 +110,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
             video_timer = SimbaTimer(start=True)
             self.__find_body_part_columns()
             _, video_name, _ = get_fn_ext(file_path)
-            if self.verbose: print(f"Analysing {video_name}... (Video {file_cnt+1}/{len(self.file_paths)})")
+            if self.verbose: stdout_information(msg=f"Analysing {video_name}... (Video {file_cnt+1}/{len(self.file_paths)})")
             self.data_df = read_df(file_path=file_path, file_type=self.file_type)
             self.video_info, self.px_per_mm, self.fps = self.read_video_info(video_name=video_name)
             if self.bp_list:
@@ -140,7 +139,8 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
                     if self.velocity:
                         self.results.loc[len(self.results)] = [video_name, animal_name, "GRAVITY CENTER", "Velocity (cm/s)", velocity]
             video_timer.stop_timer()
-            if self.verbose: print(f'Movement analysis in video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)')
+            if self.verbose:
+                stdout_information(msg=f'Movement analysis in video {video_name} complete', elapsed_time=video_timer.elapsed_time_str)
 
     def save(self):
         if self.transpose:
