@@ -12,9 +12,10 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.heat_mapper_location import HeatmapperLocationSingleCore
 from simba.plotting.heat_mapper_location_mp import \
     HeatMapperLocationMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        SimbaButton, SimbaCheckbox,
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, CreateToolTip,
+                                        DropDownMenu, SimbaButton, SimbaCheckbox,
                                         SimBADropDown)
+from simba.utils.lookups import get_tooltips
 from simba.utils.checks import check_if_filepath_list_is_empty
 from simba.utils.enums import Formats, Keys, Links, Paths
 from simba.utils.read_write import get_file_name_info_in_directory
@@ -40,17 +41,17 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         max_scales.insert(0, "Auto-compute")
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.HEATMAP_LOCATION.value)
 
-        self.palette_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.palette_options, label='PALETTE: ', label_width=25, dropdown_width=30, value=self.palette_options[0], img='color_wheel')
-        self.shading_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.shading_options, label='SHADING: ', label_width=25, dropdown_width=30, value=self.shading_options[0], img='shade')
-        self.bp_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.body_parts_lst, label='BODY-PART: ', label_width=25, dropdown_width=30, value=self.body_parts_lst[0],img='pose')
-        self.max_time_scale_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=max_scales, label='MAX TIME SCALE (S): ', label_width=25, dropdown_width=30, value=max_scales[0], img='timer_2')
-        self.bin_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.heatmap_bin_size_options, label='BIN SIZE (MM): ', label_width=25, dropdown_width=30, value="80×80", img='rectangle_red')
+        self.palette_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.palette_options, label='PALETTE: ', label_width=25, dropdown_width=30, value=self.palette_options[0], img='color_wheel', tooltip_key='HEATMAP_LOCATION_PALETTE')
+        self.shading_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.shading_options, label='SHADING: ', label_width=25, dropdown_width=30, value=self.shading_options[0], img='shade', tooltip_key='HEATMAP_LOCATION_SHADING')
+        self.bp_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.body_parts_lst, label='BODY-PART: ', label_width=25, dropdown_width=30, value=self.body_parts_lst[0],img='pose', tooltip_key='HEATMAP_LOCATION_BODY_PART')
+        self.max_time_scale_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=max_scales, label='MAX TIME SCALE (S): ', label_width=25, dropdown_width=30, value=max_scales[0], img='timer_2', tooltip_key='HEATMAP_LOCATION_MAX_TIME_SCALE')
+        self.bin_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.heatmap_bin_size_options, label='BIN SIZE (MM): ', label_width=25, dropdown_width=30, value="80×80", img='rectangle_red', tooltip_key='HEATMAP_LOCATION_BIN_SIZE')
 
         self.settings_frm = LabelFrame(self.main_frm, text="VISUALIZATION SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
-        self.multiprocess_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), label='CPU CORES: ', label_width=25, dropdown_width=30, value=int(self.cpu_cnt/2), img='cpu_small')
-        heatmap_frames_cb, self.heatmap_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames')
-        heatmap_videos_cb, self.heatmap_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', txt_img='video')
-        heatmap_last_frm_cb, self.heatmap_last_frm_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE LAST FRAME', txt_img='finish')
+        self.multiprocess_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), label='CPU CORES: ', label_width=25, dropdown_width=30, value=int(self.cpu_cnt/2), img='cpu_small', tooltip_key='HEATMAP_LOCATION_CPU_CORES')
+        heatmap_frames_cb, self.heatmap_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames', tooltip_key='HEATMAP_LOCATION_CREATE_FRAMES')
+        heatmap_videos_cb, self.heatmap_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', txt_img='video', tooltip_key='HEATMAP_LOCATION_CREATE_VIDEOS')
+        heatmap_last_frm_cb, self.heatmap_last_frm_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE LAST FRAME', txt_img='finish', tooltip_key='HEATMAP_LOCATION_CREATE_LAST_FRAME', val=True)
 
         self.run_frm = LabelFrame(self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
         self.run_single_video_frm = LabelFrame(self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
@@ -59,6 +60,9 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create single video", txt_clr="blue", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.__create_heatmap_plots, cmd_kwargs={'multiple_videos': False})
         self.single_video_dropdown = DropDownMenu(self.run_single_video_frm, "Video:", list(self.files_found_dict.keys()), "12")
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
+        tooltips = get_tooltips()
+        if 'HEATMAP_LOCATION_SINGLE_VIDEO' in tooltips:
+            CreateToolTip(widget=self.single_video_dropdown.lblName, text=tooltips['HEATMAP_LOCATION_SINGLE_VIDEO'])
         self.run_multiple_videos = LabelFrame(self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
 
         self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt="Create multiple videos ({} video(s) found)".format(str(len(list(self.files_found_dict.keys())))), img='rocket', txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.__create_heatmap_plots, cmd_kwargs={'multiple_videos': True})
@@ -82,7 +86,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
 
         self.run_multiple_videos.grid(row=1, sticky=NW)
         self.run_multiple_video_btn.grid(row=0, sticky=NW)
-        #self.main_frm.mainloop()
+        self.main_frm.mainloop()
 
     def __create_heatmap_plots(self, multiple_videos: bool):
         if multiple_videos:
@@ -101,8 +105,8 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
                       "shading": self.shading_dropdown.getChoices(),
                       "max_scale": max_scale,
                       "bin_size": bin_size}
-
-        if int(self.multiprocess_dropdown.get_value()) == 1:
+        cpu_cores = int(self.multiprocess_dropdown.get_value())
+        if cpu_cores == 1:
             heatmapper_clf = HeatmapperLocationSingleCore(config_path=self.config_path,
                                                           style_attr=style_attr,
                                                           final_img_setting=self.heatmap_last_frm_var.get(),
@@ -121,10 +125,11 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
                                                             frame_setting=self.heatmap_frames_var.get(),
                                                             bodypart=self.bp_dropdown.getChoices(),
                                                             data_paths=data_paths,
-                                                            core_cnt=int(self.multiprocess_dropdown.getChoices()))
+                                                            core_cnt=cpu_cores)
 
             heatmapper_clf.run()
 
 
 
 #_ = HeatmapLocationPopup(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
+#_ = HeatmapLocationPopup(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini")

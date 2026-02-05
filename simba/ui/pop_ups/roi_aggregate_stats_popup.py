@@ -34,7 +34,7 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         PopUpMixin.__init__(self, title="ROI AGGREGATE STATISTICS ANALYSIS", icon='data_table')
         self.config_path = config_path
         self.animal_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMAL(S)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_DATA_ANALYSIS.value)
-        self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, label="# OF ANIMALS", dropdown_options=list(range(1, self.animal_cnt + 1)), label_width=30, dropdown_width=30, value=1, command= lambda x: self._get_settings_frm(x), img='abacus')
+        self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, label="# OF ANIMALS", dropdown_options=list(range(1, self.animal_cnt + 1)), label_width=30, dropdown_width=30, value=1, command= lambda x: self._get_settings_frm(x), img='abacus', tooltip_key='ROI_TRACKING_NUMBER_OF_ANIMALS')
         self.animal_cnt_frm.grid(row=0, column=0, sticky=NW)
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
 
@@ -53,7 +53,7 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
             self.format_frm.destroy()
 
         self.probability_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT PROBABILITY THRESHOLD", icon_name='pose')
-        self.probability_entry = Entry_Box(parent=self.probability_frm, fileDescription='PROBABILITY THRESHOLD (0.0-1.0):', labelwidth=30, value=0.0, entry_box_width=30, justify='center', img='green_dice')
+        self.probability_entry = Entry_Box(parent=self.probability_frm, fileDescription='PROBABILITY THRESHOLD (0.0-1.0):', labelwidth=30, value=0.0, entry_box_width=30, justify='center', img='green_dice', tooltip_key='ROI_AGGREGATE_PROBABILITY_THRESHOLD')
         self.probability_frm.grid(row=self.frame_children(frame=self.main_frm), sticky=NW, pady=(5, 5))
         self.probability_entry.grid(row=0, column=0, sticky=NW)
 
@@ -61,18 +61,18 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         self.body_part_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PART(S)", icon_name='pose')
         self.body_part_frm.grid(row=self.frame_children(frame=self.main_frm), sticky=NW, pady=(5, 5))
         for bp_cnt in range(int(self.animal_cnt_dropdown.getChoices())):
-            self.body_parts_dropdowns[bp_cnt] = SimBADropDown(parent=self.body_part_frm, label=f"BODY-PART {str(bp_cnt + 1)}:", dropdown_options=self.body_parts_lst, label_width=30, value=self.body_parts_lst[bp_cnt], dropdown_width=30, img='mouse_small')
+            self.body_parts_dropdowns[bp_cnt] = SimBADropDown(parent=self.body_part_frm, label=f"BODY-PART {str(bp_cnt + 1)}:", dropdown_options=self.body_parts_lst, label_width=30, value=self.body_parts_lst[bp_cnt], dropdown_width=30, img='mouse_small', tooltip_key='ROI_TRACKING_BODY_PART')
             self.body_parts_dropdowns[bp_cnt].grid(row=bp_cnt, column=0, sticky=NW)
 
         self.data_options_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="DATA OPTIONS", icon_name='abacus')
-        self.total_time_cb, self.total_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='TOTAL ROI TIME (S)', val=True, txt_img='timer')
-        self.entry_counts_cb, self.entry_counts_var = SimbaCheckbox(parent=self.data_options_frm, txt='ROI ENTRIES (COUNTS)', val=True, txt_img='abacus_2')
-        self.first_entry_time_cb, self.first_entry_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='FIRST ROI ENTRY TIME (S)', val=False, txt_img='one_blue')
-        self.last_entry_time_cb, self.last_entry_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='LAST ROI ENTRY TIME (S)', val=False, txt_img='finish')
-        self.mean_bout_time_cb, self.mean_bout_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='MEAN ROI BOUT TIME (S)', val=False, txt_img='average')
-        self.detailed_cb, self.detailed_var = SimbaCheckbox(parent=self.data_options_frm, txt='DETAILED ROI BOUT DATA (SEQUENCES)', val=False, txt_img='details')
-        self.movement_cb, self.movement_var = SimbaCheckbox(parent=self.data_options_frm, txt='ROI MOVEMENT (VELOCITY & DISTANCES)', val=False, txt_img='pose')
-        self.outside_cb, self.outside_var = SimbaCheckbox(parent=self.data_options_frm, txt='OUTSIDE ROI ZONES DATA', val=False, txt_img='outside_2', tooltip_txt=f'TREAT ALL NON-ROI REGIONS AS AN ROI REGION NAMED \n "{OUTSIDE_ROI}"')
+        self.total_time_cb, self.total_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='TOTAL ROI TIME (S)', val=True, txt_img='timer', tooltip_key='ROI_AGGREGATE_TOTAL_TIME')
+        self.entry_counts_cb, self.entry_counts_var = SimbaCheckbox(parent=self.data_options_frm, txt='ROI ENTRIES (COUNTS)', val=True, txt_img='abacus_2', tooltip_key='ROI_AGGREGATE_ENTRY_COUNTS')
+        self.first_entry_time_cb, self.first_entry_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='FIRST ROI ENTRY TIME (S)', val=False, txt_img='one_blue', tooltip_key='ROI_AGGREGATE_FIRST_ENTRY_TIME')
+        self.last_entry_time_cb, self.last_entry_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='LAST ROI ENTRY TIME (S)', val=False, txt_img='finish', tooltip_key='ROI_AGGREGATE_LAST_ENTRY_TIME')
+        self.mean_bout_time_cb, self.mean_bout_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='MEAN ROI BOUT TIME (S)', val=False, txt_img='average', tooltip_key='ROI_AGGREGATE_MEAN_BOUT_TIME')
+        self.detailed_cb, self.detailed_var = SimbaCheckbox(parent=self.data_options_frm, txt='DETAILED ROI BOUT DATA (SEQUENCES)', val=False, txt_img='details', tooltip_key='ROI_AGGREGATE_DETAILED_BOUT_DATA')
+        self.movement_cb, self.movement_var = SimbaCheckbox(parent=self.data_options_frm, txt='ROI MOVEMENT (VELOCITY & DISTANCES)', val=False, txt_img='pose', tooltip_key='ROI_AGGREGATE_MOVEMENT')
+        self.outside_cb, self.outside_var = SimbaCheckbox(parent=self.data_options_frm, txt='OUTSIDE ROI ZONES DATA', val=False, txt_img='outside_2', tooltip_key='ROI_AGGREGATE_OUTSIDE_ROI')
 
         self.data_options_frm.grid(row=self.frame_children(frame=self.main_frm), column=0, sticky=NW)
         self.total_time_cb.grid(row=0, column=0, sticky=NW)
@@ -85,10 +85,10 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         self.outside_cb.grid(row=7, column=0, sticky=NW)
 
         self.format_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="FORMAT OPTIONS", icon_name='abacus')
-        self.transpose_cb, self.transpose_var = SimbaCheckbox(parent=self.format_frm, txt='TRANSPOSE OUTPUT TABLE', val=False, txt_img='restart')
-        self.fps_cb, self.fps_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE FPS DATA', val=False, txt_img='fps')
-        self.video_length_cb, self.video_length_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE VIDEO LENGTH DATA', val=False, txt_img='timer_2')
-        self.px_per_mm_cb, self.px_per_mm_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE PIXEL PER MILLIMETER DATA', val=False, txt_img='ruler')
+        self.transpose_cb, self.transpose_var = SimbaCheckbox(parent=self.format_frm, txt='TRANSPOSE OUTPUT TABLE', val=False, txt_img='restart', tooltip_key='ROI_AGGREGATE_TRANSPOSE')
+        self.fps_cb, self.fps_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE FPS DATA', val=False, txt_img='fps', tooltip_key='ROI_AGGREGATE_INCLUDE_FPS')
+        self.video_length_cb, self.video_length_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE VIDEO LENGTH DATA', val=False, txt_img='timer_2', tooltip_key='ROI_AGGREGATE_INCLUDE_VIDEO_LENGTH')
+        self.px_per_mm_cb, self.px_per_mm_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE PIXEL PER MILLIMETER DATA', val=False, txt_img='ruler', tooltip_key='ROI_AGGREGATE_INCLUDE_PX_PER_MM')
 
         self.format_frm.grid(row=self.frame_children(frame=self.main_frm), column=0, sticky=NW)
         self.transpose_cb.grid(row=0, column=0, sticky=NW)
@@ -165,6 +165,10 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         analyzer.save()
 
 #_ = ROIAggregateDataAnalyzerPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
+
+#_ = ROIAggregateDataAnalyzerPopUp(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini")
+
+
 
 #analyzer = ROIAggregateDataAnalyzerPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
 

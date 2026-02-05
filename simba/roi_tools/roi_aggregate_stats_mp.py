@@ -18,10 +18,10 @@ from simba.utils.checks import (
     check_file_exist_and_readable, check_float, check_if_dir_exists, check_int,
     check_that_column_exist, check_valid_boolean, check_valid_lst)
 from simba.utils.data import (detect_bouts, slice_roi_dict_for_video,
-                              terminate_cpu_pool)
+                              terminate_cpu_pool, get_cpu_pool)
 from simba.utils.enums import ROI_SETTINGS, Formats, Keys
 from simba.utils.errors import CountError, ROICoordinatesNotFoundError
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import (find_core_cnt, get_fn_ext, read_data_paths,
                                     read_df, read_video_info)
 from simba.utils.warnings import NoDataFoundWarning
@@ -55,7 +55,7 @@ def _agg_roi_stats_helper(data_paths: list,
     for file_cnt, file_path in enumerate(data_paths):
         video_timer = SimbaTimer(start=True)
         _, video_name, _ = get_fn_ext(file_path)
-        if verbose: print(f"Analysing ROI data for video {video_name}... (Video {file_cnt+1}/{len(data_paths)}, core: {batch_id}")
+        if verbose: stdout_information(msg=f"Analysing ROI data for video {video_name}... (Video {file_cnt+1}/{len(data_paths)}, core: {batch_id}")
         video_settings, pix_per_mm, fps = read_video_info(video_name=video_name, video_info_df=video_info_df)
         sliced_roi_dict, video_shape_names = slice_roi_dict_for_video(data=roi_dict, video_name=video_name)
         if len(video_shape_names) == 0:
@@ -137,7 +137,7 @@ def _agg_roi_stats_helper(data_paths: list,
                     results.loc[len(results)] = [video_name, animal_name, bp_cols[0][:-2], OUTSIDE_ROI, 'NONE', VIDEO_LENGTH, len(data_df) / fps]
                     results.loc[len(results)] = [video_name, animal_name, bp_cols[0][:-2], OUTSIDE_ROI, 'NONE', PIX_PER_MM, pix_per_mm]
         video_timer.stop_timer()
-        if verbose: print(f'ROI analysis video {video_name} complete... (elapsed time: {video_timer.elapsed_time_str}s)')
+        if verbose: stdout_information(msg='ROI analysis video {video_name} complete...', elapsed_time=video_timer.elapsed_time_str)
     detailed_dfs = pd.concat(detailed_dfs, axis=0).reset_index(drop=True)
     return batch_id, results, detailed_dfs
 
@@ -285,27 +285,27 @@ class ROIAggregateStatisticsAnalyzerMultiprocess(ConfigReader, FeatureExtraction
         chunked_data_paths = [self.data_paths[i:i + ((len(self.data_paths) + self.core_cnt - 1) // self.core_cnt)] for i in range(0, len(self.data_paths), (len(self.data_paths) + self.core_cnt - 1) // self.core_cnt)]
         chunked_data_paths = [(i, x) for i, x in enumerate(chunked_data_paths)]
         self.results, self.detailed_dfs = [], []
-        with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
-            constants = functools.partial(_agg_roi_stats_helper,
-                                          roi_dict=self.roi_dict,
-                                          threshold=self.threshold,
-                                          verbose=self.verbose,
-                                          video_info_df=self.video_info_df,
-                                          roi_headers=self.roi_headers,
-                                          bp_dict=self.bp_dict,
-                                          non_roi_zone=self.non_roi_zone)
-            for cnt, (batch_id, result, detailed_dfs) in enumerate(pool.map(constants, chunked_data_paths, chunksize=self.multiprocess_chunksize)):
-                self.results.append(result); self.detailed_dfs.append(detailed_dfs)
-                print(f"Data batch core {batch_id} / {self.core_cnt} complete...")
+        pool = get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__)
+        constants = functools.partial(_agg_roi_stats_helper,
+                                      roi_dict=self.roi_dict,
+                                      threshold=self.threshold,
+                                      verbose=self.verbose,
+                                      video_info_df=self.video_info_df,
+                                      roi_headers=self.roi_headers,
+                                      bp_dict=self.bp_dict,
+                                      non_roi_zone=self.non_roi_zone)
+        for cnt, (batch_id, result, detailed_dfs) in enumerate(pool.map(constants, chunked_data_paths, chunksize=self.multiprocess_chunksize)):
+            self.results.append(result); self.detailed_dfs.append(detailed_dfs)
+            if self.verbose: stdout_information(msg=f"Data batch core {batch_id} / {self.core_cnt} complete...")
         self.results = pd.concat(self.results, axis=0).reset_index(drop=True)
-        terminate_cpu_pool(pool=pool, force=False)
+        terminate_cpu_pool(pool=pool, force=False, source=self.__class__.__name__)
 
 
     def save(self):
         self.__clean_results()
         if self.detailed_bout_data and len(self.detailed_df) > 0:
             self.detailed_df.to_csv(self.detailed_bout_data_save_path)
-            if self.verbose: print(f"Detailed ROI data saved at {self.detailed_bout_data_save_path}...")
+            if self.verbose: stdout_information(msg=f"Detailed ROI data saved at {self.detailed_bout_data_save_path}...")
         self.results.to_csv(self.save_path)
         self.timer.stop_timer()
         stdout_success(f'ROI statistics saved at {self.save_path}', elapsed_time=self.timer.elapsed_time_str)

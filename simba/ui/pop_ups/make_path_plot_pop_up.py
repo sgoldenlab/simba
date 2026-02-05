@@ -4,7 +4,7 @@ from tkinter import *
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.ez_path_plot import EzPathPlot
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
-                                        FileSelect, SimBADropDown)
+                                        FileSelect, SimBADropDown, SimBALabel)
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_valid_rgb_tuple, check_int, check_str)
 from simba.utils.enums import Formats, Keys, Links, Options
@@ -13,19 +13,41 @@ from simba.utils.read_write import str_2_bool
 
 
 class MakePathPlotPopUp(PopUpMixin):
+    """
+    Tkinter pop-up window for creating simple path plots from pose estimation data.
+
+    This pop-up provides a simplified interface to visualize animal movement paths
+    from pose estimation data files (H5 or CSV format). It creates a path plot
+    showing where a selected body-part traveled over time, displayed as a line
+    connecting sequential positions.
+
+    The path plot can be created as either:
+    - A video showing the path growing frame-by-frame
+    - A single image showing the complete cumulative path
+
+    This tool works independently of SimBA projects and can be used with any
+    pose estimation data file. For more advanced path plots with multiple animals,
+    ROI overlays, classification markers, and other features, use the full
+    "CREATE PATH PLOTS" tool available in the SimBA project interface.
+
+    :example:
+    >>> popup = MakePathPlotPopUp()
+    >>> # User selects video, data file, body-part, and styling options
+    >>> # Then clicks RUN to generate the path plot
+    """
     def __init__(self):
         PopUpMixin.__init__(self, title="CREATE SIMPLE PATH PLOT", size=(600, 300), icon='path_2')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.video_path = FileSelect(settings_frm, "VIDEO PATH: ", lblwidth=30, entry_width=30, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='video_2')
-        self.body_part = Entry_Box(settings_frm, fileDescription= "BODY PART: ", labelwidth=30, entry_box_width=30, img='nose', justify='center')
-        self.data_path = FileSelect(settings_frm, fileDescription="DATA PATH (e.g., H5 or CSV file): ", lblwidth=30, entry_width=30, lbl_icon='file')
+        self.video_path = FileSelect(settings_frm, "VIDEO PATH: ", lblwidth=30, entry_width=30, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='video_2', tooltip_key='SIMPLE_PATH_PLOT_VIDEO_PATH')
+        self.body_part = Entry_Box(settings_frm, fileDescription= "BODY PART: ", labelwidth=30, entry_box_width=30, img='nose', justify='center', tooltip_key='SIMPLE_PATH_PLOT_BODY_PART')
+        self.data_path = FileSelect(settings_frm, fileDescription="DATA PATH (e.g., H5 or CSV file): ", lblwidth=30, entry_width=30, lbl_icon='file', tooltip_key='SIMPLE_PATH_PLOT_DATA_PATH')
         color_lst = list(get_color_dict().keys())
 
-        self.background_color = SimBADropDown(parent=settings_frm, label="BACKGROUND COLOR: ", dropdown_options=color_lst, label_width=30, dropdown_width=30, img='fill', value="White")
-        self.line_color = SimBADropDown(parent=settings_frm, label="LINE COLOR: ", dropdown_options=color_lst, label_width=30, dropdown_width=30, img='line', value="Red")
-        self.line_thickness = SimBADropDown(parent=settings_frm, label="LINE THICKNESS: ", dropdown_options=list(range(1, 11)), label_width=30, dropdown_width=30, img='bold', value=1)
-        self.circle_size = SimBADropDown(parent=settings_frm, label="CIRCLE SIZE: ", dropdown_options=list(range(1, 11)), label_width=30, dropdown_width=30, img='circle_small', value=5)
-        self.last_frm_only_dropdown = SimBADropDown(parent=settings_frm, label="LAST FRAME ONLY: ", dropdown_options=["TRUE", "FALSE"], label_width=30, dropdown_width=30, img='finish', value='FALSE')
+        self.background_color = SimBADropDown(parent=settings_frm, label="BACKGROUND COLOR: ", dropdown_options=color_lst, label_width=30, dropdown_width=30, img='fill', value="White", tooltip_key='SIMPLE_PATH_PLOT_BACKGROUND_COLOR')
+        self.line_color = SimBADropDown(parent=settings_frm, label="LINE COLOR: ", dropdown_options=color_lst, label_width=30, dropdown_width=30, img='line', value="Red", tooltip_key='SIMPLE_PATH_PLOT_LINE_COLOR')
+        self.line_thickness = SimBADropDown(parent=settings_frm, label="LINE THICKNESS: ", dropdown_options=list(range(1, 11)), label_width=30, dropdown_width=30, img='bold', value=1, tooltip_key='SIMPLE_PATH_PLOT_LINE_THICKNESS')
+        self.circle_size = SimBADropDown(parent=settings_frm, label="CIRCLE SIZE: ", dropdown_options=list(range(1, 11)), label_width=30, dropdown_width=30, img='circle_small', value=5, tooltip_key='SIMPLE_PATH_PLOT_CIRCLE_SIZE')
+        self.last_frm_only_dropdown = SimBADropDown(parent=settings_frm, label="LAST FRAME ONLY: ", dropdown_options=["TRUE", "FALSE"], label_width=30, dropdown_width=30, img='finish', value='TRUE', tooltip_key='SIMPLE_PATH_PLOT_LAST_FRAME_ONLY')
 
         settings_frm.grid(row=0, sticky=W)
         self.video_path.grid(row=0, sticky=W)
@@ -36,7 +58,7 @@ class MakePathPlotPopUp(PopUpMixin):
         self.line_thickness.grid(row=5, sticky=W)
         self.circle_size.grid(row=6, sticky=W)
         self.last_frm_only_dropdown.grid(row=7, sticky=W)
-        Label(settings_frm,fg="green",font=Formats.FONT_REGULAR.value,text=" NOTE: For more complex path plots, faster, \n see 'CREATE PATH PLOTS' under the [VISUALIZATIONS] tab after loading your SimBA project").grid(row=8, sticky=W)
+        SimBALabel(parent=settings_frm, font=Formats.FONT_REGULAR_ITALICS.value, txt=" NOTE: For more complex path plots, faster, \n see 'CREATE PATH PLOTS' under the [VISUALIZATIONS] tab after loading your SimBA project", txt_clr="green").grid(row=8, sticky=W)
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
 

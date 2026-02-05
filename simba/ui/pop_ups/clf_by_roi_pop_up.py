@@ -39,38 +39,38 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
 
         self.roi_vars = {}
         for roi_cnt, roi_name in enumerate(self.roi_names):
-            roi_cb, self.roi_vars[roi_name] = SimbaCheckbox(parent=roi_frm, txt=roi_name, val=True)
+            roi_cb, self.roi_vars[roi_name] = SimbaCheckbox(parent=roi_frm, txt=roi_name, val=True, tooltip_key='ROI_CLF_ROI')
             roi_cb.grid(row=roi_cnt, sticky=NW)
         roi_frm.grid(row=0, column=0, sticky=NW)
 
         clf_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT CLASSIFIERS", icon_name='forest', padx=2, pady=2, relief='solid')
         self.clf_vars = {}
         for clf_cnt, clf_name in enumerate(self.clf_names):
-            clf_cb, self.clf_vars[clf_name] = SimbaCheckbox(parent=clf_frm, txt=clf_name, val=True)
+            clf_cb, self.clf_vars[clf_name] = SimbaCheckbox(parent=clf_frm, txt=clf_name, val=True, tooltip_key='ROI_CLF_CLASSIFIER')
             clf_cb.grid(row=clf_cnt, sticky=NW)
         clf_frm.grid(row=1, column=0, sticky=NW)
 
         measurements_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT MEASUREMENTS", icon_name='ruler', padx=2, pady=2, relief='solid')
         measurements_frm.grid(row=2, column=0, sticky=NW, padx=2, pady=2)
-        self.total_time_cb, self.total_time_var = SimbaCheckbox(parent=measurements_frm, txt='TOTAL BEHAVIOR TIME IN ROI (S)', txt_img='timer_2', val=True)
+        self.total_time_cb, self.total_time_var = SimbaCheckbox(parent=measurements_frm, txt='TOTAL BEHAVIOR TIME IN ROI (S)', txt_img='timer_2', val=True, tooltip_key='ROI_CLF_TOTAL_TIME')
         self.total_time_cb.grid(row=0, column=0, sticky=NW)
-        self.start_bouts_cb, self.start_bouts_var = SimbaCheckbox(parent=measurements_frm, txt='STARTED BEHAVIOR BOUTS IN ROI (COUNT)', txt_img='abacus', val=True)
+        self.start_bouts_cb, self.start_bouts_var = SimbaCheckbox(parent=measurements_frm, txt='STARTED BEHAVIOR BOUTS IN ROI (COUNT)', txt_img='abacus', val=True, tooltip_key='ROI_CLF_STARTED_BOUTS')
         self.start_bouts_cb.grid(row=1, column=0, sticky=NW)
-        self.end_bouts_cb, self.end_bouts_var = SimbaCheckbox(parent=measurements_frm, txt='ENDED BEHAVIOR BOUTS IN ROI (COUNT)', txt_img='abacus', val=True)
+        self.end_bouts_cb, self.end_bouts_var = SimbaCheckbox(parent=measurements_frm, txt='ENDED BEHAVIOR BOUTS IN ROI (COUNT)', txt_img='abacus', val=True, tooltip_key='ROI_CLF_ENDED_BOUTS')
         self.end_bouts_cb.grid(row=2, column=0, sticky=NW)
-        self.detailed_bouts_cb, self.detailed_bouts_var = SimbaCheckbox(parent=measurements_frm, txt='DETAILED BOUTS TABLE - EACH BEHAVIOR EVENT BY ROI (START/END TIME)', txt_img='abacus', val=True)
+        self.detailed_bouts_cb, self.detailed_bouts_var = SimbaCheckbox(parent=measurements_frm, txt='DETAILED BOUTS TABLE - EACH BEHAVIOR EVENT BY ROI (START/END TIME)', txt_img='abacus', val=True, tooltip_key='ROI_CLF_DETAILED_BOUTS')
         self.detailed_bouts_cb.grid(row=3, column=0, sticky=NW)
 
 
         bp_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PARTS", icon_name='pose', icon_link=Links.ANALYZE_ML_RESULTS.value, padx=2, pady=2, relief='solid')
         self.bp_vars = {}
         for bp_cnt, bp_name in enumerate(self.body_parts_lst):
-            bp_cb, self.bp_vars[bp_name] = SimbaCheckbox(parent=bp_frm, txt=bp_name)
+            bp_cb, self.bp_vars[bp_name] = SimbaCheckbox(parent=bp_frm, txt=bp_name, tooltip_key='ROI_CLF_BODY_PART')
             bp_cb.grid(row=bp_cnt, sticky=NW)
         bp_frm.grid(row=3, column=0, sticky=NW)
 
         format_options_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="OUTPUT FORMAT OPTIONS", icon_name='settings', icon_link=Links.ANALYZE_ML_RESULTS.value, padx=2, pady=2, relief='solid')
-        self.transpose_cb, self.transpose_var = SimbaCheckbox(parent=format_options_frm, txt='TRANSPOSE OUTPUT (ONE ROW PER VIDEO)', txt_img='rotate', val=False)
+        self.transpose_cb, self.transpose_var = SimbaCheckbox(parent=format_options_frm, txt='TRANSPOSE OUTPUT (ONE ROW PER VIDEO)', txt_img='rotate', val=False, tooltip_key='ROI_CLF_TRANSPOSE')
         format_options_frm.grid(row=4, column=0, sticky=NW)
         self.transpose_cb.grid(row=0, column=0, sticky=NW)
 

@@ -18,7 +18,7 @@ from simba.utils.checks import (
     check_valid_boolean, check_valid_lst)
 from simba.utils.enums import TagNames
 from simba.utils.errors import FrameRangeError, InvalidInputError, NoDataError
-from simba.utils.printing import SimbaTimer, log_event, stdout_success
+from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
 from simba.utils.read_write import (create_directory,
                                     find_files_of_filetypes_in_directory,
                                     find_time_stamp_from_frame_numbers,
@@ -97,11 +97,11 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
         self.animal_combinations = list(itertools.combinations(self.animal_bp_dict, 2))
         self.bin_length, self.plots = bin_length, plots
         if verbose:
-            print(f"Processing {len(self.file_paths)} video(s) for time-bins movement data...")
+            stdout_information(msg=f"Processing {len(self.file_paths)} video(s) for time-bins movement data...")
 
     def __create_plots(self):
         timer = SimbaTimer(start=True)
-        print("Creating time-bin movement plots...")
+        stdout_information(msg="Creating time-bin movement plots...")
         plots_dir = os.path.join( self.project_path, "logs", f"time_bin_movement_plots_{self.datetime}")
         create_directory(paths=plots_dir, overwrite=True)
         for video_name in self.results["VIDEO"].unique():
@@ -124,7 +124,7 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(file_path)
             if self.verbose:
-                print(f"Processing time-bin movements ({self.bin_length}s) for video {video_name} ({str(file_cnt+1)}/{str(len(self.file_paths))})...")
+                stdout_information(msg=f"Processing time-bin movements ({self.bin_length}s) for video {video_name} ({str(file_cnt+1)}/{str(len(self.file_paths))})...")
             video_dict[video_name] = {}
             video_settings, px_per_mm, fps = self.read_video_info(video_name=video_name)
             fps, self.movement_cols, self.velocity_cols = int(fps), set(), set()
@@ -153,7 +153,7 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
             self.out_df_lst.append(results)
             video_timer.stop_timer()
             if self.verbose:
-                print(f"Time-bin movement calculations for video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)...")
+                stdout_information(msg=f"Time-bin movement calculations for video {video_name} complete...", elapsed_time=video_timer.elapsed_time_str)
 
     def save(self):
         self.results = pd.concat(self.out_df_lst, axis=0).sort_values(by=["VIDEO", "TIME BIN #", "MEASUREMENT", "ANIMAL"])[["VIDEO", "TIME BIN #", "START TIME", "END TIME", "ANIMAL", "BODY-PART", "MEASUREMENT", "VALUE"]]
@@ -164,13 +164,13 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
             self.results = self.results.pivot_table(index=["VIDEO", "ANIMAL", "BODY-PART", "MEASUREMENT"], columns="TIME BIN #", values="VALUE").reset_index()
         self.results.set_index("VIDEO").to_csv(self.save_path)
         self.timer.stop_timer()
-        stdout_success(msg=f"Movement time-bins results saved at {self.save_path}", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+        if self.verbose: stdout_success(msg=f"Movement time-bins results saved at {self.save_path}", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
 
-# test = TimeBinsMovementCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                                   body_parts=['Nose'],
-#                                   bin_length=30,
+# test = TimeBinsMovementCalculator(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini",
+#                                   body_parts=['center'],
+#                                   bin_length=600,
 #                                   plots=False,
 #                                   include_timestamp=False,
 #                                   transpose=True,

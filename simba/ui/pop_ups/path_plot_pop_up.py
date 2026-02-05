@@ -10,13 +10,14 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.path_plotter import PathPlotterSingleCore
 from simba.plotting.path_plotter_mp import PathPlotterMulticore
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, SimbaButton, SimbaCheckbox,
-                                        SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, CreateToolTip,
+                                        DropDownMenu, Entry_Box, SimbaButton,
+                                        SimbaCheckbox, SimBADropDown)
+from simba.utils.lookups import get_tooltips
 from simba.utils.checks import (check_if_string_value_is_valid_video_timestamp,
                                 check_if_valid_rgb_str, check_int,
                                 check_that_hhmmss_start_is_before_end)
-from simba.utils.enums import Formats, Links
+from simba.utils.enums import Formats, Links, Options
 from simba.utils.errors import (FrameRangeError, NoFilesFoundError,
                                 NoROIDataError)
 from simba.utils.lookups import get_color_dict
@@ -55,9 +56,11 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         PopUpMixin.__init__(self, title="CREATE PATH PLOTS", size=(650, 850), icon='path_2')
         self.resolution_options = deepcopy(self.resolutions)
         self.resolution_options.insert(0, AUTO)
+        self.color_dict = get_color_dict()
         self.bg_clr_options = deepcopy(list(self.colors_dict.keys()))
-        self.animal_trace_clrs = deepcopy(list(self.colors_dict.keys()))
         self.bg_clr_options.extend((VIDEO_STATIC_FRAME, VIDEO_MOVING_FRAME))
+        self.animal_trace_clrs = deepcopy(list(self.colors_dict.keys()))
+        self.animal_trace_clrs.extend(Options.PALETTE_OPTIONS.value)
         self.animal_trace_clrs.append(CUSTOM)
         self.max_prior_lines_options = list(range(1, 61, 1))
         self.max_prior_lines_options.insert(0, ENTIRE_VIDEO)
@@ -75,18 +78,18 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.custom_rgb_selections = {}
 
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name='style', icon_link=Links.PATH_PLOTS.value)
-        self.max_prior_lines_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.max_prior_lines_options, label='MAX PRIOR LINES (S): ', label_width=35, dropdown_width=30, value=ENTIRE_VIDEO, img='timer_2')
-        self.resolution_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.resolution_options, label='RESOLUTION: ', label_width=35, dropdown_width=30, value=AUTO, img='monitor')
-        self.bg_clr_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.bg_clr_options, label='BACKGROUND: ', label_width=35, dropdown_width=30, value='White', command=self.__activate_settings, img='fill')
-        self.line_width_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.line_width_options, label='LINE WIDTH: ', label_width=35, dropdown_width=30, value=AUTO, img='line')
-        self.font_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.font_size_options, label='FONT SIZE: ', label_width=35, dropdown_width=30, value=AUTO, img='font_size')
-        self.font_thickness_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.font_thickness_options, label='FONT THICKNESS: ', label_width=35, dropdown_width=30, value=AUTO, img='bold')
-        self.bg_opacity_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.bg_opacity_options, label='BACKGROUND OPACITY (%): ', label_width=35, dropdown_width=30, value=100,  img='opacity')
-        self.circle_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.circle_size_options, label='CIRCLE SIZE: ', label_width=35, dropdown_width=30, value=AUTO, img='circle_small')
-        self.show_animal_names_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ANIMAL NAMES: ', label_width=35, dropdown_width=30, value='FALSE', img='label_yellow')
+        self.max_prior_lines_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.max_prior_lines_options, label='MAX PRIOR LINES (S): ', label_width=35, dropdown_width=30, value=ENTIRE_VIDEO, img='timer_2', tooltip_key='PATH_PLOT_MAX_PRIOR_LINES')
+        self.resolution_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.resolution_options, label='RESOLUTION: ', label_width=35, dropdown_width=30, value=AUTO, img='monitor', tooltip_key='PATH_PLOT_RESOLUTION')
+        self.bg_clr_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.bg_clr_options, label='BACKGROUND: ', label_width=35, dropdown_width=30, value='White', command=self.__activate_settings, img='fill', tooltip_key='PATH_PLOT_BACKGROUND')
+        self.line_width_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.line_width_options, label='LINE WIDTH: ', label_width=35, dropdown_width=30, value=AUTO, img='line', tooltip_key='PATH_PLOT_LINE_WIDTH')
+        self.font_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.font_size_options, label='FONT SIZE: ', label_width=35, dropdown_width=30, value=AUTO, img='font_size', tooltip_key='PATH_PLOT_FONT_SIZE')
+        self.font_thickness_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.font_thickness_options, label='FONT THICKNESS: ', label_width=35, dropdown_width=30, value=AUTO, img='bold', tooltip_key='PATH_PLOT_FONT_THICKNESS')
+        self.bg_opacity_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.bg_opacity_options, label='BACKGROUND OPACITY (%): ', label_width=35, dropdown_width=30, value=100,  img='opacity', tooltip_key='PATH_PLOT_BG_OPACITY')
+        self.circle_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.circle_size_options, label='CIRCLE SIZE: ', label_width=35, dropdown_width=30, value=AUTO, img='circle_small', tooltip_key='PATH_PLOT_CIRCLE_SIZE')
+        self.show_animal_names_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ANIMAL NAMES: ', label_width=35, dropdown_width=30, value='FALSE', img='label_yellow', tooltip_key='PATH_PLOT_SHOW_ANIMAL_NAMES')
 
         self.body_parts_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHOOSE BODY-PARTS", icon_name='pose', icon_link=Links.PATH_PLOTS.value)
-        self.number_of_animals_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.animal_cnt_options, label="# ANIMALS:", label_width=35, dropdown_width=30, value=self.animal_cnt_options[0], command=self.populate_body_parts_menu, img='abacus')
+        self.number_of_animals_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.animal_cnt_options, label="# ANIMALS:", label_width=35, dropdown_width=30, value=self.animal_cnt_options[0], command=self.populate_body_parts_menu, img='abacus', tooltip_key='PATH_PLOT_NUMBER_OF_ANIMALS')
 
         self.style_settings_frm.grid(row=0, sticky=NW)
         self.resolution_dropdown.grid(row=1, sticky=NW)
@@ -101,11 +104,14 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
 
         self.video_slicing_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SEGMENTS", icon_name='clip', icon_link=Links.PATH_PLOTS.value)
         self.slice_var = BooleanVar(value=False)
-        self.video_start_time_entry = Entry_Box(self.video_slicing_frm, "START TIME:", "35", entry_box_width=30, value="00:00:00", status=DISABLED)
-        self.video_end_time_entry = Entry_Box(self.video_slicing_frm, "END TIME:", "35", entry_box_width=30, value="00:00:00", status=DISABLED)
+        self.video_start_time_entry = Entry_Box(self.video_slicing_frm, "START TIME:", "35", entry_box_width=30, value="00:00:00", status=DISABLED, tooltip_key='PATH_PLOT_START_TIME')
+        self.video_end_time_entry = Entry_Box(self.video_slicing_frm, "END TIME:", "35", entry_box_width=30, value="00:00:00", status=DISABLED, tooltip_key='PATH_PLOT_END_TIME')
         self.slice_cb = Checkbutton(self.video_slicing_frm, text="Plot ONLY defined time-segment", font=Formats.FONT_REGULAR_BOLD.value, variable=self.slice_var, command=lambda: self.enable_entrybox_from_checkbox(check_box_var=self.slice_var, entry_boxes=[self.video_start_time_entry, self.video_end_time_entry]))
         self.video_slicing_frm.grid(row=1, sticky=NW)
         self.slice_cb.grid(row=0, column=0, sticky=NW)
+        tooltips = get_tooltips()
+        if 'PATH_PLOT_TIME_SEGMENT' in tooltips:
+            CreateToolTip(widget=self.slice_cb, text=tooltips['PATH_PLOT_TIME_SEGMENT'])
         self.video_start_time_entry.grid(row=1, column=0, sticky=NW)
         self.video_end_time_entry.grid(row=2, column=0, sticky=NW)
 
@@ -113,20 +119,24 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.include_clf_locations_var = BooleanVar(value=False)
         self.include_clf_locations_cb = Checkbutton(self.clf_frm, text="INCLUDE CLASSIFICATION LOCATIONS", font=Formats.FONT_REGULAR.value, variable=self.include_clf_locations_var, command=self.populate_clf_location_data)
         self.include_clf_locations_cb.grid(row=0, sticky=NW)
+        tooltips = get_tooltips()
+        if 'PATH_PLOT_INCLUDE_CLF_LOCATIONS' in tooltips:
+            CreateToolTip(widget=self.include_clf_locations_cb, text=tooltips['PATH_PLOT_INCLUDE_CLF_LOCATIONS'])
         self.populate_clf_location_data()
         self.clf_frm.grid(row=2, sticky=NW)
 
         self.roi_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="ROI VISUALIZATION", icon_name='shapes_small', icon_link=Links.PATH_PLOTS.value)
-        roi_cb, self.roi_var = SimbaCheckbox(parent=self.roi_frm, txt='INCLUDE ROIs', txt_img='roi', val=False)
+        roi_state = NORMAL if os.path.isfile(self.roi_coordinates_path) else DISABLED
+        roi_cb, self.roi_var = SimbaCheckbox(parent=self.roi_frm, txt='INCLUDE ROIs', txt_img='roi', val=False, state=roi_state, tooltip_key='PATH_PLOT_INCLUDE_ROIS')
 
         self.populate_body_parts_menu(self.animal_cnt_options[0])
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZATION SETTINGS", icon_name='eye', icon_link=Links.PATH_PLOTS.value)
 
-        path_frames_cb, self.path_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames', val=False)
-        path_videos_cb, self.path_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', txt_img='video', val=False)
-        path_last_frm_cb, self.path_last_frm_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE LAST FRAME', txt_img='finish', val=True)
-        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt+1)), label='CPU CORE COUNT: ', label_width=35, dropdown_width=30, value=int(self.cpu_cnt/3))
+        path_frames_cb, self.path_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames', val=False, tooltip_key='PATH_PLOT_CREATE_FRAMES')
+        path_videos_cb, self.path_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', txt_img='video', val=False, tooltip_key='PATH_PLOT_CREATE_VIDEOS')
+        path_last_frm_cb, self.path_last_frm_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE LAST FRAME', txt_img='finish', val=True, tooltip_key='PATH_PLOT_CREATE_LAST_FRAME')
+        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(2, self.cpu_cnt+1)), label='CPU CORE COUNT: ', label_width=35, dropdown_width=30, value=int(self.cpu_cnt/3), tooltip_key='PATH_PLOT_CPU_CORE_COUNT')
 
         self.run_frm = LabelFrame(self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
         self.run_single_video_frm = LabelFrame(self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
@@ -134,6 +144,9 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
 
         self.single_video_dropdown = DropDownMenu( self.run_single_video_frm, "Video:", self.files_found, "12")
         self.single_video_dropdown.setChoices(self.files_found[0])
+        tooltips = get_tooltips()
+        if 'PATH_PLOT_SINGLE_VIDEO' in tooltips:
+            CreateToolTip(widget=self.single_video_dropdown.lblName, text=tooltips['PATH_PLOT_SINGLE_VIDEO'])
         self.run_multiple_videos = LabelFrame( self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
         self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt=f"Create multiple videos ({len(self.files_found)} video(s) found)", font=Formats.FONT_REGULAR.value, img='rocket', txt_clr='blue', cmd=self._run, cmd_kwargs={'multiple_videos': True})
 
@@ -172,11 +185,9 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.bp_dropdowns, self.bp_colors = {}, {}
         self.bp_row_idx = []
         for animal_cnt in range(int(self.number_of_animals_dropdown.getChoices())):
-            self.bp_dropdowns[animal_cnt] = DropDownMenu(self.body_parts_frm, "Body-part {}:".format(str(animal_cnt + 1)), self.body_parts_lst, "16")
-            self.bp_dropdowns[animal_cnt].setChoices(self.body_parts_lst[animal_cnt])
-            self.bp_dropdowns[animal_cnt].grid(row=animal_cnt + 1, column=0, sticky=NW)
-            self.bp_colors[animal_cnt] = DropDownMenu(self.body_parts_frm, "", self.animal_trace_clrs, "2", com=lambda x, k=animal_cnt: self.__set_custom_clrs(choice=x, row=k))
-            self.bp_colors[animal_cnt].setChoices(list(self.colors_dict.keys())[animal_cnt])
+            self.bp_dropdowns[animal_cnt] = SimBADropDown(parent=self.body_parts_frm, dropdown_options=self.body_parts_lst, label=f"BODY-PART {animal_cnt + 1}:", label_width=20, dropdown_width=20, value=self.body_parts_lst[animal_cnt], tooltip_key='PATH_PLOT_BODY_PART')
+            self.bp_dropdowns[animal_cnt].grid(row=animal_cnt + 1, column=0, sticky=NW, padx=(0, 10))
+            self.bp_colors[animal_cnt] = SimBADropDown(parent=self.body_parts_frm, dropdown_options=self.animal_trace_clrs, label="COLOR/PALETTE:", label_width=20, dropdown_width=20, value=list(self.colors_dict.keys())[animal_cnt], command=lambda x, k=animal_cnt: self.__set_custom_clrs(choice=x, row=k), tooltip_key='PATH_PLOT_ANIMAL_COLOR')
             self.bp_colors[animal_cnt].grid(row=animal_cnt + 1, column=1, sticky=NW)
 
     def __activate_settings(self, choice: str):
@@ -185,7 +196,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         else:
             self.bg_opacity_dropdown.disable()
         if choice == VIDEO_STATIC_FRAME:
-            self.static_frm_index_eb = Entry_Box(self.style_settings_frm, "SELECT FRAME INDEX: ", labelwidth=20, entry_box_width=10, validation="numeric", value=1)
+            self.static_frm_index_eb = Entry_Box(self.style_settings_frm, "SELECT FRAME INDEX: ", labelwidth=20, entry_box_width=10, validation="numeric", value=1, tooltip_key='PATH_PLOT_STATIC_FRAME_INDEX')
             self.static_frm_index_eb.grid(row=8, column=1, sticky=NW)
         else:
             if hasattr(self, "static_frm_index_eb"):
@@ -193,7 +204,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
 
     def __set_custom_clrs(self, choice: str, row: int):
         if choice == CUSTOM:
-            self.custom_rgb_selections[row] = Entry_Box(self.body_parts_frm, "RGB:", "5", entry_box_width=10)
+            self.custom_rgb_selections[row] = Entry_Box(self.body_parts_frm, "RGB:", "5", entry_box_width=10, tooltip_key='PATH_PLOT_CUSTOM_RGB')
             self.custom_rgb_selections[row].entry_set(val="255,0,0")
             self.custom_rgb_selections[row].grid(row=row + 1, column=3, sticky=NW)
         else:
@@ -205,18 +216,25 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.clf_name, self.clf_clr, self.clf_size = {}, {}, {}
         size_lst = list(range(1, 51))
         size_lst = ["Size: " + str(x) for x in size_lst]
+        tooltips = get_tooltips()
         for clf_cnt, clf_name in enumerate(self.clf_names):
             self.clf_name[clf_cnt] = DropDownMenu(self.clf_frm, "Classifier {}:".format(str(clf_cnt + 1)), self.clf_names, "16")
             self.clf_name[clf_cnt].setChoices(self.clf_names[clf_cnt])
             self.clf_name[clf_cnt].grid(row=clf_cnt + 1, column=0, sticky=NW)
+            if 'PATH_PLOT_CLF_NAME' in tooltips:
+                CreateToolTip(widget=self.clf_name[clf_cnt].lblName, text=tooltips['PATH_PLOT_CLF_NAME'])
 
             self.clf_clr[clf_cnt] = DropDownMenu(self.clf_frm, "", list(self.colors_dict.keys()), "2")
             self.clf_clr[clf_cnt].setChoices(list(self.colors_dict.keys())[clf_cnt])
             self.clf_clr[clf_cnt].grid(row=clf_cnt + 1, column=1, sticky=NW)
+            if 'PATH_PLOT_CLF_COLOR' in tooltips:
+                CreateToolTip(widget=self.clf_clr[clf_cnt].lblName, text=tooltips['PATH_PLOT_CLF_COLOR'])
 
             self.clf_size[clf_cnt] = DropDownMenu(self.clf_frm, "", size_lst, "2")
             self.clf_size[clf_cnt].setChoices(size_lst[15])
             self.clf_size[clf_cnt].grid(row=clf_cnt + 1, column=2, sticky=NW)
+            if 'PATH_PLOT_CLF_SIZE' in tooltips:
+                CreateToolTip(widget=self.clf_size[clf_cnt].lblName, text=tooltips['PATH_PLOT_CLF_SIZE'])
 
         self.enable_clf_location_settings()
 
@@ -239,8 +257,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
                 clr = check_if_valid_rgb_str(input=clr)
                 animal_attr[cnt]["color"] = clr
             else:
-                animal_attr[cnt]["color"] = get_color_dict()[value.getChoices()]
-
+                animal_attr[cnt]["color"] = self.color_dict[value.getChoices()] if value.getChoices() in self.color_dict.keys() else value.getChoices()
         for cnt, (key, value) in enumerate(self.bp_dropdowns.items()):
             if cnt not in animal_attr.keys():
                 animal_attr[cnt] = {}
@@ -365,7 +382,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
 
 
 
-#_ = PathPlotPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
+# _ = PathPlotPopUp(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini")
 
 #_ = PathPlotPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
 

@@ -49,21 +49,21 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
 
         self.probability_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="PROBABILITY THRESHOLD", icon_name='green_dice', icon_link=Links.ROI_FEATURES_PLOT.value)
         threshold_label = SimBALabel(parent=self.probability_frm, txt="NOTE: body-part locations detected with probabilities \n below this threshold are filtered.", font=Formats.FONT_REGULAR_ITALICS.value)
-        self.threshold_entry_box = Entry_Box(self.probability_frm, "PROBABILITY THRESHOLD:", "25", value=0.0, entry_box_width=15, img='green_dice')
+        self.threshold_entry_box = Entry_Box(self.probability_frm, "PROBABILITY THRESHOLD:", "25", value=0.0, entry_box_width=15, img='green_dice', tooltip_key='ROI_FEATURES_PROBABILITY_THRESHOLD')
 
         self.probability_frm.grid(row=0, column=0, sticky=NW)
         threshold_label.grid(row=0, column=0, sticky=NW)
         self.threshold_entry_box.grid(row=1, column=0, sticky=NW)
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', icon_link=Links.ROI_FEATURES_PLOT.value)
-        self.show_directionality_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['FALSE', 'LINES', 'FUNNEL'],  label='SHOW DIRECTIONALITY:', label_width=25, dropdown_width=15, value='FALSE', state=self.directing_viable, img='direction_3')
+        self.show_directionality_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['FALSE', 'LINES', 'FUNNEL'],  label='SHOW DIRECTIONALITY:', label_width=25, dropdown_width=15, value='FALSE', state=self.directing_viable, img='direction_3', tooltip_key='ROI_FEATURES_SHOW_DIRECTIONALITY')
         self.border_clr_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(self.colors_dict.keys()), label='BORDER COLOR:', label_width=25, dropdown_width=15, value='Black', img='fill', tooltip_key='BORDER_BG_COLOR')
-        self.show_pose_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW POSE:', label_width=25, dropdown_width=15, value='TRUE', img='pose')
-        self.show_roi_centers_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ROI CENTERS:', label_width=25, dropdown_width=15, value='TRUE', img='bullseye')
-        self.show_roi_eartags_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ROI EAR TAGS:', label_width=25, dropdown_width=15, value='TRUE', img='ear_small')
-        self.show_animal_names_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ANIMAL NAMES:', label_width=25, dropdown_width=15, value='FALSE', img='id_card')
-        self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=25, dropdown_width=15, value='FALSE', state=self.gpu_available, img='gpu_3')
-        self.cpu_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(2, self.cpu_cnt+1)), label='CPU CORES: ', label_width=25, dropdown_width=15, value=int(self.cpu_cnt/2), img='cpu_small')
+        self.show_pose_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW POSE:', label_width=25, dropdown_width=15, value='TRUE', img='pose', tooltip_key='ROI_TRACKING_SHOW_POSE')
+        self.show_roi_centers_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ROI CENTERS:', label_width=25, dropdown_width=15, value='TRUE', img='bullseye', tooltip_key='ROI_FEATURES_SHOW_ROI_CENTERS')
+        self.show_roi_eartags_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ROI EAR TAGS:', label_width=25, dropdown_width=15, value='TRUE', img='ear_small', tooltip_key='ROI_FEATURES_SHOW_ROI_EARTAGS')
+        self.show_animal_names_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ANIMAL NAMES:', label_width=25, dropdown_width=15, value='FALSE', img='id_card', tooltip_key='ROI_TRACKING_SHOW_ANIMAL_NAMES')
+        self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=25, dropdown_width=15, value='FALSE', state=self.gpu_available, img='gpu_3', tooltip_key='USE_GPU')
+        self.cpu_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(2, self.cpu_cnt+1)), label='CPU CORES: ', label_width=25, dropdown_width=15, value=int(self.cpu_cnt/2), img='cpu_small', tooltip_key='ROI_TRACKING_CPU_CORES')
         self.settings_frm.grid(row=1, column=0, sticky=NW)
         self.show_directionality_dropdown.grid(row=0, column=0, sticky=NW)
         self.border_clr_dropdown.grid(row=1, column=0, sticky=NW)
@@ -74,13 +74,13 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
         self.cpu_cnt_dropdown.grid(row=6, column=0, sticky=NW)
 
         self.body_parts_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PARTS", icon_name='pose', icon_link=Links.ROI_FEATURES_PLOT.value)
-        self.animal_cnt_dropdown = SimBADropDown(parent=self.body_parts_frm, dropdown_options=list(range(1, self.animal_cnt + 1)), label='NUMBER OF ANIMALS:', label_width=25, dropdown_width=15, value=1, command=self.__populate_bp_dropdown, img='abacus')
+        self.animal_cnt_dropdown = SimBADropDown(parent=self.body_parts_frm, dropdown_options=list(range(1, self.animal_cnt + 1)), label='NUMBER OF ANIMALS:', label_width=25, dropdown_width=15, value=1, command=self.__populate_bp_dropdown, img='abacus', tooltip_key='ROI_TRACKING_NUMBER_OF_ANIMALS')
         self.__populate_bp_dropdown(bp_cnt=1)
         self.body_parts_frm.grid(row=2, column=0, sticky=NW)
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
 
         self.single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZE SINGLE VIDEO", icon_name='video', icon_link=Links.ROI_FEATURES_PLOT.value)
-        self.single_video_dropdown = SimBADropDown(parent=self.single_video_frm, dropdown_options=self.video_list, label='SELECT VIDEO:', label_width=25, dropdown_width=self.max_video_name_len+10, value=self.video_list[0], img='video')
+        self.single_video_dropdown = SimBADropDown(parent=self.single_video_frm, dropdown_options=self.video_list, label='SELECT VIDEO:', label_width=25, dropdown_width=self.max_video_name_len+10, value=self.video_list[0], img='video_2', tooltip_key='ROI_FEATURES_SELECT_VIDEO')
         self.single_video_btn = SimbaButton(parent=self.single_video_frm, txt="VISUALIZE ROI FEATURES: SINGLE VIDEO", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': False}, width=240, txt_clr='blue')
 
         self.single_video_frm.grid(row=3, column=0, sticky=NW)
@@ -103,7 +103,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
 
         self.bp_dropdown_dict = {}
         for cnt in range(int(self.animal_cnt_dropdown.getChoices())):
-            self.bp_dropdown_dict[cnt] = SimBADropDown(parent=self.body_parts_frm, dropdown_options=self.body_parts_lst, label=self.multi_animal_id_list[cnt], label_width=25, dropdown_width=25, value=self.body_parts_lst[cnt])
+            self.bp_dropdown_dict[cnt] = SimBADropDown(parent=self.body_parts_frm, dropdown_options=self.body_parts_lst, label=self.multi_animal_id_list[cnt], label_width=25, dropdown_width=25, value=self.body_parts_lst[cnt], img='point', tooltip_key='ROI_TRACKING_BODY_PART')
             self.bp_dropdown_dict[cnt].grid(row=cnt + 1, column=0, sticky=NW)
 
     def run(self, multiple: bool):
@@ -136,6 +136,11 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
                                                                           direction=direction)
 
             threading.Thread(target=roi_feature_visualizer.run()).start()
+
+
+
+
+#_ = VisualizeROIFeaturesPopUp(config_path=r"E:\troubleshooting\mitra_emergence\project_folder\project_config.ini")
 
 
 

@@ -14,14 +14,12 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_filepaths_in_iterable_exist,
-    check_float, check_if_keys_exist_in_dict, check_int, check_valid_lst)
-from simba.utils.data import terminate_cpu_pool
+    check_float, check_if_keys_exist_in_dict, check_int, check_valid_lst, check_valid_boolean)
+from simba.utils.data import terminate_cpu_pool, get_cpu_pool
 from simba.utils.enums import Defaults, Formats, TagNames
 from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    find_core_cnt, get_fn_ext, read_df,
-                                    remove_a_folder)
+from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
+from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, get_fn_ext, read_df, remove_a_folder)
 
 STYLE_PALETTE = 'palette'
 STYLE_SHADING = 'shading'
@@ -112,16 +110,17 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
                  final_img_setting: Optional[bool] = True,
                  video_setting: Optional[bool] = False,
                  frame_setting: Optional[bool] = False,
-                 core_cnt: Optional[int] = -1):
+                 core_cnt: Optional[int] = -1,
+                 verbose: bool = True):
 
         if (not frame_setting) and (not video_setting) and (not final_img_setting):
             raise NoSpecifiedOutputError(msg="Please choose to select either heatmap videos, frames, and/or final image.", source=self.__class__.__name__)
         check_file_exist_and_readable(file_path=config_path)
         check_valid_lst(data=data_paths, valid_dtypes=(str,), min_len=1)
         check_if_keys_exist_in_dict(data=style_attr, key=STYLE_ATTR, name=f'{self.__class__.__name__} style_attr')
-        check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, max_value=find_core_cnt()[0])
+        check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], unaccepted_vals=[0])
         check_filepaths_in_iterable_exist(file_paths=data_paths, name=f'{self.__class__.__name__} data_paths')
-        if core_cnt == -1: core_cnt = find_core_cnt()[0]
+        core_cnt = find_core_cnt()[0] if core_cnt == -1 else core_cnt
         self.core_cnt = core_cnt
         ConfigReader.__init__(self, config_path=config_path, create_logger=False)
         PlottingMixin.__init__(self)
@@ -131,9 +130,10 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
         if not os.path.exists(self.heatmap_location_dir):
             os.makedirs(self.heatmap_location_dir)
         self.bp_lst = [self.bp + "_x", self.bp + "_y"]
-        if platform.system() == "Darwin":
-            multiprocessing.set_start_method("spawn", force=True)
-        print(f"Processing {len(self.data_paths)} video(s)...")
+        if platform.system() == "Darwin": multiprocessing.set_start_method("spawn", force=True)
+        check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose', raise_error=True)
+        self.verbose = verbose
+        if self.verbose: stdout_information(msg=f"Processing {len(self.data_paths)} video(s)...")
 
     @staticmethod
     @jit(nopython=True)
@@ -148,6 +148,7 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
 
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
+        self.pool = get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__)
         for file_cnt, file_path in enumerate(self.data_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(file_path)
@@ -168,11 +169,8 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
                 self.save_video_path = os.path.join(self.heatmap_location_dir, f"{self.video_name}.mp4")
 
             self.data_df = read_df(file_path=file_path, file_type=self.file_type, usecols=self.bp_lst)
-
-
-
             squares, aspect_ratio = GeometryMixin().bucket_img_into_grid_square(bucket_grid_size_mm=self.style_attr[STYLE_BIN_SIZE], img_size=(self.width, self.height), px_per_mm=self.px_per_mm)
-            cum_sum_squares = GeometryMixin().cumsum_coord_geometries(data=self.data_df.values, fps=self.fps, geometries=squares)
+            cum_sum_squares = GeometryMixin().cumsum_coord_geometries(data=self.data_df.values, fps=self.fps, geometries=squares, core_cnt=self.core_cnt, pool=self.pool)
             if self.style_attr[STYLE_MAX_SCALE] == "auto":
                 self.style_attr[STYLE_MAX_SCALE]= np.round(np.max(np.max(cum_sum_squares[-1], axis=0)), 3)
                 if self.style_attr[STYLE_MAX_SCALE] == 0: self.style_attr[STYLE_MAX_SCALE] = 1
@@ -190,7 +188,7 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
                                                 img_size=(self.width, self.height))
 
             if self.video_setting or self.frame_setting:
-                print("Creating heatmap location video frames...")
+                stdout_information(msg="Creating heatmap location video frames...")
                 frame_arrays = np.array_split(cum_sum_squares, self.core_cnt)
                 last_frm_idx = 0
                 for frm_group in range(len(frame_arrays)):
@@ -198,35 +196,30 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
                     frame_arrays[frm_group] = self.__insert_group_idx_column(data=split_arr, group=frm_group, last_frm_idx=last_frm_idx)
                     last_frm_idx = np.max(frame_arrays[frm_group].reshape((frame_arrays[frm_group].shape[0], -1)))
 
-                with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
-                    constants = functools.partial(_heatmap_location,
-                                                  video_setting=self.video_setting,
-                                                  frame_setting=self.frame_setting,
-                                                  style_attr=self.style_attr,
-                                                  fps=self.fps,
-                                                  video_temp_dir=self.temp_folder,
-                                                  frame_dir=self.save_frame_folder_dir,
-                                                  aspect_ratio=aspect_ratio,
-                                                  size=(self.width, self.height),
-                                                  video_name=self.video_name,
-                                                  make_location_heatmap_plot=self.make_location_heatmap_plot)
-                    for cnt, result in enumerate(pool.imap(constants,frame_arrays,chunksize=self.multiprocess_chunksize)):
+
+                constants = functools.partial(_heatmap_location,
+                                              video_setting=self.video_setting,
+                                              frame_setting=self.frame_setting,
+                                              style_attr=self.style_attr,
+                                              fps=self.fps,
+                                              video_temp_dir=self.temp_folder,
+                                              frame_dir=self.save_frame_folder_dir,
+                                              aspect_ratio=aspect_ratio,
+                                              size=(self.width, self.height),
+                                              video_name=self.video_name,
+                                              make_location_heatmap_plot=self.make_location_heatmap_plot)
+                for cnt, result in enumerate(self.pool.imap(constants,frame_arrays,chunksize=self.multiprocess_chunksize)):
                         print(f'Batch {result}/{self.core_cnt} complete... Video: {self.video_name} ({file_cnt+1}/{len(self.data_paths)})')
-                    terminate_cpu_pool(pool=pool, force=False)
+
 
                 if self.video_setting:
-                    print(f"Joining {self.video_name} multiprocessed heatmap location video...")
+                    stdout_information(msg=f"Joining {self.video_name} multiprocessed heatmap location video...")
                     concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_video_path)
+                stdout_information(msg=f"Heatmap video {self.video_name} complete...", elapsed_time=video_timer.elapsed_time_str)
 
-                video_timer.stop_timer()
-                print(
-                    "Heatmap video {} complete (elapsed time: {}s) ...".format(
-                        self.video_name, video_timer.elapsed_time_str
-                    )
-                )
-
-            self.timer.stop_timer()
-            stdout_success(msg=f"Heatmap location videos visualizations for {len(self.data_paths)} videos created in {self.heatmap_location_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+        self.timer.stop_timer()
+        terminate_cpu_pool(pool=self.pool, force=False, source=self.__class__.__name__)
+        stdout_success(msg=f"Heatmap location videos visualizations for {len(self.data_paths)} videos created in {self.heatmap_location_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
 

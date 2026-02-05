@@ -63,7 +63,6 @@ class RunMachineModelsPopUp(PopUpMixin, ConfigReader):
         run_btn = SimbaButton(parent=run_frm, txt="RUN", img='rocket', txt_clr='red', font=Formats.FONT_REGULAR.value, hover_font=Formats.FONT_REGULAR.value, cmd=self.run)
         run_frm.grid(row=2, sticky=W, pady=5, padx=5)
         run_btn.grid(row=0, sticky=W, pady=5, padx=5)
-
         self.main_frm.mainloop()
 
     def run(self):
@@ -94,7 +93,6 @@ class RunMachineModelsPopUp(PopUpMixin, ConfigReader):
 
         with open(self.config_path, "w") as f:
             self.config.write(f)
-
         stdout_success(msg=f"Model paths/settings saved in project_config.ini ({self.config_path})", source=self.__class__.__name__)
 
         if len(self.feature_file_paths) == 0:

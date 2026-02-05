@@ -207,8 +207,8 @@ class MitraFeatureExtractor(ConfigReader,
 
 
 
-# feature_extractor = MitraFeatureExtractor(config_path=r"E:\troubleshooting\mitra_emergence\project_folder\project_config.ini")
-# feature_extractor.run()
+feature_extractor = MitraFeatureExtractor(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini")
+feature_extractor.run()
 
 
 

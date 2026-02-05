@@ -1372,7 +1372,7 @@ class PlottingMixin(object):
     @staticmethod
     def make_path_plot(
         data: List[np.ndarray],
-        colors: List[Tuple[int, int, int]],
+        colors: List[Union[Tuple[int, int, int], str]],
         width: Optional[int] = 640,
         height: Optional[int] = 480,
         max_lines: Optional[int] = None,
@@ -1393,7 +1393,7 @@ class PlottingMixin(object):
            :align: center
 
         :param List[np.ndarray] data: List of numpy arrays containing path data.
-        :param List[Tuple[int, int, int]] colors: List of RGB tuples representing colors for each path.
+        :param List[Tuple[int, int, int]] colors: List of RGB tuples, strings (names of palettes), or lists of list of tuples, representing colors for each path.
         :param width: Width of the output image (default is 640 pixels).
         :param height: Height of the output image (default is 480 pixels).
         :param max_lines: Maximum number of lines to plot from each path data.
@@ -1418,68 +1418,47 @@ class PlottingMixin(object):
         >>> PlottingMixin.make_path_plot(data=[x, y], colors=[(0, 255, 0), (255, 0, 0)], clf_attr=clf_data)
         """
 
-        check_valid_lst(
-            data=data,
-            source=PlottingMixin.make_path_plot.__name__,
-            valid_dtypes=(np.ndarray,),
-            min_len=1,
-        )
+        check_valid_lst(data=data, source=PlottingMixin.make_path_plot.__name__, valid_dtypes=(np.ndarray,), min_len=1)
         for i in data:
-            check_valid_array(
-                data=i,
-                source=PlottingMixin.make_path_plot.__name__,
-                accepted_ndims=(2,),
-                accepted_axis_1_shape=(2,),
-                accepted_dtypes=Formats.NUMERIC_DTYPES.value)
-        check_valid_lst(
-            data=colors,
-            source=PlottingMixin.make_path_plot.__name__,
-            valid_dtypes=(tuple,),
-            exact_len=len(data),
-        )
-        for i in colors:
-            check_if_valid_rgb_tuple(data=i)
-        check_instance(
-            source="bg_clr", instance=bg_clr, accepted_types=(np.ndarray, tuple)
-        )
-        if isinstance(bg_clr, tuple):
-            check_if_valid_rgb_tuple(data=bg_clr)
-        check_int(
-            name=f"{PlottingMixin.make_path_plot.__name__} height",
-            value=height,
-            min_value=1,
-        )
-        check_int(
-            name=f"{PlottingMixin.make_path_plot.__name__} height",
-            value=width,
-            min_value=1,
-        )
-        check_float(
-            name=f"{PlottingMixin.make_path_plot.__name__} font_size", value=font_size
-        )
-        check_int(
-            name=f"{PlottingMixin.make_path_plot.__name__} font_thickness",
-            value=font_thickness,
-        )
-        check_int(
-            name=f"{PlottingMixin.make_path_plot.__name__} line_width", value=line_width
-        )
+            check_valid_array(data=i, source=PlottingMixin.make_path_plot.__name__, accepted_ndims=(2,), accepted_axis_1_shape=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_instance(source="bg_clr", instance=bg_clr, accepted_types=(np.ndarray, tuple))
+        if isinstance(bg_clr, tuple): check_if_valid_rgb_tuple(data=bg_clr)
+        check_int(name=f"{PlottingMixin.make_path_plot.__name__} height", value=height, min_value=1)
+        check_int(name=f"{PlottingMixin.make_path_plot.__name__} height", value=width, min_value=1)
+        check_float(name=f"{PlottingMixin.make_path_plot.__name__} font_size", value=font_size)
+        check_int(name=f"{PlottingMixin.make_path_plot.__name__} font_thickness", value=font_thickness)
+        check_int(name=f"{PlottingMixin.make_path_plot.__name__} line_width", value=line_width)
         timer = SimbaTimer(start=True)
+        plot_clrs = []
+        check_valid_lst(data=colors, source=PlottingMixin.make_path_plot.__name__, valid_dtypes=(tuple, str, list,), exact_len=len(data))
+        for cnt, t in enumerate(colors):
+            if check_if_valid_rgb_tuple(data=t, raise_error=False):
+                plot_clrs.append([t] * data[cnt].shape[0])
+            elif t in Options.PALETTE_OPTIONS.value:
+                plot_clrs.append(create_color_palette(pallete_name=t, increments=data[cnt].shape[0], as_int=True))
+            elif isinstance(t, list):
+                check_valid_lst(data=t, source=PlottingMixin.make_path_plot.__name__, valid_dtypes=(tuple,), exact_len=data[cnt].shape[0])
+                for lst_clr in t:
+                    check_if_valid_rgb_tuple(data=lst_clr, raise_error=True, source=PlottingMixin.make_path_plot.__class__.__name__)
+                plot_clrs.append(t)
+            else:
+                raise InvalidInputError(msg=f'The color {t} for is not a valid color palette or valid rgb color tuple.', source=PlottingMixin.make_path_plot.__class__.__name__)
         if (isinstance(bg_clr, np.ndarray)) and bg_clr.ndim > 1:
             img = np.zeros((bg_clr.shape[0], bg_clr.shape[1], 3))
         else:
             img = np.zeros((height, width, 3))
         img[:] = bg_clr
         for line_cnt in range(len(data)):
-            clr = colors[line_cnt]
+            last_clr = plot_clrs[line_cnt][-1]
             line_data = data[line_cnt]
             if max_lines is not None:
                 check_int(name=f"{PlottingMixin.make_path_plot.__name__} max_lines", value=max_lines, min_value=1)
                 line_data = line_data[-max_lines:]
             for i in range(1, line_data.shape[0]):
+                clr = plot_clrs[line_cnt][i]
                 cv2.line(img, tuple(int(x) for x in line_data[i]), tuple(int(x) for x in line_data[i - 1]), clr, line_width)
             if circle_size is not None:
-                cv2.circle(img, tuple(int(x) for x in line_data[-1]),0, clr, circle_size)
+                cv2.circle(img, tuple(int(x) for x in line_data[-1]),0, last_clr, circle_size)
             if animal_names is not None:
                 cv2.putText(
                     img,
@@ -1487,7 +1466,7 @@ class PlottingMixin(object):
                     tuple(int(x) for x in line_data[-1]),
                     cv2.FONT_HERSHEY_COMPLEX,
                     font_size,
-                    clr,
+                    last_clr,
                     font_thickness,
                 )
         if clf_attr is not None:

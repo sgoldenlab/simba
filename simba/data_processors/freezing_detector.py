@@ -27,14 +27,17 @@ class FreezingDetector(ConfigReader):
     Analyzes pose-estimation data to detect freezing episodes by computing the mean velocity
     of key body parts (nape, nose, and tail-base) and identifying periods where movement falls below
     a specified threshold for a minimum duration.
+
     .. important::
         Freezing is detected as `present` when **the velocity (computed from the mean movement of the nape, nose, and tail-base body-parts) falls below
         the movement threshold for the duration (and longer) of the specified time-window**.
         Freezing is detected as `absent` when not present.
+
     .. note::
        The method uses the left and right ear body-parts to compute the `nape` location of the animal
        as the midpoint between the ears. The nape, nose, and tail-base movements are averaged to compute
        overall animal movement velocity.
+
     :param Union[str, os.PathLike] data_dir: Path to directory containing pose-estimated body-part data in CSV format. Each CSV file should contain pose estimation data for one video.
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file (`.ini` format) containing project settings and video information.
     :param Optional[str] nose_name: The name of the pose-estimated nose body-part column (without _x/_y suffix). Defaults to 'nose'.
@@ -48,15 +51,12 @@ class FreezingDetector(ConfigReader):
     :returns: None. Results are saved to CSV files in the specified save directory:
         - Individual video results: One CSV file per video with freezing annotations added as a 'FREEZING' column (1 = freezing, 0 = not freezing)
         - Aggregate results: `aggregate_freezing_results.csv` containing summary statistics for all videos
+
     :example:
-    >>> FreezingDetector(
-    ...     data_dir=r'D:\\troubleshooting\\mitra\\project_folder\\csv\\outlier_corrected_movement_location',
-    ...     config_path=r"D:\\troubleshooting\\mitra\\project_folder\\project_config.ini",
-    ...     time_window=3,
-    ...     movement_threshold=5,
-    ...     shortest_bout=100
-    ... ).run()
-    References
+    >>> x = FreezingDetector(data_dir=r'D:\\troubleshooting\\mitra\\project_folder\\csv\\outlier_corrected_movement_location', config_path=r"D:\\troubleshooting\\mitra\\project_folder\\project_config.ini", time_window=3, movement_threshold=5, shortest_bout=100
+    >>> x.run()
+
+    references
     ----------
     ..
     .. [1] Sabnis et al., Visual detection of seizures in mice using supervised machine learning, `biorxiv`, doi: https://doi.org/10.1101/2024.05.29.596520.
@@ -65,6 +65,7 @@ class FreezingDetector(ConfigReader):
     .. [4] Lazaro et al., Brainwide Genetic Capture for Conscious State Transitions, `biorxiv`, doi: https://doi.org/10.1101/2025.03.28.646066
     .. [5] Sabnis et al., Visual detection of seizures in mice using supervised machine learning, 2025, Cell Reports Methods 5, 101242 December 15, 2025.
     """
+
     def __init__(self,
                  config_path: Union[str, os.PathLike],
                  nose_name: str = 'nose',
@@ -142,7 +143,17 @@ class FreezingDetector(ConfigReader):
                 df[FREEZING] = 0
                 freezing_idx = []
             df.to_csv(save_file_path)
-            print(video_name, len(freezing_idx), round(len(freezing_idx) / fps, 4), df[FREEZING].sum())
+            #print(video_name, len(freezing_idx), round(len(freezing_idx) / fps, 4), df[FREEZING].sum())
             agg_results.loc[len(agg_results)] = [video_name, len(freezing_idx), round(len(freezing_idx) / fps, 4), len(bouts), round((len(freezing_idx) / len(df)) * 100, 4), len(df), round(len(df)/fps, 2) ]
         agg_results.to_csv(agg_results_path)
         self.timer.stop_timer(); stdout_success(msg=f'Results saved in {self.save_dir} directory.', elapsed_time=self.timer.elapsed_time_str)
+
+
+
+# FreezingDetector(
+#     data_dir=r'E:\troubleshooting\mitra_emergence_hour\project_folder\csv\outlier_corrected_movement_location',
+#     config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini",
+#     time_window=3,
+#     movement_threshold=5,
+#     shortest_bout=100
+# ).run()

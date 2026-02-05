@@ -30,7 +30,7 @@ from simba.utils.enums import ROI_SETTINGS, Formats, Keys, Paths, TextOptions
 from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError,
                                 NoFilesFoundError, NoROIDataError,
                                 ROICoordinatesNotFoundError)
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_current_time,
                                     get_video_meta_data, read_df)
@@ -118,7 +118,8 @@ def _roi_plotter_mp(data: Tuple[int, pd.DataFrame],
 
             writer.write(img)
             current_frm += 1
-            if verbose: print(f"[{get_current_time()}] Multi-processing video frame {current_frm}/{video_meta_data['frame_count']} (core batch: {group_cnt}, video: {video_meta_data['video_name']})...")
+            if verbose:
+                stdout_information(msg=f"Multi-processing video frame {current_frm}/{video_meta_data['frame_count']} (core batch: {group_cnt}, video: {video_meta_data['video_name']})...")
         else:
             FrameRangeWarning(msg=f'Could not read frame {current_frm} in video {video_meta_data["video_name"]}', source=_roi_plotter_mp.__name__)
             break
@@ -363,7 +364,7 @@ class ROIPlotMultiprocess(ConfigReader):
         data = [(i, j) for i, j in enumerate(data)]
         del self.data_df
         del self.roi_analyzer.logger
-        if self.verbose: print(f"Creating ROI images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
+        if self.verbose: stdout_information(msg=f"Creating ROI images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
         self.pool = get_cpu_pool(core_cnt=self.core_cnt, maxtasksperchild=self.maxtasksperchild, source=self.__class__.__name__, verbose=True)
         constants = functools.partial(_roi_plotter_mp,
                                       loc_dict=self.loc_dict,
@@ -387,12 +388,13 @@ class ROIPlotMultiprocess(ConfigReader):
                                       show_bbox=self.show_bbox)
 
         for cnt, batch_cnt in enumerate(self.pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
-            print(f'Image batch {batch_cnt+1} / {self.core_cnt} complete...')
-            print(f"Joining {self.video_name} multi-processed ROI video...")
-        concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_path, video_format="mp4", remove_splits=True, gpu=self.gpu)
+            if self.verbose: stdout_information(msg=f'Image batch {batch_cnt+1} / {self.core_cnt} complete...')
+
+        if self.verbose: stdout_information(msg=f"Joining {self.video_name} multi-processed ROI video...")
+        concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_path, video_format="mp4", remove_splits=True, gpu=self.gpu, verbose=self.verbose)
         terminate_cpu_pool(pool=self.pool, force=False, source=self.__class__.__name__)
         video_timer.stop_timer()
-        stdout_success(msg=f"Video {self.video_name} created. ROI video saved at {self.save_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__, )
+        if self.verbose: stdout_success(msg=f"Video {self.video_name} created. ROI video saved at {self.save_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__, )
 
 
 

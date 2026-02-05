@@ -4,7 +4,8 @@ import functools
 import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Union
-
+import warnings
+warnings.filterwarnings("ignore", message=".*global colormaps dictionary.*")
 import cv2
 import numpy as np
 
@@ -19,16 +20,17 @@ from simba.utils.checks import (
     check_valid_dataframe, check_valid_lst,
     check_video_and_data_frm_count_align)
 from simba.utils.data import (find_frame_numbers_from_time_stamp, get_cpu_pool,
-                              slice_roi_dict_for_video, terminate_cpu_pool)
-from simba.utils.enums import Formats, TagNames
+                              slice_roi_dict_for_video, terminate_cpu_pool,create_color_palette)
+from simba.utils.enums import Formats, TagNames, Options
 from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 InvalidVideoFileError, NoSpecifiedOutputError)
-from simba.utils.printing import SimbaTimer, log_event, stdout_success
+from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     find_video_of_file, get_current_time,
                                     get_fn_ext, read_df, read_frm_of_video)
 from simba.utils.warnings import ROIWarning
+
 
 STYLE_WIDTH = "width"
 STYLE_HEIGHT = "height"
@@ -77,7 +79,7 @@ def path_plot_mp(data: np.ndarray,
     batch_id, frm_cnt_rng, frm_id_rng = data[0], data[1], data[2]
     if video_setting:
         video_save_path = os.path.join(video_save_dir, f"{batch_id}.mp4")
-        FOURCC = cv2.VideoWriter_fourcc(*Formats.AVI_CODEC.value)
+        FOURCC = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         video_writer = cv2.VideoWriter(video_save_path, FOURCC, int(fps), (style_attr[STYLE_WIDTH], style_attr[STYLE_HEIGHT]))
     for frm_cnt, frm_id in zip(frm_cnt_rng, frm_id_rng):
         if isinstance(style_attr[STYLE_BG], str):
@@ -85,12 +87,13 @@ def path_plot_mp(data: np.ndarray,
         else:
             bg = deepcopy(style_attr[STYLE_BG])
         plot_arrs = [x[:frm_cnt, :] for x in line_data]
+        # make_path_plot expects list of lists of (R,G,B) tuples; normalize in case colors are lists from create_color_palette
+        plot_clrs = [[tuple(e) for e in x[:frm_cnt]] for x in colors]
         clf_attr_cpy = deepcopy(clf_attr)
         if clf_attr is not None:
             for k, v in clf_attr.items(): clf_attr_cpy[k]["clfs"][frm_id + 1 :] = 0
-
         img = PlottingMixin.make_path_plot(data=plot_arrs,
-                                           colors=colors,
+                                           colors=plot_clrs,
                                            width=style_attr[STYLE_WIDTH],
                                            height=style_attr[STYLE_HEIGHT],
                                            max_lines=style_attr[STYLE_MAX_LINES],
@@ -213,13 +216,18 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
         bp_data, data_cols, animal_names, colors = {}, [], [], [],
         for cnt, (k, v) in enumerate(self.animal_attr.items()):
             check_if_keys_exist_in_dict(data=v, key=[COLOR, BODY_PART], name=f'{self.__class__.__name__} animal_attr')
-            check_str(name=f'animal {k} body_part', value=v[BODY_PART], options=self.body_parts_lst)
-            check_if_valid_rgb_tuple(data=v[COLOR], raise_error=True)
+            check_str(name=f'{self.__class__.__name__} animal {k} body_part', value=v[BODY_PART], options=self.body_parts_lst)
             name = self.find_animal_name_from_body_part_name(bp_name=v[BODY_PART], bp_dict=self.animal_bp_dict)
+            if check_if_valid_rgb_tuple(data=v[COLOR], raise_error=False, source=f'{self.__class__.__name__} animal_attr {cnt}'):
+                colors.append(v[COLOR])
+            elif v[COLOR] in Options.PALETTE_OPTIONS.value:
+                colors.append(v[COLOR])
+            else:
+                raise InvalidInputError(msg=f'The color {v[COLOR]} for animal {cnt} ({name}) is not a valid color palette or valid rgb color tuple.', source=self.__class__.__name__)
             bp_data[cnt] = {ANIMAL_NAME: name, 'x': f'{v[BODY_PART]}_x', 'y': f'{v[BODY_PART]}_y', 'p': f'{v[BODY_PART]}_p', COLOR: v[COLOR]}
             data_cols.extend([f'{v[BODY_PART]}_x', f'{v[BODY_PART]}_y'])
             animal_names.append(name)
-            colors.append(v[COLOR])
+
         return bp_data, data_cols, animal_names, colors
 
 
@@ -251,7 +259,7 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
 
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
-        print(f"Processing path plots for {len(self.data_paths)} video(s)...")
+        stdout_information(msg=f"Processing path plots for {len(self.data_paths)} video(s)...")
         if self.video_setting or self.frame_setting:
             self.pool = get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__, )
         else:
@@ -276,7 +284,6 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
             video_styles = self.__get_styles(self.style_attr)
             if self.video_setting:
                 self.video_save_path = os.path.join(self.path_plot_dir, f"{self.video_name}.mp4")
-                #self.writer = cv2.VideoWriter(self.video_save_path, self.fourcc, self.fps, (video_styles[STYLE_WIDTH], video_styles[STYLE_HEIGHT]))
                 self.video_temp_dir = os.path.join(self.path_plot_dir, self.video_name)
                 create_directory(paths=self.video_temp_dir, overwrite=True)
             if self.frame_setting:
@@ -332,10 +339,17 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
                 frm_cnt_range = np.array_split(frm_cnt_range, self.core_cnt)
                 frm_id_range = np.array_split(frm_numbers, self.core_cnt)
                 frm_range = [(cnt, x, y) for cnt, (x, y) in enumerate(zip(frm_cnt_range, frm_id_range))]
-                print(f"Creating path plots, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
+                plot_clrs = []
+                for cnt, color in enumerate(self.colors):
+                    if check_if_valid_rgb_tuple(data=color, raise_error=False):
+                        plot_clrs.append([color] * line_data[cnt].shape[0])
+                    elif color in Options.PALETTE_OPTIONS.value:
+                        plot_clrs.append(create_color_palette(pallete_name=color, increments=line_data[cnt].shape[0], as_int=True))
+
+                stdout_information(msg=f"Creating path plots, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
                 constants = functools.partial(path_plot_mp,
                                               line_data=line_data,
-                                              colors=self.colors,
+                                              colors=plot_clrs,
                                               video_setting=self.video_setting,
                                               video_name=self.video_name,
                                               frame_setting=self.frame_setting,
@@ -350,46 +364,45 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
                 for cnt, result in enumerate(self.pool.imap(constants, frm_range, chunksize=self.multiprocess_chunksize)):
                     print(f"[{get_current_time()}] Path batch {result+1}/{self.core_cnt} complete...")
                 if self.video_setting:
-                    print(f"Joining {self.video_name} multi-processed video...")
+                    stdout_information(msg=f"Joining {self.video_name} multi-processed video...", source=self.__class__.__name__)
                     print(self.video_temp_dir, self.video_save_path)
                     concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.video_save_path, remove_splits=True)
                 video_timer.stop_timer()
-                print(f"Path plot video {self.video_name} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
+                stdout_information(msg=f'Path plot video {self.video_name} complete...', source=self.__class__.__name__, elapsed_time=video_timer.elapsed_time_str)
 
         self.timer.stop_timer()
         if self.pool is not None: terminate_cpu_pool(pool=self.pool, force=False, source=self.__class__.__name__)
         stdout_success(msg=f"Path plot visualizations for {len(self.data_paths)} video(s) created in {self.path_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
-#
+# #
 # if __name__ == "__main__":
 #     style_attr = {STYLE_WIDTH: None,
 #                   STYLE_HEIGHT: None,
-#                   STYLE_LINE_WIDTH: 5,
+#                   STYLE_LINE_WIDTH: 3,
 #                   STYLE_FONT_SIZE: 5,
 #                   STYLE_FONT_THICKNESS: 2,
 #                   STYLE_CIRCLE_SIZE: 5,
-#                   STYLE_BG: 'video',
+#                   STYLE_BG: (255, 255, 255),
 #                   STYLE_BG_OPACITY: 100,
 #                   STYLE_MAX_LINES: None}
 #
-#     animal_attr = {0: {'body_part': 'Snout', 'color': (255, 0, 0)}, 1: {'body_part': 'Front Paw R', 'color': (0, 0, 255)}}  #['Ear_right_1', 'Red'], 1: ['Ear_right_2', 'Green']}
-#     #clf_attr = {'Rearing': {'color': (155, 1, 10), 'size': 30}}
+#     animal_attr = {0: {'body_part': 'center', 'color': 'jet'}}
 #     clf_attr = None
-#     test = PathPlotterMulticore(config_path=r"C:\troubleshooting\open_field_below\project_folder\project_config.ini",
+#     test = PathPlotterMulticore(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini",
 #                                  frame_setting=False,
 #                                  video_setting=True,
-#                                  last_frame=True,
-#                                  slicing={'start_time': '00:00:00', 'end_time': '00:00:05'},#{'start_time': '00:00:00', 'end_time': '00:00:05'}, #{'start_time': '00:00:00', 'end_time': '00:00:50'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},, #{'start_time': '00:00:00', 'end_time': '00:00:01'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},
+#                                  last_frame=False,
+#                                  slicing=None,#{'start_time': '00:00:00', 'end_time': '00:00:05'},#{'start_time': '00:00:00', 'end_time': '00:00:05'}, #{'start_time': '00:00:00', 'end_time': '00:00:50'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},, #{'start_time': '00:00:00', 'end_time': '00:00:01'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},
 #                                  style_attr=style_attr,
 #                                  animal_attr=animal_attr,
 #                                  clf_attr=clf_attr,
 #                                  print_animal_names=False,
-#                                  core_cnt=1,
-#                                  roi=True,
-#                                  data_paths=[r"C:\troubleshooting\open_field_below\project_folder\csv\outlier_corrected_movement_location\raw_clip1.csv"])
+#                                  core_cnt=10,
+#                                  roi=False,
+#                                  data_paths=[r"E:\troubleshooting\mitra_emergence_hour\project_folder\csv\outlier_corrected_movement_location\Box2_180mISOeme_Males.csv"])
 #     test.run()
-#
+
 
 
 

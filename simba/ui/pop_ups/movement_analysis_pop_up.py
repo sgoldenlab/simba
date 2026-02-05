@@ -23,12 +23,12 @@ class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
         PopUpMixin.__init__(self, title="ANALYZE MOVEMENT", size=(500, 500), icon='run')
 
         self.animal_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMALS", icon_name='mouse_head', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, label="# OF ANIMALS", label_width=20, dropdown_width=20, value=1, dropdown_options=list(range(1, self.animal_cnt + 1)), command=self.create_settings_frm, img='abacus')
+        self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, label="# OF ANIMALS", label_width=20, dropdown_width=20, value=1, dropdown_options=list(range(1, self.animal_cnt + 1)), command=self.create_settings_frm, img='abacus', tooltip_key='TIMEBINS_MOVEMENT_NUMBER_OF_ANIMALS')
         self.animal_cnt_frm.grid(row=0, column=0, sticky=NW)
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
 
         self.choose_threshold_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PART THRESHOLD", icon_name='green_dice', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        self.probability_entry = Entry_Box(parent=self.choose_threshold_frm, fileDescription='THRESHOLD: ', labelwidth=20, entry_box_width=20, value=0.0, justify='center', img='green_dice', trace=self._entrybox_bg_check_float)
+        self.probability_entry = Entry_Box(parent=self.choose_threshold_frm, fileDescription='THRESHOLD: ', labelwidth=20, entry_box_width=20, value=0.0, justify='center', img='green_dice', trace=self._entrybox_bg_check_float, tooltip_key='MOVEMENT_PROBABILITY_THRESHOLD')
         self.choose_threshold_frm.grid(row=1, column=0, sticky=NW)
         self.probability_entry.grid(row=0, column=0, sticky=NW)
 
@@ -37,14 +37,14 @@ class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
         self.create_settings_frm(animal_cnt=1)
 
         self.measurments_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MEASUREMENTS", icon_name='ruler', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        distance_cb, self.distance_var = SimbaCheckbox(parent=self.measurments_frm, txt='DISTANCE (CM)', txt_img='distance', val=True)
-        velocity_cb, self.velocity_var = SimbaCheckbox(parent=self.measurments_frm, txt='VELOCITY (CM/S)', txt_img='run', val=True)
+        distance_cb, self.distance_var = SimbaCheckbox(parent=self.measurments_frm, txt='DISTANCE (CM)', txt_img='distance', val=True, tooltip_key='MOVEMENT_DISTANCE')
+        velocity_cb, self.velocity_var = SimbaCheckbox(parent=self.measurments_frm, txt='VELOCITY (CM/S)', txt_img='run', val=True, tooltip_key='MOVEMENT_VELOCITY')
         self.measurments_frm.grid(row=3, column=0, sticky=NW)
         distance_cb.grid(row=0, column=0, sticky=NW)
         velocity_cb.grid(row=1, column=0, sticky=NW)
 
         self.transpose_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="TRANSPOSE OUTPUT CSV", icon_name='rotate', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        transpose_cb, self.transpose_var = SimbaCheckbox(parent=self.transpose_frm, txt='TRANSPOSE OUTPUT CSV', txt_img='rotate', val=False)
+        transpose_cb, self.transpose_var = SimbaCheckbox(parent=self.transpose_frm, txt='TRANSPOSE OUTPUT CSV', txt_img='rotate', val=False, tooltip_key='MOVEMENT_TRANSPOSE')
         self.transpose_frm.grid(row=4, column=0, sticky=NW)
         transpose_cb.grid(row=0, column=0, sticky=NW)
 
@@ -66,7 +66,7 @@ class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
         self.bp_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PARTS", icon_name='pose', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
         self.body_parts_dropdowns = {}
         for cnt, i in enumerate(range(int(animal_cnt))):
-            self.body_parts_dropdowns[cnt] = SimBADropDown(parent=self.bp_frm, label=f"Animal {cnt+1}", label_width=20, dropdown_width=20, value=self.body_part_options[cnt], dropdown_options=self.body_part_options, img='circle_black')
+            self.body_parts_dropdowns[cnt] = SimBADropDown(parent=self.bp_frm, label=f"Animal {cnt+1}", label_width=20, dropdown_width=20, value=self.body_part_options[cnt], dropdown_options=self.body_part_options, img='circle_black', tooltip_key='TIMEBINS_MOVEMENT_BODY_PART')
             self.body_parts_dropdowns[cnt].grid(row=cnt, column=0, sticky=NW)
         self.bp_frm.grid(row=2, column=0, sticky=NW)
 

@@ -719,13 +719,23 @@ def check_if_valid_rgb_str(
 def check_if_valid_rgb_tuple(data: Tuple[int, int, int],
                              raise_error: bool = True,
                              source: Optional[str] = None) -> bool:
-    check_instance(source=check_if_valid_rgb_tuple.__name__, instance=data, accepted_types=tuple, raise_error=raise_error)
-    check_iterable_length(source=check_if_valid_rgb_tuple.__name__, val=len(data), exact_accepted_length=3, raise_error=raise_error)
+
+    valid_tuple = check_instance(source=f'{check_if_valid_rgb_tuple.__name__} {source}', instance=data, accepted_types=tuple, raise_error=False, warning=False)
+    if not valid_tuple and raise_error:
+        raise InvalidInputError(msg=f'Invalid COLOR tuple: {data}', source=source)
+    elif not valid_tuple and not raise_error:
+        return False
+    valid_iterable = check_iterable_length(source=check_if_valid_rgb_tuple.__name__, val=len(data), exact_accepted_length=3, raise_error=False)
+    if not valid_iterable and raise_error:
+        raise InvalidInputError(msg=f'Invalid COLOR tuple: {data}', source=source)
+    elif not valid_iterable and not raise_error:
+        return False
     for i in range(len(data)):
-        if source is None:
-            check_int(name="RGB value", value=data[i], max_value=255, min_value=0, raise_error=raise_error)
-        else:
-            check_int(name=f"RGB value {source}", value=data[i], max_value=255, min_value=0, raise_error=raise_error)
+        valid_int = check_int(name="RGB value", value=data[i], max_value=255, min_value=0, raise_error=False)[0]
+        if not valid_int and raise_error:
+            raise InvalidInputError(msg=f'Invalid COLOR tuple: {data}', source=source)
+        elif not valid_int and not raise_error:
+            return False
     return True
 
 

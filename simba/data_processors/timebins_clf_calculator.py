@@ -21,7 +21,7 @@ from simba.utils.checks import (
 from simba.utils.data import detect_bouts
 from simba.utils.errors import NoDataError
 from simba.utils.lookups import get_current_time
-from simba.utils.printing import stdout_success
+from simba.utils.printing import stdout_success, stdout_information
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     find_time_stamp_from_frame_numbers,
                                     get_fn_ext, read_df)
@@ -140,7 +140,7 @@ class TimeBinsClfCalculator(ConfigReader):
         for file_cnt, file_path in enumerate(self.data_paths):
             _, file_name, _ = get_fn_ext(file_path)
             self.video_dict[file_name] = {}
-            print(f'Analyzing classification in time-bins ({self.bin_length}s) for video {file_name} ({file_cnt+1}/{len(self.data_paths)}; {get_current_time()})...')
+            stdout_information(msg=f'Analyzing classification in time-bins ({self.bin_length}s) for video {file_name} ({file_cnt+1}/{len(self.data_paths)}')
             data_df = read_df(file_path, self.file_type)
             check_that_column_exist(df=data_df, column_name=self.clfs, file_name=file_path)
             video_settings, px_per_mm, fps = self.read_video_info(video_name=file_name)

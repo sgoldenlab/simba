@@ -34,17 +34,17 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
             raise NoDataError(msg=f'No data files found in {self.outlier_corrected_dir} directory, cannot compute time-bins movement statistics.', source=self.__class__.__name__)
         PopUpMixin.__init__(self, title="TIME BINS: DISTANCE/VELOCITY", size=(400, 600), icon='run')
         self.animal_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMALS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, label="# OF ANIMALS", label_width=30, dropdown_width=20, value=1, dropdown_options=list(range(1, self.animal_cnt + 1)), command=self.create_bp_frm, img='abacus')
+        self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, label="# OF ANIMALS", label_width=30, dropdown_width=20, value=1, dropdown_options=list(range(1, self.animal_cnt + 1)), command=self.create_bp_frm, img='abacus', tooltip_key='TIMEBINS_MOVEMENT_NUMBER_OF_ANIMALS')
         self.animal_cnt_frm.grid(row=0, column=0, sticky=NW, padx=5, pady=5)
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
 
         self.plots_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="PLOTS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        self.plots_cb, self.plots_var = SimbaCheckbox(parent=self.plots_frm, txt='CREATE PLOTS', txt_img='plot', val=True)
+        self.plots_cb, self.plots_var = SimbaCheckbox(parent=self.plots_frm, txt='CREATE PLOTS', txt_img='plot', val=True, tooltip_key='TIMEBINS_MOVEMENT_CREATE_PLOTS')
         self.plots_frm.grid(row=1, column=0, sticky=NW, padx=5, pady=5)
         self.plots_cb.grid(row=0, column=0, sticky=NW)
 
         self.time_bin_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="TIME BIN", icon_name='timer_2', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        self.time_bin_entry = Entry_Box(parent=self.time_bin_frm, fileDescription='TIME BIN SIZE (S): ', labelwidth=30, entry_box_width=20, justify='center', img='timer_2', trace=self._entrybox_bg_check_float)
+        self.time_bin_entry = Entry_Box(parent=self.time_bin_frm, fileDescription='TIME BIN SIZE (S): ', labelwidth=30, entry_box_width=20, justify='center', img='timer_2', trace=self._entrybox_bg_check_float, tooltip_key='TIMEBINS_MOVEMENT_TIME_BIN_SIZE')
         self.time_bin_frm.grid(row=2, column=0, sticky=NW, padx=5, pady=5)
         self.time_bin_entry.grid(row=0, column=0, sticky=NW)
 
@@ -55,15 +55,15 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
 
 
         self.measurments_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MEASUREMENTS", icon_name='ruler', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        distance_cb, self.distance_var = SimbaCheckbox(parent=self.measurments_frm, txt='DISTANCE (CM)', txt_img='distance', val=True)
-        velocity_cb, self.velocity_var = SimbaCheckbox(parent=self.measurments_frm, txt='VELOCITY (CM/S)', txt_img='run', val=True)
+        distance_cb, self.distance_var = SimbaCheckbox(parent=self.measurments_frm, txt='DISTANCE (CM)', txt_img='distance', val=True, tooltip_key='TIMEBINS_MOVEMENT_DISTANCE')
+        velocity_cb, self.velocity_var = SimbaCheckbox(parent=self.measurments_frm, txt='VELOCITY (CM/S)', txt_img='run', val=True, tooltip_key='TIMEBINS_MOVEMENT_VELOCITY')
         self.measurments_frm.grid(row=5, column=0, sticky=NW)
         distance_cb.grid(row=0, column=0, sticky=NW)
         velocity_cb.grid(row=1, column=0, sticky=NW)
 
         self.output_format_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="OUTPUT FORMAT", icon_name='rotate', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        transpose_cb, self.transpose_var = SimbaCheckbox(parent=self.output_format_frm, txt='TRANSPOSE OUTPUT CSV', txt_img='rotate', val=False)
-        include_timestamps_cb, self.include_timestamps_var = SimbaCheckbox(parent=self.output_format_frm, txt='INCLUDE TIME-STAMPS', txt_img='timer', val=True)
+        transpose_cb, self.transpose_var = SimbaCheckbox(parent=self.output_format_frm, txt='TRANSPOSE OUTPUT CSV', txt_img='rotate', val=False, tooltip_key='TIMEBINS_MOVEMENT_TRANSPOSE')
+        include_timestamps_cb, self.include_timestamps_var = SimbaCheckbox(parent=self.output_format_frm, txt='INCLUDE TIME-STAMPS', txt_img='timer', val=True, tooltip_key='TIMEBINS_MOVEMENT_INCLUDE_TIMESTAMPS')
         self.output_format_frm.grid(row=6, column=0, sticky=NW, padx=5, pady=5)
         transpose_cb.grid(row=0, column=0, sticky=NW)
         include_timestamps_cb.grid(row=1, column=0, sticky=NW)
@@ -82,7 +82,7 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         self.bp_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PARTS", icon_name='pose', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
         self.body_parts_dropdowns = {}
         for cnt, i in enumerate(range(int(animal_cnt))):
-            self.body_parts_dropdowns[cnt] = SimBADropDown(parent=self.bp_frm, label=f"Animal {cnt+1}", label_width=30, dropdown_width=20, value=self.body_parts_lst[cnt], dropdown_options=self.body_parts_lst, img='circle_black')
+            self.body_parts_dropdowns[cnt] = SimBADropDown(parent=self.bp_frm, label=f"Animal {cnt+1}", label_width=30, dropdown_width=20, value=self.body_parts_lst[cnt], dropdown_options=self.body_parts_lst, img='circle_black', tooltip_key='TIMEBINS_MOVEMENT_BODY_PART')
             self.body_parts_dropdowns[cnt].grid(row=cnt, column=0, sticky=NW)
         self.bp_frm.grid(row=4, column=0, sticky=NW, padx=5, pady=5)
 

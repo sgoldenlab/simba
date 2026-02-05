@@ -156,7 +156,7 @@ class Formats(Enum):
     PERIMETER = "perimeter"
     AREA = "area"
     H5 = "h5"
-    ROOT_WINDOW_SIZE = "750x750"
+    ROOT_WINDOW_SIZE = "850x750"
     FONT = cv2.FONT_HERSHEY_TRIPLEX
     LABELFRAME_GREY = '#DCDCDC'
     BTN_HOVER_CLR = '#d1e0e0'

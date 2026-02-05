@@ -27,7 +27,7 @@ from simba.utils.checks import (check_file_exist_and_readable,
 from simba.utils.data import slice_roi_dict_for_video, terminate_cpu_pool
 from simba.utils.enums import Formats, TextOptions
 from simba.utils.errors import BodypartColumnNotFoundError, NoFilesFoundError
-from simba.utils.printing import stdout_success
+from simba.utils.printing import stdout_success, stdout_information
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_fn_ext,
                                     get_video_meta_data, read_df,
@@ -118,7 +118,7 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
                                                                   thickness=shape_info[shape_name]["Thickness"],
                                                                   style=direction)
             writer.write(np.uint8(img))
-            print(f"Multiprocessing frame: {current_frm} / {video_meta_data['frame_count']}  on core {group_cnt}...")
+            stdout_information(msg=f"Multiprocessing frame: {current_frm} / {video_meta_data['frame_count']}  on core {group_cnt}...")
             current_frm += 1
         else:
             break
@@ -283,7 +283,7 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
         frm_lst = np.array_split(frm_lst, self.core_cnt)
         frame_range = []
         for i in range(len(frm_lst)): frame_range.append((i, frm_lst[i]))
-        print(f"Creating ROI feature images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
+        stdout_information(msg=f"Creating ROI feature images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
         with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
             constants = functools.partial(_roi_feature_visualizer_mp,
                                           data_df=self.data_df.reset_index(drop=True),
@@ -310,8 +310,8 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
                                           direction=self.direction)
 
             for cnt, result in enumerate(pool.imap(constants, frame_range, chunksize=self.multiprocess_chunksize)):
-               print(f"Batch core {result+1}/{self.core_cnt} complete...")
-            print(f"Joining {self.video_name} multi-processed video...")
+                stdout_information(msg=f"Batch core {result+1}/{self.core_cnt} complete...")
+            stdout_information(f"Joining {self.video_name} multi-processed video...")
             concatenate_videos_in_folder(in_folder=self.save_temp_dir, save_path=self.save_path, video_format="mp4", remove_splits=True, gpu=self.gpu)
             self.timer.stop_timer()
             terminate_cpu_pool(pool=pool, force=False)

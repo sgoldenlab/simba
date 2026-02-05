@@ -24,7 +24,6 @@ class OutlierCorrectionSkipper(ConfigReader):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         if not os.path.exists(self.outlier_corrected_dir):os.makedirs(self.outlier_corrected_dir)
         check_if_filepath_list_is_empty(filepaths=self.input_csv_paths, error_msg=f"No files found in {self.input_csv_dir}.",)
-        print(f"Processing {len(self.input_csv_paths)} file(s)...")
 
     def run(self):
         """
@@ -33,6 +32,7 @@ class OutlierCorrectionSkipper(ConfigReader):
         the SimBA project.
         """
 
+        stdout_information(msg=f"Skipping outlier correction for {len(self.input_csv_paths)} file(s)...")
         for file_cnt, file_path in enumerate(self.input_csv_paths):
             video_timer = SimbaTimer(start=True)
             _, video_name, ext = get_fn_ext(file_path)

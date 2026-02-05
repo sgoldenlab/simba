@@ -21,7 +21,7 @@ from simba.utils.checks import (
 from simba.utils.data import detect_bouts, slice_roi_dict_for_video
 from simba.utils.errors import (CountError, FrameRangeError,
                                 ROICoordinatesNotFoundError)
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import get_fn_ext, read_data_paths, read_df
 from simba.utils.warnings import ROIWarning
 
@@ -193,7 +193,7 @@ class ROITimebinAnalyzer(ConfigReader):
         for file_cnt, file_path in enumerate(self.data_paths):
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(filepath=file_path)
-            if self.verbose: print(f"Analysing ROI data for video {video_name}... (Video {file_cnt + 1}/{len(self.data_paths)})")
+            if self.verbose: stdout_information(msg=f"Analysing ROI data for video {video_name}... (Video {file_cnt + 1}/{len(self.data_paths)})")
             _, px_per_mm, fps = self.read_video_info(video_name=video_name)
             video_df = self.detailed_df[self.detailed_df['VIDEO'] == video_name].reset_index(drop=True)
             _, video_shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=video_name)
@@ -212,7 +212,7 @@ class ROITimebinAnalyzer(ConfigReader):
                 inside_roi_frm_idx = [list(range(x, y)) for x, y in zip(list(video_roi_animal_df['Start_frame'].astype(int)), list(video_roi_animal_df["End_frame"].astype(int) + 1))]
                 inside_roi_frm_idx = [i for s in inside_roi_frm_idx for i in s]
                 for bin_cnt, bin_frms in enumerate(frame_bins):
-                    if self.verbose: print(f"Analysing time-bin {bin_cnt+1} (bin: {bin_cnt+1}/{len(frame_bins)}, roi: {roi_name}, animal: {animal_name}, video: {file_cnt + 1}/{len(self.data_paths)}, video name: {video_name})")
+                    if self.verbose: stdout_information(msg=f"Analysing time-bin {bin_cnt+1} (bin: {bin_cnt+1}/{len(frame_bins)}, roi: {roi_name}, animal: {animal_name}, video: {file_cnt + 1}/{len(self.data_paths)}, video name: {video_name})")
                     bin_start_time, bin_end_time = bin_frms[0] / fps, bin_frms[-1] / fps
                     bin_start_frm, bin_end_frm = bin_frms[0], bin_frms[-1]
                     frms_inside_roi_in_timebin_idx = [x for x in inside_roi_frm_idx if x in bin_frms]
@@ -255,7 +255,7 @@ class ROITimebinAnalyzer(ConfigReader):
 
 
                     for bin_cnt, bin_frms in enumerate(frame_bins):
-                        if self.verbose: print(f"Analysing OUTSIDE ROI time-bin {bin_cnt + 1} (bin: {bin_cnt + 1}/{len(frame_bins)}, roi: {OUTSIDE_ROI}, animal: {animal_name}, video: {file_cnt + 1}/{len(self.data_paths)}, video name: {video_name})")
+                        if self.verbose: stdout_information(msg=f"Analysing OUTSIDE ROI time-bin {bin_cnt + 1} (bin: {bin_cnt + 1}/{len(frame_bins)}, roi: {OUTSIDE_ROI}, animal: {animal_name}, video: {file_cnt + 1}/{len(self.data_paths)}, video name: {video_name})")
                         bin_start_time, bin_end_time = bin_frms[0] / fps, bin_frms[-1] / fps
                         bin_start_frm, bin_end_frm = bin_frms[0], bin_frms[-1]
                         frms_outside_roi_in_timebin_idx = [x for x in outside_roi_frm_idx if x in bin_frms]
@@ -287,17 +287,17 @@ class ROITimebinAnalyzer(ConfigReader):
                         self.results.loc[len(self.results)] = [video_name, OUTSIDE_ROI, animal_name, bp_name, bin_cnt, bin_start_time, bin_end_time, bin_start_frm, bin_end_frm, PIX_PER_MM, px_per_mm]
 
             video_timer.stop_timer()
-            if self.verbose: print(f'ROI analysis video {video_name} complete... (elapsed time: {video_timer.elapsed_time_str}s)')
+            if self.verbose: stdout_information(msg=f'ROI analysis video {video_name} complete...', elapsed_time=video_timer.elapsed_time_str)
 
 
     def save(self):
         self.__clean_results()
         if self.detailed_bout_data and len(self.detailed_df) > 0:
             self.detailed_df.to_csv(self.detailed_bout_data_save_path)
-            print(f"Detailed ROI data saved at {self.detailed_bout_data_save_path}...")
+            if self.verbose: stdout_information(msg=f"Detailed ROI data saved at {self.detailed_bout_data_save_path}...")
         self.results.to_csv(self.save_path)
         self.timer.stop_timer()
-        stdout_success(f'ROI statistics saved at {self.save_path}', elapsed_time=self.timer.elapsed_time_str)
+        if self.verbose: stdout_success(f'ROI statistics saved at {self.save_path}', elapsed_time=self.timer.elapsed_time_str)
 
 
 # test = ROITimebinAnalyzer(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",

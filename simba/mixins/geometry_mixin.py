@@ -49,6 +49,7 @@ from simba.utils.read_write import (SimbaTimer, find_core_cnt,
                                     find_max_vertices_coordinates, read_df,
                                     read_frm_of_video, read_sleap_csv,
                                     stdout_success, write_pickle)
+from simba.utils.printing import stdout_information
 
 
 class GeometryMixin(object):
@@ -3292,7 +3293,7 @@ class GeometryMixin(object):
                                         ):
         data_point = Point(data[1:])
         if verbose:
-            print(f"Processing animal grid square location in frame {int(data[0])}...")
+            stdout_information(msg=f"Processing animal grid square location in frame {int(data[0])}...")
         for k, r in geometries.items():
             if r.contains(data_point):
                 return (int(data[0]), k[0], k[1])
@@ -3356,10 +3357,7 @@ class GeometryMixin(object):
                 img_arr[result[0], result[2] - 1, result[1] - 1] = 1
         if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().cumsum_coord_geometries.__name__)
         timer.stop_timer()
-        stdout_success(
-            msg="Cumulative coordinates in geometries complete",
-            elapsed_time=timer.elapsed_time_str,
-        )
+        stdout_success(msg="Cumulative coordinates in geometries complete", elapsed_time=timer.elapsed_time_str)
         if fps is None:
             return np.cumsum(img_arr, axis=0)
         else:

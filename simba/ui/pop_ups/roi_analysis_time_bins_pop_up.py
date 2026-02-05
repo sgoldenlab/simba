@@ -31,7 +31,7 @@ class ROIAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         PopUpMixin.__init__(self, title="ROI AGGREGATE STATISTICS ANALYSIS BY TIME-BIN", icon='shapes_small')
         self.config_path = config_path
         self.animal_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMAL(S)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_DATA_ANALYSIS.value)
-        self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, dropdown_options=list(range(1, self.animal_cnt + 1)), label="# OF ANIMALS", label_width=30, dropdown_width=10, value=1, img='abacus')
+        self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, dropdown_options=list(range(1, self.animal_cnt + 1)), label="# OF ANIMALS", label_width=30, dropdown_width=10, value=1, img='abacus', tooltip_key='ROI_TRACKING_NUMBER_OF_ANIMALS')
         self.animal_cnt_confirm_btn = SimbaButton(parent=self.animal_cnt_frm, txt="CONFIRM", img='tick', txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self._get_settings_frm)
         self.animal_cnt_frm.grid(row=0, column=0, sticky=NW)
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
@@ -49,12 +49,12 @@ class ROIAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
             self.format_frm.destroy()
 
         self.time_bin_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHOOSE TIME BIN", icon_name='pose')
-        self.time_bin_entry = Entry_Box(parent=self.time_bin_frm, fileDescription='TIME BIN (S):', labelwidth="30", img='histogram')
+        self.time_bin_entry = Entry_Box(parent=self.time_bin_frm, fileDescription='TIME BIN (S):', labelwidth="30", img='histogram', tooltip_key='ROI_TIMEBINS_TIME_BIN_SIZE', value=30, justify='center')
         self.time_bin_frm.grid(row=self.frame_children(frame=self.main_frm), sticky=NW)
         self.time_bin_entry.grid(row=0, column=0, sticky=NW)
 
         self.probability_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT PROBABILITY THRESHOLD", icon_name='pose')
-        self.probability_entry = Entry_Box(parent=self.probability_frm, fileDescription='PROBABILITY THRESHOLD (0.0-1.0):', labelwidth="30", value='0.0', img='green_dice')
+        self.probability_entry = Entry_Box(parent=self.probability_frm, fileDescription='PROBABILITY THRESHOLD (0.0-1.0):', labelwidth="30", value='0.0', img='green_dice', tooltip_key='ROI_AGGREGATE_PROBABILITY_THRESHOLD', justify='center')
         self.probability_frm.grid(row=self.frame_children(frame=self.main_frm), sticky=NW)
         self.probability_entry.grid(row=0, column=0, sticky=NW)
 
@@ -62,18 +62,18 @@ class ROIAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         self.body_part_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PART(S)", icon_name='pose')
         self.body_part_frm.grid(row=self.frame_children(frame=self.main_frm), sticky=NW)
         for bp_cnt in range(int(self.animal_cnt_dropdown.getChoices())):
-            self.body_parts_dropdowns[bp_cnt] = SimBADropDown(parent=self.body_part_frm, dropdown_options=self.body_parts_lst, label=f"BODY-PART {bp_cnt + 1}:", label_width=30, dropdown_width=self.max_bp_len+5, value=self.body_parts_lst[bp_cnt],img='circle_black')
+            self.body_parts_dropdowns[bp_cnt] = SimBADropDown(parent=self.body_part_frm, dropdown_options=self.body_parts_lst, label=f"BODY-PART {bp_cnt + 1}:", label_width=30, dropdown_width=self.max_bp_len+5, value=self.body_parts_lst[bp_cnt],img='circle_black', tooltip_key='ROI_TRACKING_BODY_PART')
 
             self.body_parts_dropdowns[bp_cnt].grid(row=bp_cnt, column=0, sticky=NW)
 
         self.data_options_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="DATA OPTIONS", icon_name='abacus')
-        self.total_time_cb, self.total_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='TOTAL ROI TIME (S)', val=True, txt_img='timer')
-        self.entry_counts_cb, self.entry_counts_var = SimbaCheckbox(parent=self.data_options_frm, txt='ROI ENTRIES (COUNTS)', val=True, txt_img='abacus_2')
-        self.first_entry_time_cb, self.first_entry_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='FIRST ROI ENTRY TIME (S)', val=False, txt_img='one_blue')
-        self.last_entry_time_cb, self.last_entry_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='LAST ROI ENTRY TIME (S)', val=False, txt_img='finish')
-        self.detailed_cb, self.detailed_var = SimbaCheckbox(parent=self.data_options_frm, txt='DETAILED ROI BOUT DATA (SEQUENCES)', val=False, txt_img='details')
-        self.movement_cb, self.movement_var = SimbaCheckbox(parent=self.data_options_frm, txt='ROI MOVEMENT (VELOCITY & DISTANCES)', val=False, txt_img='pose')
-        self.outside_cb, self.outside_var = SimbaCheckbox(parent=self.data_options_frm, txt='OUTSIDE ROI ZONES DATA', val=False, txt_img='outside_2', tooltip_txt=f'TREAT ALL NON-ROI REGIONS AS AN ROI REGION NAMED \n "{OUTSIDE_ROI}"')
+        self.total_time_cb, self.total_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='TOTAL ROI TIME (S)', val=True, txt_img='timer', tooltip_key='ROI_TIMEBINS_TOTAL_TIME')
+        self.entry_counts_cb, self.entry_counts_var = SimbaCheckbox(parent=self.data_options_frm, txt='ROI ENTRIES (COUNTS)', val=True, txt_img='abacus_2', tooltip_key='ROI_TIMEBINS_ENTRY_COUNTS')
+        self.first_entry_time_cb, self.first_entry_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='FIRST ROI ENTRY TIME (S)', val=False, txt_img='one_blue', tooltip_key='ROI_TIMEBINS_FIRST_ENTRY_TIME')
+        self.last_entry_time_cb, self.last_entry_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='LAST ROI ENTRY TIME (S)', val=False, txt_img='finish', tooltip_key='ROI_TIMEBINS_LAST_ENTRY_TIME')
+        self.detailed_cb, self.detailed_var = SimbaCheckbox(parent=self.data_options_frm, txt='DETAILED ROI BOUT DATA (SEQUENCES)', val=False, txt_img='details', tooltip_key='ROI_TIMEBINS_DETAILED_BOUT_DATA')
+        self.movement_cb, self.movement_var = SimbaCheckbox(parent=self.data_options_frm, txt='ROI MOVEMENT (VELOCITY & DISTANCES)', val=False, txt_img='pose', tooltip_key='ROI_TIMEBINS_MOVEMENT')
+        self.outside_cb, self.outside_var = SimbaCheckbox(parent=self.data_options_frm, txt='OUTSIDE ROI ZONES DATA', val=False, txt_img='outside_2', tooltip_key='ROI_AGGREGATE_OUTSIDE_ROI')
 
         self.data_options_frm.grid(row=self.frame_children(frame=self.main_frm), column=0, sticky=NW)
         self.total_time_cb.grid(row=0, column=0, sticky=NW)
@@ -85,11 +85,11 @@ class ROIAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         self.outside_cb.grid(row=6, column=0, sticky=NW)
 
         self.format_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="FORMAT OPTIONS", icon_name='abacus')
-        self.transpose_cb, self.transpose_var = SimbaCheckbox(parent=self.format_frm, txt='TRANSPOSE OUTPUT TABLE', val=False,  txt_img='restart')
-        self.fps_cb, self.fps_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE FPS DATA', val=False, txt_img='fps')
-        self.video_length_cb, self.video_length_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE VIDEO LENGTH DATA', val=False, txt_img='timer_2')
-        self.px_per_mm_cb, self.px_per_mm_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE PIXEL PER MILLIMETER DATA', val=False, txt_img='ruler')
-        self.timbin_cb, self.timbin_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE TIME-BIN TIME STAMPS', val=False, txt_img='time')
+        self.transpose_cb, self.transpose_var = SimbaCheckbox(parent=self.format_frm, txt='TRANSPOSE OUTPUT TABLE', val=False,  txt_img='restart', tooltip_key='ROI_TIMEBINS_TRANSPOSE')
+        self.fps_cb, self.fps_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE FPS DATA', val=False, txt_img='fps', tooltip_key='ROI_AGGREGATE_INCLUDE_FPS')
+        self.video_length_cb, self.video_length_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE VIDEO LENGTH DATA', val=False, txt_img='timer_2', tooltip_key='ROI_AGGREGATE_INCLUDE_VIDEO_LENGTH')
+        self.px_per_mm_cb, self.px_per_mm_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE PIXEL PER MILLIMETER DATA', val=False, txt_img='ruler', tooltip_key='ROI_AGGREGATE_INCLUDE_PX_PER_MM')
+        self.timbin_cb, self.timbin_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE TIME-BIN TIME STAMPS', val=False, txt_img='time', tooltip_key='ROI_TIMEBINS_INCLUDE_TIMESTAMPS')
 
         self.format_frm.grid(row=self.frame_children(frame=self.main_frm), column=0, sticky=NW)
         self.transpose_cb.grid(row=0, column=0, sticky=NW)
@@ -148,3 +148,4 @@ class ROIAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
 
 #_ = ROIAnalysisTimeBinsPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 # _ = ROIAnalysisTimeBinsPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
+#_ = ROIAnalysisTimeBinsPopUp(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini")

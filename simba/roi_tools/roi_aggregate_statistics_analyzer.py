@@ -18,7 +18,7 @@ from simba.utils.checks import (
 from simba.utils.data import detect_bouts, slice_roi_dict_for_video
 from simba.utils.enums import ROI_SETTINGS, Keys
 from simba.utils.errors import CountError, ROICoordinatesNotFoundError
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import get_fn_ext, read_data_paths, read_df
 from simba.utils.warnings import NoDataFoundWarning
 
@@ -181,7 +181,7 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
         for file_cnt, file_path in enumerate(self.data_paths):
             _, video_name, _ = get_fn_ext(file_path)
             video_timer = SimbaTimer(start=True)
-            if self.verbose: print(f"Analysing ROI data for video {video_name}... (Video {file_cnt+1}/{len(self.data_paths)})")
+            if self.verbose: stdout_information(msg=f"Analysing ROI data for video {video_name}... (Video {file_cnt+1}/{len(self.data_paths)})")
             video_settings, pix_per_mm, self.fps = self.read_video_info(video_name=video_name)
             self.sliced_roi_dict, video_shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=video_name)
             if len(video_shape_names) == 0:
@@ -267,14 +267,14 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
                             self.results.loc[len(self.results)] = [video_name, animal_name, bp_cols[0][:-2], OUTSIDE_ROI, 'NONE', PIX_PER_MM, pix_per_mm]
 
                 video_timer.stop_timer()
-                if self.verbose: print(f'ROI analysis video {video_name} complete... (elapsed time: {video_timer.elapsed_time_str}s)')
+                if self.verbose: stdout_information(msg=f'ROI analysis video {video_name} complete..', elapsed_time=video_timer.elapsed_time_str)
 
 
     def save(self):
         self.__clean_results()
         if self.detailed_bout_data and len(self.detailed_df) > 0:
             self.detailed_df.to_csv(self.detailed_bout_data_save_path)
-            if self.verbose: print(f"Detailed ROI data saved at {self.detailed_bout_data_save_path}...")
+            if self.verbose: stdout_information(msg=f"Detailed ROI data saved at {self.detailed_bout_data_save_path}...")
         self.results.to_csv(self.save_path)
         self.timer.stop_timer()
         stdout_success(f'ROI statistics saved at {self.save_path}', elapsed_time=self.timer.elapsed_time_str)

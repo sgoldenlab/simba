@@ -13,13 +13,12 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log, check_if_dir_exists,
-    check_if_keys_exist_in_dict, check_int)
+    check_if_keys_exist_in_dict)
 from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import TagNames
 from simba.utils.errors import NoFilesFoundError
-from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (find_core_cnt,
-                                    find_files_of_filetypes_in_directory,
+from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, read_df, write_df)
 from simba.utils.warnings import NoFileFoundWarning
 
@@ -53,7 +52,8 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
                  config_path: Union[str, os.PathLike],
                  features_dir: Optional[Union[str, os.PathLike]] = None,
                  save_dir: Optional[Union[str, os.PathLike]] = None,
-                 minimum_bout_length: Optional[int] = None):
+                 minimum_bout_length: Optional[int] = None,
+                 verbose: bool = True):
 
         ConfigReader.__init__(self, config_path=config_path)
         if features_dir is not None:
@@ -69,7 +69,8 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
         log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         if len(self.feature_file_paths) == 0:
             raise NoFilesFoundError(f"Zero files found in the {self.features_dir}. Create features before running classifier.", source=self.__class__.__name__,)
-        print(f"Analyzing {len(self.feature_file_paths)} file(s) with {self.clf_cnt} classifier(s)...")
+        self.verbose = verbose
+        if verbose: stdout_information(msg=f"Analyzing {len(self.feature_file_paths)} file(s) with {self.clf_cnt} classifier(s)...")
         self.timer = SimbaTimer(start=True)
         self.model_dict = self.get_model_info(config=self.config, model_cnt=self.clf_cnt)
 
@@ -78,7 +79,7 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
         for file_cnt, file_path in enumerate(self.feature_file_paths):
             video_timer = SimbaTimer(start=True)
             _, file_name, _ = get_fn_ext(file_path)
-            print(f"Analyzing video {file_name}... (Video {file_cnt+1}/{len(self.feature_file_paths)})")
+            if self.verbose: stdout_information(msg=f"Analyzing video {file_name}... (Video {file_cnt+1}/{len(self.feature_file_paths)})")
             file_save_path = os.path.join(self.save_dir, f"{file_name}.{self.file_type}")
             in_df = read_df(file_path, self.file_type)
             x_df = self.drop_bp_cords(df=in_df).astype(np.float32)
@@ -95,11 +96,11 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
                 out_df[probability_column] = self.clf_predict_proba(clf=clf, x_df=x_df, data_path=file_path, model_name=m_hyp[MODEL_NAME])
                 out_df[m_hyp[MODEL_NAME]] = np.where(out_df[probability_column] > m_hyp[THRESHOLD], 1, 0)
                 if int(m_hyp[MINIMUM_BOUT_LENGTH]) > 0:
-                    print(f'Correcting minimum bouts in video {file_name} and classifier {m_hyp[MODEL_NAME]} ({m_hyp[MINIMUM_BOUT_LENGTH]}ms)...')
+                    if self.verbose: stdout_information(msg=f'Correcting minimum bouts in video {file_name} and classifier {m_hyp[MODEL_NAME]} ({m_hyp[MINIMUM_BOUT_LENGTH]}ms)...')
                     out_df = plug_holes_shortest_bout(data_df=out_df, clf_name=m_hyp[MODEL_NAME], fps=fps, shortest_bout=m_hyp[MINIMUM_BOUT_LENGTH])
             write_df(out_df, self.file_type, file_save_path)
             video_timer.stop_timer()
-            print(f"Predictions created for {file_name} (frame count: {len(in_df)}, elapsed time: {video_timer.elapsed_time_str}) ...")
+            if self.verbose: stdout_information(msg=f"Predictions created for {file_name} (frame count: {len(in_df)}, elapsed time: {video_timer.elapsed_time_str}) ...")
         self.timer.stop_timer()
         stdout_success(msg=f"Machine predictions complete for {len(self.feature_file_paths)} file(s). Files saved in {self.save_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 

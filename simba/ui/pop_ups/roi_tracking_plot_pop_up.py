@@ -11,10 +11,11 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.roi_plotter import ROIPlotter
 from simba.plotting.roi_plotter_mp import ROIPlotMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, FileSelect, SimbaButton,
-                                        SimbaCheckbox, SimBADropDown,
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, CreateToolTip,
+                                        DropDownMenu, Entry_Box, FileSelect,
+                                        SimbaButton, SimbaCheckbox, SimBADropDown,
                                         SimBALabel)
+from simba.utils.lookups import get_tooltips
 from simba.utils.checks import check_file_exist_and_readable, check_float
 from simba.utils.enums import ROI_SETTINGS, Formats, Keys, Links, Options
 from simba.utils.errors import NoDataError, ROICoordinatesNotFoundError
@@ -57,14 +58,14 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
 
         PopUpMixin.__init__(self, title="VISUALIZE ROI TRACKING", size=(800, 500), icon='shapes_small')
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_DATA_PLOT.value)
-        self.threshold_entry_box = Entry_Box(self.settings_frm, "BODY-PART PROBABILITY THRESHOLD:", labelwidth=35, value='0.0', justify='center', entry_box_width=20, img='green_dice')
-        self.show_pose_estimation_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW POSE-ESTIMATED LOCATIONS:', label_width=35, value='TRUE', command=self._disable_clr, img='pose')
-        self.show_animal_name_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL NAMES:', label_width=35, value='FALSE', img='label')
+        self.threshold_entry_box = Entry_Box(self.settings_frm, "BODY-PART PROBABILITY THRESHOLD:", labelwidth=35, value='0.0', justify='center', entry_box_width=20, img='green_dice', tooltip_key='ROI_TRACKING_PROBABILITY_THRESHOLD')
+        self.show_pose_estimation_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW POSE-ESTIMATED LOCATIONS:', label_width=35, value='TRUE', command=self._disable_clr, img='pose', tooltip_key='ROI_TRACKING_SHOW_POSE')
+        self.show_animal_name_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL NAMES:', label_width=35, value='FALSE', img='label', tooltip_key='ROI_TRACKING_SHOW_ANIMAL_NAMES')
         self.show_bbox_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL BOUNDING BOXES:', label_width=35, value='FALSE', tooltip_key='SHOW_ANIMAL_BBOX', img='rectangle_2')
         self.border_bg_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(self.bg_clr_options.keys()), dropdown_width=self.longest_animal_name_len, label='BORDER BACKGROUND COLOR:', label_width=35, value='Black', tooltip_key='BORDER_BG_COLOR', img='fill')
-        self.outside_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='OUTSIDE ROI ZONES DATA:', label_width=35, value='FALSE', tooltip_txt=f'TREAT ALL NON-ROI REGIONS AS AN ROI REGION NAMED \n "{ROI_SETTINGS.OUTSIDE_ROI.value}"', img='outside')
-        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), dropdown_width=self.longest_animal_name_len, label='NUMBER OF CPU CORES:', label_width=35, value=find_core_cnt()[1], img='cpu_small')
-        self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='USE GPU:', label_width=35, value='FALSE', state=gpu_state, img='gpu_3')
+        self.outside_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='OUTSIDE ROI ZONES DATA:', label_width=35, value='FALSE', tooltip_key='ROI_TRACKING_OUTSIDE_ROI', img='outside')
+        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), dropdown_width=self.longest_animal_name_len, label='NUMBER OF CPU CORES:', label_width=35, value=find_core_cnt()[1], img='cpu_small', tooltip_key='ROI_TRACKING_CPU_CORES')
+        self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='USE GPU:', label_width=35, value='FALSE', state=gpu_state, img='gpu_3', tooltip_key='USE_GPU')
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         self.threshold_entry_box.grid(row=0, column=0, sticky=NW)
@@ -77,7 +78,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         #self.gpu_dropdown.grid(row=5, column=0, sticky=NW)
 
         self.body_parts_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMAL(S)", icon_name='pose', icon_link=Links.ROI_DATA_PLOT.value)
-        self.animal_cnt_dropdown = SimBADropDown(parent=self.body_parts_frm, dropdown_options=list(range(1, self.animal_cnt + 1)), dropdown_width=self.longest_animal_name_len, label="NUMBER OF ANIMALS:", label_width=35, value=1, command=self.__create_animal_bp_table, img='abacus')
+        self.animal_cnt_dropdown = SimBADropDown(parent=self.body_parts_frm, dropdown_options=list(range(1, self.animal_cnt + 1)), dropdown_width=self.longest_animal_name_len, label="NUMBER OF ANIMALS:", label_width=35, value=1, command=self.__create_animal_bp_table, img='abacus', tooltip_key='ROI_TRACKING_NUMBER_OF_ANIMALS')
         self.__create_animal_bp_table(bp_cnt=1)
         self.body_parts_frm.grid(row=1, column=0, sticky=NW)
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
@@ -89,6 +90,9 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         self.select_video_file_select = FileSelect(self.single_video_frm, "", lblwidth="1", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], dropdown=self.single_video_dropdown, initialdir=self.video_dir)
         self.select_video_file_select.filePath.set(self.videos_with_rois_and_data[0])
         self.single_video_dropdown.setChoices(self.videos_with_rois_and_data[0])
+        tooltips = get_tooltips()
+        if 'ROI_TRACKING_SINGLE_VIDEO' in tooltips:
+            CreateToolTip(widget=self.single_video_dropdown.lblName, text=tooltips['ROI_TRACKING_SINGLE_VIDEO'])
         self.single_video_btn = SimbaButton(parent=self.single_video_frm, txt="CREATE SINGLE ROI VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': False})
         self.single_video_frm.grid(row=3, column=0, sticky=NW)
         self.single_video_dropdown.grid(row=0, column=0, sticky=NW)
@@ -123,9 +127,9 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         self.bp_dropdown_dict, self.bp_clr_dict, self.bp_size_dict = {}, {}, {}
         for cnt in range(bp_cnt):
             animal_name_lbl = SimBALabel(parent=self.animal_table_frm, txt=self.multi_animal_id_list[cnt], width=self.longest_animal_name_len, font=Formats.FONT_HEADER.value)
-            self.bp_dropdown_dict[cnt] = SimBADropDown(parent=self.animal_table_frm, dropdown_options=self.body_parts_lst, dropdown_width=self.longest_animal_name_len, label=None, label_width=None, value=self.body_parts_lst[cnt])
-            self.bp_clr_dict[cnt] = SimBADropDown(parent=self.animal_table_frm, dropdown_options=list(self.clr_dict.keys()), dropdown_width=self.longest_animal_name_len + 5, label=None, label_width=None, value=list(self.clr_dict.keys())[cnt])
-            self.bp_size_dict[cnt] = SimBADropDown(parent=self.animal_table_frm, dropdown_options=BP_SIZE_OPTIONS, dropdown_width=15, label=None, label_width=None, value='AUTO')
+            self.bp_dropdown_dict[cnt] = SimBADropDown(parent=self.animal_table_frm, dropdown_options=self.body_parts_lst, dropdown_width=self.longest_animal_name_len, label=None, label_width=None, value=self.body_parts_lst[cnt], tooltip_key='ROI_TRACKING_BODY_PART')
+            self.bp_clr_dict[cnt] = SimBADropDown(parent=self.animal_table_frm, dropdown_options=list(self.clr_dict.keys()), dropdown_width=self.longest_animal_name_len + 5, label=None, label_width=None, value=list(self.clr_dict.keys())[cnt], tooltip_key='ROI_TRACKING_BODY_PART_COLOR')
+            self.bp_size_dict[cnt] = SimBADropDown(parent=self.animal_table_frm, dropdown_options=BP_SIZE_OPTIONS, dropdown_width=15, label=None, label_width=None, value='AUTO', tooltip_key='ROI_TRACKING_KEYPOINT_SIZE')
             animal_name_lbl.grid(row=cnt + 2, column=0, sticky=NW)
             self.bp_dropdown_dict[cnt].grid(row=cnt + 2, column=1, sticky=NW)
             self.bp_clr_dict[cnt].grid(row=cnt + 2, column=2, sticky=NW)
@@ -197,7 +201,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
 
 
 
-#_ = VisualizeROITrackingPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
+# _ = VisualizeROITrackingPopUp(config_path=r"E:\troubleshooting\mitra_emergence\project_folder\project_config.ini")
 
 #_ = VisualizeROITrackingPopUp(config_path=r"C:\troubleshooting\roi_entries\project_folder\project_config.ini")
 
