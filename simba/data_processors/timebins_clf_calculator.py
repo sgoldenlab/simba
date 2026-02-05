@@ -21,7 +21,7 @@ from simba.utils.checks import (
 from simba.utils.data import detect_bouts
 from simba.utils.errors import NoDataError
 from simba.utils.lookups import get_current_time
-from simba.utils.printing import stdout_success, stdout_information
+from simba.utils.printing import stdout_information, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     find_time_stamp_from_frame_numbers,
                                     get_fn_ext, read_df)

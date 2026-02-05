@@ -17,7 +17,8 @@ from simba.utils.checks import (
 from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import TagNames
 from simba.utils.errors import NoFilesFoundError
-from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
+from simba.utils.printing import (SimbaTimer, log_event, stdout_information,
+                                  stdout_success)
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, read_df, write_df)
 from simba.utils.warnings import NoFileFoundWarning

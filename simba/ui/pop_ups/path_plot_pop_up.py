@@ -10,17 +10,17 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.path_plotter import PathPlotterSingleCore
 from simba.plotting.path_plotter_mp import PathPlotterMulticore
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, CreateToolTip,
-                                        DropDownMenu, Entry_Box, SimbaButton,
-                                        SimbaCheckbox, SimBADropDown)
-from simba.utils.lookups import get_tooltips
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
+                                        CreateToolTip, DropDownMenu, Entry_Box,
+                                        SimbaButton, SimbaCheckbox,
+                                        SimBADropDown)
 from simba.utils.checks import (check_if_string_value_is_valid_video_timestamp,
                                 check_if_valid_rgb_str, check_int,
                                 check_that_hhmmss_start_is_before_end)
 from simba.utils.enums import Formats, Links, Options
 from simba.utils.errors import (FrameRangeError, NoFilesFoundError,
                                 NoROIDataError)
-from simba.utils.lookups import get_color_dict
+from simba.utils.lookups import get_color_dict, get_tooltips
 from simba.utils.read_write import get_file_name_info_in_directory, str_2_bool
 
 AUTO = 'AUTO'

@@ -18,7 +18,8 @@ from simba.utils.checks import (
     check_valid_boolean, check_valid_lst)
 from simba.utils.enums import TagNames
 from simba.utils.errors import FrameRangeError, InvalidInputError, NoDataError
-from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
+from simba.utils.printing import (SimbaTimer, log_event, stdout_information,
+                                  stdout_success)
 from simba.utils.read_write import (create_directory,
                                     find_files_of_filetypes_in_directory,
                                     find_time_stamp_from_frame_numbers,

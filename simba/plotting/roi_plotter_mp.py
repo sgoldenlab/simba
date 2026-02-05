@@ -30,7 +30,7 @@ from simba.utils.enums import ROI_SETTINGS, Formats, Keys, Paths, TextOptions
 from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError,
                                 NoFilesFoundError, NoROIDataError,
                                 ROICoordinatesNotFoundError)
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_current_time,
                                     get_video_meta_data, read_df)
