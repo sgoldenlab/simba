@@ -13,8 +13,7 @@ import shutil
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_str)
 from simba.utils.errors import CropError, FFMPEGNotFoundError, PermissionError
-from simba.utils.lookups import (get_current_time, get_ffmpeg_encoders,
-                                 gpu_quality_to_cpu_quality_lk)
+from simba.utils.lookups import (get_ffmpeg_encoders, gpu_quality_to_cpu_quality_lk)
 from simba.utils.printing import stdout_information
 from simba.utils.warnings import CropWarning
 from simba.video_processors.video_processing import (change_single_video_fps,

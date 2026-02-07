@@ -341,6 +341,7 @@ class PlottingMixin(object):
                         width: int = 640,
                         height: int = 480,
                         font_size: int = 8,
+                        bar_opacity: float = 0.85,
                         font_rotation: int = 45,
                         font: Optional[str] = None,
                         save_path: Optional[str] = None,
@@ -379,7 +380,7 @@ class PlottingMixin(object):
                 if event[0] == x:
                     ix = clf_names.index(x)
                     data_event = event[1][["Start_time", "Bout_time"]]
-                    ax.broken_barh(data_event.values, (colour_tuple_x[ix], 3), facecolors=palette[ix], edgecolor=edge_clr, linewidth=0.5, alpha=0.9)
+                    ax.broken_barh(data_event.values, (colour_tuple_x[ix], 3), facecolors=palette[ix], edgecolor=edge_clr, linewidth=0.25, alpha=bar_opacity)
 
         x_ticks_seconds = np.round(np.linspace(0, x_length / fps, 6))
         x_ticks_locs = x_ticks_seconds

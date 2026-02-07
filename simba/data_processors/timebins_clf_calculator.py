@@ -20,7 +20,6 @@ from simba.utils.checks import (
     check_valid_boolean, check_valid_lst)
 from simba.utils.data import detect_bouts
 from simba.utils.errors import NoDataError
-from simba.utils.lookups import get_current_time
 from simba.utils.printing import stdout_success, stdout_information
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     find_time_stamp_from_frame_numbers,
@@ -182,6 +181,21 @@ class TimeBinsClfCalculator(ConfigReader):
         self.out_df.to_csv(self.save_path)
         self.timer.stop_timer()
         stdout_success(msg=f'Classification time-bins results saved at {self.save_path}', elapsed_time=self.timer.elapsed_time_str)
+
+
+#
+# test = TimeBinsClfCalculator(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini",
+#                              classifiers=['CIRCLING'],
+#                              bin_length=600,
+#                              include_timestamp=True,
+#                              transpose=True)
+#
+# test.run()
+# test.save()
+#
+
+
+
 
 #
 # test = TimeBinsClfCalculator(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",

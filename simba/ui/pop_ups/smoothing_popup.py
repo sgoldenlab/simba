@@ -35,9 +35,9 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
 
         self.settings_frm= CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
         instruction_lbl = SimBALabel(parent=self.settings_frm, txt=INSTRUCTIONS_LBL_1, font=Formats.FONT_REGULAR_ITALICS.value)
-        self.time_window = Entry_Box(self.settings_frm, "TIME WINDOW (MILLISECONDS):", "35", validation="numeric", entry_box_width=35, value=100, justify='center', img='timer')
-        self.method_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=Options.SMOOTHING_OPTIONS.value, label="SMOOTHING METHOD:", label_width=35, dropdown_width=35, value=Options.SMOOTHING_OPTIONS.value[0], img='equation_small')
-        self.save_originals_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SAVE ORIGINALS:", label_width=35, dropdown_width=35, value='TRUE', img='save')
+        self.time_window = Entry_Box(self.settings_frm, "TIME WINDOW (MILLISECONDS):", "35", validation="numeric", entry_box_width=35, value=100, justify='center', img='timer', tooltip_key='SMOOTH_TIME_WINDOW')
+        self.method_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=Options.SMOOTHING_OPTIONS.value, label="SMOOTHING METHOD:", label_width=35, dropdown_width=35, value=Options.SMOOTHING_OPTIONS.value[0], img='equation_small', tooltip_key='SMOOTH_METHOD')
+        self.save_originals_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SAVE ORIGINALS:", label_width=35, dropdown_width=35, value='TRUE', img='save', tooltip_key='SMOOTH_SAVE_ORIGINALS')
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         instruction_lbl.grid(row=0, column=0, sticky=NW)
@@ -46,7 +46,7 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
         self.save_originals_dropdown.grid(row=3, column=0, sticky=NW)
 
         self.single_file_frm = LabelFrame(self.main_frm, text="SMOOTH SINGLE DATA FILE", font=Formats.FONT_HEADER.value)
-        self.selected_file = FileSelect(self.single_file_frm, "DATA PATH:", lblwidth=35, file_types=[("VIDEO FILE", ".csv .parquet")], initialdir=self.project_path)
+        self.selected_file = FileSelect(self.single_file_frm, "DATA PATH:", lblwidth=35, file_types=[("VIDEO FILE", ".csv .parquet")], initialdir=self.project_path, tooltip_key='SMOOTH_DATA_PATH')
         instruction_lbl_single = SimBALabel(parent=self.single_file_frm, txt=INSTRUCTIONS_LBL_2, font=Formats.FONT_REGULAR_ITALICS.value, justify='center')
 
         self.run_btn_single = SimbaButton(parent=self.single_file_frm, txt="RUN SINGLE DATA FILE SMOOTHING", img='rocket', txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': False})
@@ -56,7 +56,7 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
         self.run_btn_single.grid(row=2, column=0, sticky=NW)
 
         self.multiple_file_frm = LabelFrame(self.main_frm, text="SMOOTH DIRECTORY OF DATA", font=Formats.FONT_HEADER.value)
-        self.selected_dir = FolderSelect(self.multiple_file_frm, "SELECT DIRECTORY OF DATA FILES:", lblwidth=35, initialdir=self.project_path)
+        self.selected_dir = FolderSelect(self.multiple_file_frm, "SELECT DIRECTORY OF DATA FILES:", lblwidth=35, initialdir=self.project_path, tooltip_key='SMOOTH_DATA_DIR')
         instruction_lbl_multiple = SimBALabel(parent=self.multiple_file_frm, txt=INSTRUCTIONS_LBL_3, font=Formats.FONT_REGULAR_ITALICS.value, justify='center')
         self.run_btn_multiple = SimbaButton(parent=self.multiple_file_frm, txt="RUN DATA DIRECTORY SMOOTHING", img='rocket', txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': True})
         self.multiple_file_frm.grid(row=2, column=0, sticky=NW)
@@ -91,4 +91,4 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
         smoothing.run()
 
 
-#SmoothingPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+#SmoothingPopUp(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini")

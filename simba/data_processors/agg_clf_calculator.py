@@ -21,7 +21,7 @@ from simba.utils.checks import (
 from simba.utils.data import detect_bouts
 from simba.utils.enums import TagNames
 from simba.utils.errors import NoChoosenMeasurementError
-from simba.utils.printing import log_event, stdout_success
+from simba.utils.printing import log_event, stdout_success, stdout_information
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, read_df)
 from simba.utils.warnings import NoDataFoundWarning
@@ -136,7 +136,7 @@ class AggregateClfCalculator(ConfigReader):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.machine_results_paths)
         for file_cnt, file_path in enumerate(self.data_paths):
             _, file_name, _ = get_fn_ext(file_path)
-            print(f"Analyzing classifier descriptive statistics for video {file_name} ({file_cnt+1}/{len(self.machine_results_paths)})...")
+            stdout_information(msg=f"Analyzing classifier descriptive statistics for video {file_name} ({file_cnt+1}/{len(self.machine_results_paths)})...")
             _, _, fps = self.read_video_info(video_name=file_name)
             check_file_exist_and_readable(file_path)
             data_df = read_df(file_path, self.file_type)

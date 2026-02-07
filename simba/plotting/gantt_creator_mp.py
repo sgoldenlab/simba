@@ -44,13 +44,13 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_int, check_str,
-    check_that_column_exist, check_valid_boolean, check_valid_lst)
+    check_that_column_exist, check_valid_boolean, check_valid_lst, check_float)
 from simba.utils.data import (create_color_palette, detect_bouts, get_cpu_pool,
                               terminate_cpu_pool)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.lookups import get_fonts
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     get_current_time, get_fn_ext, read_df)
@@ -69,6 +69,7 @@ def gantt_creator_mp(data: np.array,
                      bouts_df: pd.DataFrame,
                      clf_names: list,
                      fps: int,
+                     bar_opacity: float,
                      video_name: str,
                      width: int,
                      height: int,
@@ -96,6 +97,7 @@ def gantt_creator_mp(data: np.array,
                                                height=height,
                                                font_size=font_size,
                                                font=font,
+                                               bar_opacity=bar_opacity,
                                                font_rotation=font_rotation,
                                                video_name=video_name,
                                                save_path=None,
@@ -107,9 +109,8 @@ def gantt_creator_mp(data: np.array,
             cv2.imwrite(frame_save_path, plot)
         if video_setting:
             video_writer.write(plot)
-        # Clear memory after each frame
         del plot
-        if current_frm % 100 == 0:  # Periodic garbage collection to prevent memory buildup
+        if current_frm % 100 == 0:
             gc.collect()
         print(f"[{get_current_time()}] Gantt frame created: {current_frm + 1}, Video: {video_name}, Processing core: {batch_id + 1}")
 
@@ -164,6 +165,7 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
                  font_size: int = 8,
                  font_rotation: int = 45,
                  font: Optional[str] = None,
+                 bar_opacity: float = 0.85,
                  palette: str = 'Set1',
                  core_cnt: int = -1,
                  hhmmss: bool = False,
@@ -180,6 +182,7 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
         check_valid_boolean(value=hhmmss, source=f'{self.__class__.__name__} hhmmss', raise_error=False)
         palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
         check_str(name=f'{self.__class__.__name__} palette', value=palette, options=palettes)
+        check_float(name=f'{self.__class__.__name__} bar_opacity', value=bar_opacity, allow_zero=False, allow_negative=False, max_value=1.0, raise_error=True)
         check_int(name=f"{self.__class__.__name__} core_cnt",value=core_cnt, min_value=-1, unaccepted_vals=[0], max_value=find_core_cnt()[0])
         self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
         self.width, self.height, self.font_size, self.font_rotation, self.hhmmss = width, height, font_size, font_rotation, hhmmss
@@ -199,11 +202,11 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
             self.clf_names = clf_names
         PlottingMixin.__init__(self)
         self.clr_lst = create_color_palette(pallete_name=palette, increments=len(self.body_parts_lst) + 1, as_int=True, as_rgb_ratio=True)
-        self.frame_setting, self.video_setting, self.data_paths, self.last_frm_setting, self.font = frame_setting, video_setting,data_paths, last_frm_setting, font
+        self.frame_setting, self.video_setting, self.data_paths, self.last_frm_setting, self.font, self.bar_opacity = frame_setting, video_setting,data_paths, last_frm_setting, font, bar_opacity
         if not os.path.exists(self.gantt_plot_dir): os.makedirs(self.gantt_plot_dir)
         if platform.system() == "Darwin":
             multiprocessing.set_start_method("spawn", force=True)
-        print(f"Processing {len(self.data_paths)} video(s)...")
+        stdout_information(msg=f"Processing {len(self.data_paths)} video(s)...")
 
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
@@ -216,7 +219,7 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
             _, self.video_name, _ = get_fn_ext(file_path)
             self.data_df = read_df(file_path, self.file_type)
             check_that_column_exist(df=self.data_df, column_name=self.clf_names, file_name=file_path)
-            print(f"Processing video {self.video_name}, Frame count: {len(self.data_df)} (Video {(file_cnt + 1)}/{len(self.data_paths)})...")
+            stdout_information(msg=f"Processing video {self.video_name}, Frame count: {len(self.data_df)} (Video {(file_cnt + 1)}/{len(self.data_paths)})...")
             self.video_info_settings, _, self.fps = self.read_video_info(video_name=self.video_name)
             self.bouts_df = detect_bouts(data_df=self.data_df, target_lst=list(self.clf_names), fps=int(self.fps))
             self.temp_folder = os.path.join(self.gantt_plot_dir, self.video_name, "temp")
@@ -237,6 +240,7 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
                                      font_size=self.font_size,
                                      font_rotation=self.font_rotation,
                                      video_name=self.video_name,
+                                     bar_opacity=self.bar_opacity,
                                      font=self.font,
                                      save_path=os.path.join(self.gantt_plot_dir, f"{self.video_name}_final_image.png"),
                                      palette=self.clr_lst,
@@ -257,6 +261,7 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
                                               width=self.width,
                                               height=self.height,
                                               font_size=self.font_size,
+                                              bar_opacity=self.bar_opacity,
                                               font=self.font,
                                               font_rotation=self.font_rotation,
                                               video_name=self.video_name,

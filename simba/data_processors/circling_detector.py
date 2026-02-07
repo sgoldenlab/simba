@@ -145,6 +145,6 @@ class CirclingDetector(ConfigReader):
 
 #
 #
-# detector = CirclingDetector(config_path=r"E:\troubleshooting\mitra_emergence\project_folder\project_config.ini")
-# detector.run()
+detector = CirclingDetector(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini")
+detector.run()
 

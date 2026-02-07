@@ -16,6 +16,7 @@ from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.lookups import get_fonts
 from simba.utils.read_write import find_files_of_filetypes_in_directory
 
+OPACITY_OPTIONS = [round(x, 2) for x in __import__('numpy').arange(0.05, 1.05, 0.05)]
 
 class GanttPlotPopUp(PopUpMixin, ConfigReader):
 
@@ -36,30 +37,31 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         PopUpMixin.__init__(self, config_path=config_path, title="VISUALIZE GANTT PLOTS", icon='gantt_small')
 
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name='settings', icon_link=Links.GANTT_PLOTS.value, relief='solid', padx=5, pady=5)
-        self.resolution_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.resolutions, label='GANTT PLOT RESOLUTION: ', label_width=30, dropdown_width=30, value='640×480', img='monitor')
-        self.font_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, 26)), label='TEXT SIZE: ', label_width=30, dropdown_width=30, value=8, img='text')
-        self.font_rotation_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(0, 182, 2)), label='TEXT ROTATION (°): ', label_width=30, dropdown_width=30, value=0, img='rotate')
-        self.palette_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=palettes, label='COLOR PALETTE: ', label_width=30, dropdown_width=30, value='Set1', img='palette_small')
-        self.time_format_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=['SECONDS', 'HH:MM:SS'], label='X-AXIS TIME FORMAT: ', label_width=30, dropdown_width=30, value='SECONDS', img='timer_2')
-        self.core_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, self.cpu_cnt+1)), label='CPU CORES: ', label_width=30, dropdown_width=30, value=int(self.cpu_cnt/2), img='cpu_small')
-        self.font_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=fonts, label='FONT: ', label_width=30, dropdown_width=30, value=default_font, img='font')
+        self.resolution_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.resolutions, label='GANTT PLOT RESOLUTION: ', label_width=30, dropdown_width=30, value='640×480', img='monitor', tooltip_key='GANTT_RESOLUTION')
+        self.font_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, 26)), label='TEXT SIZE: ', label_width=30, dropdown_width=30, value=8, img='text', tooltip_key='GANTT_TEXT_SIZE')
+        self.font_rotation_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(0, 182, 2)), label='TEXT ROTATION (°): ', label_width=30, dropdown_width=30, value=0, img='rotate', tooltip_key='GANTT_TEXT_ROTATION')
+        self.palette_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=palettes, label='COLOR PALETTE: ', label_width=30, dropdown_width=30, value='Set1', img='palette_small', tooltip_key='GANTT_PALETTE')
+        self.time_format_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=['SECONDS', 'HH:MM:SS'], label='X-AXIS TIME FORMAT: ', label_width=30, dropdown_width=30, value='SECONDS', img='timer_2', tooltip_key='GANTT_TIME_FORMAT')
+        self.opacity_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=OPACITY_OPTIONS, label='BAR OPACITY (%): ', label_width=30, dropdown_width=30, value=0.85, img='opacity', tooltip_key='GANTT_BAR_OPACITY')
+        self.core_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(2, self.cpu_cnt+1)), label='CPU CORES: ', label_width=30, dropdown_width=30, value=int(self.cpu_cnt/2), img='cpu_small', tooltip_key='GANTT_CPU_CORES')
+        self.font_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=fonts, label='FONT: ', label_width=30, dropdown_width=30, value=default_font, img='font', tooltip_key='GANTT_FONT')
 
 
         self.clf_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BEHAVIORS", icon_name='forest', icon_link=Links.GANTT_PLOTS.value, relief='solid', padx=5, pady=5)
         self.clf_choices = {}
         for cnt, clf_name in enumerate(self.clf_names):
-            gantt_frames_cb, self.gantt_frames_var = SimbaCheckbox(parent=self.clf_frm, txt=clf_name, val=True)
+            gantt_frames_cb, self.gantt_frames_var = SimbaCheckbox(parent=self.clf_frm, txt=clf_name, val=True, tooltip_key='GANTT_BEHAVIOR')
             self.clf_choices[clf_name] = self.gantt_frames_var
             gantt_frames_cb.grid(row=cnt, column=0, sticky=NW)
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZATION SETTINGS", icon_name='eye', icon_link=Links.GANTT_PLOTS.value, relief='solid', padx=5, pady=5)
-        gantt_frames_cb, self.gantt_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames', val=False)
-        gantt_videos_cb, self.gantt_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', txt_img='video', val=False)
-        gantt_last_frame_cb, self.gantt_last_frame_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE LAST FRAME', txt_img='finish', val=True)
+        gantt_frames_cb, self.gantt_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames', val=False, tooltip_key='GANTT_CREATE_FRAMES')
+        gantt_videos_cb, self.gantt_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', txt_img='video', val=False, tooltip_key='GANTT_CREATE_VIDEOS')
+        gantt_last_frame_cb, self.gantt_last_frame_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE LAST FRAME', txt_img='finish', val=True, tooltip_key='GANTT_CREATE_LAST_FRAME')
 
         self.run_single_video_frm= CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name='video', icon_link=Links.GANTT_PLOTS.value, relief='solid', padx=5, pady=5)
         self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="VIDEO", txt_clr="blue", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.__create_gantt_plots, cmd_kwargs={'multiple': False})
-        self.single_video_dropdown = SimBADropDown(parent=self.run_single_video_frm, dropdown_options=list(self.data_paths.keys()), label='VIDEO', label_width=20, dropdown_width=max_file_name_len, value=list(self.data_paths.keys())[0])
+        self.single_video_dropdown = SimBADropDown(parent=self.run_single_video_frm, dropdown_options=list(self.data_paths.keys()), label='VIDEO', label_width=20, dropdown_width=max_file_name_len, value=list(self.data_paths.keys())[0], tooltip_key='GANTT_SINGLE_VIDEO')
 
         self.run_multiple_videos = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEO(S)", icon_name='stack', icon_link=Links.GANTT_PLOTS.value, relief='solid', padx=5, pady=5)
         self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt=f"Create multiple videos ({len(list(self.data_paths.keys()))} video(s) found)", txt_clr="blue", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.__create_gantt_plots, cmd_kwargs={'multiple': True})
@@ -68,9 +70,10 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         self.font_size_dropdown.grid(row=1, sticky=NW)
         self.font_rotation_dropdown.grid(row=2, sticky=NW)
         self.palette_dropdown.grid(row=3, sticky=NW)
-        self.time_format_dropdown.grid(row=4, sticky=NW)
-        self.font_dropdown.grid(row=5, sticky=NW)
-        self.core_dropdown.grid(row=6, sticky=NW)
+        self.opacity_dropdown.grid(row=4, sticky=NW)
+        self.time_format_dropdown.grid(row=5, sticky=NW)
+        self.font_dropdown.grid(row=6, sticky=NW)
+        self.core_dropdown.grid(row=7, sticky=NW)
 
         self.clf_frm.grid(row=1, sticky=NW, padx=10, pady=10)
         self.settings_frm.grid(row=2, sticky=NW, padx=10, pady=10)
@@ -99,6 +102,7 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         video_setting = self.gantt_videos_var.get()
         last_frm_setting = self.gantt_last_frame_var.get()
         palette = self.palette_dropdown.get_value()
+        bar_opacity = float(self.opacity_dropdown.get_value())
         font = self.font_dropdown.get_value()
         font = None if font == 'AUTO' else font
         hhmmss = True if self.time_format_dropdown.get_value() == 'HH:MM:SS' else False
@@ -123,6 +127,7 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
                                                      data_paths=data_paths,
                                                      width=width,
                                                      height=height,
+                                                     bar_opacity=bar_opacity,
                                                      font=font,
                                                      clf_names=clf_names,
                                                      font_size=font_size,

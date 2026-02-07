@@ -678,7 +678,7 @@ def change_single_video_fps(file_path: Union[str, os.PathLike],
 
     :param Union[str, os.PathLike] file_path: Path to video file
     :param Union[int, float] fps: FPS of the new video file.
-    :param bool gpu: If True, use NVIDEA GPU codecs. Default False. GPU can provide significant speedup (3-4x faster) for FPS conversion, especially for longer videos.
+    :param bool gpu: If True, use NVIDEA GPU codecs. Default False. GPU accelerates only decode and encode; the ``fps`` filter runs on CPU, so GPU may give little or no speedup for FPS conversion.
     :param Optional[str] codec: Video codec to use. If None, automatically selects based on file extension (libvpx-vp9 for .webm, mpeg4 for .avi, libx264 for others). Default None.
     :param Optional[Union[str, os.PathLike]] save_path: Path where to save the converted video. If None, saves in the same directory as input file with ``_fps_{fps}`` suffix. Default None.
     :param Optional[int] quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
@@ -704,7 +704,7 @@ def change_single_video_fps(file_path: Union[str, os.PathLike],
     else:
         check_if_dir_exists(in_dir=os.path.dirname(save_path), raise_error=True)
     quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
-    if verbose: print(f"Converting the FPS {video_meta_data['fps']} -> {fps} for video {file_name} ...")
+    if verbose: stdout_information(msg=f"Converting the FPS {video_meta_data['fps']} -> {fps} for video {file_name} ...")
     if codec is None:
         codec = get_ffmpeg_codec(file_name=file_path)
     else:
@@ -712,11 +712,16 @@ def change_single_video_fps(file_path: Union[str, os.PathLike],
     if os.path.isfile(save_path):
         FileExistWarning(msg=f"Overwriting existing file at {save_path}...", source=change_single_video_fps.__name__,)
     if gpu:
-        cmd = f'ffmpeg -hwaccel auto -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -preset p4 -cq {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+        # First try GPU decode (h264_cuvid). Use -loglevel fatal so NAL/decoder errors are suppressed; -stats progress still prints.
+        cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy "{save_path}" -loglevel fatal -stats -hide_banner -y'
         result = subprocess.run(cmd, shell=True)
         if result.returncode != 0:
-            if verbose: SimBAGPUError(msg=f'FPS convertion ({video_meta_data["fps"]}->{fps}) GPU for video {file_name} failed, using CPU instead...')
-            gpu = False
+            if verbose: GPUToolsWarning(msg=f'GPU H.264 decode not supported for this video ({file_name}), retrying with auto decoder...', source=change_single_video_fps.__name__)
+            cmd = f'ffmpeg -hwaccel auto -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -preset p4 -cq {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+            result = subprocess.run(cmd, shell=True)
+            if result.returncode != 0:
+                if verbose: SimBAGPUError(msg=f'FPS convertion ({video_meta_data["fps"]}->{fps}) GPU for video {file_name} failed, using CPU instead...')
+                gpu = False
     if not gpu:
         cmd = f'ffmpeg -i "{file_path}" -filter:v fps=fps={fps} -c:v {codec} -crf {quality} -c:a aac "{save_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(cmd, shell=True)
@@ -744,6 +749,7 @@ def change_fps_of_multiple_videos(path: Union[str, os.PathLike, List[Union[str, 
     
     .. note::
        Codec is automatically selected based on file extension: libvpx-vp9 for .webm, mpeg4 for .avi, libx264 for others.
+       GPU accelerates only decode and encode; the ``fps`` filter runs on CPU, so GPU may give little or no speedup for FPS conversion compared to CPU.
 
     :example:
     >>> _ = change_fps_of_multiple_videos(path='project_folder/videos/Video_1.mp4', fps=15)
@@ -783,21 +789,21 @@ def change_fps_of_multiple_videos(path: Union[str, os.PathLike, List[Union[str, 
         if os.path.isfile(save_path):
             FileExistWarning(msg=f"Overwriting existing file at {save_path}...", source=change_single_video_fps.__name__, )
         if gpu:
-            cmd = f'ffmpeg -hwaccel auto -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -preset p4 -cq {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+            # First try GPU decode (h264_cuvid). Use -loglevel fatal so NAL/decoder errors are suppressed; -stats progress still prints.
+            cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy "{save_path}" -loglevel fatal -stats -hide_banner -y'
             result = subprocess.run(cmd, shell=True)
             if result.returncode != 0:
-                if verbose: SimBAGPUError(msg=f'FPS convertion ({video_meta_data["fps"]}->{fps}) GPU for video {file_name} failed, using CPU instead...')
-                gpu = False
+                if verbose: GPUToolsWarning(msg=f'GPU H.264 decode not supported for this video ({file_name}), retrying with auto decoder...', source=change_fps_of_multiple_videos.__name__)
+                cmd = f'ffmpeg -hwaccel auto -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -preset p4 -cq {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+                result = subprocess.run(cmd, shell=True)
+                if result.returncode != 0:
+                    if verbose: SimBAGPUError(msg=f'FPS convertion ({video_meta_data["fps"]}->{fps}) GPU for video {file_name} failed, using CPU instead...')
+                    gpu = False
         if not gpu:
             cmd = f'ffmpeg -i "{file_path}" -filter:v fps=fps={fps} -c:v {codec} -crf {quality} -c:a aac "{save_path}" -loglevel error -stats -hide_banner -y'
             subprocess.call(cmd, shell=True)
-        if gpu:
-            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
-        else:
-            command = f'ffmpeg -i "{file_path}" -filter:v fps=fps={fps} -c:v {codec} -crf {quality} -c:a aac "{save_path}" -loglevel error -stats -hide_banner -y'
-        subprocess.call(command, shell=True)
         video_timer.stop_timer()
-        if verbose: print(f"Video {file_name} complete (saved at {save_path})... (elapsed time: {video_timer.elapsed_time_str}s)")
+        if verbose: stdout_information(msg=f"Video {file_name} complete (saved at {save_path})... (elapsed time: {video_timer.elapsed_time_str}s)")
     timer.stop_timer()
     if verbose: stdout_success(msg=f"SIMBA COMPLETE: FPS of {len(video_paths)} video(s) changed to {fps}", elapsed_time=timer.elapsed_time_str, source=change_fps_of_multiple_videos.__name__,)
 
@@ -1274,7 +1280,7 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
         cmd = f'ffmpeg -hwaccel auto -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -c:v h264_nvenc -rc vbr -cq {quality_crf} "{save_name}" -loglevel error -stats -hide_banner -y'
     else:
         cmd = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -c:v {codec} -crf {quality_crf} "{save_name}" -loglevel error -stats -hide_banner -y'
-    if verbose: print(f"Clipping video {file_name} between {start_time} and {end_time}... ")
+    if verbose: stdout_information(msg=f"Clipping video {file_name} between {start_time} and {end_time}... ")
     subprocess.call(cmd, shell=True)
     timer.stop_timer()
     if verbose: stdout_success(msg=f"Video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str, source=clip_video_in_range.__name__)
