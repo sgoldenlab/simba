@@ -21,7 +21,7 @@ from simba.utils.checks import (
 from simba.utils.data import detect_bouts
 from simba.utils.enums import TagNames
 from simba.utils.errors import NoChoosenMeasurementError
-from simba.utils.printing import log_event, stdout_success, stdout_information
+from simba.utils.printing import log_event, stdout_information, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, read_df)
 from simba.utils.warnings import NoDataFoundWarning
