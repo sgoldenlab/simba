@@ -14,12 +14,16 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_filepaths_in_iterable_exist,
-    check_float, check_if_keys_exist_in_dict, check_int, check_valid_lst, check_valid_boolean)
-from simba.utils.data import terminate_cpu_pool, get_cpu_pool
+    check_float, check_if_keys_exist_in_dict, check_int, check_valid_boolean,
+    check_valid_lst)
+from simba.utils.data import get_cpu_pool, terminate_cpu_pool
 from simba.utils.enums import Defaults, Formats, TagNames
 from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
-from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, get_fn_ext, read_df, remove_a_folder)
+from simba.utils.printing import (SimbaTimer, log_event, stdout_information,
+                                  stdout_success)
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt, get_fn_ext, read_df,
+                                    remove_a_folder)
 
 STYLE_PALETTE = 'palette'
 STYLE_SHADING = 'shading'

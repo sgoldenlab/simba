@@ -11,15 +11,14 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.roi_plotter import ROIPlotter
 from simba.plotting.roi_plotter_mp import ROIPlotMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, CreateToolTip,
-                                        DropDownMenu, Entry_Box, FileSelect,
-                                        SimbaButton, SimbaCheckbox, SimBADropDown,
-                                        SimBALabel)
-from simba.utils.lookups import get_tooltips
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
+                                        CreateToolTip, DropDownMenu, Entry_Box,
+                                        FileSelect, SimbaButton, SimbaCheckbox,
+                                        SimBADropDown, SimBALabel)
 from simba.utils.checks import check_file_exist_and_readable, check_float
 from simba.utils.enums import ROI_SETTINGS, Formats, Keys, Links, Options
 from simba.utils.errors import NoDataError, ROICoordinatesNotFoundError
-from simba.utils.lookups import get_color_dict
+from simba.utils.lookups import get_color_dict, get_tooltips
 from simba.utils.read_write import (find_all_videos_in_directory,
                                     find_core_cnt,
                                     find_files_of_filetypes_in_directory,
