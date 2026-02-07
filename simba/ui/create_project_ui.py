@@ -65,13 +65,13 @@ class ProjectCreatorPopUp():
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.create_project_tab, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CREATE_PROJECT.value)
         self.general_settings_frm = CreateLabelFrameWithIcon(parent=self.settings_frm, header="GENERAL PROJECT SETTINGS", icon_name='settings', icon_link=Links.CREATE_PROJECT.value, padx=5, pady=5, relief='solid')
-        self.project_dir_select = FolderSelect(self.general_settings_frm, "PROJECT DIRECTORY:", lblwidth=35, entry_width=35, font=Formats.FONT_REGULAR.value, lbl_icon='browse')
-        self.project_name_eb = Entry_Box(self.general_settings_frm, "PROJECT NAME:", labelwidth=35, entry_box_width=35, img='id_card_2', justify='center')
-        self.file_type_dropdown = SimBADropDown(parent=self.general_settings_frm, dropdown_options=Options.WORKFLOW_FILE_TYPE_OPTIONS.value, label='WORKFLOW FILE TYPE:', label_width=35, dropdown_width=35, value=Options.WORKFLOW_FILE_TYPE_OPTIONS.value[0], img='file_type')
+        self.project_dir_select = FolderSelect(self.general_settings_frm, "PROJECT DIRECTORY:", lblwidth=35, entry_width=35, font=Formats.FONT_REGULAR.value, lbl_icon='browse', tooltip_key='CREATE_PROJECT_DIR')
+        self.project_name_eb = Entry_Box(self.general_settings_frm, "PROJECT NAME:", labelwidth=35, entry_box_width=35, img='id_card_2', justify='center', tooltip_key='CREATE_PROJECT_NAME')
+        self.file_type_dropdown = SimBADropDown(parent=self.general_settings_frm, dropdown_options=Options.WORKFLOW_FILE_TYPE_OPTIONS.value, label='WORKFLOW FILE TYPE:', label_width=35, dropdown_width=35, value=Options.WORKFLOW_FILE_TYPE_OPTIONS.value[0], img='file_type', tooltip_key='CREATE_PROJECT_FILE_TYPE')
 
         self.ml_settings_frm = GetMLSettingsFrame(parent=self.create_project_tab, lbl_width=35, bx_width=22)
         self.animal_settings_frm = CreateLabelFrameWithIcon(parent=self.create_project_tab, header="ANIMAL SETTINGS", icon_name='pose', icon_link=Links.CREATE_PROJECT.value, font=Formats.FONT_HEADER.value, padx=5, pady=5, relief='solid')
-        self.tracking_type_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=Options.TRACKING_TYPE_OPTIONS.value, label='TYPE OF TRACKING', label_width=35, dropdown_width=35, value=Options.TRACKING_TYPE_OPTIONS.value[0], command=self.update_body_part_dropdown, img='category')
+        self.tracking_type_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=Options.TRACKING_TYPE_OPTIONS.value, label='TYPE OF TRACKING', label_width=35, dropdown_width=35, value=Options.TRACKING_TYPE_OPTIONS.value[0], command=self.update_body_part_dropdown, img='category', tooltip_key='CREATE_PROJECT_TRACKING_TYPE')
 
         project_animal_cnt_path = os.path.join(os.path.dirname(simba.__file__), Paths.SIMBA_NO_ANIMALS_PATH.value)
         self.animal_count_lst = list(pd.read_csv(project_animal_cnt_path, header=None)[0])
@@ -97,9 +97,9 @@ class ProjectCreatorPopUp():
         self.multi_tracking_options.extend(self.user_defined_options)
         self.three_dim_tracking_options.extend(self.user_defined_options)
 
-        self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=Options.CLASSICAL_TRACKING_OPTIONS.value, label='BODY-PART CONFIGURATION: ', img='pose_2', label_width=35, dropdown_width=35, value=self.classical_tracking_options[0], command=self.update_img)
+        self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=Options.CLASSICAL_TRACKING_OPTIONS.value, label='BODY-PART CONFIGURATION: ', img='pose_2', label_width=35, dropdown_width=35, value=self.classical_tracking_options[0], command=self.update_img, tooltip_key='CREATE_PROJECT_BP_CONFIG')
         self.img_lbl = Label(self.animal_settings_frm, image=self.bp_lu[self.classical_tracking_options[0]]["img"], font=Formats.FONT_REGULAR.value)
-        reset_btn = SimbaButton(parent=self.animal_settings_frm, txt="RESET USER DEFINED POSE-CONFIGS", txt_clr='red', img='clean', cmd=PoseResetterPopUp)
+        reset_btn = SimbaButton(parent=self.animal_settings_frm, txt="RESET USER DEFINED POSE-CONFIGS", txt_clr='red', img='clean', cmd=PoseResetterPopUp, tooltip_key='CREATE_PROJECT_RESET_POSE_CONFIGS')
 
         run_frm = CreateLabelFrameWithIcon(parent=self.create_project_tab, header="CREATE PROJECT CONFIG", icon_name='create', icon_link=Links.CREATE_PROJECT.value)
         create_project_btn = SimbaButton(parent=run_frm, txt="CREATE PROJECT CONFIG", txt_clr='navy', img='create', font=Formats.FONT_HEADER.value, hover_font=Formats.FONT_HEADER.value, cmd=self.run)
@@ -126,14 +126,14 @@ class ProjectCreatorPopUp():
     def update_body_part_dropdown(self, selected_value):
         self.selected_tracking_dropdown.destroy()
         if selected_value == Methods.MULTI_TRACKING.value:
-            self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=self.multi_tracking_options, label='BODY-PART CONFIGURATION: ', label_width=35, dropdown_width=35, value=self.multi_tracking_options[0], command=self.update_img, img='pose_2')
+            self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=self.multi_tracking_options, label='BODY-PART CONFIGURATION: ', label_width=35, dropdown_width=35, value=self.multi_tracking_options[0], command=self.update_img, img='pose_2', tooltip_key='CREATE_PROJECT_BP_CONFIG')
             self.selected_tracking_dropdown.grid(row=1, column=0, sticky=NW)
         elif selected_value == Methods.CLASSIC_TRACKING.value:
-            self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=self.classical_tracking_options, label='BODY-PART CONFIGURATION: ', label_width=35, dropdown_width=35, value=self.classical_tracking_options[0], command=self.update_img, img='pose_2')
+            self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=self.classical_tracking_options, label='BODY-PART CONFIGURATION: ', label_width=35, dropdown_width=35, value=self.classical_tracking_options[0], command=self.update_img, img='pose_2', tooltip_key='CREATE_PROJECT_BP_CONFIG')
             self.selected_tracking_dropdown.grid(row=1, column=0, sticky=NW)
 
         elif selected_value == Methods.THREE_D_TRACKING.value:
-            self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=self.three_dim_tracking_options, label='BODY-PART CONFIGURATION: ', label_width=35, dropdown_width=35, value=self.three_dim_tracking_options[0], command=self.update_img, img='pose_2')
+            self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=self.three_dim_tracking_options, label='BODY-PART CONFIGURATION: ', label_width=35, dropdown_width=35, value=self.three_dim_tracking_options[0], command=self.update_img, img='pose_2', tooltip_key='CREATE_PROJECT_BP_CONFIG')
             self.selected_tracking_dropdown.grid(row=1, column=0, sticky=NW)
         self.update_img(self.selected_tracking_dropdown.getChoices())
 

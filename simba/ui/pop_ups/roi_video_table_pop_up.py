@@ -19,7 +19,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import NoFilesFoundError
-from simba.utils.read_write import find_all_videos_in_directory, get_fn_ext
+from simba.utils.read_write import find_all_videos_in_directory, get_fn_ext, read_frm_of_video
 
 WINDOW_SIZE = (720, 960)
 
@@ -104,10 +104,14 @@ class ROITableRow():
         self.index.grid(row=row_idx, column=0, sticky=NW)
         _, video_name, _ = get_fn_ext(filepath=video_path)
         self.video_table_window = video_table_window
+        try:
+            img = read_frm_of_video(video_path=video_path, size=(320, 180), keep_aspect_ratio=True, raise_error=False)
+        except:
+            img = None
         if video_name not in videos_w_rois:
-            self.video_lbl = SimBALabel(parent=parent, txt=video_name, txt_clr='black', width=str_width, font=Formats.FONT_REGULAR.value)
+            self.video_lbl = SimBALabel(parent=parent, txt=video_name, txt_clr='black', width=str_width, font=Formats.FONT_REGULAR.value, hover_img=img)
         else:
-            self.video_lbl = SimBALabel(parent=parent, txt=video_name, txt_clr='green', width=str_width, font=Formats.FONT_REGULAR_BOLD.value)
+            self.video_lbl = SimBALabel(parent=parent, txt=video_name, txt_clr='green', width=str_width, font=Formats.FONT_REGULAR_BOLD.value, hover_img=img)
         self.video_lbl.grid(row=row_idx, column=1, sticky=NW)
         self.draw_btn = SimbaButton(parent=parent, txt='DRAW', img='paint', cmd=self.draw, cmd_kwargs={'config_path': lambda: config_path, 'video_path': lambda: video_path})
         self.draw_btn.grid(row=row_idx, column=2, sticky=NW)

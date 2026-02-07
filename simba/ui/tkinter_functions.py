@@ -129,12 +129,15 @@ class DropDownMenu(Frame):
                  labelwidth="",
                  com=None,
                  val: Optional[Any] = None,
+                 tooltip_key: Optional[str] = None,
                  **kw):
 
         Frame.__init__(self, master=parent, **kw)
         self.dropdownvar = StringVar()
         self.lblName = Label(self, text=dropdownLabel, width=labelwidth, anchor=W, font=Formats.FONT_REGULAR.value)
         self.lblName.grid(row=0, column=0)
+        if tooltip_key is not None and tooltip_key in TOOLTIPS.keys():
+            CreateToolTip(widget=self.lblName, text=TOOLTIPS[tooltip_key])
         self.choices = choice_dict
         self.popupMenu = OptionMenu(self, self.dropdownvar, *self.choices, command=com)
         self.popupMenu.grid(row=0, column=1)
