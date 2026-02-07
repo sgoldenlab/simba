@@ -43,14 +43,14 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
-    check_file_exist_and_readable, check_int, check_str,
-    check_that_column_exist, check_valid_boolean, check_valid_lst, check_float)
+    check_file_exist_and_readable, check_float, check_int, check_str,
+    check_that_column_exist, check_valid_boolean, check_valid_lst)
 from simba.utils.data import (create_color_palette, detect_bouts, get_cpu_pool,
                               terminate_cpu_pool)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.lookups import get_fonts
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     get_current_time, get_fn_ext, read_df)
