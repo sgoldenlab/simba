@@ -7,19 +7,21 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.roi_ui import ROI_ui
 from simba.roi_tools.roi_utils import multiply_ROIs, reset_video_ROIs
+from simba.ui.pop_ups.delete_all_rois_pop_up import delete_all_rois_pop_up
 from simba.ui.pop_ups.duplicate_rois_by_source_target_popup import \
     DuplicateROIsBySourceTarget
 from simba.ui.pop_ups.import_roi_csv_popup import \
     ROIDefinitionsCSVImporterPopUp
 from simba.ui.pop_ups.min_max_draw_size_popup import SetMinMaxDrawWindowSize
-from simba.ui.pop_ups.roi_size_standardizer_popup import ROISizeStandardizerPopUp
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, SimbaButton, SimBALabel)
+from simba.ui.pop_ups.roi_size_standardizer_popup import \
+    ROISizeStandardizerPopUp
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        SimbaButton, SimBALabel)
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import Formats, Links
 from simba.utils.errors import NoFilesFoundError
-from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,  read_frm_of_video)
-from simba.ui.pop_ups.delete_all_rois_pop_up import delete_all_rois_pop_up
-
+from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
+                                    read_frm_of_video)
 
 WINDOW_SIZE = (720, 960)
 

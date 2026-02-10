@@ -11,13 +11,16 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.heat_mapper_location import HeatmapperLocationSingleCore
 from simba.plotting.heat_mapper_location_mp import \
     HeatMapperLocationMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         SimbaButton, SimbaCheckbox,
-                                        SimBADropDown, Entry_Box)
-from simba.utils.checks import check_if_filepath_list_is_empty, check_if_string_value_is_valid_video_timestamp, check_that_hhmmss_start_is_before_end, check_int
+                                        SimBADropDown)
+from simba.utils.checks import (check_if_filepath_list_is_empty,
+                                check_if_string_value_is_valid_video_timestamp,
+                                check_int,
+                                check_that_hhmmss_start_is_before_end)
 from simba.utils.enums import Formats, Links, Paths
-from simba.utils.read_write import get_file_name_info_in_directory, str_2_bool
 from simba.utils.lookups import get_named_colors
+from simba.utils.read_write import get_file_name_info_in_directory, str_2_bool
 
 AUTO = 'AUTO'
 VIDEO_FRM = 'VIDEO FRAME'

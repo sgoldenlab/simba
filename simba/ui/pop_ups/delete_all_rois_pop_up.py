@@ -1,5 +1,5 @@
 import os
-from typing import Union, Optional, Any
+from typing import Any, Optional, Union
 
 from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
 from simba.utils.checks import check_file_exist_and_readable

@@ -14,18 +14,24 @@ from simba.data_processors.directing_other_animals_calculator import \
     DirectingOtherAnimalsAnalyzer
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (check_file_exist_and_readable,
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_keys_exist_in_dict,
-                                check_if_valid_rgb_tuple, check_int,
-                                check_valid_lst,
-                                check_video_and_data_frm_count_align,
                                 check_if_string_value_is_valid_video_timestamp,
-                                check_that_hhmmss_start_is_before_end, check_float)
-from simba.utils.data import create_color_palettes, terminate_cpu_pool, get_cpu_pool, find_frame_numbers_from_time_stamp
+                                check_if_valid_rgb_tuple, check_int,
+                                check_that_hhmmss_start_is_before_end,
+                                check_valid_lst,
+                                check_video_and_data_frm_count_align)
+from simba.utils.data import (create_color_palettes,
+                              find_frame_numbers_from_time_stamp, get_cpu_pool,
+                              terminate_cpu_pool)
 from simba.utils.enums import OS, Formats, Keys, TextOptions
-from simba.utils.errors import (AnimalNumberError, InvalidInputError, NoFilesFoundError)
-from simba.utils.printing import stdout_success, stdout_information
-from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, get_fn_ext, get_video_meta_data, read_df, check_if_hhmmss_timestamp_is_valid_part_of_video, seconds_to_timestamp)
+from simba.utils.errors import (AnimalNumberError, InvalidInputError,
+                                NoFilesFoundError)
+from simba.utils.printing import stdout_information, stdout_success
+from simba.utils.read_write import (
+    check_if_hhmmss_timestamp_is_valid_part_of_video,
+    concatenate_videos_in_folder, find_core_cnt, get_fn_ext,
+    get_video_meta_data, read_df, seconds_to_timestamp)
 from simba.utils.warnings import NoDataFoundWarning
 
 DIRECTION_THICKNESS = "direction_thickness"
