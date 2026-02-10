@@ -108,7 +108,7 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
     """
     Create heatmaps representing the location where animals spend time.
 
-    ..note::
+    .. note::
        `GitHub visualizations tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
     .. image:: _static/img/heatmap_location.gif
@@ -120,18 +120,30 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
        :height: 480
        :align: center
 
-    :param str config_path: path to SimBA project config file in Configparser format
-    :param bool final_img_setting: If True, then create a single image representing the last frame of the input video
-    :param bool video_setting: If True, then create a video of heatmaps.
-    :param bool frame_setting: If True, then create individual heatmap frames.
-    :param str clf_name: The name of the classified behavior.
-    :param str bodypart: The name of the body-part used to infer the location of the classified behavior
-    :param Dict style_attr: Dict containing settings for colormap, bin-size, max scale, and smooothing operations. For example: {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 50, 'max_scale': 'auto'}.
-    :param int core_cnt: The number of CPU cores to use. If -1, then all available cores.
+    .. image:: _static/img/HeatMapperLocationMultiprocess.webp
+       :width: 600
+       :align: center
+
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
+    :param Union[List[Union[str, os.PathLike]], str, os.PathLike] data_paths: Path(s) to outlier-corrected movement or location CSV file(s). If None, uses all files in project.
+    :param str bodypart: Body-part name used for location heatmap (e.g. 'Nose_1'). The heatmap shows where this body-part spends time.
+    :param Dict[str, Any] style_attr: Dict with keys 'palette', 'shading', 'bin_size', 'max_scale'. E.g. {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 50, 'max_scale': 'auto'}.
+    :param Optional[int] bg_img: If set, overlay heatmap on video frame. -1 or None = no background. Non-negative int = frame index to use as background.
+    :param Optional[Dict[str, str]] time_slice: If set, restrict analysis to time period. Dict with keys 'start_time' and 'end_time' (HH:MM:SS). Default None.
+    :param bool show_keypoint: If True, draw body-part position as dot on each frame. Default False.
+    :param bool show_legend: If True, append color bar showing seconds scale. Default True.
+    :param Optional[float] heatmap_opacity: Opacity of heatmap over background (0–1). Used when bg_img is set. Default None.
+    :param Optional[int] min_seconds: Hide bins with time below this (seconds). Bins below threshold shown as empty. Default None.
+    :param Optional[str] line_clr: Color for grid lines between bins (e.g. 'white', 'red'). None = no grid. Default None.
+    :param Optional[bool] final_img_setting: If True, create a single cumulative heatmap image. Default True.
+    :param Optional[bool] video_setting: If True, create heatmap video. Default False.
+    :param Optional[bool] frame_setting: If True, create individual heatmap frame images. Default False.
+    :param Optional[int] core_cnt: Number of CPU cores. -1 = use all available. Default -1.
+    :param bool verbose: If True, print progress. Default True.
 
     :example:
     >>> style_attr = {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 100, 'max_scale': 'auto'}
-    >>> heatmapper = HeatMapperLocationMultiprocess(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', style_attr = style_attr, core_cnt=-1, final_img_setting=True, video_setting=True, frame_setting=False, bodypart='Nose_1', files_found=['/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv'])
+    >>> heatmapper = HeatMapperLocationMultiprocess(config_path='project_config.ini', data_paths='csv/outlier_corrected_movement_location/Together_1.csv', bodypart='Nose_1', style_attr=style_attr, core_cnt=-1, final_img_setting=True, video_setting=False, frame_setting=False)
     >>> heatmapper.run()
     """
 
