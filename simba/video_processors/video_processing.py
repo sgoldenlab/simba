@@ -30,6 +30,7 @@ except:
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.image_mixin import ImageMixin
+from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
@@ -75,7 +76,6 @@ from simba.video_processors.extract_frames import video_to_frames
 from simba.video_processors.roi_selector import ROISelector
 from simba.video_processors.roi_selector_circle import ROISelectorCircle
 from simba.video_processors.roi_selector_polygon import ROISelectorPolygon
-from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
 
 MAX_FRM_SIZE = 1080, 650
 
