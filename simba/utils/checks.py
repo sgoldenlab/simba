@@ -607,8 +607,8 @@ def check_if_string_value_is_valid_video_timestamp(value: str, name: str, raise_
         return True
 
 def check_that_hhmmss_start_is_before_end(
-    start_time: str, end_time: str, name: str
-) -> None:
+    start_time: str, end_time: str, name: str, raise_error: bool = True
+) -> bool:
     """
     Helper to check that a start time in HH:MM:SS or HH:MM:SS:MS format is before an end time in HH:MM:SS or HH:MM:SS:MS format
 
@@ -624,23 +624,27 @@ def check_that_hhmmss_start_is_before_end(
     """
 
     if len(start_time.split(":")) != 3:
-        raise InvalidInputError(
-            f"Invalid time-stamp: ({start_time}). HH:MM:SS or HH:MM:SS.MS format required"
-        )
+        if raise_error:
+            raise InvalidInputError(f"Invalid time-stamp: ({start_time}). HH:MM:SS or HH:MM:SS.MS format required")
+        else:
+            return False
     elif len(end_time.split(":")) != 3:
-        raise InvalidInputError(
-            f"Invalid time-stamp: ({end_time}). HH:MM:SS or HH:MM:SS.MS format required"
-        )
+        if raise_error:
+            raise InvalidInputError(
+                f"Invalid time-stamp: ({end_time}). HH:MM:SS or HH:MM:SS.MS format required"
+            )
+        else:
+            return False
     start_h, start_m, start_s = start_time.split(":")
     end_h, end_m, end_s = end_time.split(":")
     start_val = int(start_h) * 3600 + int(start_m) * 60 + float(start_s)
     end_val = int(end_h) * 3600 + int(end_m) * 60 + float(end_s)
     if end_val < start_val:
-        raise InvalidInputError(
-            f"{name} has an end-time which is before the start-time.",
-            source=check_that_hhmmss_start_is_before_end.__name__,
-        )
-
+        if raise_error:
+            raise InvalidInputError(msg=f"{name} has an end-time which is before the start-time.", source=check_that_hhmmss_start_is_before_end.__name__)
+        else:
+            return False
+    return True
 
 def check_nvidea_gpu_available(raise_error: bool = False) -> bool:
     """
@@ -902,6 +906,7 @@ def check_if_valid_img(data: np.ndarray,
                        source: str = "",
                        raise_error: bool = True,
                        greyscale: bool = False,
+                       size: Optional[Tuple[int, int]] = None, # WIDTH x HEIGHT
                        color: bool = False) -> Union[bool, None]:
     """
     Check if a variable is a valid image.
@@ -939,9 +944,17 @@ def check_if_valid_img(data: np.ndarray,
                 raise InvalidInputError(msg=f"The {source} image is not a color image. Got {data.ndim} dimensions", source=check_if_valid_img.__name__)
             else:
                 return False
-
-
-
+    if size is not None:
+        check_valid_tuple(x=size, source=f'{check_valid_tuple.__name__} size', accepted_lengths=(2,), valid_dtypes=Formats.INTEGER_DTYPES.value, min_integer=1)
+        if size[0] != data.shape[1]:
+            if raise_error:
+                raise InvalidInputError(msg=f"The {source} image is not correct width. Got {data.shape[1]}. Accepted: {size[0]}.", source=check_if_valid_img.__name__)
+            return False
+        if size[1] != data.shape[0]:
+            if raise_error:
+                raise InvalidInputError(msg=f"The {source} image is not correct height. Got {data.shape[0]}. Accepted: {size[1]}.", source=check_if_valid_img.__name__)
+            else:
+                return False
     return True
 
 

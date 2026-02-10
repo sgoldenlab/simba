@@ -75,6 +75,7 @@ from simba.video_processors.extract_frames import video_to_frames
 from simba.video_processors.roi_selector import ROISelector
 from simba.video_processors.roi_selector_circle import ROISelectorCircle
 from simba.video_processors.roi_selector_polygon import ROISelectorPolygon
+from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
 
 MAX_FRM_SIZE = 1080, 650
 
@@ -2151,26 +2152,35 @@ class VideoRotator(ConfigReader):
 
 
 def extract_frames_from_all_videos_in_directory(config_path: Union[str, os.PathLike],
-                                                directory: Union[str, os.PathLike]) -> None:
+                                                directory: Union[str, os.PathLike],
+                                                confirm_popup: bool = False) -> None:
 
     """
     Extract all frames from all videos in a directory.
 
-    :param str config_path: path to SimBA project config file in Configparser format.
-    :param str directory: path to file or folder containing videos in mp4 and/or avi format.
-    :returns: None. The results are saved in the ``project_folder/frames/input directory`` of the SimBA project
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config file in Configparser format.
+    :param Union[str, os.PathLike] directory: Path to file or folder containing videos (e.g. mp4, avi).
+    :param bool confirm_popup: If True, show a confirmation dialog before extracting. If the user chooses NO, no frames are extracted. Default: False.
+    :return: None. Frames are saved in ``project_folder/frames/input`` of the SimBA project.
 
     :example:
-    >>> extract_frames_from_all_videos_in_directory(config_path='project_folder/project_config.ini', source='/tests/test_data/video_tests')
+    >>> extract_frames_from_all_videos_in_directory(config_path='project_folder/project_config.ini', directory='/tests/test_data/video_tests')
+    >>> extract_frames_from_all_videos_in_directory(config_path=config_path, directory=video_dir, confirm_popup=True)
     """
-
     timer = SimbaTimer(start=True)
     video_paths = find_all_videos_in_directory(directory=directory, as_dict=True, raise_error=True)
     video_paths = list(video_paths.values())
     config = read_config_file(config_path)
     project_path = read_config_entry(config, "General settings", "project_path", data_type="folder_path")
+    check_valid_boolean(value=confirm_popup, source=f'{extract_frames_from_all_videos_in_directory.__name__} confirm_popup', raise_error=True)
 
-    print(f"Extracting frames for {len(video_paths)} video(s) into project_folder/frames/input directory...")
+
+    if confirm_popup:
+        question = TwoOptionQuestionPopUp(question='Are you sure you want to EXTRACT ALL frames \nfrom all VIDEOS in project? \n(WARNING TIME-CONSUMING)', option_one='YES', option_two='NO', title='EXTRACT ALL FRAMES')
+        if question.selected_option != "YES":
+            return
+
+    stdout_information(msg=f"Extracting frames for {len(video_paths)} video(s) into project_folder/frames/input directory...")
     for video_path in video_paths:
         dir_name, video_name, ext = get_fn_ext(video_path)
         save_path = os.path.join(project_path, "frames", "input", video_name)

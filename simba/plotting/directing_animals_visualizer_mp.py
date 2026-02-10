@@ -18,15 +18,14 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_keys_exist_in_dict,
                                 check_if_valid_rgb_tuple, check_int,
                                 check_valid_lst,
-                                check_video_and_data_frm_count_align)
-from simba.utils.data import create_color_palettes, terminate_cpu_pool
+                                check_video_and_data_frm_count_align,
+                                check_if_string_value_is_valid_video_timestamp,
+                                check_that_hhmmss_start_is_before_end, check_float)
+from simba.utils.data import create_color_palettes, terminate_cpu_pool, get_cpu_pool, find_frame_numbers_from_time_stamp
 from simba.utils.enums import OS, Formats, Keys, TextOptions
-from simba.utils.errors import (AnimalNumberError, InvalidInputError,
-                                NoFilesFoundError)
-from simba.utils.printing import stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    find_core_cnt, get_fn_ext,
-                                    get_video_meta_data, read_df)
+from simba.utils.errors import (AnimalNumberError, InvalidInputError, NoFilesFoundError)
+from simba.utils.printing import stdout_success, stdout_information
+from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, get_fn_ext, get_video_meta_data, read_df, check_if_hhmmss_timestamp_is_valid_part_of_video, seconds_to_timestamp)
 from simba.utils.warnings import NoDataFoundWarning
 
 DIRECTION_THICKNESS = "direction_thickness"
@@ -35,9 +34,11 @@ CIRCLE_SIZE = "circle_size"
 HIGHLIGHT_ENDPOINTS = "highlight_endpoints"
 SHOW_POSE = "show_pose"
 ANIMAL_NAMES = "animal_names"
+START_TIME = 'start_time'
+END_TIME = 'end_time'
 STYLE_ATTR = [DIRECTION_THICKNESS, DIRECTIONALITY_COLOR, CIRCLE_SIZE, HIGHLIGHT_ENDPOINTS, SHOW_POSE, ANIMAL_NAMES]
 
-FOURCC = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
+FOURCC = cv2.VideoWriter_fourcc(*Formats.AVI_CODEC.value)
 X_BPS, Y_BPS = Keys.X_BPS.value, Keys.Y_BPS.value
 
 def _directing_animals_mp(frm_range: Tuple[int, np.ndarray],
@@ -46,13 +47,14 @@ def _directing_animals_mp(frm_range: Tuple[int, np.ndarray],
                           style_attr: dict,
                           animal_bp_dict: dict,
                           save_temp_dir: str,
+                          line_opacity: float,
                           video_path: str,
                           video_meta_data: dict,
-                          colors: list,
-):
+                          colors: list):
+
     batch = frm_range[0]
     start_frm, current_frm, end_frm = frm_range[1][0], frm_range[1][0], frm_range[1][-1]
-    save_path = os.path.join(save_temp_dir, f"{batch}.mp4")
+    save_path = os.path.join(save_temp_dir, f"{batch}.avi")
     writer = cv2.VideoWriter(save_path, FOURCC, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]))
     cap = cv2.VideoCapture(video_path)
     cap.set(1, start_frm)
@@ -75,12 +77,10 @@ def _directing_animals_mp(frm_range: Tuple[int, np.ndarray],
                 img_data = directionality_data[directionality_data["Frame_#"] == current_frm]
                 for animal_name in img_data["Animal_1"].unique():
                     animal_img_data = img_data[img_data["Animal_1"] == animal_name].reset_index(drop=True)
-                    img = PlottingMixin.draw_lines_on_img(img=img, start_positions=animal_img_data[["Eye_x", "Eye_y"]].values.astype(np.int64), end_positions=animal_img_data[["Animal_2_bodypart_x", "Animal_2_bodypart_y"]].values.astype(np.int64), color=tuple(colors[animal_name]), highlight_endpoint=style_attr[HIGHLIGHT_ENDPOINTS], thickness=style_attr[DIRECTION_THICKNESS], circle_size=style_attr[CIRCLE_SIZE])
+                    img = PlottingMixin.draw_lines_on_img(img=img, start_positions=animal_img_data[["Eye_x", "Eye_y"]].values.astype(np.int64), end_positions=animal_img_data[["Animal_2_bodypart_x", "Animal_2_bodypart_y"]].values.astype(np.int64), color=tuple(colors[animal_name]), highlight_endpoint=style_attr[HIGHLIGHT_ENDPOINTS], thickness=style_attr[DIRECTION_THICKNESS], circle_size=style_attr[CIRCLE_SIZE], opacity=line_opacity)
             current_frm += 1
-            writer.write(np.uint8(img))
-            print(
-                f"Frame: {current_frm} / {video_meta_data['frame_count']}. Core batch: {batch}"
-            )
+            writer.write(img.astype(np.uint8))
+            stdout_information(msg=f"Created directing frame: {current_frm}, frame timestamp: {seconds_to_timestamp(current_frm / video_meta_data['fps'])} (core batch: {batch}) ...")
 
         else:
             break
@@ -111,6 +111,10 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
        :height: 480
        :align: center
 
+    .. video:: _static/img/DirectingOtherAnimalsVisualizerMultiprocess.mp4
+       :width: 900
+       :loop:
+
     .. seealso::
        For single core function, see :func:`simba.plotting.directing_animals_visualizer.DirectingOtherAnimalsVisualizer`.
 
@@ -136,8 +140,10 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
                  config_path: Union[str, os.PathLike],
                  video_path: Union[str, os.PathLike],
                  style_attr: Dict[str, Any],
-                 core_cnt: Optional[int] = -1,
+                 core_cnt: int = -1,
+                 time_slice: Optional[Dict[str, str]] = None,
                  left_ear_name: Optional[str] = None,
+                 line_opacity: float = 1.0,
                  right_ear_name: Optional[str] = None,
                  nose_name: Optional[str] = None):
 
@@ -147,7 +153,13 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
         check_file_exist_and_readable(file_path=config_path)
         check_if_keys_exist_in_dict(data=style_attr, key=STYLE_ATTR, name=f"{self.__class__.__name__} style_attr")
         check_int(name=f"{self.__class__.__name__} core_cnt", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], unaccepted_vals=[0])
+        check_float(name=f"{self.__class__.__name__} line_opacity", value=line_opacity, min_value=0.0, max_value=1.0, raise_error=True)
         if core_cnt == -1: core_cnt = find_core_cnt()[0]
+        if time_slice is not None:
+            check_if_keys_exist_in_dict(data=time_slice, key=[START_TIME, END_TIME], name=f'{self.__class__.__name__} slicing')
+            check_if_string_value_is_valid_video_timestamp(value=time_slice[START_TIME], name="Video slicing START TIME")
+            check_if_string_value_is_valid_video_timestamp(value=time_slice[END_TIME], name="Video slicing END TIME")
+            check_that_hhmmss_start_is_before_end(start_time=time_slice[START_TIME], end_time=time_slice[END_TIME], name="SLICE TIME STAMPS")
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
         if self.animal_cnt < 2:
@@ -190,7 +202,6 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
         if style_attr[DIRECTION_THICKNESS] is None:
             style_attr[DIRECTION_THICKNESS] = PlottingMixin().get_optimal_circle_size(frame_size=(self.video_meta_data['width'], self.video_meta_data['height']), circle_frame_ratio=80)
         check_video_and_data_frm_count_align(video=video_path, data=self.data_path, name=video_path, raise_error=False)
-        self.video_save_path = os.path.join(self.directing_animals_video_output_path, f"{self.video_name}.mp4")
         if not os.path.exists(self.directing_animals_video_output_path):
             os.makedirs(self.directing_animals_video_output_path)
         self.save_path = os.path.join(self.directing_animals_video_output_path, f"{self.video_name}.mp4")
@@ -198,50 +209,63 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
         if os.path.exists(self.save_temp_path):
             self.remove_a_folder(folder_dir=self.save_temp_path)
         os.makedirs(self.save_temp_path)
-        self.core_cnt, self.video_path = core_cnt, video_path
-        print(f"Processing video {self.video_name}...")
+        self.core_cnt, self.video_path, self.time_slice, self.video_path, self.line_opacity = core_cnt, video_path, time_slice, video_path, line_opacity
+        stdout_information(msg=f"Processing video {self.video_name}...")
 
     def run(self):
         video_data = self.data_dict[self.video_name]
-        self.writer = cv2.VideoWriter(self.video_save_path, FOURCC, self.video_meta_data["fps"], (self.video_meta_data["width"], self.video_meta_data["height"]))
         if len(video_data) < 1:
             NoDataFoundWarning(msg=f"SimBA skipping video {self.video_name}: No animals are directing each other in the video.")
         else:
-            frm_data = np.array_split(list(range(0, self.video_meta_data["frame_count"] + 1)), self.core_cnt)
-            frm_ranges = []
-            for i in range(len(frm_data)): frm_ranges.append((i, frm_data[i]))
-            print(f"Creating directing images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
-            with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
-                constants = functools.partial(_directing_animals_mp,
-                                              directionality_data=video_data,
-                                              pose_data=self.data_df,
-                                              video_meta_data=self.video_meta_data,
-                                              style_attr=self.style_attr,
-                                              save_temp_dir=self.save_temp_path,
-                                              video_path=self.video_path,
-                                              animal_bp_dict=self.animal_bp_dict,
-                                              colors=self.direction_colors)
-                for cnt, result in enumerate(pool.imap(constants, frm_ranges, chunksize=self.multiprocess_chunksize)):
-                    print(f"Core batch {result+1} complete...")
-            print(f"Joining {self.video_name} multi-processed video...")
-            concatenate_videos_in_folder(in_folder=self.save_temp_path, save_path=self.save_path, video_format="mp4", remove_splits=True)
+            pool = get_cpu_pool(core_cnt=self.core_cnt, maxtasksperchild=self.maxtasksperchild, source=self.__class__.__name__)
+            if self.time_slice is None:
+                frm_data = np.array_split(list(range(0, self.video_meta_data["frame_count"] + 1)), self.core_cnt)
+            else:
+                check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=self.time_slice[START_TIME], video_path=self.video_path)
+                check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=self.time_slice[END_TIME], video_path=self.video_path)
+                frm_numbers = find_frame_numbers_from_time_stamp(start_time=self.time_slice[START_TIME], end_time=self.time_slice[END_TIME], fps=self.video_meta_data["fps"])
+                frm_data = np.array_split(list(range(min(frm_numbers), max(frm_numbers) + 1)), self.core_cnt)
+            frm_data = [(i, j) for i, j in enumerate(frm_data)]
+            stdout_information(msg=f"Creating directing images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
+            constants = functools.partial(_directing_animals_mp,
+                                          directionality_data=video_data,
+                                          pose_data=self.data_df,
+                                          video_meta_data=self.video_meta_data,
+                                          style_attr=self.style_attr,
+                                          save_temp_dir=self.save_temp_path,
+                                          video_path=self.video_path,
+                                          line_opacity=self.line_opacity,
+                                          animal_bp_dict=self.animal_bp_dict,
+                                          colors=self.direction_colors)
+            for cnt, result in enumerate(pool.imap(constants, frm_data, chunksize=self.multiprocess_chunksize)):
+                stdout_information(msg=f"Core batch {result+1} complete...")
+            stdout_information(msg=f"Joining {self.video_name} multi-processed video...")
+            concatenate_videos_in_folder(in_folder=self.save_temp_path, save_path=self.save_path, video_format="avi", fps=self.video_meta_data["fps"], remove_splits=True)
             self.timer.stop_timer()
-            terminate_cpu_pool(pool=pool, force=False)
+            terminate_cpu_pool(pool=pool, force=False, source=self.__class__.__name__)
             stdout_success(msg=f"Video {self.video_name} complete. Video saved in {self.directing_animals_video_output_path} directory", elapsed_time=self.timer.elapsed_time_str)
 
 
-# style_attr = {SHOW_POSE: True,
-#               ANIMAL_NAMES: False,
-#               CIRCLE_SIZE: 3,
-#               DIRECTIONALITY_COLOR: [(255, 0, 0), (0, 0, 255)],
-#               DIRECTION_THICKNESS: 10,
-#               HIGHLIGHT_ENDPOINTS: True}
-# test = DirectingOtherAnimalsVisualizerMultiprocess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
-#                                                    video_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi',
-#                                                    style_attr=style_attr,
-#                                                    core_cnt=-1)
-#
-# test.run()
+
+
+
+
+# if __name__ == "__main__":
+#     style_attr = {SHOW_POSE: True,
+#                   ANIMAL_NAMES: False,
+#                   CIRCLE_SIZE: 3,
+#                   DIRECTIONALITY_COLOR: [(255, 0, 0), (0, 0, 255)],
+#                   DIRECTION_THICKNESS: 10,
+#                   HIGHLIGHT_ENDPOINTS: True}
+#     test = DirectingOtherAnimalsVisualizerMultiprocess(config_path=r"D:\troubleshooting\two_animals_sleap\project_folder\project_config.ini",
+#                                                        video_path=r"D:\troubleshooting\two_animals_sleap\project_folder\videos\Test2025-05-14_11-15-49.mp4",
+#                                                        style_attr=style_attr,
+#                                                        core_cnt=5,
+#                                                        time_slice={START_TIME: '00:01:00', END_TIME: '00:02:00'},
+#                                                        left_ear_name='earL1',
+#                                                        right_ear_name='earR1',
+#                                                        nose_name='nose1')
+#     test.run()
 
 
 # style_attr = {'Show_pose': True,

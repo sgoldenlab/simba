@@ -17,6 +17,8 @@ import plotly.graph_objs as go
 import seaborn as sns
 from matplotlib import cm
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+from matplotlib.ticker import FuncFormatter, MaxNLocator
 from numba import bool_, njit, uint8
 from PIL import Image
 
@@ -34,7 +36,7 @@ from simba.utils.checks import (
     check_if_keys_exist_in_dict, check_if_valid_rgb_tuple, check_instance,
     check_int, check_str, check_that_column_exist, check_valid_array,
     check_valid_boolean, check_valid_dataframe, check_valid_lst,
-    check_valid_tuple)
+    check_valid_tuple, check_if_valid_img)
 from simba.utils.data import create_color_palette, detect_bouts
 from simba.utils.enums import Formats, Keys, Options, Paths
 from simba.utils.errors import InvalidInputError
@@ -510,47 +512,111 @@ class PlottingMixin(object):
                                    aspect_ratio: float,
                                    shading: str,
                                    img_size: Tuple[int, int],
-                                   file_name: Optional[Union[str, os.PathLike]] = None):
+                                   file_name: Optional[Union[str, os.PathLike]] = None,
+                                   line_clr: Optional[str] = None,
+                                   min_seconds: Optional[float] = None,
+                                   bg_img: Optional[np.ndarray] = None,
+                                   heatmap_opacity: Optional[float] = 0.99,
+                                   color_legend: bool = True,
+                                   leg_width: Optional[int] = None) -> Union[np.ndarray, None]:
 
         cum_df = pd.DataFrame(frm_data).reset_index()
         cum_df = cum_df.melt(id_vars="index", value_vars=None, var_name=None, value_name="seconds", col_level=None).rename(columns={"index": "vertical_idx", "variable": "horizontal_idx"})
+        below_min = cum_df["seconds"] < min_seconds if min_seconds is not None else pd.Series(False, index=cum_df.index)
+        if min_seconds is not None:
+            cum_df.loc[below_min, "seconds"] = 0
         cum_df["color"] = ((cum_df["seconds"].astype(float) / float(max_scale)).round(2).clip(upper=100))
         color_array = np.zeros((len(cum_df["vertical_idx"].unique()), len(cum_df["horizontal_idx"].unique())))
+        below_min_arr = np.zeros(color_array.shape, dtype=bool)
         for i in range(color_array.shape[0]):
             for j in range(color_array.shape[1]):
-                value = cum_df["color"][(cum_df["horizontal_idx"] == j) & (cum_df["vertical_idx"] == i)].values[0]
-                color_array[i, j] = value
+                mask = (cum_df["horizontal_idx"] == j) & (cum_df["vertical_idx"] == i)
+                color_array[i, j] = cum_df.loc[mask, "color"].values[0]
+                if min_seconds is not None:
+                    below_min_arr[i, j] = below_min.loc[mask].values[0]
         color_array = color_array * max_scale
+        if min_seconds is not None and bg_img is None:
+            color_array = color_array.astype(np.float64)
+            color_array[below_min_arr] = np.nan
+        vmin_plot = min_seconds if min_seconds is not None else 0.0
         matplotlib.font_manager._get_font.cache_clear()
         plt.close("all")
-        fig = plt.figure()
-        im_ratio = color_array.shape[0] / color_array.shape[1]
-        plt.pcolormesh(color_array,
-                       shading=shading,
-                       cmap=palette,
-                       rasterized=True,
-                       alpha=1,
-                       vmin=0.0,
-                       vmax=max_scale)
-
+        fig = plt.figure(facecolor="white")
+        ax = plt.gca()
+        ax.set_facecolor("white")
+        if line_clr is not None:
+            linewidths = PlottingMixin().get_optimal_circle_size(frame_size=img_size, circle_frame_ratio=175)
+        else:
+            linewidths = None
+        plt.pcolormesh(color_array, shading=shading, cmap=palette, rasterized=True, alpha=1, vmin=vmin_plot, vmax=max_scale, linewidths=linewidths, edgecolors=line_clr)
+        plt.gca().set_aspect("equal")
         plt.gca().invert_yaxis()
         plt.xticks([])
         plt.yticks([])
         plt.axis("off")
         plt.tick_params(axis="both", which="both", length=0)
-        cb = plt.colorbar(pad=0.0, fraction=0.023 * im_ratio)
-        cb.ax.tick_params(size=0)
-        cb.outline.set_visible(False)
-        cb.set_label("location (seconds)", rotation=270, labelpad=10)
         plt.tight_layout()
-        # plt.gca().set_aspect(aspect_ratio)
         canvas = FigureCanvas(fig)
         canvas.draw()
         mat = np.array(canvas.renderer._renderer)
         image = cv2.cvtColor(mat, cv2.COLOR_RGB2BGR)
-        image = cv2.resize(image, img_size)
         image = np.uint8(image)
         plt.close("all")
+        if bg_img is not None:
+            check_if_valid_img(data=bg_img, source=f'{PlottingMixin.make_location_heatmap_plot.__name__} bg_img', raise_error=False)
+            bg_h, bg_w = bg_img.shape[0], bg_img.shape[1]
+            if bg_img.ndim == 2:
+                bg_img = cv2.cvtColor(bg_img, cv2.COLOR_GRAY2BGR)
+            image = cv2.resize(image, (bg_w, bg_h))
+            heatmap_w = max(0.0, min(1.0, float(heatmap_opacity) if heatmap_opacity is not None else 0.8))
+            threshold = max(1e-9, float(max_scale) * 0.01)
+            alpha_mask = (color_array > threshold).astype(np.float64)
+            alpha_resized = cv2.resize(alpha_mask, (bg_w, bg_h), interpolation=cv2.INTER_LINEAR)
+            blend = np.clip(alpha_resized * heatmap_w, 0, 1)
+            blend_3ch = np.repeat(blend[:, :, np.newaxis], 3, axis=2)
+            image = (image.astype(np.float64) * blend_3ch + bg_img.astype(np.float64) * (1.0 - blend_3ch)).round().astype(np.uint8)
+        if color_legend:
+            fig_cb = Figure(figsize=(0.6, 4))
+            ax_cb = fig_cb.add_subplot(111)
+            sm = cm.ScalarMappable(cmap=palette, norm=matplotlib.colors.Normalize(vmin=vmin_plot, vmax=max_scale))
+            sm.set_array([])
+            cb = fig_cb.colorbar(sm, cax=ax_cb)
+            cb.set_label("location (seconds)", rotation=270, labelpad=14, fontsize=10)
+            cb.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+
+            def _legend_formatter(x, pos):
+                if x >= max_scale - 1e-9:
+                    return f">{int(round(max_scale))}"
+                if min_seconds is not None and x <= vmin_plot + 1e-9:
+                    return f"<{int(round(min_seconds))}"
+                return str(int(round(x)))
+
+            cb.ax.yaxis.set_major_formatter(FuncFormatter(_legend_formatter))
+            cb.ax.tick_params(size=0)
+            cb.outline.set_visible(False)
+            buf = io.BytesIO()
+            fig_cb.savefig(buf, format="png", dpi=100, bbox_inches="tight", pad_inches=0.15)
+            buf.seek(0)
+            mat_cb = np.array(Image.open(buf).convert("RGB"))
+            plt.close(fig_cb)
+            cb_bgr = cv2.cvtColor(mat_cb, cv2.COLOR_RGB2BGR)
+            leg_h = image.shape[0]
+            leg_w = leg_width if leg_width is not None else max(1, int(cb_bgr.shape[1] * leg_h / cb_bgr.shape[0]))
+            cb_resized = cv2.resize(cb_bgr, (leg_w, leg_h), interpolation=cv2.INTER_LINEAR)
+            image = np.hstack((image, cb_resized))
+        if not color_legend:
+            h, w = image.shape[:2]
+            target_w, target_h = img_size[0], img_size[1]
+            scale = min(target_w / w, target_h / h)
+            new_w, new_h = int(round(w * scale)), int(round(h * scale))
+            image = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+            if new_w < target_w or new_h < target_h:
+                padded = np.zeros((target_h, target_w, image.shape[2]), dtype=image.dtype)
+                padded[:] = 0
+                y0 = (target_h - new_h) // 2
+                x0 = (target_w - new_w) // 2
+                padded[y0 : y0 + new_h, x0 : x0 + new_w] = image
+                image = padded
         if file_name is not None:
             cv2.imwrite(file_name, image)
             stdout_success(msg=f"Location heatmap image saved at at {file_name}", source=PlottingMixin.make_location_heatmap_plot.__class__.__name__)
@@ -1704,6 +1770,7 @@ class PlottingMixin(object):
                           start_positions: np.ndarray,
                           end_positions: np.ndarray,
                           color: Tuple[int, int, int],
+                          opacity: Optional[float] = None,
                           highlight_endpoint: Optional[bool] = False,
                           thickness: Optional[int] = 2,
                           circle_size: Optional[int] = 2) -> np.ndarray:
@@ -1721,39 +1788,24 @@ class PlottingMixin(object):
         :return np.ndarray: The image with the lines overlayed.
         """
 
-        check_valid_array(
-            data=start_positions,
-            source=f"{PlottingMixin.draw_lines_on_img.__name__} img",
-        )
-        check_valid_array(
-            data=start_positions,
-            source=f"{PlottingMixin.draw_lines_on_img.__name__} start_positions",
-            accepted_ndims=(2,),
-            accepted_dtypes=(Formats.INTEGER_DTYPES.value),
-            min_axis_0=1,
-        )
-        check_valid_array(
-            data=end_positions,
-            source=f"{PlottingMixin.draw_lines_on_img.__name__} end_positions",
-            accepted_shapes=[(start_positions.shape[0], 2),],
-            accepted_dtypes=Formats.INTEGER_DTYPES.value)
+        check_valid_array(data=start_positions, source=f"{PlottingMixin.draw_lines_on_img.__name__} start_positions")
+        check_valid_array(data=start_positions, source=f"{PlottingMixin.draw_lines_on_img.__name__} start_positions", accepted_ndims=(2,), accepted_dtypes=(Formats.INTEGER_DTYPES.value), min_axis_0=1 )
+        check_valid_array(data=end_positions, source=f"{PlottingMixin.draw_lines_on_img.__name__} end_positions", accepted_shapes=[(start_positions.shape[0], 2),], accepted_dtypes=Formats.INTEGER_DTYPES.value)
+        check_if_valid_img(data=img, source=f"{PlottingMixin.draw_lines_on_img.__name__} img", raise_error=True)
+        if opacity is not None: check_float(name=f"{PlottingMixin.draw_lines_on_img.__name__} opacity", value=opacity, min_value=0.0, max_value=1.0, raise_error=True, allow_negative=False)
         check_if_valid_rgb_tuple(data=color)
-        for i in range(start_positions.shape[0]):
-            cv2.line(
-                img,
-                (start_positions[i][0], start_positions[i][1]),
-                (end_positions[i][0], end_positions[i][1]),
-                color,
-                thickness,
-            )
-            if highlight_endpoint:
-                cv2.circle(
-                    img,
-                    (end_positions[i][0], end_positions[i][1]),
-                    circle_size,
-                    color,
-                    -1,
-                )
+        if opacity is not None and opacity < 1.0:
+            line_layer = img.copy()
+            for i in range(start_positions.shape[0]):
+                cv2.line(img, pt1=(start_positions[i][0], start_positions[i][1]), pt2=(end_positions[i][0], end_positions[i][1]), color=color, thickness=thickness)
+                if highlight_endpoint:
+                    cv2.circle(img,(end_positions[i][0], end_positions[i][1]), circle_size, color, -1)
+            img = cv2.addWeighted(line_layer, 1 - opacity, img, opacity, 0)
+        else:
+            for i in range(start_positions.shape[0]):
+                cv2.line(img, pt1=(start_positions[i][0], start_positions[i][1]), pt2=(end_positions[i][0], end_positions[i][1]), color=color, thickness=thickness)
+                if highlight_endpoint:
+                    cv2.circle(img,(end_positions[i][0], end_positions[i][1]), circle_size, color, -1)
         return img
 
 

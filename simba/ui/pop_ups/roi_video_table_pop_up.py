@@ -12,15 +12,14 @@ from simba.ui.pop_ups.duplicate_rois_by_source_target_popup import \
 from simba.ui.pop_ups.import_roi_csv_popup import \
     ROIDefinitionsCSVImporterPopUp
 from simba.ui.pop_ups.min_max_draw_size_popup import SetMinMaxDrawWindowSize
-from simba.ui.pop_ups.roi_size_standardizer_popup import \
-    ROISizeStandardizerPopUp
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
-                                        SimbaButton, SimBALabel)
+from simba.ui.pop_ups.roi_size_standardizer_popup import ROISizeStandardizerPopUp
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, SimbaButton, SimBALabel)
 from simba.utils.checks import check_file_exist_and_readable
-from simba.utils.enums import Formats, Keys, Links
+from simba.utils.enums import Formats, Links
 from simba.utils.errors import NoFilesFoundError
-from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
-                                    read_frm_of_video)
+from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,  read_frm_of_video)
+from simba.ui.pop_ups.delete_all_rois_pop_up import delete_all_rois_pop_up
+
 
 WINDOW_SIZE = (720, 960)
 
@@ -74,6 +73,7 @@ class ROIVideoTable(ConfigReader, PopUpMixin):
         file_menu.add_command(label="Duplicate ROIs from source video to target videos... ", compound="left", image=self.menu_icons["duplicate_small"]["img"], command=lambda: DuplicateROIsBySourceTarget(config_path=self.config_path, roi_data_path=self.roi_coordinates_path, roi_table_popup=self))
         file_menu.add_command(label="Import SimBA ROI CSV definitions... ", compound="left", image=self.menu_icons["csv_black"]["img"], command=lambda: ROIDefinitionsCSVImporterPopUp(config_path=self.config_path, roi_table_frm=self))
         file_menu.add_command(label="Set min/max draw window size...", compound="left", image=self.menu_icons["monitor"]["img"], command=lambda: SetMinMaxDrawWindowSize(config_path=self.config_path))
+        file_menu.add_command(label="Delete all ROIs...", compound="left", image=self.menu_icons["trash"]["img"], command=lambda: delete_all_rois_pop_up(config_path=self.config_path, roi_table_frm=self))
         self.root.config(menu=menu)
 
     def run(self):

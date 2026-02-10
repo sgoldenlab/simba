@@ -242,9 +242,8 @@ class LoadProjectPopUp(object):
         for k in self.btn_icons.keys(): self.btn_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), self.btn_icons[k]["icon_path"])))
         self.main_frm.iconphoto(False, self.btn_icons['browse']["img"])
         self.load_project_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="LOAD SIMBA PROJECT_CONFIG.INI", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LOAD_PROJECT.value)
-        self.selected_file = FileSelect(self.load_project_frm, "SIMBA CONFIG FILE: ", title="Select project_config.ini file", file_types=[("SimBA Project .ini", "*.ini")], lblwidth=30, lbl_icon='file_type')
+        self.selected_file = FileSelect(self.load_project_frm, "SIMBA CONFIG FILE: ", title="Select project_config.ini file", file_types=[("SimBA Project .ini", "*.ini")], lblwidth=30, lbl_icon='file_type', tooltip_key='LOAD_PROJECT_CONFIG_FILE')
         load_project_btn = SimbaButton(parent=self.load_project_frm, txt="LOAD PROJECT PATH", txt_clr='blue', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.launch_project, cmd_kwargs={'project_path': lambda: self.selected_file.file_path})
-        #load_project_btn = SimbaButton(parent=self.load_project_frm, txt="LOAD PROJECT PATH", txt_clr='blue', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.launch_project, cmd_kwargs={'project_path': self.selected_file.file_path})
         self.load_project_frm.grid(row=0, sticky=NW, pady=(0, 10))
         self.selected_file.grid(row=0, sticky=NW)
         load_project_btn.grid(row=1, pady=(3, 0), sticky=NW)
@@ -252,7 +251,7 @@ class LoadProjectPopUp(object):
         if len(recent_project_paths) > 0:
             max_len = max(len(s) for s in recent_project_paths)
             self.load_recent_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="LOAD RECENT PROJECT", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LOAD_PROJECT.value)
-            self.recent_project_dropdown = SimBADropDown(parent=self.load_recent_frm, dropdown_options=recent_project_paths, label='RECENT CONFIG FILE PATH:', label_width=30, value=recent_project_paths[0], dropdown_width=max_len)
+            self.recent_project_dropdown = SimBADropDown(parent=self.load_recent_frm, dropdown_options=recent_project_paths, label='RECENT CONFIG FILE PATH:', label_width=30, value=recent_project_paths[0], dropdown_width=max_len, tooltip_key='LOAD_PROJECT_RECENT_CONFIG')
             self.load_recent_project_btn = SimbaButton(parent=self.load_recent_frm, txt="LOAD RECENT PROJECT", txt_clr='darkgreen', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.launch_project, cmd_kwargs={'project_path': lambda: self.recent_project_dropdown.get_value()})
             self.load_recent_frm.grid(row=1, sticky=NW)
             self.recent_project_dropdown.grid(row=0, sticky=NW)
@@ -345,7 +344,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         import_frm.grid(row=0, column=0, sticky=NW)
 
         further_methods_frm = CreateLabelFrameWithIcon(parent=import_frm, header="FURTHER METHODS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ADDITIONAL_IMPORTS.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
-        extract_frm_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="EXTRACT FRAMES FOR ALL VIDEOS IN SIMBA PROJECT", txt_clr='blue', compound='right', img='image', font=Formats.FONT_REGULAR.value, cmd=extract_frames_from_all_videos_in_directory, cmd_kwargs={'config_path': lambda:self.config_path, 'directory': lambda:self.video_dir})
+        extract_frm_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="EXTRACT FRAMES FOR ALL VIDEOS IN SIMBA PROJECT", txt_clr='blue', compound='right', img='image', font=Formats.FONT_REGULAR.value, cmd=extract_frames_from_all_videos_in_directory, cmd_kwargs={'config_path': lambda:self.config_path, 'directory': lambda:self.video_dir, 'confirm_popup': True})
         import_frm_dir_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="IMPORT FRAMES DIRECTORY TO SIMBA PROJECT", txt_clr='blue', compound='right', img='import', font=Formats.FONT_REGULAR.value, cmd=ImportFrameDirectoryPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         add_clf_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="ADD CLASSIFIER TO SIMBA PROJECT", txt_clr='blue', compound='right', img='plus', font=Formats.FONT_REGULAR.value, cmd=AddClfPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         remove_clf_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="REMOVE CLASSIFIER FROM SIMBA PROJECT", txt_clr='blue', compound='right', img='trash', font=Formats.FONT_REGULAR.value, cmd=RemoveAClassifierPopUp, cmd_kwargs={'config_path': lambda:self.config_path})

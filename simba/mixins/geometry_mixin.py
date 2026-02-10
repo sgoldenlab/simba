@@ -3291,9 +3291,10 @@ class GeometryMixin(object):
     @staticmethod
     def _cumsum_coord_geometries_helper(data: np.ndarray, geometries: Dict[Tuple[int, int], Polygon], verbose: bool
                                         ):
-        data_point = Point(data[1:])
+        data_point = Point(data[1:3])
         if verbose:
-            stdout_information(msg=f"Processing animal grid square location in frame {int(data[0])}...")
+            core_id = int(data[3]) if data.shape[0] > 3 else multiprocessing.current_process().name
+            stdout_information(msg=f"Processing animal grid square location in frame {int(data[0])} (core {core_id})...")
         for k, r in geometries.items():
             if r.contains(data_point):
                 return (int(data[0]), k[0], k[1])
@@ -3331,30 +3332,27 @@ class GeometryMixin(object):
         timer = SimbaTimer(start=True)
         check_instance(source=f"{self.__class__.__name__} data", instance=data, accepted_types=np.ndarray)
         if (data.shape[1] != 2) or (data.ndim != 2):
-            raise CountError(
-                msg=f"A N x 2 array is required (got {data.shape})",
-                source=self.__class__.__name__,
-            )
+            raise CountError(msg=f"A N x 2 array is required (got {data.shape})", source=f'{self.__class__.__name__} data')
         if fps is not None:
             check_int(name="fps", value=fps, min_value=1)
         else:
             fps = 1
         check_int(name="core_cnt", value=core_cnt, min_value=-1)
-        if core_cnt == -1:
-            core_cnt = find_core_cnt()[0]
+        if core_cnt == -1: core_cnt = find_core_cnt()[0]
         w, h = 0, 0
         for k in geometries.keys():
             w, h = max(w, k[0]), max(h, k[1])
         frm_id = np.arange(0, data.shape[0]).reshape(-1, 1)
-        data = np.hstack((frm_id, data))
+        core_id = (np.arange(0, data.shape[0]) % core_cnt).reshape(-1, 1)
+        data = np.hstack((frm_id, data, core_id))
         img_arr = np.zeros((data.shape[0], h + 1, w + 1))
         pool_terminate_flag = False if pool is not None else True
         if pool is not None: check_valid_cpu_pool(value=pool, source=f'{GeometryMixin().cumsum_coord_geometries.__name__} pool', raise_error=True, accepted_cores=core_cnt)
         else: pool = get_cpu_pool(core_cnt=core_cnt, source=GeometryMixin().cumsum_coord_geometries.__name__)
         constants = functools.partial(self._cumsum_coord_geometries_helper, geometries=geometries, verbose=verbose)
-        for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
+        for cnt, result in enumerate(pool.imap(constants, data, chunksize=500)):
             if result[1] != -1:
-                img_arr[result[0], result[2] - 1, result[1] - 1] = 1
+                img_arr[result[0], result[2], result[1]] = 1
         if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().cumsum_coord_geometries.__name__)
         timer.stop_timer()
         stdout_success(msg="Cumulative coordinates in geometries complete", elapsed_time=timer.elapsed_time_str)
@@ -3447,7 +3445,7 @@ class GeometryMixin(object):
         constants = functools.partial(self._cumsum_bool_helper, geometries=geometries, verbose=verbose)
         for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
             if result[1] != -1:
-                img_arr[result[0], result[2] - 1, result[1] - 1] = 1
+                img_arr[result[0], result[2], result[1]] = 1
         if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=GeometryMixin().cumsum_bool_geometries.__name__)
         if fps is None:
             return np.cumsum(img_arr, axis=0)

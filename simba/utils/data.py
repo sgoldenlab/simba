@@ -37,11 +37,12 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_module_has_import,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_if_valid_rgb_tuple, check_instance,
-                                check_int, check_str, check_that_column_exist,
+                                check_int, check_iterable_length, check_str,
+                                check_that_column_exist,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_array, check_valid_boolean,
                                 check_valid_cpu_pool, check_valid_dataframe,
-                                check_valid_lst)
+                                check_valid_lst, check_valid_tuple)
 from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Formats, Keys,
                                Options)
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
@@ -1913,6 +1914,50 @@ def get_cpu_pool(core_cnt: int = -1,
     else:
         pool = multiprocessing.Pool(processes=core_cnt, maxtasksperchild=maxtasksperchild)
     return pool
+
+
+def scale_pose_keypoints(keypoints: np.ndarray,
+                         original_size: Tuple[int, int],
+                         new_size: Tuple[int, int]) -> np.ndarray:
+    """
+    Scale pose keypoints from original image dimensions to new image dimensions.
+
+    :param np.ndarray keypoints: Nx2 array of (x, y) coordinates in pixel space, or 1D array of (x, y) for a single point.
+    :param Tuple[int, int] original_size: (width, height) of the original image.
+    :param Tuple[int, int] new_size: (width, height) of the target image.
+    :return: Array of scaled (x, y) coordinates. Same shape as input (1D if input was 1D, else Nx2).
+
+    :example:
+    >>> kp = np.array([[100, 200], [300, 400]])
+    >>> scale_pose_keypoints(kp, original_size=(640, 480), new_size=(320, 240))
+    >>> scale_pose_keypoints(np.array([100, 200]), original_size=(640, 480), new_size=(320, 240))
+    """
+    check_instance(source=f'{scale_pose_keypoints.__name__} keypoints', instance=keypoints, accepted_types=(np.ndarray, list, tuple))
+    keypoints = np.asarray(keypoints, dtype=np.float64)
+    if keypoints.ndim == 1:
+        check_iterable_length(source=f'{scale_pose_keypoints.__name__} keypoints', val=len(keypoints), exact_accepted_length=2)
+        keypoints = keypoints.reshape(1, 2)
+        squeeze_output = True
+    elif keypoints.ndim == 2:
+        check_valid_array(data=keypoints, source=f'{scale_pose_keypoints.__name__} keypoints', accepted_ndims=(2,), accepted_axis_1_shape=[2])
+        squeeze_output = False
+    else:
+        raise InvalidInputError(msg=f'{scale_pose_keypoints.__name__} keypoints must be 1D (2,) or 2D (N,2), got ndim {keypoints.ndim}', source=scale_pose_keypoints.__name__)
+
+    check_valid_tuple(x=tuple(original_size), source=f'{scale_pose_keypoints.__name__} original_size', accepted_lengths=(2,), valid_dtypes=Formats.INTEGER_DTYPES.value, min_integer=1)
+    check_valid_tuple(x=tuple(new_size), source=f'{scale_pose_keypoints.__name__} new_size', accepted_lengths=(2,), valid_dtypes=Formats.INTEGER_DTYPES.value, min_integer=1)
+
+    orig_w, orig_h = original_size[0], original_size[1]
+    new_w, new_h = new_size[0], new_size[1]
+
+    scale_x, scale_y = new_w / orig_w, new_h / orig_h
+    scaled = keypoints.copy()
+    scaled[:, 0] = keypoints[:, 0] * scale_x
+    scaled[:, 1] = keypoints[:, 1] * scale_y
+
+    if squeeze_output:
+        return scaled.reshape(2).astype(np.int32)
+    return scaled.astype(np.int32)
 
 
 #get_cpu_pool()
