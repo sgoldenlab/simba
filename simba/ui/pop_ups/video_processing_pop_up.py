@@ -192,8 +192,8 @@ class ClipVideoPopUp(PopUpMixin):
 
         method_1_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="METHOD 1", icon_name='circle_black', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5)
         label_set_time_1 = SimBALabel(parent=method_1_frm, txt="Please enter the time frame in HH:MM:SS format", font=Formats.FONT_REGULAR_ITALICS.value)
-        self.start_time = Entry_Box(method_1_frm,  fileDescription="START AT (HH:MM:SS):", labelwidth=35, img='play', justify='center')
-        self.end_time = Entry_Box(method_1_frm, fileDescription="END AT (HH:MM:SS):", labelwidth=35, img='stop', justify='center')
+        self.start_time = Entry_Box(method_1_frm,  fileDescription="START AT (HH:MM:SS):", labelwidth=35, img='play', justify='center', trace=self._check_valid_timestamp)
+        self.end_time = Entry_Box(method_1_frm, fileDescription="END AT (HH:MM:SS):", labelwidth=35, img='stop', justify='center', trace=self._check_valid_timestamp)
         CreateToolTip(method_1_frm, "Method 1 will retrieve the specified time input. (eg: input of Start at: 00:00:00, End at: 00:01:00, will create a new video from the chosen video from the very start till it reaches the first minute of the video)")
         button_cutvideo_method_1 = SimbaButton(parent=method_1_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=clip_video_in_range, cmd_kwargs={'file_path': lambda: self.selected_video.file_path, 'quality': lambda: self.quality_dropdown.get_value(), 'start_time': lambda:self.start_time.entry_get.strip(), 'end_time': lambda:self.end_time.entry_get.strip(), 'gpu': lambda: str_2_bool(self.gpu_dropdown.get_value())})
         button_cutvideo_method_1.grid(row=3, column=0, sticky=NW)
@@ -223,6 +223,14 @@ class ClipVideoPopUp(PopUpMixin):
         label_method_3.grid(row=0, column=0, sticky=NW)
         method_3_time.grid(row=1, column=0, sticky=NW)
         button_cutvideo_method_3.grid(row=2, column=0, sticky=NW)
+        #self.main_frm.mainloop()
+
+
+
+    def _check_valid_timestamp(self, entry_box: Entry_Box, valid_clr: str = 'white', invalid_clr: str = 'lightsalmon'):
+        valid_time_stamp = check_if_string_value_is_valid_video_timestamp(value=entry_box.entry_get, raise_error=False, name='')
+        clr = valid_clr if valid_time_stamp else invalid_clr
+        entry_box.set_bg_clr(clr=clr)
 
     def initiate_clipper(self):
         check_file_exist_and_readable(file_path=self.selected_video.file_path, raise_error=True)
@@ -259,6 +267,8 @@ class ClipVideoPopUp(PopUpMixin):
         self.start_time.entry_set(start_time)
         self.end_time.entry_set(end_time)
 
+
+#ClipVideoPopUp()
 class GreyscaleSingleVideoPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="GREYSCALE VIDEO", icon='grey')
