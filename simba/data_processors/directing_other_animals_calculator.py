@@ -23,6 +23,7 @@ from simba.utils.printing import (SimbaTimer, log_event, stdout_information,
                                   stdout_success)
 from simba.utils.read_write import (create_directory, get_fn_ext, read_df,
                                     write_df, seconds_to_timestamp)
+from simba.utils.data import detect_bouts
 
 NOSE, EAR_LEFT, EAR_RIGHT = Keys.NOSE.value, Keys.EAR_LEFT.value, Keys.EAR_RIGHT.value
 X_BPS, Y_BPS = Keys.X_BPS.value, Keys.Y_BPS.value
@@ -74,7 +75,8 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
                  left_ear_name: Optional[str] = None,
                  right_ear_name: Optional[str] = None,
                  nose_name: Optional[str] = None,
-                 save_dir: Optional[Union[str, os.PathLike]] = None):
+                 save_dir: Optional[Union[str, os.PathLike]] = None,
+                 ):
 
         check_file_exist_and_readable(file_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)
@@ -132,15 +134,15 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
                     out_df_lst.append(directing_df)
             self.directionality_df_dict[video_name] = pd.concat(out_df_lst, axis=0).drop("Directing_BOOL", axis=1)
 
-    def _count_bouts_from_frame_indexes(self, frame_indexes):
-        if not frame_indexes:
-            return 0
-        arr = np.unique(np.asarray(list(frame_indexes), dtype=np.int64))
-        if len(arr) == 0:
-            return 0
-        gaps = np.diff(arr) > 1
-        return int(1 + np.sum(gaps))
-
+    def _count_bouts_from_frame_indexes(self, frame_indexes, video_name, fps):
+        df = pd.DataFrame(index=[list(range(0, self.frm_cnts[video_name]))])
+        df['BEHAVIOR'] = 0
+        df.loc[list(frame_indexes), 'BEHAVIOR'] = 1
+        bouts = detect_bouts(data_df=df, target_lst=['BEHAVIOR'], fps=fps)
+        if len(bouts) > 0:
+            return len(bouts), seconds_to_timestamp(bouts['Bout_time'].max()), seconds_to_timestamp(bouts['Bout_time'].min()), seconds_to_timestamp(bouts['Bout_time'].mean())
+        else:
+            return 0, 'None', 'None', 'None'
 
     def run(self):
         if self.aggregate_statistics_tables:
@@ -208,7 +210,7 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
             agg_stat_timer = SimbaTimer(start=True)
             if self.verbose: print("Computing summary statistics...")
             save_path = os.path.join(self.save_dir, f"Direction_aggregate_summary_data_{self.datetime}.csv")
-            out_df = pd.DataFrame(columns=["VIDEO", "ANIMAL PERMUTATION", "TOTAL DIRECTING TIME (S)", "PROPORTION OF VIDEO (%)", "FIRST DIRECTING TIME (HH:MM:SS)", "LAST DIRECTING TIME (HH:MM:SS)", "DIRECTING BOUT COUNT"])
+            out_df = pd.DataFrame(columns=["VIDEO", "ANIMAL PERMUTATION", "TOTAL DIRECTING TIME (S)", "PROPORTION OF VIDEO (%)", "FIRST DIRECTING TIME (HH:MM:SS)", "LAST DIRECTING TIME (HH:MM:SS)", "DIRECTING BOUT COUNT", "LONGEST DIRECTING BOUT (HH:MM:SS)", "SHORTEST DIRECTING BOUT (HH:MM:SS)", "MEAN DIRECTING BOUT (HH:MM:SS)"])
             for video_name, video_data in self.results.items():
                 _, _, fps = self.read_video_info(video_name=video_name)
                 for animal_permutation, permutation_data in video_data.items():
@@ -218,10 +220,9 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
                     directing_time = round(len(idx_directing) / fps, 3)
                     first_directing_time = seconds_to_timestamp((min(idx_directing) / fps)) if len(idx_directing) > 0 else 'NONE'
                     last_directing_time = seconds_to_timestamp((max(idx_directing) / fps)) if len(idx_directing) > 0 else 'NONE'
-                    directing_bout_cnt = self._count_bouts_from_frame_indexes(frame_indexes=idx_directing)
-                    prop = round((len(idx_directing) / self.frm_cnts[video_name]) * 100, 3)
-                    out_df.loc[len(out_df)] = [video_name, animal_permutation, directing_time, prop, first_directing_time, last_directing_time, directing_bout_cnt]
-
+                    directing_bout_cnt, longest_bout, shortest_bout, mean_bout = self._count_bouts_from_frame_indexes(frame_indexes=idx_directing, video_name=video_name, fps=fps)
+                    prop = round((len(idx_directing) / self.frm_cnts[video_name]) * 100, 3) if len(idx_directing) > 0 else 0.00
+                    out_df.loc[len(out_df)] = [video_name, animal_permutation, directing_time, prop, first_directing_time, last_directing_time, directing_bout_cnt, longest_bout, shortest_bout, mean_bout]
             self.out_df = out_df.sort_values(by=["VIDEO", "ANIMAL PERMUTATION"]).set_index("VIDEO")
             self.out_df.to_csv(save_path)
             agg_stat_timer.stop_timer()
@@ -239,8 +240,6 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
         if self.verbose: stdout_success(msg="All directional data saved in SimBA project", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
-
-
 # test = DirectingOtherAnimalsAnalyzer(config_path=r"D:\troubleshooting\two_animals_sleap\project_folder\project_config.ini",
 #                                      bool_tables=True,
 #                                      summary_tables=True,
@@ -251,7 +250,7 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
 #                                      left_ear_name='earR1',
 #                                      right_ear_name='nose1')
 # test.run()
-
+#
 
 # test = DirectingOtherAnimalsAnalyzer(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
 #                                      bool_tables=True,
