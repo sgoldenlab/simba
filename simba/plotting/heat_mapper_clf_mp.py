@@ -4,8 +4,9 @@ import functools
 import multiprocessing
 import os
 import platform
-from typing import List, Union, Tuple, Optional, Dict
 from copy import deepcopy
+from typing import Dict, List, Optional, Tuple, Union
+
 import cv2
 import numpy as np
 import pandas as pd
@@ -14,15 +15,24 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log, check_float,
-    check_filepaths_in_iterable_exist, check_int, check_str,
-    check_valid_boolean, check_valid_dataframe, check_valid_dict, check_if_keys_exist_in_dict, check_if_string_value_is_valid_video_timestamp, check_that_hhmmss_start_is_before_end)
-from simba.utils.data import get_cpu_pool, terminate_cpu_pool, find_frame_numbers_from_time_stamp
+    check_all_file_names_are_represented_in_video_log,
+    check_filepaths_in_iterable_exist, check_float,
+    check_if_keys_exist_in_dict,
+    check_if_string_value_is_valid_video_timestamp, check_int, check_str,
+    check_that_hhmmss_start_is_before_end, check_valid_boolean,
+    check_valid_dataframe, check_valid_dict)
+from simba.utils.data import (find_frame_numbers_from_time_stamp, get_cpu_pool,
+                              terminate_cpu_pool)
 from simba.utils.enums import Formats
+from simba.utils.errors import (FrameRangeError, InvalidInputError,
+                                NoDataError, NoSpecifiedOutputError)
 from simba.utils.lookups import get_named_colors
-from simba.utils.errors import InvalidInputError, NoSpecifiedOutputError, FrameRangeError, NoDataError
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
-from simba.utils.read_write import (concatenate_videos_in_folder, get_video_meta_data, find_core_cnt, get_fn_ext, read_df, remove_a_folder, seconds_to_timestamp, read_frm_of_video, find_video_of_file)
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt, find_video_of_file,
+                                    get_fn_ext, get_video_meta_data, read_df,
+                                    read_frm_of_video, remove_a_folder,
+                                    seconds_to_timestamp)
 
 START_TIME = 'start_time'
 END_TIME = 'end_time'
