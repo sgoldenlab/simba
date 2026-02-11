@@ -20,7 +20,7 @@ from simba.utils.errors import (AnimalNumberError, CountError,
 from simba.utils.lookups import create_directionality_cords
 from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
 from simba.utils.read_write import (create_directory, get_fn_ext, read_df,
-                                    write_df)
+                                    write_df, seconds_to_timestamp)
 
 NOSE, EAR_LEFT, EAR_RIGHT = Keys.NOSE.value, Keys.EAR_LEFT.value, Keys.EAR_RIGHT.value
 X_BPS, Y_BPS = Keys.X_BPS.value, Keys.Y_BPS.value
@@ -130,18 +130,27 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
                     out_df_lst.append(directing_df)
             self.directionality_df_dict[video_name] = pd.concat(out_df_lst, axis=0).drop("Directing_BOOL", axis=1)
 
+    def _count_bouts_from_frame_indexes(self, frame_indexes):
+        if not frame_indexes:
+            return 0
+        arr = np.unique(np.asarray(list(frame_indexes), dtype=np.int64))
+        if len(arr) == 0:
+            return 0
+        gaps = np.diff(arr) > 1
+        return int(1 + np.sum(gaps))
 
 
     def run(self):
         if self.aggregate_statistics_tables:
             check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
-        self.results = {}
+        self.results, self.frm_cnts = {}, {}
         for file_cnt, file_path in enumerate(self.data_paths):
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(file_path)
             self.results[video_name] = {}
             stdout_information(msg=f"Analyzing directionality between animals in video {video_name}... (file {file_cnt+1}/{len(self.data_paths)})")
             data_df = read_df(file_path=file_path, file_type=self.file_type)
+            self.frm_cnts[video_name] = len(data_df)
             for animal_permutation in self.animal_permutations:
                 self.results[video_name][f"{animal_permutation[0]} directing towards {animal_permutation[1]}"] = {}
                 first_animal_bps, second_animal_bps = (self.direct_bp_dict[animal_permutation[0]], self.animal_bp_dict[animal_permutation[1]])
@@ -169,8 +178,8 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
                     bp_data.insert(loc=0, column="Animal_2", value=animal_permutation[1])
                     bp_data.insert(loc=0, column="Animal_1", value=animal_permutation[0])
                     self.results[video_name][f"{animal_permutation[0]} directing towards {animal_permutation[1]}"][x_bp[:-2]] = bp_data
-            #video_timer.stop_timer()
-            #print(f"Direction analysis complete for video {video_name} ({file_cnt + 1}/{len(self.outlier_corrected_paths)}, elapsed time: {video_timer.elapsed_time_str}s)...")
+            video_timer.stop_timer()
+            print(f"Direction analysis complete for video {video_name} ({file_cnt + 1}/{len(self.outlier_corrected_paths)}, elapsed time: {video_timer.elapsed_time_str}s)...")
 
         if self.bool_tables:
             save_dir = os.path.join(self.save_dir, f"Animal_directing_animal_booleans_{self.datetime}")
@@ -197,15 +206,19 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
             agg_stat_timer = SimbaTimer(start=True)
             if self.verbose: print("Computing summary statistics...")
             save_path = os.path.join(self.save_dir, f"Direction_aggregate_summary_data_{self.datetime}.csv")
-            out_df = pd.DataFrame(columns=["VIDEO", "ANIMAL PERMUTATION", "VALUE (S)"])
+            out_df = pd.DataFrame(columns=["VIDEO", "ANIMAL PERMUTATION", "TOTAL DIRECTING TIME (S)", "PROPORTION OF VIDEO (%)", "FIRST DIRECTING TIME (HH:MM:SS)", "LAST DIRECTING TIME (HH:MM:SS)", "DIRECTING BOUT COUNT"])
             for video_name, video_data in self.results.items():
                 _, _, fps = self.read_video_info(video_name=video_name)
                 for animal_permutation, permutation_data in video_data.items():
                     idx_directing = set()
                     for bp_name, bp_data in permutation_data.items():
                         idx_directing.update(list(bp_data.index[bp_data["Directing_BOOL"] == 1]))
-                    value = round(len(idx_directing) / fps, 3)
-                    out_df.loc[len(out_df)] = [video_name, animal_permutation, value]
+                    directing_time = round(len(idx_directing) / fps, 3)
+                    first_directing_time = seconds_to_timestamp((min(idx_directing) / fps)) if len(idx_directing) > 0 else 'NONE'
+                    last_directing_time = seconds_to_timestamp((max(idx_directing) / fps)) if len(idx_directing) > 0 else 'NONE'
+                    directing_bout_cnt = self._count_bouts_from_frame_indexes(frame_indexes=idx_directing)
+                    prop = round((len(idx_directing) / self.frm_cnts[video_name]) * 100, 3)
+                    out_df.loc[len(out_df)] = [video_name, animal_permutation, directing_time, prop, first_directing_time, last_directing_time, directing_bout_cnt]
 
             self.out_df = out_df.sort_values(by=["VIDEO", "ANIMAL PERMUTATION"]).set_index("VIDEO")
             self.out_df.to_csv(save_path)
