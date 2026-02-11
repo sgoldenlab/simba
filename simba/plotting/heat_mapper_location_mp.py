@@ -128,6 +128,10 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
        :width: 600
        :align: center
 
+    .. video:: _static/img/HeatMapperLocationMultiprocess.webm
+       :width: 600
+       :loop:
+
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
     :param Union[List[Union[str, os.PathLike]], str, os.PathLike] data_paths: Path(s) to outlier-corrected movement or location CSV file(s). If None, uses all files in project.
     :param str bodypart: Body-part name used for location heatmap (e.g. 'Nose_1'). The heatmap shows where this body-part spends time.

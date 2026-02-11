@@ -21,7 +21,7 @@ from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
 from simba.video_processors.video_processing import (change_playback_speed,
                                                      change_playback_speed_dir)
 
-SPEED_OPTIONS = [round(x, 2) for x in np.arange(0.1, 10.1, 0.1)]
+SPEED_OPTIONS = [round(x, 2) for x in np.arange(0.1, 40.1, 0.1)]
 QUALITY_OPTIONS = list(range(10, 110, 10))
 
 class ChangeSpeedPopup(PopUpMixin):

@@ -3,7 +3,7 @@ __author__ = "Simon Nilsson; sronilsson@gmail.com"
 import itertools
 import os
 from copy import deepcopy
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 import numpy as np
 import pandas as pd
@@ -13,12 +13,12 @@ from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_that_dir_has_list_of_filenames,
-    check_valid_boolean, check_valid_dataframe, check_valid_lst)
-from simba.utils.enums import Formats, Keys, Paths, TagNames
+    check_valid_boolean, check_valid_dataframe, check_valid_lst, check_if_dir_exists)
+from simba.utils.enums import Formats, Keys, TagNames
 from simba.utils.errors import (AnimalNumberError, CountError,
                                 InvalidInputError, NoFilesFoundError)
 from simba.utils.lookups import create_directionality_cords
-from simba.utils.printing import SimbaTimer, log_event, stdout_success
+from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
 from simba.utils.read_write import (create_directory, get_fn_ext, read_df,
                                     write_df)
 
@@ -26,6 +26,7 @@ NOSE, EAR_LEFT, EAR_RIGHT = Keys.NOSE.value, Keys.EAR_LEFT.value, Keys.EAR_RIGHT
 X_BPS, Y_BPS = Keys.X_BPS.value, Keys.Y_BPS.value
 
 class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
+
     """
     Calculate when animals are directing towards body-parts of other animals. Results are stored in
     the ``project_folder/logs/directionality_dataframes`` directory of the SimBA project.
@@ -62,22 +63,23 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
 
     def __init__(self,
                  config_path: Union[str, os.PathLike],
-                 data_paths: Optional[Union[str, os.PathLike, None]] = None,
-                 bool_tables: Optional[bool] = True,
-                 summary_tables: Optional[bool] = False,
-                 append_bool_tables_to_features: Optional[bool] = False,
-                 aggregate_statistics_tables: Optional[bool] = False,
-                 verbose: Optional[bool] = True,
+                 data_paths: Optional[Union[str, os.PathLike, None, List[str]]] = None,
+                 bool_tables: bool = True,
+                 summary_tables: bool = False,
+                 append_bool_tables_to_features: bool = False,
+                 aggregate_statistics_tables: bool = False,
+                 verbose: bool = True,
                  left_ear_name: Optional[str] = None,
                  right_ear_name: Optional[str] = None,
-                 nose_name: Optional[str] = None):
+                 nose_name: Optional[str] = None,
+                 save_dir: Optional[Union[str, os.PathLike]] = None):
 
         check_file_exist_and_readable(file_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)
         FeatureExtractionMixin.__init__(self, config_path=config_path)
         if data_paths is None:
             data_paths = deepcopy(self.outlier_corrected_paths)
-            if len(data_paths) == 0: raise NoFilesFoundError(msg=f'No data files cound be found in the {self.outlier_corrected_dir} directory', source=self.__class__.__name__)
+            if len(data_paths) == 0: raise NoFilesFoundError(msg=f'No data files could be found in the {self.outlier_corrected_dir} directory', source=self.__class__.__name__)
         elif isinstance(data_paths, str):
             check_file_exist_and_readable(file_path=data_paths)
             data_paths = [data_paths]
@@ -96,6 +98,11 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
         check_valid_boolean(value=append_bool_tables_to_features, source=f'{self.__class__.__name__} append_bool_tables_to_features', raise_error=True)
         check_valid_boolean(value=aggregate_statistics_tables, source=f'{self.__class__.__name__} aggregate_statistics_tables', raise_error=True)
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose', raise_error=True)
+        if save_dir is not None:
+            check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir', raise_error=True)
+            self.save_dir = save_dir
+        else:
+            self.save_dir = deepcopy(self.logs_path)
         self.animal_permutations = list(itertools.permutations(self.animal_bp_dict, 2))
         self.bool_tables, self.summary_tables, self.aggregate_statistics_tables, self.append_bool_tables_to_features = bool_tables, summary_tables, aggregate_statistics_tables, append_bool_tables_to_features
         self.verbose = verbose
@@ -110,7 +117,7 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
             if not self.check_directionality_viable()[0]:
                 raise InvalidInputError(msg="You are not tracking the necessary body-parts to calculate direction. Either (i) pass the body-parts names, or (ii) name the body-parts properly so SimBA can automatically detect the left ear, right ear, and nose body-part names.", source=self.__class__.__name__)
             self.direct_bp_dict = self.check_directionality_cords()
-        print(f"Processing {len(self.data_paths)} video(s)...")
+        stdout_information(msg=f"Processing {len(self.data_paths)} video(s)...")
 
     def transpose_results(self):
         self.directionality_df_dict = {}
@@ -133,7 +140,7 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(file_path)
             self.results[video_name] = {}
-            print(f"Analyzing directionality between animals in video {video_name}... (file {file_cnt+1}/{len(self.data_paths)})")
+            stdout_information(msg=f"Analyzing directionality between animals in video {video_name}... (file {file_cnt+1}/{len(self.data_paths)})")
             data_df = read_df(file_path=file_path, file_type=self.file_type)
             for animal_permutation in self.animal_permutations:
                 self.results[video_name][f"{animal_permutation[0]} directing towards {animal_permutation[1]}"] = {}
@@ -166,11 +173,11 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
             #print(f"Direction analysis complete for video {video_name} ({file_cnt + 1}/{len(self.outlier_corrected_paths)}, elapsed time: {video_timer.elapsed_time_str}s)...")
 
         if self.bool_tables:
-            save_dir = os.path.join(self.logs_path, f"Animal_directing_animal_booleans_{self.datetime}")
+            save_dir = os.path.join(self.save_dir, f"Animal_directing_animal_booleans_{self.datetime}")
             create_directory(paths=save_dir)
             bool_timer = SimbaTimer(start=True)
             for video_cnt, (video_name, video_data) in enumerate(self.results.items()):
-                if self.verbose: print(f"Saving boolean directing tables for video {video_name} (Video {video_cnt + 1}/{len(self.results.keys())})...")
+                if self.verbose: stdout_information(msg=f"Saving boolean directing tables for video {video_name} (Video {video_cnt + 1}/{len(self.results.keys())})...")
                 video_df = pd.DataFrame()
                 for animal_permutation, animal_permutation_data in video_data.items():
                     for (body_part_name, body_part_data) in animal_permutation_data.items():
@@ -189,7 +196,7 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
         if self.aggregate_statistics_tables:
             agg_stat_timer = SimbaTimer(start=True)
             if self.verbose: print("Computing summary statistics...")
-            save_path = os.path.join(self.logs_path, f"Direction_aggregate_summary_data_{self.datetime}.csv")
+            save_path = os.path.join(self.save_dir, f"Direction_aggregate_summary_data_{self.datetime}.csv")
             out_df = pd.DataFrame(columns=["VIDEO", "ANIMAL PERMUTATION", "VALUE (S)"])
             for video_name, video_data in self.results.items():
                 _, _, fps = self.read_video_info(video_name=video_name)
@@ -207,7 +214,7 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
 
         if self.summary_tables:
             self.transpose_results()
-            save_dir = os.path.join(self.logs_path, f"detailed_directionality_summary_dataframes_{self.datetime}")
+            save_dir = os.path.join(self.save_dir, f"detailed_directionality_summary_dataframes_{self.datetime}")
             create_directory(paths=save_dir)
             for video_cnt, (video_name, video_data) in enumerate(self.directionality_df_dict.items()):
                 save_name = os.path.join(save_dir, f"{video_name}.csv")
@@ -219,15 +226,15 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
 
 
 
-# test = DirectingOtherAnimalsAnalyzer(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
+# test = DirectingOtherAnimalsAnalyzer(config_path=r"D:\troubleshooting\two_animals_sleap\project_folder\project_config.ini",
 #                                      bool_tables=True,
 #                                      summary_tables=True,
 #                                      aggregate_statistics_tables=True,
 #                                      append_bool_tables_to_features=False,
 #                                      data_paths=None,
-#                                      nose_name='Nose',
-#                                      left_ear_name='Ear_left',
-#                                      right_ear_name='Ear_right')
+#                                      nose_name='earL1',
+#                                      left_ear_name='earR1',
+#                                      right_ear_name='nose1')
 # test.run()
 
 

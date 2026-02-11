@@ -516,6 +516,7 @@ class PlottingMixin(object):
                                    line_clr: Optional[str] = None,
                                    min_seconds: Optional[float] = None,
                                    bg_img: Optional[np.ndarray] = None,
+                                   legend_lbl: str = "location (seconds)",
                                    heatmap_opacity: Optional[float] = 0.99,
                                    color_legend: bool = True,
                                    leg_width: Optional[int] = None) -> Union[np.ndarray, None]:
@@ -581,7 +582,7 @@ class PlottingMixin(object):
             sm = cm.ScalarMappable(cmap=palette, norm=matplotlib.colors.Normalize(vmin=vmin_plot, vmax=max_scale))
             sm.set_array([])
             cb = fig_cb.colorbar(sm, cax=ax_cb)
-            cb.set_label("location (seconds)", rotation=270, labelpad=14, fontsize=10)
+            cb.set_label(legend_lbl, rotation=270, labelpad=14, fontsize=10)
             cb.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
 
             def _legend_formatter(x, pos):

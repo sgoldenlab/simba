@@ -125,12 +125,14 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
        For single core function, see :func:`simba.plotting.directing_animals_visualizer.DirectingOtherAnimalsVisualizer`.
 
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
-    :param Union[str, os.PathLike] video_path: Path to video file. Corresponding data file must exist in outlier_corrected_movement_location directory.
-    :param Dict[str, Any] style_attr: Video style attributes with required keys: 'show_pose' (bool), 'animal_names' (bool), 'circle_size' (int or None), 'directionality_color' (RGB tuple, list of tuples, or 'Random'), 'direction_thickness' (int or None), 'highlight_endpoints' (bool).
-    :param Optional[int] core_cnt: Number of CPU cores for multiprocessing. Default -1 (all available cores).
-    :param Optional[str] left_ear_name: Left ear body part name. If None, auto-detected. Must provide all three body part names or none.
-    :param Optional[str] right_ear_name: Right ear body part name. If None, auto-detected.
-    :param Optional[str] nose_name: Nose body part name. If None, auto-detected.
+    :param Union[str, os.PathLike] video_path: Path to video file. Corresponding pose data must exist in outlier_corrected_movement_location directory.
+    :param Dict[str, Any] style_attr: Style attributes with keys: 'show_pose', 'animal_names', 'circle_size', 'directionality_color', 'direction_thickness', 'highlight_endpoints'. See example.
+    :param Optional[int] core_cnt: Number of CPU cores. -1 = all available. Default -1.
+    :param Optional[Dict[str, str]] time_slice: If set, restrict to time period. Dict with keys 'start_time' and 'end_time' (HH:MM:SS). Default None.
+    :param Optional[str] left_ear_name: Left ear body-part name. If None, auto-detected. Must provide all three body parts or none.
+    :param Optional[str] right_ear_name: Right ear body-part name. If None, auto-detected.
+    :param Optional[str] nose_name: Nose body-part name. If None, auto-detected.
+    :param float line_opacity: Opacity of direction lines (0.0–1.0). Default 1.0.
 
     :raises AnimalNumberError: If project contains fewer than 2 animals.
     :raises NoFilesFoundError: If pose-estimation data file not found.

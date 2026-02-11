@@ -60,10 +60,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         self.bin_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.heatmap_bin_size_options, label='BIN SIZE (MM): ', label_width=25, dropdown_width=30, value="20×20", img='rectangle_red', tooltip_key='HEATMAP_LOCATION_BIN_SIZE')
         self.legend_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW TIME COLOR LEGEND: ', label_width=25, dropdown_width=30, value='TRUE', img='palette_small', tooltip_key='HEATMAP_LOCATION_SHOW_LEGEND')
         self.min_seconds_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=min_seconds_options, label='MINIMUM SECONDS: ', label_width=25, dropdown_width=30, value='NONE', img='timer', tooltip_key='HEATMAP_LOCATION_MIN_SECONDS')
-        self.bg_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=HEATMAP_BG_OPTIONS, label='HEATMAP BACKGROUND: ', label_width=25, dropdown_width=30, value='NONE', img='background', command=self._set_select_bg_frm, tooltip_key='HEATMAP_LOCATION_BACKGROUND')
-        self.line_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=line_color_options, label='LINE COLOR: ', label_width=25, dropdown_width=30, value='white', img='line', command=self._set_select_bg_frm)
-
-
+        self.line_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=line_color_options, label='LINE COLOR: ', label_width=25, dropdown_width=30, value='white', img='line', tooltip_key='HEATMAP_LOCATION_LINE_COLOR')
 
         self.time_slice_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="TIME PERIOD", icon_name='timer_2', icon_link=Links.HEATMAP_LOCATION.value)
         self.plot_time_period_cb, self.time_period_val = SimbaCheckbox(parent=self.time_slice_frm, txt='PLOT SELECT TIME-PERIOD', val=FALSE, txt_img='timer_2', cmd=self._set_timeslice_state, tooltip_key='HEATMAP_LOCATION_PLOT_TIME_PERIOD')
@@ -75,6 +72,9 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         heatmap_frames_cb, self.heatmap_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames', tooltip_key='HEATMAP_LOCATION_CREATE_FRAMES')
         heatmap_videos_cb, self.heatmap_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', txt_img='video', tooltip_key='HEATMAP_LOCATION_CREATE_VIDEOS')
         heatmap_last_frm_cb, self.heatmap_last_frm_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE LAST FRAME', txt_img='finish', tooltip_key='HEATMAP_LOCATION_CREATE_LAST_FRAME', val=True)
+
+        self.bg_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="HEATMAP BACKGROUND SETTINGS", icon_name='background', icon_link=Links.HEATMAP_CLF.value)
+        self.bg_dropdown = SimBADropDown(parent=self.bg_frm, dropdown_options=HEATMAP_BG_OPTIONS, label='HEATMAP BACKGROUND: ', label_width=25, dropdown_width=35, value='NONE', img='background', command=self._set_select_bg_frm, tooltip_key='HEATMAP_CLF_BACKGROUND')
 
         self.run_frm = LabelFrame(self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
         self.run_single_video_frm = LabelFrame(self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
@@ -94,6 +94,9 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         self.line_dropdown.grid(row=6, sticky=NW)
         self.bg_dropdown.grid(row=7, sticky=NW)
         self.bin_size_dropdown.grid(row=8, sticky=NW)
+
+        self.bg_frm.grid(row=1, sticky=NW)
+        self.bg_dropdown.grid(row=0, sticky=NW)
 
         self.time_slice_frm.grid(row=2, sticky=NW)
         self.plot_time_period_cb.grid(row=0, sticky=NW)
@@ -121,22 +124,19 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         self.end_time_eb.set_state(setstatus=status)
 
     def _set_select_bg_frm(self, selection):
-        if hasattr(self, 'bg_select_frm'):
-            self.bg_select_frm.destroy()
+        for widget_name in ['opacity_dropdown', 'keypoint_dropdown', 'frm_id_eb']:
+            if hasattr(self, widget_name):
+                getattr(self, widget_name).destroy()
         if selection == VIDEO:
-            self.bg_select_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BACKGROUND SETTINGS", icon_name='video_2', icon_link=Links.HEATMAP_LOCATION.value, pady=5, padx=5)
-            self.opacity_dropdown = SimBADropDown(parent=self.bg_select_frm, dropdown_options=list(np.arange(5, 105, 5)), label='HEATMAP OPACITY (%): ', label_width=25, dropdown_width=30, value=50, img='opacity', tooltip_key='HEATMAP_LOCATION_OPACITY')
-            self.keypoint_dropdown = SimBADropDown(parent=self.bg_select_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW KEYPOINT: ', label_width=25, dropdown_width=30, value='TRUE', img='pose', tooltip_key='HEATMAP_LOCATION_SHOW_KEYPOINT')
-            self.bg_select_frm.grid(row=1, sticky=NW)
-            self.opacity_dropdown.grid(row=0, sticky=NW)
-            self.keypoint_dropdown.grid(row=1, sticky=NW)
+            self.opacity_dropdown = SimBADropDown(parent=self.bg_frm, dropdown_options=list(np.arange(5, 105, 5)), label='HEATMAP OPACITY (%): ', label_width=25, dropdown_width=35, value=50, img='opacity', tooltip_key='HEATMAP_CLF_OPACITY')
+            self.keypoint_dropdown = SimBADropDown(parent=self.bg_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW KEYPOINT: ', label_width=25, dropdown_width=30, value='TRUE', img='pose', tooltip_key='HEATMAP_CLF_SHOW_KEYPOINT')
+            self.opacity_dropdown.grid(row=1, sticky=NW)
+            self.keypoint_dropdown.grid(row=2, sticky=NW)
         elif selection == VIDEO_FRM:
-            self.bg_select_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BACKGROUND SETTINGS", icon_name='video_2', icon_link=Links.HEATMAP_LOCATION.value, pady=5, padx=5)
-            self.opacity_dropdown = SimBADropDown(parent=self.bg_select_frm, dropdown_options=list(np.arange(5, 105, 5)), label='HEATMAP OPACITY (%): ', label_width=25, dropdown_width=30, value=50, img='opacity', tooltip_key='HEATMAP_LOCATION_OPACITY')
-            self.frm_id_eb = Entry_Box(parent=self.bg_select_frm, fileDescription='FRAME NUMBER:', labelwidth=25, entry_box_width=30, justify='center', validation='numeric', img='abacus_2', tooltip_key='HEATMAP_LOCATION_VIDEO_FRAME', value=0)
-            self.bg_select_frm.grid(row=1, sticky=NW)
-            self.opacity_dropdown.grid(row=0, sticky=NW)
-            self.frm_id_eb.grid(row=1, sticky=NW)
+            self.opacity_dropdown = SimBADropDown(parent=self.bg_frm, dropdown_options=list(np.arange(5, 105, 5)), label='HEATMAP OPACITY (%): ', label_width=25, dropdown_width=30, value=50, img='opacity', tooltip_key='HEATMAP_CLF_OPACITY')
+            self.frm_id_eb = Entry_Box(parent=self.bg_frm, fileDescription='FRAME NUMBER:', labelwidth=25, entry_box_width=30, justify='center', validation='numeric', img='abacus_2', tooltip_key='HEATMAP_CLF_FRAME_NUMBER', value=0)
+            self.opacity_dropdown.grid(row=1, sticky=NW)
+            self.frm_id_eb.grid(row=2, sticky=NW)
 
     def __create_heatmap_plots(self, multiple_videos: bool):
         if multiple_videos:
