@@ -22,7 +22,7 @@ from simba.utils.lookups import create_directionality_cords
 from simba.utils.printing import (SimbaTimer, log_event, stdout_information,
                                   stdout_success)
 from simba.utils.read_write import (create_directory, get_fn_ext, read_df,
-                                    write_df, seconds_to_timestamp)
+                                    seconds_to_timestamp, write_df)
 
 NOSE, EAR_LEFT, EAR_RIGHT = Keys.NOSE.value, Keys.EAR_LEFT.value, Keys.EAR_RIGHT.value
 X_BPS, Y_BPS = Keys.X_BPS.value, Keys.Y_BPS.value
