@@ -180,7 +180,7 @@ The sections below follow the **Tools** menu order and give short "what it does,
 Re-encodes **one video** to a new frame rate. You choose the input file and the output FPS (e.g. 15). SimBA creates a new file in the same directory as the input; the frame count may change depending on the ratio (e.g. 30 fps → 15 fps halves the number of frames).
 
 <p align="center">
-  <img src="images/tools/change_fps_single_video.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Change FPS for single video">
+  <img src="images/tools/change_fps_single_video.webp" width="600" alt="Change FPS for single video">
 </p>
 
 
@@ -195,7 +195,7 @@ Re-encodes **one video** to a new frame rate. You choose the input file and the 
 **Where output is saved:** Same directory as the input video. Filename suffix: `fps_{value}` (e.g. `MyVideo_fps_15.mp4`).
 
 <p align="center">
-  <video src="images/tools/change_single_video_fps.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Change FPS for single video</video>
+  <video src="images/tools/change_single_video_fps.mp4" width="600" controls>Change FPS for single video</video>
 </p>
 
 ---
@@ -208,7 +208,7 @@ Re-encodes **one video** to a new frame rate. You choose the input file and the 
 Re-encodes **all videos in a folder** to the same target FPS. Useful for batch standardizing frame rate before import or analysis.
 
 <p align="center">
-  <img src="images/tools/change_fps_multiple_video.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Change FPS for multiple videos">
+  <img src="images/tools/change_fps_multiple_video.webp" width="600" alt="Change FPS for multiple videos">
 </p>
 
 
@@ -232,7 +232,7 @@ Re-encodes **all videos in a folder** to the same target FPS. Useful for batch s
 **Increases** the frame rate of a video by generating intermediate frames (interpolation). Use when you need a higher FPS for playback or downstream tools without re-recording. For example, 15 fps → 30 fps adds interpolated frames between existing ones.
 
 <p align="center">
-  <img src="images/tools/change_fps_upsample.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Up-sample FPS with interpolation">
+  <img src="images/tools/change_fps_upsample.webp" width="600" alt="Up-sample FPS with interpolation">
 </p>
 
 
@@ -258,7 +258,7 @@ Re-encodes **all videos in a folder** to the same target FPS. Useful for batch s
 > **TIMELAPSE VIEWER** — Several clip dialogs include a <kbd>TIMELAPSE VIEWER</kbd> button. It opens an interactive window that shows a composite image of evenly-spaced frames from the video, with a time ruler and sliders. Drag the sliders to select the start and end of the segment visually; the window highlights the selected range and shows frame previews. When you close the window (click X or press **Esc**), the chosen start/end times or frame numbers are filled into the dialog. Use it when you prefer visual selection instead of typing timestamps or frame indices manually.
 
 <p align="center">
-  <img src="images/tools/timelapse_viewer.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Timelapse viewer">
+  <img src="images/tools/timelapse_viewer.webp" width="600" alt="Timelapse viewer">
 </p>
 
 
@@ -276,7 +276,7 @@ Re-encodes **all videos in a folder** to the same target FPS. Useful for batch s
 Trims **one video** by specifying start and end time. For example, from a 2-minute video you can keep only 00:00:10 to 00:01:55.
 
 <p align="center">
-  <img src="images/tools/clip_single_video.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Clip single video">
+  <img src="images/tools/clip_single_video.webp" width="600" alt="Clip single video">
 </p>
 
 
@@ -301,7 +301,7 @@ Trims **one video** by specifying start and end time. For example, from a 2-minu
 Trims **all videos in a folder** by time. You select an input directory and an output directory; a table opens with one row per video showing **VIDEO LENGTH**. You set **START TIME** and **END TIME** for each row, then run.
 
 <p align="center">
-  <img src="images/tools/clip_multiple_videos_time.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Clip multiple videos by time">
+  <img src="images/tools/clip_multiple_videos_time.webp" width="600" alt="Clip multiple videos by time">
 </p>
 
 
@@ -330,7 +330,7 @@ Trims **all videos in a folder** by time. You select an input directory and an o
 Splits **one video** into **several separate clips**. You define how many clips and the start/stop time for each (e.g. clip 1: 00:00:00–00:01:00, clip 2: 00:01:00–00:02:00).
 
 <p align="center">
-  <img src="images/tools/clip_video_into_multiple_videos.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Clip video into multiple videos">
+  <img src="images/tools/clip_video_into_multiple_videos.webp" width="600" alt="Clip video into multiple videos">
 </p>
 
 | Option | Description |
@@ -355,7 +355,7 @@ Splits **one video** into **several separate clips**. You define how many clips 
 Trims **one video** by **start frame** and **end frame** index instead of time. Useful when you know exact frame numbers from another tool or script.
 
 <p align="center">
-  <img src="images/tools/clip_single_video_frame_numbers.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Clip single video by frame numbers">
+  <img src="images/tools/clip_single_video_frame_numbers.webp" width="600" alt="Clip single video by frame numbers">
 </p>
 
 
@@ -381,7 +381,7 @@ Trims **one video** by **start frame** and **end frame** index instead of time. 
 Same as clip single by frame numbers, but for **all videos in a folder**. You select input and output directories; a table lists each video with **TOTAL FRAMES**; you set **START FRAME** and **END FRAME** per video, then run.
 
 <p align="center">
-  <img src="images/tools/clip_multiple_videos_frm_numbers.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Clip multiple videos by frame numbers">
+  <img src="images/tools/clip_multiple_videos_frm_numbers.webp" width="600" alt="Clip multiple videos by frame numbers">
 </p>
 
 
@@ -421,7 +421,7 @@ Same as clip single by frame numbers, but for **all videos in a folder**. You se
 Crops **one video** to a **rectangular** region. The first frame opens; you click and drag to draw the rectangle, then press **Enter** twice to apply.
 
 <p align="center">
-  <img src="images/tools/crop_rectangle.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Crop videos rectangle">
+  <img src="images/tools/crop_rectangle.webp" width="600" alt="Crop videos rectangle">
 </p>
 
 
@@ -435,7 +435,7 @@ Crops **one video** to a **rectangular** region. The first frame opens; you clic
 **Where output is saved:** Same folder as the input video. Filename: original name + `_cropped` (e.g. `MyVideo_cropped.mp4`).
 
 <p align="center">
-  <video src="images/tools/crop_rectangle.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Crop videos rectangle</video>
+  <video src="images/tools/crop_rectangle.mp4" width="600" controls>Crop videos rectangle</video>
 </p>
 
 ---
@@ -463,16 +463,16 @@ Crops to a **circular** region. Single-video mode: draw one circle per video. **
 **Where output is saved:** Same folder as input (single), or the **output directory** you chose (batch). Filenames typically add `_cropped` or similar.
 
 <p align="center">
-  <video src="images/tools/crop_circle_0.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Crop videos (circles)</video>
+  <video src="images/tools/crop_circle_0.mp4" width="600" controls>Crop videos (circles)</video>
 </p>
 <p align="center">
-  <video src="images/tools/crop_circle_1.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Crop videos (circles)</video>
+  <video src="images/tools/crop_circle_1.mp4" width="600" controls>Crop videos (circles)</video>
 </p>
 <p align="center">
-  <video src="images/tools/circle_crop_2.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Crop videos (circles)</video>
+  <video src="images/tools/circle_crop_2.mp4" width="600" controls>Crop videos (circles)</video>
 </p>
 <p align="center">
-  <video src="images/tools/circle_crop_3.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Crop videos (circles)</video>
+  <video src="images/tools/circle_crop_3.mp4" width="600" controls>Crop videos (circles)</video>
 </p>
 
 ---
@@ -496,7 +496,7 @@ Crops to a **user-defined polygon** (shape with multiple corners). You click poi
 **Where output is saved:** As specified in the dialog (often same directory as input with `_cropped` or similar).
 
 <p align="center">
-  <video src="images/tools/roi_selector_polygon.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Crop videos (polygons)</video>
+  <video src="images/tools/roi_selector_polygon.mp4" width="600" controls>Crop videos (polygons)</video>
 </p>
 
 ---
@@ -509,7 +509,7 @@ Crops to a **user-defined polygon** (shape with multiple corners). You click poi
 Splits **each video** into **several cropped videos** by drawing multiple rectangles (e.g. one camera recording four arenas yields four output videos per file). You set **CROPS PER VIDEO**; for each video in the folder, the first frame opens and you draw that many rectangles in order (one per output clip). Press **Enter** after each rectangle; then move to the next video.
 
 <p align="center">
-  <img src="images/tools/multicrop.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Multi-crop videos">
+  <img src="images/tools/multicrop.webp" width="600" alt="Multi-crop videos">
 </p>
 
 | Option | Description |
@@ -527,7 +527,7 @@ Splits **each video** into **several cropped videos** by drawing multiple rectan
 **Fixed rectangle for many videos:** To apply the same rectangle to all videos in a folder, use a Fixed Crop Videos option if present in your build, or **Multi-crop** with **# of crop** = 1 and draw the same rectangle for each file.
 
 <p align="center">
-  <video src="images/tools/multicrop.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Multi-crop videos</video>
+  <video src="images/tools/multicrop.mp4" width="600" controls>Multi-crop videos</video>
 </p>
 
 ---
@@ -608,7 +608,7 @@ Converts one or more videos to a target **container format** (e.g. MP4, AVI, WEB
 Converts video(s) to grayscale. Single-file or batch depending on the sub-option.
 
 <p align="center">
-  <img src="images/tools/greyscale_gui.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Convert to grayscale dialog">
+  <img src="images/tools/greyscale_gui.webp" width="600" alt="Convert to grayscale dialog">
 </p>
 
 | Option | Description |
@@ -622,10 +622,10 @@ Converts video(s) to grayscale. Single-file or batch depending on the sub-option
 **Where output is saved:** Same folder as the input video(s). Filename: original name + `_grayscale` (e.g. `MyVideo_grayscale.mp4`).
 
 <p align="center">
-  <video src="images/tools/geyscale_0.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Convert to grayscale</video>
+  <video src="images/tools/geyscale_0.mp4" width="600" controls>Convert to grayscale</video>
 </p>
 <p align="center">
-  <img src="images/tools/greyscale_1.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Convert to grayscale">
+  <img src="images/tools/greyscale_1.webp" width="600" alt="Convert to grayscale">
 </p>
 
 ---
@@ -638,7 +638,7 @@ Converts video(s) to grayscale. Single-file or batch depending on the sub-option
 Converts video(s) to **black and white** (binary): each pixel becomes either black or white, with no gray. Useful for high-contrast views or when you need a strict foreground/background. Single file or batch depending on the dialog.
 
 <p align="center">
-  <video src="images/tools/bw_gui.webp" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Convert to grayscale</video>
+  <video src="images/tools/bw_gui.webp" width="600" controls>Convert to grayscale</video>
 </p>
 
 | Option | Description |
@@ -651,10 +651,10 @@ Converts video(s) to **black and white** (binary): each pixel becomes either bla
 **Where output is saved:** Same directory as input (often with a suffix such as `_bw` or `_black_white`).
 
 <p align="center">
-  <video src="images/tools/black_and_white_0.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Convert to black and white</video>
+  <video src="images/tools/black_and_white_0.mp4" width="600" controls>Convert to black and white</video>
 </p>
 <p align="center">
-  <img src="images/tools/black_and_white_1.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Convert to black and white">
+  <img src="images/tools/black_and_white_1.webp" width="600" alt="Convert to black and white">
 </p>
 
 ---
@@ -667,7 +667,7 @@ Converts video(s) to **black and white** (binary): each pixel becomes either bla
 Applies **CLAHE** (contrast-limited adaptive histogram equalization) to improve **local contrast**—making dim or flat footage easier to see without over-brightening the whole frame. Useful for infrared, low light, or when the animal is hard to see against the background.
 
 <p align="center">
-  <img src="images/tools/clahe_gui_1.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="CLAHE enhance videos dialog">
+  <img src="images/tools/clahe_gui_1.webp" width="600" alt="CLAHE enhance videos dialog">
 </p>
 
 | Option | Description |
@@ -682,7 +682,7 @@ Applies **CLAHE** (contrast-limited adaptive histogram equalization) to improve 
 **Where output is saved:** Same folder as the input video. Filename: `CLAHE_` + original name. Output is often **.avi** format.
 
 <p align="center">
-  <video src="images/tools/clahe.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">CLAHE enhance videos</video>
+  <video src="images/tools/clahe.mp4" width="600" controls>CLAHE enhance videos</video>
 </p>
 
 
@@ -697,7 +697,7 @@ Applies **CLAHE** (contrast-limited adaptive histogram equalization) to improve 
 Same as CLAHE enhance, but opens an **interactive window** where you can adjust **Clip limit** and **Tile size** with sliders and see a live preview before saving. Use this when you want to tune the look (e.g. how strong the contrast boost is) by eye.
 
 <p align="center">
-  <video src="images/tools/interactive_clahe_ui.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Interactively CLAHE enhance videos</video>
+  <video src="images/tools/interactive_clahe_ui.mp4" width="600" controls>Interactively CLAHE enhance videos</video>
 </p>
 
 | Option | Description |
@@ -719,7 +719,7 @@ Same as CLAHE enhance, but opens an **interactive window** where you can adjust 
 **What it is:** Concatenating (stacking) means **combining two or more videos into one output file**. SimBA can place them **side by side or stacked** in the same frame (so you see all streams at once), or—for "temporal join" elsewhere—play them one after another in time.
 
 <p align="center">
-  <img src="images/scenario2/concatenate_videos.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Concatenate (stack) videos">
+  <img src="images/scenario2/concatenate_videos.webp" width="600" alt="Concatenate (stack) videos">
 </p>
 
 **Why use it:** Compare two views of the same moment (e.g. raw video next to a classification overlay, or two cages), build figures for papers or talks (e.g. original + Gantt + path plot in one view), or create a single file that shows multiple panels in sync. No SimBA project required.
@@ -727,7 +727,7 @@ Same as CLAHE enhance, but opens an **interactive window** where you can adjust 
 **For more info:** [Visualizations.md — Concatenate two videos](Visualizations.md#concatenate-two-videos-tools-menu). **Related:** [Concatenate multiple videos](#concatenate-multiple-videos) (mosaic), [Temporal join videos](#temporal-join-videos) (one-after-another in time), [Scenario 2 — Part 5: Merge videos](Scenario2.md#merge-concatenate-multiple-videos).
 
 <p align="center">
-  <video src="images/scenario2/concat_videos.mp4" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Concatenate (stack) videos — merged output</video>
+  <video src="images/scenario2/concat_videos.mp4" width="600" controls>Concatenate (stack) videos — merged output</video>
 </p>
 
 ---
@@ -737,7 +737,7 @@ Same as CLAHE enhance, but opens an **interactive window** where you can adjust 
 Place **two videos** in one output: either **horizontally** (side by side) or **vertically** (one above the other). Same duration; you see both streams at once.
 
 <p align="center">
-  <img src="images/tools/concat_two_videos.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Concatenate two videos dialog">
+  <img src="images/tools/concat_two_videos.webp" width="600" alt="Concatenate two videos dialog">
 </p>
 
 
@@ -762,7 +762,7 @@ Place **two videos** in one output: either **horizontally** (side by side) or **
 **What "merge" means here:** SimBA **merges** 2–20 videos into **one output video** where each input becomes a **panel** in a **mosaic** (a grid layout). All panels play in sync; you do not get one long video in time, but one frame showing 2–20 videos at the same time.
 
 <p align="center">
-  <img src="images/tools/concat_many.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Concatenate multiple videos dialog">
+  <img src="images/tools/concat_many.webp" width="600" alt="Concatenate multiple videos dialog">
 </p>
 
 
@@ -781,7 +781,7 @@ Place **two videos** in one output: either **horizontally** (side by side) or **
 → Also under **[Visualizations]** tab as **MERGE FRAMES**; see [Visualizations.md](Visualizations.md#merge-concatenate-multiple-videos).
 
 <p align="center">
-  <img src="images/tools/mixed_mosaic.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Concatenate multiple videos — mixed mosaic example">
+  <img src="images/tools/mixed_mosaic.webp" width="600" alt="Concatenate multiple videos — mixed mosaic example">
 </p>
 
 ---
@@ -862,7 +862,7 @@ Place **two videos** in one output: either **horizontally** (side by side) or **
 **What it is:** A **path plot** is a video (or image) that shows the **trajectory** of a chosen body-part over time—e.g. the path the nose or center of mass took through the arena. SimBA draws this from a pose CSV/parquet file and optionally overlays it on the source video.
 
 <p align="center">
-  <img src="images/tools/path_plot_tools.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Create path plot — Tools dialog">
+  <img src="images/tools/path_plot_tools.webp" width="600" alt="Create path plot — Tools dialog">
 </p>
 
 **More advanced path plots:** For multiple animals, classification markers on the path, ROI overlays, time-segment selection, or batch processing, use **[Visualizations]** tab → **Path plots**; see [Visualizations.md — Visualize path plots](Visualizations.md#visualize-path-plots) and [Scenario 2 — Part 5: Path plots](Scenario2.md#visualize-path-plots).
@@ -887,7 +887,7 @@ Place **two videos** in one output: either **horizontally** (side by side) or **
 **Where output is saved:** Next to input or in chosen folder. Full description: [Visualizations.md — Create path plots](Visualizations.md#create-path-plots-roi-tab) (same tool under **ROI** tab).
 
 <p align="center">
-  <video src="images/visualizations/EzPathPlot_2.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Create path plot (simple)</video>
+  <video src="images/visualizations/EzPathPlot_2.mp4" width="600" controls>Create path plot (simple)</video>
 </p>
 
 ---
@@ -936,7 +936,7 @@ Place **two videos** in one output: either **horizontally** (side by side) or **
 * **Tools** → **Down-sample video...** → **Down-sample single video**
 
 <p align="center">
-  <img src="images/tools/downsample_single_video.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Down-sample single video">
+  <img src="images/tools/downsample_single_video.webp" width="600" alt="Down-sample single video">
 </p>
 
 | Option | Description |
@@ -956,7 +956,7 @@ Place **two videos** in one output: either **horizontally** (side by side) or **
 * **Tools** → **Down-sample video...** → **Down-sample multiple videos**
 
 <p align="center">
-  <img src="images/tools/downsample_multiple_videos.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Down-sample multiple videos">
+  <img src="images/tools/downsample_multiple_videos.webp" width="600" alt="Down-sample multiple videos">
 </p>
 
 | Option | Description |
@@ -1050,7 +1050,7 @@ Extract all frames from a `.seq` file. Output: folder of images (e.g. PNGs).
 **What it is:** An **animated GIF** is a short, looping clip saved as a `.gif` file that plays in browsers and many apps without a video player. This tool takes a **segment** of a video (start time and duration) and encodes it as a **GIF** at the size and quality you choose.
 
 <p align="center">
-  <img src="images/tools/gif_popup.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Create GIFs dialog">
+  <img src="images/tools/gif_popup.webp" width="600" alt="Create GIFs dialog">
 </p>
 
 
@@ -1097,7 +1097,7 @@ Extract all frames from a `.seq` file. Output: folder of images (e.g. PNGs).
 | **Output** | The conversion factor is printed in the main SimBA terminal. Use this value for calibration when not using the project's **Video parameters** tab. |
 
 <p align="center">
-  <video src="images/tools/pixel_per_mm.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Get metric conversion factor (pixels/millimeter)</video>
+  <video src="images/tools/pixel_per_mm.mp4" width="600" controls>Get metric conversion factor (pixels/millimeter)</video>
 </p>
 
 ---
@@ -1114,7 +1114,7 @@ Extract all frames from a `.seq` file. Output: folder of images (e.g. PNGs).
 **Related:** [Remove color from videos](#remove-color-from-videos-tools-menu) (grayscale, CLAHE), [Box blur videos](#box-blur-videos).
 
 <p align="center">
-  <video src="images/tools/brightness_contrast_ui.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Change video brightness / contrast</video>
+  <video src="images/tools/brightness_contrast_ui.mp4" width="600" controls>Change video brightness / contrast</video>
 </p>
 
 | Option | Description |
@@ -1166,7 +1166,7 @@ Extract all frames from a `.seq` file. Output: folder of images (e.g. PNGs).
 **What it is:** **Playback speed** controls how fast the video plays (e.g. 2× = twice as fast, 0.5× = half speed). SimBA re-encodes the video so that when played at normal speed, the motion appears faster or slower (by dropping or duplicating frames, or changing FPS metadata).
 
 <p align="center">
-  <img src="images/tools/playback_speed_gui.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Change playback speed dialog">
+  <img src="images/tools/playback_speed_gui.webp" width="600" alt="Change playback speed dialog">
 </p>
 
 
@@ -1186,7 +1186,7 @@ Extract all frames from a `.seq` file. Output: folder of images (e.g. PNGs).
 **Where output is saved:** The save directory you chose (or same folder as input if not specified).
 
 <p align="center">
-  <video src="images/tools/playback_speed.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Change video playback speed</video>
+  <video src="images/tools/playback_speed.mp4" width="600" controls>Change video playback speed</video>
 </p>
 
 ---
@@ -1281,7 +1281,7 @@ Extract all frames from a `.seq` file. Output: folder of images (e.g. PNGs).
 Rotates **every frame** by a **fixed angle** (e.g. 90° or 180°). Use when the camera was mounted sideways or upside down and you want the whole video reoriented. You choose one video or a folder; set the rotation angle; SimBA re-encodes and saves the new file(s).
 
 <p align="center">
-  <img src="images/tools/rotate_videos_1.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Rotate videos">
+  <img src="images/tools/rotate_videos_1.png" width="600" alt="Rotate videos">
 </p>
 
 | Option | Description |
@@ -1302,7 +1302,7 @@ Rotates **every frame** by a **fixed angle** (e.g. 90° or 180°). Use when the 
 * **Tools** → **Rotate / flip / reverse videos...** → **Interactively rotate videos**
 
 <p align="center">
-  <video src="images/tools/rotate_demo.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Interactively rotate videos</video>
+  <video src="images/tools/rotate_demo.mp4" width="600" controls>Interactively rotate videos</video>
 </p>
 
 Lets you **rotate by keypress** while viewing the video: use **left/right arrow keys** to rotate stepwise until the orientation looks correct, then press **Esc** to save and close. Useful when you don't know the exact angle and want to tune by eye.
@@ -1316,7 +1316,7 @@ Lets you **rotate by keypress** while viewing the video: use **left/right arrow 
 | **Run** (if in dialog) | Start the interactive window. |
 
 <p align="center">
-  <video src="images/tools/rotate_video.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Interactively rotate videos</video>
+  <video src="images/tools/rotate_video.mp4" width="600" controls>Interactively rotate videos</video>
 </p>
 
 ---
@@ -1328,7 +1328,7 @@ Lets you **rotate by keypress** while viewing the video: use **left/right arrow 
 **Mirrors** each frame **horizontally** (left–right) or **vertically** (top–bottom). No rotation—only a mirror flip. Use to correct a reversed view or to match orientation across setups. Single video or batch.
 
 <p align="center">
-  <img src="images/tools/flip_videos_gui.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Flip videos dialog">
+  <img src="images/tools/flip_videos_gui.webp" width="600" alt="Flip videos dialog">
 </p>
 
 | Option | Description |
@@ -1339,7 +1339,7 @@ Lets you **rotate by keypress** while viewing the video: use **left/right arrow 
 | **Run** | Apply flip and save. |
 
 <p align="center">
-  <video src="images/tools/flip_videos.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Flip videos</video>
+  <video src="images/tools/flip_videos.mp4" width="600" controls>Flip videos</video>
 </p>
 
 ---
@@ -1351,7 +1351,7 @@ Lets you **rotate by keypress** while viewing the video: use **left/right arrow 
 **Reverses the frame order** so the video plays **backwards** (last frame first). Use for presentation, validation, or when you need a reversed clip. Single video or batch. SimBA re-encodes the video with frames in reverse order.
 
 <p align="center">
-  <img src="images/tools/reverse_gui.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Reverse videos dialog">
+  <img src="images/tools/reverse_gui.webp" width="600" alt="Reverse videos dialog">
 </p>
 
 
@@ -1365,7 +1365,7 @@ Lets you **rotate by keypress** while viewing the video: use **left/right arrow 
 | **Run** | Start processing. |
 
 <p align="center">
-  <video src="images/tools/reverse_videos.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Reverse videos</video>
+  <video src="images/tools/reverse_videos.mp4" width="600" controls>Reverse videos</video>
 </p>
 
 ---
@@ -1390,7 +1390,7 @@ Lets you **rotate by keypress** while viewing the video: use **left/right arrow 
 Draws the **frame index** (frame number) on each frame. Useful for annotation, debugging, or when you need to reference exact frame numbers. Single video or folder. Output is saved in the same directory as the input with the suffix `_frame_no` (e.g. `MyVideo_frame_no.mp4`).
 
 <p align="center">
-  <img src="images/tools/superimpose_frm_number_gui.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Superimpose frame numbers dialog">
+  <img src="images/tools/superimpose_frm_number_gui.webp" width="600" alt="Superimpose frame numbers dialog">
 </p>
 
 
@@ -1408,7 +1408,7 @@ Draws the **frame index** (frame number) on each frame. Useful for annotation, d
 | **Run** | Process. Single: use **Run – single video**. Batch: use **Run – multiple videos**. |
 
 <p align="center">
-  <video src="images/tools/superimpose_frame_count.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Superimpose frame numbers</video>
+  <video src="images/tools/superimpose_frame_count.mp4" width="600" controls>Superimpose frame numbers</video>
 </p>
 
 ---
@@ -1420,7 +1420,7 @@ Draws the **frame index** (frame number) on each frame. Useful for annotation, d
 Overlays a **watermark image** (e.g. logo) on every frame. You choose the image, position, opacity, and scale. Use for branding or attribution when sharing videos. Output is saved in the same directory as the input with a suffix (e.g. `_watermark`).
 
 <p align="center">
-  <img src="images/tools/superimpose_watermark_gui.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Superimpose watermark dialog">
+  <img src="images/tools/superimpose_watermark_gui.webp" width="600" alt="Superimpose watermark dialog">
 </p>
 
 
@@ -1440,7 +1440,7 @@ Overlays a **watermark image** (e.g. logo) on every frame. You choose the image,
 
 
 <p align="center">
-  <video src="images/tools/watermark_video.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Superimpose watermark</video>
+  <video src="images/tools/watermark_video.mp4" width="600" controls>Superimpose watermark</video>
 </p>
 
 ---
@@ -1452,7 +1452,7 @@ Overlays a **watermark image** (e.g. logo) on every frame. You choose the image,
 Draws a **running timer** (elapsed time from the start of the video) on each frame. You set position, font, and time format. Use for time reference in presentations or when annotating. Output is saved in the same directory as the input.
 
 <p align="center">
-  <img src="images/tools/superimpose_time.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Superimpose timer dialog">
+  <img src="images/tools/superimpose_time.webp" width="600" alt="Superimpose timer dialog">
 </p>
 
 
@@ -1473,7 +1473,7 @@ Draws a **running timer** (elapsed time from the start of the video) on each fra
 | **Run** | **Run – single video** or **Run – multiple videos**. |
 
 <p align="center">
-  <video src="images/tools/superimpose_elapsed_time.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Superimpose timer</video>
+  <video src="images/tools/superimpose_elapsed_time.mp4" width="600" controls>Superimpose timer</video>
 </p>
 
 ---
@@ -1485,7 +1485,7 @@ Draws a **running timer** (elapsed time from the start of the video) on each fra
 Draws a **progress bar** on each frame that advances with playback (by frame index). Use to show how far through the video the current frame is—handy for presentations or previews. Output is saved in the same directory as the input.
 
 <p align="center">
-  <img src="images/tools/superimpose_progressbar.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Superimpose progress-bar dialog">
+  <img src="images/tools/superimpose_progressbar.webp" width="600" alt="Superimpose progress-bar dialog">
 </p>
 
 
@@ -1500,7 +1500,7 @@ Draws a **progress bar** on each frame that advances with playback (by frame ind
 | **Run** | **Run – single video** or **Run – multiple videos**. |
 
 <p align="center">
-  <video src="images/tools/overlay_video_progressbar.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Superimpose progress-bar</video>
+  <video src="images/tools/overlay_video_progressbar.mp4" width="600" controls>Superimpose progress-bar</video>
 </p>
 
 ---
@@ -1512,7 +1512,7 @@ Draws a **progress bar** on each frame that advances with playback (by frame ind
 Overlays **one video on top of another** (e.g. picture-in-picture). You choose a main video and an overlay video; set position, opacity, and scale of the overlay. Use for comparisons or inset views. Output is saved in the same directory as the main video.
 
 <p align="center">
-  <img src="images/tools/superimpose_video_on_video.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Superimpose video on video dialog">
+  <img src="images/tools/superimpose_video_on_video.webp" width="600" alt="Superimpose video on video dialog">
 </p>
 
 | Option | Description |
@@ -1526,7 +1526,7 @@ Overlays **one video on top of another** (e.g. picture-in-picture). You choose a
 | **Run** | Apply and save. |
 
 <p align="center">
-  <video src="images/tools/superimpose_video.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Superimpose video on video</video>
+  <video src="images/tools/superimpose_video.mp4" width="600" controls>Superimpose video on video</video>
 </p>
 
 ---
@@ -1538,7 +1538,7 @@ Overlays **one video on top of another** (e.g. picture-in-picture). You choose a
 Writes the **video filename** as text on each frame. Use when you need to identify the source file in the video itself (e.g. when sharing multiple clips). Output is saved in the same directory as the input.
 
 <p align="center">
-  <img src="images/tools/superimpose_video_name.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Superimpose video names dialog">
+  <img src="images/tools/superimpose_video_name.webp" width="600" alt="Superimpose video names dialog">
 </p>
 
 
@@ -1557,7 +1557,7 @@ Writes the **video filename** as text on each frame. Use when you need to identi
 | **Run** | **Run – single video** or **Run – multiple videos**. |
 
 <p align="center">
-  <video src="images/tools/superimpose_video_names.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Superimpose video names</video>
+  <video src="images/tools/superimpose_video_names.mp4" width="600" controls>Superimpose video names</video>
 </p>
 
 ---
@@ -1569,7 +1569,7 @@ Writes the **video filename** as text on each frame. Use when you need to identi
 Draws **custom text** you type on every frame. You set position, font, size, color, and border. Use for labels, titles, or any fixed caption (e.g. condition name, date). Output is saved in the same directory as the input.
 
 <p align="center">
-  <img src="images/tools/superimpose_freetext.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Superimpose free text dialog">
+  <img src="images/tools/superimpose_freetext.webp" width="600" alt="Superimpose free text dialog">
 </p>
 
 | Option | Description |
@@ -1589,7 +1589,7 @@ Draws **custom text** you type on every frame. You set position, font, size, col
 **Where output is saved:** As set in each pop-up (often same folder with a suffix such as `_frame_no`, `_watermark`, or similar).
 
 <p align="center">
-  <video src="images/tools/superimpose_freetext.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Superimpose free-text</video>
+  <video src="images/tools/superimpose_freetext.mp4" width="600" controls>Superimpose free-text</video>
 </p>
 
 ---
@@ -1615,7 +1615,7 @@ Draws **custom text** you type on every frame. You set position, font, size, col
 Process **one video**: compute or supply a background, then replace matching pixels with the chosen background color.
 
 <p align="center">
-  <img src="images/tools/remove_background_single_video.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Remove video backgrounds">
+  <img src="images/tools/remove_background_single_video.webp" width="600" alt="Remove video backgrounds">
 </p>
 
 | Option | Description |
@@ -1633,10 +1633,10 @@ Process **one video**: compute or supply a background, then replace matching pix
 **Where output is saved:** Same directory as input. Filename: original name + `_bg_subtracted`.
 
 <p align="center">
-  <video src="images/tools/bg_remover_example_4.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Background remover example 4</video>
+  <video src="images/tools/bg_remover_example_4.mp4" width="600" controls>Background remover example 4</video>
 </p>
 <p align="center">
-  <video src="images/tools/bg_remover_example_3.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Background remover example 3</video>
+  <video src="images/tools/bg_remover_example_3.mp4" width="600" controls>Background remover example 3</video>
 </p>
 
 ---
@@ -1648,7 +1648,7 @@ Process **one video**: compute or supply a background, then replace matching pix
 Process **all videos in a folder**. Optionally supply a folder of reference videos (matched by filename) for background.
 
 <p align="center">
-  <img src="images/tools/remove_background_multiple_video.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Remove background from multiple videos">
+  <img src="images/tools/remove_background_multiple_video.webp" width="600" alt="Remove background from multiple videos">
 </p>
 
 | Option | Description |
@@ -1666,10 +1666,10 @@ Process **all videos in a folder**. Optionally supply a folder of reference vide
 **Where output is saved:** Same directory as each input video. Filename: original name + `_bg_subtracted`.
 
 <p align="center">
-  <video src="images/tools/bg_removed_ex_4_clipped.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Background removed example 4 (clipped)</video>
+  <video src="images/tools/bg_removed_ex_4_clipped.mp4" width="600" controls>Background removed example 4 (clipped)</video>
 </p>
 <p align="center">
-  <video src="images/tools/bg_removed_ex_4_clipped.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Background removed example 4 (clipped)</video>
+  <video src="images/tools/bg_removed_ex_4_clipped.mp4" width="600" controls>Background removed example 4 (clipped)</video>
 </p>
 
 
@@ -1750,7 +1750,7 @@ Joins **only the videos you choose**, in the **order you set** (VIDEO PATH 1, th
 **Where output is saved:** Same directory as the input video.
 
 <p align="center">
-  <video src="images/tools/roi_blurbox.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Box blur videos</video>
+  <video src="images/tools/roi_blurbox.mp4" width="600" controls>Box blur videos</video>
 </p>
 
 
@@ -1764,7 +1764,7 @@ Joins **only the videos you choose**, in the **order you set** (VIDEO PATH 1, th
 **What it is:** A **cross-fade** is a **transition** between two videos: over a short period (e.g. 2–20 seconds), the first video **fades out** while the second **fades in**, so the change from one clip to the next is smooth rather than an abrupt cut. The output is one video containing both clips with the fade in between.
 
 <p align="center">
-  <img src="images/tools/crossfade_gui.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Cross-fade two videos dialog">
+  <img src="images/tools/crossfade_gui.webp" width="600" alt="Cross-fade two videos dialog">
 </p>
 
 
@@ -1788,7 +1788,7 @@ Joins **only the videos you choose**, in the **order you set** (VIDEO PATH 1, th
 **Where output is saved:** Same directory as the input (or as specified in the dialog).
 
 <p align="center">
-  <video src="images/tools/crossfade_two_videos.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Cross-fade videos</video>
+  <video src="images/tools/crossfade_two_videos.mp4" width="600" controls>Cross-fade videos</video>
 </p>
 
 
@@ -1801,7 +1801,7 @@ Joins **only the videos you choose**, in the **order you set** (VIDEO PATH 1, th
 **Where:** **Tools** → **Create average frames from videos**
 
 <p align="center">
-  <img src="images/tools/avg_frm_gui.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Create average frames from videos dialog">
+  <img src="images/tools/avg_frm_gui.webp" width="600" alt="Create average frames from videos dialog">
 </p>
 
 
@@ -1824,16 +1824,16 @@ Joins **only the videos you choose**, in the **order you set** (VIDEO PATH 1, th
 **Where output is saved:** In the **Average frame save directory** you chose. Filename: `{video_name}_avg_frm.png` per video.
 
 <p align="center">
-  <video src="images/tools/create_average_frm_1.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Create average frames 1</video>
+  <video src="images/tools/create_average_frm_1.mp4" width="600" controls>Create average frames 1</video>
 </p>
 <p align="center">
-  <video src="images/tools/create_average_frm_2.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Create average frames 2</video>
+  <video src="images/tools/create_average_frm_2.mp4" width="600" controls>Create average frames 2</video>
 </p>
 <p align="center">
-  <video src="images/tools/create_average_frm_3.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Create average frames 3</video>
+  <video src="images/tools/create_average_frm_3.mp4" width="600" controls>Create average frames 3</video>
 </p>
 <p align="center">
-  <video src="images/tools/create_average_frm_4.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Create average frames 4</video>
+  <video src="images/tools/create_average_frm_4.mp4" width="600" controls>Create average frames 4</video>
 </p>
 
 ---
@@ -1915,10 +1915,10 @@ Joins **only the videos you choose**, in the **order you set** (VIDEO PATH 1, th
 → Full description: [Visualizations.md — Egocentrically align pose and video](Visualizations.md#egocentrically-align-pose-and-video-tools-menu).
 
 <p align="center">
-  <video src="images/tools/egocentric_1.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Egocentric align 1</video>
+  <video src="images/tools/egocentric_1.mp4" width="600" controls>Egocentric align 1</video>
 </p>
 <p align="center">
-  <video src="images/tools/egocentric_2.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Egocentric align 2</video>
+  <video src="images/tools/egocentric_2.mp4" width="600" controls>Egocentric align 2</video>
 </p>
 
 ---

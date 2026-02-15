@@ -52,7 +52,7 @@ The pipeline is split into two parts:
 
 
 <p align="center">
-  <img src="images/scenario1/overview.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario1/overview.webp" width="600">
 </p>
 ---
 
@@ -67,7 +67,7 @@ You create a SimBA project to organize your videos, tracking data, and analysis 
 1. Open SimBA, go to `File`, and select `Create a new project`
 
 <p align="center">
-  <img src="images/scenario1/create_new_project.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario1/create_new_project.webp" width="600">
 </p>
 
 2. **General project settings**
@@ -105,7 +105,7 @@ Importing videos into the SimBA project is **not strictly required** for every w
 > **Video selection considerations:** The number of videos matters less than the total number of behavioral events. Frequent behaviors (e.g. attacks) may need only a handful of videos; rare behaviors (e.g. lateral threat displays) need more for the same event count. Behaviors should be representative of experimental data, with sufficient variability in how they are performed (e.g. different animals, contexts, or angles). You also need videos left over for validation — never test classifiers on the same videos you used to train them. **In this scenario, use 19 videos for training and 1 for validation.** You can also create rendered visualizations in Scenarios 2–4 and use SimBA’s [evaluation tools](#step-7--train-machine-model).
 
 <p align="center">
-  <img src="images/scenario1/import_videos.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario1/import_videos.png" width="600">
 </p>
 
 1. Go to the **Import videos** tab
@@ -128,7 +128,7 @@ SimBA needs the pose-estimation data (x,y coordinates of body parts) produced by
 > DLC outputs CSVs with long filenames. SimBA copies the CSV files, strips DLC notation, renames them to match video names, and saves the copies in the project folder. The original files stay untouched. **Important:** Videos and tracking CSVs must have matching filenames (before the extension) so SimBA can pair them. For example, `Mouse1_Day1.mp4` and `Mouse1_Day1.csv` will be paired; `Mouse1_Day1.mp4` and `DLC_resnet50_Mouse1Day1Jan1.csv` will not pair until SimBA renames the CSV to match the video.
 
 <p align="center">
-  <img src="images/scenario1/import_data.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario1/import_data.png" width="600">
 </p>
 
 1. Go to the **Import tracking data** tab. Leave **file type** as **CSV (DLC/DeepPoseKit)** (see [multi-animal tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/Multi_animal_pose.md) for other formats).
@@ -139,7 +139,7 @@ SimBA needs the pose-estimation data (x,y coordinates of body parts) produced by
    - See the [interpolation comparison image](https://github.com/sgoldenlab/simba/blob/master/images/Interpolation_comparison.png) for a visual, or the [linked code example](https://gist.github.com/gyassine/b47b90e8de935cc06ef856401f7582b0) for implementation details.
 
 <p align="center">
-  <img src="images/scenario1/interpolation.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario1/interpolation.png" width="600">
 </p>
 
 > [!NOTE]
@@ -151,7 +151,7 @@ SimBA needs the pose-estimation data (x,y coordinates of body parts) produced by
 > After interpolation or smoothing, use [Visualize pose estimation in folder](Tools.md#visualize-pose-estimation-in-folder) (Tools menu) to overlay the pose keypoints on your videos. The visualization tool lets you verify that the tracking looks correct (e.g. keypoints follow the animal, interpolation did not introduce obvious errors) before you proceed to feature extraction and labeling. Select the folder containing your tracking CSVs (e.g. the `project_folder/csv/input/` directory) and choose a directory to save the output; SimBA renders annotated videos for review.
 
 <p align="center">
-  <img src="images/scenario1/smoothing.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario1/smoothing.png" width="600">
 </p>
 
 4. Click <kbd>Browse Folder</kbd>, select the folder with CSV files, and then click <kbd>Import DLC CSV DIRECTORY to SimBA project</kbd> (or **Import DLC CSV FILE to SimBA project** for a single file).
@@ -176,7 +176,7 @@ Before running any analysis, you must load your project so SimBA knows which fol
 3. The `File Selected` box should show the location of the config file (e.g. `.../project_folder/project_config.ini`); "No file selected" should disappear
 
 <p align="center">
-  <img src="images/scenario1/load_project.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario1/load_project.png" width="600">
 </p>
 
 > [!NOTE]
@@ -191,7 +191,7 @@ Before running any analysis, you must load your project so SimBA knows which fol
 If you need to add more videos or tracking data later (for example, when you get new experimental videos), use the **Further imports** tab. The Further imports tab lets you add data to an existing project without recreating the project. Use the Further imports tab when you need to bring in new videos or pose files (e.g. for [Scenario 4](Scenario4.md#part-2-load-the-project-and-import-your-new-data)).
 
 <p align="center">
-  <img src="images/scenario1/further_imports.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario1/further_imports.webp" width="600">
 </p>
 
 **Import more data**
@@ -228,7 +228,7 @@ You can skip the Further imports step for Scenario 1, since you will not add new
 2. Click **CONFIGURE VIDEO PARAMETERS** to open the table.
 
 <p align="center">
-  <img src="images/scenario1/video_info.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 6px 28px rgba(0,0,0,0.22); max-width: 100%;">
+  <img src="images/scenario1/video_info.webp" width="600">
 </p>
 
 3. Video names appear in the left column. Enter known distance in the **DISTANCE IN MM** column. For each video, click **CALCULATE DISTANCE** to open the pixel picker; place two points that define the known distance (e.g. two markers 245 mm apart). The **PIXELS PER MM** column populates after you place the two points. Repeat for every video.
@@ -236,7 +236,7 @@ You can skip the Further imports step for Scenario 1, since you will not add new
 4. For each video, click **CALCULATE DISTANCE**; a window shows the first frame. Double-**left**-click two points that define the known distance. If a point is misplaced, double-click the dot to replace the misplaced point. Press **Esc** when done.
 
 <p align="center">
-  <video src="images/scenario1/getcoord.webm" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 6px 28px rgba(0,0,0,0.22);" autoplay loop muted playsinline></video>
+  <video src="images/scenario1/getcoord.mp4" width="600" autoplay loop muted playsinline></video>
 </p>
 
 5. When finished, click **SAVE PIXEL PER MILLIMETER DATA** (or <kbd>SAVE</kbd> in the table) to write the values to `video_info.csv` in `project_folder/logs`. You must save before closing the window or the calibration will not be applied to later steps.
@@ -256,7 +256,7 @@ Pose-estimation tools sometimes make mistakes—a body part might suddenly jump 
 1. Open **Outlier Correction** and click **Settings**
 
 <p align="center">
-  <img src="images/scenario1/outlier_correction.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 6px 28px rgba(0,0,0,0.22); max-width: 100%;">
+  <img src="images/scenario1/outlier_correction.png" width="600">
 </p>
 
 2. Select body parts for Animal 1 and Animal 2 to calculate a reference value (mean or median Euclidean distance in mm between the two body parts across all frames). Keep the default body-part selections.
@@ -291,7 +291,7 @@ If you want to see which features SimBA computes for your setup, you can browse 
 1. Go to the **Extract features** tab and click **EXTRACT FEATURES**. Do **not** enable **APPLY USER DEFINED FEATURE EXTRACTION SCRIPT** for this tutorial; SimBA’s built-in features are appropriate for this scenario. The user-defined script option is for advanced users who need custom features. See [user-defined feature extraction](https://github.com/sgoldenlab/simba/blob/master/docs/extractFeatures.md) for when and how to use the user-defined script option.
 
 <p align="center">
-  <img src="images/scenario1/extract_features.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 6px 28px rgba(0,0,0,0.22); max-width: 100%;">
+  <img src="images/scenario1/extract_features.png" width="600">
 </p>
 
 2. CSV files with features and pose data are saved in `project_folder/csv/features_extracted/` (one per DLC file).
@@ -322,7 +322,7 @@ For a full walkthrough of the annotation interface (frame navigation, video play
 Once you have labeled data and extracted features, you train a classifier that learns to recognize the behavior in new, unlabeled videos. In this step you configure the training settings (such as which algorithm to use and how to handle imbalanced data) and run the training. The result is a model file (`.sav`) that you can run on experimental data.
 
 <p align="center">
-  <img src="images/scenario1/ml_settings.png" width="500" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Machine learning settings">
+  <img src="images/scenario1/ml_settings.png" width="500" alt="Machine learning settings">
 </p>
 
 **Where to find the Train machine model settings:** In the main SimBA window, click the **Train machine model** tab (alongside **Outlier correction**, **Extract features**, **Label behavior**, etc.). Within that tab, click <kbd>SETTINGS</kbd> to open the settings window.
@@ -363,19 +363,18 @@ Click <kbd>SETTINGS</kbd> in the **Train machine model** tab to open the setting
 | **CRITERION** | The rule used to decide how to split data at each node: `gini` or `entropy`. Both are fine; `gini` is a bit faster. |
 | **TEST SIZE** | Fraction of your labeled data reserved for testing (e.g. 0.2 means 20% is held out). The model never sees the test set during training—the test set is used to estimate real-world performance. 0.2 is a common choice. |
 | **TRAIN-TEST SPLIT TYPE** | **FRAMES** — Split frames randomly into train and test. A single bout of behavior may be cut across both sets. **BOUTS** — Split by whole bouts, so each bout stays entirely in train or test. Use **BOUTS** if your bouts are short and you want cleaner evaluation. See illustration below. |
-
-*Train-test split: FRAMES vs BOUTS —*
-
-<p align="center">
-  <img src="images/scenario1/bout_vs_frames_split.webp" width="500" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Train-test split: FRAMES vs BOUTS">
-</p>
-
 | **MINIMUM SAMPLE LEAF** | Minimum number of samples allowed in a leaf (end node) of a tree. Higher values (e.g. 5 or 10) produce simpler trees and can reduce overfitting; lower values (e.g. 1) allow finer-grained decisions. Default 1 is fine for most cases. |
 | **UNDER SAMPLE SETTING** | **Often the most important setting for animal behavior classification.** When your behavior occurs in only a small fraction of frames (e.g. &lt;10%), the model sees mostly “absent” and may ignore “present.” **Random undersample** removes some absent frames so both classes are better balanced. Use `random undersample` and explore the ratio below—trying several undersample ratios is recommended. See [RandomUnderSampler](https://imbalanced-learn.org/stable/references/generated/imblearn.under_sampling.RandomUnderSampler.html). |
 | **UNDER SAMPLE RATIO** | **Often the most impactful setting to tune.** After undersampling, how many absent frames per present frame? **1** = equal numbers; **0.5** = half as many absent; **0.25** = fewer absent. Different ratios often give very different results—explore several values (e.g. 1, 0.5, 0.25, 0.1) to find what works best for your behavior. Only used when undersampling is enabled. |
 | **OVER SAMPLE SETTING** | Alternative to undersampling: add synthetic or duplicated “present” frames so the model sees more behavior examples. **SMOTE** creates synthetic samples; **SMOTEENN** combines SMOTE with cleanup. Use if undersampling removes too much useful data. See [imbalanced-learn](https://imbalanced-learn.org/stable/). |
 | **OVER SAMPLE RATIO** | Target ratio of present to absent frames after oversampling. Active when oversampling is enabled. |
 | **CLASS WEIGHTS SETTINGS** | Another way to handle imbalance: tell the model to penalize errors on “present” frames more heavily. **balanced** and **balanced_subsample** set weights automatically from your data. **custom** lets you set weights manually. Use when undersampling/oversampling don’t help enough. See [class_weight](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#sklearn.ensemble.RandomForestClassifier). |
+
+*Train-test split: FRAMES vs BOUTS —*
+
+<p align="center">
+  <img src="images/scenario1/bout_vs_frames_split.webp" width="500" alt="Train-test split: FRAMES vs BOUTS">
+</p>
 
 **MODEL EVALUATION SETTINGS**
 
@@ -411,7 +410,7 @@ Click <kbd>SETTINGS</kbd> in the **Train machine model** tab to open the setting
 Close the settings window and click <kbd>TRAIN SINGLE MODEL (GLOBAL ENVIRONMENT)</kbd>.
 
 <p align="center">
-  <img src="images/scenario1/run_ml_mdl.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario1/run_ml_mdl.png" width="600">
 </p>
 
 - **Mode 1 (used in this tutorial):** Save settings with **SAVE SETTINGS (GLOBAL ENVIRONMENT)**, close the settings window, and click <kbd>TRAIN SINGLE MODEL (GLOBAL ENVIRONMENT)</kbd>. SimBA saves the model as `{behavior}.sav` (e.g. `BtWGaNP.sav`) in `project_folder/models/generated_models/`. Evaluation outputs (classification report, feature importance, learning curves, etc.) go to `model_evaluations/` in `project_folder/models/generated_models/`.
@@ -432,7 +431,7 @@ Before running your classifier on real experimental data, you should check how w
 1. Go to the **Run machine model** tab and open the **VALIDATE MODEL ON SINGLE VIDEO** section.
 
 <p align="center">
-  <img src="images/scenario1/validate_1.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario1/validate_1.png" width="600">
 </p>
 
 2. **SELECT DATA FEATURE FILE PATH** — Browse to select the held-out features file. The held-out file lives in `project_folder/csv/features_extracted/` (or wherever you moved it in Step 5) and was not used for training.
@@ -448,7 +447,7 @@ Before running your classifier on real experimental data, you should check how w
    **Keyboard shortcuts (select the line plot window first):** Press the right arrow key to move forward one frame, the left arrow key to move backward, and the Space bar to play or pause.
 
 <p align="center">
-  <img src="images/scenario1/interactive_validation.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario1/interactive_validation.webp" width="600">
 </p>
 
 
@@ -476,14 +475,14 @@ Before running your classifier on real experimental data, you should check how w
 | **GANTT TYPE** | **None** = no Gantt bar chart. **Final frame only** = one static Gantt at the end (faster). **Video** = Gantt updates per frame (shows timing over video). Use CPU count > 1 for Gantt videos. |
 
 <p align="center">
-  <img src="images/scenario1/validate_2.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario1/validate_2.png" width="600">
 </p>
 
 9. **RUN** — SimBA creates a video with the classifier's predictions overlaid on each frame (e.g. behavior-present frames highlighted, probability text, Gantt chart if selected). The output video is saved to the `project_folder/frames/output/validation/` directory.
 
 
 <p align="center">
-  <video src="images/scenario1/validation_example.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 6px 28px rgba(0,0,0,0.22); max-width: 100%;">Validate model on new data — example</video>
+  <video src="images/scenario1/validation_example.mp4" width="600" controls>Validate model on new data — example</video>
 </p>
 
 > [!NOTE]

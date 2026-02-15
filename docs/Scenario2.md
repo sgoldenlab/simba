@@ -52,7 +52,7 @@ You need a **SimBA project** that contains **only** the experimental data you wa
 1. **Archive processed files** — If you want to keep using the same project folder from Scenario 1, you can move the pilot data out of the active analysis path. After loading your project, go to the **Further imports** tab. In the **FURTHER METHODS** section, click <kbd>ARCHIVE PROCESSED FILES IN SIMBA PROJECT</kbd>. Enter a name for the archive (e.g. `pilot_training_data`) and click <kbd>RUN ARCHIVE</kbd>. SimBA moves the processed CSV files (from the `csv/input_csv/`, `csv/outlier_corrected_movement_location/`, `csv/features_extracted/` directories, and related folders) into an archive subfolder so they are no longer analyzed. Your project folder stays in place; only the pilot data is relocated. After archiving, **import your experimental videos and pose-tracking data** into the project if they are not already there: use **Import videos** and **Import tracking data** (or the equivalent options in the Further imports tab) to add the experimental videos and their pose CSVs. See the [Scenario 4 — Part 1](Scenario4.md#part-1-clean-up-your-previous-project-or-create-a-new-one) for more detail.
 
 <p align="center">
-  <img src="images/scenario2/archieve_files.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/archieve_files.png" width="600">
 </p>
 
 2. **Create a new project** — Start fresh with a project that contains only your experimental data. Go to `File` → `Create a new project` and follow [Scenario 1 — Part 1: Create a new project](Scenario1.md#part-1-create-a-new-project). Use the same project name format, body-part configuration, and workflow type as your pilot project so the classifier will work. When the project is created, **import your experimental videos and pose-tracking data** into the new SimBA project: use the **Import videos** tab to add the experimental videos, then the **Import tracking data** tab (or equivalent) to add the pose-estimation CSVs for those videos (Day 1, Day 2, etc.). Do not import the pilot set.
@@ -101,7 +101,7 @@ At this point your experimental data is in the `project_folder/csv/features_extr
 2. Click <kbd>RUN MODELS</kbd>. The RUN MODELS pop-up appears with one row per classifier defined in your project (e.g. BtWGaNP). Each row has fields for the model path, discrimination threshold, and minimum bout length.
 
 <p align="center">
-  <img src="images/scenario2/run_models.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/run_models.webp" width="600">
 </p>
 
 ### Step 2: Select model file for each classifier
@@ -150,7 +150,7 @@ To access the analysis tools: go to the **Run machine model** tab and find the *
 > Analyses that do not require machine learning results (e.g. distance and velocity aggregates or time bins) can also be run from the **ROI** tab, which has equivalent tools for movement and distance metrics. Use whichever tab fits your workflow.
 
 <p align="center">
-  <img src="images/scenario2/analyze_machine_results.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/analyze_machine_results.webp" width="600">
 </p>
 
 ### 1. ANALYZE MACHINE PREDICTIONS: AGGREGATES
@@ -158,7 +158,7 @@ To access the analysis tools: go to the **Run machine model** tab and find the *
 Use **ANALYZE MACHINE PREDICTIONS: AGGREGATES** when you need **one summary number per video per classifier** for each behavioral measurement you choose (e.g. total event duration in seconds, event count, first occurrence in seconds). That gives you a single table of values—one row per video (or per video–classifier–measurement, depending on output format)—suitable for comparing experimental groups (e.g. treatment vs control) or for importing into statistics or plotting software. You select at least one **measurement** (from the list below), at least one **classifier**, then click <kbd>RUN</kbd>. The output is a date-time stamped CSV saved to the `project_folder/logs/` directory; the terminal prints the exact filename. All options in the dialog are described below.
 
 <p align="center">
-  <img src="images/scenario2/descriptive_stats.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/descriptive_stats.webp" width="600">
 </p>
 
 **MEASUREMENTS** — Choose which statistics to compute. A *bout* (or *event*) is a continuous run of frames where the classifier predicts the behavior; bouts are separated by frames where the behavior is not predicted (subject to the minimum bout length setting from the Run model step).
@@ -202,7 +202,7 @@ Use **ANALYZE DISTANCES / VELOCITY: AGGREGATES** when you need **one movement va
 
 
 <p align="center">
-  <img src="images/scenario2/distance_velocity.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/distance_velocity.webp" width="600">
 </p>
 
 
@@ -226,7 +226,7 @@ All options in the dialog are listed below.
 Use **ANALYZE MACHINE PREDICTIONS: TIME BINS** when you want **one value of each selected measurement per time bin per video per classifier**, instead of one value for the whole video. For example, for a 3-minute video with 60 s bins you get three values of “total event duration (s)” (one for 0–60 s, one for 60–120 s, one for 120–180 s), three values of “event count,” and so on—so you can see how the behavior changes over the course of the video. You choose the **time bin size** (e.g. 30 or 60 seconds), at least one **measurement** (first occurrence, event count, total event duration, mean/median duration, mean/median interval), and at least one **classifier**, then click <kbd>RUN</kbd>. Output is saved to the `project_folder/logs/` directory as `Time_bins_ML_results_{datetime}.csv`. 
 
 <p align="center">
-  <img src="images/scenario2/clf_by_timbin.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/clf_by_timbin.png" width="600">
 </p>
 
 All options in the dialog are listed below.
@@ -258,7 +258,7 @@ All options in the dialog are listed below.
 Use **ANALYZE DISTANCES / VELOCITY: TIME-BINS** when you need **one distance or velocity value per time bin per video per animal** (e.g. total distance traveled in bin 1, in bin 2, …), so you can see how movement or velocity changes over the course of each video. SimBA reads pose data from the `project_folder/csv/outlier_corrected_movement_location/` directory; no feature extraction or classifier is required. You set the **time bin size** (e.g. 60 s), choose which body part(s) to track for each animal, and select at least one of **DISTANCE (CM)** or **VELOCITY (CM/S)**, then click <kbd>RUN</kbd>. Optionally you can generate line plots of distance (or velocity) vs time bin. 
 
 <p align="center">
-  <img src="images/scenario2/movement_timebin.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/movement_timebin.webp" width="600">
 </p>
 
 
@@ -289,7 +289,7 @@ All options in the dialog are listed below.
 Use **ANALYZE MACHINE PREDICTIONS: BY ROI** when you have drawn [user-defined ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md) (e.g. zones or polygons on the video) and want **per-ROI metrics**: total time (seconds) each classified behavior occurred inside each ROI, how many behavior bouts *started* inside each ROI, and how many *ended* inside each ROI. SimBA uses the classifier predictions from the `project_folder/csv/machine_results/` directory and your ROI definitions to determine when the animal (via the body part you choose) is inside or outside each zone. You select which ROIs, which classifiers, which body part(s) to use for location, and which measurements to compute, then click <kbd>RUN</kbd>. 
 
 <p align="center">
-  <img src="images/scenario2/clf_by_timbin.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/clf_by_timbin.png" width="600">
 </p>
 
 
@@ -320,7 +320,7 @@ All options in the **Analyze machine predictions: by ROI** dialog are listed bel
 Use **ANALYZE MACHINE PREDICTIONS: BY SEVERITY** when your behavior can be graded from **mild to severe** based on movement intensity (e.g. mild vs severe attacks). SimBA computes movement (e.g. summed velocity of selected body parts) during each classified frame or each bout, then assigns a **severity score** (e.g. 1–10) to each frame or bout using a user-defined scale. The output gives you not only how often the behavior occurred but **how intense** the behavior was—e.g. how many events fell into each severity bracket. You choose the classifier, the number of brackets (scale size), whether to score per bout or per frame, how to normalize movement across videos, and optionally whether to save bracket definitions or generate example clips.
 
 <p align="center">
-  <img src="images/scenario2/clf_severity.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/clf_severity.webp" width="600">
 </p>
 
 All options in the severity analysis dialog are listed below.
@@ -375,7 +375,7 @@ Go to the **[Visualizations]** tab to access the visualization tools.
 Creates videos (or frame sequences) with classification overlays: the video plays while the current behavior predictions and probabilities are shown (e.g. text overlay, highlighted pose). Use the classification overlay to quickly review predictions or to create presentation videos. See the [example video](https://youtu.be/lGzbS7OaVEg). SimBA reads classifier data from `project_folder/csv/machine_results/` and videos from `project_folder/videos/`. 
 
 <p align="center">
-  <img src="images/scenario2/visualize_sklearn.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/visualize_sklearn.webp" width="600">
 </p>
 
 
@@ -410,11 +410,11 @@ The **Visualize classifications** dialog offers the following options:
 
 
 <p align="center">
-  <video src="images/scenario2/sklearn_visualization.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/scenario2/sklearn_visualization.mp4" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
 <p align="center">
-  <video src="images/scenario2/sklearn_visualization_2.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/scenario2/sklearn_visualization_2.mp4" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
 
@@ -424,7 +424,7 @@ The **Visualize classifications** dialog offers the following options:
 Gantt charts are horizontal bar charts: one row per classifier, with bars indicating when each behavior occurred and for how long. Use Gantt charts to compare timing and duration across behaviors or videos. They can be static (one image for the whole video) or dynamic (a video where the chart updates over time). SimBA reads classifier data from the `project_folder/csv/machine_results/` directory. 
 
 <p align="center">
-  <img src="images/scenario2/gannt_gui.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/gannt_gui.webp" width="600">
 </p>
 
 Select at least one behavior and at least one output type (frames, videos, or last frame), then run.
@@ -462,11 +462,11 @@ Select at least one behavior and at least one output type (frames, videos, or la
 
 
 <p align="center">
-  <img src="images/scenario2/gantt_plotly.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/gantt_plotly.webp" width="600">
 </p>
 
 <p align="center">
-  <img src="images/scenario2/gantt_plot.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/gantt_plot.webp" width="600">
 </p>
 
 ### VISUALIZE PROBABILITY PLOTS
@@ -474,7 +474,7 @@ Select at least one behavior and at least one output type (frames, videos, or la
 Line plots showing the classifier’s predicted probability (0–1) for one behavior across the video timeline. The x-axis is time (or frame), the y-axis is probability. Use probability plots to see when the model was confident vs uncertain and to tune the discrimination threshold. SimBA reads classifier data from the `project_folder/csv/machine_results/` directory. 
 
 <p align="center">
-  <img src="images/scenario2/probability_plots.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/probability_plots.webp" width="600">
 </p>
 
 Select at least one output type (frames, videos, or final frame), then run.
@@ -508,7 +508,7 @@ Select at least one output type (frames, videos, or final frame), then run.
 
 
 <p align="center">
-  <img src="images/scenario2/prob_plot.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/prob_plot.webp" width="600">
 </p>
 
 ### VISUALIZE PATH PLOTS
@@ -516,7 +516,7 @@ Select at least one output type (frames, videos, or final frame), then run.
 Path plots show where each animal moved over time (trajectory lines) and, optionally, where classified behaviors occurred (colored markers). Use path plots to see spatial patterns (e.g. where in the arena behaviors tended to occur) and to combine movement with classification in one visualization.
 
 <p align="center">
-  <img src="images/scenario2/path_menu.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/path_menu.webp" width="600">
 </p>
 
 **Data sources:** Pose data from `project_folder/csv/outlier_corrected_movement_location/`. When classification markers are included, SimBA also reads `project_folder/csv/machine_results/`.
@@ -588,14 +588,14 @@ Path plots show where each animal moved over time (trajectory lines) and, option
 **Example path plot outputs**
 
 <p align="center">
-  <img src="images/scenario2/path_plot_0.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;" alt="Path plot example 0">
-  <img src="images/scenario2/path_plot_1.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;" alt="Path plot example 1">
-  <video src="images/scenario2/path_plot_2.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;">Path plot animation</video>
+  <img src="images/scenario2/path_plot_0.webp" width="600" alt="Path plot example 0">
+  <img src="images/scenario2/path_plot_1.webp" width="600" alt="Path plot example 1">
+  <video src="images/scenario2/path_plot_2.mp4" width="600" controls>Path plot animation</video>
 </p>
 <p align="center">
-  <img src="images/scenario2/path_plot_3.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;" alt="Path plot example 3">
-  <img src="images/scenario2/path_plot_4.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;" alt="Path plot example 4">
-  <img src="images/scenario2/path_plot_5.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;" alt="Path plot example 5">
+  <img src="images/scenario2/path_plot_3.webp" width="600" alt="Path plot example 3">
+  <img src="images/scenario2/path_plot_4.webp" width="600" alt="Path plot example 4">
+  <img src="images/scenario2/path_plot_5.webp" width="600" alt="Path plot example 5">
 </p>
 
 
@@ -604,7 +604,7 @@ Path plots show where each animal moved over time (trajectory lines) and, option
 Line plots of the distance between pairs of body parts (or animals) over time. Use distance plots to visualize approach/retreat, proximity, or other distance-based measures (e.g. nose-to-nose distance between two animals). Data is read from the `project_folder/csv/outlier_corrected_movement_location/` directory.
 
 <p align="center">
-  <img src="images/scenario2/distance_gui.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Visualize distance plots dialog">
+  <img src="images/scenario2/distance_gui.webp" width="600" alt="Visualize distance plots dialog">
 </p>
 
 The **Visualize distance plots** dialog offers the following options:
@@ -628,8 +628,8 @@ The **Visualize distance plots** dialog offers the following options:
 **Where output is saved:** `project_folder/frames/output/line_plot/`. Per-video: `{video_name}.mp4` (or .avi for single-core), `{video_name}_final_distances.png`, and (if CREATE FRAMES) subfolder `{video_name}/` with frame images.
 
 <p align="center">
-  <img src="images/scenario2/distance_plot_1.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;" alt="Distance plot example 1">
-  <img src="images/scenario2/distance_plot_2.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;" alt="Distance plot example 2">
+  <img src="images/scenario2/distance_plot_1.webp" width="600" alt="Distance plot example 1">
+  <img src="images/scenario2/distance_plot_2.webp" width="600" alt="Distance plot example 2">
 </p>
 
 ### VISUALIZE CLASSIFICATION HEATMAPS
@@ -637,7 +637,7 @@ The **Visualize distance plots** dialog offers the following options:
 Heatmaps show where in the arena (or frame) classified behaviors tended to occur. Warmer colors indicate more time or more events at that location. Use classification heatmaps to identify spatial hotspots (e.g. corners where attacks occurred). Data is read from the `project_folder/csv/machine_results/` directory. See the [classification heatmap example video](https://youtu.be/O41x96kXUHE). The **Visualize classification heatmaps** dialog offers the following options:
 
 <p align="center">
-  <img src="images/scenario2/heatmap_clf.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/heatmap_clf.webp" width="600">
 </p>
 
 
@@ -665,8 +665,8 @@ Heatmaps show where in the arena (or frame) classified behaviors tended to occur
 **Where output is saved:** `project_folder/frames/output/heatmaps_classifier_locations/`. Per-video: `{video_name}.mp4`, `{video_name}_final_frm.png`, and (if CREATE FRAMES) subfolder `{video_name}/` with frame images.
 
 <p align="center">
-  <img src="images/scenario2/heatmap_clf_1.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;" alt="Classification heatmap example 1">
-  <img src="images/scenario2/heatmap_clf_2.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;" alt="Classification heatmap example 2">
+  <img src="images/scenario2/heatmap_clf_1.webp" width="600" alt="Classification heatmap example 1">
+  <img src="images/scenario2/heatmap_clf_2.png" width="600" alt="Classification heatmap example 2">
 </p>
 
 
@@ -678,7 +678,7 @@ Creates videos or frames where a table overlays the video, showing movement metr
 
 
 <p align="center">
-  <img src="images/scenario2/data_plot_gui.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Visualize data tables dialog">
+  <img src="images/scenario2/data_plot_gui.webp" width="600" alt="Visualize data tables dialog">
 </p>
 
 The **Visualize data tables** dialog offers the following options:
@@ -702,7 +702,7 @@ The **Visualize data tables** dialog offers the following options:
 **Where output is saved:** `project_folder/frames/output/live_data_table/`. Per-video: `{video_name}.mp4`, and (if CREATE FRAMES) subfolder `{video_name}/` with frame images.
 
 <p align="center">
-  <img src="images/scenario2/data_plot.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/data_plot.webp" width="600">
 </p>
 
 ### MERGE (CONCATENATE) MULTIPLE VIDEOS
@@ -710,14 +710,14 @@ The **Visualize data tables** dialog offers the following options:
 The **merge (concatenate) multiple videos** tool combines several videos into one output video by arranging the selected videos in a single multi-panel layout. Each input video becomes one panel; the videos are not played one after another in time, but shown side by side (or in a grid) in every frame. Typical uses include putting the original video, a classification-overlay video, a Gantt chart, and a probability or path plot into one view for figures, slides, or quick visual comparison.
 
 <p align="center">
-  <img src="images/scenario2/concatenate_videos.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/concatenate_videos.webp" width="600">
 </p>
 
 To concatenate or merge multiple videos, use the **Tools** menu → **Concatenate (stack) videos...** → **Concatenate multiple videos** (or **MERGE FRAMES** in the **[Visualizations]** tab). For options, layout types, and where output is saved, see [Tools — Concatenate (stack) videos](Tools.md#concatenate-stack-videos) and [Tools — Concatenate multiple videos](Tools.md#concatenate-multiple-videos).
 
 
 <p align="center">
-  <video src="images/scenario2/concat_videos.mp4" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/scenario2/concat_videos.mp4" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
 

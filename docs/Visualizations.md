@@ -72,7 +72,7 @@ Inspect frame-by-frame probabilities alongside the video. The window shows two p
 The **x-axis** is frame number, the **y-axis** is classifier probability (0–1). The main line (blue) traces predicted probability. Threshold lines (75%, 50%, 25%) appear as dashed horizontals. A red vertical line and circle mark the current frame. **Double-click** a point on the plot to jump the video to that frame. **Keyboard shortcuts** (focus the plot): ← → navigate frames, Space play/pause.
 
 <p align="center">
-  <img src="images/scenario1/interactive_validation.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario1/interactive_validation.webp" width="600">
 </p>
 
 ---
@@ -103,7 +103,7 @@ The **x-axis** is frame number, the **y-axis** is classifier probability (0–1)
 **Where output is saved:** `project_folder/frames/output/validation/`
 
 <p align="center">
-  <video src="images/scenario2/sklearn_visualization_2.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Validation video with classification overlays</video>
+  <video src="images/scenario2/sklearn_visualization_2.mp4" width="600" controls>Validation video with classification overlays</video>
 </p>
 
 ---
@@ -113,7 +113,7 @@ The **x-axis** is frame number, the **y-axis** is classifier probability (0–1)
 Creates videos (or frame sequences) with classification overlays: the video plays while the current behavior predictions and probabilities are shown (e.g. text overlay, highlighted pose). Use this to quickly review predictions or to create presentation videos. See [this example](https://youtu.be/lGzbS7OaVEg). 
 
 <p align="center">
-  <img src="images/scenario2/visualize_sklearn.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/visualize_sklearn.webp" width="600">
 </p>
 
 
@@ -152,10 +152,10 @@ The pop-up offers the following options:
 
 
 <p align="center">
-  <video src="images/scenario2/sklearn_visualization.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Classification visualization</video>
+  <video src="images/scenario2/sklearn_visualization.mp4" width="600" controls>Classification visualization</video>
 </p>
 <p align="center">
-  <video src="images/scenario2/sklearn_visualization_2.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Classification visualization</video>
+  <video src="images/scenario2/sklearn_visualization_2.mp4" width="600" controls>Classification visualization</video>
 </p>
 
 ---
@@ -165,7 +165,7 @@ The pop-up offers the following options:
 Gantt charts are horizontal bar charts: one row per classifier, with bars indicating when each behavior occurred and for how long. Use them to compare timing and duration across behaviors or videos. They can be static (one image for the whole video) or dynamic (a video where the chart updates over time). Select at least one behavior and at least one output type (frames, videos, or last frame), then run.
 
 <p align="center">
-  <img src="images/scenario2/gannt_gui.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/gannt_gui.webp" width="600">
 </p>
 
 **Prerequisites:**
@@ -203,10 +203,10 @@ Gantt charts are horizontal bar charts: one row per classifier, with bars indica
 
 
 <p align="center">
-  <img src="images/scenario2/gantt_plotly.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/gantt_plotly.webp" width="600">
 </p>
 <p align="center">
-  <img src="images/scenario2/gantt_plot.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/gantt_plot.webp" width="600">
 </p>
 
 ---
@@ -246,10 +246,10 @@ Line plots showing the classifier's predicted probability (0–1) for one behavi
 **Where output is saved:** Videos, frames, and final images are saved to the `project_folder/frames/output/probability_plots/` directory. Per-video outputs: `{video_name}_{classifier_name}.mp4`, `{video_name}_{classifier_name}_final_frm_{datetime}.png`, and (if CREATE FRAMES) a subfolder `{video_name}_{classifier_name}/` with frame images.
 
 <p align="center">
-  <img src="images/scenario2/probability_plots.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/probability_plots.webp" width="600">
 </p>
 <p align="center">
-  <img src="images/scenario2/prob_plot.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/prob_plot.webp" width="600">
 </p>
 
 ---
@@ -259,7 +259,7 @@ Line plots showing the classifier's predicted probability (0–1) for one behavi
 Path plots show where each animal moved over time (trajectory lines) and, optionally, where classified behaviors occurred (colored markers). Use them to see spatial patterns (e.g. where in the arena behaviors tended to occur) and to combine movement with classification in one visualization. See [Scenario 2 — Part 5](Scenario2.md#part-5--visualize-results).
 
 <p align="center">
-  <img src="images/scenario2/path_menu.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/path_menu.webp" width="600">
 </p>
 
 **Prerequisites:**
@@ -329,14 +329,14 @@ Path plots show where each animal moved over time (trajectory lines) and, option
 
 
 <p align="center">
-  <img src="images/scenario2/path_plot_0.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;">
-  <img src="images/scenario2/path_plot_1.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;">
-  <video src="images/scenario2/path_plot_2.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;">Path plot</video>
+  <img src="images/scenario2/path_plot_0.webp" width="600">
+  <img src="images/scenario2/path_plot_1.webp" width="600">
+  <video src="images/scenario2/path_plot_2.mp4" width="600" controls>Path plot</video>
 </p>
 <p align="center">
-  <img src="images/scenario2/path_plot_3.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;">
-  <img src="images/scenario2/path_plot_4.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;">
-  <img src="images/scenario2/path_plot_5.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;">
+  <img src="images/scenario2/path_plot_3.webp" width="600">
+  <img src="images/scenario2/path_plot_4.webp" width="600">
+  <img src="images/scenario2/path_plot_5.webp" width="600">
 </p>
 
 ---
@@ -344,7 +344,7 @@ Path plots show where each animal moved over time (trajectory lines) and, option
 ## VISUALIZE DISTANCE PLOTS
 
 <p align="center">
-  <img src="images/visualizations/distance_gui.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Distance plot">
+  <img src="images/visualizations/distance_gui.webp" width="600" alt="Distance plot">
 </p>
 
 Line plots of the distance between pairs of body parts (or animals) over time. Use these to visualize approach/retreat, proximity, or other distance-based measures (e.g. nose-to-nose distance between two animals). See [Scenario 2 — Part 5](Scenario2.md#part-5--visualize-results). The pop-up offers the following options:
@@ -372,8 +372,8 @@ Line plots of the distance between pairs of body parts (or animals) over time. U
 **Where output is saved:** `project_folder/frames/output/line_plot/`. Per-video: `{video_name}.mp4` (or .avi for single-core), `{video_name}_final_distances.png`, and (if CREATE FRAMES) subfolder `{video_name}/` with frame images.
 
 <p align="center">
-  <img src="images/scenario2/distance_plot_1.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;">
-  <img src="images/scenario2/distance_plot_2.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;">
+  <img src="images/scenario2/distance_plot_1.webp" width="600">
+  <img src="images/scenario2/distance_plot_2.webp" width="600">
 </p>
 
 ---
@@ -383,7 +383,7 @@ Line plots of the distance between pairs of body parts (or animals) over time. U
 Heatmaps show where in the arena (or frame) classified behaviors tended to occur. Warmer colors indicate more time or more events at that location. Use them to identify spatial hotspots (e.g. corners where attacks occurred). See [this video](https://youtu.be/O41x96kXUHE) and [Scenario 2 — Part 5](Scenario2.md#part-5--visualize-results). 
 
 <p align="center">
-  <img src="images/scenario2/heatmap_clf.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/heatmap_clf.webp" width="600">
 </p>
 
 The pop-up offers the following options:
@@ -417,8 +417,8 @@ The pop-up offers the following options:
 
 
 <p align="center">
-  <img src="images/scenario2/heatmap_clf_1.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;">
-  <img src="images/scenario2/heatmap_clf_2.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%;">
+  <img src="images/scenario2/heatmap_clf_1.webp" width="600">
+  <img src="images/scenario2/heatmap_clf_2.png" width="600">
 </p>
 
 ---
@@ -428,7 +428,7 @@ The pop-up offers the following options:
 *Available under the **[ROI]** tab → **VISUALIZE ROI DATA** → **VISUALIZE ROI TRACKING**. See [ROI Tutorial — Part 4](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-4-visualizing-roi-data).*
 
 <p align="center">
-  <img src="images/visualizations/roi_tracking.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Visualize ROI tracking">
+  <img src="images/visualizations/roi_tracking.webp" width="600" alt="Visualize ROI tracking">
 </p>
 
 
@@ -461,15 +461,15 @@ Creates videos with ROI shapes overlaid on each frame, plus **counters** showing
 **Examples:**
 
 <p align="center">
-  <img src="images/visualizations/roi_plot_1.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="ROI tracking example 1">
+  <img src="images/visualizations/roi_plot_1.webp" width="600" alt="ROI tracking example 1">
 </p>
 
 <p align="center">
-  <video src="images/visualizations/roi_plot_2.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/visualizations/roi_plot_2.mp4" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
 <p align="center">
-  <video src="images/visualizations/outside_roi_example.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/visualizations/outside_roi_example.mp4" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 *Outside ROI zones data (treats areas not covered by an ROI as one additional zone).*
 
@@ -480,7 +480,7 @@ Creates videos with ROI shapes overlaid on each frame, plus **counters** showing
 *Available under the **[ROI]** tab → **VISUALIZE ROI DATA** → **VISUALIZE ROI FEATURES**. See [ROI Tutorial — Part 5](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-5-visualizing-roi-features).*
 
 <p align="center">
-  <img src="images/visualizations/roi_features.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Visualize ROI features">
+  <img src="images/visualizations/roi_features.webp" width="600" alt="Visualize ROI features">
 </p>
 
 Creates videos showing **continuous and boolean ROI features** (rather than just time-in and entries): distances to ROIs, whether animals are inside ROIs, and optionally **directionality towards ROIs** (when the animal’s head points at an ROI). Use this to inspect ROI feature data used for machine learning or descriptive statistics.
@@ -509,11 +509,11 @@ Creates videos showing **continuous and boolean ROI features** (rather than just
 **Where output is saved:** `project_folder/frames/output/ROI_features/`. Per-video: `{video_name}.mp4`.
 
 <p align="center">
-  <img src="images/visualizations/roi_features_1.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="ROI features example 1">
+  <img src="images/visualizations/roi_features_1.webp" width="600" alt="ROI features example 1">
 </p>
 
 <p align="center">
-  <img src="images/visualizations/roi_features_2.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="ROI features example 2">
+  <img src="images/visualizations/roi_features_2.webp" width="600" alt="ROI features example 2">
 </p>
 
 ---
@@ -523,7 +523,7 @@ Creates videos showing **continuous and boolean ROI features** (rather than just
 *Available under the **[ROI]** tab → **Create heatmaps**. See [ROI Tutorial — Part 6: Heatmaps](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#heatmaps).*
 
 <p align="center">
-  <img src="images/visualizations/location_heatmap.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Location heatmap">
+  <img src="images/visualizations/location_heatmap.webp" width="600" alt="Location heatmap">
 </p>
 
 Location heatmaps visualize **time spent in different regions of the arena** (colour-coded by duration). Unlike classification heatmaps, this tool does **not** depend on user-drawn ROIs or classifier predictions: it divides the arena into square bins and shows where the selected body part spent the most time. Use it to explore spatial occupancy patterns (e.g. corners, center, edges). For an example in video format, see the [SimBA YouTube playlist](https://youtu.be/O41x96kXUHE).
@@ -555,11 +555,11 @@ Location heatmaps visualize **time spent in different regions of the arena** (co
 **Where output is saved:** `project_folder/frames/output/heatmaps_locations/`. Per-video: `{video_name}.mp4`, `{video_name}_final_frm.png` (or similar), and (if CREATE FRAMES) subfolder `{video_name}/` with frame images.
 
 <p align="center">
-  <video src="images/visualizations/location_heatmap.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/visualizations/location_heatmap.mp4" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
 <p align="center">
-  <img src="images/visualizations/location_heatmap_1.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Location heatmap example">
+  <img src="images/visualizations/location_heatmap_1.webp" width="600" alt="Location heatmap example">
 </p>
 
 ---
@@ -569,7 +569,7 @@ Location heatmaps visualize **time spent in different regions of the arena** (co
 *Available under the **[ROI]** tab. SimBA uses nose and ear coordinates to estimate head direction (line of sight). This is a proxy for gaze, not actual gaze tracking. Requires nose, left ear, and right ear (or equivalent) body parts. See [ROI Tutorial — Part 3–5](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md) and [Directionality between animals](https://github.com/sgoldenlab/simba/blob/master/docs/directionality_between_animals.md).*
 
 <p align="center">
-  <img src="images/visualizations/visualize_directionality.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Visualize directionality">
+  <img src="images/visualizations/visualize_directionality.webp" width="600" alt="Visualize directionality">
 </p>
 
 **Directionality towards ROIs** — Use [Visualize ROI Features](#visualize-roi-features-roi-tab) (SHOW DIRECTIONALITY = LINES or FUNNEL) to visualize when animals are directing towards user-defined ROIs.
@@ -602,15 +602,15 @@ Creates videos showing when each animal is **directing towards other animals** (
 **Where output is saved:** `project_folder/frames/output/Directing_animals/`
 
 <p align="center">
-  <video src="images/visualizations/visualize_directionality_1.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/visualizations/visualize_directionality_1.mp4" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
 <p align="center">
-  <video src="images/visualizations/visualize_directionality_2.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/visualizations/visualize_directionality_2.mp4" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
 <p align="center">
-  <img src="images/visualizations/visualize_directionality_3.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Directionality example 3">
+  <img src="images/visualizations/visualize_directionality_3.webp" width="600" alt="Directionality example 3">
 </p>
 
 ---
@@ -642,7 +642,7 @@ Creates videos or frames where a table overlays the video, showing movement metr
 **Where output is saved:** `project_folder/frames/output/live_data_table/`. Per-video: `{video_name}.mp4`, and (if CREATE FRAMES) subfolder `{video_name}/` with frame images.
 
 <p align="center">
-  <img src="images/scenario2/data_plot.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/data_plot.webp" width="600">
 </p>
 
 ---
@@ -652,7 +652,7 @@ Creates videos or frames where a table overlays the video, showing movement metr
 The **merge (concatenate) multiple videos** tool combines several videos into one output video by arranging them in a single multi-panel layout. Each input video becomes one panel; they are not played one after another in time, but shown side by side (or in a grid) in every frame. Typical uses include putting the original video, a classification-overlay video, a Gantt chart, and a probability or path plot into one view for figures, slides, or quick visual comparison.
 
 <p align="center">
-  <img src="images/scenario2/concatenate_videos.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario2/concatenate_videos.webp" width="600">
 </p>
 
 **Prerequisites:**
@@ -678,7 +678,7 @@ Click <kbd>RUN</kbd> to generate the merged video.
 
 
 <p align="center">
-  <video src="images/scenario2/concat_videos.mp4" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Merged output video</video>
+  <video src="images/scenario2/concat_videos.mp4" width="600" controls>Merged output video</video>
 </p>
 
 ---
@@ -688,7 +688,7 @@ Click <kbd>RUN</kbd> to generate the merged video.
 *Generates bout-level clips for reviewing predictions and spotting false positives. See [Scenario 4 — Part 7](Scenario4.md#part-7-post-classification-validation-detecting-false-positives).*
 
 <p align="center">
-  <img src="images/scenario4/clf_validation.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
+  <img src="images/scenario4/clf_validation.webp" width="600">
 </p>
 
 Creates a video for each CSV with concatenated clips of all bouts of the target behavior. Each bout is extracted and concatenated into one video so you can quickly review predictions and spot false positives.
@@ -705,10 +705,10 @@ Creates a video for each CSV with concatenated clips of all bouts of the target 
 
 
 <p align="center">
-  <video src="images/scenario4/classifiervalidation.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Post-classification validation output</video>
+  <video src="images/scenario4/classifiervalidation.mp4" width="600" controls>Post-classification validation output</video>
 </p>
 <p align="center">
-  <video src="images/scenario4/ClassifierValidationClips_1.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Classifier validation clips</video>
+  <video src="images/scenario4/ClassifierValidationClips_1.mp4" width="600" controls>Classifier validation clips</video>
 </p>
 
 ---
@@ -746,7 +746,7 @@ Renders **videos with pose keypoints overlaid** on each frame. Use this to verif
 **Typical use:** After importing and preprocessing pose data, select the folder (e.g. `project_folder/csv/outlier_corrected_movement_location/` or `project_folder/csv/input/`) and choose a save directory; SimBA renders one video per tracking file.
 
 <p align="center">
-  <img src="images/visualizations/visualize_pose_in_folder.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Visualize pose-estimation in folder">
+  <img src="images/visualizations/visualize_pose_in_folder.webp" width="600" alt="Visualize pose-estimation in folder">
 </p>
 
 | Option | Description |
@@ -766,8 +766,8 @@ Renders **videos with pose keypoints overlaid** on each frame. Use this to verif
 **Where output is saved:** The **SAVE DIRECTORY** you choose. Each input file produces one output video (e.g. `{filename}.mp4`).
 
 <p align="center">
-  <img src="images/visualizations/pose_plotter.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Pose plotter output">
-  <video src="images/visualizations/pose_plotter.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Pose plotter output video</video>
+  <img src="images/visualizations/pose_plotter.webp" width="600" alt="Pose plotter output">
+  <video src="images/visualizations/pose_plotter.mp4" width="600" controls>Pose plotter output video</video>
 </p>
 
 ---
@@ -777,7 +777,7 @@ Renders **videos with pose keypoints overlaid** on each frame. Use this to verif
 *Available under **Process Videos** → **Blob tracking...** → **Visualize blob tracking**. See [Blob tracking](https://github.com/sgoldenlab/simba/blob/master/docs/blob_track.md) and [Blob tracking visualization notebook](https://github.com/sgoldenlab/simba/blob/master/docs/nb/blob_tracking_vis.ipynb).*
 
 <p align="center">
-  <img src="images/visualizations/blob_tracking_1.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Blob tracking visualization">
+  <img src="images/visualizations/blob_tracking_1.webp" width="600" alt="Blob tracking visualization">
 </p>
 
 
@@ -810,15 +810,15 @@ Renders **videos with blob-tracking overlays**: convex hulls, anterior (nose), p
 **Where output is saved:** The **SAVE DIRECTORY** you choose.
 
 <p align="center">
-  <video src="images/visualizations/blob_tracking_2.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Blob tracking visualization</video>
+  <video src="images/visualizations/blob_tracking_2.mp4" width="600" controls>Blob tracking visualization</video>
 </p>
 
 <p align="center">
-  <video src="images/visualizations/blob_tracking_3.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Blob tracking visualization</video>
+  <video src="images/visualizations/blob_tracking_3.mp4" width="600" controls>Blob tracking visualization</video>
 </p>
 
 <p align="center">
-  <video src="images/visualizations/blob_tracking_4.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Blob tracking visualization</video>
+  <video src="images/visualizations/blob_tracking_4.mp4" width="600" controls>Blob tracking visualization</video>
 </p>
 
 ---
@@ -828,7 +828,7 @@ Renders **videos with blob-tracking overlays**: convex hulls, anterior (nose), p
 *Available under **Process Videos** → **YOLO tracking...** → **Visualize YOLO model results**. See [YOLO Pose Estimation Visualization](https://github.com/sgoldenlab/simba/blob/master/docs/yolo_pose_plot.md).*
 
 <p align="center">
-  <img src="images/visualizations/yolo_visualize.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="YOLO visualization">
+  <img src="images/visualizations/yolo_visualize.webp" width="600" alt="YOLO visualization">
 </p>
 
 
@@ -860,7 +860,7 @@ Renders **videos with YOLO pose-estimation overlays**: keypoints, skeleton lines
 **Where output is saved:** The **SAVE DIRECTORY** you choose. Output videos have the same names as the input videos with pose overlays.
 
 <p align="center">
-  <video src="images/visualizations/yolo_visualize_2.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">YOLO visualization</video>
+  <video src="images/visualizations/yolo_visualize_2.mp4" width="600" controls>YOLO visualization</video>
 </p>
 
 ---
@@ -874,7 +874,7 @@ Renders **videos with YOLO pose-estimation overlays**: keypoints, skeleton lines
 Rotates and translates **pose data** and **video frames** so one animal is centered and facing a fixed direction. Use for egocentric analysis (e.g. Straub tail classification) or visualization where orientation should be standardized. The **center anchor** body-part is placed at the center of each frame; the **direction anchor** defines the animal’s facing direction, which is rotated to the chosen **direction** (0–360°).
 
 <p align="center">
-  <img src="images/visualizations/egocentric_1.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Egocentric alignment">
+  <img src="images/visualizations/egocentric_1.webp" width="600" alt="Egocentric alignment">
 </p>
 
 **Prerequisites:**
@@ -899,7 +899,7 @@ Rotates and translates **pose data** and **video frames** so one animal is cente
 **Where output is saved:** The **SAVE DIRECTORY** you choose. Aligned CSVs and rotated videos keep the same filenames as inputs.
 
 <p align="center">
-  <video src="images/visualizations/egocentric_2.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Egocentric alignment</video>
+  <video src="images/visualizations/egocentric_2.mp4" width="600" controls>Egocentric alignment</video>
 </p>
 
 ---
@@ -912,7 +912,7 @@ Rotates and translates **pose data** and **video frames** so one animal is cente
 
 
 <p align="center">
-  <img src="images/visualizations/ez_path_plot_1.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Create path plot (ROI tab)">
+  <img src="images/visualizations/ez_path_plot_1.webp" width="600" alt="Create path plot (ROI tab)">
 </p>
 
 Creates a **simple path plot** for one body part in one video. Unlike the full path plot in the [Visualizations](#visualize-path-plots) tab, this tool has minimal options—ideal for a quick trajectory visualization without classification markers, multiple animals, ROI overlays, or time segments. For more complex path plots (multiple animals, classifiers, ROI overlays, batch processing), use **CREATE PATH PLOTS** in the **[Visualizations]** tab.
@@ -936,7 +936,7 @@ Creates a **simple path plot** for one body part in one video. Unlike the full p
 **Where output is saved:** `project_folder/frames/output/path_plots/`. Output: `{video_name}_simple_path_plot.png` (if LAST FRAME ONLY) or `{video_name}_simple_path_plot.mp4`.
 
 <p align="center">
-  <video src="images/visualizations/EzPathPlot_2.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Create path plot (ROI tab)</video>
+  <video src="images/visualizations/EzPathPlot_2.mp4" width="600" controls>Create path plot (ROI tab)</video>
 </p>
 
 ---
@@ -946,7 +946,7 @@ Creates a **simple path plot** for one body part in one video. Unlike the full p
 *Available under **Tools** → **Concatenate (stack) videos...** → **Concatenate two videos**. See [Tools: Concatenate two videos](Tools.md#concatenate-stack-videos).*
 
 <p align="center">
-  <img src="images/visualizations/concatenate_two_videos.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Concatenate two videos">
+  <img src="images/visualizations/concatenate_two_videos.webp" width="600" alt="Concatenate two videos">
 </p>
 
 Joins **two videos** into a single output video, either **horizontally** (side by side) or **vertically** (stacked). Unlike **Concatenate multiple videos** (which arranges 2–20 videos in a multi-panel mosaic), this tool produces a simple two-panel layout. No SimBA project is required.
@@ -966,7 +966,7 @@ Joins **two videos** into a single output video, either **horizontally** (side b
 **Where output is saved:** Same directory as the **first video**. Filename: `{video1}_{video2}_concat.mp4` (e.g. `Video1_Video2_concat.mp4`).
 
 <p align="center">
-  <video src="images/visualizations/concatenate_two_videos_1.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Concatenate two videos</video>
+  <video src="images/visualizations/concatenate_two_videos_1.mp4" width="600" controls>Concatenate two videos</video>
 </p>
 
 ---

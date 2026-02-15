@@ -56,7 +56,7 @@ You need a project that contains **only** the data you want to analyze in this r
 1. **Archive processed files** — Keep using the same project folder. After loading your project, go to the **Further imports** tab. In the **FURTHER METHODS** section, click <kbd>ARCHIVE PROCESSED FILES IN SIMBA PROJECT</kbd>. Enter a name for the archive (e.g. `Day1`) and click <kbd>RUN ARCHIVE</kbd>. SimBA moves the processed CSV files from the active `project_folder/csv/` subdirectories into an archive subfolder so they are no longer analyzed. Day 1 data stays in the project but is hidden from the next run. This is the same workflow described in [Scenario 2 — Part 1: Clean up or create project](Scenario2.md#part-1--clean-up-or-create-simba-project).
 
    <p align="center">
-     <img src="images/scenario2/archieve_files.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Archive processed files">
+     <img src="images/scenario2/archieve_files.png" width="600" alt="Archive processed files">
    </p>
 
 2. **Manually move files** — Alternatively, move the already-analyzed CSV files out of the immediate `project_folder/csv/` subdirectories into a subfolder (e.g. `Day1`) or another location. You must move files for **(i)** `project_folder/csv/input/`, **(ii)** `project_folder/csv/outlier_corrected_movement/`, **(iii)** `project_folder/csv/outlier_corrected_movement_location/`, **(iv)** `project_folder/csv/features_extracted/`, and **(v)** `project_folder/csv/machine_results/`. SimBA only reads CSVs that sit directly in these folders (or their configured equivalents), so moving them into a subfolder hides them. Log files (e.g. outlier correction counts, descriptive statistics) live in `project_folder/logs/`; you can move those into a Day1 subfolder too if you want to keep outputs organized.
@@ -72,7 +72,7 @@ You need a project that contains **only** the data you want to analyze in this r
 2. **Import the new tracking data and videos.** Use the **Further imports** tab to add the Day 2 and Day 3 pose-estimation CSVs and videos. Follow [Scenario 1 — Step 2 (optional): Further imports](Scenario1.md#step-2-optional--further-imports). After importing, the new files appear in `project_folder/csv/input/` (and videos in `project_folder/videos/`).
 
    <p align="center">
-     <img src="images/scenario4/further_imports.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Import DLC tracking data">
+     <img src="images/scenario4/further_imports.webp" width="600" alt="Import DLC tracking data">
    </p>
 
 ---
@@ -96,7 +96,7 @@ The Day 2–3 data is now in the project with corrected pose and extracted featu
 1. Go to the **Run machine model** tab and click <kbd>RUN MODELS</kbd>.
 
 <p align="center">
-  <img src="images/scenario2/run_models.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Run machine model tab">
+  <img src="images/scenario2/run_models.webp" width="600" alt="Run machine model tab">
 </p>
 
 2. In the pop-up, ensure the model path points to your `.sav` file (e.g. from `project_folder/models/generated_models/` or from when you ran Day 1 in Scenario 2). Paths are stored in `project_config.ini` and usually do not need to be re-entered.
@@ -106,7 +106,7 @@ The Day 2–3 data is now in the project with corrected pose and extracted featu
 To validate the classifier on a single video (e.g. to tune threshold and bout length before running on all of Day 2–3), use the **VALIDATE MODEL ON SINGLE VIDEO** section in the same tab — see [Scenario 1 — Step 8](Scenario1.md#step-8--validate-model-on-new-data).
 
 <p align="center">
-  <img src="images/scenario1/validate_1.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Validate model on single video">
+  <img src="images/scenario1/validate_1.png" width="600" alt="Validate model on single video">
 </p>
 
 ---
@@ -148,7 +148,7 @@ Create visualizations for the Day 2–3 results. Go to the **[Visualizations]** 
 When you have many predictions, you may want to review them in short clips that show only the classified events. The **post-classification validation** tool generates a video for each CSV that contains concatenated clips of all bouts of the target behavior identified by the classifier. The post-classification validation tool helps you spot false positives and tune the discrimination threshold or minimum bout length.
 
 <p align="center">
-  <img src="images/scenario4/clf_validation.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Post-classification validation">
+  <img src="images/scenario4/clf_validation.webp" width="600" alt="Post-classification validation">
 </p>
 
 - **Seconds** — Duration (in seconds) to add **before** the start and **after** the end of each event. For example, for a 2-second attack, entering **1** adds 1 second before and 1 second after, so the clip is 4 seconds long. Larger values produce longer clips.
@@ -164,11 +164,11 @@ When you have many predictions, you may want to review them in short clips that 
 
 
 <p align="center">
-  <video src="images/scenario4/classifiervalidation.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/scenario4/classifiervalidation.mp4" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
 <p align="center">
-  <video src="images/scenario4/ClassifierValidationClips_1.webm" width="600" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/scenario4/ClassifierValidationClips_1.mp4" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
 ---

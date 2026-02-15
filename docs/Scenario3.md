@@ -147,7 +147,7 @@ You now have a project whose **`project_folder/csv/targets_inserted`** folder co
 The result should look similar to the following (videos can have different resolution, px/mm, and fps):
 
 <p align="center">
-  <img src="images/scenario3/video_info.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="video_info.csv example">
+  <img src="images/scenario3/video_info.webp" width="600" alt="video_info.csv example">
 </p>
 
 > [!NOTE]

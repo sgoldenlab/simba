@@ -80,7 +80,7 @@ Once ROIs are defined and saved, use the sections below to analyze and visualize
 Compute **descriptive statistics** for each animal and each ROI across entire videos (e.g. total time in ROI, number of entries, first/last entry time, mean bout length, movement and velocity in ROI).
 
 <p align="center">
-  <img src="images/roi_tutorial/roi_aggregates.webp" width="500" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Analyze ROI data: aggregates">
+  <img src="images/roi_tutorial/roi_aggregates.webp" width="500" alt="Analyze ROI data: aggregates">
 </p>
 
 **Prerequisites:** ROIs drawn and saved; pose data in `project_folder/csv/outlier_corrected_movement_location/`.
@@ -121,7 +121,7 @@ Click **RUN** and monitor progress in the SimBA terminal.
 Same metrics as Part 2, but **stratified by time-bins** (e.g. every 60 s or 15.5 s). Use this to ask: “How much time in each ROI in each minute?” or “How many entries per 15 s?”
 
 <p align="center">
-  <img src="images/roi_tutorial/roi_aggregates_timebin.webp" width="500" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Analyze ROI data by time-bin">
+  <img src="images/roi_tutorial/roi_aggregates_timebin.webp" width="500" alt="Analyze ROI data by time-bin">
 </p>
 
 **Prerequisites:** Same as Part 2 (ROIs drawn; outlier-corrected pose data).
@@ -166,7 +166,7 @@ If the project uses **nose, left ear, and right ear** (or equivalent), SimBA als
 1. **APPEND ROI DATA TO FEATURES: BY ANIMAL** — One body-part per animal. Use when you want one location proxy per animal (e.g. nose only).
 
 <p align="center">
-  <img src="images/roi_tutorial/roi_features_by_animal.webp" width="500" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="ROI features by animal">
+  <img src="images/roi_tutorial/roi_features_by_animal.webp" width="500" alt="ROI features by animal">
 </p>
 
 2. **APPEND ROI DATA TO FEATURES: BY BODY-PARTS** — One or more body-parts, regardless of animal. Use when you need multiple ROI features (e.g. Animal_1 nose and Animal_2 tail-base distances to ROIs).
@@ -194,7 +194,7 @@ If you no longer need ROI columns in your feature files: click **REMOVE ROI FEAT
 Create videos that overlay your ROI shapes and **counters** (time spent in each ROI, number of entries) on the source video. Useful for presentations and sanity checks. This tool is also described in [Visualizations.md](Visualizations.md).
 
 <p align="center">
-  <img src="images/roi_tutorial/visualize_roi_tracking.webp" width="500" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Visualize ROI tracking">
+  <img src="images/roi_tutorial/visualize_roi_tracking.webp" width="500" alt="Visualize ROI tracking">
 </p>
 
 
@@ -219,10 +219,10 @@ Use **CREATE SINGLE ROI VIDEO** for one video or **CREATE ALL ROI VIDEOS** to pr
 **Where output is saved:** `project_folder/frames/output/ROI_analysis/`. Progress appears in the SimBA terminal.
 
 <p align="center">
-  <video src="images/roi_tutorial/ROI_visualization_1.webm" width="500" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/roi_tutorial/ROI_visualization_1.mp4" width="500" controls>Your browser does not support the video tag.</video>
 </p>
 <p align="center">
-  <video src="images/roi_tutorial/ROI_OF.webm" width="500" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/roi_tutorial/ROI_OF.mp4" width="500" controls>Your browser does not support the video tag.</video>
 </p>
 
 ---
@@ -234,7 +234,7 @@ Use **CREATE SINGLE ROI VIDEO** for one video or **CREATE ALL ROI VIDEOS** to pr
 Visualize **continuous and boolean ROI features** (distances to ROIs, inside/outside, directing towards ROIs) over time on the video, rather than only the classic “time in ROI / entries” counters.
 
 <p align="center">
-  <img src="images/roi_tutorial/visualize_roi_features.webp" width="500" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Visualize ROI features">
+  <img src="images/roi_tutorial/visualize_roi_features.webp" width="500" alt="Visualize ROI features">
 </p>
 
 
@@ -259,10 +259,10 @@ Directionality can be shown as **Funnels** or **Lines** (see example GIFs below)
 **Where output is saved:** `project_folder/frames/output/ROI_features/`.
 
 <p align="center">
-  <video src="images/roi_tutorial/Lines_directionality.webm" width="500" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/roi_tutorial/Lines_directionality.mp4" width="500" controls>Your browser does not support the video tag.</video>
 </p>
 <p align="center">
-  <video src="images/roi_tutorial/ROI_directionality.webm" width="500" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/roi_tutorial/ROI_directionality.mp4" width="500" controls>Your browser does not support the video tag.</video>
 </p>
 
 ---
@@ -343,7 +343,7 @@ Also available under **Tools** → **Create path plot** (no project required). F
 Generate **location heatmaps** (video or image) showing time spent in different **regions of the arena**. This tool does **not** use user-drawn ROIs; it divides the frame into a grid of bins (e.g. 80×80 mm) and colors regions by time spent there. Useful for “where did the animal spend most of its time?” overviews. Also described in [Visualizations.md — Heatmap locations](Visualizations.md#visualize-heatmap-locations-roi-tab).
 
 <p align="center">
-  <img src="images/visualizations/location_heatmap.webp" width="500" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Location heatmap example">
+  <img src="images/visualizations/location_heatmap.webp" width="500" alt="Location heatmap example">
 </p>
 
 | Option | Description |
@@ -372,11 +372,11 @@ Generate **location heatmaps** (video or image) showing time spent in different 
 **Where output is saved:** `project_folder/frames/output/heatmaps_locations/`.
 
 <p align="center">
-  <video src="images/visualizations/location_heatmap.webm" width="500" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/visualizations/location_heatmap.mp4" width="500" controls>Your browser does not support the video tag.</video>
 </p>
 
 <p align="center">
-  <img src="images/visualizations/location_heatmap_1.webp" width="500" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Create heatmaps dialog">
+  <img src="images/visualizations/location_heatmap_1.webp" width="500" alt="Create heatmaps dialog">
 </p>
 
 
@@ -443,7 +443,7 @@ Click <kbd>RUN ANALYSIS</kbd> to run. Output: per-frame boolean tables and summa
 **Where output is saved:** Analysis → `project_folder/logs/directionality_dataframes/`. Visualization → `project_folder/frames/output/Body_part_directing_animals/`.
 
 <p align="center">
-  <video src="images/visualizations/visualize_directionality_1.webm" width="500" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/visualizations/visualize_directionality_1.mp4" width="500" controls>Your browser does not support the video tag.</video>
 </p>
 
 ---
@@ -457,7 +457,7 @@ Compute **conditional aggregate statistics** over boolean fields (0/1), e.g. “
 **Prerequisites:** ROI features must already be [appended](#part-4-generating-features-from-roi-data). The project must have files in `project_folder/csv/features_extracted/` containing at least two boolean fields. Otherwise the button shows an error.
 
 <p align="center">
-  <img src="images/roi_tutorial/aggregate_boolean_stats_table.png" width="500" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Aggregate boolean conditional statistics dialog">
+  <img src="images/roi_tutorial/aggregate_boolean_stats_table.png" width="500" alt="Aggregate boolean conditional statistics dialog">
 </p>
 
 | Option | Description |
@@ -467,7 +467,7 @@ Compute **conditional aggregate statistics** over boolean fields (0/1), e.g. “
 | **RUN** | Runs the calculation. Output CSV (e.g. `Conditional_aggregate_statistics_YYYYMMDDHHMMSS.csv`) is saved in `project_folder/logs/`: one row per video; one column per rule (value TRUE/FALSE indicating whether that rule was included); last two columns are **TIME** (seconds) and **frame count** the combined condition was satisfied. |
 
 <p align="center">
-  <img src="images/roi_tutorial/aggregate_boolean_stats_table.png" width="500" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;" alt="Conditional aggregate statistics output example">
+  <img src="images/roi_tutorial/aggregate_boolean_stats_table.png" width="500" alt="Conditional aggregate statistics output example">
 </p>
 
 ---
@@ -500,7 +500,7 @@ Compute **spontaneous alternation** (e.g. Y-maze) from pose data and **user-defi
 Full guide: [Spontaneous alternation in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/spontaneous_alternation.md).
 
 <p align="center">
-  <video src="images/roi_tutorial/SpontaneousAlternationsPlotter.webm" width="500" controls style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">Your browser does not support the video tag.</video>
+  <video src="images/roi_tutorial/SpontaneousAlternationsPlotter.mp4" width="500" controls>Your browser does not support the video tag.</video>
 </p>
 
 ---
