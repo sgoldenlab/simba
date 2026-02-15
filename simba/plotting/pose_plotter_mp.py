@@ -70,9 +70,9 @@ def pose_plotter_mp(data: pd.DataFrame,
                     img = cv2.circle(img, center_point_tuple, circle_size+2, center_of_mass_clr, -1)
             writer.write(img)
             current_frm += 1
-            stdout_information(msg=f"[{get_current_time()}] Multi-processing video frame {current_frm} on core {group_cnt}...")
+            stdout_information(msg=f"[{get_current_time()}] Multi-processing video frame {current_frm} on core {group_cnt}...", source=pose_plotter_mp.__name__)
         else:
-            FrameRangeWarning(msg=f'Frame {current_frm} not found in video {video_path}, terminating video creation...')
+            FrameRangeWarning(msg=f'Frame {current_frm} not found in video {video_path}, terminating video creation...', source=pose_plotter_mp.__name__)
             break
     cap.release()
     writer.release()
