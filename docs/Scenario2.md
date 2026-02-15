@@ -407,17 +407,9 @@ The **Visualize classifications** dialog offers the following options:
 **SINGLE VIDEO** — Select one video from the dropdown (or use the file browser) and click <kbd>Create single video</kbd>. **MULTIPLE VIDEOS** — Click <kbd>Create multiple videos</kbd> to process all videos that have classification results.
 
 **Where output is saved:** Videos and frames are saved to the `project_folder/frames/output/sklearn_results/` directory.
+[sklearn_visualization.webm](https://github.com/user-attachments/assets/50094bd3-051a-432c-8f97-06aad53d18f0)
 
-
-<p align="center">
-  <video src="images/scenario2/sklearn_visualization.mp4" width="600" controls>Your browser does not support the video tag.</video>
-</p>
-
-<p align="center">
-  <video src="images/scenario2/sklearn_visualization_2.mp4" width="600" controls>Your browser does not support the video tag.</video>
-</p>
-
-
+[sklearn_visualization_2.webm](https://github.com/user-attachments/assets/63acd686-7c56-4552-8850-3051f10d530b)
 
 ### VISUALIZE GANTT CHARTS
 
