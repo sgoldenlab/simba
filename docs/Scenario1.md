@@ -236,7 +236,7 @@ You can skip the Further imports step for Scenario 1, since you will not add new
 4. For each video, click **CALCULATE DISTANCE**; a window shows the first frame. Double-**left**-click two points that define the known distance. If a point is misplaced, double-click the dot to replace the misplaced point. Press **Esc** when done.
 
 <p align="center">
-  <video src="images/scenario1/getcoord.mp4" width="600" autoplay loop muted playsinline></video>
+  <video src="https://github.com/user-attachments/assets/4da58c75-f9b9-4d26-bafe-a65fc1ce5d17" width="600" autoplay loop muted playsinline></video>
 </p>
 
 5. When finished, click **SAVE PIXEL PER MILLIMETER DATA** (or <kbd>SAVE</kbd> in the table) to write the values to `video_info.csv` in `project_folder/logs`. You must save before closing the window or the calibration will not be applied to later steps.
