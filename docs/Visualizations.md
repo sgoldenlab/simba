@@ -84,18 +84,21 @@ The **x-axis** is frame number, the **y-axis** is classifier probability (0–1)
 **Prerequisites:** A trained classifier (`.sav` file); one **feature file** from `project_folder/csv/features_extracted/` (typically a held-out file not used in training); and the **matching video** in `project_folder/videos/`. You select the feature file and model in the validation pop-up; SimBA runs the classifier and generates a video with predictions overlaid on each frame.
 
 **Pop-up options:**
-- **FONT SIZE** — Size of text overlays. Choose AUTO for automatic sizing from video dimensions.
-- **TEXT SPACING** — Spacing between text lines. Choose AUTO for automatic sizing.
-- **CIRCLE SIZE** — Size of pose keypoint circles. Choose AUTO for automatic sizing.
-- **TEXT OPACITY** — Opacity of text overlays (0.1 to 1.0).
-- **TEXT THICKNESS** — Thickness of text strokes.
-- **BODY-PART PALETTE** — Color scheme for pose keypoints (e.g. Pastel1, spring).
-- **SHOW POSE** — Overlay pose keypoints on the video (TRUE/FALSE).
-- **SHOW ANIMAL NAMES** — Display animal names near body parts (TRUE/FALSE).
-- **SHOW BOUNDING BOX** — Draw boxes around each animal (TRUE/FALSE).
-- **SHOW CONFIDENCE** — Display classifier confidence per frame (TRUE/FALSE).
-- **CPU COUNT** — Number of cores for parallel video creation; use more cores for faster output.
-- **GANTT TYPE** — None, final frame only (slightly faster), or video (Gantt updates per frame). Use CPU count greater than 1 when creating Gantt charts for better performance.
+
+| Option | Description |
+|--------|-------------|
+| **FONT SIZE** | Size of behavior labels and other text overlays. **AUTO** scales from video resolution; or pick 1–100 for fixed size. Use larger values for high-res or distant viewing. |
+| **TEXT SPACING** | Space between stacked text lines (e.g. behavior name and probability). **AUTO** adjusts to video; or 1–100. Reduces overlap when multiple labels appear. |
+| **CIRCLE SIZE** | Size of dots at each pose keypoint (nose, tail, etc.). **AUTO** scales with video; or 1–100. Larger circles make keypoints easier to see on small previews. |
+| **TEXT OPACITY** | Transparency of text overlays (0.1–1.0). Lower values let more video show through; 1.0 is fully opaque. Useful when overlays obscure behavior. |
+| **TEXT THICKNESS** | Boldness of text strokes. Thicker text (higher values) stays readable on busy or low-contrast frames. |
+| **BODY-PART PALETTE** | Color scheme for pose dots—one color per animal. Examples: Pastel1, spring, Set1. Pick a palette that contrasts with your arena and animals. |
+| **SHOW POSE** | **TRUE** = draw keypoints and skeleton on the video; **FALSE** = video only. Turn off for cleaner output if pose is not needed for validation. |
+| **SHOW ANIMAL NAMES** | **TRUE** = labels like "Animal_1" near each animal; **FALSE** = no names. Helps when tracking identity or explaining videos to others. |
+| **SHOW BOUNDING BOX** | **TRUE** = draw a box around each animal; **FALSE** = no boxes. Boxes clarify location and overlap; turn off for minimal overlay. |
+| **SHOW CONFIDENCE** | **TRUE** = display the classifier probability (e.g. 0–100%) for each frame; **FALSE** = hide it. Essential for threshold tuning; optional for presentation. |
+| **CPU COUNT** | Number of CPU cores for encoding. More cores speed up video creation when processing many or long videos. Use 2–4+ if available. |
+| **GANTT TYPE** | **None** = no Gantt bar chart. **Final frame only** = one static Gantt at the end (faster). **Video** = Gantt updates per frame (shows timing over video). Use CPU count > 1 for Gantt videos. |
 
 **Where output is saved:** `project_folder/frames/output/validation/`
 

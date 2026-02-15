@@ -12,7 +12,7 @@ SimBA provides several scenario-based tutorials. This tutorial covers **Scenario
 
 **You are ready for Scenario 2 if:**
 - **(i)** You trained a classifier in [Scenario 1](Scenario1.md) (e.g. BtWGaNP) and are satisfied with its validation performance, or  
-- **(ii)** You have a classifier from elsewhere: for example you **downloaded** it (e.g. from the [SimBA OSF repository](https://osf.io/d69jt/)) or **received** it from a collaborator or another lab (e.g. they shared the `.sav` model file and any project/settings info). You want to score behavior on your experimental videos with that classifier.
+- **(ii)** You have a classifier from elsewhere: for example you **downloaded** it (e.g. from the [SimBA OSF repository](https://osf.io/d69jt/)) or **received** it from a collaborator or another lab (e.g. they shared the `.sav` model file and any project/settings info). You want to score behavior on your experimental videos with the downloaded or received classifier.
 
 **Prerequisites:**
 - Pose-estimation tracking files exist (DeepLabCut CSV/H5, SLEAP SLP/CSV/H5, APT TRK, DANNCE MAT, BENTO JSON, FaceMap H5, SuperAnimal-TopView H5, SimBA BLOB/YOLO CSV — see [supported formats](https://github.com/sgoldenlab/simba/blob/master/docs/Multi_animal_pose.md)) for the same videos you want to analyze in SimBA in this tutorial.
@@ -77,9 +77,9 @@ Complete the following steps from [Scenario 1](Scenario1.md); Scenario 1 has mor
 
 **Step 2 — Further imports (optional):** Use the **Further imports** tab only if you need to add more videos or tracking files to the project after creation. If your project already has all experimental data, skip this step.
 
-**Step 3 — Set video parameters:** Calibrate pixels per millimeter and frame rate for each video so SimBA works in metric units. This step is required—without it, features and distances are not comparable across videos. Use the **Video parameters** tab; see [Scenario 1 — Step 3](Scenario1.md#step-3--set-video-parameters) for the full workflow (KNOWN DISTANCE, CONFIGURE VIDEO PARAMETERS, CALCULATE DISTANCE, SAVE).
+**Step 3 — Set video parameters:** Calibrate pixels per millimeter and frame rate for each video so SimBA works in metric units. This step is required—without video parameter calibration, features and distances are not comparable across videos. Use the **Video parameters** tab; see [Scenario 1 — Step 3](Scenario1.md#step-3--set-video-parameters) for the full workflow (KNOWN DISTANCE, CONFIGURE VIDEO PARAMETERS, CALCULATE DISTANCE, SAVE).
 
-**Step 4 — Outlier correction:** Detect and correct implausible pose jumps (e.g. body parts teleporting) so outliers do not distort features. Use the **Outlier correction** tab. If your pose-estimation quality is already excellent, you can use **SKIP OUTLIER CORRECTION (CAUTION)** instead—this formats the CSVs for later steps without correcting outliers, but use it only when you are confident the tracking has few or no implausible jumps. See [Scenario 1 — Step 4](Scenario1.md#step-4--outlier-correction) and [Outlier_settings.pdf](https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf).
+**Step 4 — Outlier correction:** Detect and correct implausible pose jumps (e.g. body parts teleporting) so outliers do not distort features. Use the **Outlier correction** tab. If your pose-estimation quality is already excellent, you can use **SKIP OUTLIER CORRECTION (CAUTION)** instead—this formats the CSVs for later steps without correcting outliers, but use the Skip outlier correction option only when you are confident the tracking has few or no implausible jumps. See [Scenario 1 — Step 4](Scenario1.md#step-4--outlier-correction) and [Outlier_settings.pdf](https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf).
 
 **Step 5 — Extract features:** Compute behavioral features (distances, angles, velocities, etc.) from the pose data. The classifier expects a fixed set of features; this step produces that feature set. Use the **Extract features** tab. See [Scenario 1 — Step 5](Scenario1.md#step-5--extract-features) and [Feature_description.csv](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv).
 
@@ -93,7 +93,7 @@ After Step 5, your experimental data resides in the `project_folder/csv/features
 At this point your experimental data is in the `project_folder/csv/features_extracted/` directory and has the same structure as the training data: pose coordinates plus computed features. The classifier will read each CSV, output a probability per frame for each behavior, apply your discrimination threshold and minimum bout length, and write new CSVs with predictions to the `project_folder/csv/machine_results/` directory for use in Part 4 and Part 5.
 
 > [!NOTE]
-> If you downloaded a classifier (e.g. from the [OSF repository](https://osf.io/d69jt/)) or received one from a collaborator, you can use that classifier here — just point to the `.sav` file when selecting the model.
+> If you downloaded a classifier (e.g. from the [OSF repository](https://osf.io/d69jt/)) or received one from a collaborator, you can use the downloaded or received classifier here — just point to the `.sav` file when selecting the model.
 
 ### Step 1: Open RUN MODELS
 
@@ -120,7 +120,7 @@ The RUN MODELS pop-up remembers your last-used model paths the next time you ope
 
 The classifier outputs a **continuous probability** per frame—a value between 0 and 1 (e.g. 0.23, 0.87), not just 0 or 1. You then convert those probabilities into binary predictions (behavior present vs absent) using two settings:
 
-- **DISCRIMINATION THRESHOLD** — Frames with probability at or above this value are classified as behavior present. Enter a value between 0.0 and 1.0 (e.g. 0.50). At 0.50, every frame with probability ≥ 0.5 is labeled as containing the behavior. Lowering the threshold (e.g. to 0.30) predicts *more* behavior (more frames classified as present); raising it (e.g. to 0.70) predicts *less* behavior. Choose a threshold that balances false positives and false negatives for your use case. If you are familiar with pose-estimation tools (e.g. DeepLabCut, SLEAP), this is analogous to body-part confidence or likelihood scores: you set a cutoff above which you treat the detection as reliable. See [threshold tuning guidance](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html).
+- **DISCRIMINATION THRESHOLD** — Frames with probability at or above this value are classified as behavior present. Enter a value between 0.0 and 1.0 (e.g. 0.50). At 0.50, every frame with probability ≥ 0.5 is labeled as containing the behavior. Lowering the threshold (e.g. to 0.30) predicts *more* behavior (more frames classified as present); raising it (e.g. to 0.70) predicts *less* behavior. Choose a threshold that balances false positives and false negatives for your use case. If you are familiar with pose-estimation tools (e.g. DeepLabCut, SLEAP), the discrimination threshold is analogous to body-part confidence or likelihood scores: you set a cutoff above which you treat the detection as reliable. See [threshold tuning guidance](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html).
 - **MINIMUM BOUT LENGTH (MS)** — The shortest bout (in milliseconds) that counts as a real behavior. Very short gaps within a bout are merged. Example: at 50 fps, predictions 1,1,1,1,0,1,1,1,1 over 9 frames give two 80 ms bouts with a 20 ms gap. If you set minimum bout length to 20 ms, that gap is removed and you get one 180 ms bout instead. Use this to filter out single-frame noise or very brief artifacts. SimBA uses each video's frame rate, so the same setting works across videos with different fps.
 
 > [!TIP]
@@ -131,11 +131,11 @@ The classifier outputs a **continuous probability** per frame—a value between 
 
 ### Step 4: Run
 
-Click the <kbd>RUN</kbd> button in the RUN MODELS pop-up. Before processing starts, look at the top of the same pop-up: it shows how many CSV files will be analyzed. Those files are the feature-extracted CSVs in your project (in the `project_folder/csv/features_extracted/` folder)—one file per video.
+Click the <kbd>RUN</kbd> button in the RUN MODELS pop-up. Before processing starts, look at the top of the same pop-up: the pop-up shows how many CSV files will be analyzed. The files shown are the feature-extracted CSVs in your project (in the `project_folder/csv/features_extracted/` folder)—one file per video.
 
-SimBA then works through each file in turn. For every file it: reads the features, runs the classifier to get a probability per frame, applies your discrimination threshold and minimum bout length to turn probabilities into behavior present/absent, and adds new columns (probabilities and predictions) to the data. You can watch progress in the **SimBA terminal** (the text window that opened when you started SimBA): it will list each file as it is processed.
+SimBA then works through each file in turn. For every file SimBA: reads the features, runs the classifier to get a probability per frame, applies your discrimination threshold and minimum bout length to turn probabilities into behavior present/absent, and adds new columns (probabilities and predictions) to the data. You can watch progress in the **SimBA terminal** (the text window that opened when you started SimBA): the SimBA terminal will list each file as the file is processed.
 
-When processing is finished, SimBA saves new CSV files to the `project_folder/csv/machine_results/` directory. Each saved file has the same base name as the corresponding input file (e.g. `Mouse1_Day1`), and contains the original pose and feature data plus the new probability and prediction columns for each classified behavior (e.g. BtWGaNP). Use these machine-results CSVs for Part 4 (analysis) and Part 5 (visualization).
+When processing is finished, SimBA saves new CSV files to the `project_folder/csv/machine_results/` directory. Each saved file has the same base name as the corresponding input file (e.g. `Mouse1_Day1`), and contains the original pose and feature data plus the new probability and prediction columns for each classified behavior (e.g. BtWGaNP). Use the machine-results CSVs from `project_folder/csv/machine_results/` for Part 4 (analysis) and Part 5 (visualization).
 
 ---
 
@@ -155,7 +155,7 @@ To access the analysis tools: go to the **Run machine model** tab and find the *
 
 ### 1. ANALYZE MACHINE PREDICTIONS: AGGREGATES
 
-Use this when you need **one summary number per video per classifier** for each behavioral measurement you choose (e.g. total event duration in seconds, event count, first occurrence in seconds). That gives you a single table of values—one row per video (or per video–classifier–measurement, depending on output format)—suitable for comparing experimental groups (e.g. treatment vs control) or for importing into statistics or plotting software. You select at least one **measurement** (from the list below), at least one **classifier**, then click <kbd>RUN</kbd>. The output is a date-time stamped CSV saved to the `project_folder/logs/` directory; the terminal prints the exact filename. All options in the dialog are described below.
+Use **ANALYZE MACHINE PREDICTIONS: AGGREGATES** when you need **one summary number per video per classifier** for each behavioral measurement you choose (e.g. total event duration in seconds, event count, first occurrence in seconds). That gives you a single table of values—one row per video (or per video–classifier–measurement, depending on output format)—suitable for comparing experimental groups (e.g. treatment vs control) or for importing into statistics or plotting software. You select at least one **measurement** (from the list below), at least one **classifier**, then click <kbd>RUN</kbd>. The output is a date-time stamped CSV saved to the `project_folder/logs/` directory; the terminal prints the exact filename. All options in the dialog are described below.
 
 <p align="center">
   <img src="images/scenario2/descriptive_stats.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
@@ -198,7 +198,7 @@ Click <kbd>RUN</kbd>. A date-time stamped CSV is saved to the `project_folder/lo
 
 ### 2. ANALYZE DISTANCES / VELOCITY: AGGREGATES
 
-Use this when you need **one movement value per video per animal** for the whole video: either total distance traveled (in cm) and/or average velocity (cm/s), depending on which measurements you check. SimBA computes these from the pose data in the `project_folder/csv/outlier_corrected_movement_location/` directory; you do not need to run the classifier or extract features for this analysis—distance and velocity come directly from the calibrated pose coordinates. You choose the number of animals, which body part(s) to track for each animal (e.g. Nose, Center of gravity), a pose confidence threshold, and at least one of **DISTANCE (CM)** or **VELOCITY (CM/S)**, then click <kbd>RUN</kbd>. Output is saved to the `project_folder/logs/` directory as `Movement_log_{datetime}.csv`. 
+Use **ANALYZE DISTANCES / VELOCITY: AGGREGATES** when you need **one movement value per video per animal** for the whole video: either total distance traveled (in cm) and/or average velocity (cm/s), depending on which measurements you check. SimBA computes these from the pose data in the `project_folder/csv/outlier_corrected_movement_location/` directory; you do not need to run the classifier or extract features for this analysis—distance and velocity come directly from the calibrated pose coordinates. You choose the number of animals, which body part(s) to track for each animal (e.g. Nose, Center of gravity), a pose confidence threshold, and at least one of **DISTANCE (CM)** or **VELOCITY (CM/S)**, then click <kbd>RUN</kbd>. Output is saved to the `project_folder/logs/` directory as `Movement_log_{datetime}.csv`. 
 
 
 <p align="center">
@@ -223,7 +223,7 @@ All options in the dialog are listed below.
 
 ### 3. ANALYZE MACHINE PREDICTIONS: TIME BINS
 
-Use this when you want **one value of each selected measurement per time bin per video per classifier**, instead of one value for the whole video. For example, for a 3-minute video with 60 s bins you get three values of “total event duration (s)” (one for 0–60 s, one for 60–120 s, one for 120–180 s), three values of “event count,” and so on—so you can see how the behavior changes over the course of the video. You choose the **time bin size** (e.g. 30 or 60 seconds), at least one **measurement** (first occurrence, event count, total event duration, mean/median duration, mean/median interval), and at least one **classifier**, then click <kbd>RUN</kbd>. Output is saved to the `project_folder/logs/` directory as `Time_bins_ML_results_{datetime}.csv`. 
+Use **ANALYZE MACHINE PREDICTIONS: TIME BINS** when you want **one value of each selected measurement per time bin per video per classifier**, instead of one value for the whole video. For example, for a 3-minute video with 60 s bins you get three values of “total event duration (s)” (one for 0–60 s, one for 60–120 s, one for 120–180 s), three values of “event count,” and so on—so you can see how the behavior changes over the course of the video. You choose the **time bin size** (e.g. 30 or 60 seconds), at least one **measurement** (first occurrence, event count, total event duration, mean/median duration, mean/median interval), and at least one **classifier**, then click <kbd>RUN</kbd>. Output is saved to the `project_folder/logs/` directory as `Time_bins_ML_results_{datetime}.csv`. 
 
 <p align="center">
   <img src="images/scenario2/clf_by_timbin.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
@@ -255,7 +255,7 @@ All options in the dialog are listed below.
 
 ### 4. ANALYZE DISTANCES / VELOCITY: TIME-BINS
 
-Use this when you need **one distance or velocity value per time bin per video per animal** (e.g. total distance traveled in bin 1, in bin 2, …), so you can see how movement or velocity changes over the course of each video. SimBA reads pose data from the `project_folder/csv/outlier_corrected_movement_location/` directory; no feature extraction or classifier is required. You set the **time bin size** (e.g. 60 s), choose which body part(s) to track for each animal, and select at least one of **DISTANCE (CM)** or **VELOCITY (CM/S)**, then click <kbd>RUN</kbd>. Optionally you can generate line plots of distance (or velocity) vs time bin. 
+Use **ANALYZE DISTANCES / VELOCITY: TIME-BINS** when you need **one distance or velocity value per time bin per video per animal** (e.g. total distance traveled in bin 1, in bin 2, …), so you can see how movement or velocity changes over the course of each video. SimBA reads pose data from the `project_folder/csv/outlier_corrected_movement_location/` directory; no feature extraction or classifier is required. You set the **time bin size** (e.g. 60 s), choose which body part(s) to track for each animal, and select at least one of **DISTANCE (CM)** or **VELOCITY (CM/S)**, then click <kbd>RUN</kbd>. Optionally you can generate line plots of distance (or velocity) vs time bin. 
 
 <p align="center">
   <img src="images/scenario2/movement_timebin.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
@@ -286,7 +286,7 @@ All options in the dialog are listed below.
 
 ### 5. ANALYZE MACHINE PREDICTIONS: BY ROI
 
-Use this when you have drawn [user-defined ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md) (e.g. zones or polygons on the video) and want **per-ROI metrics**: total time (seconds) each classified behavior occurred inside each ROI, how many behavior bouts *started* inside each ROI, and how many *ended* inside each ROI. SimBA uses the classifier predictions from the `project_folder/csv/machine_results/` directory and your ROI definitions to determine when the animal (via the body part you choose) is inside or outside each zone. You select which ROIs, which classifiers, which body part(s) to use for location, and which measurements to compute, then click <kbd>RUN</kbd>. 
+Use **ANALYZE MACHINE PREDICTIONS: BY ROI** when you have drawn [user-defined ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md) (e.g. zones or polygons on the video) and want **per-ROI metrics**: total time (seconds) each classified behavior occurred inside each ROI, how many behavior bouts *started* inside each ROI, and how many *ended* inside each ROI. SimBA uses the classifier predictions from the `project_folder/csv/machine_results/` directory and your ROI definitions to determine when the animal (via the body part you choose) is inside or outside each zone. You select which ROIs, which classifiers, which body part(s) to use for location, and which measurements to compute, then click <kbd>RUN</kbd>. 
 
 <p align="center">
   <img src="images/scenario2/clf_by_timbin.png" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
@@ -317,7 +317,7 @@ All options in the **Analyze machine predictions: by ROI** dialog are listed bel
 
 ### 6. ANALYZE MACHINE PREDICTIONS: BY SEVERITY
 
-Use this when your behavior can be graded from **mild to severe** based on movement intensity (e.g. mild vs severe attacks). SimBA computes movement (e.g. summed velocity of selected body parts) during each classified frame or each bout, then assigns a **severity score** (e.g. 1–10) to each frame or bout using a user-defined scale. The output gives you not only how often the behavior occurred but **how intense** it was—e.g. how many events fell into each severity bracket. You choose the classifier, the number of brackets (scale size), whether to score per bout or per frame, how to normalize movement across videos, and optionally whether to save bracket definitions or generate example clips.
+Use **ANALYZE MACHINE PREDICTIONS: BY SEVERITY** when your behavior can be graded from **mild to severe** based on movement intensity (e.g. mild vs severe attacks). SimBA computes movement (e.g. summed velocity of selected body parts) during each classified frame or each bout, then assigns a **severity score** (e.g. 1–10) to each frame or bout using a user-defined scale. The output gives you not only how often the behavior occurred but **how intense** the behavior was—e.g. how many events fell into each severity bracket. You choose the classifier, the number of brackets (scale size), whether to score per bout or per frame, how to normalize movement across videos, and optionally whether to save bracket definitions or generate example clips.
 
 <p align="center">
   <img src="images/scenario2/clf_severity.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
@@ -372,7 +372,7 @@ Go to the **[Visualizations]** tab to access the visualization tools.
 
 ### VISUALIZE CLASSIFICATIONS
 
-Creates videos (or frame sequences) with classification overlays: the video plays while the current behavior predictions and probabilities are shown (e.g. text overlay, highlighted pose). Use this to quickly review predictions or to create presentation videos. See [this example](https://youtu.be/lGzbS7OaVEg). SimBA reads classifier data from `project_folder/csv/machine_results/` and videos from `project_folder/videos/`. 
+Creates videos (or frame sequences) with classification overlays: the video plays while the current behavior predictions and probabilities are shown (e.g. text overlay, highlighted pose). Use the classification overlay to quickly review predictions or to create presentation videos. See the [example video](https://youtu.be/lGzbS7OaVEg). SimBA reads classifier data from `project_folder/csv/machine_results/` and videos from `project_folder/videos/`. 
 
 <p align="center">
   <img src="images/scenario2/visualize_sklearn.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">
@@ -634,7 +634,7 @@ The **Visualize distance plots** dialog offers the following options:
 
 ### VISUALIZE CLASSIFICATION HEATMAPS
 
-Heatmaps show where in the arena (or frame) classified behaviors tended to occur. Warmer colors indicate more time or more events at that location. Use classification heatmaps to identify spatial hotspots (e.g. corners where attacks occurred). Data is read from the `project_folder/csv/machine_results/` directory. See [this video](https://youtu.be/O41x96kXUHE). The **Visualize classification heatmaps** dialog offers the following options:
+Heatmaps show where in the arena (or frame) classified behaviors tended to occur. Warmer colors indicate more time or more events at that location. Use classification heatmaps to identify spatial hotspots (e.g. corners where attacks occurred). Data is read from the `project_folder/csv/machine_results/` directory. See the [classification heatmap example video](https://youtu.be/O41x96kXUHE). The **Visualize classification heatmaps** dialog offers the following options:
 
 <p align="center">
   <img src="images/scenario2/heatmap_clf.webp" width="600" style="border: 1px solid #999; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); max-width: 100%;">

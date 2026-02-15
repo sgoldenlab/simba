@@ -2,8 +2,6 @@
 
 ---
 
-> **Refreshed documentation** — This sandbox version includes updated formatting, clearer structure, and placeholders for new screenshots.
-
 > **Tooltips:** Many menu items and dialog options in SimBA have **tooltips**. Hover over a label or control to see a short description.
 
 ---

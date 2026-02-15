@@ -8,10 +8,10 @@
 
 ## 📖 Overview
 
-SimBA provides several scenario-based tutorials. This tutorial covers **Scenario 3**: improving an existing classifier by adding more training data. You have already generated a classifier (e.g. in [Scenario 1](Scenario1.md)) and want to refine it with additional annotated videos. The goal is to produce an updated classifier that includes both the original training data and your new annotations, so it can generalize to the novel setup.
+SimBA provides several scenario-based tutorials. This tutorial covers **Scenario 3**: improving an existing classifier by adding more training data. You have already generated a classifier (e.g. in [Scenario 1](Scenario1.md)) and want to refine the classifier with additional annotated videos. The goal is to produce an updated classifier that includes both the original training data and your new annotations, so the updated classifier can generalize to the novel setup.
 
 **You are ready for Scenario 3 if:**
-- You have a trained classifier (from [Scenario 1](Scenario1.md)), a classifier **received** from another lab, or [classifier data downloaded from the SimBA OSF repository](https://osf.io/d69jt/), and you want to improve it by adding more training data.
+- You have a trained classifier (from [Scenario 1](Scenario1.md)), a classifier **received** from another lab, or [classifier data downloaded from the SimBA OSF repository](https://osf.io/d69jt/), and you want to improve the classifier by adding more training data.
 - You are willing to **annotate additional videos** so the updated classifier uses both the original annotated data and your new annotations.
 
 **Prerequisites:**
@@ -24,11 +24,11 @@ SimBA provides several scenario-based tutorials. This tutorial covers **Scenario
 - **Sharing a classifier:** If you plan to share a classifier, share all of the following so others can use, validate, or extend it:
   - **Operational definitions** — So recipients know exactly how each behavior was defined and can annotate consistently if they add data.
   - **`project_folder/csv/targets_inserted`** — The CSV files for every video used in training. These hold the behavioral labels; without them, others cannot retrain the model, run learning curves, or reproduce your classifier.
-  - **`project_folder/logs/video_info.csv`** — Video metadata (resolution, pixels per mm, fps) for those same videos. SimBA needs this for feature extraction and for the project to run correctly.
+  - **`project_folder/logs/video_info.csv`** — Video metadata (resolution, pixels per mm, fps) for those same videos. SimBA needs the video metadata for feature extraction and for the project to run correctly.
 
 **Learning curves:** SimBA can generate learning curves to show how the classifier performs as you add more data. See [Scenario 1 — Step 7: Train machine model](Scenario1.md#step-7--train-machine-model) and the [scikit-learn learning curve example](https://scikit-learn.org/stable/auto_examples/model_selection/plot_learning_curve.html).
 
-In this scenario you will: **(1)** locate or back up the previously annotated CSV files; **(2)** create a new project that contains only the **new** videos and pose data you want to add; **(3)** load that project and run the full pipeline (video parameters, outlier correction, feature extraction, behavior labeling) on the new data; **(4)** copy the old annotated CSVs and update **video_info.csv** so all training data is in one project; **(5)** train a **new** classifier on the combined dataset. SimBA does **not** incrementally update the old model—it trains a brand-new classifier using all of the combined annotated data together.
+In this scenario you will: **(1)** locate or back up the previously annotated CSV files; **(2)** create a new project that contains only the **new** videos and pose data you want to add; **(3)** load that project and run the full pipeline (video parameters, outlier correction, feature extraction, behavior labeling) on the new data; **(4)** copy the old annotated CSVs and update **video_info.csv** so all training data is in one project; **(5)** train a **new** classifier on the combined dataset. SimBA does **not** incrementally update the old model—SimBA trains a brand-new classifier using all of the combined annotated data together.
 
 ---
 
@@ -58,17 +58,17 @@ Same as in Scenario 1 and 2: three days of resident–intruder testing between a
 <a id="part-1-previously-annotated-csv-files"></a>
 ## 📂 Part 1 — Previously annotated CSV files
 
-Before you create a new project or add new annotations, you need to **locate and secure the previously annotated CSV files** that were used to train the original classifier. You will bring these files into your Scenario 3 project in Part 4 so that the new classifier is trained on **both** the old and the new data.
+Before you create a new project or add new annotations, you need to **locate and secure the previously annotated CSV files** that were used to train the original classifier. You will bring the previously annotated CSV files into your Scenario 3 project in Part 4 so that the new classifier is trained on **both** the old and the new data.
 
-**What to find:** The annotated files live in **`project_folder/csv/targets_inserted`** of the project where you (or someone else) trained the original classifier. There is **one CSV per video**; each file contains pose coordinates, extracted features, and the **behavior labels** you created in the [SimBA behavioral annotation GUI](Scenario1.md#step-6--label-behavior) (e.g. which frames or bouts are “Attack,” “Sniffing,” etc.). If you are continuing from [Scenario 1](Scenario1.md) or [Scenario 2](Scenario2.md), open that project’s folder and go to `csv/targets_inserted`. **Copy** these CSVs to a safe backup location or note their path—you will copy them into your new project in Part 4.
+**What to find:** The annotated files live in **`project_folder/csv/targets_inserted`** of the project where you (or someone else) trained the original classifier. There is **one CSV per video**; each file contains pose coordinates, extracted features, and the **behavior labels** you created in the [SimBA behavioral annotation GUI](Scenario1.md#step-6--label-behavior) (e.g. which frames or bouts are “Attack,” “Sniffing,” etc.). If you are continuing from [Scenario 1](Scenario1.md) or [Scenario 2](Scenario2.md), open that project’s folder and go to `csv/targets_inserted`. **Copy** the annotated CSVs from targets_inserted to a safe backup location or note their path—you will copy them into your new project in Part 4.
 
 > [!IMPORTANT]
-> **Your annotations are valuable.** The files in `targets_inserted` represent substantial human effort: frame-by-frame (or bout) labels that define what the classifier learns. They **cannot** be recovered from the trained `.sav` model alone. Back them up, keep them in version control or a secure share if you collaborate, and avoid overwriting or deleting them. If you share a classifier, these files are what let others reproduce and extend your work.
+> **Your annotations are valuable.** The files in `targets_inserted` represent substantial human effort: frame-by-frame (or bout) labels that define what the classifier learns. They **cannot** be recovered from the trained `.sav` model alone. Back them up, keep them in version control or a secure share if you collaborate, and avoid overwriting or deleting them. If you share a classifier, the targets_inserted files are what let others reproduce and extend your work.
 
 **If the classifier came from someone else** (e.g. another lab or the [SimBA OSF repository](https://osf.io/d69jt/)) and you want to add more training data, you need:
 
-- The **targets_inserted** CSV files from the project where that classifier was created.
-- **Video metadata** for the videos used to train that classifier: resolution, pixels per mm, and fps. SimBA stores this in **`project_folder/logs/video_info.csv`** of that same project. You will merge this metadata into your Scenario 3 project in Part 4.
+- The **targets_inserted** CSV files from the project where the classifier was created.
+- **Video metadata** for the videos used to train the classifier: resolution, pixels per mm, and fps. SimBA stores the video metadata in **`project_folder/logs/video_info.csv`** of that same project. You will merge the video metadata into your Scenario 3 project in Part 4.
 
 You **do not** need CSVs from any other folder (only **targets_inserted**). You **do not** need the original video files or extracted frames that were used to create the original classifier.
 
@@ -100,12 +100,12 @@ Follow the steps below in order. Each step links to the matching section in Scen
 
 ### Step 1: Load the project
 
-Load the project you created in Part 2 so SimBA uses the correct project folder and config. Go to **File** → **Load project**, click <kbd>Browse File</kbd>, and select **`project_config.ini`** in that project’s folder.  
+Load the project you created in Part 2 so SimBA uses the correct project folder and config. Go to **File** → **Load project**, click <kbd>Browse File</kbd>, and select **`project_config.ini`** in the new project folder from Part 2.  
 → Full instructions: [Scenario 1 — Step 1: Load project config](Scenario1.md#step-1--load-project-config).
 
 ### Step 2 (optional): Further imports
 
-If you need to add more new videos or tracking files to this project after creation, use the **Further imports** tab (**Import videos**, **Import tracking data**). For Scenario 3 you typically already imported everything when creating the project in Part 2, so you can skip this unless you are adding more files.  
+If you need to add more new videos or tracking files to the new project after creation, use the **Further imports** tab (**Import videos**, **Import tracking data**). For Scenario 3 you typically already imported everything when creating the project in Part 2, so you can skip the Further imports step unless you are adding more files.  
 → Full instructions: [Scenario 1 — Step 2 (optional): Further imports](Scenario1.md#step-2-optional--further-imports).
 
 ### Step 3: Set video parameters
@@ -160,7 +160,7 @@ The result should look similar to the following (videos can have different resol
 <a id="part-5-generate-a-new-predictive-classifier-with-the-new-dataset"></a>
 ## 🤖 Part 5 — Generate a new predictive classifier with the new dataset
 
-You now have **all** annotated data (old + new) in **`project_folder/csv/targets_inserted`** and an updated **video_info.csv** with one row per training video. In this part you **train a new classifier** on this combined dataset. SimBA will build a **brand-new** model (e.g. a new random forest) using every annotated video; the old `.sav` file is not modified—you are creating a new one that replaces it for future use.
+You now have **all** annotated data (old + new) in **`project_folder/csv/targets_inserted`** and an updated **video_info.csv** with one row per training video. In this part you **train a new classifier** on this combined dataset. SimBA will build a **brand-new** model (e.g. a new random forest) using every annotated video; the old `.sav` file is not modified—you are creating a new classifier file that replaces the old one for future use.
 
 **What to do:** Follow [Scenario 1 — Step 7: Train machine model](Scenario1.md#step-7--train-machine-model) in full. In the **Run machine model** tab, click <kbd>SETTINGS</kbd> to open the train settings window; the full list of parameters (algorithm, estimators, test size, train/test split type, undersampling, oversampling, class weights, learning curves, SHAP, etc.) is in the [Scenario 1 — Train settings](Scenario1.md#train-settings) subsection. When you are done configuring, run <kbd>TRAIN SINGLE MODEL (GLOBAL ENVIRONMENT)</kbd> (Mode 1) or <kbd>TRAIN MULTIPLE MODELS (ONE FOR EACH SAVED SETTING)</kbd> (Mode 2) as in Scenario 1.
 
@@ -181,7 +181,7 @@ You now have **all** annotated data (old + new) in **`project_folder/csv/targets
 
 ## ➡️ Next Steps
 
-- **[Scenario 1](Scenario1.md)** — Validate the new classifier or refine it further with more annotations.
+- **[Scenario 1](Scenario1.md)** — Validate the new classifier or refine the new classifier further with more annotations.
 - **[Scenario 2](Scenario2.md)** — Run the classifier on new experimental data and create visualizations.
 - **[Scenario 4](Scenario4.md)** — Add the next batch of experimental data to your project.
 
