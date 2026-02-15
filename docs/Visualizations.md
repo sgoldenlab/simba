@@ -750,10 +750,10 @@ Renders **videos with pose keypoints overlaid** on each frame. Use this to verif
 
 **Where output is saved:** The **SAVE DIRECTORY** you choose. Each input file produces one output video (e.g. `{filename}.mp4`).
 
-<p align="center">
-  <img src="images/visualizations/pose_plotter.webp" width="600" alt="Pose plotter output">
-  <video src="images/visualizations/pose_plotter.mp4" width="600" controls>Pose plotter output video</video>
-</p>
+[pose_plotter.webm](https://github.com/user-attachments/assets/09810e7a-a63f-45e0-8f51-781d7ed77c15)
+
+![pose_plotter](https://github.com/user-attachments/assets/5339ccbe-3b0f-442f-a45c-e1c1b0a9a71b)
+
 
 ---
 
@@ -794,17 +794,12 @@ Renders **videos with blob-tracking overlays**: convex hulls, anterior (nose), p
 
 **Where output is saved:** The **SAVE DIRECTORY** you choose.
 
-<p align="center">
-  <video src="images/visualizations/blob_tracking_2.mp4" width="600" controls>Blob tracking visualization</video>
-</p>
+[blob_tracking_2.webm](https://github.com/user-attachments/assets/f95d2841-992a-45d6-be1e-2e0dd9ad2dc8)
 
-<p align="center">
-  <video src="images/visualizations/blob_tracking_3.mp4" width="600" controls>Blob tracking visualization</video>
-</p>
+[blob_tracking_3.webm](https://github.com/user-attachments/assets/4e24f131-4f0d-4af3-aeee-f241541f0b41)
 
-<p align="center">
-  <video src="images/visualizations/blob_tracking_4.mp4" width="600" controls>Blob tracking visualization</video>
-</p>
+[blob_tracking_4.webm](https://github.com/user-attachments/assets/5fe5b899-102a-4ce4-9db8-57d3dff0939c)
+
 
 ---
 
@@ -844,9 +839,8 @@ Renders **videos with YOLO pose-estimation overlays**: keypoints, skeleton lines
 
 **Where output is saved:** The **SAVE DIRECTORY** you choose. Output videos have the same names as the input videos with pose overlays.
 
-<p align="center">
-  <video src="images/visualizations/yolo_visualize_2.mp4" width="600" controls>YOLO visualization</video>
-</p>
+[yolo_visualize_2.webm](https://github.com/user-attachments/assets/e7b552dd-b3e0-4ec1-bb95-27b09d447419)
+
 
 ---
 
@@ -883,9 +877,8 @@ Rotates and translates **pose data** and **video frames** so one animal is cente
 
 **Where output is saved:** The **SAVE DIRECTORY** you choose. Aligned CSVs and rotated videos keep the same filenames as inputs.
 
-<p align="center">
-  <video src="images/visualizations/egocentric_2.mp4" width="600" controls>Egocentric alignment</video>
-</p>
+[egocentric_2.webm](https://github.com/user-attachments/assets/46df9a47-7266-48b4-8d6b-271ae6f0adba)
+
 
 ---
 
@@ -920,9 +913,8 @@ Creates a **simple path plot** for one body part in one video. Unlike the full p
 
 **Where output is saved:** `project_folder/frames/output/path_plots/`. Output: `{video_name}_simple_path_plot.png` (if LAST FRAME ONLY) or `{video_name}_simple_path_plot.mp4`.
 
-<p align="center">
-  <video src="images/visualizations/EzPathPlot_2.mp4" width="600" controls>Create path plot (ROI tab)</video>
-</p>
+[EzPathPlot_2.webm](https://github.com/user-attachments/assets/f9f484dd-b5fa-4542-a9ee-8718b7c1b515)
+
 
 ---
 
@@ -950,9 +942,8 @@ Joins **two videos** into a single output video, either **horizontally** (side b
 
 **Where output is saved:** Same directory as the **first video**. Filename: `{video1}_{video2}_concat.mp4` (e.g. `Video1_Video2_concat.mp4`).
 
-<p align="center">
-  <video src="images/visualizations/concatenate_two_videos_1.mp4" width="600" controls>Concatenate two videos</video>
-</p>
+[concatenate_two_videos_1.webm](https://github.com/user-attachments/assets/04ab462f-a194-41f0-92b7-e21d9d0fe042)
+
 
 ---
 
