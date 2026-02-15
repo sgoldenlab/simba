@@ -15,6 +15,7 @@ from simba.utils.checks import (
     check_file_exist_and_readable, check_if_dir_exists,
     check_that_dir_has_list_of_filenames, check_valid_boolean,
     check_valid_dataframe, check_valid_lst)
+from simba.utils.data import detect_bouts
 from simba.utils.enums import Formats, Keys, TagNames
 from simba.utils.errors import (AnimalNumberError, CountError,
                                 InvalidInputError, NoFilesFoundError)
@@ -22,8 +23,7 @@ from simba.utils.lookups import create_directionality_cords
 from simba.utils.printing import (SimbaTimer, log_event, stdout_information,
                                   stdout_success)
 from simba.utils.read_write import (create_directory, get_fn_ext, read_df,
-                                    write_df, seconds_to_timestamp)
-from simba.utils.data import detect_bouts
+                                    seconds_to_timestamp, write_df)
 
 NOSE, EAR_LEFT, EAR_RIGHT = Keys.NOSE.value, Keys.EAR_LEFT.value, Keys.EAR_RIGHT.value
 X_BPS, Y_BPS = Keys.X_BPS.value, Keys.Y_BPS.value
