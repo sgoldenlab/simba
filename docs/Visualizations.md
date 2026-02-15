@@ -150,13 +150,10 @@ The pop-up offers the following options:
 
 **Where output is saved:** Videos and frames are saved to the `project_folder/frames/output/sklearn_results/` directory.
 
+[sklearn_visualization.webm](https://github.com/user-attachments/assets/8a040763-267a-464b-9a33-fe139fc644bb)
 
-<p align="center">
-  <video src="images/scenario2/sklearn_visualization.mp4" width="600" controls>Classification visualization</video>
-</p>
-<p align="center">
-  <video src="images/scenario2/sklearn_visualization_2.mp4" width="600" controls>Classification visualization</video>
-</p>
+[sklearn_visualization_2.webm](https://github.com/user-attachments/assets/a65c89ed-37ae-423d-a0b2-e470b55c7f15)
+
 
 ---
 
@@ -331,13 +328,14 @@ Path plots show where each animal moved over time (trajectory lines) and, option
 <p align="center">
   <img src="images/scenario2/path_plot_0.webp" width="600">
   <img src="images/scenario2/path_plot_1.webp" width="600">
-  <video src="images/scenario2/path_plot_2.mp4" width="600" controls>Path plot</video>
 </p>
 <p align="center">
   <img src="images/scenario2/path_plot_3.webp" width="600">
   <img src="images/scenario2/path_plot_4.webp" width="600">
   <img src="images/scenario2/path_plot_5.webp" width="600">
 </p>
+
+[path_plot_2.webm](https://github.com/user-attachments/assets/4e0e249c-0571-4f8c-b705-7ff341f429fd)
 
 ---
 
