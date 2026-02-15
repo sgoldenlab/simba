@@ -408,16 +408,9 @@ The **Visualize classifications** dialog offers the following options:
 
 **Where output is saved:** Videos and frames are saved to the `project_folder/frames/output/sklearn_results/` directory.
 
+[sklearn_visualization.webm](https://github.com/user-attachments/assets/50094bd3-051a-432c-8f97-06aad53d18f0)
 
-<p align="center">
-  <video src="images/scenario2/sklearn_visualization.mp4" width="600" controls>Your browser does not support the video tag.</video>
-</p>
-
-<p align="center">
-  <video src="images/scenario2/sklearn_visualization_2.mp4" width="600" controls>Your browser does not support the video tag.</video>
-</p>
-
-
+[sklearn_visualization_2.webm](https://github.com/user-attachments/assets/63acd686-7c56-4552-8850-3051f10d530b)
 
 ### VISUALIZE GANTT CHARTS
 
@@ -590,13 +583,15 @@ Path plots show where each animal moved over time (trajectory lines) and, option
 <p align="center">
   <img src="images/scenario2/path_plot_0.webp" width="600" alt="Path plot example 0">
   <img src="images/scenario2/path_plot_1.webp" width="600" alt="Path plot example 1">
-  <video src="images/scenario2/path_plot_2.mp4" width="600" controls>Path plot animation</video>
 </p>
 <p align="center">
   <img src="images/scenario2/path_plot_3.webp" width="600" alt="Path plot example 3">
   <img src="images/scenario2/path_plot_4.webp" width="600" alt="Path plot example 4">
   <img src="images/scenario2/path_plot_5.webp" width="600" alt="Path plot example 5">
 </p>
+
+[path_plot_2.webm](https://github.com/user-attachments/assets/0aee884a-8548-450e-a6b1-e41502eb8ca6)
+
 
 
 ### VISUALIZE DISTANCE PLOTS
@@ -716,9 +711,7 @@ The **merge (concatenate) multiple videos** tool combines several videos into on
 To concatenate or merge multiple videos, use the **Tools** menu → **Concatenate (stack) videos...** → **Concatenate multiple videos** (or **MERGE FRAMES** in the **[Visualizations]** tab). For options, layout types, and where output is saved, see [Tools — Concatenate (stack) videos](Tools.md#concatenate-stack-videos) and [Tools — Concatenate multiple videos](Tools.md#concatenate-multiple-videos).
 
 
-<p align="center">
-  <video src="images/scenario2/concat_videos.mp4" width="600" controls>Your browser does not support the video tag.</video>
-</p>
+https://github.com/user-attachments/assets/f2c936c2-dc35-4e6c-8264-56f9bb6b8aee
 
 
 ---

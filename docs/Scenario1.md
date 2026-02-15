@@ -147,12 +147,19 @@ SimBA needs the pose-estimation data (x,y coordinates of body parts) produced by
 
 3. **Smoothing (optional):** Pose data can be “jittery” with unrealistic jumps between frames. Smoothing averages predictions with neighbouring frames. The options are **Gaussian** or **Savitzky Golay**. When you select **Gaussian** or **Savitzky Golay**, set **Smoothing period (ms)** (e.g. 100–300). See the [before/after smoothing video](https://youtu.be/d9-Bi4_HyfQ), [smoothing example (webm)](../_static/img/smoothing_example_2.webm), or [smoothing example (gif)](../_static/img/smoothing.gif) to compare results. For this tutorial, select **None**.
 
-> [!TIP]
-> After interpolation or smoothing, use [Visualize pose estimation in folder](Tools.md#visualize-pose-estimation-in-folder) (Tools menu) to overlay the pose keypoints on your videos. The visualization tool lets you verify that the tracking looks correct (e.g. keypoints follow the animal, interpolation did not introduce obvious errors) before you proceed to feature extraction and labeling. Select the folder containing your tracking CSVs (e.g. the `project_folder/csv/input/` directory) and choose a directory to save the output; SimBA renders annotated videos for review.
-
 <p align="center">
   <img src="images/scenario1/smoothing.png" width="600">
 </p>
+
+[smoothing.webm](https://github.com/user-attachments/assets/17afddde-2869-4dbe-99b5-dd3880d8387b)
+
+[wmoothing_2.webm](https://github.com/user-attachments/assets/3f54ddc8-cf3f-4b44-82b6-0b20c178ae55)
+
+
+> [!TIP]
+> After interpolation or smoothing, use [Visualize pose estimation in folder](Tools.md#visualize-pose-estimation-in-folder) (Tools menu) to overlay the pose keypoints on your videos. The visualization tool lets you verify that the tracking looks correct (e.g. keypoints follow the animal, interpolation did not introduce obvious errors) before you proceed to feature extraction and labeling. Select the folder containing your tracking CSVs (e.g. the `project_folder/csv/input/` directory) and choose a directory to save the output; SimBA renders annotated videos for review.
+
+
 
 4. Click <kbd>Browse Folder</kbd>, select the folder with CSV files, and then click <kbd>Import DLC CSV DIRECTORY to SimBA project</kbd> (or **Import DLC CSV FILE to SimBA project** for a single file).
 
@@ -235,9 +242,7 @@ You can skip the Further imports step for Scenario 1, since you will not add new
 
 4. For each video, click **CALCULATE DISTANCE**; a window shows the first frame. Double-**left**-click two points that define the known distance. If a point is misplaced, double-click the dot to replace the misplaced point. Press **Esc** when done.
 
-<p align="center">
-  <video src="https://github.com/user-attachments/assets/4da58c75-f9b9-4d26-bafe-a65fc1ce5d17" width="600" autoplay loop muted playsinline></video>
-</p>
+[getcoord.webm](https://github.com/user-attachments/assets/4da58c75-f9b9-4d26-bafe-a65fc1ce5d17)
 
 5. When finished, click **SAVE PIXEL PER MILLIMETER DATA** (or <kbd>SAVE</kbd> in the table) to write the values to `video_info.csv` in `project_folder/logs`. You must save before closing the window or the calibration will not be applied to later steps.
 
@@ -481,9 +486,8 @@ Before running your classifier on real experimental data, you should check how w
 9. **RUN** — SimBA creates a video with the classifier's predictions overlaid on each frame (e.g. behavior-present frames highlighted, probability text, Gantt chart if selected). The output video is saved to the `project_folder/frames/output/validation/` directory.
 
 
-<p align="center">
-  <video src="images/scenario1/validation_example.mp4" width="600" controls>Validate model on new data — example</video>
-</p>
+[validation_example.webm](https://github.com/user-attachments/assets/7d8cc685-1e84-4ae1-9634-71f9fecbcefe)
+
 
 > [!NOTE]
 > See the [Classifier Validation](https://github.com/sgoldenlab/simba/blob/master/docs/classifier_validation.md) tool for detecting false positives (the tool creates bout-level overlays with frame counts and probabilities).

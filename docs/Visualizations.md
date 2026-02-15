@@ -150,13 +150,10 @@ The pop-up offers the following options:
 
 **Where output is saved:** Videos and frames are saved to the `project_folder/frames/output/sklearn_results/` directory.
 
+[sklearn_visualization.webm](https://github.com/user-attachments/assets/8a040763-267a-464b-9a33-fe139fc644bb)
 
-<p align="center">
-  <video src="images/scenario2/sklearn_visualization.mp4" width="600" controls>Classification visualization</video>
-</p>
-<p align="center">
-  <video src="images/scenario2/sklearn_visualization_2.mp4" width="600" controls>Classification visualization</video>
-</p>
+[sklearn_visualization_2.webm](https://github.com/user-attachments/assets/a65c89ed-37ae-423d-a0b2-e470b55c7f15)
+
 
 ---
 
@@ -331,13 +328,14 @@ Path plots show where each animal moved over time (trajectory lines) and, option
 <p align="center">
   <img src="images/scenario2/path_plot_0.webp" width="600">
   <img src="images/scenario2/path_plot_1.webp" width="600">
-  <video src="images/scenario2/path_plot_2.mp4" width="600" controls>Path plot</video>
 </p>
 <p align="center">
   <img src="images/scenario2/path_plot_3.webp" width="600">
   <img src="images/scenario2/path_plot_4.webp" width="600">
   <img src="images/scenario2/path_plot_5.webp" width="600">
 </p>
+
+[path_plot_2.webm](https://github.com/user-attachments/assets/4e0e249c-0571-4f8c-b705-7ff341f429fd)
 
 ---
 
@@ -460,17 +458,13 @@ Creates videos with ROI shapes overlaid on each frame, plus **counters** showing
 
 **Examples:**
 
-<p align="center">
-  <img src="images/visualizations/roi_plot_1.webp" width="600" alt="ROI tracking example 1">
-</p>
+![roi_plot_1](https://github.com/user-attachments/assets/406369ab-b90f-4f9c-9ca9-47016cca97ec)
 
-<p align="center">
-  <video src="images/visualizations/roi_plot_2.mp4" width="600" controls>Your browser does not support the video tag.</video>
-</p>
 
-<p align="center">
-  <video src="images/visualizations/outside_roi_example.mp4" width="600" controls>Your browser does not support the video tag.</video>
-</p>
+[roi_plot_2.webm](https://github.com/user-attachments/assets/7eb65e5d-8d1f-451a-b6fd-2558ba4afc5e)
+
+[outside_roi_example.webm](https://github.com/user-attachments/assets/6174e057-2476-498e-8e5b-2de1390acd8f)
+
 *Outside ROI zones data (treats areas not covered by an ROI as one additional zone).*
 
 ---
@@ -554,9 +548,7 @@ Location heatmaps visualize **time spent in different regions of the arena** (co
 
 **Where output is saved:** `project_folder/frames/output/heatmaps_locations/`. Per-video: `{video_name}.mp4`, `{video_name}_final_frm.png` (or similar), and (if CREATE FRAMES) subfolder `{video_name}/` with frame images.
 
-<p align="center">
-  <video src="images/visualizations/location_heatmap.mp4" width="600" controls>Your browser does not support the video tag.</video>
-</p>
+[location_heatmap.webm](https://github.com/user-attachments/assets/d124f790-bd80-4a1e-9020-3a31ea12fc35)
 
 <p align="center">
   <img src="images/visualizations/location_heatmap_1.webp" width="600" alt="Location heatmap example">
@@ -601,17 +593,11 @@ Creates videos showing when each animal is **directing towards other animals** (
 
 **Where output is saved:** `project_folder/frames/output/Directing_animals/`
 
-<p align="center">
-  <video src="images/visualizations/visualize_directionality_1.mp4" width="600" controls>Your browser does not support the video tag.</video>
-</p>
+[visualize_directionality_1.webm](https://github.com/user-attachments/assets/84538728-eb2c-40b2-9360-a5f73d8da506)
 
-<p align="center">
-  <video src="images/visualizations/visualize_directionality_2.mp4" width="600" controls>Your browser does not support the video tag.</video>
-</p>
+[visualize_directionality_2.webm](https://github.com/user-attachments/assets/cf73b602-932b-4ab4-82e0-2fa9f963531b)
 
-<p align="center">
-  <img src="images/visualizations/visualize_directionality_3.webp" width="600" alt="Directionality example 3">
-</p>
+![visualize_directionality_3](https://github.com/user-attachments/assets/e607adf8-3227-4316-88da-cd6075f17a3c)
 
 ---
 
@@ -677,9 +663,8 @@ Click <kbd>RUN</kbd> to generate the merged video.
 **Where output is saved:** `project_folder/frames/output/merged/` as `merged_video_YYYYMMDDHHMMSS.mp4` (date and time with no separator, e.g. `merged_video_20250212143055.mp4`). When the tool is run without a project (**Tools** → **Concatenate multiple videos**), the file is saved in the same directory as the first selected video.
 
 
-<p align="center">
-  <video src="images/scenario2/concat_videos.mp4" width="600" controls>Merged output video</video>
-</p>
+
+https://github.com/user-attachments/assets/b84364ee-3e85-4630-8955-070491f74f00
 
 ---
 
@@ -765,10 +750,10 @@ Renders **videos with pose keypoints overlaid** on each frame. Use this to verif
 
 **Where output is saved:** The **SAVE DIRECTORY** you choose. Each input file produces one output video (e.g. `{filename}.mp4`).
 
-<p align="center">
-  <img src="images/visualizations/pose_plotter.webp" width="600" alt="Pose plotter output">
-  <video src="images/visualizations/pose_plotter.mp4" width="600" controls>Pose plotter output video</video>
-</p>
+[pose_plotter.webm](https://github.com/user-attachments/assets/09810e7a-a63f-45e0-8f51-781d7ed77c15)
+
+![pose_plotter](https://github.com/user-attachments/assets/5339ccbe-3b0f-442f-a45c-e1c1b0a9a71b)
+
 
 ---
 
@@ -809,17 +794,12 @@ Renders **videos with blob-tracking overlays**: convex hulls, anterior (nose), p
 
 **Where output is saved:** The **SAVE DIRECTORY** you choose.
 
-<p align="center">
-  <video src="images/visualizations/blob_tracking_2.mp4" width="600" controls>Blob tracking visualization</video>
-</p>
+[blob_tracking_2.webm](https://github.com/user-attachments/assets/f95d2841-992a-45d6-be1e-2e0dd9ad2dc8)
 
-<p align="center">
-  <video src="images/visualizations/blob_tracking_3.mp4" width="600" controls>Blob tracking visualization</video>
-</p>
+[blob_tracking_3.webm](https://github.com/user-attachments/assets/4e24f131-4f0d-4af3-aeee-f241541f0b41)
 
-<p align="center">
-  <video src="images/visualizations/blob_tracking_4.mp4" width="600" controls>Blob tracking visualization</video>
-</p>
+[blob_tracking_4.webm](https://github.com/user-attachments/assets/5fe5b899-102a-4ce4-9db8-57d3dff0939c)
+
 
 ---
 
@@ -859,9 +839,8 @@ Renders **videos with YOLO pose-estimation overlays**: keypoints, skeleton lines
 
 **Where output is saved:** The **SAVE DIRECTORY** you choose. Output videos have the same names as the input videos with pose overlays.
 
-<p align="center">
-  <video src="images/visualizations/yolo_visualize_2.mp4" width="600" controls>YOLO visualization</video>
-</p>
+[yolo_visualize_2.webm](https://github.com/user-attachments/assets/e7b552dd-b3e0-4ec1-bb95-27b09d447419)
+
 
 ---
 
@@ -898,9 +877,8 @@ Rotates and translates **pose data** and **video frames** so one animal is cente
 
 **Where output is saved:** The **SAVE DIRECTORY** you choose. Aligned CSVs and rotated videos keep the same filenames as inputs.
 
-<p align="center">
-  <video src="images/visualizations/egocentric_2.mp4" width="600" controls>Egocentric alignment</video>
-</p>
+[egocentric_2.webm](https://github.com/user-attachments/assets/46df9a47-7266-48b4-8d6b-271ae6f0adba)
+
 
 ---
 
@@ -935,9 +913,8 @@ Creates a **simple path plot** for one body part in one video. Unlike the full p
 
 **Where output is saved:** `project_folder/frames/output/path_plots/`. Output: `{video_name}_simple_path_plot.png` (if LAST FRAME ONLY) or `{video_name}_simple_path_plot.mp4`.
 
-<p align="center">
-  <video src="images/visualizations/EzPathPlot_2.mp4" width="600" controls>Create path plot (ROI tab)</video>
-</p>
+[EzPathPlot_2.webm](https://github.com/user-attachments/assets/f9f484dd-b5fa-4542-a9ee-8718b7c1b515)
+
 
 ---
 
@@ -965,9 +942,8 @@ Joins **two videos** into a single output video, either **horizontally** (side b
 
 **Where output is saved:** Same directory as the **first video**. Filename: `{video1}_{video2}_concat.mp4` (e.g. `Video1_Video2_concat.mp4`).
 
-<p align="center">
-  <video src="images/visualizations/concatenate_two_videos_1.mp4" width="600" controls>Concatenate two videos</video>
-</p>
+[concatenate_two_videos_1.webm](https://github.com/user-attachments/assets/04ab462f-a194-41f0-92b7-e21d9d0fe042)
+
 
 ---
 

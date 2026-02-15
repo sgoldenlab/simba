@@ -28,20 +28,13 @@ pip install simba-uw-tf-dev
 ```
 For detailed installation instructions, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md)
 
+## Installation ⚙️
 
-## Documentation: General methods
+- [Install SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md)
 
-### Step 1: [Pre-process videos](docs/tutorial_process_videos.md) 
+- [Install SimBA using Anaconda](https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_2025.md)
 
-### Step 2: [Create tracking model and generate pose-estimation data](docs/Tutorial_DLC.md) 
-
-### Step 3: [Building classfier(s)](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-6-label-behavior)
-
-### Step 4: [Analysis/Visualization](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-9-analyze-machine-results)
-
-### [Click here for the full *generic* tutorial on building classifiers in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md).
-
-## Scenario tutorials
+##  Documentation: Scenario tutorials
 
 To faciliate the initial use of SimBA, we provide several use scenarios. We have created these scenarios around a hypothetical experiment that take a user from initial use (completely new start) all the way through analyzing a complete experiment and then adding additional experimental datasets to an initial project.
 
@@ -53,15 +46,10 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 
 ### Scenario 4: [Analyzing and adding new Experimental data to a previously started project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4_new.md)
 
-## Installation ⚙️
-
-- [Install SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md)
-
-- [Install SimBA using Anaconda](https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_2025.md)
-
 ## Tutorial 📚
 - [API](https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html) 📘
-- [Process video using SimBA tools](docs/Tutorial_tools.md) 🔨
+- [Visualization tools](docs/Visualizations.md) 👁️
+- [Process video using SimBA tools](docs/Tools.md) 🔨
 - [Batch pre-process video using SimBA](docs/tutorial_process_videos.md) 🏭
 - [Using DeepPoseKit in SimBA](docs/DeepPoseKit_in_SimBA.md) 📙
 - [Using DeepLabCut through SimBA](docs/Tutorial_DLC.md) 📗
@@ -85,6 +73,18 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [Analysing animal directions in SimBA](docs/directionality_between_animals.md) 🧭
 - [Recommended hardware](https://github.com/sgoldenlab/simba/blob/master/misc/system_requirements.md) 🖥️
 - [Downloading compressed data from the SimBA OSF repository](https://github.com/sgoldenlab/simba/blob/master/docs/using_OSF.md) 💾
+
+## Legacy documentation: General methods
+
+### Step 1: [Pre-process videos](docs/tutorial_process_videos.md) 
+
+### Step 2: [Create tracking model and generate pose-estimation data](docs/Tutorial_DLC.md) 
+
+### Step 3: [Building classfier(s)](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-6-label-behavior)
+
+### Step 4: [Analysis/Visualization](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-9-analyze-machine-results)
+
+### [Click here for the full legacy *generic* tutorial on building classifiers in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md).
 
 ## Apr-03-2025: Blob (contour) tracking in SimBA
 
