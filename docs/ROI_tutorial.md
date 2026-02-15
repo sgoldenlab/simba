@@ -218,12 +218,10 @@ Use **CREATE SINGLE ROI VIDEO** for one video or **CREATE ALL ROI VIDEOS** to pr
 
 **Where output is saved:** `project_folder/frames/output/ROI_analysis/`. Progress appears in the SimBA terminal.
 
-<p align="center">
-  <video src="images/roi_tutorial/ROI_visualization_1.mp4" width="500" controls>Your browser does not support the video tag.</video>
-</p>
-<p align="center">
-  <video src="images/roi_tutorial/ROI_OF.mp4" width="500" controls>Your browser does not support the video tag.</video>
-</p>
+[ROI_visualization_1.webm](https://github.com/user-attachments/assets/4c5516ff-1a51-426e-91b8-3935243b4e6d)
+
+[ROI_OF.webm](https://github.com/user-attachments/assets/43dd9017-9621-4d15-a1a7-6b1845774858)
+
 
 ---
 
@@ -258,12 +256,10 @@ Directionality can be shown as **Funnels** or **Lines** (see example GIFs below)
 
 **Where output is saved:** `project_folder/frames/output/ROI_features/`.
 
-<p align="center">
-  <video src="images/roi_tutorial/Lines_directionality.mp4" width="500" controls>Your browser does not support the video tag.</video>
-</p>
-<p align="center">
-  <video src="images/roi_tutorial/ROI_directionality.mp4" width="500" controls>Your browser does not support the video tag.</video>
-</p>
+
+[Lines_directionality.webm](https://github.com/user-attachments/assets/9ac7c4e6-87ed-48a8-9278-ea22a9fbc828)
+
+[ROI_directionality.webm](https://github.com/user-attachments/assets/93f26f08-8e0e-4b1e-8a5d-cca25b87d906)
 
 ---
 
@@ -371,14 +367,9 @@ Generate **location heatmaps** (video or image) showing time spent in different 
 
 **Where output is saved:** `project_folder/frames/output/heatmaps_locations/`.
 
-<p align="center">
-  <video src="images/visualizations/location_heatmap.mp4" width="500" controls>Your browser does not support the video tag.</video>
-</p>
+[location_heatmap.webm](https://github.com/user-attachments/assets/3339fa15-a2b4-4e61-ab1f-0a1ed6fab149)
 
-<p align="center">
-  <img src="images/visualizations/location_heatmap_1.webp" width="500" alt="Create heatmaps dialog">
-</p>
-
+![location_heatmap_1](https://github.com/user-attachments/assets/c766f71d-ff07-48b9-8917-88ebd939fbd5)
 
 ---
 
@@ -442,9 +433,9 @@ Click <kbd>RUN ANALYSIS</kbd> to run. Output: per-frame boolean tables and summa
 
 **Where output is saved:** Analysis → `project_folder/logs/directionality_dataframes/`. Visualization → `project_folder/frames/output/Body_part_directing_animals/`.
 
-<p align="center">
-  <video src="images/visualizations/visualize_directionality_1.mp4" width="500" controls>Your browser does not support the video tag.</video>
-</p>
+[visualize_directionality_1.webm](https://github.com/user-attachments/assets/f595ad66-9ffc-439a-a2fe-efc9f80d4ff2)
+
+[visualize_directionality_2.webm](https://github.com/user-attachments/assets/01d431bc-2425-4491-ad8f-44427a22df84)
 
 ---
 
@@ -499,9 +490,8 @@ Compute **spontaneous alternation** (e.g. Y-maze) from pose data and **user-defi
 
 Full guide: [Spontaneous alternation in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/spontaneous_alternation.md).
 
-<p align="center">
-  <video src="images/roi_tutorial/SpontaneousAlternationsPlotter.mp4" width="500" controls>Your browser does not support the video tag.</video>
-</p>
+[SpontaneousAlternationsPlotter.webm](https://github.com/user-attachments/assets/0091bd6e-799d-4d37-b2b6-b5507d0753fb)
+
 
 ---
 
