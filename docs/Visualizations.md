@@ -458,17 +458,13 @@ Creates videos with ROI shapes overlaid on each frame, plus **counters** showing
 
 **Examples:**
 
-<p align="center">
-  <img src="images/visualizations/roi_plot_1.webp" width="600" alt="ROI tracking example 1">
-</p>
+![roi_plot_1](https://github.com/user-attachments/assets/406369ab-b90f-4f9c-9ca9-47016cca97ec)
 
-<p align="center">
-  <video src="images/visualizations/roi_plot_2.mp4" width="600" controls>Your browser does not support the video tag.</video>
-</p>
 
-<p align="center">
-  <video src="images/visualizations/outside_roi_example.mp4" width="600" controls>Your browser does not support the video tag.</video>
-</p>
+[roi_plot_2.webm](https://github.com/user-attachments/assets/7eb65e5d-8d1f-451a-b6fd-2558ba4afc5e)
+
+[outside_roi_example.webm](https://github.com/user-attachments/assets/6174e057-2476-498e-8e5b-2de1390acd8f)
+
 *Outside ROI zones data (treats areas not covered by an ROI as one additional zone).*
 
 ---
@@ -552,9 +548,7 @@ Location heatmaps visualize **time spent in different regions of the arena** (co
 
 **Where output is saved:** `project_folder/frames/output/heatmaps_locations/`. Per-video: `{video_name}.mp4`, `{video_name}_final_frm.png` (or similar), and (if CREATE FRAMES) subfolder `{video_name}/` with frame images.
 
-<p align="center">
-  <video src="images/visualizations/location_heatmap.mp4" width="600" controls>Your browser does not support the video tag.</video>
-</p>
+[location_heatmap.webm](https://github.com/user-attachments/assets/d124f790-bd80-4a1e-9020-3a31ea12fc35)
 
 <p align="center">
   <img src="images/visualizations/location_heatmap_1.webp" width="600" alt="Location heatmap example">
@@ -599,17 +593,11 @@ Creates videos showing when each animal is **directing towards other animals** (
 
 **Where output is saved:** `project_folder/frames/output/Directing_animals/`
 
-<p align="center">
-  <video src="images/visualizations/visualize_directionality_1.mp4" width="600" controls>Your browser does not support the video tag.</video>
-</p>
+[visualize_directionality_1.webm](https://github.com/user-attachments/assets/84538728-eb2c-40b2-9360-a5f73d8da506)
 
-<p align="center">
-  <video src="images/visualizations/visualize_directionality_2.mp4" width="600" controls>Your browser does not support the video tag.</video>
-</p>
+[visualize_directionality_2.webm](https://github.com/user-attachments/assets/cf73b602-932b-4ab4-82e0-2fa9f963531b)
 
-<p align="center">
-  <img src="images/visualizations/visualize_directionality_3.webp" width="600" alt="Directionality example 3">
-</p>
+![visualize_directionality_3](https://github.com/user-attachments/assets/e607adf8-3227-4316-88da-cd6075f17a3c)
 
 ---
 
@@ -675,9 +663,8 @@ Click <kbd>RUN</kbd> to generate the merged video.
 **Where output is saved:** `project_folder/frames/output/merged/` as `merged_video_YYYYMMDDHHMMSS.mp4` (date and time with no separator, e.g. `merged_video_20250212143055.mp4`). When the tool is run without a project (**Tools** → **Concatenate multiple videos**), the file is saved in the same directory as the first selected video.
 
 
-<p align="center">
-  <video src="images/scenario2/concat_videos.mp4" width="600" controls>Merged output video</video>
-</p>
+
+https://github.com/user-attachments/assets/b84364ee-3e85-4630-8955-070491f74f00
 
 ---
 
