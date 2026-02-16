@@ -113,37 +113,37 @@ Jump to any section:
 
 | Menu path | Description |
 |-----------|-------------|
-| **Tools** → **Change FPS...** | Single/multiple video FPS; up-sample with interpolation |
-| **Tools** → **Clip videos...** | Clip single/multiple by time or frame numbers; clip into multiple videos |
-| **Tools** → **Crop videos...** | Rectangle crop; circle crop; polygon crop; multi-crop |
-| **Tools** → **Convert file formats...** | Images (PNG, JPEG, BMP, TIFF, WEBP); videos (MP4, AVI, WEBM, MOV) |
-| **Tools** → **Remove color from videos...** | Grayscale; black and white; CLAHE; interactive CLAHE |
-| **Tools** → **Concatenate (stack) videos...** | Two videos (horizontal/vertical); multiple videos (mosaic) |
-| **Tools** → **Convert ROI definitions** | Export ROI definitions (H5) to CSV (polygons, rectangles, circles) |
-| **Tools** → **Convert tracking data formats...** | DLC/SLEAP/COCO/Labelme ↔ YOLO and other pose formats |
-| **Tools** → **Convert working file type...** | CSV ↔ parquet |
-| **Tools** → **Create path plot** | Simple path plot from pose CSV (no project). See [Visualizations.md](Visualizations.md#create-path-plots-roi-tab). |
-| **Tools** → **Drop body-parts from tracking data** | Remove selected body-parts from pose CSVs in a folder |
-| **Tools** → **Down-sample video...** | Single or multiple videos to lower resolution |
-| **Tools** → **Extract frames...** | Defined frame range; single/multiple video; from .seq files |
-| **Tools** → **Create GIFs** | Generate GIF from video (start time, duration, size) |
-| **Tools** → **Get metric conversion factor (pixels/millimeter)** | Calibrate known length in mm on one frame |
-| **Tools** → **Change video brightness / contrast** | Adjust brightness and contrast |
-| **Tools** → **Merge frames to video** | Folder of images → video (format, fps, bitrate) |
-| **Tools** → **Change video playback speed** | Speed up or slow down video |
-| **Tools** → **Print classifier info** | Print model details from a `.sav` file |
-| **Tools** → **Show video file(s) meta data** | Print video metadata (resolution, fps, etc.) |
-| **Tools** → **Reorganize Tracking Data** | Reorder body-parts across pose files in a folder |
-| **Tools** → **Rotate / flip / reverse videos...** | Rotate (fixed or interactive); flip; reverse |
-| **Tools** → **Superimpose on videos...** | Frame numbers; watermark; timer; progress bar; video on video; video names; free text |
-| **Tools** → **Remove video backgrounds...** | Mean-subtraction background removal (single or directory) |
-| **Tools** → **Temporal join videos...** | Join videos in directory or selected list into one (by order) |
-| **Tools** → **Box blur videos** | Apply box blur |
-| **Tools** → **Cross-fade videos** | Cross-fade between two videos |
-| **Tools** → **Create average frames from videos** | Average frame(s) across videos |
-| **Tools** → **Validate video seekability** | Check if videos are seekable (e.g. for analysis) |
-| **Tools** → **Visualize pose-estimation in folder...** | Overlay pose on videos from any folder. See [Visualizations.md](Visualizations.md#visualize-pose-estimation-in-folder-tools-menu). |
-| **Tools** → **Egocentrically align pose and video** | Center and align orientation. See [Visualizations.md](Visualizations.md#egocentrically-align-pose-and-video-tools-menu). |
+| [**Tools** → **Change FPS...**](#change-fps-tools-menu) | Single/multiple video FPS; up-sample with interpolation |
+| [**Tools** → **Clip videos...**](#clip-videos-tools-menu) | Clip single/multiple by time or frame numbers; clip into multiple videos |
+| [**Tools** → **Crop videos...**](#crop-videos-tools-menu) | Rectangle crop; circle crop; polygon crop; multi-crop |
+| [**Tools** → **Convert file formats...**](#convert-file-formats-tools-menu) | Images (PNG, JPEG, BMP, TIFF, WEBP); videos (MP4, AVI, WEBM, MOV) |
+| [**Tools** → **Remove color from videos...**](#remove-color-from-videos-tools-menu) | Grayscale; black and white; CLAHE; interactive CLAHE |
+| [**Tools** → **Concatenate (stack) videos...**](#concatenate-stack-videos) | Two videos (horizontal/vertical); multiple videos (mosaic) |
+| [**Tools** → **Convert ROI definitions**](#convert-roi-definitions) | Export ROI definitions (H5) to CSV (polygons, rectangles, circles) |
+| [**Tools** → **Convert tracking data formats...**](#convert-tracking-data-formats) | DLC/SLEAP/COCO/Labelme ↔ YOLO and other pose formats |
+| [**Tools** → **Convert working file type...**](#convert-working-file-type) | CSV ↔ parquet |
+| [**Tools** → **Create path plot**](#create-path-plot) | Simple path plot from pose CSV (no project). See [Visualizations](Visualizations.md#create-path-plots-roi-tab). |
+| [**Tools** → **Drop body-parts from tracking data**](#drop-body-parts-from-tracking-data) | Remove selected body-parts from pose CSVs in a folder |
+| [**Tools** → **Down-sample video...**](#down-sample-video) | Single or multiple videos to lower resolution |
+| [**Tools** → **Extract frames...**](#extract-frames) | Defined frame range; single/multiple video; from .seq files |
+| [**Tools** → **Create GIFs**](#create-gifs) | Generate GIF from video (start time, duration, size) |
+| [**Tools** → **Get metric conversion factor (pixels/millimeter)**](#get-metric-conversion-factor-pixelsmillimeter) | Calibrate known length in mm on one frame |
+| [**Tools** → **Change video brightness / contrast**](#change-video-brightness--contrast) | Adjust brightness and contrast |
+| [**Tools** → **Merge frames to video**](#merge-frames-to-video) | Folder of images → video (format, fps, bitrate) |
+| [**Tools** → **Change video playback speed**](#change-video-playback-speed) | Speed up or slow down video |
+| [**Tools** → **Print classifier info**](#print-classifier-info) | Print model details from a `.sav` file |
+| [**Tools** → **Show video file(s) meta data**](#show-video-files-meta-data) | Print video metadata (resolution, fps, etc.) |
+| [**Tools** → **Reorganize Tracking Data**](#reorganize-tracking-data) | Reorder body-parts across pose files in a folder |
+| [**Tools** → **Rotate / flip / reverse videos...**](#rotate--flip--reverse-videos) | Rotate (fixed or interactive); flip; reverse |
+| [**Tools** → **Superimpose on videos...**](#superimpose-on-videos) | Frame numbers; watermark; timer; progress bar; video on video; video names; free text |
+| [**Tools** → **Remove video backgrounds...**](#remove-video-backgrounds) | Mean-subtraction background removal (single or directory) |
+| [**Tools** → **Temporal join videos...**](#temporal-join-videos) | Join videos in directory or selected list into one (by order) |
+| [**Tools** → **Box blur videos**](#box-blur-videos) | Apply box blur |
+| [**Tools** → **Cross-fade videos**](#cross-fade-videos) | Cross-fade between two videos |
+| [**Tools** → **Create average frames from videos**](#create-average-frames-from-videos) | Average frame(s) across videos |
+| [**Tools** → **Validate video seekability**](#validate-video-seekability) | Check if videos are seekable (e.g. for analysis) |
+| [**Tools** → **Visualize pose-estimation in folder...**](#visualize-pose-estimation-in-folder) | Overlay pose on videos from any folder. See [Visualizations](Visualizations.md#visualize-pose-estimation-in-folder-tools-menu). |
+| [**Tools** → **Egocentrically align pose and video**](#egocentrically-align-pose-and-video) | Center and align orientation. See [Visualizations](Visualizations.md#egocentrically-align-pose-and-video-tools-menu). |
 
 
 

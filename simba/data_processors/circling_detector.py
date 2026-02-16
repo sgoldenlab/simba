@@ -37,6 +37,12 @@ class CirclingDetector(ConfigReader):
 
        We pass the names of the left ear, right ear, and nose, as the method will use these body-parts to compute the direction of the animal in degrees.
 
+
+    .. video:: _static/img/CirclingDetector.webm
+       :width: 1000
+       :autoplay:
+       :loop:
+
     :param Union[str, os.PathLike] data_dir: Path to directory containing pose-estimated body-part data in CSV format.
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
     :param Optional[str] nose_name: The name of the pose-estimated nose body-part. Defaults to 'nose'.
@@ -66,8 +72,8 @@ class CirclingDetector(ConfigReader):
                  right_ear_name: Optional[str] = 'right_ear',
                  tail_base_name: Optional[str] = 'tail_base',
                  center_name: Optional[str] = 'center',
-                 time_threshold: Optional[int] = 7,
-                 circular_range_threshold: Optional[int] = 350,
+                 time_threshold: Optional[int] = 10,
+                 circular_range_threshold: Optional[int] = 340,
                  shortest_bout: int = 100,
                  movement_threshold: Optional[int] = 60,
                  save_dir: Optional[Union[str, os.PathLike]] = None):
@@ -143,8 +149,10 @@ class CirclingDetector(ConfigReader):
         agg_results.to_csv(agg_results_path)
         stdout_success(msg=f'Results saved in {self.save_dir} directory.')
 
-#
-#
-detector = CirclingDetector(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini")
-detector.run()
+
+# detector = CirclingDetector(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini")
+# detector.run()
+
+# detector = CirclingDetector(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini")
+# detector.run()
 

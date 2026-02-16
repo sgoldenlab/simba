@@ -66,7 +66,7 @@ from simba.utils.read_write import (
     find_all_videos_in_directory, find_core_cnt,
     find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data,
     read_config_entry, read_config_file, read_frm_of_video, read_img,
-    read_img_batch_from_video_gpu, recursive_file_search)
+    read_img_batch_from_video_gpu, recursive_file_search, seconds_to_timestamp)
 from simba.utils.warnings import (CropWarning, FFMpegCodecWarning,
                                   FileExistWarning, FrameRangeWarning,
                                   GPUToolsWarning, InValidUserInputWarning,
@@ -4344,8 +4344,9 @@ def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
             out_frm = cv2.morphologyEx(out_frm, cv2.MORPH_CLOSE, closing_kernel, iterations=closing_iterations)
         writer.write(out_frm)
         current_frm += 1
+        time_stamp = seconds_to_timestamp(seconds=current_frm/video_meta_data['fps'])
         if verbose:
-            print(f'Background subtracted frame {current_frm}/{video_meta_data["frame_count"]} (Video: {video_name})')
+            stdout_information(msg=f'Background subtracted frame {current_frm}/{video_meta_data["frame_count"]} (frame time-stamp: {time_stamp}, video name: {video_name}, processing CPU core: {batch})')
     writer.release()
     cap.release()
     return batch
@@ -4502,9 +4503,9 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
                                   opening_kernel=opening_kernel,
                                   opening_iterations=opening_iterations)
     for cnt, result in enumerate(pool.imap(constants, frm_data, chunksize=1)):
-        print(f'Frame batch {result+1} completed...')
-    if pool_terminate_flag: terminate_cpu_pool(pool=pool)
-    print(f"Joining {video_name} multi-processed video...")
+        stdout_information(msg=f'Frame batch {result+1} completed...', source=video_bg_subtraction_mp.__name__)
+    if pool_terminate_flag: terminate_cpu_pool(pool=pool, source=video_bg_subtraction_mp.__name__)
+    stdout_information(msg=f"Joining {video_name} multi-processed video...", source=video_bg_subtraction_mp.__name__)
     elapsed = time.time() - start
     print(elapsed)
     concatenate_videos_in_folder(in_folder=temp_dir, save_path=save_path, video_format=ext[1:], remove_splits=True, gpu=gpu, fps=video_meta_data['fps'])

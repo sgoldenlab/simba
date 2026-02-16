@@ -325,6 +325,10 @@
   "CLF_PLOT_SHOW_ANIMAL_NAMES": "Show labels like “Animal_1” on the video so you can tell animals apart.",
   "CLF_PLOT_SHOW_BBOX": "Draw a box around each animal. Helps see where the animal is and if animals overlap.",
   "CLF_PLOT_SHOW_PROBABILITY": "Show how confident the model was (0–100%) for the predicted behavior on each frame.",
+  "CLF_PLOT_TIME_SEGMENT": "When enabled, only a portion of the video is visualized.\nSet START TIME and END TIME below to define the segment (format: HH:MM:SS).\nLeave disabled to process the entire video.",
+  "CLF_PLOT_PLOT_SPECIFIC_TIME_SEGMENT": "If checked, only frames between START TIME and END TIME are drawn on the video.\nUseful to focus on a specific part (e.g. a 1‑minute trial) instead of the full video.",
+  "CLF_PLOT_START_TIME": "When the plotted segment begins. Format: HH:MM:SS (e.g. 00:01:30 = 1 min 30 sec).\nOnly used when PLOT SPECIFIC TIME SEGMENT is checked.",
+  "CLF_PLOT_END_TIME": "When the plotted segment ends. Format: HH:MM:SS. Must be after START TIME.\nOnly used when PLOT SPECIFIC TIME SEGMENT is checked.",
   "CREATE_PROJECT_DIR": "Folder where the new SimBA project will be created.\nAll project files (videos, CSV, config) will live inside a subfolder with the project name.",
   "CREATE_PROJECT_NAME": "Name for your project. SimBA will create a folder with this name inside the project directory.\nKeep it short; avoid spaces or special characters.",
   "CREATE_PROJECT_FILE_TYPE": "Format for saving pose and results (e.g. CSV or Parquet).\nCSV is strongly recommended.",
@@ -346,5 +350,14 @@
   "IMPORT_POSE_DLC_TRACKING_TYPE": "Multi-animal DLC export format. Choose the file type that matches your exported DLC data (e.g. h5, csv).",
   "IMPORT_POSE_MULTI_ANIMAL_DATA_DIRECTORY": "Folder containing multi-animal pose files (DLC H5, SLEAP SLP/CSV/H5, APT TRK, or SuperAnimal H5). File names should match project videos.",
   "LOAD_PROJECT_CONFIG_FILE": "Path to the project_config.ini file of the SimBA project you want to open. Use BROWSE to select the file; it is usually inside the project folder.",
-  "LOAD_PROJECT_RECENT_CONFIG": "Previously loaded projects. Select one from the list and click LOAD RECENT PROJECT to open it without browsing."
+  "LOAD_PROJECT_RECENT_CONFIG": "Previously loaded projects. Select one from the list and click LOAD RECENT PROJECT to open it without browsing.",
+  "BG_REMOVE_VIDEO_PATH": "The video file to process. SimBA compares each frame to a learned background and replaces background pixels with your chosen color. The output video is saved in the same folder with a new filename.",
+  "BG_REMOVE_BG_REFERENCE_VIDEO_PATH": "Optional. A different video whose frames are averaged to estimate the background. Leave blank to use the input video itself. Use a separate reference when the animal is almost always moving (e.g., cage footage) and the input video has no clear empty background—provide a similar video where the cage/enclosure is empty or the animal is out of frame.",
+  "BG_REMOVE_BACKGROUND_COLOR": "The color that replaces the background (everything not detected as the animal). SimBA averages frames to build a background model, then paints pixels that match that background with this color. Pick a color that contrasts with the foreground so the animal is easy to see.",
+  "BG_REMOVE_FOREGROUND_COLOR": "The color of the animal (foreground) in the output. Original keeps the animal's real colors from the video. A solid color (e.g., black) gives a silhouette-style output useful for blob tracking or masking.",
+  "BG_REMOVE_BACKGROUND_THRESHOLD": "Controls how different a pixel must be from the background to count as part of the animal (1–99). Low values (e.g., 10–20): more pixels count as animal, including shadows and subtle changes. High values (e.g., 50–80): only strong differences count. Start around 30 and adjust based on lighting and animal contrast.",
+  "BG_REMOVE_BG_START": "Start of the segment used to build the background. Enter a frame number (e.g., 100) or time in HH:MM:SS. SimBA averages frames in this range. Use this when only part of the video has a usable empty background (e.g., the animal enters after a few seconds). Disabled when \"Compute background from entire video\" is checked.",
+  "BG_REMOVE_BG_END": "End of the segment used to build the background. Must be after START. Enter a frame number or time in HH:MM:SS. Together with START, defines the window of frames averaged into the background model. Disabled when \"Compute background from entire video\" is checked.",
+  "BG_REMOVE_CPU_CORE_COUNT": "How many CPU cores to use for parallel processing. More cores can make processing faster for long videos. Using more than half of your available cores may slow other programs or cause heavy CPU load.",
+  "BG_REMOVE_ENTIRE_VIDEO_AS_BG": "If checked, SimBA averages the entire video (or reference video) to build the background. If unchecked, only the segment between BACKGROUND VIDEO START and END is used. Uncheck when the animal occupies the frame for most of the video—use START/END to pick a short period where the background is visible (e.g., before the animal enters)."
 }

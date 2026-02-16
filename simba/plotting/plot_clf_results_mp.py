@@ -5,7 +5,7 @@ import multiprocessing
 import os
 import platform
 from copy import deepcopy
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Dict
 
 import cv2
 import numpy as np
@@ -19,20 +19,21 @@ from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
                                 check_int, check_nvidea_gpu_available,
                                 check_str, check_that_column_exist,
                                 check_valid_boolean,
-                                check_video_and_data_frm_count_align)
+                                check_video_and_data_frm_count_align, check_valid_dict, check_that_hhmmss_start_is_before_end)
 from simba.utils.data import (create_color_palette, detect_bouts, get_cpu_pool,
-                              terminate_cpu_pool)
+                              terminate_cpu_pool, check_if_string_value_is_valid_video_timestamp, find_frame_numbers_from_time_stamp)
 from simba.utils.enums import ConfigKey, Dtypes, Options, TagNames, TextOptions
-from simba.utils.errors import (InvalidInputError, NoDataError,
-                                NoSpecifiedOutputError)
-from simba.utils.lookups import get_current_time
-from simba.utils.printing import SimbaTimer, log_event, stdout_success
+from simba.utils.errors import (InvalidInputError, NoDataError,NoSpecifiedOutputError)
+from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory,
                                     find_all_videos_in_project, find_core_cnt,
                                     get_fn_ext, get_video_meta_data,
-                                    read_config_entry, read_df)
+                                    read_config_entry, read_df, seconds_to_timestamp)
 from simba.utils.warnings import FrameRangeWarning
+
+
+START_TIME, END_TIME = 'start_time', 'end_time'
 
 
 def _multiprocess_sklearn_video(data: pd.DataFrame,
@@ -150,7 +151,8 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                 frame_save_name = os.path.join(frame_save_dir, f"{current_frm}.png")
                 cv2.imwrite(frame_save_name, img)
             current_frm += 1
-            if verbose: print(f"[{get_current_time()}] Multi-processing video frame {current_frm}/{video_meta_data['frame_count']} (core batch: {batch}, video name: {video_meta_data['video_name']})...")
+            time = seconds_to_timestamp(seconds= current_frm/ video_meta_data['fps'])
+            if verbose: stdout_information(msg=f"Multi-processing video frame {current_frm} (time-stamp: {time}, core batch: {batch}, video name: {video_meta_data['video_name']})...")
         else:
             FrameRangeWarning(msg=f'Could not read frame {current_frm} in video {video_path}. Stopping video creation.')
             break
@@ -242,6 +244,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                  pose_palette: Optional[str] = 'Set1',
                  print_timers: bool = True,
                  show_bbox: bool = False,
+                 time_slice: Optional[Dict[str, str]] = None,
                  show_gantt: Optional[int] = None,
                  text_clr: Tuple[int, int, int] = (255, 255, 255),
                  text_bg_clr: Tuple[int, int, int] = (0, 0, 0),
@@ -270,14 +273,20 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         check_if_valid_rgb_tuple(data=text_clr, source=f'{self.__class__.__name__} text_clr')
         check_if_valid_rgb_tuple(data=text_bg_clr, source=f'{self.__class__.__name__} text_bg_clr')
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose', raise_error=True)
-        if show_gantt is not None:
-            check_int(name=f"{self.__class__.__name__} show_gantt", value=show_gantt, max_value=2, min_value=1)
+        if show_gantt is not None: check_int(name=f"{self.__class__.__name__} show_gantt", value=show_gantt, max_value=2, min_value=1)
+        if time_slice is not None:
+            check_valid_dict(x=time_slice, valid_key_dtypes=(str,), valid_values_dtypes=(str,), valid_keys=(START_TIME, END_TIME), required_keys=(START_TIME, END_TIME),)
+            check_if_string_value_is_valid_video_timestamp(value=time_slice[START_TIME], name='START TIME', raise_error=True)
+            check_if_string_value_is_valid_video_timestamp(value=time_slice[END_TIME], name='END TIME', raise_error=True)
+            check_that_hhmmss_start_is_before_end(start_time=time_slice[START_TIME], end_time=time_slice[END_TIME], name=f'TIME SLICE', raise_error=True)
+
         self.video_setting, self.frame_setting, self.rotate, self.print_timers = video_setting, frame_setting, rotate, print_timers
         self.circle_size, self.font_size, self.animal_names, self.text_opacity = circle_size, font_size, animal_names, text_opacity
         self.text_thickness, self.space_size, self.show_pose, self.pose_palette, self.verbose = text_thickness, space_size, show_pose, pose_palette, verbose
         self.text_color, self.text_bg_color, self.show_bbox, self.show_gantt, self.show_confidence = text_clr, text_bg_clr, show_bbox, show_gantt, show_confidence
         self.gpu = True if check_nvidea_gpu_available() and gpu else False
         self.pose_threshold = read_config_entry(self.config, ConfigKey.THRESHOLD_SETTINGS.value, ConfigKey.SKLEARN_BP_PROB_THRESH.value, Dtypes.FLOAT.value, 0.00)
+        self.time_slice = time_slice
         if not os.path.exists(self.sklearn_plot_dir):
             os.makedirs(self.sklearn_plot_dir)
         if isinstance(video_paths, str): self.video_paths = [video_paths]
@@ -310,17 +319,22 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         self.video_text_opacity = 0.8 if self.text_opacity is None else float(self.text_opacity)
 
     def run(self):
-        if self.verbose: print(f'Creating {len(self.video_paths)} classification visualization(s) using {self.core_cnt} cores... ({get_current_time()})')
+        if self.verbose: stdout_information(msg=f'Creating {len(self.video_paths)} classification visualization(s) using {self.core_cnt} cores...')
         self.pool = get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__, )
         for video_cnt, video_path in enumerate(self.video_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(video_path)
-            if self.verbose: print(f"[{get_current_time()}] Creating classification visualization for video {self.video_name}...")
+            if self.verbose: stdout_information(msg=f"Creating classification visualization for video {self.video_name}...")
             self.data_path = os.path.join(self.machine_results_dir, f'{self.video_name}.{self.file_type}')
             self.data_df = read_df(self.data_path, self.file_type).reset_index(drop=True).fillna(0)
             if self.show_pose: check_that_column_exist(df=self.data_df, column_name=self.bp_col_names, file_name=self.data_path)
             if self.show_confidence: check_that_column_exist(df=self.data_df, column_name=self.conf_cols, file_name=self.data_path)
             self.video_meta_data = get_video_meta_data(video_path=video_path)
+            if self.time_slice is not None:
+                check_if_string_value_is_valid_video_timestamp(value=self.time_slice[START_TIME], name=f'START TIME {START_TIME}')
+                check_if_string_value_is_valid_video_timestamp(value=self.time_slice[END_TIME], name=f'END TIME {END_TIME}')
+                frm_ids = find_frame_numbers_from_time_stamp(start_time=self.time_slice[START_TIME], end_time=self.time_slice[END_TIME], fps=int(self.video_meta_data['fps']))
+                self.data_df = self.data_df.loc[frm_ids]
             height, width = deepcopy(self.video_meta_data["height"]), deepcopy(self.video_meta_data["width"])
             self.save_path = os.path.join(self.sklearn_plot_dir, f"{self.video_name}.mp4")
             self.video_frame_dir, self.video_temp_dir = None, None
@@ -333,7 +347,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                 create_directory(paths=self.video_temp_dir, overwrite=True)
             if self.rotate:
                 self.video_meta_data["height"], self.video_meta_data["width"] = (width, height)
-            check_video_and_data_frm_count_align(video=video_path, data=self.data_df, name=self.video_name, raise_error=False)
+            if self.time_slice is None: check_video_and_data_frm_count_align(video=video_path, data=self.data_df, name=self.video_name, raise_error=False)
             check_that_column_exist(df=self.data_df, column_name=self.clf_names, file_name=self.data_path)
             self.__get_print_settings()
             if self.show_gantt is not None:
@@ -385,15 +399,15 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                                           verbose=self.verbose)
 
             for cnt, result in enumerate(self.pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
-                if self.verbose: print(f"[{get_current_time()}] Image batch {result} complete, Video {(video_cnt + 1)}/{len(self.video_paths)}...")
+                if self.verbose: stdout_information(f"Image batch {result} complete, Video {(video_cnt + 1)}/{len(self.video_paths)}...")
 
             if self.video_setting:
-                if self.verbose: print(f"Joining {self.video_name} multiprocessed video...")
+                if self.verbose: stdout_information(msg=f"Joining {self.video_name} multiprocessed video...")
                 concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.video_save_path, gpu=self.gpu, verbose=self.verbose)
                 video_timer.stop_timer()
-                print(f"Video {self.video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)...")
+                stdout_information(msg=f"Video {self.video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)...")
 
-        terminate_cpu_pool(pool=self.pool, force=False)
+        terminate_cpu_pool(pool=self.pool, force=False, source=self.__class__.__name__)
         self.timer.stop_timer()
         if self.video_setting:
             stdout_success(msg=f"{len(self.video_paths)} video(s) saved in {self.sklearn_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)

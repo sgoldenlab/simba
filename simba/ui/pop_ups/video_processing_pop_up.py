@@ -45,7 +45,7 @@ from simba.utils.errors import (CountError, DuplicationError,
 from simba.utils.lookups import (get_color_dict, get_ffmpeg_crossfade_methods,
                                  get_fonts, get_monitor_info,
                                  percent_to_crf_lookup, quality_pct_to_crf)
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     concatenate_videos_in_folder, find_all_videos_in_directory, find_core_cnt,
@@ -3033,18 +3033,18 @@ class BackgroundRemoverSingleVideoPopUp(PopUpMixin):
         self.foreground_clr_options = list(self.clr_dict.keys())
         self.foreground_clr_options.append('Original')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.video_path = FileSelect(settings_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=45, lbl_icon='video_2')
-        self.bg_video_path = FileSelect(settings_frm, "BACKGROUND REFERENCE VIDEO PATH (OPTIONAL):", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=45, lbl_icon='video_2')
+        self.video_path = FileSelect(settings_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=45, lbl_icon='video_2', tooltip_key='BG_REMOVE_VIDEO_PATH')
+        self.bg_video_path = FileSelect(settings_frm, "BACKGROUND REFERENCE VIDEO PATH (OPTIONAL):", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=45, lbl_icon='video_2', tooltip_key='BG_REMOVE_BG_REFERENCE_VIDEO_PATH')
 
-        self.bg_clr_dropdown = SimBADropDown(parent=settings_frm, label="BACKGROUND COLOR:", dropdown_options=list(self.clr_dict.keys()), label_width=45, value='White', img='fill')
-        self.fg_clr_dropdown = SimBADropDown(parent=settings_frm, label="FOREGROUND COLOR:", dropdown_options=self.foreground_clr_options, label_width=45, value='Original', img='mouse_head')
-        self.bg_threshold_dropdown = SimBADropDown(parent=settings_frm, label="BACKGROUND THRESHOLD:", dropdown_options=list(range(1, 100)), label_width=45, value=30, img='threshold')
-        self.bg_start_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO START (FRAME # OR TIME):', img='play', value='00:00:00', status=DISABLED)
-        self.bg_end_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO END (FRAME # OR TIME):', img='stop', value='00:00:20', status=DISABLED)
+        self.bg_clr_dropdown = SimBADropDown(parent=settings_frm, label="BACKGROUND COLOR:", dropdown_options=list(self.clr_dict.keys()), label_width=45, value='White', img='fill', tooltip_key='BG_REMOVE_BACKGROUND_COLOR')
+        self.fg_clr_dropdown = SimBADropDown(parent=settings_frm, label="FOREGROUND COLOR:", dropdown_options=self.foreground_clr_options, label_width=45, value='Original', img='mouse_head', tooltip_key='BG_REMOVE_FOREGROUND_COLOR')
+        self.bg_threshold_dropdown = SimBADropDown(parent=settings_frm, label="BACKGROUND THRESHOLD:", dropdown_options=list(range(1, 100)), label_width=45, value=30, img='threshold', tooltip_key='BG_REMOVE_BACKGROUND_THRESHOLD')
+        self.bg_start_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO START (FRAME # OR TIME):', img='play', value='00:00:00', status=DISABLED, tooltip_key='BG_REMOVE_BG_START')
+        self.bg_end_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO END (FRAME # OR TIME):', img='stop', value='00:00:20', status=DISABLED, tooltip_key='BG_REMOVE_BG_END')
 
 
-        self.multiprocess_dropdown = SimBADropDown(parent=settings_frm, label="CPU CORE COUNT:", dropdown_options=list(range(1, find_core_cnt()[0]+1)), label_width=45, value=int(find_core_cnt()[0]/2), img='cpu_small')
-        self.entire_video_as_bg_cb, self.entire_video_as_bg_var = SimbaCheckbox(parent=settings_frm, txt="COMPUTE BACKGROUND FROM ENTIRE VIDEO", font=Formats.FONT_REGULAR.value, val=True, cmd=lambda: self.enable_entrybox_from_checkbox(check_box_var=self.entire_video_as_bg_var, entry_boxes=[self.bg_start_eb, self.bg_end_eb], reverse=True))
+        self.multiprocess_dropdown = SimBADropDown(parent=settings_frm, label="CPU CORE COUNT:", dropdown_options=list(range(1, find_core_cnt()[0]+1)), label_width=45, value=int(find_core_cnt()[0]/2), img='cpu_small', tooltip_key='BG_REMOVE_CPU_CORE_COUNT')
+        self.entire_video_as_bg_cb, self.entire_video_as_bg_var = SimbaCheckbox(parent=settings_frm, txt="COMPUTE BACKGROUND FROM ENTIRE VIDEO", font=Formats.FONT_REGULAR.value, val=True, cmd=lambda: self.enable_entrybox_from_checkbox(check_box_var=self.entire_video_as_bg_var, entry_boxes=[self.bg_start_eb, self.bg_end_eb], reverse=True), tooltip_key='BG_REMOVE_ENTIRE_VIDEO_AS_BG')
 
 
         settings_frm.grid(row=0, column=0, sticky=NW)
@@ -3101,7 +3101,7 @@ class BackgroundRemoverSingleVideoPopUp(PopUpMixin):
             bg_start_time, bg_end_time = None, None
 
 
-        print(f'Running background subtraction for video {video_meta_data["video_name"]}...')
+        stdout_information(msg=f'Running background subtraction for video {video_meta_data["video_name"]}...', source=self.__class__.__name__)
         if core_cnt == 1:
             video_bg_subtraction(video_path=video_path,
                                  bg_video_path=bg_video,
