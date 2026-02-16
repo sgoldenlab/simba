@@ -12,6 +12,13 @@ BORIS
    :members:
    :show-inheritance:
 
+BORIS source cleaner
+-----------------------------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.boris_source_cleaner.BorisSourceCleaner
+   :members:
+   :show-inheritance:
+
 Deepethogram
 ------------------------------------------------------------------
 
@@ -40,10 +47,24 @@ Solomon coder
    :members:
    :show-inheritance:
 
+Shah appender
+-------------------------------------------------------------
+
+.. automodule:: simba.third_party_label_appenders.shah_appender
+   :members:
+   :show-inheritance:
+
 Generic third-party appender tool
 ------------------------------------------------------------------
 
 .. automodule:: simba.third_party_label_appenders.third_party_appender
+   :members:
+   :show-inheritance:
+
+Third-party annotation tools
+------------------------------------------------------------------
+
+.. automodule:: simba.third_party_label_appenders.tools
    :members:
    :show-inheritance:
 
@@ -96,10 +117,34 @@ DeepLabCut predictions -> YOLO pose-estimation annotations
    :show-inheritance:
 
 
+Multi-animal DeepLabCut -> YOLO pose-estimation annotations
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.dlc_multi_to_yolo.MultiDLC2Yolo
+   :members:
+   :show-inheritance:
+
+
+DeepLabCut single-to-multi-animal format converter
+---------------------------------------
+
+.. automodule:: simba.third_party_label_appenders.transform.dlc_single_to_multi_format_converter
+   :members:
+   :show-inheritance:
+
+
 DeepLabCut annotations -> Labelme annotations
 ---------------------------------------
 
 .. autoclass:: simba.third_party_label_appenders.transform.dlc_to_labelme.DLC2Labelme
+   :members:
+   :show-inheritance:
+
+
+Labelme annotations -> DeepLabCut annotations
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.labelme_to_dlc.Labelme2DLC
    :members:
    :show-inheritance:
 

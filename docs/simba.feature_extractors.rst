@@ -126,8 +126,37 @@ Aggression feature extractor (11/25)
    :show-inheritance:
    :undoc-members:
 
+AMBER pipeline feature extractor
+-----------------------------------------------
 
+.. autoclass:: simba.feature_extractors.amber_feature_extractor.AmberFeatureExtractor
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
+Boundary rearing feature extractor
+-----------------------------------------------
+
+.. autoclass:: simba.feature_extractors.boundary_rearing_analyzer.BoundaryRearingFeaturizer
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Riptortus pedestris feature extractor
+-----------------------------------------------
+
+.. autoclass:: simba.feature_extractors.riptortus_featurizer.RiptortusFeaturizer
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Custom feature extractor
+-----------------------------------------------
+
+.. autoclass:: simba.utils.custom_feature_extractor.CustomFeatureExtractor
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
 
 

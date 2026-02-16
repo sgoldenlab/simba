@@ -14,6 +14,7 @@ import pickle
 import platform
 import re
 import shutil
+import stat
 import subprocess
 import webbrowser
 from ast import literal_eval
@@ -575,7 +576,18 @@ def get_video_info_ffmpeg(video_path: Union[str, os.PathLike]) -> Dict[str, Any]
 def remove_a_folder(folder_dir: Union[str, os.PathLike],
                     ignore_errors: Optional[bool] = True,
                     verbose: bool = False) -> None:
-    """Helper to remove a directory"""
+
+    """Helper to remove a directory. """
+    def _handle_remove_readonly(func, path, exc_info):
+        """Clear readonly bit and retry; otherwise respect ignore_errors."""
+        if not os.access(path, os.W_OK):
+            os.chmod(path, stat.S_IWUSR)
+            func(path)
+        elif ignore_errors:
+            pass
+        else:
+            raise exc_info[1].with_traceback(exc_info[2])
+
     valid_dir = check_if_dir_exists(in_dir=folder_dir, source=remove_a_folder.__name__, raise_error=False)
     if not valid_dir and not ignore_errors:
         raise NotDirectoryError(msg=f'Cannot delete directory {folder_dir}: The directory does not exist', source=remove_a_folder.__name__)
@@ -583,7 +595,7 @@ def remove_a_folder(folder_dir: Union[str, os.PathLike],
         return
     try:
         if verbose: stdout_information(msg=f'Removing directory {folder_dir}...')
-        shutil.rmtree(folder_dir, ignore_errors=ignore_errors)
+        shutil.rmtree(folder_dir, onerror=_handle_remove_readonly)
     except Exception as e:
         raise PermissionError(msg=f'Could not delete directory: {folder_dir}. is the directory or its content beeing used by anothe process?', source=remove_a_folder.__name__)
 

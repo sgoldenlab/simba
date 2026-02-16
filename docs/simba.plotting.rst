@@ -58,7 +58,14 @@ Circular diffusion plotting
 Classifier validation
 ------------------------------------
 
-.. automodule:: simba.plotting.clf_validator.ClassifierValidationClips.ClassifierValidationClipsMultiprocess
+.. automodule:: simba.plotting.clf_validator.ClassifierValidationClips
+   :members:
+   :show-inheritance:
+
+Classifier validation - multiprocess
+----------------------------------------
+
+.. automodule:: simba.plotting.clf_validator_mp.ClassifierValidationClipsMultiprocess
    :members:
    :show-inheritance:
 

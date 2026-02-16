@@ -118,6 +118,53 @@ Movement time-bins calculator
    :members:
    :undoc-members:
 
+Movement time-bins calculator (multiprocess)
+------------------------------------------------------------
+
+.. autoclass:: simba.data_processors.timebins_movement_calculator_mp.TimeBinsMovementCalculatorMultiprocess
+   :members:
+   :undoc-members:
+
+Aggregate classifier statistics (multiprocess)
+------------------------------------------------------------
+
+.. autoclass:: simba.data_processors.agg_clf_counter_mp.AggregateClfCalculatorMultiprocess
+   :members:
+   :undoc-members:
+
+Directing-animal-to-bodypart calculator
+------------------------------------------------------------
+
+.. automodule:: simba.data_processors.directing_animal_to_bodypart
+   :members:
+   :undoc-members:
+
+Severity bout-based calculator
+------------------------------------------------------------
+
+.. automodule:: simba.data_processors.severity_bout_based_calculator
+   :members:
+   :undoc-members:
+
+Severity frame-based calculator
+------------------------------------------------------------
+
+.. automodule:: simba.data_processors.severity_frame_based_calculator
+   :members:
+   :undoc-members:
+
+YOLO track cleaner
+------------------------------------------------------------
+
+.. autoclass:: simba.data_processors.yolo_track_cleaner.YoloTrackCleaner
+   :members:
+   :undoc-members:
+
+SHAP log (GPU)
+------------------------------------------------------------
+
+.. autofunction:: simba.data_processors.cuda.create_shap_log.create_shap_log
+
 
 Mutual exclusivity refactorer
 ------------------------------------------------------------

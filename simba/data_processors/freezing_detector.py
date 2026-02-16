@@ -28,6 +28,12 @@ class FreezingDetector(ConfigReader):
     of key body parts (nape, nose, and tail-base) and identifying periods where movement falls below
     a specified threshold for a minimum duration.
 
+
+    .. video:: _static/img/FreezingDetector.webm
+       :width: 1000
+       :autoplay:
+       :loop:
+
     .. important::
         Freezing is detected as `present` when **the velocity (computed from the mean movement of the nape, nose, and tail-base body-parts) falls below
         the movement threshold for the duration (and longer) of the specified time-window**.
@@ -69,7 +75,7 @@ class FreezingDetector(ConfigReader):
     def __init__(self,
                  config_path: Union[str, os.PathLike],
                  nose_name: str = 'nose',
-                 left_ear_name: str = 'Left_ear',
+                 left_ear_name: str = 'left_ear',
                  right_ear_name: str = 'right_ear',
                  tail_base_name: str = 'tail_base',
                  data_dir: Optional[Union[str, os.PathLike]] = None,
@@ -77,6 +83,7 @@ class FreezingDetector(ConfigReader):
                  movement_threshold: int = 5,
                  shortest_bout: int = 100,
                  save_dir: Optional[Union[str, os.PathLike]] = None):
+
         for bp_name in [nose_name, left_ear_name, right_ear_name, tail_base_name]: check_str(name='body part name', value=bp_name, allow_blank=False)
         ConfigReader.__init__(self, config_path=config_path, read_video_info=True, create_logger=False)
         if data_dir is not None:
@@ -143,11 +150,18 @@ class FreezingDetector(ConfigReader):
                 df[FREEZING] = 0
                 freezing_idx = []
             df.to_csv(save_file_path)
-            #print(video_name, len(freezing_idx), round(len(freezing_idx) / fps, 4), df[FREEZING].sum())
             agg_results.loc[len(agg_results)] = [video_name, len(freezing_idx), round(len(freezing_idx) / fps, 4), len(bouts), round((len(freezing_idx) / len(df)) * 100, 4), len(df), round(len(df)/fps, 2) ]
         agg_results.to_csv(agg_results_path)
         self.timer.stop_timer(); stdout_success(msg=f'Results saved in {self.save_dir} directory.', elapsed_time=self.timer.elapsed_time_str)
 
+
+# FreezingDetector(
+#     data_dir=r'E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\csv\outlier_corrected_movement_location',
+#     config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",
+#     time_window=3,
+#     movement_threshold=5,
+#     shortest_bout=100
+# ).run()
 
 
 # FreezingDetector(

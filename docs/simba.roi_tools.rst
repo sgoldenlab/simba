@@ -57,6 +57,13 @@ ROI Time-Bin Calculator
    :members:
    :show-inheritance:
 
+ROI Time-Bin Calculator (Legacy)
+--------------------------------
+
+.. autoclass:: simba.roi_tools.ROI_time_bin_calculator.ROITimebinCalculator
+   :members:
+   :show-inheritance:
+
 ROI Size Standardizer
 ---------------------
 
@@ -147,6 +154,20 @@ ROI Polygon Selector
 --------------------
 
 .. automodule:: simba.roi_tools.roi_selector_polygon_tkinter
+   :members:
+   :show-inheritance:
+
+ROI Rectangle Selector (Tkinter)
+--------------------------------
+
+.. autoclass:: simba.roi_tools.roi_selector_rectangle_tkinter.ROISelector
+   :members:
+   :show-inheritance:
+
+ROI Interactive Bufferer
+-------------------------
+
+.. autoclass:: simba.roi_tools.interactive_roi_bufferer.InteractiveROIBufferer
    :members:
    :show-inheritance:
 

@@ -80,4 +80,17 @@ Regression - fit and transform
    :members:
    :show-inheritance:
 
+SAM2 segmentation inference
+-------------------------------------------------
+
+.. autoclass:: simba.model.sam_inference.SamInference
+   :members:
+   :undoc-members:
+
+Fit YOLO model
+-------------------------------------------------
+
+.. autoclass:: simba.model.yolo_fit.FitYolo
+   :members:
+   :undoc-members:
 

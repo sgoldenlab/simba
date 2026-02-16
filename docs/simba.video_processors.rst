@@ -23,6 +23,13 @@ Extract frames
    :members:
    :show-inheritance:
 
+Videos to frames
+----------------------------------------------
+
+.. automodule:: simba.video_processors.videos_to_frames
+   :members:
+   :show-inheritance:
+
 Extract .SEQ frames
 -------------------------------------------------
 

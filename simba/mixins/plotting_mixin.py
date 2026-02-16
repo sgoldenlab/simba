@@ -366,7 +366,7 @@ class PlottingMixin(object):
         fig, ax = plt.subplots()
         fig.patch.set_facecolor('white')
         
-        plt.title(video_name, fontsize=font_size + 6, pad=25, fontweight='bold')
+        plt.title(video_name, fontsize=font_size + 2, pad=25, fontweight='bold')
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
         ax.spines['left'].set_color('#666666')

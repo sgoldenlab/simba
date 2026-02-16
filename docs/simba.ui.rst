@@ -14,6 +14,14 @@ Set machine learning hyperparameters UI
    :undoc-members:
    :show-inheritance:
 
+SimBA ML settings frame
+--------------------------------------------
+
+.. automodule:: simba.ui.ml_settings_frm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 SimBA tkinter methods
 ----------------------------------
 
@@ -34,6 +42,38 @@ SimBA set video info UI
 -------------------------------
 
 .. automodule:: simba.ui.video_info_ui
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SimBA video timelapse
+-------------------------------
+
+.. automodule:: simba.ui.video_timelaps
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SimBA import pose frame
+-------------------------------
+
+.. automodule:: simba.ui.import_pose_frame
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SimBA import videos frame
+-------------------------------
+
+.. automodule:: simba.ui.import_videos_frame
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SimBA batch process menus
+-------------------------------
+
+.. automodule:: simba.video_processors.batch_process_menus
    :members:
    :undoc-members:
    :show-inheritance:
