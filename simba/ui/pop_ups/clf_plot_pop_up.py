@@ -13,7 +13,10 @@ from simba.plotting.plot_clf_results_mp import PlotSklearnResultsMultiProcess
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         FileSelect, SimbaButton, SimbaCheckbox,
                                         SimBADropDown, SimBALabel)
-from simba.utils.checks import check_float, check_nvidea_gpu_available, check_that_hhmmss_start_is_before_end, check_if_string_value_is_valid_video_timestamp
+from simba.utils.checks import (check_float,
+                                check_if_string_value_is_valid_video_timestamp,
+                                check_nvidea_gpu_available,
+                                check_that_hhmmss_start_is_before_end)
 from simba.utils.enums import Formats, Links, Options
 from simba.utils.errors import NoFilesFoundError, NoSpecifiedOutputError
 from simba.utils.lookups import get_color_dict
