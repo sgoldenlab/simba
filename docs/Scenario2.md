@@ -392,6 +392,9 @@ The **Visualize classifications** dialog offers the following options:
 | **TEXT COLOR** | Color of the behavior name text (e.g. White, Red). |
 | **TEXT BACKGROUND COLOR** | Color of the box behind the text. Helps labels stand out on busy frames. |
 | **TRACKING COLOR PALETTE** | Color scheme for pose dots (one color per animal). Options include Set1, Set2, etc. |
+| **PLOT SPECIFIC TIME SEGMENT** | If checked, only the segment between START TIME and END TIME is visualized. Uncheck to process the entire video. |
+| **START TIME (HH:MM:SS)** | Start of the time segment to plot. Used when PLOT SPECIFIC TIME SEGMENT is checked. |
+| **END TIME (HH:MM:SS)** | End of the time segment to plot. Must be after START TIME. Used when PLOT SPECIFIC TIME SEGMENT is checked. |
 | **CPU CORES** | Number of CPU cores for parallel processing when creating multiple videos. |
 | **USE GPU** | If TRUE and a compatible GPU is available, use it to speed up video creation. |
 | **SHOW GANTT PLOT** | **NO GANTT** = no bar chart. **Static Gantt (final frame, faster)** = one bar chart at the end. **Dynamic Gantt (updated per frame)** = bar chart updates as the video plays. |
@@ -403,6 +406,7 @@ The **Visualize classifications** dialog offers the following options:
 | **SHOW ANIMAL NAME(S)** | If checked, displays labels like "Animal_1" so you can tell animals apart. |
 | **SHOW ANIMAL BOUNDING BOXES** | If checked, draws a box around each animal. Helps see location and overlap. |
 | **SHOW CLASSIFICATION PROBABILITY** | If checked, displays the model's confidence (0–100%) for the predicted behavior on each frame. |
+| **VIDEO** (Single Video) | Dropdown to select which video to create when using <kbd>Create single video</kbd>. You can also browse to pick a video file directly. |
 
 **SINGLE VIDEO** — Select one video from the dropdown (or use the file browser) and click <kbd>Create single video</kbd>. **MULTIPLE VIDEOS** — Click <kbd>Create multiple videos</kbd> to process all videos that have classification results.
 

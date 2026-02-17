@@ -143,7 +143,7 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
             add_spacer += 1
             for clf_name in clf_cumsum.keys():
                 if data.loc[current_frm, clf_name] == 1:
-                    img = PlottingMixin().put_text(img=img, text=clf_name, pos=(TextOptions.BORDER_BUFFER_Y.value, (video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer), font_size=font_size, font_thickness=text_thickness, font=font, text_color=TextOptions.COLOR.value, text_bg_alpha=text_opacity)
+                    img = PlottingMixin().put_text(img=img, text=clf_name, pos=(TextOptions.BORDER_BUFFER_Y.value, (video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer), font_size=font_size, font_thickness=text_thickness, font=font, text_color=TextOptions.FLAMINGO.value, text_bg_alpha=text_opacity)
                     add_spacer += 1
             if video_setting:
                 video_writer.write(img.astype(np.uint8))

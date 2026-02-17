@@ -14,15 +14,12 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.statistics_mixin import Statistics
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log,
-    check_if_filepath_list_is_empty)
-from simba.utils.read_write import (SimbaTimer, get_fn_ext, read_df,
-                                    stdout_success, write_df)
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_if_filepath_list_is_empty)
+from simba.utils.read_write import (SimbaTimer, get_fn_ext, read_df, stdout_success, write_df, stdout_information)
 
 NOSE = 'nose'
-LEFT_SIDE = 'left_side'
-RIGHT_SIDE = 'right_side'
+LEFT_SIDE = 'lat_left'
+RIGHT_SIDE = 'lat_right'
 LEFT_EAR = 'left_ear'
 RIGHT_EAR = 'right_ear'
 CENTER = 'center'
@@ -43,6 +40,18 @@ class MitraFeatureExtractor(ConfigReader,
     .. image:: _static/GerbilFeaturizer.webp
        :width: 500
        :align: center
+
+
+    .. video:: _static/img/MitraFeatureExtractor.webm
+       :width: 1000
+       :autoplay:
+       :loop:
+
+
+    .. video:: _static/img/MitraFeatureExtractor_2.webm
+       :width: 1000
+       :autoplay:
+       :loop:
 
     :param Union[str, os.PathLike] config_path: Path to SimBA project_config.ini.
     :return: None. Featurized pose-estimation data is saved in the simba project `project_folder/csv/features_extracted` directory.
@@ -70,7 +79,7 @@ class MitraFeatureExtractor(ConfigReader,
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(filepath=file_path)
             save_path = os.path.join(self.features_dir, video_name + f'.{self.file_type}')
-            print(f'Featurizing video {video_name} ...(Video {file_cnt+1}/{len(self.outlier_corrected_paths)})')
+            stdout_information(msg=f'Featurizing video {video_name} ...(Video {file_cnt+1}/{len(self.outlier_corrected_paths)})')
             _, px_per_mm, fps = self.read_video_info(video_name=video_name)
             shifted_ =  df.shift(periods=1).combine_first(df)
             nose_arr = df[[f'{NOSE}_x', f'{NOSE}_y']].values.astype(np.float32)
@@ -93,7 +102,7 @@ class MitraFeatureExtractor(ConfigReader,
             direction_degrees = CircularStatisticsMixin().direction_three_bps(nose_loc=nose_arr, left_ear_loc=left_ear_arr, right_ear_loc=right_ear_arr).astype(np.float32)
 
             # GEOMETRY FEATURES
-            print('Compute geometry features...')
+            stdout_information(msg='Compute geometry features...')
             results['GEOMETRY_FRAME_HULL_LENGTH'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=nose_arr.astype(np.float64), location_2=tailbase_arr.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
             results['GEOMETRY_FRAME_HULL_WIDTH'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=lat_left_arr.astype(np.float64), location_2=lat_right_arr.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
             results['GEOMETRY_FRAME_HULL_AREA'] = (jitted_hull(points=animal_hull_arr, target='area') / px_per_mm).astype(np.int32)
@@ -130,7 +139,7 @@ class MitraFeatureExtractor(ConfigReader,
             results = pd.concat([results, upper_lower_body_size_correlations, hull_head_correlations, hull_tail_length_correlations, left_body_right_body_correlations], axis=1)
 
             # CIRCULAR FEATURES
-            print('Compute circular features...')
+            stdout_information(msg='Compute circular features...')
             results['CIRCULAR_FRAME_HULL_3POINT_ANGLE'] = FeatureExtractionMixin.angle3pt_vectorized(data=np.hstack([nose_arr, center_arr, tailbase_arr]))
             results['CIRCULAR_FRAME_TAIL_3POINT_ANGLE'] = FeatureExtractionMixin.angle3pt_vectorized(data=np.hstack([tailbase_arr, tail_center_arr, tail_tip_arr]))
             results['CIRCULAR_FRAME_HEAD_3POINT_ANGLE'] = FeatureExtractionMixin.angle3pt_vectorized(data=np.hstack([left_ear_arr, nose_arr, right_ear_arr]))
@@ -145,7 +154,7 @@ class MitraFeatureExtractor(ConfigReader,
             results = pd.concat([results, angular_difference, rao_spacing, circular_range, circular_std, head_hull_angular_corr, hull_tail_angular_corr, mean_resultant_vector_length], axis=1)
 
             # MOVEMENT FEATURES
-            print('Compute movement features...')
+            stdout_information(msg='Compute movement features...')
             results['MOVEMENT_FRAME_NOSE'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=nose_arr.astype(np.float64), location_2=shifted_[[f'{NOSE}_x', f'{NOSE}_y']].values.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
             results['MOVEMENT_FRAME_CENTER'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=center_arr.astype(np.float64), location_2=shifted_[[f'{CENTER}_x', f'{CENTER}_y']].values.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
             results['MOVEMENT_FRAME_TAILBASE'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=tailbase_arr.astype(np.float64), location_2=shifted_[[f'{TAIL_BASE}_x', f'{TAIL_BASE}_y']].values.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
@@ -182,14 +191,14 @@ class MitraFeatureExtractor(ConfigReader,
                 results[f'MOVEMENT_SUM_{time}_{bp.upper()}'] = results[f'MOVEMENT_FRAME_{bp.upper()}'].rolling(int(time * fps), min_periods=1).sum()
 
             # POSE CONFIDENCE FEATURES
-            print('Compute probability features...')
+            stdout_information(msg='Compute probability features...')
             p_df = pd.DataFrame(FeatureExtractionMixin.count_values_in_range(data=p_arr, ranges=np.array([[0.0, 0.25], [0.25, 0.50], [0.50, 0.75], [0.75, 1.0]])), columns=['PROBABILITIES_LOW_COUNT', 'PROBABILITIES_MEDIUM_LOW_COUNT', 'PROBABILITIES_MEDIUM_HIGHT', 'PROBABILITIES_HIGH_COUNT']).astype(np.int32)
             sliding_z_p_low = pd.DataFrame(Statistics.sliding_z_scores(data=p_df['PROBABILITIES_LOW_COUNT'].values.astype(np.float32), time_windows=TIME_WINDOWS, fps=int(fps)), columns=[f'PROBABILITIES_LOW_COUNT_SLIDING_Z_SCORE_250', f'PROBABILITIES_LOW_COUNT_SLIDING_Z_SCORE_500', f'PROBABILITIES_LOW_COUNT_SLIDING_Z_SCORE_1000', f'PROBABILITIES_LOW_COUNT_SLIDING_Z_SCORE_2000'])
             sliding_z_p_high = pd.DataFrame(Statistics.sliding_z_scores(data=p_df['PROBABILITIES_HIGH_COUNT'].values.astype(np.float32), time_windows=TIME_WINDOWS, fps=int(fps)), columns=[f'PROBABILITIES_HIGH_COUNT_SLIDING_Z_SCORE_250', f'PROBABILITIES_HIGH_COUNT_SLIDING_Z_SCORE_500', f'PROBABILITIES_HIGH_COUNT_SLIDING_Z_SCORE_1000', f'PROBABILITIES_HIGH_COUNT_SLIDING_Z_SCORE_2000'])
             results = pd.concat([df, results, p_df, sliding_z_p_low, sliding_z_p_high], axis=1).fillna(-1)
             self.save(df=results, save_path=save_path)
             video_timer.stop_timer()
-            print(f'Video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)...')
+            stdout_information(msg=f'Video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)...')
 
         self.timer.stop_timer()
         stdout_success(msg=f'Features extracted for {len(self.outlier_corrected_paths)} files(s)', elapsed_time=self.timer.elapsed_time_str)
@@ -207,8 +216,8 @@ class MitraFeatureExtractor(ConfigReader,
 
 
 
-feature_extractor = MitraFeatureExtractor(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini")
-feature_extractor.run()
+# feature_extractor = MitraFeatureExtractor(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini")
+# feature_extractor.run()
 
 
 

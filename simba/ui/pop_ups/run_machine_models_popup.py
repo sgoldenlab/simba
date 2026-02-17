@@ -33,10 +33,10 @@ class RunMachineModelsPopUp(PopUpMixin, ConfigReader):
         PopUpMixin.__init__(self, title="SET MODEL PARAMETERS", icon='equation_small')
         padx, self.config_path = (0, 25), config_path
         self.clf_table_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.SET_RUN_ML_PARAMETERS.value)
-        clf_header = SimBALabel(parent=self.clf_table_frm, txt="CLASSIFIER", font=Formats.FONT_HEADER.value, img='label')
-        mdl_path_header = SimBALabel(parent=self.clf_table_frm, txt="MODEL PATH (.SAV)", font=Formats.FONT_HEADER.value, img='file_type', justify='center')
-        threshold_header = SimBALabel(parent=self.clf_table_frm, txt="THRESHOLD (0.0 - 1.0)", font=Formats.FONT_HEADER.value, img='threshold', justify='center')
-        min_bout_header = SimBALabel(parent=self.clf_table_frm, txt="MINIMUM BOUT LENGTH (MS)", font=Formats.FONT_HEADER.value, img='timer_2', justify='center')
+        clf_header = SimBALabel(parent=self.clf_table_frm, txt="CLASSIFIER", font=Formats.FONT_HEADER.value, img='label', tooltip_key='RUN_ML_CLASSIFIER_HEADER')
+        mdl_path_header = SimBALabel(parent=self.clf_table_frm, txt="MODEL PATH (.SAV)", font=Formats.FONT_HEADER.value, img='file_type', justify='center', tooltip_key='RUN_ML_MODEL_PATH_HEADER')
+        threshold_header = SimBALabel(parent=self.clf_table_frm, txt="THRESHOLD (0.0 - 1.0)", font=Formats.FONT_HEADER.value, img='threshold', justify='center', tooltip_key='RUN_ML_THRESHOLD_HEADER')
+        min_bout_header = SimBALabel(parent=self.clf_table_frm, txt="MINIMUM BOUT LENGTH (MS)", font=Formats.FONT_HEADER.value, img='timer_2', justify='center', tooltip_key='RUN_ML_MIN_BOUT_HEADER')
         clf_header.grid(row=0, column=0, sticky=NW, padx=padx)
         mdl_path_header.grid(row=0, column=1, sticky=NW, padx=padx)
         threshold_header.grid(row=0, column=2, sticky=NW, padx=padx)
@@ -48,13 +48,13 @@ class RunMachineModelsPopUp(PopUpMixin, ConfigReader):
         self.clf_data = {}
         for clf_cnt, clf_name in enumerate(self.clf_names):
             self.clf_data[clf_name] = {}
-            SimBALabel(parent=self.clf_table_frm, txt=clf_name, font=Formats.FONT_REGULAR_ITALICS.value).grid(row=clf_cnt + 2, column=0, sticky=W, padx=padx)
+            SimBALabel(parent=self.clf_table_frm, txt=clf_name, font=Formats.FONT_REGULAR_ITALICS.value, tooltip_key='RUN_ML_CLASSIFIER_NAME').grid(row=clf_cnt + 2, column=0, sticky=W, padx=padx)
             mdl_path = read_config_entry(config=self.config, section=ConfigKey.SML_SETTINGS.value, option=f"model_path_{clf_cnt + 1}", default_value='Select model (.sav) file', data_type=Dtypes.STR.value)
             self.clf_data[clf_name][PATH] = FileSelect(self.clf_table_frm, title="Select model (.sav) file", initialdir=self.project_path, file_types=[("SimBA Classifier", "*.sav")], initial_path=mdl_path)
             threshold = read_config_entry(config=self.config, section=ConfigKey.THRESHOLD_SETTINGS.value, option=f"threshold_{clf_cnt + 1}", default_value='', data_type=Dtypes.STR.value)
-            self.clf_data[clf_name][THRESHOLD] = Entry_Box(parent=self.clf_table_frm, fileDescription='', labelwidth=0, entry_box_width=20, value=threshold, justify='center')
+            self.clf_data[clf_name][THRESHOLD] = Entry_Box(parent=self.clf_table_frm, fileDescription='', labelwidth=0, entry_box_width=20, value=threshold, justify='center', trace=self._check_eb_validity_float)
             bout_length = read_config_entry(config=self.config, section=ConfigKey.MIN_BOUT_LENGTH.value, option=f"min_bout_{clf_cnt + 1}", default_value='', data_type=Dtypes.STR.value)
-            self.clf_data[clf_name][MIN_BOUT] = Entry_Box(parent=self.clf_table_frm, fileDescription='', labelwidth=0, entry_box_width=20, value=bout_length, justify='center')
+            self.clf_data[clf_name][MIN_BOUT] = Entry_Box(parent=self.clf_table_frm, fileDescription='', labelwidth=0, entry_box_width=20, value=bout_length, justify='center', trace=self._check_eb_validity_int)
             self.clf_data[clf_name][PATH].grid(row=clf_cnt + 2, column=1, sticky=NW, padx=padx)
             self.clf_data[clf_name][THRESHOLD].grid(row=clf_cnt + 2, column=2, sticky=NW, padx=padx)
             self.clf_data[clf_name][MIN_BOUT].grid(row=clf_cnt + 2, column=3, sticky=NW, padx=padx)
@@ -64,6 +64,15 @@ class RunMachineModelsPopUp(PopUpMixin, ConfigReader):
         run_frm.grid(row=2, sticky=W, pady=5, padx=5)
         run_btn.grid(row=0, sticky=W, pady=5, padx=5)
         self.main_frm.mainloop()
+
+
+    def _check_eb_validity_float(self, entry_box: Entry_Box, valid_clr: str = 'palegreen', invalid_clr: str = 'white'):
+        valid_float = check_float(name=f'THRESHOLD', value=entry_box.entry_get, min_value=0.0, max_value=1.0, allow_negative=False, allow_zero=False, raise_error=False)[0]
+        entry_box.set_bg_clr(clr=valid_clr if valid_float else invalid_clr)
+
+    def _check_eb_validity_int(self, entry_box: Entry_Box, valid_clr: str = 'palegreen', invalid_clr: str = 'white'):
+        valid_int = check_int(name=f'MIN_BOUT', value=entry_box.entry_get, min_value=0, allow_negative=False, allow_zero=False, raise_error=False)[0]
+        entry_box.set_bg_clr(clr=valid_clr if valid_int else invalid_clr)
 
     def run(self):
         filtered_clf_data = {}
