@@ -20,10 +20,10 @@ from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_if_dir_exists, check_int,
     check_valid_boolean, check_valid_dataframe, check_valid_lst)
-from simba.utils.data import detect_bouts, terminate_cpu_pool
+from simba.utils.data import detect_bouts, terminate_cpu_pool, get_cpu_pool
 from simba.utils.enums import TagNames
 from simba.utils.errors import NoChoosenMeasurementError
-from simba.utils.printing import SimbaTimer, log_event, stdout_success
+from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
 from simba.utils.read_write import (find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     get_fn_ext, read_df, read_video_info)
@@ -40,7 +40,9 @@ FRAME_COUNT = 'Frame count'
 VIDEO_LENGTH = "Video length (s)"
 CLASSIFIER = "CLASSIFIER"
 MEASUREMENT = "MEASUREMENT"
-MEASUREMENT_NAMES = [FIRST_OCCURRENCE, EVENT_COUNT, TOTAL_EVENT_DURATION, MEAN_EVENT_DURATION, MEDIAN_EVENT_DURATION, MEAN_EVENT_INTERVAL, MEDIAN_EVENT_INTERVAL]
+PCT_OF_SESSION = 'Total event duration (% of session)'
+
+MEASUREMENT_NAMES = [FIRST_OCCURRENCE, EVENT_COUNT, TOTAL_EVENT_DURATION, MEAN_EVENT_DURATION, MEDIAN_EVENT_DURATION, MEAN_EVENT_INTERVAL, MEDIAN_EVENT_INTERVAL, PCT_OF_SESSION]
 
 
 def _agg_clf_helper(data: tuple,
@@ -55,7 +57,7 @@ def _agg_clf_helper(data: tuple,
     batch_bouts_df_lst, batch_results_df = [], pd.DataFrame()
     for file_cnt, file_path in enumerate(data_paths):
         _, file_name, _ = get_fn_ext(file_path)
-        if verbose: print(f"Analyzing classifier descriptive statistics for video {file_name} ({file_cnt + 1}/{len(data_paths)}, cpu core: {batch_id})...")
+        if verbose: stdout_information(msg=f"Analyzing classifier descriptive statistics for video {file_name} ({file_cnt + 1}/{len(data_paths)}, cpu core: {batch_id})...")
         _, _, fps = read_video_info(video_name=file_name, video_info_df=video_info_df)
         check_file_exist_and_readable(file_path)
         data_df = read_df(file_path, 'csv')
@@ -74,11 +76,14 @@ def _agg_clf_helper(data: tuple,
                 clf_results_dict[FIRST_OCCURRENCE] = round(clf_data["Start_time"].min(), 3)
                 clf_results_dict[EVENT_COUNT] = len(clf_data)
                 clf_results_dict[TOTAL_EVENT_DURATION] = round(clf_data["Bout_time"].sum(), 3)
+                clf_results_dict[PCT_OF_SESSION] = round(((round(clf_data["Bout_time"].sum(), 3) * fps) / len(data_df)) * 100, 3)
                 clf_results_dict[MEAN_EVENT_DURATION] = round(clf_data["Bout_time"].mean(), 3)
                 clf_results_dict[MEDIAN_EVENT_DURATION] = round(clf_data["Bout_time"].median(), 3)
             else:
                 clf_results_dict[FIRST_OCCURRENCE], clf_results_dict[EVENT_COUNT] = None, 0
-                clf_results_dict[TOTAL_EVENT_DURATION], clf_results_dict[MEAN_EVENT_DURATION] = 0, None
+                clf_results_dict[TOTAL_EVENT_DURATION] = 0
+                clf_results_dict[PCT_OF_SESSION] = 0
+                clf_results_dict[MEAN_EVENT_DURATION] = None
                 clf_results_dict[MEDIAN_EVENT_DURATION] = None
             if len(clf_data) > 1:
                 interval_df = clf_data[:-1].copy()
@@ -152,6 +157,7 @@ class AggregateClfCalculatorMultiprocess(ConfigReader):
                  median_event_duration: bool = True,
                  mean_interval_duration: bool = True,
                  median_interval_duration: bool = True,
+                 pct_of_session: bool = True,
                  frame_count: bool = False,
                  video_length: bool = False,
                  verbose: bool = True,
@@ -166,7 +172,7 @@ class AggregateClfCalculatorMultiprocess(ConfigReader):
             check_if_dir_exists(in_dir=data_dir)
         self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=[f'.{self.file_type}'], raise_error=True)
         self.measurements = []
-        for i, j in zip([first_occurrence, event_count, total_event_duration, mean_event_duration, median_event_duration, mean_interval_duration, median_interval_duration], MEASUREMENT_NAMES):
+        for i, j in zip([first_occurrence, event_count, total_event_duration, mean_event_duration, median_event_duration, mean_interval_duration, median_interval_duration, pct_of_session], MEASUREMENT_NAMES):
             check_valid_boolean(value=i, source=f'{self.__class__.__name__} {j}', raise_error=True)
             if i: self.measurements.append(j)
         check_valid_boolean(value=frame_count, source=f'{self.__class__.__name__} frame_count', raise_error=True)
@@ -174,7 +180,7 @@ class AggregateClfCalculatorMultiprocess(ConfigReader):
         check_valid_boolean(value=transpose, source=f'{self.__class__.__name__} transpose', raise_error=True)
         check_valid_boolean(value=detailed_bout_data, source=f'{self.__class__.__name__} detailed_bout_data', raise_error=True)
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose', raise_error=True)
-        if not any([first_occurrence, event_count, total_event_duration, mean_event_duration, median_event_duration, mean_interval_duration, median_interval_duration]):
+        if not any([first_occurrence, event_count, total_event_duration, mean_event_duration, median_event_duration, mean_interval_duration, median_interval_duration, pct_of_session]):
             raise NoChoosenMeasurementError(source=self.__class__.__name__)
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0], raise_error=True)
         self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
@@ -197,20 +203,20 @@ class AggregateClfCalculatorMultiprocess(ConfigReader):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.machine_results_paths)
         chunked_data_paths = [self.data_paths[i:i + ((len(self.data_paths) + self.core_cnt - 1) // self.core_cnt)] for i in range(0, len(self.data_paths), (len(self.data_paths) + self.core_cnt - 1) // self.core_cnt)]
         chunked_data_paths = [(i, x) for i, x in enumerate(chunked_data_paths)]
-        with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
-            constants = functools.partial(_agg_clf_helper,
-                                          frame_count=self.frame_count,
-                                          video_len=self.video_length,
-                                          verbose=self.verbose,
-                                          video_info_df=self.video_info_df,
-                                          clfs=self.clf_names,
-                                          detailed_bout_data=self.detailed_bout_data)
-            for cnt, (batch_id, batch_results_df, batch_bouts_df_lst) in enumerate(pool.map(constants, chunked_data_paths, chunksize=self.multiprocess_chunksize)):
-                self.results_df = pd.concat([self.results_df, batch_results_df], axis=0)
-                self.bouts_df_lst.append(batch_bouts_df_lst)
-                print(f"Data batch core {batch_id+1} / {self.core_cnt} complete...")
+        pool = get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__)
+        constants = functools.partial(_agg_clf_helper,
+                                      frame_count=self.frame_count,
+                                      video_len=self.video_length,
+                                      verbose=self.verbose,
+                                      video_info_df=self.video_info_df,
+                                      clfs=self.classifiers,
+                                      detailed_bout_data=self.detailed_bout_data)
+        for cnt, (batch_id, batch_results_df, batch_bouts_df_lst) in enumerate(pool.map(constants, chunked_data_paths, chunksize=self.multiprocess_chunksize)):
+            self.results_df = pd.concat([self.results_df, batch_results_df], axis=0)
+            self.bouts_df_lst.append(batch_bouts_df_lst)
+            stdout_information(msg=f"Data batch core {batch_id+1} / {self.core_cnt} complete...")
         self.bouts_df_lst = [df for sub in self.bouts_df_lst for df in sub]
-        terminate_cpu_pool(pool=pool, force=False)
+        terminate_cpu_pool(pool=pool, source=self.__class__.__name__)
 
     def save(self) -> None:
         """

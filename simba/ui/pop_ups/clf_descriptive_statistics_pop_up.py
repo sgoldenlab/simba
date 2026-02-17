@@ -26,7 +26,8 @@ class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):
 
         first_occurance_cb, self.first_occurance_var = SimbaCheckbox(parent=measures_frm, txt="First occurrence (s)", txt_img='one', val=True, tooltip_key='CLF_DESC_FIRST_OCCURRENCE')
         event_count_cb, self.event_count_var = SimbaCheckbox(parent=measures_frm, txt="Event (bout) count", txt_img='abacus', val=True, tooltip_key='CLF_DESC_EVENT_COUNT')
-        total_event_duration_cb, self.total_event_duration_var = SimbaCheckbox(parent=measures_frm, txt="Total event duration (s)", txt_img='stopwatch', val=True, tooltip_key='CLF_DESC_TOTAL_EVENT_DURATION')
+        total_event_duration_cb, self.total_event_duration_var = SimbaCheckbox(parent=measures_frm, txt="Total duration (s)", txt_img='stopwatch', val=True, tooltip_key='CLF_DESC_TOTAL_EVENT_DURATION')
+        event_duration_pct_cb, self.event_duration_pct_var = SimbaCheckbox(parent=measures_frm, txt="Total duration (% of session)", txt_img='stopwatch', val=True, tooltip_key='CLF_DESC_TOTAL_EVENT_DURATION_PCT')
         mean_event_duration_cb, self.mean_event_duration_var = SimbaCheckbox(parent=measures_frm, txt="Mean event duration (s)", txt_img='average', val=False, tooltip_key='CLF_DESC_MEAN_EVENT_DURATION')
         median_event_duration_cb, self.median_event_duration_var = SimbaCheckbox(parent=measures_frm, txt="Median event duration (s)", txt_img='average_2', val=False, tooltip_key='CLF_DESC_MEDIAN_EVENT_DURATION')
         mean_interval_duration_cb, self.mean_interval_duration_var = SimbaCheckbox(parent=measures_frm, txt="Mean event interval (s)", txt_img='timer_2', val=False, tooltip_key='CLF_DESC_MEAN_INTERVAL_DURATION')
@@ -36,10 +37,11 @@ class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):
         first_occurance_cb.grid(row=0, column=0, sticky=NW)
         event_count_cb.grid(row=1, column=0, sticky=NW)
         total_event_duration_cb.grid(row=2, column=0, sticky=NW)
-        mean_event_duration_cb.grid(row=3, column=0, sticky=NW)
-        median_event_duration_cb.grid(row=4, column=0, sticky=NW)
-        mean_interval_duration_cb.grid(row=5, column=0, sticky=NW)
-        median_interval_duration_cb.grid(row=6, column=0, sticky=NW)
+        event_duration_pct_cb.grid(row=3, column=0, sticky=NW)
+        mean_event_duration_cb.grid(row=4, column=0, sticky=NW)
+        median_event_duration_cb.grid(row=5, column=0, sticky=NW)
+        mean_interval_duration_cb.grid(row=6, column=0, sticky=NW)
+        median_interval_duration_cb.grid(row=7, column=0, sticky=NW)
 
         self.clf_vars = {}
         clf_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CLASSIFIERS", icon_name='forest', icon_link=Links.ANALYZE_ML_RESULTS.value, relief='solid')
@@ -83,7 +85,8 @@ class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):
         median_event_duration = self.median_event_duration_var.get()
         mean_interval_duration = self.mean_interval_duration_var.get()
         median_interval_duration = self.median_interval_duration_var.get()
-        if not any([first_occurance, event_cnt, total_event_duration, mean_event_duration, median_event_duration, mean_interval_duration, median_interval_duration]):
+        event_duration_pct = self.event_duration_pct_var.get()
+        if not any([first_occurance, event_cnt, total_event_duration, mean_event_duration, median_event_duration, mean_interval_duration, median_interval_duration, event_duration_pct]):
             raise NoChoosenMeasurementError(source=self.__class__.__name__)
         clfs = [clf_name for clf_name, cb_var in self.clf_vars.items() if cb_var.get()]
         if len(clfs) == 0:
@@ -102,6 +105,7 @@ class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):
                                                        first_occurrence=first_occurance,
                                                        event_count=event_cnt,
                                                        total_event_duration=total_event_duration,
+                                                       pct_of_session=event_duration_pct,
                                                        mean_event_duration=mean_event_duration,
                                                        median_event_duration=median_event_duration,
                                                        mean_interval_duration=mean_interval_duration,
@@ -118,6 +122,7 @@ class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):
                                                                    event_count=event_cnt,
                                                                    total_event_duration=total_event_duration,
                                                                    mean_event_duration=mean_event_duration,
+                                                                   pct_of_session=event_duration_pct,
                                                                    median_event_duration=median_event_duration,
                                                                    mean_interval_duration=mean_interval_duration,
                                                                    median_interval_duration=median_interval_duration,

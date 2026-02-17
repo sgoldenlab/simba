@@ -123,9 +123,16 @@ The pop-up offers the following options:
 - **Classifier predictions** — You must have already run the classifier (e.g. from the **Run machine model** tab) so that CSVs with predictions and probabilities exist in `project_folder/csv/machine_results/`. Each file should match a video (same base name).
 - **Videos** — Source videos must be in `project_folder/videos/` with filenames matching the machine_results CSVs (excluding extension). SimBA overlays the classification labels on these videos.
 
+**BODY-PART VISUALIZATION THRESHOLD**
+
 | Option | Description |
 |--------|-------------|
 | **BODY-PART PROBABILITY THRESHOLD** | Minimum pose-estimation confidence (0.0–1.0) for body parts to be drawn. Use 0.0 to show all; use 1.0 to show only 100% certain detections. Body parts below this threshold are hidden. |
+
+**TEXT SETTINGS**
+
+| Option | Description |
+|--------|-------------|
 | **TEXT SIZE** | Size of behavior labels on the video. AUTO = SimBA picks based on video resolution; or choose 1–100. |
 | **TEXT SPACING** | Space between label text and other drawn elements. AUTO = SimBA picks; or 1–100. |
 | **TEXT THICKNESS** | How bold the behavior labels are. AUTO or 1–100; higher = thicker text. |
@@ -134,19 +141,30 @@ The pop-up offers the following options:
 | **TEXT COLOR** | Color of the behavior name text (e.g. White, Red). |
 | **TEXT BACKGROUND COLOR** | Color of the box behind the text. Helps labels stand out on busy frames. |
 | **TRACKING COLOR PALETTE** | Color scheme for pose dots (one color per animal). Options include Set1, Set2, etc. |
-| **CPU CORES** | Number of CPU cores for parallel processing when creating multiple videos. |
-| **USE GPU** | If TRUE and a compatible GPU is available, use it to speed up video creation. |
+
+**TIME SEGMENT**
+
+| Option | Description |
+|--------|-------------|
+| **PLOT SPECIFIC TIME SEGMENT** | If checked, **START TIME (HH:MM:SS)** and **END TIME (HH:MM:SS)** become active. Only the selected time window of the video is used for the output (e.g. 00:01:30 to 00:05:00). Use for long videos when you only need a clip. |
+
+**VISUALIZATION SETTINGS**
+
+| Option | Description |
+|--------|-------------|
+| **CPU CORES** | Number of CPU cores for parallel processing when creating multiple videos (2 to max). |
+| **USE GPU** | If TRUE and a compatible NVIDIA GPU is available, use it to speed up video creation. Disabled if no compatible GPU is detected. |
 | **SHOW GANTT PLOT** | **NO GANTT** = no bar chart. **Static Gantt (final frame, faster)** = one bar chart at the end. **Dynamic Gantt (updated per frame)** = bar chart updates as the video plays. |
+| **SHOW TRACKING (POSE)** | If checked, draws tracked body parts (dots and skeleton) on the video. |
+| **SHOW ANIMAL BOUNDING BOXES** | If checked, draws a box around each animal. Helps see location and overlap. |
+| **SHOW CLASSIFICATION PROBABILITY** | If checked, displays the model's confidence (0–100%) for the predicted behavior on each frame. |
+| **SHOW ANIMAL NAME(S)** | If checked, displays labels like "Animal_1" so you can tell animals apart. |
 | **CREATE VIDEO** | If checked, generates an .mp4 with behavior labels and optional overlays. |
 | **CREATE FRAMES** | If checked, saves one .png image per frame. At least one of CREATE VIDEO or CREATE FRAMES must be checked. |
 | **INCLUDE TIMERS OVERLAY** | If checked, shows a timer (time or frame number) on each frame. Handy for presentations or matching other data. |
 | **ROTATE VIDEO 90°** | If checked, rotates the output 90°. Use for portrait (vertical) recordings. |
-| **SHOW TRACKING (POSE)** | If checked, draws tracked body parts (dots and skeleton) on the video. |
-| **SHOW ANIMAL NAME(S)** | If checked, displays labels like "Animal_1" so you can tell animals apart. |
-| **SHOW ANIMAL BOUNDING BOXES** | If checked, draws a box around each animal. Helps see location and overlap. |
-| **SHOW CLASSIFICATION PROBABILITY** | If checked, displays the model's confidence (0–100%) for the predicted behavior on each frame. |
 
-**SINGLE VIDEO** — Select one video from the dropdown (or use the file browser) and click <kbd>Create single video</kbd>. **MULTIPLE VIDEOS** — Click <kbd>Create multiple videos</kbd> to process all videos that have classification results.
+**SINGLE VIDEO** — Select one video from the **VIDEO** dropdown (or use the file browser) and click <kbd>Create single video</kbd>. **MULTIPLE VIDEOS** — Click <kbd>Create multiple videos (N found)</kbd> to process all videos that have classification results.
 
 **Where output is saved:** Videos and frames are saved to the `project_folder/frames/output/sklearn_results/` directory.
 

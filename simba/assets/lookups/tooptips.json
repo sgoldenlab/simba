@@ -44,6 +44,7 @@
   "CLF_DESC_FIRST_OCCURRENCE": "If checked, calculates the time (in seconds) when the behavior first occurs in each video.",
   "CLF_DESC_EVENT_COUNT": "If checked, counts the total number of behavior bouts (events) in each video.",
   "CLF_DESC_TOTAL_EVENT_DURATION": "If checked, calculates the total duration (in seconds) that the behavior occurs across all bouts in each video.",
+  "CLF_DESC_TOTAL_EVENT_DURATION_PCT": "If checked, calculates the total duration of the behavior as a percentage of the video (session) length. Useful for comparing across videos of different lengths.",
   "CLF_DESC_MEAN_EVENT_DURATION": "If checked, calculates the average duration (in seconds) of each behavior bout in each video.",
   "CLF_DESC_MEDIAN_EVENT_DURATION": "If checked, calculates the median duration (in seconds) of each behavior bout in each video.",
   "CLF_DESC_MEAN_INTERVAL_DURATION": "If checked, calculates the average time (in seconds) between behavior events in each video.",

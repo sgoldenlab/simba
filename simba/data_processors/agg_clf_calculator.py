@@ -35,7 +35,8 @@ MEAN_EVENT_INTERVAL = "Mean event interval (s)"
 MEDIAN_EVENT_INTERVAL = "Median event interval (s)"
 FRAME_COUNT = 'Frame count'
 VIDEO_LENGTH = "Video length (s)"
-MEASUREMENT_NAMES = [FIRST_OCCURRENCE, EVENT_COUNT, TOTAL_EVENT_DURATION, MEAN_EVENT_DURATION, MEDIAN_EVENT_DURATION, MEAN_EVENT_INTERVAL, MEDIAN_EVENT_INTERVAL]
+PCT_OF_SESSION = 'Total event duration (% of session)'
+MEASUREMENT_NAMES = [FIRST_OCCURRENCE, EVENT_COUNT, TOTAL_EVENT_DURATION, MEAN_EVENT_DURATION, MEDIAN_EVENT_DURATION, MEAN_EVENT_INTERVAL, MEDIAN_EVENT_INTERVAL, PCT_OF_SESSION]
 
 class AggregateClfCalculator(ConfigReader):
     """
@@ -90,6 +91,7 @@ class AggregateClfCalculator(ConfigReader):
                  first_occurrence: bool = True,
                  event_count: bool = True,
                  total_event_duration: bool = True,
+                 pct_of_session: bool = True,
                  mean_event_duration: bool = True,
                  median_event_duration: bool = True,
                  mean_interval_duration: bool = True,
@@ -107,7 +109,7 @@ class AggregateClfCalculator(ConfigReader):
         self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=[f'.{self.file_type}'], raise_error=True)
 
         self.measurements = []
-        for i, j  in zip([first_occurrence, event_count, total_event_duration, mean_event_duration, median_event_duration, mean_interval_duration, median_interval_duration], MEASUREMENT_NAMES):
+        for i, j  in zip([first_occurrence, event_count, total_event_duration, mean_event_duration, median_event_duration, mean_interval_duration, median_interval_duration, pct_of_session], MEASUREMENT_NAMES):
             check_valid_boolean(value=i, source=f'{self.__class__.__name__} {j}', raise_error=True)
             if i: self.measurements.append(j)
 
@@ -115,7 +117,7 @@ class AggregateClfCalculator(ConfigReader):
         check_valid_boolean(value=video_length, source=f'{self.__class__.__name__} video_length', raise_error=True)
         check_valid_boolean(value=transpose, source=f'{self.__class__.__name__} transpose', raise_error=True)
         check_valid_boolean(value=detailed_bout_data, source=f'{self.__class__.__name__} detailed_bout_data', raise_error=True)
-        if not any([first_occurrence, event_count, total_event_duration, mean_event_duration, median_event_duration, mean_interval_duration, median_interval_duration]):
+        if not any([first_occurrence, event_count, total_event_duration, mean_event_duration, median_event_duration, mean_interval_duration, median_interval_duration, pct_of_session]):
             raise NoChoosenMeasurementError(source=self.__class__.__name__)
 
         self.classifiers, self.detailed_bout_data, self.transpose = classifiers, detailed_bout_data, transpose
@@ -155,12 +157,14 @@ class AggregateClfCalculator(ConfigReader):
                     clf_results_dict[FIRST_OCCURRENCE] = round(clf_data["Start_time"].min(), 3)
                     clf_results_dict[EVENT_COUNT] = len(clf_data)
                     clf_results_dict[TOTAL_EVENT_DURATION] = round(clf_data["Bout_time"].sum(), 3)
+                    clf_results_dict[PCT_OF_SESSION] = round(((round(clf_data["Bout_time"].sum(), 3) * fps) / len(data_df)) * 100, 3)
                     clf_results_dict[MEAN_EVENT_DURATION] = round(clf_data["Bout_time"].mean(), 3)
                     clf_results_dict[MEDIAN_EVENT_DURATION] = round(clf_data["Bout_time"].median(), 3)
                 else:
                     clf_results_dict[FIRST_OCCURRENCE] = None
                     clf_results_dict[EVENT_COUNT] = 0
                     clf_results_dict[TOTAL_EVENT_DURATION] = 0
+                    clf_results_dict[PCT_OF_SESSION] = 0
                     clf_results_dict[MEAN_EVENT_DURATION] = None
                     clf_results_dict[MEDIAN_EVENT_DURATION] = None
                 if len(clf_data) > 1:
@@ -171,7 +175,7 @@ class AggregateClfCalculator(ConfigReader):
                     clf_results_dict[MEAN_EVENT_INTERVAL] = None
                     clf_results_dict[MEDIAN_EVENT_INTERVAL] = None
                 if self.frame_count:
-                        clf_results_dict[FRAME_COUNT] = len(data_df)
+                    clf_results_dict[FRAME_COUNT] = len(data_df)
                 if self.video_length:
                     clf_results_dict["Video length (s)"] = round(len(data_df) / fps, 3)
                 video_clf_pd = (pd.DataFrame.from_dict(clf_results_dict, orient="index").reset_index().rename(columns={"index": "MEASUREMENT", 0: "VALUE"}))
