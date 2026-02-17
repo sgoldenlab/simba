@@ -45,7 +45,7 @@ from simba.utils.errors import (CountError, DuplicationError,
 from simba.utils.lookups import (get_color_dict, get_ffmpeg_crossfade_methods,
                                  get_fonts, get_monitor_info,
                                  percent_to_crf_lookup, quality_pct_to_crf)
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     concatenate_videos_in_folder, find_all_videos_in_directory, find_core_cnt,

@@ -5,7 +5,7 @@ import multiprocessing
 import os
 import platform
 from copy import deepcopy
-from typing import List, Optional, Tuple, Union, Dict
+from typing import Dict, List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
@@ -18,20 +18,25 @@ from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
                                 check_int, check_nvidea_gpu_available,
                                 check_str, check_that_column_exist,
-                                check_valid_boolean,
-                                check_video_and_data_frm_count_align, check_valid_dict, check_that_hhmmss_start_is_before_end)
-from simba.utils.data import (create_color_palette, detect_bouts, get_cpu_pool,
-                              terminate_cpu_pool, check_if_string_value_is_valid_video_timestamp, find_frame_numbers_from_time_stamp)
+                                check_that_hhmmss_start_is_before_end,
+                                check_valid_boolean, check_valid_dict,
+                                check_video_and_data_frm_count_align)
+from simba.utils.data import (check_if_string_value_is_valid_video_timestamp,
+                              create_color_palette, detect_bouts,
+                              find_frame_numbers_from_time_stamp, get_cpu_pool,
+                              terminate_cpu_pool)
 from simba.utils.enums import ConfigKey, Dtypes, Options, TagNames, TextOptions
-from simba.utils.errors import (InvalidInputError, NoDataError,NoSpecifiedOutputError)
-from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
+from simba.utils.errors import (InvalidInputError, NoDataError,
+                                NoSpecifiedOutputError)
+from simba.utils.printing import (SimbaTimer, log_event, stdout_information,
+                                  stdout_success)
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory,
                                     find_all_videos_in_project, find_core_cnt,
                                     get_fn_ext, get_video_meta_data,
-                                    read_config_entry, read_df, seconds_to_timestamp)
+                                    read_config_entry, read_df,
+                                    seconds_to_timestamp)
 from simba.utils.warnings import FrameRangeWarning
-
 
 START_TIME, END_TIME = 'start_time', 'end_time'
 
