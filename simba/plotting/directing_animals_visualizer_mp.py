@@ -120,6 +120,7 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
     .. video:: _static/img/DirectingOtherAnimalsVisualizerMultiprocess.mp4
        :width: 900
        :loop:
+       :muted:
 
     .. seealso::
        For single core function, see :func:`simba.plotting.directing_animals_visualizer.DirectingOtherAnimalsVisualizer`.

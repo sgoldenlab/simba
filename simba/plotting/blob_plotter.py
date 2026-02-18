@@ -40,6 +40,7 @@ class BlobPlotter(PlottingMixin):
         :width: 800
         :autoplay:
         :loop:
+        :muted:
 
      :param Union[List[str], str, os.PathLike] data_path: Path(s) to video file(s) or directory containing video files.
      :param Optional[bool] gpu: Whether to use GPU for processing. Defaults to False.

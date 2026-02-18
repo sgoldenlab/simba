@@ -262,6 +262,7 @@ class ImageMixin(object):
            :width: 800
            :autoplay:
            :loop:
+           :muted:
 
         :param Union[np.ndarray, Tuple[cv2.VideoCapture, int]] img: Either an image in numpy array format OR a tuple with cv2.VideoCapture object and the frame index.
         :param List[Union[Polygon, np.ndarray]] img: A list of shapes either as vertices in a numpy array, or as shapely Polygons.

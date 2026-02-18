@@ -111,6 +111,7 @@ class CueLightAnalyzer(ConfigReader):
        :width: 800
        :autoplay:
        :loop:
+       :muted:
 
     :example:
     >>> cue_light_analyzer = CueLightAnalyzer(config_path='MyProjectConfig', in_dir='project_folder/csv/outlier_corrected_movement_location', cue_light_names=['Cue_light'])

@@ -115,11 +115,13 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
        :width: 900
        :autoplay:
        :loop:
+       :muted:
 
     .. video:: _static/img/GeometryPlotter_2.webm
        :width: 600
        :autoplay:
        :loop:
+       :muted:
 
     :param List[List[Union[Polygon, LineString, MultiPolygon, MultiLineString, Point]]] geometries: List of lists of geometries for each frame. Each list contains as many entries as frames. Each list may represent a track or unique tracked object.
     :param Union[str, os.PathLike] video_name: Name of the input video.

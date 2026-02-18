@@ -118,6 +118,7 @@ class CueLightVisualizer(ConfigReader):
        :width: 800
        :autoplay:
        :loop:
+       :muted:
 
     :examples:
     >>> cue_light_visualizer = CueLightVisualizer(config_path='SimBAConfig', cue_light_names=['Cue_light'], video_path='VideoPath', video_setting=True, frame_setting=False)

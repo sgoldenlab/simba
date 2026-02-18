@@ -55,6 +55,7 @@ class ROIPlotter(ConfigReader):
        :width: 800
        :autoplay:
        :loop:
+       :muted:
 
     ..  youtube:: Q2ByLfwJIaw
        :width: 640

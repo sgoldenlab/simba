@@ -29,11 +29,13 @@ class EgocentricalAligner():
        :width: 800
        :autoplay:
        :loop:
+       :muted:
 
     .. video:: _static/img/EgocentricalAligner_2.webm
        :width: 800
        :autoplay:
        :loop:
+       :muted:
 
     .. seealso::
        To produce rotation vectors, uses :func:`~simba.utils.data.egocentrically_align_pose_numba` or :func:`~simba.utils.data.egocentrically_align_pose`.

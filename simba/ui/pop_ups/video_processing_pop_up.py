@@ -970,6 +970,7 @@ class CalculatePixelsPerMMInVideoPopUp(PopUpMixin):
        :width: 800
        :autoplay:
        :loop:
+       :muted:
     """
 
     def __init__(self):

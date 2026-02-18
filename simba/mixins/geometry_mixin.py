@@ -867,6 +867,7 @@ class GeometryMixin(object):
            :width: 500
            :autoplay:
            :loop:
+           :muted:
 
         .. seealso:
            For multicore method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_union`
@@ -2051,6 +2052,7 @@ class GeometryMixin(object):
            :width: 600
            :autoplay:
            :loop:
+           :muted:
 
         .. seealso::
            For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.union`
@@ -3128,6 +3130,7 @@ class GeometryMixin(object):
            :width: 500
            :autoplay:
            :loop:
+           :muted:
 
         .. seealso::
            To segment image into **hexagons**, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
@@ -3233,6 +3236,7 @@ class GeometryMixin(object):
            :width: 500
            :autoplay:
            :loop:
+           :muted:
 
         .. seealso::
            To segment image into **rectangles**, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square`

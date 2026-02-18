@@ -62,6 +62,7 @@ def egocentrically_align_pose_cuda(data: np.ndarray,
        :width: 600
        :autoplay:
        :loop:
+       :muted:
 
     .. seealso::
        For numpy function, see :func:`simba.utils.data.egocentrically_align_pose`.

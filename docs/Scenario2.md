@@ -168,6 +168,7 @@ Use **ANALYZE MACHINE PREDICTIONS: AGGREGATES** when you need **one summary numb
 | **First occurrence (s)** | Time (in seconds) from video start until the behavior first occurs. | Useful for latency measures. If the behavior never occurs, the field is empty. |
 | **Event (bout) count** | Total number of behavior bouts in each video. | Counts each bout as one event, regardless of duration. |
 | **Total event duration (s)** | Sum of all bout durations. Total time (in seconds) the behavior occurs across the whole video. | Use with video length to compute proportion of time in behavior. |
+| **Total duration (% of session)** | Total time the behavior occurs as a percentage of the video length. | (Total event duration ÷ video length) × 100. Useful for comparing across videos of different lengths. |
 | **Mean event duration (s)** | Average duration (in seconds) of each bout. | Sum of bout durations ÷ number of bouts. One long bout yields a high mean. |
 | **Median event duration (s)** | Median duration (in seconds) of each bout. | Less sensitive than mean to a few very long or short bouts. |
 | **Mean event interval (s)** | Average time (in seconds) between the *end* of one bout and the *start* of the next. | If only one bout, interval is undefined (field empty). |

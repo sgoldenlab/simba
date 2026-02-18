@@ -107,12 +107,14 @@ class YOLOPoseVisualizer():
     .. video:: _static/img/YOLOPoseVisualizer.webm
        :width: 900
        :loop:
+       :muted:
        :autoplay:
 
     .. video:: _static/img/T1.webm
        :width: 1000
        :autoplay:
        :loop:
+       :muted:
 
     :param Union[str, os.PathLike] data_path: Path to the CSV file containing keypoint data, or folder containing keypoint data (output from YOLO pose inference).
     :param Union[str, os.PathLike] video_path: Path to the original input video, or folder containing original videos, to overlay keypoints on.

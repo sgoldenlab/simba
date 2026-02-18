@@ -151,6 +151,7 @@ class ROIPlotMultiprocess(ConfigReader):
        :width: 800
        :autoplay:
        :loop:
+       :muted:
 
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file in Configparser format.
     :param Union[str, os.PathLike] video_path: Path to video file to create ROI visualizations for.

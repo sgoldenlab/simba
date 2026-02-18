@@ -26,6 +26,7 @@ class ROIRuler(object):
        :width: 800
        :autoplay:
        :loop:
+       :muted:
 
     :param Toplevel img_window: Tkinter Toplevel window containing an image label named 'img_lbl'.
     :param Optional[int] thickness: Thickness of the main line in pixels. If None, automatically calculated based on image size using optimal circle size ratio. Default None.

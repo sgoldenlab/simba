@@ -917,11 +917,13 @@ def slice_imgs(video_path: Union[str, os.PathLike],
     .. video:: _static/img/simba.sandbox.cuda_slice_w_crop.slice_imgs.webm
        :width: 900
        :loop:
+       :muted:
 
     .. video:: _static/img/slice_imgs_gpu.webm
        :width: 800
        :autoplay:
        :loop:
+       :muted:
 
     .. csv-table::
        :header: EXPECTED RUNTIMES
@@ -1246,6 +1248,7 @@ def bg_subtraction_cuda(video_path: Union[str, os.PathLike],
        :width: 800
        :autoplay:
        :loop:
+       :muted:
 
     .. note::
        To create an `avg_frm`, use :func:`simba.video_processors.video_processing.create_average_frm`, :func:`simba.data_processors.cuda.image.create_average_frm_cupy`, or :func:`~simba.data_processors.cuda.image.create_average_frm_cuda`
@@ -1344,6 +1347,7 @@ def bg_subtraction_cupy(video_path: Union[str, os.PathLike],
        :width: 800
        :autoplay:
        :loop:
+       :muted:
 
     .. seealso::
        For CPU-based alternative, see :func:`simba.video_processors.video_processing.video_bg_subtraction` or :func:`~simba.video_processors.video_processing.video_bg_subtraction_mp`
@@ -1474,6 +1478,7 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
        :width: 800
        :autoplay:
        :loop:
+       :muted:
 
     .. seealso::
        For CPU based methods, see :func:`~simba.plotting.path_plotter.PathPlotterSingleCore` and :func:`~simba.plotting.path_plotter_mp.PathPlotterMulticore`.

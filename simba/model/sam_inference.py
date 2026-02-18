@@ -40,6 +40,7 @@ class SamInference():
 
     .. video:: _static/img/sam_example.webm
        :loop:
+       :muted:
 
     """
     def __init__(self,

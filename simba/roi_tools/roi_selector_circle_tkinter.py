@@ -23,6 +23,7 @@ class ROISelectorCircle(object):
     .. video:: tutorials_rst/img/roi/draw_circle.webm
        :width: 900
        :loop:
+       :muted:
 
     .. seealso::
        For OpenCV based method, see :func:`simba.video_processors.roi_selector_circle.ROISelectorCircle`

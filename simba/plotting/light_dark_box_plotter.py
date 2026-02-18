@@ -87,6 +87,7 @@ class LightDarkBoxPlotter():
        :width: 400
        :autoplay:
        :loop:
+       :muted:
 
     :param (str or os.PathLike) data_dir: Directory containing pose estimation CSV files.
     :param (str or os.PathLike) video_dir: Directory containing video files corresponding with the names of the CSVs in ``data_dir``.

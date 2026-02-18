@@ -182,6 +182,7 @@ menus (see the video below):
    :width: 800
    :autoplay:
    :loop:
+   :muted:
 
 SET NEW SHAPE
 -------------
@@ -259,6 +260,7 @@ rectangle, **press the keyboard ``ESCAPE`` key** to save your rectangle.
    :width: 800
    :autoplay:
    :loop:
+   :muted:
 
 DRAW CIRCLE
 ~~~~~~~~~~~
@@ -276,6 +278,7 @@ mouse button at the center of the circle.
    :width: 800
    :autoplay:
    :loop:
+   :muted:
 
 DRAW POLYGON
 ~~~~~~~~~~~~
@@ -290,6 +293,7 @@ hit the **keyboard ``ESCAPE`` key** and the polygon will appear in full.
    :width: 800
    :autoplay:
    :loop:
+   :muted:
 
 SHAPE MANIPULATIONS
 -------------------
@@ -329,6 +333,7 @@ DELETING ROIs
    :width: 800
    :autoplay:
    :loop:
+   :muted:
 
 -  To delete a specific ROI, first use the ``ROI`` drop-down menu in the
    ``DRAW`` sub-menu to select the ROI you wish to delete. Next, click
@@ -338,6 +343,7 @@ DELETING ROIs
    :width: 800
    :autoplay:
    :loop:
+   :muted:
 
 DUPLICATE ROIs
 ~~~~~~~~~~~~~~
@@ -353,6 +359,7 @@ DUPLICATE ROIs
    :width: 800
    :autoplay:
    :loop:
+   :muted:
 
 
 2. The duplicated ROI will inherit the name of the original ROI with the
@@ -398,6 +405,7 @@ CHANGING ROI LOCATIONS
    :width: 800
    :autoplay:
    :loop:
+   :muted:
 
 CHANGING ROI SHAPES
 ~~~~~~~~~~~~~~~~~~~
@@ -455,6 +463,7 @@ CHANGING ROI SHAPES
    :width: 800
    :autoplay:
    :loop:
+   :muted:
 
 CHANGE ROI ATTRIBUTES
 ~~~~~~~~~~~~~~~~~~~~~
@@ -477,6 +486,7 @@ CHANGE ROI ATTRIBUTES
    :width: 800
    :autoplay:
    :loop:
+   :muted:
 
 
 SHOW SHAPE SIZE INFORMATION.
@@ -512,6 +522,7 @@ millimeter conversion factor in your
    :width: 800
    :autoplay:
    :loop:
+   :muted:
 
 DRAW SHAPES OF USER-DEFINED METRIC SIZES
 ----------------------------------------

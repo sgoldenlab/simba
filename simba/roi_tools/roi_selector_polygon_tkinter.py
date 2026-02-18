@@ -26,6 +26,7 @@ class ROISelectorPolygon(object):
     .. video:: tutorials_rst/img/roi/draw_polygon.webm
        :width: 900
        :loop:
+       :muted:
 
     .. seealso::
        For OpenCV based method, see :func:`simba.video_processors.roi_selector_polygon.ROISelectorPolygon`

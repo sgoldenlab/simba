@@ -230,6 +230,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
        :width: 1000
        :autoplay:
        :loop:
+       :muted:
 
     :example:
     >>> # Create multiprocess validation video with dynamic Gantt chart

@@ -1503,6 +1503,7 @@ def egocentrically_align_pose(data: np.ndarray,
        :width: 800
        :autoplay:
        :loop:
+       :muted:
 
     :param np.ndarray data: A 3D array of shape `(num_frames, num_points, 2)` containing 2D points for each frame. Each frame is represented as a 2D array of shape `(num_points, 2)`, where each row corresponds to a point's (x, y) coordinates.
     :param int anchor_1_idx: The index of the first anchor point in `data` used as the center of alignment. This body-part will be placed in the center of the image.
@@ -1572,6 +1573,7 @@ def egocentrically_align_pose_numba(data: np.ndarray,
        :width: 600
        :autoplay:
        :loop:
+       :muted:
 
     .. csv-table::
        :header: EXPECTED RUNTIMES

@@ -5,11 +5,13 @@ Blob (contour) tracking
    :width: 800px
    :autoplay:
    :loop:
+   :muted:
 
 .. video:: https://github.com/sgoldenlab/simba/blob/master/images/EPM_2_V2_cropped.mp4
    :width: 800px
    :autoplay:
    :loop:
+   :muted:
 
 Introduction
 -----------
@@ -38,6 +40,7 @@ It is also determined by the resolution of your videos and the frame-rate of the
    :width: 800px
    :autoplay:
    :loop:
+   :muted:
 
 For example, if your video resolutions are large (1000 x 1000), but you can visually detect the animals even at smaller resolutions (640 x 640, or even 480 x 480), then consider down sampling your videos before performing blob detection.
 
@@ -59,6 +62,7 @@ When performing animal tracking through background subtraction, for every video 
    :width: 800px
    :autoplay:
    :loop:
+   :muted:
 
 
 It is possible to select the same video as that being analyzed as the background reference video. However, note that this:
@@ -119,6 +123,7 @@ Generally, a value between 20-70 should do the trick.
    :width: 800px
    :autoplay:
    :loop:
+   :muted:
 
 **SMOOTHING TIME (S)**: If this dropdown is set to None, **no** temporal smooth of the animal tracking points is performed.
 
@@ -128,6 +133,7 @@ If set to, for example, 0.5, then SimBA performs Savitzky-Golay smoothing across
    :width: 800px
    :autoplay:
    :loop:
+   :muted:
 
 **BUFFER SIZE (PIXELS)**: If set to None, then animals detected key-points will be placed right along the hull perimeter.
 
@@ -139,6 +145,7 @@ See further information below, or this visual example of expected results from w
    :width: 800px
    :autoplay:
    :loop:
+   :muted:
 
 **GAP FILL FILTER SIZE (%)**: Also known as *CLOSING KERNEL SIZE*. This value controls and refines the detected animal shape.
 
@@ -158,6 +165,7 @@ For further details on ``GAP FILL FILTER SIZE``, see below, or see this visual e
    :width: 800px
    :autoplay:
    :loop:
+   :muted:
 
 **NOISE REMOVAL FILTER SIZE (%)**: Also known as *OPENING KERNEL SIZE*. This controls and removes smaller parts of the background that has been mistakenly detected as the animal.
 
@@ -169,6 +177,7 @@ For further details on ``NOISE REMOVAL FILTER SIZE``, see below, or this visual 
    :width: 800px
    :autoplay:
    :loop:
+   :muted:
 
 Run-time Settings
 ~~~~~~~~~~~~~~
@@ -187,6 +196,7 @@ SimBA will automatically pair each background video with the videos in the table
    :width: 800px
    :autoplay:
    :loop:
+   :muted:
 
 .. note::
    As discussed above, the larger the background videos are (higher resolution, higher FPS, longer time), the longer the detection processing will be.

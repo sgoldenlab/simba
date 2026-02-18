@@ -37,6 +37,8 @@ class Smoothing(ConfigReader):
        :width: 800
        :autoplay:
        :loop:
+       :muted:
+       :align: center
 
     .. note::
        `Smoothing tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files>`__.
