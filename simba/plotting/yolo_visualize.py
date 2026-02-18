@@ -33,6 +33,7 @@ class YOLOVisualizer():
       :loop:
       :autoplay:
       :muted:
+      :align: center
 
     :param Union[str, os.PathLike] data_path: Path to YOLO results CSV results. Produced by :func:`simba.bounding_box_tools.yolo.model.inference_yolo`
     :param Union[str, os.PathLike] video_path: Path to the video from which the data was produced.

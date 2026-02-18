@@ -27,6 +27,7 @@ class ROISelectorPolygon(object):
        :width: 900
        :loop:
        :muted:
+       :align: center
 
     .. seealso::
        For OpenCV based method, see :func:`simba.video_processors.roi_selector_polygon.ROISelectorPolygon`

@@ -190,6 +190,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     ..  youtube:: Frq6mMcaHBc
        :width: 640

@@ -34,6 +34,7 @@ class FreezingDetector(ConfigReader):
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     .. important::
         Freezing is detected as `present` when **the velocity (computed from the mean movement of the nape, nose, and tail-base body-parts) falls below

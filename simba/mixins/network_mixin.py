@@ -31,6 +31,7 @@ class NetworkMixin(object):
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     When working with pose-estimation data for more than two animals - over extended periods - it can be beneficial to
     represent the data as a graph where the animals feature as nodes are their relationship strengths are represented as edges.

@@ -180,6 +180,7 @@ menus (see the video below):
 
 .. video:: img/roi/roi_tutorial_4.webm
    :width: 800
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -258,6 +259,7 @@ rectangle, **press the keyboard ``ESCAPE`` key** to save your rectangle.
 
 .. video:: img/roi/draw_rectangle.webm
    :width: 800
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -276,6 +278,7 @@ mouse button at the center of the circle.
 
 .. video:: img/roi/draw_circle.webm
    :width: 800
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -291,6 +294,7 @@ hit the **keyboard ``ESCAPE`` key** and the polygon will appear in full.
 
 .. video:: img/roi/draw_polygon.webm
    :width: 800
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -331,6 +335,7 @@ DELETING ROIs
 
 .. video:: img/roi/delete_all.webm
    :width: 800
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -341,6 +346,7 @@ DELETING ROIs
 
 .. video:: img/roi/delete_selected.webm
    :width: 800
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -357,6 +363,7 @@ DUPLICATE ROIs
 
 .. video:: img/roi/draw_rectangle.webm
    :width: 800
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -403,6 +410,7 @@ CHANGING ROI LOCATIONS
 
 .. video:: img/roi/move_shapes.webm
    :width: 800
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -461,6 +469,7 @@ CHANGING ROI SHAPES
 
 .. video:: img/roi/change_shapes.webm
    :width: 800
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -484,6 +493,7 @@ CHANGE ROI ATTRIBUTES
 
 .. video:: img/roi/change_attributes.webm
    :width: 800
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -520,6 +530,7 @@ millimeter conversion factor in your
 
 .. video:: img/roi/show_shape_size.webm
    :width: 800
+   :align: center
    :autoplay:
    :loop:
    :muted:

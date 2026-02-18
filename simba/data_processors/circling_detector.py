@@ -43,6 +43,7 @@ class CirclingDetector(ConfigReader):
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] data_dir: Path to directory containing pose-estimated body-part data in CSV format.
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.

@@ -121,6 +121,7 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
        :width: 900
        :loop:
        :muted:
+       :align: center
 
     .. seealso::
        For single core function, see :func:`simba.plotting.directing_animals_visualizer.DirectingOtherAnimalsVisualizer`.

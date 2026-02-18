@@ -41,6 +41,7 @@ class SamInference():
     .. video:: _static/img/sam_example.webm
        :loop:
        :muted:
+       :align: center
 
     """
     def __init__(self,

@@ -51,6 +51,7 @@ class MitraFeatureExtractor(ConfigReader,
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
 
     .. video:: _static/img/MitraFeatureExtractor_2.webm
@@ -58,6 +59,7 @@ class MitraFeatureExtractor(ConfigReader,
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] config_path: Path to SimBA project_config.ini.
     :return: None. Featurized pose-estimation data is saved in the simba project `project_folder/csv/features_extracted` directory.

@@ -3,12 +3,14 @@ Blob (contour) tracking
 
 .. video:: https://github.com/user-attachments/assets/f8a18ba8-76b4-473b-b001-2331192b72c1
    :width: 800px
+   :align: center
    :autoplay:
    :loop:
    :muted:
 
 .. video:: https://github.com/sgoldenlab/simba/blob/master/images/EPM_2_V2_cropped.mp4
    :width: 800px
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -38,6 +40,7 @@ It is also determined by the resolution of your videos and the frame-rate of the
 
 .. video:: https://github.com/user-attachments/assets/b04b8f13-f0c7-489a-a3cd-a07b8a39dc68
    :width: 800px
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -60,6 +63,7 @@ When performing animal tracking through background subtraction, for every video 
 
 .. video:: https://github.com/user-attachments/assets/3418e032-9dcc-4b81-8c56-d0daaae36c99
    :width: 800px
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -121,6 +125,7 @@ Generally, a value between 20-70 should do the trick.
 
 .. video:: https://github.com/user-attachments/assets/62cca260-5ab9-41ca-9cae-5369b3dc194c
    :width: 800px
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -131,6 +136,7 @@ If set to, for example, 0.5, then SimBA performs Savitzky-Golay smoothing across
 
 .. video:: https://github.com/user-attachments/assets/a86a0d7b-35c6-4da7-b44c-4856d71fd861
    :width: 800px
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -143,6 +149,7 @@ See further information below, or this visual example of expected results from w
 
 .. video:: https://github.com/user-attachments/assets/91b8b70a-a442-454c-b957-31ba5253d042
    :width: 800px
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -163,6 +170,7 @@ For further details on ``GAP FILL FILTER SIZE``, see below, or see this visual e
 
 .. video:: https://github.com/user-attachments/assets/2fcb2aae-0c27-472e-8d29-b80e7306a6ad
    :width: 800px
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -175,6 +183,7 @@ For further details on ``NOISE REMOVAL FILTER SIZE``, see below, or this visual 
 
 .. video:: https://github.com/user-attachments/assets/9e498c6d-cf2c-4084-ba42-2582305421bd
    :width: 800px
+   :align: center
    :autoplay:
    :loop:
    :muted:
@@ -194,6 +203,7 @@ SimBA will automatically pair each background video with the videos in the table
 
 .. video:: https://github.com/user-attachments/assets/bfcd54f8-76e-4fb7-ab50-fec64ad803be
    :width: 800px
+   :align: center
    :autoplay:
    :loop:
    :muted:

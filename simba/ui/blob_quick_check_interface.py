@@ -33,6 +33,7 @@ class BlobQuickChecker():
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] video_path: Path to the video file being analyzed.
     :param Union[str, os.PathLike] bg_video_path: Path to the background reference video.

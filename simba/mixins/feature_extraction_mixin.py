@@ -710,6 +710,7 @@ class FeatureExtractionMixin(object):
            :autoplay:
            :loop:
            :muted:
+           :align: center
 
         ..  youtube:: vqdYUS3bM68
            :width: 640

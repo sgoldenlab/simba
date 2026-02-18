@@ -49,6 +49,7 @@ class AdvancedInterpolator(ConfigReader):
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] data_path: Path to folder containing pose-estimation data or a file with pose-estimation data.
     :param Union[str, os.PathLike] config_path: Optional path to SimBA project config file in Configparser format.

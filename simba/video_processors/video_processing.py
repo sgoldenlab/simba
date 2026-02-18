@@ -677,6 +677,7 @@ def change_single_video_fps(file_path: Union[str, os.PathLike],
     .. video:: _static/img/change_single_video_fps.webm
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] file_path: Path to video file
     :param Union[int, float] fps: FPS of the new video file.
@@ -1881,6 +1882,7 @@ def video_concatenator(video_one_path: Union[str, os.PathLike],
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     :param str video_one_path: Path to the first video in the concatenated video
     :param str video_two_path: Path to the second video in the concatenated video
@@ -3458,6 +3460,7 @@ def superimpose_video_progressbar(video_path: Union[str, os.PathLike],
        :width: 700
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] video_path: Directory containing video files or a single video file
     :param Optional[int] bar_height: The height of the progressbar in percent of the video height.
@@ -3531,6 +3534,7 @@ def crossfade_two_videos(video_path_1: Union[str, os.PathLike],
     .. video:: _static/img/crossfade_two_videos.webm
        :loop:
        :muted:
+       :align: center
 
     .. note::
        See ``simba.utils.lookups.get_ffmpeg_crossfade_methods`` for named crossfade methods.
@@ -3599,6 +3603,7 @@ def watermark_video(video_path: Union[str, os.PathLike],
        :width: 900
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] video_path: The path to the video file or path to directory with video files.
     :param Union[str, os.PathLike] watermark_path: The path to the watermark .png file.
@@ -3681,6 +3686,7 @@ def superimpose_overlay_video(video_path: Union[str, os.PathLike],
        :width: 700
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] video_path: The path to the video file.
     :param Union[str, os.PathLike] overlay_video_path: The path to video to be inserted into the ``video_path`` video.
@@ -3762,6 +3768,7 @@ def roi_blurbox(video_path: Union[str, os.PathLike],
     .. video:: _static/img/roi_blurbox.webm
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] video_path: The path to the video on disk
     :param Optional[float] blur_level: The level of the blur as a ratio 0-1.0.
@@ -3816,6 +3823,7 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
        :width: 900
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] video_path: Path to the input video file or directory containing video files.
     :param Optional[int] font_size: Font size for the elapsed time text. Default 30.
@@ -3915,6 +3923,7 @@ def reverse_videos(path: Union[str, os.PathLike],
        :width: 800
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] path: Path to the video file or directory containing video files to be reversed.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory to save the reversed videos. If not provided, reversed videos will be saved in a subdirectory named 'reversed_<timestamp>' in the same directory as the input file(s).
@@ -3977,6 +3986,7 @@ def video_to_bw(video_path: Union[str, os.PathLike],
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     .. seealso::
        :func:`simba.mixins.image_mixin.ImageMixin.img_to_bw`, :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_bw`,
@@ -4073,6 +4083,7 @@ def create_average_frm(video_path: Union[str, os.PathLike],
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     .. note::
        Useful helper for e.g., video background subtraction ``simba.video_processors.video_processing.video_bg_substraction()``
@@ -4179,6 +4190,7 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     .. note::
        If  ``bg_video_path`` is passed, that video will be used to parse the background. If None, ``video_path`` will be use dto parse background.
@@ -4409,6 +4421,7 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     .. note::
        If ``avg_frm`` is passed, that img will be used to parse the background.
@@ -4551,6 +4564,7 @@ def superimpose_video_names(video_path: Union[str, os.PathLike],
        :width: 900
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] video_path: Path to the input video file or directory containing video files.
     :param Optional[int] font_size: Font size for the video name text. Default 30.
@@ -4650,6 +4664,7 @@ def superimpose_freetext(video_path: Union[str, os.PathLike],
        :width: 900
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] video_path: Path to the input video file or directory containing video files.
     :param str text: The text to overlay on the video
@@ -4725,6 +4740,7 @@ def rotate_video(video_path: Union[str, os.PathLike],
        :loop:
        :autoplay:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] video_path: Path to the input video file or directory containing video files.
     :param int degrees: Number of degrees (between 1 and 359, inclusive) to rotate the video clockwise.
@@ -4790,6 +4806,7 @@ def flip_videos(video_path: Union[str, os.PathLike],
        :loop:
        :autoplay:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] video_path: Path to the input video file or directory containing video files.
     :param Optional[bool] horizontal_flip: If True, flip the video(s) horizontally (default is False).
@@ -5012,6 +5029,7 @@ def get_video_slic(video_path: Union[str, os.PathLike],
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     .. seealso::
        To convert single image, see :func:`simba.video_processors.video_processing.get_img_slic`
@@ -5260,6 +5278,7 @@ def change_playback_speed(video_path: Union[str, os.PathLike],
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] video_path: Path to the input video file.
     :param float speed: Playback speed multiplier. Must be between 0.001 and 100. Values > 1.0 increase speed, values < 1.0 decrease speed.

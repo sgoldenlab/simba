@@ -45,6 +45,7 @@ class AdvancedSmoother(ConfigReader):
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     :parameter str data_dir: path to pose-estimation data in CSV or parquet format
     :parameter str config_path: path to SimBA project config file in Configparser format.

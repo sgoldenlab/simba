@@ -26,6 +26,7 @@ class GetPixelsPerMillimeterInterface():
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] video_path: Path to a video file on disk.
     :param float known_metric_mm: Known millimeter distance to get the pixels conversion factor for.

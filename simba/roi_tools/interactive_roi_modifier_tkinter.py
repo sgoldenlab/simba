@@ -83,6 +83,7 @@ class InteractiveROIModifier():
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     .. note::
        - The `img_window` must contain a Tkinter `Label` widget with the name 'img_lbl' that displays the image.

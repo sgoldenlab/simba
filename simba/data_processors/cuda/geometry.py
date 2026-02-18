@@ -267,6 +267,7 @@ def get_convex_hull(pts: np.ndarray) -> np.ndarray:
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     :param pts: A 3D numpy array of shape (M, N, 2) where: - M is the number of frames. - N is the number of points (body-parts) in each frame. - The last dimension (2) represents the x and y coordinates of each point.
     :return: An upated 3D numpy array of shape (M, N, 2) consisting of the points in the hull.

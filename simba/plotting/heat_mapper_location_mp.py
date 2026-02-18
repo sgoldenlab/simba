@@ -132,6 +132,7 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
        :width: 600
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
     :param Union[List[Union[str, os.PathLike]], str, os.PathLike] data_paths: Path(s) to outlier-corrected movement or location CSV file(s). If None, uses all files in project.

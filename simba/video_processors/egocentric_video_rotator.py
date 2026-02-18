@@ -81,6 +81,7 @@ class EgocentricVideoRotator():
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     .. seealso::
        To perform joint egocentric alignment of both pose and video, or pose only, use :func:`~simba.data_processors.egocentric_aligner.EgocentricalAligner`.

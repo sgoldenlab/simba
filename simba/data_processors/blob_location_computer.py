@@ -43,6 +43,7 @@ class BlobLocationComputer(object):
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     :param Union[str, os.PathLike] data_path: Path to a video file or a directory containing video files. The videos will be processed for blob detection.
     :param Optional[bool] verbose:  If True, prints progress and success messages to the console. Default is True.

@@ -44,6 +44,7 @@ class BlobVisualizer():
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     ..seealso::
        To create blob data, see :func:`simba.video_processors.blob_tracking_executor.BlobTrackingExecutor`
