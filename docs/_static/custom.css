@@ -45,3 +45,20 @@ body {
 .simba-table td {
     vertical-align: middle; /* Align text vertically in the center of cells */
 }
+
+/* sphinxcontrib-video: make :align: center actually center the video */
+.sphinx-contrib-video-container.align-center {
+    text-align: center;
+}
+.sphinx-contrib-video-container.align-center video {
+    display: inline-block;
+}
+.sphinx-contrib-video-container.align-right {
+    text-align: right;
+}
+.sphinx-contrib-video-container.align-right video {
+    display: inline-block;
+}
+.sphinx-contrib-video-container.align-left video {
+    display: inline-block;
+}
