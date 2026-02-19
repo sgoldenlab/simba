@@ -33,7 +33,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_int, check_nvidea_gpu_available,
                                 check_str,
                                 check_that_hhmmss_start_is_before_end)
-from simba.utils.data import convert_roi_definitions
+from simba.utils.data import convert_roi_definitions, get_cpu_pool, terminate_cpu_pool
 from simba.utils.enums import (Dtypes, Formats, Keys, Links, Options, Paths,
                                TkBinds)
 from simba.utils.errors import (CountError, DuplicationError,
@@ -85,14 +85,21 @@ class CLAHEPopUp(PopUpMixin):
         super().__init__(title="CLAHE VIDEO CONVERSION", icon='clahe')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', icon_link=Links.VIDEO_TOOLS.value)
         lbl = SimBALabel(parent=settings_frm, txt='For more control over CLAHE conversion, try "Interactively CLAHE enhance videos" \n in SimBA Tools->Remove color from videos.', font=Formats.FONT_REGULAR_ITALICS.value)
-        self.core_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, find_core_cnt()[0]+1)), label='CORE COUNT:', label_width=25, dropdown_width=20, value=1, img='cpu_small')
-        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=25, dropdown_width=20, value='FALSE', img='gpu_3')
-        if not check_nvidea_gpu_available(): self.gpu_dropdown.disable()
+        self.core_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, find_core_cnt()[0]+1)), label='CORE COUNT:', label_width=25, dropdown_width=20, value=1, img='cpu_small', tooltip_key='CORE_COUNT')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=25, dropdown_width=20, value='FALSE', img='gpu_3', tooltip_key='USE_GPU')
+        self.clip_limit_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(2, 62, 2)), label='CLIP LIMIT:', label_width=25, dropdown_width=20, value=2, img='clip', tooltip_key='CLAHE_CLIP_LIMIT')
+        self.tile_height_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(2, 62, 1)), label='TILE SIZE (HEIGHT):', label_width=25, dropdown_width=20, value=16, img='height', tooltip_key='CLAHE_TILE_HEIGHT')
+        self.tile_width_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(2, 62, 1)), label='TILE SIZE (WIDTH):', label_width=25, dropdown_width=20, value=16, img='width', tooltip_key='CLAHE_TILE_WIDTH')
 
+        if not check_nvidea_gpu_available(): self.gpu_dropdown.disable()
         settings_frm.grid(row=0, column=0, sticky=NW)
         lbl.grid(row=0, column=0, sticky=NW)
         self.core_cnt_dropdown.grid(row=1, column=0, sticky=NW)
         self.gpu_dropdown.grid(row=2, column=0, sticky=NW)
+        self.clip_limit_dropdown.grid(row=3, column=0, sticky=NW)
+        self.tile_height_dropdown.grid(row=4, column=0, sticky=NW)
+        self.tile_width_dropdown.grid(row=5, column=0, sticky=NW)
+
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - Contrast Limited Adaptive Histogram Equalization", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25, lbl_icon='video_2')
@@ -112,16 +119,23 @@ class CLAHEPopUp(PopUpMixin):
     def _get_settings(self):
         self.core_cnt = int(self.core_cnt_dropdown.get_value())
         self.gpu = str_2_bool(self.gpu_dropdown.get_value())
+        height = int(self.tile_height_dropdown.get_value())
+        width = int(self.tile_width_dropdown.get_value())
+        self.tile_size = (height, width)
+        self.clip_limit = int(self.clip_limit_dropdown.get_value())
+
 
     def run_single_video(self):
         selected_video = self.selected_video.file_path
         check_file_exist_and_readable(file_path=selected_video)
         self._get_settings()
-        print(f'Applying CLAHE conversion on video {selected_video}...')
+        if self.core_cnt > 1: pool = get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__)
+        else: pool = None
+        stdout_information(msg=f'Applying CLAHE conversion on video {selected_video}...')
         if self.core_cnt == 1:
-            threading.Thread(target=clahe_enhance_video(file_path=selected_video)).start()
+            threading.Thread(target=clahe_enhance_video(file_path=selected_video, clip_limit=self.clip_limit, tile_grid_size=self.tile_size)).start()
         else:
-            threading.Thread(target=clahe_enhance_video_mp(file_path=selected_video)).start()
+            threading.Thread(target=clahe_enhance_video_mp(file_path=selected_video, clip_limit=self.clip_limit, tile_grid_size=self.tile_size, core_cnt=self.core_cnt, pool=pool)).start()
 
     def run_directory(self):
         timer = SimbaTimer(start=True)
@@ -129,12 +143,17 @@ class CLAHEPopUp(PopUpMixin):
         check_if_dir_exists(in_dir=video_dir, source=self.__class__.__name__)
         self.video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True)
         self._get_settings()
-        print(f'Applying CLAHE conversion on {len(self.video_paths)} videos...')
+        stdout_information(msg=f'Applying CLAHE conversion on {len(self.video_paths)} videos...')
+        if self.core_cnt > 1:
+            pool = get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__)
+        else:
+            pool = None
         for file_path in self.video_paths:
             if self.core_cnt == 1:
-                threading.Thread(target=clahe_enhance_video(file_path=file_path)).start()
+                threading.Thread(target=clahe_enhance_video(file_path=file_path, clip_limit=self.clip_limit, tile_grid_size=self.tile_size)).start()
             else:
-                clahe_enhance_video_mp(file_path=file_path, gpu=self.gpu)
+                clahe_enhance_video_mp(file_path=file_path, gpu=self.gpu, clip_limit=self.clip_limit, tile_grid_size=self.tile_size, pool=pool)
+        if pool is not None: terminate_cpu_pool(pool=pool, source=self.__class__.__name__)
         timer.stop_timer()
         stdout_success(msg=f'CLAHE enhanced {len(self.video_paths)} video(s)', elapsed_time=timer.elapsed_time_str)
 
@@ -227,7 +246,7 @@ class ClipVideoPopUp(PopUpMixin):
 
 
 
-    def _check_valid_timestamp(self, entry_box: Entry_Box, valid_clr: str = 'white', invalid_clr: str = 'lightsalmon'):
+    def _check_valid_timestamp(self, entry_box: Entry_Box, valid_clr: str = 'lightgreen', invalid_clr: str = 'white'):
         valid_time_stamp = check_if_string_value_is_valid_video_timestamp(value=entry_box.entry_get, raise_error=False, name='')
         clr = valid_clr if valid_time_stamp else invalid_clr
         entry_box.set_bg_clr(clr=clr)

@@ -460,15 +460,15 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike],
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 clahe_frm = clahe_filter.apply(img)
                 writer.write(clahe_frm)
-                if verbose: print(f"CLAHE converted frame {frm_cnt}/{video_meta_data['frame_count']} ({file_name})...")
+                if verbose: stdout_information(msg=f"CLAHE converted frame {frm_cnt}/{video_meta_data['frame_count']} ({file_name})...")
             else:
                 break
         cap.release()
         writer.release()
-        if verbose: print(f"CLAHE video created: {save_path}.")
+        if verbose: stdout_information(msg=f"CLAHE video created: {save_path}.")
     except Exception as se:
         if verbose: print(se.args)
-        if verbose: print(f"CLAHE conversion failed for video {file_name}.")
+        if verbose: stdout_information(msg=f"CLAHE conversion failed for video {file_name}.")
         cap.release()
         writer.release()
         raise InvalidVideoFileError(msg=f"Could not convert file {file_path} to CLAHE enhanced video: {se.args}", source=clahe_enhance_video.__name__,)
@@ -478,6 +478,7 @@ def _clahe_enhance_video_mp_helper(data: tuple,
                                    video_path: str,
                                    clip_limit: int,
                                    temp_dir: str,
+                                   verbose: bool,
                                    tile_grid_size: tuple):
 
     cap = cv2.VideoCapture(video_path)
@@ -497,7 +498,7 @@ def _clahe_enhance_video_mp_helper(data: tuple,
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             clahe_frm = clahe_filter.apply(img)
             writer.write(clahe_frm)
-            print(f"[{get_current_time()}] CLAHE converted frame {current_frm}/{video_meta_data['frame_count']} (core batch: {batch_id}, video name: {video_meta_data['video_name']})...")
+            if verbose: stdout_information(msg=f"CLAHE converted frame {current_frm}/{video_meta_data['frame_count']} (core batch: {batch_id}, video name: {video_meta_data['video_name']})...")
         else:
             FrameRangeWarning(msg=f'Could not read frame {current_frm} in video {video_meta_data["video_name"]}', source=_clahe_enhance_video_mp_helper.__name__)
             break
@@ -510,6 +511,8 @@ def clahe_enhance_video_mp(file_path: Union[str, os.PathLike],
                            tile_grid_size: Tuple[int, int] = (16, 16),
                            out_path: Optional[Union[str, os.PathLike]] = None,
                            gpu: bool = False,
+                           verbose: bool = True,
+                           pool: Optional[multiprocessing.Pool] = None,
                            core_cnt: int = -1) -> None:
 
     """
@@ -547,6 +550,7 @@ def clahe_enhance_video_mp(file_path: Union[str, os.PathLike],
     video_meta_data = get_video_meta_data(file_path)
     check_valid_tuple(x=tile_grid_size, source=f'{clahe_enhance_video_mp.__name__} tile_grid_size', accepted_lengths=(2,), valid_dtypes=(int,),)
     check_valid_boolean(value=[gpu], source=f'{clahe_enhance_video_mp.__name__} gpu', raise_error=True)
+    check_valid_boolean(value=verbose, source=f'{clahe_enhance_video_mp.__name__} verbose', raise_error=True)
     if gpu and not check_nvidea_gpu_available():
         GPUToolsWarning(msg='No NVIDEA GPU detected and GPU selected. Running without GPU', source=clahe_enhance_video_mp.__name__)
         gpu = False
@@ -566,20 +570,22 @@ def clahe_enhance_video_mp(file_path: Union[str, os.PathLike],
     frm_idx = list(range(0, video_meta_data['frame_count']))
     frm_idx = np.array_split(frm_idx, core_cnt)
     frm_idx = [(i, list(j)) for i, j in enumerate(frm_idx)]
-    pool = get_cpu_pool(core_cnt=core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value, source=clahe_enhance_video_mp.__name__)
+    pool_terminate_flag = True if pool is None else False
+    pool = get_cpu_pool(core_cnt=core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value, source=clahe_enhance_video_mp.__name__) if pool is None else pool
     constants = functools.partial(_clahe_enhance_video_mp_helper,
                                   video_path=file_path,
                                   clip_limit=clip_limit,
                                   temp_dir=tempdir,
+                                  verbose=verbose,
                                   tile_grid_size=tile_grid_size)
     for cnt, result in enumerate(pool.imap(constants, frm_idx, chunksize=1)):
-        print(f'[{get_current_time()}] Batch {(result + 1)} / {core_cnt} complete...')
+        if verbose: stdout_information(msg=f'Batch {(result + 1)} / {core_cnt} complete...')
 
-    terminate_cpu_pool(pool=pool, force=False, source=clahe_enhance_video_mp.__name__)
-    print(f"Joining {video_meta_data['video_name']} multiprocessed video...")
+    if pool_terminate_flag: terminate_cpu_pool(pool=pool, force=False, source=clahe_enhance_video_mp.__name__)
+    if verbose: stdout_information(msg=f"Joining {video_meta_data['video_name']} multiprocessed video...")
     concatenate_videos_in_folder(in_folder=tempdir, save_path=save_path, remove_splits=True, gpu=gpu)
     video_timer.stop_timer()
-    print(f"[{get_current_time()}] CLAHE video {video_meta_data['video_name']} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
+    stdout_success(msg=f"CLAHE video {video_meta_data['video_name']} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
 
 
 #_ = clahe_enhance_video_mp(file_path= r"D:\EPM_4\original\1.mp4")
@@ -4065,18 +4071,21 @@ def create_average_frm(video_path: Union[str, os.PathLike],
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     .. video:: _static/img/create_average_frm_2.webm
        :width: 800
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     .. video:: _static/img/create_average_frm_3.webm
        :width: 800
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     .. video:: _static/img/create_average_frm_4.webm
        :width: 800
@@ -4178,12 +4187,14 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     .. video:: _static/img/bg_remover_example_1.webm
        :width: 800
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     .. video:: _static/img/bg_remover_example_2.webm
        :width: 800
@@ -4409,12 +4420,14 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     .. video:: _static/img/bg_remover_example_3.webm
        :width: 900
        :autoplay:
        :loop:
        :muted:
+       :align: center
 
     .. video:: _static/img/bg_remover_example_4.webm
        :width: 900
