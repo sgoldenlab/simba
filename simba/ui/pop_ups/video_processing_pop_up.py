@@ -33,7 +33,8 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_int, check_nvidea_gpu_available,
                                 check_str,
                                 check_that_hhmmss_start_is_before_end)
-from simba.utils.data import convert_roi_definitions, get_cpu_pool, terminate_cpu_pool
+from simba.utils.data import (convert_roi_definitions, get_cpu_pool,
+                              terminate_cpu_pool)
 from simba.utils.enums import (Dtypes, Formats, Keys, Links, Options, Paths,
                                TkBinds)
 from simba.utils.errors import (CountError, DuplicationError,
