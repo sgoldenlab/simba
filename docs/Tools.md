@@ -576,24 +576,17 @@ Converts one or more videos to a target **container format** (e.g. MP4, AVI, WEB
 
 
 ---
-## 🎨 Remove color from videos (Tools menu)
-
-*Available under **Tools** → **Remove color from videos...**. Four sub-options: grayscale, black and white, CLAHE, interactive CLAHE.*
-
-**What it is:** These tools change how color is represented in the video: **grayscale** (one channel, no color), **black and white** (binary or high-contrast), or **CLAHE** (contrast-limited adaptive histogram equalization), which boosts local contrast so dim or flat footage is easier to see.
-
-**Why use it:** Grayscale or black-and-white can reduce file size and sometimes improve tracking or analysis when color is irrelevant. CLAHE is useful when footage is too dark or low-contrast (e.g. infrared or poor lighting) so that animals or features become clearer. No SimBA project required.
-
-**Related:** [Extract frames](#extract-frames) (grayscale/CLAHE option when extracting), [Change video brightness / contrast](#change-video-brightness--contrast).
-
----
-
-
-### 🎨 Convert to grayscale
+## 🎨 Convert to grayscale
 
 * **Tools** → **Remove color from videos...** → **Convert to grayscale**
 
-Converts video(s) to grayscale. Single-file or batch depending on the sub-option.
+**What it is:** Converts color video to single-channel grayscale (no color information). Each pixel becomes a shade of gray based on luminance. Uses FFmpeg's `format=gray` filter or OpenCV's `COLOR_BGR2GRAY` conversion. Supports single video or batch processing. Output format is typically MP4 with `_grayscale` suffix. Can use GPU acceleration (NVIDIA NVENC) for faster encoding.
+
+**Why use it:** Reduces file size (single channel vs. three RGB channels), removes color information that may be irrelevant for tracking, can improve processing speed, and is useful when color doesn't contribute to analysis. No SimBA project required.
+
+**Technical details:** Uses FFmpeg (`-vf format=gray`) or OpenCV (`cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)`). GPU acceleration available via NVIDIA NVENC codec.
+
+**Related:** [Extract frames](#extract-frames) (grayscale option when extracting), [Change video brightness / contrast](#change-video-brightness--contrast).
 
 <p align="center">
   <img src="images/tools/greyscale_gui.webp" width="600" alt="Convert to grayscale dialog">
@@ -618,11 +611,19 @@ Converts video(s) to grayscale. Single-file or batch depending on the sub-option
 ---
 
 
-### 🎨 Convert to black and white
+---
+
+## 🎨 Convert to black and white
 
 * **Tools** → **Remove color from videos...** → **Convert to black and white**
 
-Converts video(s) to **black and white** (binary): each pixel becomes either black or white, with no gray. Useful for high-contrast views or when you need a strict foreground/background. Single file or batch depending on the dialog.
+**What it is:** Creates a binary (two-tone) video where each pixel is either pure black (0) or pure white (255), with no gray values. Uses threshold-based conversion: pixels below the threshold become black, pixels above become white. The threshold value (0.01–1.01, default 0.5) controls the balance—lower values produce more white pixels, higher values produce more black pixels. Useful for creating high-contrast foreground/background separation or when you need strict binary segmentation. Supports single video or batch processing.
+
+**Why use it:** Creates strict binary segmentation for foreground/background separation, useful for blob tracking or when you need high-contrast visualization, can help isolate animals from background in controlled lighting. No SimBA project required.
+
+**Technical details:** Uses threshold-based binary conversion (`cv2.threshold()`). Threshold value normalized to 0–1 range, then applied per pixel.
+
+**Related:** [Extract frames](#extract-frames) (black and white option when extracting), [Change video brightness / contrast](#change-video-brightness--contrast).
 
 <p align="center">
   <video src="images/tools/bw_gui.webp" width="600" controls>Convert to grayscale</video>
@@ -644,11 +645,19 @@ Converts video(s) to **black and white** (binary): each pixel becomes either bla
 ---
 
 
-### 🎨 CLAHE enhance videos
+---
+
+## 🎨 CLAHE enhance videos
 
 * **Tools** → **Remove color from videos...** → **CLAHE enhance videos**
 
-Applies **CLAHE** (contrast-limited adaptive histogram equalization) to improve **local contrast**—making dim or flat footage easier to see without over-brightening the whole frame. Useful for infrared, low light, or when the animal is hard to see against the background.
+**What it is:** Applies Contrast-Limited Adaptive Histogram Equalization to improve local contrast in dim or low-contrast footage. Unlike global histogram equalization, CLAHE divides the image into small tiles (default 16×16 pixels) and equalizes each tile independently, then limits the amplification to prevent over-enhancement. The **clip limit** parameter (default 2.0) controls how much contrast can be boosted per tile—higher values increase local contrast but may introduce noise. The **tile size** parameter controls the size of local regions—smaller tiles preserve more local detail, larger tiles produce smoother results. Converts video to grayscale first, then applies CLAHE per frame using OpenCV's `cv2.createCLAHE()`. Output is typically saved as `.avi` format with `CLAHE_` prefix.
+
+**Why use it:** Enhances visibility in poor lighting conditions (infrared, low-light), improves local contrast without over-brightening entire frames, makes subtle features more visible, particularly useful for dark or flat footage where animals blend into background. No SimBA project required.
+
+**Technical details:** Uses OpenCV's `cv2.createCLAHE(clipLimit, tileGridSize)` applied frame-by-frame. First converts to grayscale, then applies CLAHE filter.
+
+**Related:** [Extract frames](#extract-frames) (CLAHE option when extracting), [Change video brightness / contrast](#change-video-brightness--contrast), [Interactively CLAHE enhance videos](#-interactively-clahe-enhance-videos).
 
 <p align="center">
   <img src="images/tools/clahe_gui_1.webp" width="600" alt="CLAHE enhance videos dialog">
@@ -671,11 +680,19 @@ Applies **CLAHE** (contrast-limited adaptive histogram equalization) to improve 
 ---
 
 
-### 🎨 Interactively CLAHE enhance videos
+---
+
+## 🎨 Interactively CLAHE enhance videos
 
 * **Tools** → **Remove color from videos...** → **Interactively CLAHE enhance videos**
 
-Same as CLAHE enhance, but opens an **interactive window** where you can adjust **Clip limit** and **Tile size** with sliders and see a live preview before saving. Use this when you want to tune the look (e.g. how strong the contrast boost is) by eye.
+**What it is:** Same CLAHE enhancement as the standard CLAHE function, but provides an interactive OpenCV window with real-time preview. You can adjust **Clip limit** and **Tile size** using sliders and see the effect immediately on a sample frame before processing the entire video. The preview updates as you move the sliders, allowing you to fine-tune parameters visually. Once satisfied with the preview, you can apply the settings to the full video.
+
+**Why use it:** Allows visual tuning of CLAHE parameters before processing, saves time by avoiding trial-and-error batch processing, helps find optimal settings for specific video conditions. Ideal when you need to experiment with different contrast levels or when default CLAHE settings don't produce the desired result. No SimBA project required.
+
+**Technical details:** Uses OpenCV trackbars (`cv2.createTrackbar()`) for real-time parameter adjustment, updates preview with throttling to prevent lag. Applies the same CLAHE algorithm (`cv2.createCLAHE()`) as the standard function once parameters are confirmed.
+
+**Related:** [CLAHE enhance videos](#-clahe-enhance-videos), [Extract frames](#extract-frames) (CLAHE option when extracting), [Change video brightness / contrast](#change-video-brightness--contrast).
 
 <p align="center">
   <video src="images/tools/interactive_clahe_ui.mp4" width="600" controls>Interactively CLAHE enhance videos</video>
