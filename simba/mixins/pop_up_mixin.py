@@ -4,6 +4,7 @@ import os
 from tkinter import *
 from tkinter import ttk
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+
 try:
     from typing import Literal
 except:
@@ -16,10 +17,11 @@ from simba.mixins.config_reader import ConfigReader
 from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
                                         SimbaButton, hxtScrollbar)
 from simba.utils.checks import (check_float, check_instance, check_int,
-                                check_valid_lst, check_str)
+                                check_str, check_valid_lst)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import CountError, NoFilesFoundError
-from simba.utils.lookups import (get_color_dict, get_icons_paths, get_named_colors, get_monitor_info)
+from simba.utils.lookups import (get_color_dict, get_icons_paths,
+                                 get_monitor_info, get_named_colors)
 from simba.utils.read_write import find_core_cnt
 
 

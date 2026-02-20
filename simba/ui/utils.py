@@ -3,9 +3,10 @@ try:
 except:
     from typing_extensions import Literal
 
-from simba.utils.lookups import get_monitor_info
 from tkinter import Toplevel
+
 from simba.utils.checks import check_instance, check_int, check_str
+from simba.utils.lookups import get_monitor_info
 
 
 def position_window(window: Toplevel,
