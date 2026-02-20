@@ -102,8 +102,13 @@ class ROITableRow():
                  videos_w_rois: list,
                  video_table_window: ROIVideoTable):
 
-        self.index = Entry_Box(parent=parent, fileDescription='', labelwidth=0, entry_box_width=4)
-        self.index.entry_set(val=f'{row_idx+1}.')
+
+
+
+        self.index = SimBALabel(parent=parent, txt=f'{row_idx+1}.', font=Formats.FONT_REGULAR_BOLD.value, img='frame')
+
+        #self.index = Entry_Box(parent=parent, fileDescription='', labelwidth=0, entry_box_width=4)
+        #self.index.entry_set(val=f'{row_idx+1}.')
         self.index.grid(row=row_idx, column=0, sticky=NW)
         _, video_name, _ = get_fn_ext(filepath=video_path)
         self.video_table_window = video_table_window
@@ -140,4 +145,4 @@ class ROITableRow():
         self.video_table_window.refresh_window()
 
 
-#ROIVideoTable(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini")
+#ROIVideoTable(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini")

@@ -13,7 +13,7 @@ from simba.roi_tools.roi_utils import get_image_from_label
 from simba.ui.tkinter_functions import SimBALabel
 from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
                                 check_instance, check_int)
-from simba.utils.enums import TextOptions, TkBinds
+from simba.utils.enums import TkBinds
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 
@@ -163,7 +163,7 @@ class ROIRuler(object):
 
 
 
-
+#
 # img = cv2.imread(r"C:\Users\sroni\OneDrive\Desktop\webp_20251218114745\BlobTrackingUI.webp")
 # root = Toplevel()
 # root.title(DRAW_FRAME_NAME)
@@ -178,4 +178,4 @@ class ROIRuler(object):
 #
 # _ = ROIRuler(img_window=root, second_clr=(0, 0, 0), px_per_mm=1.5)
 # root.mainloop()
-
+#

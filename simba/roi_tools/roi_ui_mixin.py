@@ -19,8 +19,8 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.roi_tools.interactive_roi_bufferer import InteractiveROIBufferer
-from simba.roi_tools.interactive_roi_modifier_tkinter import \
-    InteractiveROIModifier
+from simba.roi_tools.interactive_roi_modifier_tkinter import InteractiveROIModifier
+from simba.ui.utils import position_window
 from simba.roi_tools.roi_ruler import ROIRuler
 from simba.roi_tools.roi_selector_circle_tkinter import ROISelectorCircle
 from simba.roi_tools.roi_selector_polygon_tkinter import ROISelectorPolygon
@@ -127,7 +127,6 @@ class ROI_mixin(ConfigReader):
             self.min_draw_display_ratio_h, self.min_draw_display_ratio_w = MIN_DRAW_UI_DISPLAY_RATIO[1], MIN_DRAW_UI_DISPLAY_RATIO[0]
             self.max_draw_display_ratio_h, self.max_draw_display_ratio_w = MAX_DRAW_UI_DISPLAY_RATIO[1], MAX_DRAW_UI_DISPLAY_RATIO[0]
 
-
         self.monitor_info, (self.display_w, self.display_h) = get_monitor_info()
         stdout_information(msg=f'AVAILABLE MONITOR(S): \n {self.monitor_info}')
         self.display_img_width, self.display_img_height, self.downscale_factor, self.upscale_factor = get_img_resize_info(img_size=(self.video_meta['width'], self.video_meta['height']), display_resolution=(self.display_w, self.display_h), max_height_ratio=self.max_draw_display_ratio_h, max_width_ratio=self.max_draw_display_ratio_w, min_height_ratio=self.min_draw_display_ratio_h, min_width_ratio=self.min_draw_display_ratio_w)
@@ -157,6 +156,7 @@ class ROI_mixin(ConfigReader):
         self.img_window.resizable(False, False)
         self.img_window.title(DRAW_FRAME_NAME)
         self.img_window.iconphoto(False, self.menu_icons['paint']["img"])
+        position_window(window=self.img_window, position='middle_top')
         self.img_lbl = Label(self.img_window, name='img_lbl')
         self.img_lbl.pack()
         self.img_window.protocol("WM_DELETE_WINDOW", self.close_img)

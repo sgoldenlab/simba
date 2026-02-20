@@ -4,6 +4,10 @@ import os
 from tkinter import *
 from tkinter import ttk
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 
 import PIL.Image
 from PIL import ImageTk
@@ -12,11 +16,10 @@ from simba.mixins.config_reader import ConfigReader
 from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
                                         SimbaButton, hxtScrollbar)
 from simba.utils.checks import (check_float, check_instance, check_int,
-                                check_valid_lst)
+                                check_valid_lst, check_str)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import CountError, NoFilesFoundError
-from simba.utils.lookups import (get_color_dict, get_icons_paths,
-                                 get_named_colors)
+from simba.utils.lookups import (get_color_dict, get_icons_paths, get_named_colors, get_monitor_info)
 from simba.utils.read_write import find_core_cnt
 
 
@@ -375,6 +378,41 @@ class PopUpMixin(object):
         self.probability_entry = Entry_Box(self.probability_frm, "Probability threshold: ", labelwidth=20)
         self.probability_entry.entry_set("0.00")
         self.probability_entry.grid(row=0, column=0, sticky=NW)
+
+    @staticmethod
+    def place_window_at_corner(window: Toplevel,
+                               corner: Literal["top_left", "top_right", "bottom_left", "bottom_right"],
+                               offset_x: int = 0,
+                               offset_y: int = 0) -> None:
+        """
+        Place the window at a screen corner. Placement is deferred (via after(0, ...)) so the window
+        is laid out first; call right after building the window.
+
+        :param win: A tk.Toplevel or tk.Tk window.
+        :param corner: One of "top_left", "top_right", "bottom_left", "bottom_right".
+        :param offset_x: Pixels from the corner horizontally (positive = inward).
+        :param offset_y: Pixels from the corner vertically (positive = inward).
+        """
+        check_instance(source=f'{PopUpMixin.place_window_at_corner.__name__} window', instance=window, accepted_types=(Toplevel,), raise_error=True)
+        check_int(name=f'{PopUpMixin.place_window_at_corner.__name__} offset_x', value=offset_x, raise_error=True)
+        check_int(name=f'{PopUpMixin.place_window_at_corner.__name__} offset_y', value=offset_y, raise_error=True)
+        check_str(name=f'{PopUpMixin.place_window_at_corner.__name__} corner', value=corner, options=("top_left", "top_right", "bottom_left", "bottom_right"), raise_error=True)
+
+        def do_place():
+            window.update_idletasks()
+            w = window.winfo_width()
+            h = window.winfo_height()
+            if w <= 1 or h <= 1:
+                w = max(w, window.winfo_reqwidth())
+                h = max(h, window.winfo_reqheight())
+            _, (sw, sh) = get_monitor_info()
+            if corner == "top_left": x, y = offset_x, offset_y
+            elif corner == "top_right": x, y = sw - w - offset_x, offset_y
+            elif corner == "bottom_left": x, y = offset_x, sh - h - offset_y
+            else: x, y = sw - w - offset_x, sh - h - offset_y
+            window.geometry(f"+{x}+{y}")
+
+        window.after(0, do_place)
 
     def enable_dropdown_from_checkbox(
         self, check_box_var: BooleanVar, dropdown_menus: List[DropDownMenu]

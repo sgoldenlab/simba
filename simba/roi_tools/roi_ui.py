@@ -9,12 +9,11 @@ from simba.mixins.image_mixin import ImageMixin
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.roi_ui_mixin import ROI_mixin
 from simba.roi_tools.roi_utils import get_pose_for_roi_ui
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
 from simba.utils.enums import ROI_SETTINGS
 from simba.utils.errors import InvalidInputError
-from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
-                                    get_video_meta_data)
+from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext, get_video_meta_data)
+from simba.ui.utils import position_window
 
 warnings.filterwarnings("ignore")
 
@@ -85,6 +84,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
         self.get_file_menu(root=self.define_ui.root)
         self.set_selected_shape_type(shape_type='rectangle')
         self.define_ui.root.protocol("WM_DELETE_WINDOW", self._close)
+        position_window(self.define_ui.root, position='top_left')
         self.define_ui.main_frm.mainloop()
 
     def _close(self):
@@ -96,9 +96,9 @@ class ROI_ui(ROI_mixin, ConfigReader):
         self.define_ui.root.quit()
         self.roi_table_popup.refresh_window()
 
-# ROI_ui(config_path=r"C:\troubleshooting\SDS_pre_post\project_folder\project_config.ini",
-#        video_path=r"C:\troubleshooting\SDS_pre_post\project_folder\videos\SDI100 x ALR2 pre_d7.mp4")
-#
+# ROI_ui(roi_coordinates_path=r"D:\troubleshooting\mouse_open_field\project_folder\logs\measures\ROI_definitions.h5",
+#        video_path=r"D:\troubleshooting\mouse_open_field\project_folder\videos\0_video.mp4")
+
 
 #
 # ROI_ui(config_path=r"C:\troubleshooting\open_field_below\project_folder\project_config.ini",
