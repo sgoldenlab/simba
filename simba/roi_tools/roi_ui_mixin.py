@@ -19,8 +19,8 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.roi_tools.interactive_roi_bufferer import InteractiveROIBufferer
-from simba.roi_tools.interactive_roi_modifier_tkinter import InteractiveROIModifier
-from simba.ui.utils import position_window
+from simba.roi_tools.interactive_roi_modifier_tkinter import \
+    InteractiveROIModifier
 from simba.roi_tools.roi_ruler import ROIRuler
 from simba.roi_tools.roi_selector_circle_tkinter import ROISelectorCircle
 from simba.roi_tools.roi_selector_polygon_tkinter import ROISelectorPolygon
@@ -45,6 +45,7 @@ from simba.roi_tools.roi_utils import (change_roi_dict_video_name,
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, SimbaButton, SimBADropDown,
                                         SimBALabel, get_menu_icons)
+from simba.ui.utils import position_window
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_str, check_valid_array)
 from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys, TkBinds
