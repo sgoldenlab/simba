@@ -832,7 +832,7 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
                       keep_aspect_ratio: bool = False,
                       greyscale: Optional[bool] = False,
                       black_and_white: Optional[bool] = False,
-                      clahe: Optional[bool] = False,
+                      clahe: Optional[Union[Tuple[int, int, int], bool]] = False,
                       use_ffmpeg: Optional[bool] = False,
                       raise_error: Optional[bool] = True) -> Union[np.ndarray, None]:
 
@@ -851,14 +851,14 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
     :param bool keep_aspect_ratio: If True and size is provided, resizes the image to fit within the target size while maintaining aspect ratio. If False, resizes to exact size (may distort aspect ratio). Default False.
     :param Optional[bool] greyscale: If True, returns the greyscale image. Default False.
     :param Optional[bool] black_and_white: If True, returns black and white image at threshold 127. Default False.
-    :param Optional[bool] clahe: If True, returns CLAHE enhanced image. Default False.
+    :param Optional[Union[Tuple[int, int, int], bool]] clahe: CLAHE settings. If ``True``, uses default CLAHE (clipLimit=2, tileGridSize=(16, 16)). If a 3-tuple, interpreted as ``(clip_limit, tile_x, tile_y)``. If ``False``/``None``, CLAHE is not applied.
     :param Optional[bool] use_ffmpeg: If True, uses FFmpeg for frame extraction instead of OpenCV. Default False.
     :param Optional[bool] raise_error: If True, raises error on failure. If False, returns None on failure. Default True.
     :return: Image as numpy array, or None if raise_error=False and an error occurs.
     :rtype: Union[np.ndarray, None]
 
     :example:
-    >>> img = read_frm_of_video(video_path='/Users/simon/Desktop/envs/platea_featurizer/data/video/3D_Mouse_5-choice_MouseTouchBasic_s9_a4_grayscale.mp4', clahe=True)
+    >>> img = read_frm_of_video(video_path='/Users/simon/Desktop/envs/platea_featurizer/data/video/3D_Mouse_5-choice_MouseTouchBasic_s9_a4_grayscale.mp4')
     >>> cv2.imshow('img', img)
     >>> cv2.waitKey(5000)
     """
@@ -936,10 +936,14 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     if black_and_white:
         img = np.where(img > 127, 255, 0).astype(np.uint8)
-    if clahe:
+    if clahe is not None:
         if len(img.shape) > 2:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img = cv2.createCLAHE(clipLimit=2, tileGridSize=(16, 16)).apply(img)
+        valid_clahe_tuple = check_valid_tuple(x=clahe, source=f'{read_frm_of_video.__name__} clahe', accepted_lengths=(3,), valid_dtypes=Formats.INTEGER_DTYPES.value, min_integer=1, raise_error=False)
+        if valid_clahe_tuple:
+            img = cv2.createCLAHE(clipLimit=clahe[0], tileGridSize=(clahe[1], clahe[2])).apply(img)
+        else:
+            img = cv2.createCLAHE(clipLimit=2, tileGridSize=(16, 16)).apply(img)
 
     return img
 
@@ -977,42 +981,84 @@ def read_img(img_path: Union[str, os.PathLike],
 def find_video_of_file(video_dir: Union[str, os.PathLike],
                        filename: str,
                        raise_error: Optional[bool] = False,
-                       warning: Optional[bool] = True) -> Union[str, os.PathLike, None]:
+                       warning: Optional[bool] = True,
+                       recursive: bool = False) -> Union[str, os.PathLike, None]:
     """
     Helper to find the video file with the SimBA project that represents a known data file path.
 
     :param str video_dir: Directory holding putative video file.
-    :param str filename: Data file name, e.g., ``Video_1``.
+    :param str filename: Data file name (stem only, e.g. ``Video_1``). Path separators are stripped to the basename.
     :param Optional[bool] raise_error: If True, raise error if no file can be found. If False, returns None if no file can be found. Default: False
     :param Optional[bool] warning: If True, print warning if no file can be found. If False, no warning is printed if file cannot be found. Default: False
-    :return: Video file path.
-    :rtype: Union[str, os.PathLike]
+    :param bool recursive: If True, search subdirectories of video_dir for the video file. If False, only the top-level of video_dir is searched. Default: False. If several files are found as a match, the first one is returned.
+    :return: Video file path, or None if not found.
+    :rtype: Union[str, os.PathLike, None]
 
     :examples:
     >>> find_video_of_file(video_dir='project_folder/videos', filename='Together_1')
     >>> 'project_folder/videos/Together_1.avi'
 
     """
-    try:
-        all_files_in_video_folder = [f for f in next(os.walk(video_dir))[2] if not f[0] == "."]
-    except StopIteration:
+    if video_dir is None or (isinstance(video_dir, str) and not str(video_dir).strip()):
         if raise_error:
-            raise NoFilesFoundError(msg=f"No files found in the {video_dir} directory", source=find_video_of_file.__name__)
+            raise NoFilesFoundError(msg="video_dir must be a non-empty path", source=find_video_of_file.__name__)
         elif warning:
-            NoFileFoundWarning(msg=f"SimBA could not find a video file representing {filename} in the project video directory {video_dir}", source=find_video_of_file.__name__)
+            NoFileFoundWarning(msg=f"SimBA could not find a video file representing {filename}: video_dir is empty or invalid", source=find_video_of_file.__name__)
         return None
 
-    all_files_in_video_folder = [os.path.join(video_dir, x) for x in all_files_in_video_folder]
-    return_path = None
-    for file_path in all_files_in_video_folder:
-        _, video_filename, ext = get_fn_ext(file_path)
-        if (video_filename == filename) and (ext.lower() in Options.ALL_VIDEO_FORMAT_OPTIONS.value):
-            return_path = file_path
+    filename_base = os.path.basename(str(filename)).strip() if filename is not None else ""
+    if not filename_base:
+        if raise_error:
+            raise NoFilesFoundError(msg="filename must be non-empty", source=find_video_of_file.__name__)
+        elif warning:
+            NoFileFoundWarning(msg="SimBA could not find a video file: filename is empty", source=find_video_of_file.__name__)
+        return None
 
-    if return_path is None and raise_error:
-        raise NoFilesFoundError(msg=f"SimBA could not find a video file representing {filename} in the project video directory {video_dir}", source=find_video_of_file.__name__)
-    elif return_path is None and warning:
-        NoFileFoundWarning(msg=f"SimBA could not find a video file representing {filename} in the project video directory {video_dir}", source=find_video_of_file.__name__)
+    return_path = None
+    if not os.path.isdir(video_dir):
+        if raise_error:
+            raise NoFilesFoundError(msg=f"{video_dir} is not a valid directory", source=find_video_of_file.__name__)
+        elif warning:
+            NoFileFoundWarning(msg=f"SimBA could not find a video file representing {filename_base} in the project video directory {video_dir}", source=find_video_of_file.__name__)
+        return None
+
+    if recursive:
+        try:
+            for root, _, files in os.walk(video_dir):
+                for f in files:
+                    if f.startswith("."):
+                        continue
+                    file_path = os.path.join(root, f)
+                    _, video_filename, ext = get_fn_ext(file_path)
+                    if (video_filename == filename_base) and (ext.lower() in Options.ALL_VIDEO_FORMAT_OPTIONS.value):
+                        return_path = file_path
+                        break
+                if return_path is not None:
+                    break
+        except (OSError, PermissionError):
+            if raise_error:
+                raise
+            elif warning:
+                NoFileFoundWarning(msg=f"SimBA could not search {video_dir} for video {filename_base}: access error or permission denied", source=find_video_of_file.__name__)
+            return None
+    else:
+        try:
+            _root, _dirs, files = next(os.walk(video_dir))
+            all_files_in_video_folder = [f for f in files if f and not f.startswith(".")]
+        except StopIteration:
+            all_files_in_video_folder = []
+        all_files_in_video_folder = [os.path.join(video_dir, x) for x in all_files_in_video_folder]
+        for file_path in all_files_in_video_folder:
+            _, video_filename, ext = get_fn_ext(file_path)
+            if (video_filename == filename_base) and (ext.lower() in Options.ALL_VIDEO_FORMAT_OPTIONS.value):
+                return_path = file_path
+                break
+
+    if return_path is None:
+        if raise_error:
+            raise NoFilesFoundError(msg=f"SimBA could not find a video file representing {filename_base} in the project video directory {video_dir}", source=find_video_of_file.__name__)
+        elif warning:
+            NoFileFoundWarning(msg=f"SimBA could not find a video file representing {filename_base} in the project video directory {video_dir}", source=find_video_of_file.__name__)
     return return_path
 
 

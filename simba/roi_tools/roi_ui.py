@@ -84,7 +84,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
         self.get_file_menu(root=self.define_ui.root)
         self.set_selected_shape_type(shape_type='rectangle')
         self.define_ui.root.protocol("WM_DELETE_WINDOW", self._close)
-        position_window(self.define_ui.root, position='top_left')
+        position_window(self.define_ui.root, position='top_left', lift=True, verbose=True, focus=True, after_ms=100)
         self.define_ui.main_frm.mainloop()
 
     def _close(self):

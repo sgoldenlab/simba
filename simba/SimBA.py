@@ -84,6 +84,7 @@ from simba.ui.pop_ups.clf_probability_plot_pop_up import \
     VisualizeClassificationProbabilityPopUp
 from simba.ui.pop_ups.clf_validation_plot_pop_up import \
     ClassifierValidationPopUp
+from simba.ui.utils import position_window
 from simba.ui.pop_ups.coco_keypoints_to_yolo_popup import \
     COCOKeypoints2YOLOkeypointsPopUp
 from simba.ui.pop_ups.csv_2_parquet_pop_up import (Csv2ParquetPopUp,
@@ -829,6 +830,7 @@ class App(object):
         self.menu_icons = get_icons_paths()
         recent_project_paths = get_recent_projects_paths()
         self.root = Tk()
+        position_window(window=self.root, position='center', lift=True)
         self.root.title("SimBA")
         self.root.minsize(750, 750)
         self.root.geometry(Formats.ROOT_WINDOW_SIZE.value)
@@ -849,7 +851,6 @@ class App(object):
 
         ultralytics_version = get_pkg_version(pkg=PackageNames.ULTRALYTICS.value)
         yolo_state = DISABLED if ultralytics_version is None else NORMAL
-
 
         menu = Menu(self.root)
         self.root.config(menu=menu)

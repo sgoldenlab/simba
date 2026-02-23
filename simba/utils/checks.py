@@ -1616,7 +1616,8 @@ def check_valid_tuple(x: tuple,
                       valid_dtypes: Optional[Tuple[Any]] = None,
                       minimum_length: Optional[int] = None,
                       accepted_values: Optional[Iterable[Any]] = None,
-                      min_integer: Optional[int] = None):
+                      min_integer: Optional[int] = None,
+                      raise_error: bool = True) -> bool:
     """
     Validate a tuple against various criteria.
 
@@ -1642,37 +1643,53 @@ def check_valid_tuple(x: tuple,
     """
 
     if not isinstance(x, (tuple)):
-        raise InvalidInputError(msg=f"{check_valid_tuple.__name__} {source} is not a valid tuple, got: {type(x)}", source=source,)
+        if raise_error:
+            raise InvalidInputError(msg=f"{check_valid_tuple.__name__} {source} is not a valid tuple, got: {type(x)}", source=source,)
+        else:
+            return False
     if accepted_lengths is not None:
         if len(x) not in accepted_lengths:
-            raise InvalidInputError(
-                msg=f"Tuple is not of valid lengths. Found {len(x)}. Accepted: {accepted_lengths}",
-                source=source,
-            )
+            if raise_error:
+                raise InvalidInputError(msg=f"Tuple is not of valid lengths. Found {len(x)}. Accepted: {accepted_lengths}", source=source)
+            else:
+                return False
     if valid_dtypes is not None:
         dtypes = list(set([type(v) for v in x]))
         additional = [x for x in dtypes if x not in valid_dtypes]
         if len(additional) > 0:
-            raise InvalidInputError(msg=f"The tuple {source} has invalid data format(s) {additional}. Valid: {valid_dtypes}", source=source)
-
+            if raise_error:
+                raise InvalidInputError(msg=f"The tuple {source} has invalid data format(s) {additional}. Valid: {valid_dtypes}", source=source)
+            else:
+                return False
     if minimum_length is not None:
         check_int(name=f'{check_valid_tuple.__name__} minimum_length', value=minimum_length, min_value=1)
         tuple_len = len(x)
         if tuple_len < minimum_length:
-            raise InvalidInputError(msg=f"The tuple {source} is shorter ({tuple_len}) than the minimum required length ({minimum_length}).", source=source)
+            if raise_error:
+                raise InvalidInputError(msg=f"The tuple {source} is shorter ({tuple_len}) than the minimum required length ({minimum_length}).", source=source)
+            else:
+                return False
 
     if accepted_values is not None:
         check_instance(source=f'{check_valid_tuple.__name__} accepted_values', accepted_types=(list, tuple,), instance=accepted_values)
         for i in x:
             if i not in accepted_values:
-                raise InvalidInputError(msg=f"The tuple {source} has a value that is NOT accepted: {i}, (accepted: {accepted_values}).", source=source)
+                if raise_error:
+                    raise InvalidInputError(msg=f"The tuple {source} has a value that is NOT accepted: {i}, (accepted: {accepted_values}).", source=source)
+                else:
+                    return False
 
     if min_integer is not None:
         check_int(name=f'{check_valid_tuple.__name__} min_integer', value=min_integer)
         for i in x:
             if isinstance(i, int):
                 if i < min_integer:
-                    raise InvalidInputError(msg=f"The tuple {source} has an integer value below the minimum allowed integer value: {i}, (minimum: {min_integer}).", source=source)
+                    if raise_error:
+                        raise InvalidInputError(msg=f"The tuple {source} has an integer value below the minimum allowed integer value: {i}, (minimum: {min_integer}).", source=source)
+                    else:
+                        return False
+
+    return True
 
 
 def check_video_and_data_frm_count_align(video: Union[str, os.PathLike, cv2.VideoCapture],

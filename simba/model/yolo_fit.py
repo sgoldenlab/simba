@@ -242,3 +242,14 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 #                  imgsz=640)
 # fitter.run()
 #
+
+
+# fitter = FitYolo(weights_path=r"D:\maplight_tg2576_yolo\yolo_mdl\original_weight_oct\best.pt",
+#                  model_yaml=r"F:\todd_sleap\yolo_dataset\map.yaml",
+#                  save_path=r"F:\todd_sleap\yolo_dataset\mdl",
+#                  epochs=1500,
+#                  batch=22,
+#                  format=None,
+#                  device=0,
+#                  imgsz=640)
+# fitter.run()

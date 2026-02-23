@@ -111,7 +111,7 @@ class SleapAnnotations2Yolo():
                     if self.video_dir is None:
                         raise NoFilesFoundError(msg=f'Could not locate file {video_path}, pass a video directory', source=self.__class__.__name__)
                     else:
-                        video_path = find_video_of_file(video_dir=self.video_dir, filename=get_fn_ext(filepath=video_path)[1], raise_error=True)
+                        video_path = find_video_of_file(video_dir=self.video_dir, filename=get_fn_ext(filepath=video_path)[1], raise_error=True, recursive=True)
             for i, frame_data in enumerate(frames):
                 if self.verbose: print(f'Converting SLEAP annotation to YOLO {img_cnt+1}/{lbl_cnt}...')
                 frame_idx = frame_data[0]
@@ -167,6 +167,16 @@ class SleapAnnotations2Yolo():
 
 # runner = SleapAnnotations2Yolo(sleap_dir=r'D:\slp_predictions', save_dir=r'D:\slp_predictions\yolo', single_id='mouse')
 # runner.run()
-
+#
+# runner = SleapAnnotations2Yolo(
+#     sleap_dir=r'F:\todd_sleap',
+#     save_dir=r'F:\todd_sleap\yolo_dataset',
+#     video_dir=r'F:\todd_sleap',  # if paths in SLP don't match
+#     single_id='mouse',  # one class; or None for multi-animal
+#     train_size=0.8,
+#     verbose=True,
+# )
+# runner.run()
+#
 
 
