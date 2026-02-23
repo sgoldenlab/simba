@@ -2,10 +2,12 @@ try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
+from tkinter import Tk, Toplevel
 from typing import Union
-from simba.utils.lookups import get_monitor_info
-from tkinter import Toplevel, Tk
+
 from simba.utils.checks import check_instance, check_int, check_str
+from simba.utils.lookups import get_monitor_info
 
 VALID_POSITIONS = ("top_left", "top_right", "bottom_left", "bottom_right", "middle_top", "middle_bottom", "middle_left", "middle_right", "center",)
 

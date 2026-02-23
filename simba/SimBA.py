@@ -84,7 +84,6 @@ from simba.ui.pop_ups.clf_probability_plot_pop_up import \
     VisualizeClassificationProbabilityPopUp
 from simba.ui.pop_ups.clf_validation_plot_pop_up import \
     ClassifierValidationPopUp
-from simba.ui.utils import position_window
 from simba.ui.pop_ups.coco_keypoints_to_yolo_popup import \
     COCOKeypoints2YOLOkeypointsPopUp
 from simba.ui.pop_ups.csv_2_parquet_pop_up import (Csv2ParquetPopUp,
@@ -199,6 +198,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         FileSelect, SimbaButton, SimbaCheckbox,
                                         SimBADropDown, SimBALabel,
                                         hxtScrollbar)
+from simba.ui.utils import position_window
 from simba.ui.video_info_ui import VideoInfoTable
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int)

@@ -3,14 +3,15 @@ from copy import deepcopy
 from tkinter import *
 from typing import Union
 
+from simba.data_processors.distance_calculator import DistanceCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         SimbaCheckbox, SimBADropDown)
 from simba.utils.checks import check_float
 from simba.utils.enums import Links
-from simba.utils.errors import InvalidInputError, NoDataError, DuplicationError
-from simba.data_processors.distance_calculator import DistanceCalculator
+from simba.utils.errors import DuplicationError, InvalidInputError, NoDataError
+
 
 class DistanceAnalysisPopUp(ConfigReader, PopUpMixin):
     def __init__(self,
