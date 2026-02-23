@@ -13,13 +13,13 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
                                 check_valid_boolean, check_valid_dataframe,
-                                check_valid_lst, check_valid_tuple)
+                                check_valid_lst, check_valid_tuple, check_valid_cpu_pool)
 from simba.utils.data import (create_color_palette, get_cpu_pool,
                               terminate_cpu_pool)
 from simba.utils.enums import Defaults, Options
 from simba.utils.errors import (CountError, DataHeaderError, FrameRangeError,
                                 InvalidInputError, NoDataError)
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     find_files_of_filetypes_in_directory,
@@ -43,6 +43,7 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
                               video_path: str,
                               save_dir: str,
                               circle_size: int,
+                              verbose: bool,
                               thickness: int,
                               palettes: dict,
                               bbox: bool,
@@ -55,18 +56,15 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
     fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_DUPLEX
     video_save_path = os.path.join(save_dir, f'{batch_id}.mp4')
     video_writer = cv2.VideoWriter(video_save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]))
+
     if TRACK in data.columns:
         data = data.drop([TRACK], axis=1)
     while current_frm <= end_frm:
-        print(f'[{get_current_time()}] Processing frame {current_frm}/{video_meta_data["frame_count"]} (batch: {batch_id}, video: {video_meta_data["video_name"]})...')
+        if verbose: stdout_information(f'Processing frame {current_frm}/{video_meta_data["frame_count"]} (batch: {batch_id}, video: {video_meta_data["video_name"]})...')
         img = read_frm_of_video(video_path=video_path, frame_index=current_frm)
         frm_data = data.loc[data[FRAME] == current_frm]
         frm_data = frm_data[frm_data[CONFIDENCE] > threshold]
         for cnt, (row, row_data) in enumerate(frm_data.iterrows()):
-            #print(row_data)
-            #row_data = row_data.drop(["LEFT_SIDE_X", "LEFT_SIDE_Y", "LEFT_SIDE_P"], errors="ignore")
-            #row_data = row_data.drop(["RIGHT_SIDE_X", "RIGHT_SIDE_Y", "RIGHT_SIDE_P"], errors="ignore")
-            #row_data = row_data.drop(["CENTER_X", "CENTER_Y", "CENTER_P"], errors="ignore")
             clrs = np.array(palettes[int(row_data[CLASS_ID])]).astype(np.int32)
             bbox_cords = row_data[BOX_CORD_FIELDS].values.astype(np.int32).reshape(-1, 2)
             kp_coords = row_data.drop(EXPECTED_COLS).values.astype(np.int32).reshape(-1, 3)[:, :-1]
@@ -84,8 +82,10 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
                         pos_1 = np.array([row_data[[f'{kp1}_X', f'{kp1}_Y']].values.astype(np.int32)])
                         pos_2 = np.array([row_data[[f'{kp2}_X', f'{kp2}_Y']].values.astype(np.int32)])
                         img = PlottingMixin().draw_lines_on_img(img=img, start_positions=pos_1, end_positions=pos_2, color=(105,105,105), highlight_endpoint=False, thickness=int(max(1, int(circle_size/2))))
+        img = img.astype(np.uint8)
         video_writer.write(img)
         current_frm += 1
+
     cap.release()
     video_writer.release()
     return batch_id
@@ -149,14 +149,15 @@ class YOLOPoseVisualizer():
                  video_path: Union[str, os.PathLike],
                  save_dir: Union[str, os.PathLike],
                  palettes: Optional[Union[str, Tuple[str, ...]]] = 'Set1',
-                 core_cnt: Optional[int] = -1,
+                 core_cnt: int = -1,
                  threshold: float = 0.0,
                  thickness: Optional[int] = None,
                  circle_size: Optional[int] = None,
-                 verbose: Optional[bool] = False,
+                 verbose: bool = True,
                  bbox: Optional[bool] = True,
                  skeleton: List[Tuple[str, str]] = None,
                  recursive: Optional[bool] = False,
+                 pool: Optional[multiprocessing.Pool] = None,
                  sample_n: Optional[int] = None):
 
         check_valid_boolean(value=[recursive], source=f'{self.__class__.__name__} recursive', raise_error=True)
@@ -186,7 +187,7 @@ class YOLOPoseVisualizer():
         missing_video_paths = [x for x in data_paths.keys() if x not in video_paths.keys()]
         if len(missing_video_paths) > 0:
             raise NoDataError(msg=f'The data file(s) {missing_video_paths} does not have a representative video.', source=self.__class__.__name__)
-        #for _, v in video_paths.items(): _ = get_video_meta_data(video_path=v)
+        if pool is not None: check_valid_cpu_pool(value=pool, raise_error=True)
         self.data_paths, self.video_paths = data_paths, video_paths
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
@@ -206,11 +207,12 @@ class YOLOPoseVisualizer():
             check_valid_tuple(x=palettes, source=f'{self.__class__.__name__} palettes', minimum_length=1, valid_dtypes=(str,), accepted_values=Options.PALETTE_OPTIONS_CATEGORICAL.value)
         self.save_dir, self.verbose, self.palette, self.thickness = save_dir, verbose, palettes, thickness
         self.threshold, self.circle_size, self.thickness, self.bbox = threshold, circle_size, thickness, bbox
-        self.palettes, self.skeleton = palettes, skeleton
+        self.palettes, self.skeleton, self.pool = palettes, skeleton, pool
         self.timer = SimbaTimer(start=True)
 
     def run(self):
-        self.pool = get_cpu_pool(core_cnt=self.core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value, verbose=True, source=self.__class__.__name__)
+        pool_terminate_flag = True if self.pool is None else False
+        pool = get_cpu_pool(core_cnt=self.core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value, source=self.__class__.__name__, verbose=self.verbose) if self.pool is None else self.pool
         for video_cnt, (video_name, data_path) in enumerate(self.data_paths.items()):
             video_timer = SimbaTimer(start=True)
             self.video_temp_dir = os.path.join(self.save_dir, video_name, "temp")
@@ -218,7 +220,6 @@ class YOLOPoseVisualizer():
                 remove_a_folder(folder_dir=self.video_temp_dir)
             create_directory(paths=self.video_temp_dir)
             self.data_df = pd.read_csv(data_path, index_col=0)
-            print(f'Visualizing video {video_name} ({video_cnt+1}/{len(list(self.data_paths.keys()))})...')
             self.video_meta_data = get_video_meta_data(video_path=self.video_paths[video_name])
             check_valid_dataframe(df=self.data_df, source=f'{self.__class__.__name__} {data_path}', required_fields=EXPECTED_COLS)
             self.df_frm_cnt = np.unique(self.data_df[FRAME].values).shape[0]
@@ -253,7 +254,7 @@ class YOLOPoseVisualizer():
                 thickness = deepcopy(self.thickness)
             frm_batches = np.array_split(np.array(list(range(0, self.df_frm_cnt))), self.core_cnt)
             frm_batches = [(i, j) for i, j in enumerate(frm_batches)]
-            if self.verbose: print(f'[{get_current_time()}] Visualizing video {self.video_meta_data["video_name"]} (frame count: {self.video_meta_data["frame_count"]})...')
+            if self.verbose: stdout_information(msg=f'Visualizing video {self.video_meta_data["video_name"]} (frame count: {self.video_meta_data["frame_count"]}, video: {video_cnt+1}/{len(list(self.data_paths.keys()))})...')
             constants = functools.partial(_yolo_keypoint_visualizer,
                                       data=self.data_df,
                                       threshold=self.threshold,
@@ -263,16 +264,17 @@ class YOLOPoseVisualizer():
                                       thickness=thickness,
                                       palettes=self.clrs,
                                       bbox=self.bbox,
-                                      skeleton=self.skeleton)
-            for cnt, result in enumerate(self.pool.imap(constants, frm_batches, chunksize=1)):
-                print(f'[{get_current_time()}] Video batch {result+1}/{self.core_cnt} complete...')
+                                      skeleton=self.skeleton,
+                                      verbose=self.verbose,)
+            for cnt, result in enumerate(pool.imap(constants, frm_batches, chunksize=1)):
+                if self.verbose: stdout_information(msg=f'Video batch {result+1}/{self.core_cnt} complete...')
             video_timer.stop_timer()
-            concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.save_path, gpu=True)
-            stdout_success(msg=f'YOLO pose video saved at {self.save_path} (Video {video_cnt+1}/{len(list(self.data_paths.keys()))})', source=self.__class__.__name__, elapsed_time=video_timer.elapsed_time_str)
+            concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.save_path, gpu=False)
+            if self.verbose: stdout_success(msg=f'YOLO pose video saved at {self.save_path} (Video {video_cnt+1}/{len(list(self.data_paths.keys()))})', source=self.__class__.__name__, elapsed_time=video_timer.elapsed_time_str)
 
-        terminate_cpu_pool(pool=self.pool, force=False, source=self.__class__.__name__)
+        if pool_terminate_flag: terminate_cpu_pool(pool=pool, force=False, source=self.__class__.__name__)
         self.timer.stop_timer()
-        stdout_success(msg=f'{len(list(self.data_paths.keys()))} YOLO pose video saved in directory {self.save_dir}', source=self.__class__.__name__, elapsed_time=self.timer.elapsed_time_str)
+        if self.verbose: stdout_success(msg=f'{len(list(self.data_paths.keys()))} YOLO pose video saved in directory {self.save_dir}', source=self.__class__.__name__, elapsed_time=self.timer.elapsed_time_str)
 
 
 
@@ -416,18 +418,16 @@ class YOLOPoseVisualizer():
 #     kp_vis.run()
 
 
-if __name__ == "__main__":
-    video_path = r"E:\netholabs_videos\primeintellect_100_videos\cage_1_date_2025_08_28_hour_20_minute_21.avi"
-    data_path = r"E:\netholabs_videos\primeintellect_100_largest\cage_1_date_2025_08_28_hour_20_minute_21.csv"
-    save_dir = r'E:\netholabs_videos\test_order'
-    kp_vis = YOLOPoseVisualizer(data_path=data_path,
-                                video_path=video_path,
-                                save_dir=save_dir,
-                                core_cnt=14,
-                                palettes=('tab20',),
-                                recursive=True,
-                                sample_n=None)
-
-
-    kp_vis.run()
+# if __name__ == "__main__":
+#     video_path = r"E:\todd_tail\sample\video1_CLAHE_CLIPLIMIT_14_TILESIZE_19_20260216171121.mp4"
+#     data_path = r"E:\todd_tail\yolo_model_predict\video1_CLAHE_CLIPLIMIT_14_TILESIZE_19_20260216171121.csv"
+#     save_dir = r'E:\todd_tail\yolo_mdl_video'
+#     kp_vis = YOLOPoseVisualizer(data_path=data_path,
+#                                 video_path=video_path,
+#                                 save_dir=save_dir,
+#                                 core_cnt=14,
+#                                 threshold=0.0,)
+#
+#
+#     kp_vis.run()
 

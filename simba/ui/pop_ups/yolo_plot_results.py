@@ -11,15 +11,12 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
                                         SimBADropDown)
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists)
-from simba.utils.enums import Options, PackageNames
-from simba.utils.errors import (NoDataError, SimBAGPUError,
-                                SimBAPAckageVersionError)
+from simba.utils.enums import Options
+from simba.utils.errors import NoDataError
 from simba.utils.printing import stdout_warning
-from simba.utils.read_write import (find_core_cnt,
-                                    find_files_of_filetypes_in_directory,
-                                    get_pkg_version, get_video_meta_data,
-                                    str_2_bool)
+from simba.utils.read_write import (find_core_cnt, find_files_of_filetypes_in_directory, get_video_meta_data, str_2_bool)
 from simba.utils.warnings import MissingFileWarning
+from simba.utils.data import get_cpu_pool, terminate_cpu_pool
 
 MAX_TRACKS_OPTIONS = ['None', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 CORE_CNT_OPTIONS = list(range(1, find_core_cnt()[0]))
@@ -99,8 +96,11 @@ class YoloPoseVisualizerPopUp(PopUpMixin):
                               thickness=thickness,
                               circle_size=circle_size,
                               verbose=verbose,
+                              sample_n=None,
+                              recursive=False,
                               bbox=bbox)
             plotter.run()
+
         else:
             data_dir = self.data_dir_path.folder_path
             video_dir = self.video_dir_path.folder_path
@@ -108,18 +108,17 @@ class YoloPoseVisualizerPopUp(PopUpMixin):
             check_if_dir_exists(in_dir=video_dir)
             data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.csv'], raise_error=True, as_dict=True)
             video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True, as_dict=True)
-
             missing_videos = list([x for x in video_paths.keys() if x not in data_paths.keys()])
             missing_data_paths = list([x for x in data_paths.keys() if x not in video_paths.keys()])
             if len(missing_videos) > 0:
                 MissingFileWarning(msg=f'Data files are missing video files in the {video_dir} directory: {missing_videos}', source=self.__class__.__name__)
             if len(missing_data_paths) > 0:
                 MissingFileWarning(msg=f'Video files are missing data files in the {data_dir} directory: {missing_data_paths}', source=self.__class__.__name__)
-
             data_paths = {k:v for k, v in data_paths.items() if k in video_paths.keys()}
             if len(list(data_paths.keys())) == 0:
                 raise NoDataError(msg=f'No data file in the {data_dir} directory has a representative video file in the {video_dir} directory', source=self.__class__.__name__)
             video_cnt = len(list(data_paths.keys()))
+            pool = get_cpu_pool(core_cnt=core_cnt, source=self.__class__.__name__, verbose=True)
             for cnt, (name, data_path) in enumerate(data_paths.items()):
                 if name in video_paths.keys():
                     video_path = video_paths[name]
@@ -132,11 +131,12 @@ class YoloPoseVisualizerPopUp(PopUpMixin):
                                       thickness=thickness,
                                       circle_size=circle_size,
                                       verbose=verbose,
-                                      bbox=bbox)
+                                      bbox=bbox,
+                                      pool=pool)
                     plotter.run()
                 else:
                     stdout_warning(msg=f'Skipping video {name} (no video exist in {video_dir})...')
-
+            terminate_cpu_pool(pool=pool, source=self.__class__.__name__)
 
 
 #YoloPoseVisualizerPopUp()

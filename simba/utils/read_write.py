@@ -936,10 +936,18 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     if black_and_white:
         img = np.where(img > 127, 255, 0).astype(np.uint8)
-    if clahe is not None:
+    apply_default_clahe = isinstance(clahe, bool) and clahe
+    valid_clahe_tuple = check_valid_tuple(
+        x=clahe,
+        source=f'{read_frm_of_video.__name__} clahe',
+        accepted_lengths=(3,),
+        valid_dtypes=Formats.INTEGER_DTYPES.value,
+        min_integer=1,
+        raise_error=False
+    ) if isinstance(clahe, tuple) else False
+    if apply_default_clahe or valid_clahe_tuple:
         if len(img.shape) > 2:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        valid_clahe_tuple = check_valid_tuple(x=clahe, source=f'{read_frm_of_video.__name__} clahe', accepted_lengths=(3,), valid_dtypes=Formats.INTEGER_DTYPES.value, min_integer=1, raise_error=False)
         if valid_clahe_tuple:
             img = cv2.createCLAHE(clipLimit=clahe[0], tileGridSize=(clahe[1], clahe[2])).apply(img)
         else:
