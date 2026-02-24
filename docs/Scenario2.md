@@ -142,12 +142,15 @@ When processing is finished, SimBA saves new CSV files to the `project_folder/cs
 <a id="part-4-analyze-machine-learning-results"></a>
 ## 📈 Part 4 — Analyze machine learning results
 
-The files in the `project_folder/csv/machine_results/` directory contain frame-by-frame predictions and probabilities **for each classified behavior** (e.g. BtWGaNP): for every frame, the probability that the behavior occurred (0–1) and the binary prediction (present or absent) based on your threshold and minimum bout length. To summarize the predictions for analysis (e.g. for statistics, figures, or group comparisons), use the analysis tools in the **Run machine model** tab. The **Analyze machine results** sub-menu offers six options, each covered in the sections below: **(1)** ANALYZE MACHINE PREDICTIONS: AGGREGATES, **(2)** ANALYZE DISTANCES / VELOCITY: AGGREGATES, **(3)** ANALYZE MACHINE PREDICTIONS: TIME BINS, **(4)** ANALYZE DISTANCES / VELOCITY: TIME-BINS, **(5)** ANALYZE MACHINE PREDICTIONS: BY ROI, **(6)** ANALYZE MACHINE PREDICTIONS: BY SEVERITY. Each tool reads from the `project_folder/csv/machine_results/` directory, computes the requested metrics, and writes a date-time stamped CSV to the `project_folder/logs/` directory (plots in subfolders when applicable). The terminal prints the exact filename(s) after each run.
+The files in the `project_folder/csv/machine_results/` directory contain frame-by-frame predictions and probabilities **for each classified behavior** (e.g. BtWGaNP): for every frame, the probability that the behavior occurred (0–1) and the binary prediction (present or absent) based on your threshold and minimum bout length. To summarize the predictions for analysis (e.g. for statistics, figures, or group comparisons), use the analysis tools in the **Run machine model** tab. The **Analyze machine results** sub-menu offers eight options: **(1)** ANALYZE MACHINE PREDICTIONS: AGGREGATES, **(2)** ANALYZE MOVEMENT / VELOCITY: AGGREGATES, **(3)** ANALYZE MACHINE PREDICTIONS: TIME BINS, **(4)** ANALYZE MOVEMENT / VELOCITY: TIME-BINS, **(5)** ANALYZE DISTANCES: AGGREGATES, **(6)** ANALYZE DISTANCES: TIME-BINS, **(7)** ANALYZE MACHINE PREDICTIONS: BY ROI, **(8)** ANALYZE MACHINE PREDICTIONS: BY SEVERITY. Each tool reads required inputs from the project folders, computes the requested metrics, and writes date-time stamped outputs to the `project_folder/logs/` directory (plots in subfolders when applicable). The terminal prints the exact filename(s) after each run.
 
 To access the analysis tools: go to the **Run machine model** tab and find the **Analyze machine results** section. Click the button for the analysis you want (e.g. **ANALYZE MACHINE PREDICTIONS: AGGREGATES**).
 
 > [!NOTE]
 > Analyses that do not require machine learning results (e.g. distance and velocity aggregates or time bins) can also be run from the **ROI** tab, which has equivalent tools for movement and distance metrics. Use whichever tab fits your workflow.
+
+> [!NOTE]
+> The **ANALYZE DISTANCES: AGGREGATES** and **ANALYZE DISTANCES: TIME-BINS** buttons are dedicated body-part pair distance tools (separate from movement/velocity tools). They use pose coordinates from outlier-corrected pose files and save outputs to `project_folder/logs/`.
 
 <p align="center">
   <img src="images/scenario2/analyze_machine_results.webp" width="600">
@@ -197,9 +200,9 @@ Use **ANALYZE MACHINE PREDICTIONS: AGGREGATES** when you need **one summary numb
 
 Click <kbd>RUN</kbd>. A date-time stamped CSV is saved to the `project_folder/logs/` directory. The terminal prints the exact filename.
 
-### 2. ANALYZE DISTANCES / VELOCITY: AGGREGATES
+### 2. ANALYZE MOVEMENT / VELOCITY: AGGREGATES
 
-Use **ANALYZE DISTANCES / VELOCITY: AGGREGATES** when you need **one movement value per video per animal** for the whole video: either total distance traveled (in cm) and/or average velocity (cm/s), depending on which measurements you check. SimBA computes these from the pose data in the `project_folder/csv/outlier_corrected_movement_location/` directory; you do not need to run the classifier or extract features for this analysis—distance and velocity come directly from the calibrated pose coordinates. You choose the number of animals, which body part(s) to track for each animal (e.g. Nose, Center of gravity), a pose confidence threshold, and at least one of **DISTANCE (CM)** or **VELOCITY (CM/S)**, then click <kbd>RUN</kbd>. Output is saved to the `project_folder/logs/` directory as `Movement_log_{datetime}.csv`. 
+Use **ANALYZE MOVEMENT / VELOCITY: AGGREGATES** when you need **one movement value per video per animal** for the whole video: either total distance traveled (in cm) and/or average velocity (cm/s), depending on which measurements you check. SimBA computes these from the pose data in the `project_folder/csv/outlier_corrected_movement_location/` directory; you do not need to run the classifier or extract features for this analysis—distance and velocity come directly from the calibrated pose coordinates. You choose the number of animals, which body part(s) to track for each animal (e.g. Nose, Center of gravity), a pose confidence threshold, and at least one of **DISTANCE (CM)** or **VELOCITY (CM/S)**, then click <kbd>RUN</kbd>. Output is saved to the `project_folder/logs/` directory as `Movement_log_{datetime}.csv`. 
 
 
 <p align="center">
@@ -254,9 +257,9 @@ All options in the dialog are listed below.
 
 
 
-### 4. ANALYZE DISTANCES / VELOCITY: TIME-BINS
+### 4. ANALYZE MOVEMENT / VELOCITY: TIME-BINS
 
-Use **ANALYZE DISTANCES / VELOCITY: TIME-BINS** when you need **one distance or velocity value per time bin per video per animal** (e.g. total distance traveled in bin 1, in bin 2, …), so you can see how movement or velocity changes over the course of each video. SimBA reads pose data from the `project_folder/csv/outlier_corrected_movement_location/` directory; no feature extraction or classifier is required. You set the **time bin size** (e.g. 60 s), choose which body part(s) to track for each animal, and select at least one of **DISTANCE (CM)** or **VELOCITY (CM/S)**, then click <kbd>RUN</kbd>. Optionally you can generate line plots of distance (or velocity) vs time bin. 
+Use **ANALYZE MOVEMENT / VELOCITY: TIME-BINS** when you need **one distance or velocity value per time bin per video per animal** (e.g. total distance traveled in bin 1, in bin 2, …), so you can see how movement or velocity changes over the course of each video. SimBA reads pose data from the `project_folder/csv/outlier_corrected_movement_location/` directory; no feature extraction or classifier is required. You set the **time bin size** (e.g. 60 s), choose which body part(s) to track for each animal, and select at least one of **DISTANCE (CM)** or **VELOCITY (CM/S)**, then click <kbd>RUN</kbd>. Optionally you can generate line plots of distance (or velocity) vs time bin. 
 
 <p align="center">
   <img src="images/scenario2/movement_timebin.webp" width="600">
@@ -285,7 +288,45 @@ All options in the dialog are listed below.
 
 
 
-### 5. ANALYZE MACHINE PREDICTIONS: BY ROI
+### 5. ANALYZE DISTANCES: AGGREGATES
+
+Use **ANALYZE DISTANCES: AGGREGATES** when you need **one body-part pair distance summary per video** (for example, distance between Animal_1 Nose and Animal_2 Nose across the full video). Unlike movement/velocity analyses (which track one body-part trajectory per animal), this tool compares two selected body-parts directly and summarizes their frame-wise Euclidean distance. You can analyze one or multiple body-part pairs, set a body-part confidence threshold, choose summary metrics, and optionally apply a distance threshold to quantify time below/above that distance threshold.
+
+**Where data is saved:**
+- **CSV:** `project_folder/logs/` — e.g. `Distance_log_{datetime}_bodypart_threshold_{threshold}_distance_threshold_{value}.csv`. The terminal prints the exact filename.
+- **Detailed per-frame outputs (optional):** If enabled in advanced/API usage, per-pair CSVs are saved in a dedicated `detailed_distance_{datetime}` folder in `project_folder/logs/`.
+
+| Option | Description |
+|--------|-------------|
+| **# OF DISTANCES** (SELECT NUMBER OF DISTANCES) | Number of body-part pairs to analyze. Each row below contains one pair (`BODY-PART 1` and `BODY-PART 2`). |
+| **SELECT BODY-PARTS** | Choose two different body-parts per row. Distances are computed frame-by-frame between these two points. |
+| **BODY-PART THRESHOLD** | Minimum pose-estimation confidence (0.0-1.0). Frames where either body-part in the pair is below threshold are excluded. |
+| **USE DISTANCE THRESHOLD** | Enables threshold-based distance analysis for each pair. |
+| **DISTANCE THRESHOLD (MM)** | Distance cutoff in millimeters used when thresholding is enabled. SimBA reports total time below and above this distance. |
+| **MEAN DISTANCE (MM)** | If checked, outputs the mean pair distance over included frames. |
+| **MEDIAN DISTANCE (MM)** | If checked, outputs the median pair distance over included frames. |
+| **TRANSPOSE OUTPUT CSV** | If checked, output is one row per video with pair/metric columns. Default is long format (one row per video/pair/metric). |
+| **DETAILED PER-FRAME DATA** | If checked, saves frame-level distance values for each pair in `project_folder/logs/detailed_distance_{datetime}/` (in addition to the summary CSV). |
+
+### 6. ANALYZE DISTANCES: TIME-BINS
+
+Use **ANALYZE DISTANCES: TIME-BINS** when you need **distance metrics per time bin** (rather than one value for the entire video). This is useful for testing whether pairwise distance changes over time (e.g. social proximity dynamics across a session). SimBA computes frame-wise distances for each body-part pair, splits the video into equal bins, and reports selected metrics per bin.
+
+**Where data is saved:**
+- **CSV:** `project_folder/logs/` — e.g. `Distance_log_{datetime}.csv` with one or more rows per video/time-bin/pair/metric.
+
+| Option | Description |
+|--------|-------------|
+| **# OF DISTANCES** (SELECT NUMBER OF DISTANCES) | Number of body-part pairs to analyze per video. |
+| **SELECT BODY-PARTS** | Choose two different body-parts for each pair row. |
+| **BODY-PART THRESHOLD** | Minimum pose-estimation confidence (0.0-1.0). Within each bin, frames below threshold for either body-part are excluded. |
+| **TIME BIN (S)** | Duration of each bin in seconds (must be > 0). Example: `60` creates 1-minute bins. |
+| **MEAN DISTANCE (MM)** | If checked, outputs mean distance per pair per bin. |
+| **MEDIAN DISTANCE (MM)** | If checked, outputs median distance per pair per bin. |
+| **VARIANCE DISTANCE (MM)** | If checked, outputs distance-variance metric per pair per bin. |
+| **TRANSPOSE OUTPUT CSV** | If checked, transposes output so bins become columns per metric/pair. Default is long format with one row per video/bin/pair/metric. |
+
+### 7. ANALYZE MACHINE PREDICTIONS: BY ROI
 
 Use **ANALYZE MACHINE PREDICTIONS: BY ROI** when you have drawn [user-defined ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md) (e.g. zones or polygons on the video) and want **per-ROI metrics**: total time (seconds) each classified behavior occurred inside each ROI, how many behavior bouts *started* inside each ROI, and how many *ended* inside each ROI. SimBA uses the classifier predictions from the `project_folder/csv/machine_results/` directory and your ROI definitions to determine when the animal (via the body part you choose) is inside or outside each zone. You select which ROIs, which classifiers, which body part(s) to use for location, and which measurements to compute, then click <kbd>RUN</kbd>. 
 
@@ -316,7 +357,7 @@ All options in the **Analyze machine predictions: by ROI** dialog are listed bel
 
 
 
-### 6. ANALYZE MACHINE PREDICTIONS: BY SEVERITY
+### 8. ANALYZE MACHINE PREDICTIONS: BY SEVERITY
 
 Use **ANALYZE MACHINE PREDICTIONS: BY SEVERITY** when your behavior can be graded from **mild to severe** based on movement intensity (e.g. mild vs severe attacks). SimBA computes movement (e.g. summed velocity of selected body parts) during each classified frame or each bout, then assigns a **severity score** (e.g. 1–10) to each frame or bout using a user-defined scale. The output gives you not only how often the behavior occurred but **how intense** the behavior was—e.g. how many events fell into each severity bracket. You choose the classifier, the number of brackets (scale size), whether to score per bout or per frame, how to normalize movement across videos, and optionally whether to save bracket definitions or generate example clips.
 

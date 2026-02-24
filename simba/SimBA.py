@@ -389,8 +389,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         visualizeROIfeature.grid(row=1, sticky="NW")
 
         processmovementdupLabel = CreateLabelFrameWithIcon(parent=tab6, header="OTHER ANALYSES / VISUALIZATIONS", icon_name='list', icon_link=Links.ROI.value, bg='#DCDCDC', padx=5, pady=5)
-        analyze_distances_velocity_btn = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE DISTANCES / VELOCITY: AGGREGATES", img='metrics_green', txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=MovementAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        analyze_distances_velocity_timebins_btn = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE DISTANCES / VELOCITY: TIME-BINS", img='metrics_blue', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=MovementAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        analyze_distances_velocity_btn = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE MOVEMENT / VELOCITY: AGGREGATES", img='metrics_green', txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=MovementAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        analyze_distances_velocity_timebins_btn = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE MOVEMENT / VELOCITY: TIME-BINS", img='metrics_blue', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=MovementAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         heatmaps_location_button = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="CREATE LOCATION HEATMAPS", txt_clr='red', img='heatmap', font=Formats.FONT_REGULAR.value, cmd=HeatmapLocationPopup, cmd_kwargs={'config_path': lambda:self.config_path})
         button_lineplot = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="CREATE PATH PLOTS", txt_clr='orange', img='path', font=Formats.FONT_REGULAR.value, cmd=QuickLineplotPopup, cmd_kwargs={'config_path': lambda:self.config_path})
 

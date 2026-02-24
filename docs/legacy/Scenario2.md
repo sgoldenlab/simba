@@ -89,13 +89,13 @@ Once the classifications have been generated, we may want to analyze descriptive
 Next, clicking `RUN` executes the selected desciptive statistics on all the files in `project_folder/csv/machine_results` directory. A date-time stamped output csv file with the data is saved within the `/project_folder/log` folder. Check the main SimBA terminal window for the exact output filename and file path. 
 
 
-2. `ANALYZE DISTANCES / VELOCITY: AGGREGATES`: This button generates descriptive statistics for distances and velocities. Clicking the button will display a pop-up window where the user selects how many animal, and which body-parts, the user wants to use to calculate the distance and velocity metrics. The pop up window should look like this:
+2. `ANALYZE MOVEMENT / VELOCITY: AGGREGATES`: This button generates descriptive statistics for distances and velocities. Clicking the button will display a pop-up window where the user selects how many animal, and which body-parts, the user wants to use to calculate the distance and velocity metrics. The pop up window should look like this:
 
 ![alt-text-1](/images/data_analysis_0523_3.png "data_log")
 
 Clicking the `Run` buttons calculates the descriptive statistics on all the CSV files in `project_folder/csv/machine_results` directory. A date-time stamped output csv file with the data is saved in the `/project_folder/log` folder. 
 
-> Note: When clicking the `Body-part` dropdown in the `ANALYZE DISTANCES / VELOCITY: AGGREGATES` pop-up menu, you should see all the body-parts available in your project. You should also see options with the suffix **CENTER OF GRAVITY**, e.g., an option may be named `Animal 1 CENTER OF GRAVITY`. If you use this option, SimBA will estimate the centroid of the choosen animal and compute the moved distance and the velocity based on the estimated centroid. 
+> Note: When clicking the `Body-part` dropdown in the `ANALYZE MOVEMENT / VELOCITY: AGGREGATES` pop-up menu, you should see all the body-parts available in your project. You should also see options with the suffix **CENTER OF GRAVITY**, e.g., an option may be named `Animal 1 CENTER OF GRAVITY`. If you use this option, SimBA will estimate the centroid of the choosen animal and compute the moved distance and the velocity based on the estimated centroid. 
 
 3. `ANALYZE MACHINE PREDICTIONS: TIME BINS`: Use this menu to compute descriptive statistics of classification within **user-defined time-bins**. This menu looks very similar to the menu used for aggregate machine classification computations, but has one additional entry-box at the bottom. In this bottom entry-box, enter the size of your time-bins in **seconds**. 
 
@@ -103,7 +103,7 @@ Clicking the `Run` buttons calculates the descriptive statistics on all the CSV 
 
 >Note: (i) If no behavior was expressed in a certain time bin, then the fields representing that time bin is missing. (ii) If there was 1 behavior event within a time bin, then the `Mean event interval (s)` and `Median event interval (s)` fields are missing for that time-bin. 
 
-4. `ANALYZE DISTANCES / VELOCITY: TIME-BINS`: This button generates descriptive statistics for movements, velocities, and distances between animals in **user-defined time-bins**. Clicking this button brings up a pop-up menu very similar to the `ANALYZE DISTANCES / VELOCITY: AGGREGATES`,  but has one additional entry-box at the bottom. In this bottom entry-box, enter the size of your time-bins in **seconds**. It also has a checkbox named `Create plots`. If the `Create plots` checkbox is ticked, SimBA will generate line plots, with one line plot per videos, representing the movement of your animals in the defined time-bins. 
+4. `ANALYZE MOVEMENT / VELOCITY: TIME-BINS`: This button generates descriptive statistics for movements, velocities, and distances between animals in **user-defined time-bins**. Clicking this button brings up a pop-up menu very similar to the `ANALYZE MOVEMENT / VELOCITY: AGGREGATES`,  but has one additional entry-box at the bottom. In this bottom entry-box, enter the size of your time-bins in **seconds**. It also has a checkbox named `Create plots`. If the `Create plots` checkbox is ticked, SimBA will generate line plots, with one line plot per videos, representing the movement of your animals in the defined time-bins. 
 
 ![alt-text-1](/images/data_analysis_0523_5.png "data_log")
 

@@ -142,7 +142,7 @@ When processing is finished, SimBA saves new CSV files to the `project_folder/cs
 <a id="part-4-analyze-machine-learning-results"></a>
 ## 📈 Part 4 — Analyze machine learning results
 
-The files in the `project_folder/csv/machine_results/` directory contain frame-by-frame predictions and probabilities **for each classified behavior** (e.g. BtWGaNP): for every frame, the probability that the behavior occurred (0–1) and the binary prediction (present or absent) based on your threshold and minimum bout length. To summarize the predictions for analysis (e.g. for statistics, figures, or group comparisons), use the analysis tools in the **Run machine model** tab. The **Analyze machine results** sub-menu offers six options, each covered in the sections below: **(1)** ANALYZE MACHINE PREDICTIONS: AGGREGATES, **(2)** ANALYZE DISTANCES / VELOCITY: AGGREGATES, **(3)** ANALYZE MACHINE PREDICTIONS: TIME BINS, **(4)** ANALYZE DISTANCES / VELOCITY: TIME-BINS, **(5)** ANALYZE MACHINE PREDICTIONS: BY ROI, **(6)** ANALYZE MACHINE PREDICTIONS: BY SEVERITY. Each tool reads from the `project_folder/csv/machine_results/` directory, computes the requested metrics, and writes a date-time stamped CSV to the `project_folder/logs/` directory (plots in subfolders when applicable). The terminal prints the exact filename(s) after each run.
+The files in the `project_folder/csv/machine_results/` directory contain frame-by-frame predictions and probabilities **for each classified behavior** (e.g. BtWGaNP): for every frame, the probability that the behavior occurred (0–1) and the binary prediction (present or absent) based on your threshold and minimum bout length. To summarize the predictions for analysis (e.g. for statistics, figures, or group comparisons), use the analysis tools in the **Run machine model** tab. The **Analyze machine results** sub-menu offers six options, each covered in the sections below: **(1)** ANALYZE MACHINE PREDICTIONS: AGGREGATES, **(2)** ANALYZE MOVEMENT / VELOCITY: AGGREGATES, **(3)** ANALYZE MACHINE PREDICTIONS: TIME BINS, **(4)** ANALYZE MOVEMENT / VELOCITY: TIME-BINS, **(5)** ANALYZE MACHINE PREDICTIONS: BY ROI, **(6)** ANALYZE MACHINE PREDICTIONS: BY SEVERITY. Each tool reads from the `project_folder/csv/machine_results/` directory, computes the requested metrics, and writes a date-time stamped CSV to the `project_folder/logs/` directory (plots in subfolders when applicable). The terminal prints the exact filename(s) after each run.
 
 To access the analysis tools: go to the **Run machine model** tab and find the **Analyze machine results** section. Click the button for the analysis you want (e.g. **ANALYZE MACHINE PREDICTIONS: AGGREGATES**).
 
@@ -196,7 +196,7 @@ Use this when you need **one summary number per video per classifier** for each 
 
 Click <kbd>RUN</kbd>. A date-time stamped CSV is saved to the `project_folder/logs/` directory. The terminal prints the exact filename.
 
-### 2. ANALYZE DISTANCES / VELOCITY: AGGREGATES
+### 2. ANALYZE MOVEMENT / VELOCITY: AGGREGATES
 
 Use this when you need **one movement value per video per animal** for the whole video: either total distance traveled (in cm) and/or average velocity (cm/s), depending on which measurements you check. SimBA computes these from the pose data in the `project_folder/csv/outlier_corrected_movement_location/` directory; you do not need to run the classifier or extract features for this analysis—distance and velocity come directly from the calibrated pose coordinates. You choose the number of animals, which body part(s) to track for each animal (e.g. Nose, Center of gravity), a pose confidence threshold, and at least one of **DISTANCE (CM)** or **VELOCITY (CM/S)**, then click <kbd>RUN</kbd>. Output is saved to the `project_folder/logs/` directory as `Movement_log_{datetime}.csv`. 
 
@@ -253,7 +253,7 @@ All options in the dialog are listed below.
 
 
 
-### 4. ANALYZE DISTANCES / VELOCITY: TIME-BINS
+### 4. ANALYZE MOVEMENT / VELOCITY: TIME-BINS
 
 Use this when you need **one distance or velocity value per time bin per video per animal** (e.g. total distance traveled in bin 1, in bin 2, …), so you can see how movement or velocity changes over the course of each video. SimBA reads pose data from the `project_folder/csv/outlier_corrected_movement_location/` directory; no feature extraction or classifier is required. You set the **time bin size** (e.g. 60 s), choose which body part(s) to track for each animal, and select at least one of **DISTANCE (CM)** or **VELOCITY (CM/S)**, then click <kbd>RUN</kbd>. Optionally you can generate line plots of distance (or velocity) vs time bin. 
 

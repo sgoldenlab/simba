@@ -271,7 +271,7 @@ The **[ROI]** tab has a right-hand frame **OTHER ANALYSES / VISUALIZATIONS** tha
 
 ### Distances / velocity (aggregates and time-bins)
 
-**Where:** **[ROI]** tab → **OTHER ANALYSES / VISUALIZATIONS** → **ANALYZE DISTANCES / VELOCITY: AGGREGATES** or **ANALYZE DISTANCES / VELOCITY: TIME-BINS**
+**Where:** **[ROI]** tab → **OTHER ANALYSES / VISUALIZATIONS** → **ANALYZE MOVEMENT / VELOCITY: AGGREGATES** or **ANALYZE MOVEMENT / VELOCITY: TIME-BINS**
 
 Compute **total distance moved** and **average velocity** (e.g. cm, cm/s) per animal per video from pose data. No ROIs required—SimBA uses the body-part(s) you choose (e.g. nose, center of mass) to compute movement. **Aggregates** gives one set of statistics per video; **Time-bins** gives the same metrics in user-defined time windows (e.g. per minute) and can optionally create line plots.
 
