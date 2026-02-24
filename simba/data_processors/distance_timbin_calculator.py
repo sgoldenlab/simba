@@ -1,17 +1,22 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 import os
-from typing import List, Optional, Union, Tuple, Iterable
+from typing import Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_float, check_str, check_that_column_exist, check_valid_boolean, check_valid_lst, check_instance, check_valid_tuple)
-from simba.utils.errors import NoDataError, InvalidInputError, FrameRangeError
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log, check_float,
+    check_instance, check_str, check_that_column_exist, check_valid_boolean,
+    check_valid_lst, check_valid_tuple)
+from simba.utils.errors import FrameRangeError, InvalidInputError, NoDataError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    find_time_stamp_from_frame_numbers,
+                                    get_fn_ext, read_df)
 from simba.utils.warnings import NotEnoughDataWarning
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,  get_fn_ext, read_df, find_time_stamp_from_frame_numbers)
 
 
 class DistanceTimeBinCalculator(ConfigReader, FeatureExtractionMixin):
