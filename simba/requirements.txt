@@ -39,7 +39,7 @@ psutil == 5.9.8; python_version=="3.6"
 psutil; python_version>="3.9"
 dash == 1.14.0
 dash_color_picker == 0.0.1
-dash_core_components == 1.10.2
+dash_core_components == 2.0.0
 dash_colorscales == 0.0.4
 dash_html_components == 1.0.3
 h5py==2.9.0;python_version=="3.6"
