@@ -60,7 +60,7 @@ class DistanceTimeBinCalculator(ConfigReader, FeatureExtractionMixin):
                  save_path: Optional[Union[str, os.PathLike]] = None,
                  distance_mean: bool = True,
                  distance_median: bool = True,
-                 distance_var: bool = True,
+                 distance_var: bool = False,
                  verbose: bool = True,
                  transpose: bool = False):
 
@@ -118,10 +118,11 @@ class DistanceTimeBinCalculator(ConfigReader, FeatureExtractionMixin):
         self.results = pd.DataFrame(columns=["VIDEO", "TIME BIN #", "START TIME", "END TIME", "ANIMAL 1", "BODY-PART 1",  "ANIMAL 2", "BODY-PART 2", "MEASUREMENT", "VALUE"])
         self.__find_body_part_columns()
         for file_cnt, file_path in enumerate(self.file_paths):
-            video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(file_path)
+
             if self.verbose: stdout_information(msg=f"Analysing {video_name}... (Video {file_cnt+1}/{len(self.file_paths)})")
             self.data_df = read_df(file_path=file_path, file_type=self.file_type)
+            print(video_name, len(self.data_df))
             self.video_info, self.px_per_mm, self.fps = self.read_video_info(video_name=video_name)
             bin_length_frames = int(self.fps * self.time_bin)
             if bin_length_frames == 0:
@@ -130,39 +131,43 @@ class DistanceTimeBinCalculator(ConfigReader, FeatureExtractionMixin):
                 check_that_column_exist(df=self.data_df, column_name=v["BODY-PART HEADERS 1"], file_name=file_path)
                 check_that_column_exist(df=self.data_df, column_name=v["BODY-PART HEADERS 2"], file_name=file_path)
             for bp_pair_cnt, bp_pair in self.body_parts_dict.items():
-                bp_1_data = self.data_df[bp_pair["BODY-PART HEADERS 1"]]
-                bp_2_data = self.data_df[bp_pair["BODY-PART HEADERS 2"]]
-                if self.threshold > 0.00:
-                    idx_1 = list(bp_1_data.index[bp_1_data[bp_pair["BODY-PART HEADERS 1"][-1]] < self.threshold])
-                    idx_2 = list(bp_2_data.index[bp_2_data[bp_pair["BODY-PART HEADERS 2"][-1]] < self.threshold])
-                    drop_idx = sorted(list(set(idx_1) | set(idx_2)))
-                    bp_1_data = bp_1_data.drop(index=drop_idx, errors="ignore").values[:, :2]
-                    bp_2_data = bp_2_data.drop(index=drop_idx, errors="ignore").values[:, :2]
-                else:
-                    bp_1_data, bp_2_data = bp_1_data.values[:, :2], bp_2_data.values[:, :2]
-                if len(bp_1_data) < 1 or len(bp_2_data) < 1:
-                    NotEnoughDataWarning(msg=f'Cannot compute distances in file {file_path}. No body-part distance comparisons possible at probability (threshold) value {self.threshold}', source=self.__class__.__name__)
-                else:
-                    distance = FeatureExtractionMixin.keypoint_distances(a=bp_1_data, b=bp_2_data, px_per_mm=self.px_per_mm, in_centimeters=False)
-                    distance_lists = [distance[i: i + bin_length_frames] for i in range(0, distance.shape[0], bin_length_frames)]
-                    for bin_cnt, distance_list in enumerate(distance_lists):
-                        bin_times = find_time_stamp_from_frame_numbers(start_frame=int(bin_length_frames * bin_cnt), end_frame=min(int(bin_length_frames * (bin_cnt + 1)), len(self.data_df)), fps=self.fps)
-                        if self.distance_mean:
-                            self.results.loc[len(self.results)] = [video_name, bin_cnt, bin_times[0], bin_times[1], bp_pair["ANIMAL NAME 1"], bp_pair["BODY-PART 1"], bp_pair["ANIMAL NAME 2"], bp_pair["BODY-PART 2"], "MEAN DISTANCE (CM)", np.mean(distance_list)]
-                        if self.distance_median:
-                            self.results.loc[len(self.results)] = [video_name, bin_cnt, bin_times[0], bin_times[1], bp_pair["ANIMAL NAME 1"], bp_pair["BODY-PART 1"], bp_pair["ANIMAL NAME 2"], bp_pair["BODY-PART 2"], "MEDIAN DISTANCE (CM)", np.median(distance)]
-                        if self.distance_var:
-                            self.results.loc[len(self.results)] = [video_name, bin_cnt, bin_times[0], bin_times[1],  bp_pair["ANIMAL NAME 1"], bp_pair["BODY-PART 1"], bp_pair["ANIMAL NAME 2"], bp_pair["BODY-PART 2"], "VARIANCE DISTANCE (CM)",  np.std(distance)]
-            video_timer.stop_timer()
-            #if self.verbose:
-            #    stdout_information(msg=f'Distance analysis in video {video_name} complete', elapsed_time=video_timer.elapsed_time_str)
+                bp_1_data = self.data_df[bp_pair["BODY-PART HEADERS 1"]].values[:, 0:2]
+                bp_2_data = self.data_df[bp_pair["BODY-PART HEADERS 2"]].values[:, 0:2]
+                bp_1_conf = self.data_df[bp_pair["BODY-PART HEADERS 1"]].values[:, 2]
+                bp_2_conf = self.data_df[bp_pair["BODY-PART HEADERS 2"]].values[:, 2]
+                distance = FeatureExtractionMixin.keypoint_distances(a=bp_1_data, b=bp_2_data, px_per_mm=self.px_per_mm, in_centimeters=False)
+                distance_lists = [distance[i: i + bin_length_frames] for i in range(0, distance.shape[0], bin_length_frames)]
+                conf_list_1 = [bp_1_conf[i: i + bin_length_frames] for i in range(0, bp_1_conf.shape[0], bin_length_frames)]
+                conf_list_2 = [bp_2_conf[i: i + bin_length_frames] for i in range(0, bp_2_conf.shape[0], bin_length_frames)]
+                for bin_cnt, (distance_list, p_bp_1, p_bp_2) in enumerate(zip(distance_lists, conf_list_1, conf_list_2)):
+                    bin_times = find_time_stamp_from_frame_numbers(start_frame=int(bin_length_frames * bin_cnt), end_frame=min(int(bin_length_frames * (bin_cnt + 1)), len(self.data_df)), fps=self.fps)
+                    if self.threshold > 0.00:
+                        idx_1 = np.argwhere(p_bp_1 < self.threshold).flatten()
+                        idx_2 = np.argwhere(p_bp_1 < self.threshold).flatten()
+                        distance_list = [v for i, v in enumerate(distance_list) if i not in list(np.concatenate([idx_1, idx_2]))]
+                    if len(distance_list) < 1:
+                        NotEnoughDataWarning(msg=f'Cannot compute distances in file {file_path} and tim-bin {bin_cnt}. No body-part distance comparisons possible at probability (threshold) value {self.threshold}', source=self.__class__.__name__)
+                        mean, median, variance = 'None', 'None', 'None'
+                    else:
+                        mean, median, variance = np.mean(distance_list), np.median(distance), np.std(distance)
+                    if self.distance_mean:
+                        self.results.loc[len(self.results)] = [video_name, bin_cnt, bin_times[0], bin_times[1], bp_pair["ANIMAL NAME 1"], bp_pair["BODY-PART 1"], bp_pair["ANIMAL NAME 2"], bp_pair["BODY-PART 2"], "MEAN DISTANCE (CM)", mean,]
+                    if self.distance_median:
+                        self.results.loc[len(self.results)] = [video_name, bin_cnt, bin_times[0], bin_times[1], bp_pair["ANIMAL NAME 1"], bp_pair["BODY-PART 1"], bp_pair["ANIMAL NAME 2"], bp_pair["BODY-PART 2"], "MEDIAN DISTANCE (CM)", median]
+                    if self.distance_var:
+                        self.results.loc[len(self.results)] = [video_name, bin_cnt, bin_times[0], bin_times[1],  bp_pair["ANIMAL NAME 1"], bp_pair["BODY-PART 1"], bp_pair["ANIMAL NAME 2"], bp_pair["BODY-PART 2"], "VARIANCE DISTANCE (CM)",  variance]
         if self.transpose:
-            self.results = (self.results.assign(col=lambda x: x["ANIMAL 1"] + "_" + x["BODY-PART 1"] + " versus " +  x["ANIMAL 2"] + "_" + x["BODY-PART 2"] + " " + x["MEASUREMENT"]).pivot(index="VIDEO", columns="col", values="VALUE").reset_index())
+            self.results = self.results.pivot_table(index=["VIDEO", "ANIMAL 1", "BODY-PART 1", "ANIMAL 2", "BODY-PART 2", "MEASUREMENT"], columns="TIME BIN #", values="VALUE").reset_index()
+
 
     def save(self):
         self.results.set_index("VIDEO").to_csv(self.save_path)
         self.timer.stop_timer()
         if self.verbose: stdout_success(msg=f"Distance log saved in {self.save_path}", elapsed_time=self.timer.elapsed_time_str)
+
+
+
+
 #
 #
 # if __name__ == "__main__" and not hasattr(sys, 'ps1'):
@@ -213,9 +218,9 @@ class DistanceTimeBinCalculator(ConfigReader, FeatureExtractionMixin):
 
 
 
-# test = DistanceCalculator(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",
+# test = DistanceTimeBinCalculator(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",
 #                           body_parts=(('nose', 'center'),),
 #                           threshold=0.5,
-#                           transpose=True)
+#                           transpose=False, time_bin=60)
 # test.run()
 # test.save()

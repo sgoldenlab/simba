@@ -235,6 +235,7 @@ class Entry_Box(Frame):
                  entry_box_clr: Optional[str] = 'white',
                  img: Optional[str] = None,
                  value: Optional[Any] = None,
+                 bg_clr: Optional[str] = None,
                  label_font: tuple = Formats.FONT_REGULAR.value,
                  entry_font: tuple = Formats.FONT_REGULAR.value,
                  tooltip_key: Optional[str] = None,
@@ -274,6 +275,8 @@ class Entry_Box(Frame):
         self.allow_blank = allow_blank
         if trace is not None:
             self.filePath.trace_add('write', lambda *a: trace(self))
+        if bg_clr is not None: self.set_bg_clr(clr=bg_clr)
+
 
 
     def bind_combobox_keys(self):

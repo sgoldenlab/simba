@@ -71,6 +71,8 @@ from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import \
 from simba.ui.pop_ups.change_speed_popup import ChangeSpeedPopup
 from simba.ui.pop_ups.check_videos_seekable_pop_up import \
     CheckVideoSeekablePopUp
+
+from simba.ui.pop_ups.distance_analysis_pop_up import DistanceAnalysisPopUp
 from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
     AddClfPopUp, PrintModelInfoPopUp, RemoveAClassifierPopUp)
 from simba.ui.pop_ups.clf_annotation_counts_pop_up import \
@@ -98,6 +100,7 @@ from simba.ui.pop_ups.directing_other_animals_plot_pop_up import \
 from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import \
     DirectionAnimalToBodyPartSettingsPopUp
 from simba.ui.pop_ups.distance_plot_pop_up import DistancePlotterPopUp
+from simba.ui.pop_ups.distance_timebins_popup import TimBinDistanceAnalysisPopUp
 from simba.ui.pop_ups.dlc_h5_inference_to_yolo_popup import \
     DLCH5Inference2YoloPopUp
 from simba.ui.pop_ups.dlc_to_labelme_popup import DLC2LabelmePopUp
@@ -398,6 +401,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
         btn_agg_boolean_conditional_statistics = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="AGGREGATE BOOLEAN CONDITIONAL STATISTICS", img='details', txt_clr='grey', font=Formats.FONT_REGULAR.value, cmd=BooleanConditionalSlicerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         spontaneous_alternation_pop_up_btn = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="SPONTANEOUS ALTERNATION", img='t', txt_clr='navy', font=Formats.FONT_REGULAR.value, cmd=SpontaneousAlternationPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_distances_agg = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE DISTANCES: AGGREGATES", txt_clr='blue', img='metrics_blue', cmd=DistanceAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_distances_timebins = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE DISTANCES: TIME-BINS", txt_clr='blue', img='metrics_blue', cmd=TimBinDistanceAnalysisPopUp, cmd_kwargs={'config_path': lambda: self.config_path})
 
         processmovementdupLabel.grid(row=0, column=3, sticky=NW, padx=10, pady=10)
         analyze_distances_velocity_btn.grid(row=0, sticky=NW)
@@ -410,6 +415,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_visualizeDirection_bp.grid(row=7, sticky=NW)
         btn_agg_boolean_conditional_statistics.grid(row=8, sticky=NW)
         spontaneous_alternation_pop_up_btn.grid(row=9, sticky=NW)
+        button_distances_agg.grid(row=10, sticky=NW)
+        button_distances_timebins.grid(row=11, sticky=NW)
 
         label_outliercorrection = CreateLabelFrameWithIcon(parent=tab4, header="OUTLIER CORRECTION", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.OUTLIERS_DOC.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
         button_settings_outlier = SimbaButton(parent=label_outliercorrection, width=Formats.BUTTON_WIDTH_L.value, txt="SETTINGS", txt_clr='blue', img='settings', font=Formats.FONT_REGULAR.value, cmd=OutlierSettingsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
@@ -514,11 +521,13 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
 
         button_process_datalog = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE MACHINE PREDICTIONS: AGGREGATES", img='metrics_blue', txt_clr='blue', cmd=ClfDescriptiveStatsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_process_movement = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE DISTANCES/VELOCITY: AGGREGATES", img='metrics_blue', txt_clr='blue', cmd=MovementAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_movebins = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE DISTANCES/VELOCITY: TIME BINS", txt_clr='blue', img='metrics_blue', cmd=MovementAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_process_movement = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE MOVEMENTS/VELOCITY: AGGREGATES", img='metrics_blue', txt_clr='blue', cmd=MovementAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_movebins = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE MOVEMENTS/VELOCITY: TIME BINS", txt_clr='blue', img='metrics_blue', cmd=MovementAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         button_classifierbins = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE MACHINE PREDICTIONS: TIME-BINS", txt_clr='blue', img='metrics_blue', cmd=TimeBinsClfPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         button_classifier_ROI = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE MACHINE PREDICTION: BY ROI", txt_clr='blue', img='metrics_blue', cmd=ClfByROIPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         button_severity = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE MACHINE PREDICTION: BY SEVERITY", txt_clr='blue', img='metrics_blue', cmd=AnalyzeSeverityPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_distances_agg = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE DISTANCES: AGGREGATES", txt_clr='blue', img='metrics_blue', cmd=DistanceAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_distances_timebins = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE DISTANCES: TIME-BINS", txt_clr='blue', img='metrics_blue', cmd=TimBinDistanceAnalysisPopUp, cmd_kwargs={'config_path': lambda: self.config_path})
 
         visualization_frm = CreateLabelFrameWithIcon(parent=tab10, header="DATA VISUALIZATIONS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VISUALIZATION.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
         sklearn_visualization_btn = SimbaButton(parent=visualization_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="VISUALIZE CLASSIFICATIONS", img='split', txt_clr='black', cmd=SklearnVisualizationPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
@@ -657,6 +666,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_classifierbins.grid(row=3, column=0, sticky=W, padx=3)
         button_classifier_ROI.grid(row=4, column=0, sticky=W, padx=3)
         button_severity.grid(row=4, column=1, sticky=W, padx=3)
+        button_distances_agg.grid(row=5, column=0, sticky=W, padx=3)
+        button_distances_timebins.grid(row=5, column=1, sticky=W, padx=3)
 
         visualization_frm.grid(row=11, column=0, sticky=W + N, padx=10, pady=10)
         merge_frm.grid(row=11, column=2, sticky=W + N, padx=5)

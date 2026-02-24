@@ -3193,11 +3193,28 @@ def df_to_xlsx_sheet(xlsx_path: Union[str, os.PathLike],
                      create_file: bool = True) -> None:
 
     """
-    Append a dataframe as a new sheet in an MS Excel file.
+    Append a DataFrame as a new worksheet in an Excel workbook.
 
-    :param Union[str, os.PathLike] xlsx_path: Path to an existing MS Excel file on disk.
-    :param pd.DataFrame df: A dataframe to save as a sheet in the MS Excel file.
-    :param str sheet_name: Name of the sheet to save the dataframe under.
+    If ``xlsx_path`` does not exist and ``create_file`` is True, an empty workbook
+    is created first. The function then appends ``df`` as a new sheet. If a sheet
+    with ``sheet_name`` already exists, a :class:`DuplicationError` is raised.
+
+    .. note::
+       The DataFrame index is written to Excel because ``DataFrame.to_excel`` is
+       called with default settings.
+
+    :param Union[str, os.PathLike] xlsx_path: Path to the target ``.xlsx`` file.
+    :param pd.DataFrame df: DataFrame to write into the new worksheet.
+    :param str sheet_name: Name of the worksheet to create.
+    :param bool create_file: If True, create a new workbook when ``xlsx_path`` is
+                             missing. If False, raise :class:`NoFilesFoundError`
+                             when the file does not exist.
+    :returns: None.
+    :rtype: None
+
+    :raises NoFilesFoundError: If ``xlsx_path`` does not exist and ``create_file`` is False.
+    :raises DuplicationError: If ``sheet_name`` already exists in the workbook.
+    :raises InvalidInputError: If inputs fail validation.
     """
 
     check_valid_boolean(value=[create_file], source=df_to_xlsx_sheet.__name__, raise_error=True)
