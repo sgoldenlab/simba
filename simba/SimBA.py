@@ -71,8 +71,6 @@ from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import \
 from simba.ui.pop_ups.change_speed_popup import ChangeSpeedPopup
 from simba.ui.pop_ups.check_videos_seekable_pop_up import \
     CheckVideoSeekablePopUp
-
-from simba.ui.pop_ups.distance_analysis_pop_up import DistanceAnalysisPopUp
 from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
     AddClfPopUp, PrintModelInfoPopUp, RemoveAClassifierPopUp)
 from simba.ui.pop_ups.clf_annotation_counts_pop_up import \
@@ -99,8 +97,10 @@ from simba.ui.pop_ups.directing_other_animals_plot_pop_up import \
     DirectingOtherAnimalsVisualizerPopUp
 from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import \
     DirectionAnimalToBodyPartSettingsPopUp
+from simba.ui.pop_ups.distance_analysis_pop_up import DistanceAnalysisPopUp
 from simba.ui.pop_ups.distance_plot_pop_up import DistancePlotterPopUp
-from simba.ui.pop_ups.distance_timebins_popup import TimBinDistanceAnalysisPopUp
+from simba.ui.pop_ups.distance_timebins_popup import \
+    TimBinDistanceAnalysisPopUp
 from simba.ui.pop_ups.dlc_h5_inference_to_yolo_popup import \
     DLCH5Inference2YoloPopUp
 from simba.ui.pop_ups.dlc_to_labelme_popup import DLC2LabelmePopUp

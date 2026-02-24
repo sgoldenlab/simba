@@ -3,7 +3,8 @@ from copy import deepcopy
 from tkinter import *
 from typing import Union
 
-from simba.data_processors.distance_timbin_calculator import DistanceTimeBinCalculator
+from simba.data_processors.distance_timbin_calculator import \
+    DistanceTimeBinCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
