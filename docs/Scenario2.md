@@ -292,6 +292,11 @@ All options in the dialog are listed below.
 
 Use **ANALYZE DISTANCES: AGGREGATES** when you need **one body-part pair distance summary per video** (for example, distance between Animal_1 Nose and Animal_2 Nose across the full video). Unlike movement/velocity analyses (which track one body-part trajectory per animal), this tool compares two selected body-parts directly and summarizes their frame-wise Euclidean distance. You can analyze one or multiple body-part pairs, set a body-part confidence threshold, choose summary metrics, and optionally apply a distance threshold to quantify time below/above that distance threshold.
 
+<p align="center">
+<img width="696" height="526" alt="image" src="https://github.com/user-attachments/assets/d8b0fee5-599d-41e6-b2f1-9635f42b08b1" />
+</p>
+
+
 **Where data is saved:**
 - **CSV:** `project_folder/logs/` — e.g. `Distance_log_{datetime}_bodypart_threshold_{threshold}_distance_threshold_{value}.csv`. The terminal prints the exact filename.
 - **Detailed per-frame outputs (optional):** If enabled in advanced/API usage, per-pair CSVs are saved in a dedicated `detailed_distance_{datetime}` folder in `project_folder/logs/`.
@@ -311,6 +316,10 @@ Use **ANALYZE DISTANCES: AGGREGATES** when you need **one body-part pair distanc
 ### 6. ANALYZE DISTANCES: TIME-BINS
 
 Use **ANALYZE DISTANCES: TIME-BINS** when you need **distance metrics per time bin** (rather than one value for the entire video). This is useful for testing whether pairwise distance changes over time (e.g. social proximity dynamics across a session). SimBA computes frame-wise distances for each body-part pair, splits the video into equal bins, and reports selected metrics per bin.
+
+<p align="center">
+<img width="702" height="524" alt="image" src="https://github.com/user-attachments/assets/5c462677-c093-4ed9-ab25-0bcd9bd2ee71" />
+</p>
 
 **Where data is saved:**
 - **CSV:** `project_folder/logs/` — e.g. `Distance_log_{datetime}.csv` with one or more rows per video/time-bin/pair/metric.
