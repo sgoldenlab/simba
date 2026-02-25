@@ -275,6 +275,7 @@ All options in the dialog are listed below.
 | Option | Description |
 |--------|-------------|
 | **# OF ANIMALS** (SELECT NUMBER OF ANIMALS) | Number of animals to analyze (1 to project max). Determines how many body-part dropdowns appear below. |
+| **THRESHOLD (0.0-1.0)** (BODY-PART THRESHOLD) | Minimum pose-estimation confidence. Frames below this threshold are ignored for movement calculations. Use 0.0 to include all frames; higher values are stricter. |
 | **PLOTS** — **CREATE PLOTS** | If checked, generates line plots (one per video per body part) showing distance across time bins. Saved to `project_folder/logs/time_bin_movement_plots_{datetime}/`. |
 | **TIME BIN** — **TIME BIN SIZE (S)** | Duration of each time bin in seconds (e.g. 60 for 1-minute bins). The video is divided into equal segments of this length. |
 | **CPU CORE COUNT** | Number of CPU cores to use for processing. Use more cores (e.g. 4–8) if you have many videos. |
