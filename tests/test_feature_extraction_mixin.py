@@ -81,6 +81,12 @@ def test_create_shifted_df():
     assert len(results) == len(df)
     assert results._is_numeric_mixed_type
 
+def test_create_shifted_array():
+    data = np.array([[10], [95], [85]])
+    results = FeatureExtractionMixin.create_shifted_array(data=data)
+    assert results.shape == (3, 1)
+    assert np.array_equal(results.flatten(), np.array([10, 10, 95]))
+
 @pytest.mark.parametrize("pose", ['2 animals 16 body-parts',
                                   '2 animals 14 body-parts',
                                   '2 animals 8 body-parts',

@@ -19,7 +19,7 @@ from scipy.spatial.qhull import QhullError
 import simba
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_filepath_list_is_empty,
-                                check_minimum_roll_windows, check_valid_array,
+                                check_int, check_minimum_roll_windows, check_valid_array,
                                 check_valid_boolean)
 from simba.utils.enums import Formats, Options, Paths
 from simba.utils.errors import CountError
@@ -556,6 +556,9 @@ class FeatureExtractionMixin(object):
         """
         Create dataframe including duplicated shifted (1) columns with ``_shifted`` suffix.
 
+        .. seealso::
+           For NumPy input and shifted-values-only output, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.create_shifted_array`.
+
         :param pd.DataFrame df: Dataframe to create additional shifted fields from.
         :param periods int: The rows to shift the new fields. 1 denotes that the shifted fields get shifted one row "down". -1 and the fields would be shifted one row "up".
         :param str suffix: The suffix to add to the new, shifted, fields. Default: "shifted".
@@ -573,6 +576,58 @@ class FeatureExtractionMixin(object):
         data_df_shifted = df.shift(periods=periods)
         data_df_shifted = data_df_shifted.combine_first(df).add_suffix(suffix)
         return pd.concat([df, data_df_shifted], axis=1, join="inner").reset_index(drop=True)
+
+    @staticmethod
+    def create_shifted_array(data: np.ndarray, periods: int = 1) -> np.ndarray:
+        """
+        Create a shifted NumPy array with edge values filled from original data.
+
+        This method mirrors :func:`create_shifted_df` shift behavior, but for NumPy arrays.
+        It returns only shifted values (not concatenated with original input values).
+
+        .. seealso::
+           For pandas DataFrame input with concatenated original and shifted columns, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.create_shifted_df`.
+
+        :param np.ndarray data: Numeric 1D or 2D array with frames on axis 0.
+        :param int periods: Number of rows to shift. Positive shifts down, negative shifts up.
+        :return: Shifted array with the same shape as input (1D input is returned as 2D ``(n, 1)``).
+        :rtype: np.ndarray
+
+        :example:
+        >>> arr = np.array([[10], [95], [85]])
+        >>> FeatureExtractionMixin.create_shifted_array(data=arr, periods=1)
+        >>> array([[10.], [10.], [95.]])
+        """
+        check_valid_array(data=data, source=f"{FeatureExtractionMixin.create_shifted_array.__name__} data", accepted_ndims=(1, 2), accepted_dtypes=Formats.NUMERIC_DTYPES.value, raise_error=True)
+        check_int(name=f"{FeatureExtractionMixin.create_shifted_array.__name__} periods", value=periods, raise_error=True)
+        values = data
+        if values.ndim == 1: values = values.reshape(-1, 1)
+        values = values.copy()
+        if values.shape[0] == 0: return values
+
+        if np.issubdtype(values.dtype, np.integer) or np.issubdtype(values.dtype, np.bool_):
+            values = values.astype(np.float64, copy=False)
+
+        shifted_values = np.empty_like(values)
+        n_rows = values.shape[0]
+
+        if periods == 0:
+            shifted_values[:] = values
+        elif periods > 0:
+            if periods >= n_rows:
+                shifted_values[:] = values
+            else:
+                shifted_values[:periods] = values[:periods]
+                shifted_values[periods:] = values[:-periods]
+        else:
+            shift_abs = abs(periods)
+            if shift_abs >= n_rows:
+                shifted_values[:] = values
+            else:
+                shifted_values[:-shift_abs] = values[shift_abs:]
+                shifted_values[-shift_abs:] = values[-shift_abs:]
+
+        return shifted_values
 
     def check_directionality_viable(self) -> Tuple[bool, List[np.ndarray], List[np.ndarray], List[np.ndarray]]:
         """

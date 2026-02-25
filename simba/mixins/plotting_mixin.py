@@ -1178,9 +1178,9 @@ class PlottingMixin(object):
                   x_label: Optional[str] = None,
                   y_label: Optional[str] = None,
                   title: Optional[str] = None,
-                  fig_size: Optional[Tuple[int]] = (10, 6),
-                  error_opacity: Optional[float] = 0.2,
-                  palette: Optional[str] = 'Set1',
+                  fig_size: Tuple[int] = (10, 6),
+                  error_opacity: float = 0.2,
+                  palette: str = 'Set1',
                   save_path: Optional[Union[str, os.PathLike]] = None):
 
         check_instance(source=f"{PlottingMixin.line_plot.__name__} df", instance=df, accepted_types=(pd.DataFrame))
@@ -1246,6 +1246,10 @@ class PlottingMixin(object):
                        title: Optional[str] = None,
                        y_lbl: Optional[str] = None,
                        x_lbl: Optional[str] = None,
+                       y_tick_lbls_as_int: bool = False,
+                       x_tick_lbls_as_int: bool = False,
+                       y_tick_cnt: int = 10,
+                       x_tick_cnt: int = 5,
                        y_max: Optional[Union[int, float]] = -1,
                        line_opacity: Optional[float] = 1.0,
                        save_path: Optional[Union[str, os.PathLike]] = None,
@@ -1276,14 +1280,22 @@ class PlottingMixin(object):
         max_x = max([len(x) for x in data])
         if y_max == -1:
             y_max = max([np.max(x) for x in data])
-        y_ticks_locs = y_lbls = np.round(np.linspace(0, y_max, 10), 2)
-        x_ticks_locs = x_lbls = np.linspace(0, max_x, 5)
+        if not y_tick_lbls_as_int:
+            y_ticks_locs = y_lbls = np.round(np.linspace(0, y_max, y_tick_cnt), 2)
+        else:
+            y_ticks_locs = y_lbls = np.round(np.linspace(0, y_max, y_tick_cnt)).astype(np.int32)
+        if not x_tick_lbls_as_int:
+            x_ticks_locs = x_lbls = np.linspace(0, max_x, x_tick_cnt)
+        else:
+            x_ticks_locs = x_lbls = np.linspace(0, max_x, x_tick_cnt).astype(np.int32)
         if x_lbl_divisor is not None:
             x_lbls = np.round((x_lbls / x_lbl_divisor), 1)
         if y_lbl is not None:
             plt.ylabel(y_lbl)
         if x_lbl is not None:
             plt.xlabel(x_lbl)
+
+
         plt.xticks(x_ticks_locs, x_lbls, rotation="horizontal", fontsize=font_size)
         plt.yticks(y_ticks_locs, y_lbls, fontsize=font_size)
         plt.ylim(0, y_max)

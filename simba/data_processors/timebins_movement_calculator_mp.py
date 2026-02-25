@@ -5,7 +5,7 @@ import itertools
 import multiprocessing
 import os
 import platform
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple
 
 import numpy as np
 import pandas as pd
@@ -17,15 +17,15 @@ from simba.mixins.feature_extraction_supplement_mixin import \
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log, check_float, check_int,
-    check_that_column_exist, check_valid_boolean, check_valid_lst)
+    check_that_column_exist, check_valid_boolean, check_valid_lst, check_valid_tuple)
 from simba.utils.enums import TagNames
 from simba.utils.errors import FrameRangeError, InvalidInputError, NoDataError
-from simba.utils.lookups import get_current_time
-from simba.utils.printing import SimbaTimer, log_event, stdout_success
+from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
 from simba.utils.read_write import (create_directory, find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     find_time_stamp_from_frame_numbers,
                                     get_fn_ext, read_df, read_video_info)
+from simba.utils.data import get_cpu_pool, terminate_cpu_pool
 
 
 def _time_bin_movement_helper(data: list,
@@ -34,8 +34,19 @@ def _time_bin_movement_helper(data: list,
                               video_info_df: pd.DataFrame,
                               bp_headers: list,
                               bp_dict: dict,
+                              threshold: float,
                               distance: bool,
                               velocity: bool):
+
+
+    def _remove_low_confidence_positions(arr, threshold):
+        arr = arr.copy()
+        valid = arr[:, -1] >= threshold
+        last_valid = None
+        for i in range(len(arr)):
+            if valid[i]: last_valid = arr[i, :-1]
+            elif last_valid is not None: arr[i, :-1] = last_valid
+        return arr
 
     batch_id, file_paths = data
     video_dict, movement_dict, batch_results = {}, {}, []
@@ -45,33 +56,39 @@ def _time_bin_movement_helper(data: list,
         if verbose: print(f"Processing time-bin movements ({bin_length}s) for video {video_name} ({str(file_cnt+1)}/{str(len(file_paths))}, core batch: {batch_id})...")
         video_dict[video_name] = {}
         video_settings, px_per_mm, fps = read_video_info(video_name=video_name, video_info_df=video_info_df)
-        #fps, px_per_mm = 30, 4
         fps, movement_cols, velocity_cols = fps, set(), set()
         bin_length_frames = int(fps * bin_length)
-        if bin_length_frames == 0:  raise FrameRangeError(msg=f"The specified time-bin length of {bin_length} is TOO SHORT for video {video_name} which has a specified FPS of {fps}. This results in time bins that are LESS THAN a single frame.", source=_time_bin_movement_helper.__name__,)
+        if bin_length_frames == 0:
+            raise FrameRangeError(msg=f"The specified time-bin length of {bin_length} is TOO SHORT for video {video_name} which has a specified FPS of {fps}. This results in time bins that are LESS THAN a single frame.", source=_time_bin_movement_helper.__name__,)
         data_df = read_df(file_path)
         check_that_column_exist(df=data_df, column_name=bp_headers, file_name=file_path)
         data_df = data_df[bp_headers]
         data_df = FeatureExtractionMixin().create_shifted_df(df=data_df)
         video_results = []
         for animal_data in bp_dict.values():
-            name, bps = list(animal_data.keys())[0], list(animal_data.values())[0]
-            bp_time_1, bp_time_2 = (data_df[bps].values, data_df[[f"{bps[0]}_shifted", f"{bps[1]}_shifted"]].values,)
-            movement_data = pd.DataFrame(FeatureExtractionMixin().framewise_euclidean_distance(location_1=bp_time_1.astype(np.float64), location_2=bp_time_2.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=True), columns=["VALUE"])
-            movement_dict[video_name] = movement_data
-            movement_df_lists = [movement_data[i : i + bin_length_frames] for i in range(0, movement_data.shape[0], bin_length_frames)]
-            for bin, movement_df in enumerate(movement_df_lists):
+            name, animal_bps = list(animal_data.keys())[0], list(animal_data.values())[0]
+            bp_time_1, bp_time_2 = (data_df[animal_bps].values, data_df[[f"{animal_bps[0]}_shifted", f"{animal_bps[1]}_shifted"]].values,)
+            movement_dict[video_name] = pd.DataFrame(FeatureExtractionMixin().framewise_euclidean_distance(location_1=bp_time_1.astype(np.float64)[:, :2], location_2=bp_time_2.astype(np.float64)[:, :2], px_per_mm=np.float64(px_per_mm), centimeter=True), columns=["VALUE"])
+            animal_data = data_df[animal_bps].values.astype(np.float32)
+            movement_lists = [animal_data[i: i + bin_length_frames] for i in range(0, animal_data.shape[0], bin_length_frames)]
+            for bin, movement_bin_positions in enumerate(movement_lists):
                 bin_times = find_time_stamp_from_frame_numbers(start_frame=int(bin_length_frames * bin), end_frame=min(int(bin_length_frames * (bin + 1)), len(data_df)), fps=fps)
+                if threshold > 0.0:
+                    movement_bin_positions = _remove_low_confidence_positions(arr=movement_bin_positions, threshold=threshold)
+
+                movement_bin_positions = movement_bin_positions[:, :2]
+                movement_bin_positions_shifted = FeatureExtractionMixin.create_shifted_array(data=movement_bin_positions, periods=1)
+                movement_df = pd.DataFrame(FeatureExtractionMixin.framewise_euclidean_distance(location_1=movement_bin_positions.astype(np.float64), location_2=movement_bin_positions_shifted.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=True), columns=["VALUE"])
                 movement_data, velocity_data = (FeatureExtractionSupplemental.distance_and_velocity(x=movement_df["VALUE"].values, fps=fps, pixels_per_mm=px_per_mm, centimeters=False))
                 if distance:
-                    video_results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": name,"BODY-PART": bps[0][:-2],"MEASUREMENT": "Movement (cm)","VALUE": round(movement_data, 4)})
+                    video_results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": name,"BODY-PART": animal_bps[0][:-2],"MEASUREMENT": "Movement (cm)","VALUE": round(movement_data, 4)})
                 if velocity:
-                    video_results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": name,"BODY-PART": bps[0][:-2],"MEASUREMENT": "Velocity (cm/s)","VALUE": round(velocity_data, 4)})
+                    video_results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": name,"BODY-PART": animal_bps[0][:-2],"MEASUREMENT": "Velocity (cm/s)","VALUE": round(velocity_data, 4)})
         results = pd.DataFrame(video_results).reset_index(drop=True)
         batch_results.append(results)
         video_timer.stop_timer()
         if verbose:
-            print(f"Time-bin movement calculations for video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)...")
+            stdout_information(msg=f"Time-bin movement calculations for video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)...")
 
     return batch_results, video_dict, movement_dict
 
@@ -116,20 +133,29 @@ class TimeBinsMovementCalculatorMultiprocess(ConfigReader, FeatureExtractionMixi
     def __init__(self,
                  config_path: Union[str, os.PathLike],
                  bin_length: Union[int, float],
-                 body_parts: List[str],
+                 body_parts: Union[List[str], Tuple[str]],
                  data_path: Optional[Union[List[Union[str, os.PathLike]], str, os.PathLike]] = None,
                  plots: bool = False,
                  verbose: bool = True,
                  core_cnt: int = -1,
                  distance: bool = True,
                  velocity: bool = True,
+                 threshold: float = 0.00,
                  transpose: bool = False,
                  include_timestamp: bool = False):
 
         ConfigReader.__init__(self, config_path=config_path)
         log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()),)
         check_float(name=f"{self.__class__.__name__} TIME BIN", value=bin_length, min_value=10e-6)
-        check_valid_lst(data=body_parts, source=f'{self.__class__.__name__} file_paths', min_len=1, valid_dtypes=(str,), valid_values=self.body_parts_lst)
+        if isinstance(body_parts, list):
+            check_valid_lst(data=body_parts, source=f'{self.__class__.__name__} body_parts', min_len=1, valid_dtypes=(str,), valid_values=self.body_parts_lst)
+        elif isinstance(body_parts, tuple):
+            check_valid_tuple(x=body_parts, source=f'{self.__class__.__name__} body_parts', minimum_length=1, valid_dtypes=(str,), accepted_values=self.body_parts_lst)
+        else:
+            raise InvalidInputError(msg='Body-parts has to be a list of tuple of strings', source=f'{self.__class__.__name__} body_parts')
+
+
+
         if data_path is None:
             if len(self.outlier_corrected_paths) == 0: raise NoDataError(msg=f'No data files found in {self.outlier_corrected_dir}', source=self.__class__.__name__)
             self.file_paths = self.outlier_corrected_paths
@@ -146,40 +172,52 @@ class TimeBinsMovementCalculatorMultiprocess(ConfigReader, FeatureExtractionMixi
         check_valid_boolean(value=transpose, source=f'{self.__class__.__name__} transpose', raise_error=True)
         check_valid_boolean(value=include_timestamp, source=f'{self.__class__.__name__} include_timestamp', raise_error=True)
         check_int(f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0], raise_error=True)
+        check_float(name=f'{self.__class__.__name__} threshold', value=threshold, allow_negative=False)
         self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
-        self.verbose, self.distance, self.velocity, self.transpose, self.include_timestamp = verbose, distance, velocity, transpose, include_timestamp
+        self.verbose, self.distance, self.velocity, self.transpose, self.include_timestamp, self.threshold = verbose, distance, velocity, transpose, include_timestamp, threshold
         if not distance and not velocity:
             raise InvalidInputError(msg='distance AND velocity are both False. To compute movement metrics, set at least one value to True.', source=self.__class__.__name__)
         self.col_headers, self.bp_dict = [], {}
         for bp_cnt, bp in enumerate(body_parts):
-            self.col_headers.extend((f"{bp}_x", f"{bp}_y"))
+            self.col_headers.extend((f"{bp}_x", f"{bp}_y", f'{bp}_p'))
             animal_name = self.find_animal_name_from_body_part_name(bp_name=bp, bp_dict=self.animal_bp_dict)
-            self.bp_dict[bp_cnt] = {animal_name: [f"{bp}_x", f"{bp}_y"]}
+            self.bp_dict[bp_cnt] = {animal_name: [f"{bp}_x", f"{bp}_y", f'{bp}_p']}
         self.animal_combinations = list(itertools.combinations(self.animal_bp_dict, 2))
         self.bin_length, self.plots = bin_length, plots
         if platform.system() == "Darwin": multiprocessing.set_start_method("spawn", force=True)
-        if verbose: print(f"Processing {len(self.file_paths)} video(s) for time-bins movement data... ({get_current_time()})")
+        if verbose: stdout_information(msg=f"Processing {len(self.file_paths)} video(s) for time-bins movement data...")
 
     def __create_plots(self):
         timer = SimbaTimer(start=True)
-        print("Creating time-bin movement plots...")
+        stdout_information(msg="Creating time-bin movement plots...")
         plots_dir = os.path.join( self.project_path, "logs", f"time_bin_movement_plots_{self.datetime}")
         create_directory(paths=plots_dir, overwrite=True)
+        y_max = -np.inf
         for video_name in self.results["VIDEO"].unique():
-            video_timer = SimbaTimer(start=True)
-            if self.verbose: print(f'Creating plots for video {video_name}...')
+            video_df = self.results.loc[(self.results["VIDEO"] == video_name) & (self.results["MEASUREMENT"] == "Movement (cm)")]
+            for body_part in video_df["BODY-PART"].unique():
+                body_part_df = (video_df[video_df["BODY-PART"] == body_part].reset_index(drop=True).sort_values(by=["TIME BIN #"]))
+                body_part_df["VALUE"] = body_part_df["VALUE"].astype(float)
+                y_max = max(y_max, np.max(body_part_df["VALUE"]))
+
+        for video_name in self.results["VIDEO"].unique():
             video_df = self.results.loc[(self.results["VIDEO"] == video_name) & (self.results["MEASUREMENT"] == "Movement (cm)")]
             video_df["TIME BIN #"] = video_df["TIME BIN #"].astype(int)
             for body_part in video_df["BODY-PART"].unique():
                 body_part_df = (video_df[video_df["BODY-PART"] == body_part] .reset_index(drop=True) .sort_values(by=["TIME BIN #"]))
                 body_part_df[f"Time bin # (bin length {self.bin_length}s)"] = (body_part_df["TIME BIN #"])
                 body_part_df["VALUE"] = body_part_df["VALUE"].astype(float)
-                _ = PlottingMixin.line_plot(df=body_part_df,
-                                            x=f"Time bin # (bin length {self.bin_length}s)",
-                                            y="VALUE", y_label="Distance (cm)",
-                                            save_path=os.path.join(plots_dir, f"{video_name}_{body_part}.png"))
-                video_timer.stop_timer()
-                if self.verbose: print(f'Plot for video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)')
+                _ = PlottingMixin.make_line_plot(data=[body_part_df["VALUE"].astype(float).values],
+                                                 colors=['Green'],
+                                                 save_path=os.path.join(plots_dir, f"{video_name}_{body_part}.png"),
+                                                 title=video_name,
+                                                 y_max=int(y_max),
+                                                 line_opacity=0.8,
+                                                 y_lbl="DISTANCE (CM)",
+                                                 x_lbl=f"TIME BIN # (BIN LENGTH {self.bin_length}s)",
+                                                 x_tick_lbls_as_int=True,
+                                                 y_tick_lbls_as_int=True,
+                                                 x_tick_cnt=body_part_df["VALUE"].astype(float).values.shape[0]+1)
         timer.stop_timer()
         stdout_success(msg=f"Time bin movement plots saved in {plots_dir}", elapsed_time=timer.elapsed_time_str, source=self.__class__.__name__)
 
@@ -189,22 +227,24 @@ class TimeBinsMovementCalculatorMultiprocess(ConfigReader, FeatureExtractionMixi
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.file_paths)
         split_data_paths = [self.file_paths[i * len(self.file_paths) // self.core_cnt: (i + 1) * len(self.file_paths) // self.core_cnt] for i in range(self.core_cnt)]
         split_data_paths = [(x, i) for x, i in enumerate(split_data_paths)]
-
-        with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
-            constants = functools.partial(_time_bin_movement_helper,
-                                          bin_length=self.bin_length,
-                                          verbose=self.verbose,
-                                          video_info_df=self.video_info_df,
-                                          bp_headers=self.col_headers,
-                                          bp_dict=self.bp_dict,
-                                          distance=self.distance,
-                                          velocity=self.velocity)
-            for cnt, result in enumerate(pool.imap(constants, split_data_paths, chunksize=self.multiprocess_chunksize)):
-                results_df, video_dict, movement_dict = result
-                self.out_df_lst.append(results_df)
-                self.movement_dict.update(movement_dict)
-                self.video_dict.update(video_dict)
-            self.out_df_lst = [item for sub in self.out_df_lst for item in sub]
+        pool = get_cpu_pool(core_cnt=self.core_cnt, verbose=True, source=self.__class__.__name__)
+        constants = functools.partial(_time_bin_movement_helper,
+                                      bin_length=self.bin_length,
+                                      verbose=self.verbose,
+                                      video_info_df=self.video_info_df,
+                                      bp_headers=self.col_headers,
+                                      bp_dict=self.bp_dict,
+                                      threshold=self.threshold,
+                                      distance=self.distance,
+                                      velocity=self.velocity)
+        for cnt, result in enumerate(pool.imap(constants, split_data_paths, chunksize=self.multiprocess_chunksize)):
+            results_df, video_dict, movement_dict = result
+            self.out_df_lst.append(results_df)
+            self.movement_dict.update(movement_dict)
+            self.video_dict.update(video_dict)
+        print(self.velocity)
+        self.out_df_lst = [item for sub in self.out_df_lst for item in sub]
+        terminate_cpu_pool(pool=pool, verbose=True, source=self.__class__.__name__)
 
     def save(self):
         self.results = pd.concat(self.out_df_lst, axis=0).sort_values(by=["VIDEO", "TIME BIN #", "MEASUREMENT", "ANIMAL"])[["VIDEO", "TIME BIN #", "START TIME", "END TIME", "ANIMAL", "BODY-PART", "MEASUREMENT", "VALUE"]]
@@ -228,10 +268,14 @@ class TimeBinsMovementCalculatorMultiprocess(ConfigReader, FeatureExtractionMixi
 #     test.save()
 
 
-
-# test = TimeBinsMovementCalculator(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini",
-#                                   bin_length=0.1,
-#                                   plots=True,
-#                                   body_parts=['Nose_1'])
-# test.run()
-# test.save()
+# if __name__ == "__main__":
+#     test = TimeBinsMovementCalculatorMultiprocess(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",
+#                                                   bin_length=60,
+#                                                   plots=False,
+#                                                   core_cnt=10,
+#                                                   velocity=False,
+#                                                   transpose=True,
+#                                                   threshold=0.859,
+#                                                   body_parts=['center'])
+#     test.run()
+#     test.save()
