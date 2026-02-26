@@ -16,7 +16,7 @@ from simba.utils.checks import (
 from simba.utils.enums import Formats
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.lookups import get_color_dict
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
 
 VALID_COLORS = list(get_color_dict().keys())
