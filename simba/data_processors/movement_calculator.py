@@ -2,7 +2,7 @@ __author__ = "Simon Nilsson; sronilsson@gmail.com"
 import argparse
 import os
 import sys
-from typing import List, Optional, Union, Tuple
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -14,7 +14,8 @@ from simba.mixins.feature_extraction_supplement_mixin import \
     FeatureExtractionSupplemental
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log, check_float, check_str,
-    check_that_column_exist, check_valid_boolean, check_valid_lst, check_valid_tuple)
+    check_that_column_exist, check_valid_boolean, check_valid_lst,
+    check_valid_tuple)
 from simba.utils.errors import InvalidInputError, NoDataError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
