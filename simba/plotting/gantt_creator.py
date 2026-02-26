@@ -18,7 +18,7 @@ from simba.utils.data import create_color_palette, detect_bouts
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.lookups import get_fonts, get_named_colors
-from simba.utils.printing import stdout_success, stdout_information
+from simba.utils.printing import stdout_information, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df, seconds_to_timestamp
 
 STYLE_WIDTH = 'width'

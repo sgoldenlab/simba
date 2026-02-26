@@ -53,7 +53,7 @@ from simba.utils.lookups import get_fonts
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
-                                    seconds_to_timestamp, get_fn_ext, read_df)
+                                    get_fn_ext, read_df, seconds_to_timestamp)
 
 HEIGHT = "height"
 WIDTH = "width"
