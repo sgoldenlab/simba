@@ -16,7 +16,7 @@ from simba.utils.checks import (
 from simba.utils.enums import Formats
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.lookups import get_color_dict
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import get_fn_ext, read_df
 
 VALID_COLORS = list(get_color_dict().keys())
@@ -24,7 +24,12 @@ FOURCC = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
 
 class TresholdPlotCreatorSingleProcess(ConfigReader, PlottingMixin):
     """
-    Create line chart visualizations displaying the classification probabilities of a single classifier.
+    Create classifier-probability line plots using single-process execution.
+
+    Produces one or more of:
+    (i) frame-by-frame probability plot images,
+    (ii) a dynamic probability-plot video,
+    (iii) a final static probability plot (PNG or SVG).
 
     .. note::
        `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`_.
@@ -34,13 +39,20 @@ class TresholdPlotCreatorSingleProcess(ConfigReader, PlottingMixin):
        :width: 300
        :align: center
 
-    :param str config_path: path to SimBA project config file in Configparser format
-    :param str clf_name: Name of the classifier to create visualizations for
-    :param bool frame_setting: When True, SimBA creates indidvidual frames in png format
-    :param bool video_setting: When True, SimBA creates compressed video in mp4 format
-    :param bool last_image: When True, creates image .png representing last frame of the video.
-    :param dict style_attr: User-defined style attributes of the visualization (line size, color etc).
-    :param List[str] files_found: Files to create threshold plots for.
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
+    :param Union[List[Union[str, os.PathLike]], str, os.PathLike] data_path: Single machine-results file path or a list of file paths.
+    :param str clf_name: Classifier name to visualize.
+    :param bool frame_setting: If ``True``, save one plot image per frame. Default: ``False``.
+    :param bool video_setting: If ``True``, save a probability-plot video. Default: ``False``.
+    :param bool last_frame: If ``True``, save a final static probability plot. Default: ``True``.
+    :param Tuple[int, int] size: Output image/video size as ``(width, height)``. Default: ``(640, 480)``.
+    :param int font_size: Plot font size. Default: ``10``.
+    :param int line_width: Probability line width. Default: ``2``.
+    :param bool last_frame_as_svg: If ``True``, save final static plot as SVG; else PNG. Default: ``False``.
+    :param Optional[int] y_max: Fixed y-axis max. If ``None``, inferred from data.
+    :param str line_color: Probability line color name. Default: ``'Red'``.
+    :param float line_opacity: Probability line opacity in range (0, 1]. Default: ``0.8``.
+    :param bool show_thresholds: If ``True``, draw horizontal threshold guide lines. Default: ``True``.
 
     Examples
     -----
@@ -62,6 +74,7 @@ class TresholdPlotCreatorSingleProcess(ConfigReader, PlottingMixin):
                  size: Tuple[int, int] = (640, 480),
                  font_size: int = 10,
                  line_width: int = 2,
+                 last_frame_as_svg: bool = False,
                  y_max: Optional[int] = None,
                  line_color: str = 'Red',
                  line_opacity: float = 0.8,
@@ -80,6 +93,8 @@ class TresholdPlotCreatorSingleProcess(ConfigReader, PlottingMixin):
         check_str(name=f'{self.__class__.__name__} color', value=line_color, options=VALID_COLORS)
         check_float(name=f'{self.__class__.__name__} line_opacity', value=line_opacity, min_value=0.001, max_value=1.0, raise_error=True)
         check_valid_boolean(value=show_thresholds, source=f'{self.__class__.__name__} show_thresholds')
+        check_valid_boolean(value=last_frame_as_svg, source=f'{self.__class__.__name__} last_frame_as_svg', raise_error=False)
+        self.last_frm_ext, self.last_frame_as_svg = 'svg' if last_frame_as_svg else 'png', last_frame_as_svg
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
         check_str(name=f"{self.__class__.__name__} clf_name", value=clf_name, options=(self.clf_names))
@@ -94,7 +109,7 @@ class TresholdPlotCreatorSingleProcess(ConfigReader, PlottingMixin):
         self.data_paths, self.orginal_clf_name = data_path, clf_name
         self.clf_name = f"Probability_{self.orginal_clf_name}"
         if not os.path.exists(self.probability_plot_dir): os.makedirs(self.probability_plot_dir)
-        print(f"Processing probability plots for {len(self.data_paths)} video(s)...")
+        stdout_information(msg=f"Processing probability plots for {len(self.data_paths)} video(s)...")
         self.timer = SimbaTimer(start=True)
 
     def run(self):
@@ -115,7 +130,7 @@ class TresholdPlotCreatorSingleProcess(ConfigReader, PlottingMixin):
             clf_data = data_df[self.clf_name].values
             y_max = deepcopy(self.y_max) if self.y_max is not None else float(np.max(clf_data))
             if self.last_image:
-                final_frm_save_path = os.path.join(self.probability_plot_dir, f'{self.video_name}_{self.orginal_clf_name}_final_frm_{self.datetime}.png')
+                final_frm_save_path = os.path.join(self.probability_plot_dir, f'{self.video_name}_{self.orginal_clf_name}_final_frm_{self.datetime}.{self.last_frm_ext}')
                 _ = PlottingMixin.make_line_plot(data=[clf_data],
                                                        colors=[self.line_clr],
                                                        width=self.img_size[0],
@@ -124,6 +139,7 @@ class TresholdPlotCreatorSingleProcess(ConfigReader, PlottingMixin):
                                                        font_size=self.font_size,
                                                        y_lbl=f"{self.orginal_clf_name} probability",
                                                        y_max=y_max,
+                                                       as_svg=self.last_frame_as_svg,
                                                        x_lbl='frame count',
                                                        title=f'{self.video_name} - {self.clf_name}',
                                                        save_path=final_frm_save_path,
@@ -151,11 +167,11 @@ class TresholdPlotCreatorSingleProcess(ConfigReader, PlottingMixin):
                         cv2.imwrite(frame_save_path, img)
                     if self.video_setting:
                         self.writer.write(img.astype(np.uint8)[:, :, :3])
-                    print(f"Probability frame: {i+1} / {len(data_df)}. Video: {self.video_name} (File {file_cnt + 1}/{len(self.data_paths)})")
+                    stdout_information(msg=f"Probability frame: {i+1} / {len(data_df)}. Video: {self.video_name} (File {file_cnt + 1}/{len(self.data_paths)})")
                 if self.video_setting:
                     self.writer.release()
                 video_timer.stop_timer()
-                print(f"Probability plot for video {self.video_name} saved (elapsed time: {video_timer.elapsed_time_str}s)...")
+                stdout_information(msg=f"Probability plot for video {self.video_name} saved (elapsed time: {video_timer.elapsed_time_str}s)...")
         self.timer.stop_timer()
         stdout_success(msg=f"All probability visualizations created in {self.probability_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str)
 

@@ -58,6 +58,8 @@ class DistancePlotterPopUp(PopUpMixin, ConfigReader):
         distance_frames_cb, self.distance_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames', val=False)
         distance_videos_cb, self.distance_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', txt_img='video', val=False)
         distance_final_img_cb, self.distance_final_img_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE LAST FRAME', txt_img='finish', val=True)
+        last_frame_as_svg_cb, self.last_frame_as_svg_var = SimbaCheckbox(parent=self.settings_frm, txt='LAST FRAME AS SVG', txt_img='svg', val=False, tooltip_key='LAST_FRAME_AS_SVG')
+
         self.multiprocess_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), label='CPU CORE COUNT: ', label_width=25, dropdown_width=20, value=int(self.cpu_cnt/2), img='cpu_small')
 
         self.run_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="RUN", icon_name='run', icon_link=Links.DISTANCE_PLOTS.value)
@@ -85,6 +87,7 @@ class DistancePlotterPopUp(PopUpMixin, ConfigReader):
         distance_frames_cb.grid(row=1, sticky=NW)
         distance_videos_cb.grid(row=2, sticky=NW)
         distance_final_img_cb.grid(row=3, sticky=NW)
+        last_frame_as_svg_cb.grid(row=4, sticky=NW)
 
         self.run_frm.grid(row=3, sticky=NW)
         self.run_single_video_frm.grid(row=0, sticky=NW)
@@ -134,6 +137,7 @@ class DistancePlotterPopUp(PopUpMixin, ConfigReader):
         line_width = int(self.line_width_dropdown.get_value())
         opacity = float(self.opacity_dropdown.getChoices())
         core_cnt = int(self.multiprocess_dropdown.get_value())
+        as_svg = self.last_frame_as_svg_var.get()
         max_y = -1 if self.max_y_dropdown.getChoices() == AUTO else int(self.max_y_dropdown.getChoices())
 
         style_attr = {"width": width,
@@ -149,6 +153,7 @@ class DistancePlotterPopUp(PopUpMixin, ConfigReader):
                                                          video_setting=self.distance_videos_var.get(),
                                                          final_img=self.distance_final_img_var.get(),
                                                          style_attr=style_attr,
+                                                         last_frame_as_svg=as_svg,
                                                          data_paths=data_paths,
                                                          line_attr=line_attr)
         else:
@@ -157,6 +162,7 @@ class DistancePlotterPopUp(PopUpMixin, ConfigReader):
                                                         video_setting=self.distance_videos_var.get(),
                                                         final_img=self.distance_final_img_var.get(),
                                                         style_attr=style_attr,
+                                                        last_frame_as_svg=as_svg,
                                                         data_paths=data_paths,
                                                         line_attr=line_attr,
                                                         core_cnt=core_cnt)

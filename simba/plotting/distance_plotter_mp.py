@@ -14,12 +14,12 @@ from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
-    check_file_exist_and_readable, check_instance, check_int, check_valid_lst)
+    check_file_exist_and_readable, check_instance, check_int, check_valid_lst, check_valid_boolean)
 from simba.utils.data import terminate_cpu_pool
 from simba.utils.errors import (CountError, InvalidInputError,
                                 NoSpecifiedOutputError)
 from simba.utils.lookups import get_color_dict
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_fn_ext, read_df)
 
@@ -73,7 +73,7 @@ def distance_plotter_mp(
         if frame_setting:
             frm_name = os.path.join(frame_folder_dir, f"{frm_cnt}.png")
             cv2.imwrite(frm_name, np.uint8(img))
-        print(
+        stdout_information(msg=
             f"Distance frame created: {frm_cnt} (of {distances.shape[0]}), Video: {video_name}, Processing core: {group}"
         )
     if video_setting:
@@ -83,17 +83,22 @@ def distance_plotter_mp(
 
 class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
     """
-     Visualize the distances between pose-estimated body-parts (e.g., two animals) through line
-     charts. Results are saved as individual line charts, and/or a video of line charts.
-     Uses multiprocessing.
+     Visualize frame-wise body-part distances as line plots using multiprocessing.
 
-     :param str config_path: path to SimBA project config file in Configparser format
-     :param bool frame_setting: If True, creates individual frames.
-     :param bool video_setting: If True, creates videos.
-     :param bool final_img: If True, creates a single .png representing the entire video.
-     :param dict style_attr: Video style attributes (font sizes, line opacity etc.)
-     :param List[Union[str, os.PathLike]] data_paths: Files to visualize.
-     :param dict line_attr: Representing the body-parts to visualize the distance between and their colors.
+     Produces one or more of:
+     (i) frame-by-frame plot images,
+     (ii) a dynamic distance-plot video,
+     (iii) a final static distance plot (PNG or SVG).
+
+     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
+     :param List[Union[str, os.PathLike]] data_paths: One or more pose data files to process.
+     :param bool frame_setting: If ``True``, save one plot image per frame.
+     :param bool video_setting: If ``True``, save a video of the plot building over time.
+     :param bool final_img: If ``True``, save a final static distance plot for each video.
+     :param Dict[str, int] style_attr: Plot style dictionary. Expected keys include ``width``, ``height``, ``line width``, ``font size``, ``y_max``, and ``opacity``.
+     :param List[List[str]] line_attr: Distance definitions. Each entry is ``[body_part_1, body_part_2, color_name]``.
+     :param Optional[int] core_cnt: Number of CPU cores. ``-1`` uses all available cores. Default: ``-1``.
+     :param bool last_frame_as_svg: If ``True``, final static distance image is saved as SVG; else PNG. Default: ``False``.
 
     .. note::
        `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
@@ -113,23 +118,19 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
     >>> distance_plotter.run()
     """
 
-    def __init__(
-        self,
-        config_path: Union[str, os.PathLike],
-        data_paths: List[Union[str, os.PathLike]],
-        frame_setting: bool,
-        video_setting: bool,
-        final_img: bool,
-        style_attr: Dict[str, int],
-        line_attr: List[List[str]],
-        core_cnt: Optional[int] = -1,
-    ):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 data_paths: List[Union[str, os.PathLike]],
+                 frame_setting: bool,
+                 video_setting: bool,
+                 final_img: bool,
+                 style_attr: Dict[str, int],
+                 line_attr: List[List[str]],
+                 core_cnt: Optional[int] = -1,
+                 last_frame_as_svg: bool = False):
 
         if (not frame_setting) and (not video_setting) and (not final_img):
-            raise NoSpecifiedOutputError(
-                msg="Please choice to create frames and/or video distance plots",
-                source=self.__class__.__name__,
-            )
+            raise NoSpecifiedOutputError(msg="Please choice to create frames and/or video distance plots", source=self.__class__.__name__)
         check_int(
             name=f"{self.__class__.__name__} core_cnt",
             value=core_cnt,
@@ -173,6 +174,8 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
         )
         if not os.path.exists(self.line_plot_dir):
             os.makedirs(self.line_plot_dir)
+        check_valid_boolean(value=last_frame_as_svg, source=f'{self.__class__.__name__} last_frame_as_svg', raise_error=False)
+        self.last_frm_ext, self.last_frame_as_svg = 'svg' if last_frame_as_svg else 'png', last_frame_as_svg
         self.color_names = get_color_dict()
         if platform.system() == "Darwin":
             multiprocessing.set_start_method("spawn", force=True)
@@ -184,7 +187,7 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
         return np.hstack((group_col, data))
 
     def run(self):
-        print(f"Processing {len(self.data_paths)} video(s)...")
+        stdout_information(msg=f"Processing {len(self.data_paths)} video(s)...")
         check_all_file_names_are_represented_in_video_log(
             video_info_df=self.video_info_df, data_paths=self.data_paths
         )
@@ -258,10 +261,11 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
                     y_lbl="distance (cm)",
                     x_lbl="time (s)",
                     x_lbl_divisor=fps,
+                    as_svg=self.last_frame_as_svg,
                     y_max=self.style_attr["y_max"],
                     line_opacity=self.style_attr["opacity"],
                     save_path=os.path.join(
-                        self.line_plot_dir, f"{video_name}_final_distances.png"
+                        self.line_plot_dir, f"{video_name}_final_distances.{self.last_frm_ext}"
                     ),
                 )
 
@@ -278,7 +282,7 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
                     for cnt, i in enumerate(distances)
                 ]
                 distances = np.concatenate(distances, axis=0)
-                print(
+                stdout_information(msg=
                     f"Creating distance plots, multiprocessing, follow progress in terminal (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})"
                 )
                 with multiprocessing.Pool(
@@ -301,7 +305,7 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
                             constants, frm_range, chunksize=self.multiprocess_chunksize
                         )
                     ):
-                        print(f"Frame batch core {result} complete...")
+                        stdout_information(msg=f"Frame batch core {result} complete...")
                         pass
                 terminate_cpu_pool(pool=pool, force=False)
                 if self.video_setting:
@@ -320,6 +324,22 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
                 msg=f"Distance visualizations complete for {len(self.data_paths)} video(s)",
                 elapsed_time=self.timer.elapsed_time_str,
             )
+
+# style_attr = {'width': 640, 'height': 480, 'line width': 6, 'font size': 12, 'y_max': -1, 'opacity': 0.5}
+# line_attr = [['nose', 'center', 'Green'], ['center', 'center', 'Red']]
+# test = DistancePlotterMultiCore(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",
+#                                 frame_setting=False,
+#                                 video_setting=False,
+#                                 last_frame_as_svg=True,
+#                                 style_attr=style_attr,
+#                                 final_img=True,
+#                                 data_paths=[r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\csv\outlier_corrected_movement_location\2026-01-05 14-17-54 box2_1143_L_Gq_5cno.csv"],
+#                                 line_attr=line_attr,
+#                                 core_cnt=-1)
+# test.run()
+
+
+
 
 
 # style_attr = {'width': 640, 'height': 480, 'line width': 6, 'font size': 12, 'y_max': -1, 'opacity': 0.5}

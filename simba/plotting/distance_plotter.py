@@ -11,18 +11,19 @@ from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
-    check_file_exist_and_readable, check_instance, check_valid_lst)
+    check_file_exist_and_readable, check_instance, check_valid_lst, check_valid_boolean)
 from simba.utils.errors import (CountError, InvalidInputError,
                                 NoSpecifiedOutputError)
 from simba.utils.lookups import get_color_dict
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import get_fn_ext, read_df
 
 
 class DistancePlotterSingleCore(ConfigReader):
     """
-    Class for visualizing the distance between two pose-estimated body-parts (e.g., two animals) through line
-    charts. Results are saved as individual line charts, and/or videos of line charts.
+    Visualize frame-wise body-part distances as line plots using single-core processing.
+
+    Produces one or more of: (i) frame-by-frame plot images, (ii) a dynamic distance-plot video, (iii) a final static distance plot (PNG or SVG).
 
     .. note::
        For better runtime, use :meth:`simba.plotting.distance_plotter_mp.DistancePlotterMultiCore`.
@@ -32,9 +33,14 @@ class DistancePlotterSingleCore(ConfigReader):
        :width: 300
        :align: center
 
-    :parameter str config_path: path to SimBA project config file in Configparser format.
-    :parameter bool frame_setting: If True, creates individual frames.
-    :parameter bool video_setting: If True, creates videos
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
+    :param List[Union[str, os.PathLike]] data_paths: One or more pose data files to process.
+    :param Dict[str, int] style_attr: Plot style dictionary. Expected keys include ``width``, ``height``, ``line width``, ``font size``, ``y_max``, and ``opacity``.
+    :param List[List[str]] line_attr: Distance definitions. Each entry is ``[body_part_1, body_part_2, color_name]``.
+    :param bool frame_setting: If ``True``, save one plot image per frame. Default: ``False``.
+    :param bool video_setting: If ``True``, save a video of the plot building over time. Default: ``False``.
+    :param bool last_frame_as_svg: If ``True``, final static distance image is saved as SVG; else PNG. Default: ``False``.
+    :param bool final_img: If ``True``, save a final static distance plot for each video. Default: ``False``.
 
     :examples:
 
@@ -52,6 +58,7 @@ class DistancePlotterSingleCore(ConfigReader):
         line_attr: List[List[str]],
         frame_setting: Optional[bool] = False,
         video_setting: Optional[bool] = False,
+        last_frame_as_svg: bool = False,
         final_img: Optional[bool] = False,
     ):
 
@@ -83,10 +90,12 @@ class DistancePlotterSingleCore(ConfigReader):
             self.line_attr,
             self.final_img,
         ) = (video_setting, frame_setting, data_paths, style_attr, line_attr, final_img)
+        check_valid_boolean(value=last_frame_as_svg, source=f'{self.__class__.__name__} last_frame_as_svg', raise_error=False)
+        self.last_frm_ext, self.last_frame_as_svg = 'svg' if last_frame_as_svg else 'png', last_frame_as_svg
         self.color_names = get_color_dict()
 
     def run(self):
-        print(f"Processing {len(self.data_paths)} videos...")
+        stdout_information(msg=f"Processing {len(self.data_paths)} videos...")
         check_all_file_names_are_represented_in_video_log(
             video_info_df=self.video_info_df, data_paths=self.data_paths
         )
@@ -160,11 +169,12 @@ class DistancePlotterSingleCore(ConfigReader):
                     title="Animal distances",
                     y_lbl="distance (cm)",
                     x_lbl="time (s)",
+                    as_svg=self.last_frame_as_svg,
                     x_lbl_divisor=fps,
                     y_max=self.style_attr["y_max"],
                     line_opacity=self.style_attr["opacity"],
                     save_path=os.path.join(
-                        self.line_plot_dir, f"{video_name}_final_distances.png"
+                        self.line_plot_dir, f"{video_name}_final_distances.{self.last_frm_ext}"
                     ),
                 )
 
@@ -195,7 +205,7 @@ class DistancePlotterSingleCore(ConfigReader):
                             self.save_frame_folder_dir, f"{frm_cnt}.png"
                         )
                         cv2.imwrite(frm_name, np.uint8(img))
-                    print(f"Distance frame created: {frm_cnt}, Video: {video_name} ...")
+                    stdout_information(msg=f"Distance frame created: {frm_cnt}, Video: {video_name} ...")
                 if self.video_setting:
                     video_writer.release()
                 video_timer.stop_timer()

@@ -62,7 +62,7 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
         probability_frames_cb, self.probability_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', font=Formats.FONT_REGULAR.value, txt_img='frames', val=False)
         probability_videos_cb, self.probability_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', font=Formats.FONT_REGULAR.value, txt_img='video', val=False)
         probability_last_frm_cb, self.probability_last_frm_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FINAL FRAME', font=Formats.FONT_REGULAR.value, txt_img='finish', val=True)
-
+        last_frame_as_svg_cb, self.last_frame_as_svg_var = SimbaCheckbox(parent=self.settings_frm, txt='LAST FRAME AS SVG', txt_img='svg', val=False, tooltip_key='LAST_FRAME_AS_SVG')
 
         self.run_single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name='video', icon_link=Links.VISUALIZE_CLF_PROBABILITIES.value, pady=5, padx=5, relief='solid')
         self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="CREATE SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__run, cmd_kwargs={'multiple': False})
@@ -86,6 +86,7 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
         probability_frames_cb.grid(row=2, sticky=NW)
         probability_videos_cb.grid(row=3, sticky=NW)
         probability_last_frm_cb.grid(row=4, sticky=NW)
+        last_frame_as_svg_cb.grid(row=5, sticky=NW)
 
 
         self.run_single_video_frm.grid(row=2, sticky=NW, padx=10, pady=10)
@@ -105,6 +106,7 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
         core_cnt = int(self.core_cnt_dropdown.get_value())
         opacity = float(self.line_opacity_dropdown.get_value())
         color = self.line_clr_dropdown.get_value()
+        as_svg = self.last_frame_as_svg_var.get()
         show_threshold = str_2_bool(self.threshold_dropdown.get_value())
         y_max = None if self.max_y_dropdown.get_value() == 'AUTO' else (int(self.max_y_dropdown.get_value()) / 100)
 
@@ -123,6 +125,7 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
                                                                         clf_name=self.clf_dropdown.getChoices(),
                                                                         font_size=font_size,
                                                                         line_width=line_width,
+                                                                        last_frame_as_svg=as_svg,
                                                                         line_opacity=opacity,
                                                                         size=(width, height),
                                                                         line_color=color,
@@ -135,6 +138,7 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
                                                                        data_path=data_paths,
                                                                        clf_name=self.clf_dropdown.getChoices(),
                                                                        cores=core_cnt,
+                                                                       last_frame_as_svg=as_svg,
                                                                        line_width=line_width,
                                                                        font_size=font_size,
                                                                        line_opacity=opacity,

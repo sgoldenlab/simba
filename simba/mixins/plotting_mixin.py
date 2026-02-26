@@ -1274,6 +1274,7 @@ class PlottingMixin(object):
                        x_tick_cnt: int = 5,
                        y_max: Optional[Union[int, float]] = -1,
                        line_opacity: Optional[float] = 1.0,
+                       as_svg: bool = False,
                        save_path: Optional[Union[str, os.PathLike]] = None,
                        show_thresholds: bool = False):
 
@@ -1321,21 +1322,36 @@ class PlottingMixin(object):
         plt.xticks(x_ticks_locs, x_lbls, rotation="horizontal", fontsize=font_size)
         plt.yticks(y_ticks_locs, y_lbls, fontsize=font_size)
         plt.ylim(0, y_max)
-        if title is not None:
-            plt.suptitle(title, x=0.5, y=0.92, fontsize=font_size + 4)
-        buffer_ = io.BytesIO()
-        plt.savefig(buffer_, format="png")
-        buffer_.seek(0)
-        img = PIL.Image.open(buffer_)
-        img = np.uint8(cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR))
-        buffer_.close()
-        plt.close()
-        img = cv2.resize(img, (width, height))
-        if save_path is not None:
-            cv2.imwrite(save_path, img)
+        if title is not None: plt.suptitle(title, x=0.5, y=0.92, fontsize=font_size + 4)
+
+        if as_svg and save_path is None:
+            svg_buffer = io.BytesIO()
+            plt.savefig(svg_buffer, format="svg", bbox_inches="tight")
+            svg_buffer.seek(0)
+            svg_data = svg_buffer.getvalue().decode("utf-8")
+            svg_buffer.close()
+            plt.close()
+            return svg_data
+        elif as_svg and save_path is not None:
+            plt.savefig(save_path, format="svg", bbox_inches="tight")
+            plt.close()
             stdout_success(msg=f"Line plot saved at {save_path}")
+            return None
+
         else:
-            return img
+            buffer_ = io.BytesIO()
+            plt.savefig(buffer_, format="png")
+            buffer_.seek(0)
+            img = PIL.Image.open(buffer_)
+            img = np.uint8(cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR))
+            buffer_.close()
+            plt.close()
+            img = cv2.resize(img, (width, height))
+            if save_path is not None:
+                cv2.imwrite(save_path, img)
+                stdout_success(msg=f"Line plot saved at {save_path}")
+            else:
+                return img
 
     @staticmethod
     def make_line_plot_plotly(

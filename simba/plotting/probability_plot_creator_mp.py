@@ -21,9 +21,8 @@ from simba.utils.data import terminate_cpu_pool
 from simba.utils.enums import Formats
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.lookups import get_color_dict
-from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    find_core_cnt, get_fn_ext, read_df)
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
+from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, get_fn_ext, read_df)
 
 STYLE_WIDTH = 'width'
 STYLE_HEIGHT = 'height'
@@ -88,23 +87,34 @@ def _probability_plot_mp(frm_range: Tuple[int, np.ndarray],
             frame_save_name = os.path.join(frame_dir, f"{current_frm}.png")
             cv2.imwrite(frame_save_name, img)
         current_frm += 1
-        print(f"Probability frame created: {current_frm + 1}, Video: {video_name}, Processing core: {group}")
+        stdout_information(msg=f"Probability frame created: {current_frm + 1}, Video: {video_name}, Processing core: {group}")
     return group
 
 
 class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
     """
-    Class for line chart visualizations displaying the classification probabilities of a single classifier.
-    Uses multiprocessing.
+    Create classifier-probability line plots using multiprocessing.
 
-    :param str config_path: path to SimBA project config file in Configparser format
-    :param str clf_name: Name of the classifier to create visualizations for
-    :param bool frame_setting: When True, SimBA creates indidvidual frames in png format
-    :param bool video_setting: When True, SimBA creates compressed video in mp4 format
-    :param bool last_image: When True, creates image .png representing last frame of the video.
-    :param dict style_attr: User-defined style attributes of the visualization (line size, color etc).
-    :param List[str] files_found: Files to create threshold plots for.
-    :param int cores: Number of cores to use.
+    Produces one or more of:
+    (i) frame-by-frame probability plot images,
+    (ii) a dynamic probability-plot video,
+    (iii) a final static probability plot (PNG or SVG).
+
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
+    :param Union[List[Union[str, os.PathLike]], str, os.PathLike] data_path: Single machine-results file path or a list of file paths.
+    :param str clf_name: Classifier name to visualize.
+    :param bool frame_setting: If ``True``, save one plot image per frame. Default: ``False``.
+    :param bool video_setting: If ``True``, save a probability-plot video. Default: ``False``.
+    :param bool last_frame: If ``True``, save a final static probability plot. Default: ``True``.
+    :param Tuple[int, int] size: Output image/video size as ``(width, height)``. Default: ``(640, 480)``.
+    :param int font_size: Plot font size. Default: ``10``.
+    :param int line_width: Probability line width. Default: ``2``.
+    :param Optional[Union[int, float]] y_max: Fixed y-axis max. If ``None``, inferred from data.
+    :param str line_color: Probability line color name. Default: ``'Red'``.
+    :param bool last_frame_as_svg: If ``True``, save final static plot as SVG; else PNG. Default: ``False``.
+    :param float line_opacity: Probability line opacity in range (0, 1]. Default: ``0.8``.
+    :param Optional[int] cores: Number of CPU cores. ``-1`` uses all available cores. Default: ``-1``.
+    :param bool show_thresholds: If ``True``, draw horizontal threshold guide lines. Default: ``True``.
 
     .. note::
        `Visualization tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
@@ -128,8 +138,9 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
                  size: Tuple[int, int] = (640, 480),
                  font_size: int = 10,
                  line_width: int = 2,
-                 y_max: Optional[int] = None,
+                 y_max: Optional[Union[int, float]] = None,
                  line_color: str = 'Red',
+                 last_frame_as_svg: bool = False,
                  line_opacity: float = 0.8,
                  cores: Optional[int] = -1,
                  show_thresholds: bool = True):
@@ -143,9 +154,10 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
         check_valid_tuple(x=size, source=f'{self.__class__.__name__} size', accepted_lengths=(2,), valid_dtypes=Formats.INTEGER_DTYPES.value, min_integer=100)
         check_int(name=f'{self.__class__.__name__} font_size', value=font_size, min_value=1, raise_error=True)
         check_int(name=f'{self.__class__.__name__} line_width', value=line_width, min_value=1, raise_error=True)
+        check_valid_boolean(value=last_frame_as_svg, source=f'{self.__class__.__name__} last_frame_as_svg', raise_error=False)
         check_valid_boolean(value=show_thresholds, source=f'{self.__class__.__name__} show_thresholds')
         if y_max is not None:
-            check_float(name=f'{self.__class__.__name__} y_max', value=y_max, min_value=0.00001, raise_error=True)
+            check_float(name=f'{self.__class__.__name__} y_max', value=y_max, allow_zero=False, allow_negative=False, raise_error=True)
         check_str(name=f'{self.__class__.__name__} color', value=line_color, options=VALID_COLORS)
         check_float(name=f'{self.__class__.__name__} line_opacity', value=line_opacity, min_value=0.001, max_value=1.0, raise_error=True)
         ConfigReader.__init__(self, config_path=config_path)
@@ -165,7 +177,8 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
         self.clf_name, self.data_paths = clf_name, data_path
         self.probability_col, self.img_size = f"Probability_{self.clf_name}", size
         if not os.path.exists(self.probability_plot_dir): os.makedirs(self.probability_plot_dir)
-        print(f"Processing {len(self.data_paths)} video(s)...")
+        self.last_frm_ext, self.last_frame_as_svg = 'svg' if last_frame_as_svg else 'png', last_frame_as_svg
+        stdout_information(msg=f"Processing {len(self.data_paths)} video(s)...")
 
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
@@ -193,7 +206,7 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
             y_max = deepcopy(self.y_max) if self.y_max is not None else float(np.max(clf_data))
 
             if self.last_frame:
-                final_frm_save_path = os.path.join(self.probability_plot_dir, f'{self.video_name}_{self.clf_name}_final_frm_{self.datetime}.png')
+                final_frm_save_path = os.path.join(self.probability_plot_dir, f'{self.video_name}_{self.clf_name}_final_frm_{self.datetime}.{self.last_frm_ext}')
                 _ = PlottingMixin.make_line_plot(data=[clf_data],
                                                        colors=[self.line_clr],
                                                        width=self.img_size[0],
@@ -202,6 +215,7 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
                                                        font_size=self.font_size,
                                                        y_lbl=f"{self.clf_name} probability",
                                                        y_max=y_max,
+                                                       as_svg=self.last_frame_as_svg,
                                                        x_lbl='frame count',
                                                        title=f'{self.video_name} - {self.clf_name}',
                                                        save_path=final_frm_save_path,
@@ -213,7 +227,7 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
                 data_split = np.array_split(frm_nums, self.cores)
                 frm_range = []
                 for cnt, i in enumerate(data_split): frm_range.append((cnt, i))
-                print(f"Creating probability images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.cores})...")
+                stdout_information(msg=f"Creating probability images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.cores})...")
                 with multiprocessing.Pool(self.cores, maxtasksperchild=self.maxtasksperchild) as pool:
                     constants = functools.partial(_probability_plot_mp,
                                                   clf_name=self.clf_name,
@@ -233,15 +247,15 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
                                                   show_thresholds=self.show_thresholds)
 
                     for cnt, result in enumerate(pool.imap(constants, frm_range, chunksize=self.multiprocess_chunksize)):
-                        print(f"Core batch {result} complete...")
+                        stdout_information(msg=f"Core batch {result} complete...")
 
                 terminate_cpu_pool(pool=pool, force=False)
                 if self.video_setting:
-                    print(f"Joining {self.video_name} multiprocessed video...")
+                    stdout_information(msg=f"Joining {self.video_name} multiprocessed video...")
                     concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_video_path)
 
                 video_timer.stop_timer()
-                print(f"Probability video {self.video_name} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
+                stdout_information(msg=f"Probability video {self.video_name} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
 
         self.timer.stop_timer()
         stdout_success(msg=f"Probability visualizations for {str(len(self.data_paths))} videos created in {self.probability_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str,)
@@ -285,4 +299,21 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
 #                                             cores=4)
 #     test.run()
 #
-
+#
+# if __name__ == "__main__":
+#     test = TresholdPlotCreatorMultiprocess(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",
+#                                            frame_setting=False,
+#                                            video_setting=False,
+#                                            last_frame=True,
+#                                            clf_name='REARING',
+#                                            data_path=[r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\csv\machine_results\2026-01-05 14-17-54 box3_1143_LL_Gq_sal.csv"],
+#                                            size = (640, 480),
+#                                            font_size=10,
+#                                            line_width=2,
+#                                            last_frame_as_svg=True,
+#                                            line_color='Orange',
+#                                            y_max=1.0,
+#                                            line_opacity=0.8,
+#                                            cores=4)
+#     test.run()
+#

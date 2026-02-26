@@ -319,6 +319,7 @@
   "GANTT_CREATE_FRAMES": "Save one image per frame (many images). Use if you need to step through the video frame by frame.",
   "GANTT_CREATE_VIDEOS": "Save a video where the Gantt chart builds over time, frame by frame.",
   "GANTT_CREATE_LAST_FRAME": "Create one final static Gantt image that summarizes the entire video. This is the fastest way to get a single overview figure.",
+  "LAST_FRAME_AS_SVG": "If checked, the final static image is saved as SVG (vector) instead of PNG. This only affects CREATE LAST FRAME output.",
   "CLF_PLOT_BP_THRESHOLD": "Hide body-parts with confidence below this (0–1). 0 = show everything. Higher = hide shaky points.",
   "CLF_PLOT_TEXT_SIZE": "Size of the behavior labels on the video. AUTO = SimBA picks. Or choose 1–100.",
   "CLF_PLOT_TEXT_SPACING": "Space between the label text and other drawn elements. AUTO = SimBA picks.",
