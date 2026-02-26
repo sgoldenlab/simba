@@ -552,6 +552,7 @@ class NetworkMixin(object):
             cnt = np.argwhere(x == v).flatten().shape[0]
             pi = cnt / x.shape[0]
             results[i] = pi * np.log(pi)
+
         return np.sum(np.abs(results))
 
     @staticmethod

@@ -39,7 +39,7 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
 
         self.bp_threshold_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BODY-PART THRESHOLD", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        self.threshold_entry = Entry_Box(parent=self.bp_threshold_frm, fileDescription='THRESHOLD (0.0-1.0): ', labelwidth=30, entry_box_width=20, justify='center', value=0.0, img='pct_2', tooltip_key='MOVEMENT_PROBABILITY_THRESHOLD')
+        self.threshold_entry = Entry_Box(parent=self.bp_threshold_frm, fileDescription='THRESHOLD (0.0-1.0): ', labelwidth=30, entry_box_width=20, justify='center', value=0.0, img='pct_2', tooltip_key='TIMEBINS_MOVEMENT_BP_THRESHOLD')
         self.bp_threshold_frm.grid(row=1, column=0, sticky=NW)
         self.threshold_entry.grid(row=0, column=0, sticky=NW)
 
@@ -70,7 +70,7 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         self.plots_cb.grid(row=2, column=0, sticky=NW)
 
         self.create_bp_frm(animal_cnt=1)
-        self.create_run_frm(run_function=self._run)
+        self.create_run_frm(run_function=self._run, title=f'RUN ({len(self.outlier_corrected_paths)} files)')
 
         self.main_frm.mainloop()
 

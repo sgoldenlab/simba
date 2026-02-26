@@ -190,9 +190,9 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
                     if self.threshold > 0.0:
                         movement_bin_positions = self._remove_low_confidence_positions(arr=movement_bin_positions, threshold=self.threshold)
                     movement_bin_positions = movement_bin_positions[:, :2]
-                    movement_bin_positions_shifted = self.create_shifted_array(data=movement_bin_positions, periods=1)
-                    movement_df = pd.DataFrame(self.framewise_euclidean_distance(location_1=movement_bin_positions.astype(np.float64), location_2=movement_bin_positions_shifted.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=True), columns=["VALUE"])
-                    movement, velocity = (FeatureExtractionSupplemental.distance_and_velocity(x=movement_df["VALUE"].values, fps=fps, pixels_per_mm=px_per_mm, centimeters=False))
+                    #movement_bin_positions_shifted = self.create_shifted_array(data=movement_bin_positions, periods=1)
+                    #movement_df = pd.DataFrame(self.framewise_euclidean_distance(location_1=movement_bin_positions.astype(np.float64), location_2=movement_bin_positions_shifted.astype(np.float64), px_per_mm=1, centimeter=False), columns=["VALUE"])
+                    movement, velocity = (FeatureExtractionSupplemental.distance_and_velocity(x=movement_bin_positions, fps=fps, pixels_per_mm=px_per_mm, centimeters=True))
                     if self.distance:
                         results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": animal_name,"BODY-PART": animal_bps[0][:-2],"MEASUREMENT": "Movement (cm)","VALUE": round(movement, 4)})
                     if self.velocity:

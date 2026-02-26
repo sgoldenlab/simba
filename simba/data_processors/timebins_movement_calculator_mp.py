@@ -77,11 +77,10 @@ def _time_bin_movement_helper(data: list,
                 bin_times = find_time_stamp_from_frame_numbers(start_frame=int(bin_length_frames * bin), end_frame=min(int(bin_length_frames * (bin + 1)), len(data_df)), fps=fps)
                 if threshold > 0.0:
                     movement_bin_positions = _remove_low_confidence_positions(arr=movement_bin_positions, threshold=threshold)
-
                 movement_bin_positions = movement_bin_positions[:, :2]
-                movement_bin_positions_shifted = FeatureExtractionMixin.create_shifted_array(data=movement_bin_positions, periods=1)
-                movement_df = pd.DataFrame(FeatureExtractionMixin.framewise_euclidean_distance(location_1=movement_bin_positions.astype(np.float64), location_2=movement_bin_positions_shifted.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=True), columns=["VALUE"])
-                movement_data, velocity_data = (FeatureExtractionSupplemental.distance_and_velocity(x=movement_df["VALUE"].values, fps=fps, pixels_per_mm=px_per_mm, centimeters=False))
+                #movement_bin_positions_shifted = FeatureExtractionMixin.create_shifted_array(data=movement_bin_positions, periods=1)
+                #movement_df = pd.DataFrame(FeatureExtractionMixin.framewise_euclidean_distance(location_1=movement_bin_positions.astype(np.float64), location_2=movement_bin_positions_shifted.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=True), columns=["VALUE"])
+                movement_data, velocity_data = (FeatureExtractionSupplemental.distance_and_velocity(x=movement_bin_positions, fps=fps, pixels_per_mm=px_per_mm, centimeters=True))
                 if distance:
                     video_results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": name,"BODY-PART": animal_bps[0][:-2],"MEASUREMENT": "Movement (cm)","VALUE": round(movement_data, 4)})
                 if velocity:
@@ -155,9 +154,6 @@ class TimeBinsMovementCalculatorMultiprocess(ConfigReader, FeatureExtractionMixi
             check_valid_tuple(x=body_parts, source=f'{self.__class__.__name__} body_parts', minimum_length=1, valid_dtypes=(str,), accepted_values=self.body_parts_lst)
         else:
             raise InvalidInputError(msg='Body-parts has to be a list of tuple of strings', source=f'{self.__class__.__name__} body_parts')
-
-
-
         if data_path is None:
             if len(self.outlier_corrected_paths) == 0: raise NoDataError(msg=f'No data files found in {self.outlier_corrected_dir}', source=self.__class__.__name__)
             self.file_paths = self.outlier_corrected_paths

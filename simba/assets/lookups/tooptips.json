@@ -21,6 +21,7 @@
   "TIMEBINS_MOVEMENT_NUMBER_OF_ANIMALS": "How many animals to analyze. This controls how many body-part selectors are shown.",
   "TIMEBINS_MOVEMENT_BODY_PART": "Body-part used to track movement for this animal (for example, Center or Nose).",
   "TIMEBINS_MOVEMENT_TIME_BIN_SIZE": "Length of each time bin in seconds (for example, 60 = one-minute bins).",
+  "TIMEBINS_MOVEMENT_BP_THRESHOLD": "Minimum pose-estimation confidence. Frames below this threshold are ignored for movement calculations. \nUse 0.0 to include all frames.",
   "TIMEBINS_MOVEMENT_CREATE_PLOTS": "Create line plots of movement results across time bins.",
   "TIMEBINS_MOVEMENT_DISTANCE": "Include distance traveled (cm) for each time bin.",
   "TIMEBINS_MOVEMENT_VELOCITY": "Include average velocity (cm/s) for each time bin.",

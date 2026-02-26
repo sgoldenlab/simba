@@ -119,8 +119,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
                 self.data_df = self.data_df[self.bp_list]
                 for animal_cnt, animal_data in self.body_parts_dict.items():
                     animal_df = self.data_df[animal_data["BODY-PART HEADERS"]]
-                    if self.threshold > 0.00:
-                        animal_df = animal_df[animal_df[animal_data["BODY-PART HEADERS"][-1]] >= self.threshold]
+                    if self.threshold > 0.00: animal_df = animal_df[animal_df[animal_data["BODY-PART HEADERS"][-1]] >= self.threshold]
                     animal_df = animal_df.iloc[:, 0:2].reset_index(drop=True)
                     distance, velocity = FeatureExtractionSupplemental.distance_and_velocity(x=animal_df.values, fps=self.fps, pixels_per_mm=self.px_per_mm, centimeters=True)
                     if self.distance:
