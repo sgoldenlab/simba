@@ -58,6 +58,7 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         gantt_frames_cb, self.gantt_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames', val=False, tooltip_key='GANTT_CREATE_FRAMES')
         gantt_videos_cb, self.gantt_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', txt_img='video', val=False, tooltip_key='GANTT_CREATE_VIDEOS')
         gantt_last_frame_cb, self.gantt_last_frame_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE LAST FRAME', txt_img='finish', val=True, tooltip_key='GANTT_CREATE_LAST_FRAME')
+        last_frame_as_svg_cb, self.last_frame_as_svg_var = SimbaCheckbox(parent=self.settings_frm, txt='LAST FRAME AS SVG', txt_img='svg', val=False, tooltip_key='GANTT_CREATE_LAST_FRAME')
 
         self.run_single_video_frm= CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name='video', icon_link=Links.GANTT_PLOTS.value, relief='solid', padx=5, pady=5)
         self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="VIDEO", txt_clr="blue", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.__create_gantt_plots, cmd_kwargs={'multiple': False})
@@ -80,6 +81,7 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         gantt_videos_cb.grid(row=0, sticky=NW)
         gantt_frames_cb.grid(row=1, sticky=W)
         gantt_last_frame_cb.grid(row=2, sticky=NW)
+        last_frame_as_svg_cb.grid(row=3, sticky=NW)
 
         self.run_single_video_frm.grid(row=3, sticky=NW)
         self.run_single_video_btn.grid(row=0, sticky=NW)
@@ -101,6 +103,7 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         frame_setting = self.gantt_frames_var.get()
         video_setting = self.gantt_videos_var.get()
         last_frm_setting = self.gantt_last_frame_var.get()
+        as_svg = self.last_frame_as_svg_var.get()
         palette = self.palette_dropdown.get_value()
         bar_opacity = float(self.opacity_dropdown.get_value())
         font = self.font_dropdown.get_value()
@@ -131,6 +134,7 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
                                                      font=font,
                                                      clf_names=clf_names,
                                                      font_size=font_size,
+                                                     last_frame_as_svg=as_svg,
                                                      font_rotation=font_rotation,
                                                      core_cnt=core_cnt,
                                                      palette=palette,
@@ -144,6 +148,7 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
                                                       data_paths=data_paths,
                                                       width=width,
                                                       font=font,
+                                                      last_frame_as_svg=as_svg,
                                                       height=height,
                                                       clf_names=clf_names,
                                                       font_size=font_size,

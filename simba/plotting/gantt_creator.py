@@ -18,8 +18,8 @@ from simba.utils.data import create_color_palette, detect_bouts
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.lookups import get_fonts, get_named_colors
-from simba.utils.printing import stdout_success
-from simba.utils.read_write import get_fn_ext, read_df
+from simba.utils.printing import stdout_success, stdout_information
+from simba.utils.read_write import get_fn_ext, read_df, seconds_to_timestamp
 
 STYLE_WIDTH = 'width'
 STYLE_HEIGHT = 'height'
@@ -30,32 +30,37 @@ STYLE_ATTR = [STYLE_WIDTH, STYLE_HEIGHT, STYLE_FONT_SIZE, STYLE_FONT_ROTATION]
 
 class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
     """
-    Create classifier gantt charts in video and/or image format using single-threaded processing.
+    Create classifier Gantt charts using single-process execution.
+
+    Generates one or more of: (i) frame-by-frame Gantt images, (ii) dynamic Gantt videos, (iii) a final static Gantt image (PNG or SVG).
 
     .. note::
        `GitHub gantt tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#gantt-plot>`__.
 
     .. seealso::
-       For improved run-time, see :func:`simba.plotting.gantt_creator_mp.GanttCreatorMultiprocess`.
+       For multiprocessing alternative, see :class:`simba.plotting.gantt_creator_mp.GanttCreatorMultiprocess`.
 
     .. image:: _static/img/gantt_plot.png
        :width: 300
        :align: center
 
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
-    :param List[Union[str, os.PathLike]] data_paths: File paths to machine prediction CSV files.
+    :param Optional[Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]]] data_paths: File path, list of file paths, or ``None`` (all machine result files in project).
     :param int width: Width of output images/videos in pixels. Default: 640.
     :param int height: Height of output images/videos in pixels. Default: 480.
     :param int font_size: Font size for behavior labels. Default: 8.
     :param int font_rotation: Rotation angle for y-axis labels in degrees (0-180). Default: 45.
+    :param Optional[str] font: Matplotlib font name. If ``None``, default font is used.
     :param str palette: Color palette name for behaviors. Default: 'Set1'.
-    :param Optional[bool] frame_setting: If True, creates individual frame images. Default: False.
-    :param Optional[bool] video_setting: If True, creates gantt videos. Default: False.
-    :param Optional[bool] last_frm_setting: If True, creates single final frame PNG showing entire session. Default: True.
-    :param Optional[bool] hhmmss: If True, displays time in HH:MM:SS format instead of seconds. Default: True.
+    :param bool frame_setting: If ``True``, creates individual frame images. Default: ``False``.
+    :param bool video_setting: If ``True``, creates dynamic Gantt videos. Default: ``False``.
+    :param bool last_frm_setting: If ``True``, creates a final static Gantt image. Default: ``True``.
+    :param bool last_frame_as_svg: If ``True``, saves final static frame as SVG; else PNG. Default: ``False``.
+    :param bool hhmmss: If ``True``, x-axis labels are formatted as ``HH:MM:SS``. If ``False``, seconds are used. Default: ``True``.
+    :param Optional[List[str]] clf_names: Optional subset of classifiers to include. If ``None``, uses all project classifiers.
 
     :example:
-        >>> gantt_creator = GanttCreatorSingleProcess(config_path='project_config.ini', video_setting=True, data_paths=['csv/machine_results/video1.csv'], hhmmss=True)
+        >>> gantt_creator = GanttCreatorSingleProcess(config_path='project_config.ini', video_setting=True, data_paths=['csv/machine_results/video1.csv'], hhmmss=True, last_frm_setting=True)
         >>> gantt_creator.run()
     """
 
@@ -71,6 +76,7 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
                  frame_setting: bool = False,
                  video_setting: bool = False,
                  last_frm_setting: bool = True,
+                 last_frame_as_svg: bool = False,
                  hhmmss: bool = True,
                  clf_names: Optional[List[str]] = None):
 
@@ -89,6 +95,7 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
         else:
             data_paths = deepcopy(self.machine_results_paths)
         check_valid_boolean(value=hhmmss, source=f'{self.__class__.__name__} hhmmss', raise_error=False)
+        check_valid_boolean(value=last_frm_setting, source=f'{self.__class__.__name__} last_frm_setting', raise_error=False)
         palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
         check_str(name=f'{self.__class__.__name__} palette', value=palette, options=palettes)
         for file_path in data_paths: check_file_exist_and_readable(file_path=file_path)
@@ -105,11 +112,13 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
             check_valid_lst(data=clf_names, source=f'{self.__class__.__name__} clf_names', valid_dtypes=(str,), valid_values=self.clf_names, min_len=1, raise_error=True)
             self.clf_names = clf_names
         self.data_paths, self.hhmmss, self.font = data_paths, hhmmss, font
+        self.last_frm_ext, self.last_frame_as_svg = 'svg' if last_frame_as_svg else 'png', last_frame_as_svg
         self.colours = get_named_colors()
         self.colour_tuple_x = list(np.arange(3.5, 203.5, 5))
 
+
     def run(self):
-        print(f"Processing gantt visualizations for {len(self.data_paths)} video(s)...")
+        stdout_information(msg=f"Processing gantt visualizations for {len(self.data_paths)} video(s)...")
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
         for file_cnt, file_path in enumerate(self.data_paths):
             _, self.video_name, _ = get_fn_ext(file_path)
@@ -136,7 +145,8 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
                                      font_rotation=self.font_rotation,
                                      video_name=self.video_name,
                                      font=self.font,
-                                     save_path=os.path.join(self.gantt_plot_dir, f"{self.video_name }_final_image.png"),
+                                     as_svg=self.last_frame_as_svg,
+                                     save_path=os.path.join(self.gantt_plot_dir, f"{self.video_name }_final_image.{self.last_frm_ext}"),
                                      palette=self.clr_lst,
                                      hhmmss=self.hhmmss)
 
@@ -153,37 +163,40 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
                                                 font=self.font,
                                                 font_rotation=self.font_rotation,
                                                 video_name=self.video_name,
+                                                as_svg=False,
                                                 palette=self.clr_lst,
                                                 save_path=None,
                                                 hhmmss=self.hhmmss)
                     if self.frame_setting:
-                        frame_save_path = os.path.join(self.save_frame_folder_dir, f"{k}.png")
+                        frame_save_path = os.path.join(self.save_frame_folder_dir, f"{k}.{self.frame_file_ext}")
                         cv2.imwrite(frame_save_path, plot)
                     if self.video_setting:
                         self.writer.write(plot)
-                    print(f"Gantt frame: {image_cnt + 1} / {len(self.data_df)}. Video: {self.video_name} ({file_cnt + 1}/{len(self.data_paths)})")
+                    timestamp = seconds_to_timestamp(seconds=(k / self.fps))
+                    stdout_information(msg=f"Gantt frame: {image_cnt + 1} / {len(self.data_df)}. Video: {self.video_name} ({file_cnt + 1}/{len(self.data_paths)})")
                 if self.video_setting:
                     self.writer.release()
-                    print(f"Gantt for video {self.video_name} saved...")
+                    stdout_information(msg=f"Gantt for video {self.video_name} saved...")
             self.timer.stop_timer()
             stdout_success(msg=f"All gantt visualizations created in {self.gantt_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str)
 
 
-# test = GanttCreatorSingleProcess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                                 frame_setting=False,
-#                                 video_setting=False,
-#                                 data_paths=[r"C:\troubleshooting\mitra\project_folder\csv\machine_results\501_MA142_Gi_CNO_0516.csv"],
-#                                 last_frm_setting=True,
-#                                 width=640,
-#                                 height= 480,
-#                                 font_size=10,
+# test = GanttCreatorSingleProcess(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",
+#                                  frame_setting=False,
+#                                  video_setting=True,
+#                                  data_paths=[r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\csv\machine_results\2026-01-05 14-17-54 box1_1143_0_Gq_sal.csv"],
+#                                  last_frm_setting=True,
+#                                  width=640,
+#                                  height= 480,
+#                                  font_size=10,
 #                                  font=None,
-#                                 font_rotation=45,
-#                                 hhmmss=False,
-#                                 palette='Set1',
-#                                 clf_names=['straub_tail'])
+#                                  font_rotation=45,
+#                                  hhmmss=False,
+#                                  last_frame_as_svg=True,
+#                                  palette='Set1',
+#                                  clf_names=['REARING'])
 # test.run()
-
+#
 
 
 

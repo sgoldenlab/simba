@@ -489,7 +489,7 @@ Select at least one behavior and at least one output type (frames, videos, or la
 | **BAR OPACITY (%)** | Transparency of the bars (5%–100% in 5% steps). Lower = more transparent; useful when bars overlap. Default: 85%. |
 | **X-AXIS TIME FORMAT** | **SECONDS** = numeric (e.g. 120). **HH:MM:SS** = clock style (e.g. 00:02:00). Use HH:MM:SS for long videos or presentations. |
 | **FONT** | Font for behavior names. **AUTO** = SimBA picks; or choose a font (e.g. Arial). |
-| **CPU CORES** | Number of CPU cores for parallel processing when creating multiple Gantt videos (2 to max). Only used for MULTIPLE VIDEO(S). |
+| **CPU CORES** | Number of CPU cores for parallel processing of dynamic Gantt outputs (**CREATE FRAMES** and/or **CREATE VIDEOS**). Applies to both **SINGLE VIDEO** and **MULTIPLE VIDEO(S)** runs; not used when creating only the static last frame. |
 
 **BEHAVIORS** — Check which classifier(s) to show on the chart. At least one must be selected. Each behavior gets its own row of colored bars.
 
@@ -497,13 +497,15 @@ Select at least one behavior and at least one output type (frames, videos, or la
 
 | Option | Description |
 |--------|-------------|
-| **CREATE FRAMES** | If checked, saves one .png image per frame. Use if you need to step through frame by frame or create a GIF. |
+| **CREATE FRAMES** | If checked, saves one .png image per frame. Use if you need to step through frame by frame as individual files. |
 | **CREATE VIDEOS** | If checked, creates a .mp4 where the Gantt chart builds over time, frame by frame. |
 | **CREATE LAST FRAME** | If checked, saves one .png with the full Gantt chart for the entire video. Good for a quick summary. Default: on. |
+| **LAST FRAME AS SVG** | If checked, saves the final static Gantt as `.svg` (vector format) instead of `.png`. Useful for manuscripts and scalable figures. |
+| **VIDEO** (Single Video panel) | Choose which single video to process when clicking the **VIDEO** button under **SINGLE VIDEO**. |
 
 **SINGLE VIDEO** — Select one video from the **VIDEO** dropdown and click <kbd>VIDEO</kbd>. **MULTIPLE VIDEO(S)** — Click <kbd>Create multiple videos</kbd> to process all videos that have classification results.
 
-**Where output is saved:** Videos, frames, and final images are saved to the `project_folder/frames/output/gantt_plots/` directory. Per-video outputs: `{video_name}.mp4`, `{video_name}_final_image.png`, and (if CREATE FRAMES) a subfolder `{video_name}/` with frame images.
+**Where output is saved:** Videos, frames, and final images are saved to the `project_folder/frames/output/gantt_plots/` directory. Per-video outputs: `{video_name}.mp4`, `{video_name}_final_image.png` (or `{video_name}_final_image.svg` if **LAST FRAME AS SVG** is checked), and (if CREATE FRAMES) a subfolder `{video_name}/` with frame images.
 
 > [!TIP]
 > **GIFs:** Create GIFs from Gantt frames using **Tools** → **Generate gifs** (see [Tools: Create GIFs](Tools.md#create-gifs)). **WebM (preferred):** WebM is more modern than GIF: smaller file sizes (often 5–10× smaller for the same content), better quality (millions of colors vs GIF’s 256), and modern codecs (VP9, AV1). To convert Gantt videos (or any .mp4) to WebM, use **Tools** → **Convert file formats...** → **Change video file formats...** → **Convert videos to WEBM**.

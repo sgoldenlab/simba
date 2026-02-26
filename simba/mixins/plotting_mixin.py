@@ -348,7 +348,8 @@ class PlottingMixin(object):
                         font: Optional[str] = None,
                         save_path: Optional[str] = None,
                         edge_clr: Optional[str] = 'black',
-                        hhmmss: bool = False) -> Union[None, np.ndarray]:
+                        hhmmss: bool = False,
+                        as_svg: bool = False) -> Union[None, np.ndarray, str]:
 
         video_timer = SimbaTimer(start=True)
         colour_tuple_x = list(np.arange(3.5, 203.5, 5))
@@ -400,30 +401,51 @@ class PlottingMixin(object):
         ax.tick_params(axis="both", labelsize=font_size)
         plt.xlabel(x_label, fontsize=font_size + 3)
         ax.grid(True, axis='both', linewidth=1.0, color='gray', alpha=0.2, linestyle='--', which='major')
-
         plt.subplots_adjust(left=0.1, right=0.95, top=0.9, bottom=0.15)
         plt.tight_layout()
-        buffer_ = io.BytesIO()
-        plt.savefig(buffer_, format="png")
-        buffer_.seek(0)
-        image = PIL.Image.open(buffer_)
-        ar = np.asarray(image)
-        open_cv_image = cv2.cvtColor(ar, cv2.COLOR_RGB2BGR)
-        open_cv_image = cv2.resize(open_cv_image, (width, height))
-        frame = np.uint8(open_cv_image)
-        buffer_.close()
-        plt.close('all')
 
-        if font is not None:
-            plt.rcParams['font.family'] = original_font_family
-            matplotlib.font_manager._get_font.cache_clear()
-        
-        if save_path is not None:
-            cv2.imwrite(save_path, frame)
-            video_timer.stop_timer()
-            stdout_success(msg=f"Final gantt frame for video {video_name} saved at {save_path}",elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
+        if as_svg and save_path is None:
+            svg_buffer = io.BytesIO()
+            fig.savefig(svg_buffer, format="svg", bbox_inches="tight")
+            svg_buffer.seek(0)
+            svg_data = svg_buffer.getvalue().decode("utf-8")
+            svg_buffer.close()
+            plt.close(fig)
+            if font is not None:
+                plt.rcParams['font.family'] = original_font_family
+                matplotlib.font_manager._get_font.cache_clear()
+            return svg_data
+
+        if as_svg and save_path is not None:
+            fig.savefig(save_path, format="svg", bbox_inches="tight")
+            plt.close(fig)
+            if font is not None:
+                plt.rcParams['font.family'] = original_font_family
+                matplotlib.font_manager._get_font.cache_clear()
+            return None
+
         else:
-            return frame
+            buffer_ = io.BytesIO()
+            plt.savefig(buffer_, format="png")
+            buffer_.seek(0)
+            image = PIL.Image.open(buffer_)
+            ar = np.asarray(image)
+            open_cv_image = cv2.cvtColor(ar, cv2.COLOR_RGB2BGR)
+            open_cv_image = cv2.resize(open_cv_image, (width, height))
+            frame = np.uint8(open_cv_image)
+            buffer_.close()
+            plt.close('all')
+
+            if font is not None:
+                plt.rcParams['font.family'] = original_font_family
+                matplotlib.font_manager._get_font.cache_clear()
+
+            if save_path is not None:
+                cv2.imwrite(save_path, frame)
+                video_timer.stop_timer()
+                stdout_success(msg=f"Final gantt frame for video {video_name} saved at {save_path}",elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
+            else:
+                return frame
 
     @staticmethod
     def make_clf_heatmap_plot(
@@ -2079,3 +2101,13 @@ class PlottingMixin(object):
         plt.savefig(save_path)
         config.timer.stop_timer()
         stdout_success(msg=f"Graph saved at {save_path}", elapsed_time=config.timer.elapsed_time_str)
+
+
+    @staticmethod
+    def save_svg_markup(svg_markup: str, save_path: Union[str, os.PathLike]) -> None:
+        check_str(name=f"{PlottingMixin.save_svg_markup.__name__} svg_markup", value=svg_markup, raise_error=True)
+        check_str(name=f"{PlottingMixin.save_svg_markup.__name__} save_path", value=str(save_path), raise_error=True)
+        check_if_dir_exists(in_dir=os.path.dirname(str(save_path)))
+        print(svg_markup)
+        with open(save_path, "w", encoding="utf-8") as f:
+            f.write(svg_markup)
