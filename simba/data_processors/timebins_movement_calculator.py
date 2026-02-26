@@ -146,17 +146,7 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
         stdout_success(msg=f"Time bin movement plots saved in {plots_dir}", elapsed_time=timer.elapsed_time_str, source=self.__class__.__name__)
 
     def _remove_low_confidence_positions(self, arr, threshold):
-        arr = arr.copy()
-        valid = arr[:, -1] >= threshold
-
-        last_valid = None
-        for i in range(len(arr)):
-            if valid[i]:
-                last_valid = arr[i, :-1]
-            elif last_valid is not None:
-                arr[i, :-1] = last_valid
-
-        return arr
+        return arr[arr[:, -1] >= threshold]
 
 
     def run(self):
@@ -185,18 +175,23 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
                 self.movement_dict[video_name] = pd.DataFrame(self.framewise_euclidean_distance(location_1=bp_time_1.astype(np.float64), location_2=bp_time_2.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=True), columns=["VALUE"])
                 animal_data = self.data_df[animal_bps].values.astype(np.float32)
                 movement_lists = [animal_data[i : i + bin_length_frames] for i in range(0, animal_data.shape[0], bin_length_frames)]
+                last_valid_xy = None
                 for bin, movement_bin_positions in enumerate(movement_lists):
                     bin_times = find_time_stamp_from_frame_numbers(start_frame=int(bin_length_frames*bin), end_frame=min(int(bin_length_frames*(bin+1)), len(self.data_df)), fps=fps)
                     if self.threshold > 0.0:
                         movement_bin_positions = self._remove_low_confidence_positions(arr=movement_bin_positions, threshold=self.threshold)
                     movement_bin_positions = movement_bin_positions[:, :2]
+                    if movement_bin_positions.shape[0] > 0 and last_valid_xy is not None:
+                        movement_bin_positions = np.vstack((last_valid_xy, movement_bin_positions))
+                    if movement_bin_positions.shape[0] > 0:
+                        last_valid_xy = movement_bin_positions[-1:].copy()
                     #movement_bin_positions_shifted = self.create_shifted_array(data=movement_bin_positions, periods=1)
                     #movement_df = pd.DataFrame(self.framewise_euclidean_distance(location_1=movement_bin_positions.astype(np.float64), location_2=movement_bin_positions_shifted.astype(np.float64), px_per_mm=1, centimeter=False), columns=["VALUE"])
                     movement, velocity = (FeatureExtractionSupplemental.distance_and_velocity(x=movement_bin_positions, fps=fps, pixels_per_mm=px_per_mm, centimeters=True))
                     if self.distance:
-                        results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": animal_name,"BODY-PART": animal_bps[0][:-2],"MEASUREMENT": "Movement (cm)","VALUE": round(movement, 4)})
+                        results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": animal_name,"BODY-PART": animal_bps[0][:-2],"MEASUREMENT": "Movement (cm)","VALUE": movement})
                     if self.velocity:
-                        results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": animal_name,"BODY-PART": animal_bps[0][:-2],"MEASUREMENT": "Velocity (cm/s)","VALUE": round(velocity, 4)})
+                        results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": animal_name,"BODY-PART": animal_bps[0][:-2],"MEASUREMENT": "Velocity (cm/s)","VALUE": velocity})
             results = pd.DataFrame(results).reset_index(drop=True)
             self.out_df_lst.append(results)
             video_timer.stop_timer()
@@ -220,9 +215,9 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
 #                                   body_parts= ('center',),
 #                                   bin_length=60,
 #                                   transpose=True,
-#                                   threshold=0.859,
+#                                   threshold=0.784,
 #                                   velocity=False,
-#                                   plots=True)
+#                                   plots=False)
 # test.run()
 # test.save()
 

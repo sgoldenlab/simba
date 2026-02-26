@@ -42,13 +42,7 @@ def _time_bin_movement_helper(data: list,
 
 
     def _remove_low_confidence_positions(arr, threshold):
-        arr = arr.copy()
-        valid = arr[:, -1] >= threshold
-        last_valid = None
-        for i in range(len(arr)):
-            if valid[i]: last_valid = arr[i, :-1]
-            elif last_valid is not None: arr[i, :-1] = last_valid
-        return arr
+        return arr[arr[:, -1] >= threshold]
 
     batch_id, file_paths = data
     video_dict, movement_dict, batch_results = {}, {}, []
@@ -73,18 +67,23 @@ def _time_bin_movement_helper(data: list,
             movement_dict[video_name] = pd.DataFrame(FeatureExtractionMixin().framewise_euclidean_distance(location_1=bp_time_1.astype(np.float64)[:, :2], location_2=bp_time_2.astype(np.float64)[:, :2], px_per_mm=np.float64(px_per_mm), centimeter=True), columns=["VALUE"])
             animal_data = data_df[animal_bps].values.astype(np.float32)
             movement_lists = [animal_data[i: i + bin_length_frames] for i in range(0, animal_data.shape[0], bin_length_frames)]
+            last_valid_xy = None
             for bin, movement_bin_positions in enumerate(movement_lists):
                 bin_times = find_time_stamp_from_frame_numbers(start_frame=int(bin_length_frames * bin), end_frame=min(int(bin_length_frames * (bin + 1)), len(data_df)), fps=fps)
                 if threshold > 0.0:
                     movement_bin_positions = _remove_low_confidence_positions(arr=movement_bin_positions, threshold=threshold)
                 movement_bin_positions = movement_bin_positions[:, :2]
+                if movement_bin_positions.shape[0] > 0 and last_valid_xy is not None:
+                    movement_bin_positions = np.vstack((last_valid_xy, movement_bin_positions))
+                if movement_bin_positions.shape[0] > 0:
+                    last_valid_xy = movement_bin_positions[-1:].copy()
                 #movement_bin_positions_shifted = FeatureExtractionMixin.create_shifted_array(data=movement_bin_positions, periods=1)
                 #movement_df = pd.DataFrame(FeatureExtractionMixin.framewise_euclidean_distance(location_1=movement_bin_positions.astype(np.float64), location_2=movement_bin_positions_shifted.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=True), columns=["VALUE"])
                 movement_data, velocity_data = (FeatureExtractionSupplemental.distance_and_velocity(x=movement_bin_positions, fps=fps, pixels_per_mm=px_per_mm, centimeters=True))
                 if distance:
-                    video_results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": name,"BODY-PART": animal_bps[0][:-2],"MEASUREMENT": "Movement (cm)","VALUE": round(movement_data, 4)})
+                    video_results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": name,"BODY-PART": animal_bps[0][:-2],"MEASUREMENT": "Movement (cm)","VALUE": movement_data})
                 if velocity:
-                    video_results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": name,"BODY-PART": animal_bps[0][:-2],"MEASUREMENT": "Velocity (cm/s)","VALUE": round(velocity_data, 4)})
+                    video_results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": name,"BODY-PART": animal_bps[0][:-2],"MEASUREMENT": "Velocity (cm/s)","VALUE": velocity_data})
         results = pd.DataFrame(video_results).reset_index(drop=True)
         batch_results.append(results)
         video_timer.stop_timer()
@@ -265,7 +264,7 @@ class TimeBinsMovementCalculatorMultiprocess(ConfigReader, FeatureExtractionMixi
 #     test.run()
 #     test.save()
 
-
+#
 # if __name__ == "__main__":
 #     test = TimeBinsMovementCalculatorMultiprocess(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",
 #                                                   bin_length=60,
@@ -273,7 +272,7 @@ class TimeBinsMovementCalculatorMultiprocess(ConfigReader, FeatureExtractionMixi
 #                                                   core_cnt=10,
 #                                                   velocity=False,
 #                                                   transpose=True,
-#                                                   threshold=0.859,
+#                                                   threshold=0.784,
 #                                                   body_parts=['center'])
 #     test.run()
 #     test.save()

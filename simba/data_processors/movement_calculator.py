@@ -2,7 +2,7 @@ __author__ = "Simon Nilsson; sronilsson@gmail.com"
 import argparse
 import os
 import sys
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple
 
 import numpy as np
 import pandas as pd
@@ -14,7 +14,7 @@ from simba.mixins.feature_extraction_supplement_mixin import \
     FeatureExtractionSupplemental
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log, check_float, check_str,
-    check_that_column_exist, check_valid_boolean, check_valid_lst)
+    check_that_column_exist, check_valid_boolean, check_valid_lst, check_valid_tuple)
 from simba.utils.errors import InvalidInputError, NoDataError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
@@ -50,7 +50,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
     """
     def __init__(self,
                  config_path: Union[str, os.PathLike],
-                 body_parts: List[str],
+                 body_parts: Union[List[str], Tuple[str]],
                  threshold: float = 0.00,
                  file_paths: Optional[List[str]] = None,
                  save_path: Optional[Union[str, os.PathLike]] = None,
@@ -91,7 +91,12 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
         if not distance and not velocity:
             raise InvalidInputError(msg='distance AND velocity are both False. To compute movement metrics, set at least one value to True.', source=self.__class__.__name__)
         self.distance, self.velocity, = distance, velocity
-        check_valid_lst(data=body_parts, source=f'{self.__class__.__name__} file_paths', min_len=1, valid_dtypes=(str,), valid_values=self.body_parts_lst)
+        if isinstance(body_parts, list):
+            check_valid_lst(data=body_parts, source=f'{self.__class__.__name__} body_parts', min_len=1, valid_dtypes=(str,), valid_values=self.body_parts_lst)
+        elif isinstance(body_parts, tuple):
+            check_valid_tuple(x=body_parts, source=f'{self.__class__.__name__} body_parts', minimum_length=1, valid_dtypes=(str,), accepted_values=self.body_parts_lst)
+        else:
+            raise InvalidInputError(msg='Body-parts has to be a list of tuple of strings', source=f'{self.__class__.__name__} body_parts')
         self.body_parts, self.threshold, self.body_parts, self.transpose, self.verbose = file_paths, threshold, body_parts, transpose, verbose
 
     def __find_body_part_columns(self):
@@ -132,7 +137,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
                     x, y = (self.data_df[self.animal_bp_dict[animal_name]["X_bps"]], self.data_df[self.animal_bp_dict[animal_name]["Y_bps"]])
                     z = pd.concat([x, y], axis=1)[[item for items in zip(x.columns, y.columns) for item in items]]
                     df = pd.DataFrame(jitted_centroid(points=np.reshape(z.values, (len(z / 2), -1, 2)).astype(np.float32)), columns=["X", "Y"])
-                    df = self.dataframe_savgol_smoother(df=df, fps=self.fps).astype(int)
+                    df = self.dataframe_savgol_smoother(df=df, fps=self.fps).astype(np.int32)
                     distance, velocity = FeatureExtractionSupplemental.distance_and_velocity(x=df.values, fps=self.fps, pixels_per_mm=self.px_per_mm, centimeters=True)
                     if self.distance:
                         self.results.loc[len(self.results)] = [video_name, animal_name, "GRAVITY CENTER", "Distance (cm)", distance]
@@ -172,10 +177,12 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 # test.save()
 
 
-# test = MovementCalculator(config_path=r"C:\troubleshooting\ROI_movement_test\project_folder\project_config.ini",
-#                           body_parts=['Animal_1 CENTER OF GRAVITY'], #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
-#                           threshold=0.00)
+# test = MovementCalculator(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",
+#                           body_parts=('center',), #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
+#                           threshold=0.784,
+#                           velocity=False)
 # test.run()
+# test.save()
 
 
 
