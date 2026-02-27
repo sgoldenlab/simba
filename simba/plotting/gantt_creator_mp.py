@@ -292,15 +292,16 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
 
 
 # if __name__ == "__main__":
-#     test = GanttCreatorMultiprocess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#     test = GanttCreatorMultiprocess(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",
 #                                     frame_setting=False,
 #                                     video_setting=False,
-#                                     data_paths=[r"C:\troubleshooting\mitra\project_folder\csv\machine_results\592_MA147_Gq_CNO_0515.csv"],
 #                                     last_frm_setting=True,
+#                                     last_frame_as_svg=True,
 #                                     width=640,
 #                                     height= 480,
 #                                     font_size=10,
-#                                     font_rotation= 45)
+#                                     font_rotation= 45,
+#                                     hhmmss=True)
 #     test.run()
 
 # if __name__ == "__main__":
