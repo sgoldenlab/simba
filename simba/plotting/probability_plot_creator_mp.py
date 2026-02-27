@@ -21,8 +21,9 @@ from simba.utils.data import terminate_cpu_pool
 from simba.utils.enums import Formats
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.lookups import get_color_dict
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
-from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, get_fn_ext, read_df)
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt, get_fn_ext, read_df)
 
 STYLE_WIDTH = 'width'
 STYLE_HEIGHT = 'height'
