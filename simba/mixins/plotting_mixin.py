@@ -350,6 +350,37 @@ class PlottingMixin(object):
                         edge_clr: Optional[str] = 'black',
                         hhmmss: bool = False,
                         as_svg: bool = False) -> Union[None, np.ndarray, str]:
+        """
+        Create a Gantt chart visualization of behavioral bouts over time.
+
+        Generates a horizontal bar chart where each row represents a behavior class, and bars indicate
+        when behaviors occurred. Supports SVG output for scalable figures or PNG/NumPy array for video overlays.
+
+        .. image:: _static/img/gantt_mosaic.webp
+           :width: 1000
+           :align: center
+
+        :param pd.DataFrame bouts_df: DataFrame containing bout data with columns 'Event', 'Start_time', and 'Bout_time'.
+        :param List[str] clf_names: List of behavior/classifier names to display. Must match 'Event' values in ``bouts_df``.
+        :param List[Tuple[int, int, int]] palette: List of RGB color tuples (0-255) for each behavior. Length should match ``clf_names``.
+        :param int fps: Frames per second of the source video. Used to convert frame counts to time.
+        :param int x_length: Total length of the session in frames. Determines x-axis range.
+        :param str video_name: Title displayed at the top of the chart.
+        :param int width: Output image width in pixels (when not SVG). Default: 640.
+        :param int height: Output image height in pixels (when not SVG). Default: 480.
+        :param int font_size: Base font size for labels and ticks. Default: 8.
+        :param float bar_opacity: Opacity of behavior bars (0.0-1.0). Default: 0.85.
+        :param int font_rotation: Rotation angle in degrees for y-axis labels. Default: 45.
+        :param Optional[str] font: Font family name. If None, uses matplotlib default.
+        :param Optional[str] save_path: Path to save the image. If None and ``as_svg=False``, returns NumPy array.
+        :param Optional[str] edge_clr: Color of bar edges. Default: 'black'.
+        :param bool hhmmss: If True, displays x-axis time as HH:MM:SS. If False, displays seconds. Default: False.
+        :param bool as_svg: If True, returns or saves SVG format. If False, uses PNG format. Default: False.
+        :returns Union[None, np.ndarray, str]: If ``as_svg=True`` and ``save_path=None``, returns SVG string. If ``save_path`` provided, returns None (saves file). Otherwise returns NumPy array (BGR format).
+
+
+        """
+
 
         video_timer = SimbaTimer(start=True)
         colour_tuple_x = list(np.arange(3.5, 203.5, 5))
@@ -1277,6 +1308,40 @@ class PlottingMixin(object):
                        as_svg: bool = False,
                        save_path: Optional[Union[str, os.PathLike]] = None,
                        show_thresholds: bool = False):
+        """
+        Create a multi-line plot from NumPy arrays.
+
+        Generates a line plot with one or more data series, each with customizable colors and styling.
+        Supports SVG output for scalable figures or PNG/NumPy array for video overlays.
+
+        .. image:: _static/img/line_plot_mosaic.webp
+           :width: 1000
+           :align: center
+
+        :param List[np.ndarray] data: List of 1D or 2D NumPy arrays to plot. Each array becomes one line.
+        :param List[str] colors: List of color names (must match length of ``data``). Uses SimBA color dictionary.
+        :param Optional[bool] show_box: If False, hides plot axes and borders. Default: True.
+        :param Optional[int] width: Output image width in pixels (when not SVG). Default: 640.
+        :param Optional[int] height: Output image height in pixels (when not SVG). Default: 480.
+        :param Optional[int] line_width: Width of plotted lines. Default: 6.
+        :param Optional[int] font_size: Font size for labels and ticks. Default: 8.
+        :param Optional[str] bg_clr: Background color name. If None, uses matplotlib default.
+        :param Optional[float] x_lbl_divisor: Divide x-axis tick labels by this value (e.g., convert frames to seconds). Default: None.
+        :param Optional[str] title: Plot title displayed at top.
+        :param Optional[str] y_lbl: Y-axis label.
+        :param Optional[str] x_lbl: X-axis label.
+        :param bool y_tick_lbls_as_int: If True, formats y-axis ticks as integers. Default: False.
+        :param bool x_tick_lbls_as_int: If True, formats x-axis ticks as integers. Default: False.
+        :param int y_tick_cnt: Number of y-axis tick marks. Default: 10.
+        :param int x_tick_cnt: Number of x-axis tick marks. Default: 5.
+        :param Optional[Union[int, float]] y_max: Maximum y-axis value. If -1, auto-scales to data maximum. Default: -1.
+        :param Optional[float] line_opacity: Opacity of lines (0.0-1.0). Default: 1.0.
+        :param bool as_svg: If True, returns or saves SVG format. If False, uses PNG format. Default: False.
+        :param Optional[Union[str, os.PathLike]] save_path: Path to save the image. If None and ``as_svg=False``, returns NumPy array.
+        :param bool show_thresholds: If True, displays horizontal threshold lines at 25%, 50%, and 75%. Default: False.
+        :returns Union[None, np.ndarray, str]: If ``as_svg=True`` and ``save_path=None``, returns SVG string. If ``save_path`` provided, returns None (saves file). Otherwise returns NumPy array (BGR format).
+
+        """
 
         check_valid_lst(data=data, source=PlottingMixin.make_line_plot.__name__, valid_dtypes=(np.ndarray, list))
         check_valid_lst(data=colors, source=PlottingMixin.make_line_plot.__name__, valid_dtypes=(str,), exact_len=len(data))
@@ -1980,22 +2045,92 @@ class PlottingMixin(object):
                        x_label: Optional[str] = None,
                        y_label: Optional[str] = None,
                        title: Optional[str] = None,
-                       fig_size: Optional[Tuple[int, int]] = (10, 8),
-                       palette: Optional[str] = 'magma',
-                       save_path: Optional[Union[str, os.PathLike]] = None):
+                       fig_size: Tuple[int, int] = (10, 8),
+                       palette: str = 'magma',
+                       error_clr: str = 'grey',
+                       bar_alpha: float = 1.0,
+                       dpi: int = 600,
+                       orientation: Literal['vertical', 'horizontal'] = 'vertical',
+                       y_min: float = 0.0,
+                       y_max: Optional[float] = None,
+                       save_path: Optional[Union[str, os.PathLike]] = None,
+                       as_svg: bool = False):
+        """
+        Create a bar chart from DataFrame columns.
+
+        Generates a bar chart with optional error bars, supporting both vertical and horizontal orientations.
+        Uses seaborn for styling with customizable colors, transparency, and axis limits.
+
+        .. image:: _static/img/bar_chart_mosaic.webp
+           :width: 1000
+           :align: center
+
+        :param pd.DataFrame df: DataFrame containing the data to plot.
+        :param str x: Column name for x-axis categories.
+        :param str y: Column name for y-axis values (must be numeric).
+        :param Optional[str] error: Column name for error bar values. If None, no error bars are shown.
+        :param Optional[str] x_label: X-axis label. If None, no label is displayed.
+        :param Optional[str] y_label: Y-axis label. If None, no label is displayed.
+        :param Optional[str] title: Chart title. If None, no title is displayed.
+        :param Tuple[int, int] fig_size: Figure size (width, height) in inches. Default: (10, 8).
+        :param str palette: Seaborn color palette name. Default: 'magma'.
+        :param str error_clr: Color name for error bars. Default: 'grey'.
+        :param float bar_alpha: Bar transparency (0.0-1.0). Default: 1.0.
+        :param int dpi: Resolution for saved images. Default: 600.
+        :param Literal['vertical', 'horizontal'] orientation: Bar orientation. Default: 'vertical'.
+        :param float y_min: Minimum value for y-axis (or x-axis if horizontal). Default: 0.0.
+        :param Optional[float] y_max: Maximum value for y-axis (or x-axis if horizontal). If None, auto-scales. Default: None.
+        :param Optional[Union[str, os.PathLike]] save_path: Path to save the image. If None, returns matplotlib figure.
+        :param bool as_svg: If True, saves as SVG format. If False, saves as PNG. Default: False.
+        :returns Optional[matplotlib.figure.Figure]: Returns matplotlib figure if ``save_path`` is None, otherwise returns None.
+
+        """
 
         check_instance(source=f"{PlottingMixin.plot_bar_chart.__name__} df", instance=df, accepted_types=(pd.DataFrame))
         check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} x", value=x, options=tuple(df.columns))
         check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} y", value=y, options=tuple(df.columns))
         check_valid_lst(data=list(df[y]), source=f"{PlottingMixin.plot_bar_chart.__name__} y", valid_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_boolean(value=as_svg, source=f"{PlottingMixin.plot_bar_chart.__name__} as_svg", raise_error=True)
+        check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} error_clr", value=error_clr)
+        check_float(name=f"{PlottingMixin.plot_bar_chart.__name__} bar_alpha", value=bar_alpha, min_value=0.0, max_value=1.0)
+        check_int(name=f"{PlottingMixin.plot_bar_chart.__name__} dpi", value=dpi, min_value=1)
+        check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} orientation", value=orientation, options=('vertical', 'horizontal'))
+        check_float(name=f"{PlottingMixin.plot_bar_chart.__name__} y_min", value=y_min)
+        if y_max is not None:
+            check_float(name=f"{PlottingMixin.plot_bar_chart.__name__} y_max", value=y_max)
+            if y_max <= y_min:
+                raise InvalidInputError(msg=f"y_max ({y_max}) must be greater than y_min ({y_min})", source=f"{PlottingMixin.plot_bar_chart.__name__}")
         fig, ax = plt.subplots(figsize=fig_size)
-        sns.barplot(x=x, y=y, data=df, palette=palette, ax=ax)
-        ax.set_xticklabels(df[x].unique(), rotation=90, fontsize=8)
         if error is not None:
             check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} error", value=error, options=tuple(df.columns))
             check_valid_lst(data=list(df[error]), source=f"{PlottingMixin.plot_bar_chart.__name__} error",valid_dtypes=Formats.NUMERIC_DTYPES.value)
-            for i, (value, error) in enumerate(zip(df[y], df[error])):
-                ax.errorbar(i, value, yerr=[[0], [error]], fmt='o', color='grey', capsize=2)
+        
+        if orientation == 'horizontal':
+            sns.barplot(x=y, y=x, data=df, palette=palette, ax=ax, orient='h')
+            ax.set_yticklabels(df[x].unique(), rotation=0, fontsize=8)
+            if error is not None:
+                for i, (value, error_val) in enumerate(zip(df[y], df[error])):
+                    ax.errorbar(value, i, xerr=[[0], [error_val]], fmt='o', color=error_clr, capsize=2)
+        else:
+            sns.barplot(x=x, y=y, data=df, palette=palette, ax=ax)
+            ax.set_xticklabels(df[x].unique(), rotation=90, fontsize=8)
+            if error is not None:
+                for i, (value, error_val) in enumerate(zip(df[y], df[error])):
+                    ax.errorbar(i, value, yerr=[[0], [error_val]], fmt='o', color=error_clr, capsize=2)
+        
+        for patch in ax.patches:
+            patch.set_alpha(bar_alpha)
+        
+        if orientation == 'horizontal':
+            if y_max is not None:
+                ax.set_xlim(left=y_min, right=y_max)
+            else:
+                ax.set_xlim(left=y_min)
+        else:
+            if y_max is not None:
+                ax.set_ylim(bottom=y_min, top=y_max)
+            else:
+                ax.set_ylim(bottom=y_min)
 
         if x_label is not None:
             check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} x_label", value=x_label)
@@ -2009,7 +2144,8 @@ class PlottingMixin(object):
         if save_path is not None:
             check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} save_path", value=save_path)
             check_if_dir_exists(in_dir=os.path.dirname(save_path))
-            fig.savefig(save_path, dpi=600, bbox_inches='tight')
+            if as_svg: fig.savefig(save_path, dpi=dpi, format="svg", bbox_inches="tight")
+            else: fig.savefig(save_path, dpi=dpi, bbox_inches='tight')
         else:
             return fig
 

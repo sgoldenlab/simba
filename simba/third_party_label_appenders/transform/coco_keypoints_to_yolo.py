@@ -33,25 +33,34 @@ class COCOKeypoints2Yolo:
     """
     Convert COCO Keypoints version 1.0 data format into a YOLO keypoints training set.
 
-    .. note::
-       COCO keypoint files can be be created using `https://www.cvat.ai/ <https://www.cvat.ai/>`__.
+    Processes COCO format keypoint annotations and converts them to YOLO keypoint format, splitting
+    the data into training and validation sets. Images are copied to the output directory and annotations
+    are converted to YOLO format text files. A YAML configuration file is automatically generated.
 
-       This function expects the path to a single  COCO Keypoints version 1.0 file. To merge several before passing the file to thsi function, use
+    .. note::
+       COCO keypoint files can be created using `https://www.cvat.ai/ <https://www.cvat.ai/>`__.
+
+       This function expects the path to a single COCO Keypoints version 1.0 file. To merge several before passing the file to this function, use
        :func:`simba.third_party_label_appenders.transform.utils.merge_coco_keypoints_files`.
 
     .. important::
        All image file names have to be unique.
 
     .. seealso::
-      To convert OCO Keypoints version 1.0 data format into a YOLO bounding box training set, use :func:`simba.third_party_label_appenders.transform.coco_keypoints_to_yolo_bbox.COCOKeypoints2YoloBbox`.
+      To convert COCO Keypoints version 1.0 data format into a YOLO bounding box training set, use :func:`simba.third_party_label_appenders.transform.coco_keypoints_to_yolo_bbox.COCOKeypoints2YoloBbox`.
+      To train YOLO pose models with the converted data, see :func:`simba.model.yolo_fit.FitYolo` and `YOLO Pose Estimation Training Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/yolo_train.md>`_.
+      To run inference with trained YOLO pose models, see :func:`simba.model.yolo_pose_inference.YOLOPoseInference` or :func:`simba.model.yolo_pose_track_inference.YOLOPoseTrackInference` and `YOLO Pose Estimation Inference Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/yolo_inference.md>`_.
 
-    :param Union[str, os.PathLike] coco_path: Path to coco keypoints 1.0 file in json format.
-    :param Union[str, os.PathLike] img_dir: Directory holding img files representing the annotated entries in the ``coco_path``. Will search recursively, so its OK to have images in subdirectories.
-    :param Union[str, os.PathLike] save_dir: Directory where to save the yolo formatted data.
-    :param Tuple[float, float, float] split: The size of the training set. Value between 0-1.0 representing the percent of training data.
-    :param bool verbose: If true, prints progress. Default: True.
-    :param Tuple[int, ...] flip_idx: Tuple of ints, representing the flip of body-part coordinates when the animal image flips 180 degrees.
-    :return: None
+    :param Union[str, os.PathLike] coco_path: Path to COCO keypoints 1.0 file in JSON format. Must contain 'categories', 'images', and 'annotations' keys.
+    :param Union[str, os.PathLike] img_dir: Directory holding image files representing the annotated entries in the ``coco_path``. Will search recursively, so it's OK to have images in subdirectories.
+    :param Union[str, os.PathLike] save_dir: Directory where to save the YOLO formatted data. Will create 'images/train', 'images/val', 'labels/train', 'labels/val' subdirectories.
+    :param float train_size: Size of the training set as a fraction between 0.1 and 0.99. Remaining data becomes validation set. Default: 0.7 (70% training, 30% validation).
+    :param Tuple[int, ...] flip_idx: Tuple of integers representing the re-ordering of body-part indices when the image is horizontally flipped 180 degrees. Must match the number of keypoints. Default: (0, 2, 1, 5, 4, 3, 6).
+    :param bool verbose: If True (default), prints progress messages. If False, suppresses output.
+    :param bool greyscale: If True, converts images to greyscale before saving. If False (default), keeps original color format.
+    :param bool clahe: If True, applies CLAHE (Contrast Limited Adaptive Histogram Equalization) enhancement to images before saving. If False (default), no enhancement is applied.
+    :param Optional[float] bbox_pad: Optional padding factor for bounding boxes (between 10e-6 and 1.0). If provided, bounding boxes are expanded by this percentage to better encompass all body-parts. If None (default), no padding is applied.
+    :returns: None. YOLO formatted data is saved to ``save_dir`` with structure: images/train, images/val, labels/train, labels/val, and map.yaml.
 
     :example:
     >>> runner = COCOKeypoints2Yolo(coco_path=r"D:/cvat_annotations/frames/coco_keypoints_1/s1/annotations/s1.json", img_dir=r"D:/cvat_annotations/frames/simon", save_dir=r"D:/cvat_annotations/frames/yolo_keypoints", clahe=True)
@@ -62,7 +71,7 @@ class COCOKeypoints2Yolo:
     >>> runner.run()
 
     :example III:
-    >>> runner = COCOKeypoints2Yolo(coco_path=r"E:/netholabs_videos/mosaics/subset/to_annotate/2d_mosaic_batch_1.json", img_dir=r"E:/netholabs_videos/mosaics/subset/to_annotate", save_dir=r"E:/netholabs_videos/mosaics/yolo_mdl", clahe=False)
+    >>> runner = COCOKeypoints2Yolo(coco_path=r"E:/netholabs_videos/mosaics/subset/to_annotate/2d_mosaic_batch_1.json", img_dir=r"E:/netholabs_videos/mosaics/subset/to_annotate", save_dir=r"E:/netholabs_videos/mosaics/yolo_mdl", clahe=False, bbox_pad=0.1)
     >>> runner.run()
 
      :references:

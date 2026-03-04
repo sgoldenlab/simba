@@ -76,7 +76,7 @@ from simba.utils.errors import (ClassifierInferenceError, CorruptedFileError,
                                 MissingColumnsError, NoDataError,
                                 SamplingError, SimBAModuleNotFoundError)
 from simba.utils.lookups import get_meta_data_file_headers, get_table
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import (find_core_cnt, get_current_time,
                                     get_fn_ext, get_memory_usage_of_df,
                                     get_pkg_version, read_config_entry,
@@ -587,14 +587,19 @@ class TrainModelMixin(object):
                           save_dir: Union[str, os.PathLike],
                           digits: Optional[int] = 4,
                           clf_name: Optional[str] = None,
-                          img_size: Optional[tuple] = (2500, 4500), #width by height
-                          cmap: Optional[str] = "coolwarm",
-                          threshold: Optional[int] = 0.5,
+                          img_size: tuple = (2500, 4500), #width by height
+                          cmap: str = "coolwarm",
+                          threshold: float = 0.5,
+                          svg: bool = False,
                           save_file_no: Optional[int] = None,
-                          dpi: Optional[int] = 300) -> None:
+                          dpi: int = 300) -> None:
 
         """
         Create classifier truth table report.
+
+        Generates a classification report heatmap visualization showing precision, recall, F1-score, and support
+        for each class. The report is displayed as a heatmap with annotations showing metric values.
+        Predictions are made using the provided threshold to convert probabilities to binary predictions.
 
         .. seealso::
            `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#train-predictive-classifiers-settings>`_
@@ -607,36 +612,42 @@ class TrainModelMixin(object):
            :width: 500
            :align: center
 
-        :param RandomForestClassifier rf_clf: sklearn RandomForestClassifier object.
-        :param pd.DataFrame x_df: dataframe holding test features
-        :param pd.DataFrame y_df: dataframe holding test target
-        :param int digits: Number of floats in the classification report
-        :param str cmap: The palette to plot the heatmap in. Default blue to red ("coolwarm").
-        :param Tuple img_size: The size of the image in inches.
-        :param float threshold: The presence classification threshold. Default: 0.5.
-        :param List[str] class_names: List of classes. E.g., ['Attack absent', 'Attack present']
-        :param Optional[str] clf_name: Name of the classifier. If not None, then used in the output file name.
-        :param str save_dir: Directory where to save output in csv file format.
-        :param Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search.
-        :returns: None. Results are stored in `save_dir``.
+        .. image:: _static/img/clf_report_mosaic.webp
+           :width: 1000
+           :align: center
+
+        :param Union[RandomForestClassifier, cuRF] rf_clf: sklearn RandomForestClassifier or cuRF object.
+        :param pd.DataFrame x_df: DataFrame holding test features. Must match the feature set used for training.
+        :param pd.DataFrame y_df: DataFrame holding test target values. Should be binary (0/1) for binary classification.
+        :param List[str] class_names: List of class names. E.g., ['Attack absent', 'Attack present']. Must match the order of classes in the classifier.
+        :param Union[str, os.PathLike] save_dir: Directory where to save the classification report image.
+        :param Optional[int] digits: Number of decimal places in the classification report metrics. Default: 4.
+        :param Optional[str] clf_name: Name of the classifier. If not None, used in the output filename. If None, uses ``class_names[1]``.
+        :param Tuple[int, int] img_size: Size of the output image in pixels (width, height). Default: (2500, 4500).
+        :param str cmap: Colormap palette for the heatmap. Default: "coolwarm" (blue to red).
+        :param float threshold: Classification threshold for converting probabilities to binary predictions. Values above threshold become 1, below become 0. Default: 0.5.
+        :param bool svg: If True, save as SVG format. If False (default), save as PNG format.
+        :param Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. Used in filename generation. If None, the classifier is not part of a grid search.
+        :param int dpi: Resolution (dots per inch) for the output image. Default: 300.
+        :returns: None. Classification report image is saved to ``save_dir``.
         """
 
-        print("Creating classification report visualization...")
+        stdout_information(msg="Creating classification report visualization...")
         timer = SimbaTimer(start=True)
+        save_format = "svg" if svg else 'png'
         if save_file_no != None:
             if not clf_name:
-                save_path = os.path.join(save_dir, f'{class_names[1]}_{save_file_no}_classification_report.png')
+                save_path = os.path.join(save_dir, f'{class_names[1]}_{save_file_no}_classification_report.{save_format}')
             else:
-                save_path = os.path.join(save_dir, f"{clf_name}_{save_file_no}_classification_report.png")
+                save_path = os.path.join(save_dir, f"{clf_name}_{save_file_no}_classification_report.{save_format}")
         else:
             if not clf_name:
-                save_path = os.path.join(save_dir, f"{class_names[1]}_classification_report.png")
+                save_path = os.path.join(save_dir, f"{class_names[1]}_classification_report.{save_format}")
             else:
-                save_path = os.path.join(save_dir, f"{clf_name}_classification_report.png")
+                save_path = os.path.join(save_dir, f"{clf_name}_classification_report.{save_format}")
 
         y_pred = self.clf_predict_proba(clf=rf_clf, x_df=x_df)
         y_pred = np.where(y_pred > threshold, 1, 0)
-
         plt.figure()
         clf_report = classification_report(y_true=y_df.values, y_pred=y_pred, target_names=class_names, digits=digits, output_dict=True, zero_division=0)
         clf_report = pd.DataFrame.from_dict({key: clf_report[key] for key in class_names})
@@ -644,19 +655,25 @@ class TrainModelMixin(object):
         img = sns.heatmap(pd.DataFrame(clf_report).T, annot=True, cmap=cmap, vmin=0.0, vmax=1.0, linewidth=2.0, linecolor='black', fmt='g', annot_kws={"size": 20, "weight": "bold", "color": "white", "family": "sans-serif"})
         img.set_xticklabels(img.get_xticklabels(), size=16)
         img.set_yticklabels(img.get_yticklabels(), size=16)
-        plt.savefig(save_path, dpi=dpi)
+        plt.savefig(save_path, dpi=dpi, format=save_format, bbox_inches="tight")
         plt.close("all")
         timer.stop_timer()
-        print(f'Classification report saved at {save_path} (elapsed time: {timer.elapsed_time_str}s)')
+        stdout_information(msg=f'Classification report saved at {save_path} (elapsed time: {timer.elapsed_time_str}s)')
 
     def create_x_importance_log(self,
                                 rf_clf: Union[RandomForestClassifier, cuRF],
                                 x_names: List[str],
                                 clf_name: str,
+                                precision: int = 25,
+                                sort_ascending: bool = False,
+                                verbose: bool = True,
                                 save_dir: Optional[str] = None,
                                 save_file_no: Optional[int] = None) -> Union[None, pd.DataFrame]:
         """
         Compute gini / entropy based feature importance scores.
+
+        Calculates mean and standard deviation of feature importances across all trees in the RandomForestClassifier.
+        Results are sorted by mean importance (descending by default) and can be saved to CSV or returned as a DataFrame.
 
         .. note::
            `Example expected output  <https://github.com/sgoldenlab/simba/blob/master/images/BtWGaNP_feature_importance_log.csv>`__.
@@ -664,15 +681,18 @@ class TrainModelMixin(object):
         .. seealso::
            To plot gini / entropy based feature importance scores, see :func:`~simba.mixins.train_model_mixin.TrainModelMixin.create_x_importance_bar_chart`
 
-        :param RandomForestClassifier rf_clf: sklearn RandomForestClassifier object.
-        :param List[str] x_names: Names of features.
-        :param str clf_name: Name of classifier
-        :param str save_dir: Directory where to save output in csv file format. If None, then returns the dataframe.
-        :param Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search.
-        :returns: None. Results are stored in `save_dir``.
+        :param Union[RandomForestClassifier, cuRF] rf_clf: sklearn RandomForestClassifier or cuRF object.
+        :param List[str] x_names: Names of features. Must match the number of features in the classifier.
+        :param str clf_name: Name of classifier. Used in output filename if ``save_dir`` is provided.
+        :param int precision: Number of decimal places for rounding feature importance values. Default: 25.
+        :param bool sort_ascending: If True, sort features by importance in ascending order. If False (default), sort in descending order.
+        :param bool verbose: If True (default), print progress messages. If False, suppress output.
+        :param Optional[str] save_dir: Directory where to save output in CSV file format. If None, then returns the DataFrame instead of saving.
+        :param Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. Used in filename generation. If None, the classifier is not part of a grid search.
+        :returns Union[None, pd.DataFrame]: If ``save_dir`` is provided, returns None and saves CSV file. If ``save_dir`` is None, returns DataFrame with columns: 'FEATURE', 'FEATURE_IMPORTANCE_MEAN', 'FEATURE_IMPORTANCE_STDEV'.
         """
 
-        print("Creating feature importance log...")
+        if verbose: stdout_information(msg="Creating feature importance log...")
         timer = SimbaTimer(start=True)
         if save_dir is not None:
             if save_file_no != None:
@@ -687,12 +707,12 @@ class TrainModelMixin(object):
             importances_per_tree = np.array([tree.feature_importances_ for tree in rf_clf.estimators_])
             importances = list(np.mean(importances_per_tree, axis=0))
             std_importances = list(np.std(importances_per_tree, axis=0))
-        importances = [round(importance, 25) for importance in importances]
-        df = pd.DataFrame({'FEATURE': x_names,'FEATURE_IMPORTANCE_MEAN': importances, 'FEATURE_IMPORTANCE_STDEV': std_importances}).sort_values(by=["FEATURE_IMPORTANCE_MEAN"], ascending=False)
+        importances = [round(importance, precision) for importance in importances]
+        df = pd.DataFrame({'FEATURE': x_names,'FEATURE_IMPORTANCE_MEAN': importances, 'FEATURE_IMPORTANCE_STDEV': std_importances}).sort_values(by=["FEATURE_IMPORTANCE_MEAN"], ascending=sort_ascending)
         if save_dir is not None:
             df.to_csv(self.f_importance_save_path, index=False)
             timer.stop_timer()
-            stdout_success(msg=f'Feature importance log saved at {self.f_importance_save_path}!', elapsed_time=timer.elapsed_time_str)
+            if verbose: stdout_success(msg=f'Feature importance log saved at {self.f_importance_save_path}!', elapsed_time=timer.elapsed_time_str)
         else:
             return df.reset_index(drop=True)
 
@@ -724,7 +744,7 @@ class TrainModelMixin(object):
         """
 
         check_int(name="FEATURE IMPORTANCE BAR COUNT", value=n_bars, min_value=1)
-        print("Creating feature importance bar chart...")
+        stdout_information(msg="Creating feature importance bar chart...")
         timer = SimbaTimer(start=True)
         if save_file_no != None:
             save_file_path = os.path.join(save_dir, f"{clf_name}_{save_file_no}_feature_importance_bar_graph.png")

@@ -121,7 +121,7 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                         self.roi_bout_results.append(roi_bouts)
                         animal_bout_results[row["Name"]] = roi_bouts
                         self.entry_results.loc[len(self.entry_results)] = [video_name, animal_name, row["Name"], len(roi_bouts)]
-                        self.time_results.loc[len(self.time_results)] = [video_name,animal_name,row["Name"],roi_bouts["Bout_time"].sum()]
+                        self.time_results.loc[len(self.time_results)] = [video_name,animal_name,row["Name"], roi_bouts["Bout_time"].sum()]
                     for _, row in self.sliced_roi_dict[Keys.ROI_POLYGONS.value].iterrows():
                         roi_coords = np.array(list(zip(row["vertices"][:, 0], row["vertices"][:, 1])))
                         animal_df[row["Name"]] = (FeatureExtractionMixin.framewise_inside_polygon_roi(bp_location=animal_df.values[:, 0:2], roi_coords=roi_coords))
