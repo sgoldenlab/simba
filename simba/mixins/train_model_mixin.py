@@ -76,7 +76,7 @@ from simba.utils.errors import (ClassifierInferenceError, CorruptedFileError,
                                 MissingColumnsError, NoDataError,
                                 SamplingError, SimBAModuleNotFoundError)
 from simba.utils.lookups import get_meta_data_file_headers, get_table
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (find_core_cnt, get_current_time,
                                     get_fn_ext, get_memory_usage_of_df,
                                     get_pkg_version, read_config_entry,
