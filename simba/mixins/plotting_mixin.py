@@ -19,6 +19,7 @@ from matplotlib import cm
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.ticker import FuncFormatter, MaxNLocator
+from matplotlib.collections import LineCollection
 from numba import bool_, njit, uint8
 from PIL import Image
 
@@ -37,7 +38,7 @@ from simba.utils.checks import (
     check_instance, check_int, check_str, check_that_column_exist,
     check_valid_array, check_valid_boolean, check_valid_dataframe,
     check_valid_lst, check_valid_tuple)
-from simba.utils.data import create_color_palette, detect_bouts
+from simba.utils.data import create_color_palette, detect_bouts, savgol_smoother
 from simba.utils.enums import Formats, Keys, Options, Paths
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
@@ -2263,3 +2264,149 @@ class PlottingMixin(object):
         print(svg_markup)
         with open(save_path, "w", encoding="utf-8") as f:
             f.write(svg_markup)
+
+    @staticmethod
+    def get_path_img(data: np.ndarray,
+                     size: Optional[Tuple[int, int]] = None,  # HxW
+                     line_thickness: float = 2,
+                     line_color: Union[Tuple[int, int, int], Literal['time', 'velocity']] = (147, 20, 255),
+                     bg_clr: Union[Tuple[int, int, int], np.ndarray] = (255, 255, 255),
+                     opacity: int = 1.0,
+                     smoothing_time: Optional[int] = None,
+                     save_path: Optional[Union[str, os.PathLike]] = None,
+                     svg: bool = False,
+                     dpi: int = 500) -> Optional[matplotlib.figure.Figure]:
+        """
+        Create a path plot from NumPy array data.
+
+        Generates a path visualization with optional time or velocity-based coloring, background images, smoothing, and SVG/PNG output.
+
+        .. image:: _static/img/get_path_img.webp
+           :width: 1000
+           :align: center
+
+        :param np.ndarray data: 2D array with shape (N, 2) containing x, y coordinates.
+        :param Optional[Tuple[int, int]] size: Image size as (height, width) in pixels. If None, auto-calculated from data or bg_img.
+        :param float line_thickness: Thickness of the path line. Default: 2.
+        :param Tuple[int, int, int] line_color: RGB color tuple (0-255). Default: (147, 20, 255).
+        :param Tuple[int, int, int] bg_clr: Background color RGB tuple (0-255). Default: (255, 255, 255).
+        :param Optional[np.ndarray] bg_img: Background image array. If provided, overrides bg_clr. Default: None.
+        :param float opacity: Line opacity (0.0-1.0). Default: 1.0.
+        :param Optional[int] smoothing_time: Smoothing time window in milliseconds. Applies Savitzky-Golay filter. If None, no smoothing. Default: None.
+        :param Optional[Literal['time', 'velocity']] color_by: Color path by time progression or velocity. If None, uses line_color. Default: None.
+        :param Optional[Union[str, os.PathLike]] save_path: Path to save the image. If None, returns figure.
+        :param bool svg: If True, saves as SVG format. If False, saves as PNG. Default: False.
+        :param int dpi: Resolution for saved images. Default: 500.
+        :returns Optional[matplotlib.figure.Figure]: Returns matplotlib figure if save_path is None, otherwise None.
+
+        .. seealso::
+           For more complex path plots with multiprocessing and advanced features, see :class:`simba.plotting.path_plotter.PathPlotterSingleCore` and :class:`simba.plotting.path_plotter_mp.PathPlotterMulticore`.
+
+        :example:
+        >>> df = pd.read_csv('/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/2022-06-20_NOB_DOT_4.csv')
+        >>> data = df[['Nose_x', 'Nose_y']].values
+        >>> img = read_frm_of_video(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4.mp4', frame_index=400)
+        >>> PlottingMixin().get_path_img(data=data,
+        >>>          size=(1080, 1080),
+        >>>          line_thickness=0.5,
+        >>>          line_color=(0, 255, 0),
+        >>>          bg_clr=(255, 255, 255),
+        >>>          bg_img=img,
+        >>>          save_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/2022-06-20_NOB_DOT_4_3.png',
+        >>>          dpi=600,
+        >>>          opacity=1.0,
+        >>>          color_by=None,
+        >>>          svg=False,
+        >>>          smoothing_time=5000)
+        """
+
+        check_valid_array(data=data, source=f"{PlottingMixin.get_path_img.__name__} end_positions", accepted_ndims=(2,), min_axis_1=2, accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        if size is not None:
+            check_instance(source=f"{PlottingMixin.get_path_img.__name__} size", instance=size, accepted_types=(tuple,))
+            check_valid_lst(data=list(size), source=f"{PlottingMixin.get_path_img.__name__} size", exact_len=2, valid_dtypes=(int,))
+            check_int(name=f"{PlottingMixin.get_path_img.__name__} size[0]", value=size[0], min_value=1)
+            check_int(name=f"{PlottingMixin.get_path_img.__name__} size[1]", value=size[1], min_value=1)
+        check_float(name=f"{PlottingMixin.get_path_img.__name__} line_thickness", value=line_thickness, allow_zero=False, allow_negative=False)
+        check_float(name=f"{PlottingMixin.get_path_img.__name__} opacity", value=opacity, allow_zero=False, allow_negative=False)
+        if isinstance(line_color, tuple):
+            check_if_valid_rgb_tuple(data=line_color, raise_error=True, source=PlottingMixin.get_path_img.__name__)
+        else:
+            check_str(name=f'{PlottingMixin.get_path_img.__name__}', value=line_color, options=['time', 'velocity'])
+
+        if isinstance(bg_clr, tuple):
+            check_if_valid_rgb_tuple(data=bg_clr, raise_error=True, source=PlottingMixin.get_path_img.__name__)
+        else:
+            check_if_valid_img(data=bg_clr, source=f'{PlottingMixin.get_path_img.__name__} bg_clr', raise_error=True)
+        check_int(name=f"{PlottingMixin.get_path_img.__name__} dpi", value=dpi, min_value=1)
+        if save_path is not None:
+            check_str(name=f"{PlottingMixin.get_path_img.__name__} save_path", value=save_path)
+            check_if_dir_exists(in_dir=os.path.dirname(save_path))
+
+        if smoothing_time is not None:
+            check_int(name=f"{PlottingMixin.get_path_img.__name__} smoothing_time", value=smoothing_time, min_value=1)
+            data = savgol_smoother(data=data, fps=1, time_window=smoothing_time, source=PlottingMixin.get_path_img.__name__.__name__)
+        x, y = data[:, 0], data[:, 1]
+
+        if isinstance(bg_clr, np.ndarray):
+            if size is None:
+                size = (bg_clr.shape[0], bg_clr.shape[1])  # HxW
+            else:
+                if bg_clr.shape[0] != size[0] or bg_clr.shape[1] != size[1]:
+                    bg_clr = cv2.resize(bg_clr, (size[1], size[0]))
+        elif size is None:
+            size = (int(np.max(y.flatten())), int(np.max(x.flatten())))
+
+        fig, ax = plt.subplots(figsize=(size[1] / dpi, size[0] / dpi))
+        if isinstance(bg_clr, np.ndarray):
+            if bg_clr.shape[2] == 3:
+                bg_clr_rgb = cv2.cvtColor(bg_clr, cv2.COLOR_BGR2RGB)
+            else:
+                bg_clr_rgb = bg_img
+            ax.imshow(bg_clr_rgb, extent=[0, size[1], size[0], 0], origin='upper')
+        else:
+            bg_clr_normalized = (bg_clr[0] / 255.0, bg_clr[1] / 255.0, bg_clr[2] / 255.0)
+            fig.patch.set_facecolor(bg_clr_normalized)
+            ax.set_facecolor(bg_clr_normalized)
+
+        if isinstance(line_color, tuple):
+            clr = (line_color[0] / 255.0, line_color[1] / 255.0, line_color[2] / 255.0)
+            ax.plot(x, y, color=clr, linewidth=line_thickness, alpha=opacity)
+        elif line_color == 'time':
+            points = np.array([x, y]).T.reshape(-1, 1, 2)
+            segments = np.concatenate([points[:-1], points[1:]], axis=1)
+            colors = create_color_palette(pallete_name='jet', increments=len(segments), as_rgb_ratio=True)
+            colors = [tuple(c) for c in colors]
+            lc = LineCollection(segments, colors=colors, linewidths=line_thickness, alpha=opacity, capstyle='round', joinstyle='round', antialiaseds=True)
+            ax.add_collection(lc)
+        elif line_color == 'velocity':
+            dx, dy = np.diff(x), np.diff(y)
+            velocity = np.sqrt(dx ** 2 + dy ** 2)
+            points = np.array([x, y]).T.reshape(-1, 1, 2)
+            segments = np.concatenate([points[:-1], points[1:]], axis=1)
+            if velocity.max() > velocity.min():
+                velocity_norm = (velocity - velocity.min()) / (velocity.max() - velocity.min())
+            else:
+                velocity_norm = np.zeros_like(velocity)
+            palette_colors = create_color_palette(pallete_name='jet', increments=len(segments), as_rgb_ratio=True)
+            colors = [tuple(palette_colors[int(v * (len(palette_colors) - 1))]) for v in velocity_norm]
+            lc = LineCollection(segments, colors=colors, linewidths=line_thickness, alpha=opacity, capstyle='round', joinstyle='round', antialiaseds=True)
+            ax.add_collection(lc)
+
+        ax.axis('off')
+        if isinstance(bg_clr, np.ndarray):
+            ax.set_xlim(0, size[1])
+            ax.set_ylim(size[0], 0)
+        else:
+            ax.set_xlim(x.min(), x.max())
+            ax.set_ylim(y.max(), y.min())
+
+        if save_path is not None:
+            if isinstance(bg_clr, np.ndarray):
+                facecolor = (bg_clr[0] / 255.0, bg_clr[1] / 255.0, bg_clr[2] / 255.0)
+            else:
+                facecolor = 'white'
+            fig.savefig(save_path, dpi=dpi, bbox_inches='tight', pad_inches=0, format='svg' if svg else 'png', facecolor=facecolor)
+            plt.close(fig)
+            return None
+        else:
+            return fig

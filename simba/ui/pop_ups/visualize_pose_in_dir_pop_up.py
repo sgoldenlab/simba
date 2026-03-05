@@ -46,7 +46,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
         self.video_slice_dropdown = SimBADropDown(parent=self.settings_frm, label="VIDEO SECTION (SECONDS):", label_width=40, dropdown_width=20, value=ENTIRE_VIDEOS, command=None, dropdown_options=VIDEO_LENGTHS, img='timer', tooltip_key='POSE_VIZ_VIDEO_SECTION')
         self.cpu_cnt_dropdown = SimBADropDown(parent=self.settings_frm, label="CPU COUNT:", label_width=40, dropdown_width=20, value=find_core_cnt()[1], command=None, dropdown_options=list(range(2, find_core_cnt()[0])), img='cpu_small', tooltip_key='CORE_COUNT')
         self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, label="USE GPU:", label_width=40, dropdown_width=20, value='FALSE', command=None, dropdown_options=['TRUE', 'FALSE'], img='gpu_3', tooltip_key='USE_GPU')
-        self.include_bbox_dropdown = SimBADropDown(parent=self.settings_frm, label="INCLUDE BOUNDING BOX:", label_width=40, dropdown_width=20, value='FALSE', command=None, dropdown_options=['TRUE', 'FALSE'], img='rectangle_small', tooltip_key='SHOW_ANIMAL_BBOX')
+        self.include_bbox_dropdown = SimBADropDown(parent=self.settings_frm, label="INCLUDE BOUNDING BOX:", label_width=40, dropdown_width=20, value='FALSE', command=None, dropdown_options=['FALSE', 'AXIS-ALIGNED', 'ANIMAL-ALIGNED'], img='rectangle_small', tooltip_key='SHOW_ANIMAL_BBOX')
         self.center_mass_dropdown = SimBADropDown(parent=self.settings_frm, label="SHOW CENTER OF MASS:", label_width=40, dropdown_width=20, value='FALSE', command=None, dropdown_options=self.center_mass_options, img='bullseye', tooltip_key='POSE_VIZ_CENTER_OF_MASS')
         self.save_dir = FolderSelect(self.settings_frm, "SAVE DIRECTORY: ", title="Select a data folder", lblwidth=40, initialdir=get_desktop_path(), lbl_icon='folder', tooltip_key='SAVE_DIR')
         self.number_of_animals_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, 17)), label="NUMBER OF ANIMALS:", label_width=40, dropdown_width=20, command=self.__create_table, value=1, img='abacus_2', tooltip_key='POSE_VIZ_NUMBER_OF_ANIMALS')
@@ -108,7 +108,8 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
         else:
             circle_size = int(circle_size)
         gpu = str_2_bool(self.gpu_dropdown.get_value())
-        bbox = str_2_bool(self.include_bbox_dropdown.get_value())
+        bbox = self.include_bbox_dropdown.get_value()
+        bbox = None if bbox == 'FALSE' else bbox.lower()
         center_of_mass = self.center_mass_dropdown.get_value()
         center_of_mass = self.color_dict[center_of_mass] if center_of_mass in list(self.color_dict.keys()) else None
         cpu_cnt = int(self.cpu_cnt_dropdown.get_value())
@@ -137,4 +138,4 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
                                                core_cnt=cpu_cnt)
         plotter.run()
 
-# VisualizePoseInFolderPopUp()
+#VisualizePoseInFolderPopUp()

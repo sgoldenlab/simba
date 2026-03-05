@@ -3,13 +3,19 @@ __author__ = "Simon Nilsson"
 import os
 from copy import deepcopy
 from typing import Optional, Tuple, Union
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 import cv2
 import numpy as np
 import pandas as pd
 
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_valid_rgb_tuple, check_int)
+                                check_if_valid_rgb_tuple, check_int,
+                                check_str, check_float, check_valid_boolean,
+                                check_if_dir_exists, check_instance)
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 InvalidFileTypeError)
 from simba.utils.printing import SimbaTimer, stdout_success
@@ -23,80 +29,68 @@ CSV = '.csv'
 
 class EzPathPlot(object):
     def __init__(self,
-                 data_path: Union[str, os.PathLike],
-                 video_path: Union[str, os.PathLike],
                  body_part: str,
-                 bg_color: Optional[Tuple[int, int, int]] = (255, 255, 255),
-                 line_color: Optional[Tuple[int, int, int]] = (147, 20, 255),
-                 line_thickness: Optional[int] = 10,
-                 circle_size: Optional[int] = 5):
+                 bg_color: Union[Tuple[int, int, int], int] = (255, 255, 255),
+                 line_color: Union[Tuple[int, int, int], Literal['time', 'velocity']] = (147, 20, 255),
+                 line_thickness: Optional[float] = None,
+                 svg: bool = False,
+                 line_opacity: float = 1.0,
+                 smoothing_time: Optional[int] = None,
+                 save_dir: Optional[Union[str, os.PathLike]] = None,
+                 dpi: int = 500):
         """
-        Create a simple path plot for a single path in a single video.
+        Create a path plot with enhanced options.
 
-        .. note::
-           For more complex path plots with/without multiprocessing, see ``simba.plotting.path_plotter.PathPlotterSingleCore`` and ``simba.plotting.path_plotter_mp.PathPlotterMulticore``.
-
-           Notebook example link ->
-
-
-        .. image:: _static/img/EzPathPlot.gif
-          :width: 500
-          :align: center
-
-        :param Union[str, os.PathLike] data_path: The path to the data file in H5c or CSV format containing the coordinates.
-        :param Union[str, os.PathLike] video_path: The path to the video file.
         :param str body_part: The specific body part to plot the path for.
-        :param Optional[Tuple[int, int, int]] bg_color: The background color of the plot. Defaults to (255, 255, 255).
-        :param Optional[Tuple[int, int, int]] line_color: The color of the path line. Defaults to (147, 20, 255).
-        :param Optional[int] line_thickness: The thickness of the path line. Defaults to 10.
-        :param Optional[int] circle_size: The size of the circle indicating each data point. Defaults to 5.
-
-        :example:
-        >>> path_plotter = EzPathPlot(data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/h5/Together_1DLC_resnet50_two_black_mice_DLC_052820May27shuffle1_150000_el.h5', video_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi', body_part='Mouse_1_Nose', bg_color=(255, 255, 255), line_color=(147,20,255))
-        >>> path_plotter.run()
-
+        :param Union[Tuple[int, int, int], int] bg_color: Background color as RGB tuple (0-255) or grayscale int (0-255). Default: (255, 255, 255).
+        :param Union[Tuple[int, int, int], Literal['time', 'velocity']] line_color: Line color as RGB tuple (0-255) or 'time'/'velocity' for color mapping. Default: (147, 20, 255).
+        :param Optional[float] line_thickness: Thickness of the path line. If None, uses default. Default: None.
+        :param bool svg: If True, saves as SVG format. If False, saves as PNG. Default: False.
+        :param float line_opacity: Line opacity (0.0-1.0). Default: 1.0.
+        :param Optional[int] smoothing_time: Smoothing time window in milliseconds. If None, no smoothing. Default: None.
+        :param Optional[Union[str, os.PathLike]] save_dir: Directory to save the plot. If None, uses default location. Default: None.
+        :param int dpi: Resolution for saved images. Default: 500.
         """
-        check_file_exist_and_readable(file_path=data_path)
-        self.video_meta_data = get_video_meta_data(video_path=video_path)
-        check_if_valid_rgb_tuple(data=bg_color)
-        check_if_valid_rgb_tuple(data=line_color)
-        check_int(name=f'{self.__class__.__name__} line_thickness', value=line_thickness, min_value=1)
-        check_int(name=f'{self.__class__.__name__} circle_size', value=circle_size, min_value=1)
-        if line_color == bg_color:
-            raise DuplicationError(msg=f"The line and background cannot be identical - ({line_color})", source=self.__class__.__name__)
+        # Validate body_part
+        check_str(name=f'{self.__class__.__name__} body_part', value=body_part, allow_blank=False)
 
-        dir, file_name, ext = get_fn_ext(filepath=data_path)
-        if ext.lower() == H5:
-            self.data = pd.read_hdf(data_path)
-            headers = []
-            if len(self.data.columns[0]) == 4:
-                for c in self.data.columns:
-                    headers.append("{}_{}_{}".format(c[1], c[2], c[3]))
-            elif len(self.data.columns[0]) == 3:
-                for c in self.data.columns:
-                    headers.append("{}_{}".format(c[2], c[3]))
-            self.data.columns = headers
-        elif ext.lower() == CSV:
-            self.data = pd.read_csv(data_path)
+        # Validate bg_color
+        if isinstance(bg_color, int):
+            check_int(name=f'{self.__class__.__name__} bg_color', value=bg_color, min_value=0, max_value=255)
+        elif isinstance(bg_color, tuple):
+            check_if_valid_rgb_tuple(data=bg_color, raise_error=True, source=f'{self.__class__.__name__} bg_color')
         else:
-            raise InvalidFileTypeError(msg=f"File type {ext} is not supported (OPTIONS: h5 or csv)")
-        if len(self.data.columns[0]) == 4:
-            self.data = self.data.loc[3:]
-        elif len(self.data.columns[0]) == 3:
-            self.data = self.data.loc[2:]
-        body_parts_available = list(set([x[:-2] for x in self.data.columns]))
-        if body_part not in body_parts_available:
-            raise DataHeaderError(msg=f"Body-part {body_part} is not present in the data file. The body-parts available are: {body_parts_available}", source=self.__class__.__name__)
-        bps = [f'{body_part}_x', f'{body_part}_y']
-        if (bps[0] not in self.data.columns) or (bps[1] not in self.data.columns):
-            raise DataHeaderError(msg=f"Could not finc column {bps[0]} and/or column {bps[1]} in the data file {data_path}", source=self.__class__.__name__)
-        self.data = self.data[bps].fillna(method="ffill").astype(int).reset_index(drop=True).values
-        self.save_name = os.path.join(dir, f"{file_name}_line_plot.mp4")
-        self.writer = cv2.VideoWriter(self.save_name, 0x7634706D, int(self.video_meta_data["fps"]), (self.video_meta_data["width"], self.video_meta_data["height"]))
-        self.bg_img = np.zeros([self.video_meta_data["height"], self.video_meta_data["width"], 3])
-        self.bg_img[:] = [bg_color]
-        self.line_color, self.line_thickness, self.circle_size  = line_color, line_thickness, circle_size
-        self.timer = SimbaTimer(start=True)
+            check_instance(source=f'{self.__class__.__name__} bg_color', instance=bg_color, accepted_types=(tuple, int))
+
+        # Validate line_color
+        if isinstance(line_color, str):
+            check_str(name=f'{self.__class__.__name__} line_color', value=line_color, options=('time', 'velocity'))
+        elif isinstance(line_color, tuple):
+            check_if_valid_rgb_tuple(data=line_color, raise_error=True, source=f'{self.__class__.__name__} line_color')
+        else:
+            check_instance(source=f'{self.__class__.__name__} line_color', instance=line_color, accepted_types=(tuple, str))
+
+        # Validate line_thickness
+        if line_thickness is not None:
+            check_float(name=f'{self.__class__.__name__} line_thickness', value=line_thickness, min_value=0.0, allow_zero=False, allow_negative=False)
+
+        # Validate svg
+        check_valid_boolean(value=svg, source=f'{self.__class__.__name__} svg')
+
+        # Validate line_opacity
+        check_float(name=f'{self.__class__.__name__} line_opacity', value=line_opacity, min_value=0.0, max_value=1.0, allow_zero=True, allow_negative=False)
+
+        # Validate smoothing_time
+        if smoothing_time is not None:
+            check_int(name=f'{self.__class__.__name__} smoothing_time', value=smoothing_time, min_value=1, allow_zero=False, allow_negative=False)
+
+        # Validate save_dir
+        if save_dir is not None:
+            check_str(name=f'{self.__class__.__name__} save_dir', value=str(save_dir))
+            check_if_dir_exists(in_dir=save_dir, create_if_not_exist=True)
+
+        # Validate dpi
+        check_int(name=f'{self.__class__.__name__} dpi', value=dpi, min_value=1, allow_zero=False, allow_negative=False)
     def run(self):
         for i in range(1, self.data.shape[0]):
             line_data = self.data[:i+1]

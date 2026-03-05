@@ -30,8 +30,7 @@ from sklearn.feature_selection import VarianceThreshold
 from sklearn.inspection import partial_dependence, permutation_importance
 from sklearn.metrics import classification_report, precision_recall_curve
 from sklearn.model_selection import ShuffleSplit, learning_curve
-from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer,
-                                   StandardScaler)
+from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer, StandardScaler)
 from sklearn.tree import export_graphviz
 from sklearn.utils import parallel_backend
 
@@ -126,7 +125,7 @@ class TrainModelMixin(object):
             raise NoDataError(msg="SimBA found 0 annotated frames in the project_folder/csv/targets_inserted directory", source=self.__class__.__name__)
         for file_cnt, file in enumerate(file_paths):
             _, vid_name, _ = get_fn_ext(file)
-            print(f"Reading in {vid_name} (file {str(file_cnt + 1)}/{str(len(file_paths))})...")
+            stdout_information(msg=f"Reading in {vid_name} (file {str(file_cnt + 1)}/{str(len(file_paths))})...")
             df = (read_df(file, file_type).dropna(axis=0, how="all").fillna(0).astype(np.float32))
             frm_number_lst.extend(list(df.index))
             df.index = [vid_name] * len(df)
@@ -147,8 +146,8 @@ class TrainModelMixin(object):
         dfs = dfs.loc[:, ~dfs.columns.str.contains("^Unnamed")].fillna(0)
         timer.stop_timer()
         memory_size = get_memory_usage_of_df(df=dfs)
-        print(f'Dataset size: {memory_size["megabytes"]}MB / {memory_size["gigabytes"]}GB')
-        print(f"{len(file_paths)} file(s) read (elapsed time: {timer.elapsed_time_str}s) ...")
+        stdout_information(msg=f'Dataset size: {memory_size["megabytes"]}MB / {memory_size["gigabytes"]}GB')
+        stdout_information(msg=f"{len(file_paths)} file(s) read (elapsed time: {timer.elapsed_time_str}s) ...")
 
         return dfs.astype(np.float32), frm_number_lst
 
@@ -231,7 +230,7 @@ class TrainModelMixin(object):
         >>> self.random_undersampler(x_train=x_train, y_train=y_train, sample_ratio=1.0)
         """
 
-        print(f"Performing under-sampling at sample ratio {str(sample_ratio)}...")
+        stdout_information(msg=f"Performing under-sampling at sample ratio {str(sample_ratio)}...")
         data_df = pd.concat([x_train, y_train], axis=1)
         present_df, absent_df = (
             data_df[data_df[y_train.name] == 1],
@@ -262,7 +261,7 @@ class TrainModelMixin(object):
         >>> self.smoteen_oversampler(x_train=x_train, y_train=y_train, sample_ratio=1.0)
         """
 
-        print("Performing SMOTEENN oversampling...")
+        stdout_information(msg="Performing SMOTEENN oversampling...")
         smt = SMOTEENN(sampling_strategy=sample_ratio)
         if hasattr(smt, "fit_sample"):
             return smt.fit_sample(x_train, y_train)
@@ -282,7 +281,7 @@ class TrainModelMixin(object):
         :examples:
         >>> self.smote_oversampler(x_train=x_train, y_train=y_train, sample_ratio=1.0)
         """
-        print("Performing SMOTE oversampling...")
+        stdout_information(msg="Performing SMOTE oversampling...")
         smt = SMOTE(sampling_strategy=sample_ratio)
         if hasattr(smt, "fit_sample"):
             return smt.fit_sample(x_train, y_train)
@@ -313,7 +312,7 @@ class TrainModelMixin(object):
         :returns:  Either non or a Tuple with the dataframe and the plot. A CSV file representing the permutation importances is stored in ``save_dir`` if save_dir is passed.
         """
 
-        print("Calculating feature permutation importances...")
+        stdout_information(msg="Calculating feature permutation importances...")
         timer = SimbaTimer(start=True)
         p_importances = permutation_importance(clf, x_test, y_test, n_repeats=n_repeats, random_state=0)
         df = pd.DataFrame(np.column_stack([feature_names, p_importances.importances_mean, p_importances.importances_std]), columns=["FEATURE_NAME", "FEATURE_IMPORTANCE_MEAN", "FEATURE_IMPORTANCE_STDEV"])
@@ -341,7 +340,7 @@ class TrainModelMixin(object):
         if save_file_path is not None:
             df.to_csv(save_file_path, index=False)
             timer.stop_timer()
-            print(f"Permutation importance calculation complete (elapsed time: {timer.elapsed_time_str}s) ...")
+            stdout_information(msg=f"Permutation importance calculation complete (elapsed time: {timer.elapsed_time_str}s) ...")
         else:
             return df.reset_index(drop=True), bar_chart
 
@@ -379,7 +378,7 @@ class TrainModelMixin(object):
         :returns: None. Results are stored in ``save_dir``.
         """
 
-        print("Calculating learning curves...")
+        stdout_information(msg="Calculating learning curves...")
         timer = SimbaTimer(start=True)
         x_df, y_df = self.split_df_to_x_y(x_y_df, clf_name)
         if save_file_no != None:
@@ -426,7 +425,7 @@ class TrainModelMixin(object):
 
         results_df.to_csv(self.learning_curve_save_path, index=False)
         timer.stop_timer()
-        print(f"Learning curve calculation complete (elapsed time: {timer.elapsed_time_str}s) ...")
+        stdout_information(msg=f"Learning curve calculation complete (elapsed time: {timer.elapsed_time_str}s) ...")
 
     def calc_pr_curve(self,
                       rf_clf: RandomForestClassifier,
@@ -460,7 +459,7 @@ class TrainModelMixin(object):
         if multiclass and classifier_map is None:
             raise InvalidInputError(
                 msg="Creating PR curve for multi-classifier but classifier_map not defined. Pass classifier_map argument")
-        print("Calculating PR curves...")
+        stdout_information(msg="Calculating PR curves...")
         timer = SimbaTimer(start=True)
         if not multiclass:
             p = self.clf_predict_proba(clf=rf_clf,x_df=x_df, multiclass=False, model_name=clf_name, data_path=None)
@@ -497,7 +496,7 @@ class TrainModelMixin(object):
         if plot:
             _ = PlottingMixin.line_plot(df=pr_df, x="DISCRIMINATION THRESHOLDS", y=['PRECISION', 'RECALL', 'F1'], x_label='discrimination threshold', y_label='PERFORMANCE', title=f'SimBA {clf_name} precision-recall curve', save_path=self.pr_save_path_plot)
         timer.stop_timer()
-        print(f"Precision-recall curve calculation complete (elapsed time: {timer.elapsed_time_str}s) ...")
+        stdout_information(msg=f"Precision-recall curve calculation complete (elapsed time: {timer.elapsed_time_str}s) ...")
 
     def create_example_dt(self,
                           rf_clf: RandomForestClassifier,
@@ -525,7 +524,7 @@ class TrainModelMixin(object):
         :param Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search.
         """
 
-        print("Visualizing example decision tree using graphviz...")
+        stdout_information(msg="Visualizing example decision tree using graphviz...")
         timer = SimbaTimer(start=True)
         if CUML in str(rf_clf.__module__).lower():
             GPUToolsWarning(msg="Can't visualize trees using CUML")
@@ -549,7 +548,7 @@ class TrainModelMixin(object):
             command = f"dot {dot_name} -T pdf -o {file_name} -Gdpi=600"
             call(command, shell=True)
             timer.stop_timer()
-            print(f'Example tree saved at {file_name} (elapsed time: {timer.elapsed_time_str}s)')
+            stdout_information(msg=f'Example tree saved at {file_name} (elapsed time: {timer.elapsed_time_str}s)')
 
     def cuml_rf_x_importances(self, nodes: dict, n_features: int) -> np.ndarray:
         """
@@ -762,7 +761,7 @@ class TrainModelMixin(object):
                                          title=f'SimBA feature importances {clf_name}',
                                          save_path=save_file_path)
         timer.stop_timer()
-        print(f'Feature importance bar chart complete, saved at {save_file_path} (elapsed time: {timer.elapsed_time_str}s)')
+        stdout_information(msg=f'Feature importance bar chart complete, saved at {save_file_path} (elapsed time: {timer.elapsed_time_str}s)')
 
     def dviz_classification_visualization(
             self,
@@ -782,7 +781,7 @@ class TrainModelMixin(object):
         :parameter str save_dir: Directory where to save output in csv file format.
         """
 
-        print('Creating example decision tree using dtreeviz ....')
+        stdout_information(msg='Creating example decision tree using dtreeviz ....')
         try:
             clf = tree.DecisionTreeClassifier(max_depth=5, random_state=666)
             clf.fit(x_train, y_train)
@@ -879,7 +878,7 @@ class TrainModelMixin(object):
         """
 
         if SKLEARN in str(rf_clf.__module__).lower():
-            print("Calculating SHAP values (SINGLE CORE)...")
+            stdout_information(msg="Calculating SHAP values (SINGLE CORE)...")
             timer = SimbaTimer(start=True)
             check_instance(source='create_shap_log', instance=rf_clf, accepted_types=(RandomForestClassifier,))
             check_instance(source=f'{TrainModelMixin.create_shap_log.__name__} x', instance=x, accepted_types=(np.ndarray, pd.DataFrame))
@@ -954,11 +953,11 @@ class TrainModelMixin(object):
                 raw_df.loc[len(raw_df)] = list(shap_x.iloc[frame])
                 shap_df.loc[len(shap_df)] = frame_shap
                 if ((cnt % save_it == 0) or (cnt == len(shap_x) - 1)) and (cnt != 0) and (save_dir is not None):
-                    print(f"Saving SHAP data after {cnt} iterations...")
+                    stdout_information(msg=f"Saving SHAP data after {cnt} iterations...")
                     shap_df.to_csv(out_shap_path)
                     raw_df.to_csv(out_raw_path)
                 shap_frm_timer.stop_timer()
-                print(f"SHAP frame: {cnt + 1} / {len(shap_x)}, elapsed time: {shap_frm_timer.elapsed_time_str}...")
+                stdout_information(msg=f"SHAP frame: {cnt + 1} / {len(shap_x)}, elapsed time: {shap_frm_timer.elapsed_time_str}...")
             if plot:
                 shap_computer = ShapAggregateStatisticsCalculator(classifier_name=clf_name,
                                                                   shap_df=shap_df,
@@ -1003,7 +1002,7 @@ class TrainModelMixin(object):
         :param str clf_name: Name of classifier
         :param str save_dir: Directory where to save output in csv file format.
         """
-        print("Saving model meta data file...")
+        stdout_information(msg="Saving model meta data file...")
         save_path = os.path.join(save_dir, clf_name + "_meta.csv")
         out_df = pd.DataFrame(columns=get_meta_data_file_headers())
         out_df.loc[len(out_df)] = meta_data_lst
@@ -1011,7 +1010,7 @@ class TrainModelMixin(object):
 
     def create_meta_data_csv_training_multiple_models(self, meta_data, clf_name, save_dir,
                                                       save_file_no: Optional[int] = None) -> None:
-        print("Saving model meta data file...")
+        stdout_information(msg="Saving model meta data file...")
         save_path = os.path.join(save_dir, f"{clf_name}_{str(save_file_no)}_meta.csv")
         out_df = pd.DataFrame.from_dict(meta_data, orient="index").T
         out_df.to_csv(save_path)
@@ -1191,11 +1190,11 @@ class TrainModelMixin(object):
         >>> x_train, x_test, y_train, y_test = TrainModelMixin().bout_train_test_splitter(x_df=x, y_df=y, test_size=0.5)
         """
 
-        print("Using bout sampling...")
+        stdout_information(msg="Using bout sampling...")
         def find_bouts(s: pd.Series, type: str):
             test_bouts_frames, train_bouts_frames = [], []
             bouts = detect_bouts(pd.DataFrame(s), target_lst=pd.DataFrame(s).columns, fps=1)
-            print(f"{str(len(bouts))} {type} bouts found...")
+            stdout_information(msg=f"{str(len(bouts))} {type} bouts found...")
             bouts = list(bouts.apply(lambda x: list(range(int(x["Start_frame"]), int(x["End_frame"]) + 1)),1).values)
             test_bouts_idx = np.random.choice(np.arange(0, len(bouts)), int(len(bouts) * test_size))
             train_bouts_idx = np.array([x for x in list(range(len(bouts))) if x not in test_bouts_idx])
@@ -1359,7 +1358,7 @@ class TrainModelMixin(object):
         """
 
         timer = SimbaTimer(start=True)
-        print(f"Calculating partial dependencies for {len(x_df.columns)} features...")
+        stdout_information(msg=f"Calculating partial dependencies for {len(x_df.columns)} features...")
         clf.verbose = 0
         check_if_dir_exists(save_dir)
         scikit_version = get_library_version(library_name='sklearn')
@@ -1390,7 +1389,7 @@ class TrainModelMixin(object):
                                             title=f'SimBA partial dependence {clf_name}')
             df.to_csv(save_path)
             feature_timer.stop_timer()
-            print(f"Partial dependencies for {feature_name} complete ({feature_cnt + 1}/{len(x_df.columns)}) (elapsed time: {feature_timer.elapsed_time_str}s)...")
+            stdout_information(msg=f"Partial dependencies for {feature_name} complete ({feature_cnt + 1}/{len(x_df.columns)}) (elapsed time: {feature_timer.elapsed_time_str}s)...")
 
         timer.stop_timer()
         stdout_success(msg=f'Partial dependencies for {len(x_df.columns)} features saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
@@ -1459,7 +1458,7 @@ class TrainModelMixin(object):
         if multiclass and (clf.n_classes_ != p_vals.shape[1]):
             raise ClassifierInferenceError(msg=f"The classifier {model_name} (data path: {data_path}) is a multiclassifier expected to create {clf.n_classes_} behavior probabilities. However, it produced probabilities for {p_vals.shape[1]} behaviors. See The SimBA GitHub FAQ page or Gitter for more information and suggested fixes.", source=self.__class__.__name__)
         timer.stop_timer()
-        if verbose: print(f'Inference for model {model_name} over {x_df.shape[0]} observations complete ({timer.elapsed_time_str}s).')
+        if verbose: stdout_information(msg=f'Inference for model {model_name} over {x_df.shape[0]} observations complete ({timer.elapsed_time_str}s).')
         if not multiclass:
             if isinstance(p_vals, pd.DataFrame):
                 return p_vals[1].values
@@ -1593,7 +1592,7 @@ class TrainModelMixin(object):
                 elif (len(set(df[clf_name].unique()) - {0, 1}) > 0 and raise_bool_clf_error):
                     raise InvalidInputError(msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file_path} the {clf_name} field column contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}.", source=TrainModelMixin._read_data_file_helper.__name__)
         timer.stop_timer()
-        print(f"Reading complete {vid_name} (elapsed time: {timer.elapsed_time_str}s)...")
+        stdout_information(msg=f"Reading complete {vid_name} (elapsed time: {timer.elapsed_time_str}s)...")
 
         return df, frame_numbers
 
@@ -1649,7 +1648,7 @@ class TrainModelMixin(object):
                         :, ~df_concat.columns.str.contains("^Unnamed")
                         ].astype(np.float32)
             memory_size = get_memory_usage_of_df(df=df_concat)
-            print(f'Dataset size: {memory_size["megabytes"]}MB / {memory_size["gigabytes"]}GB')
+            stdout_information(msg=f'Dataset size: {memory_size["megabytes"]}MB / {memory_size["gigabytes"]}GB')
 
             return df_concat, frame_numbers_lst
 
@@ -1729,7 +1728,7 @@ class TrainModelMixin(object):
                 for result in concurrent.futures.as_completed(results):
                     dfs.append(result.result()[0])
                     frm_number_list.extend((result.result()[-1]))
-                    print(f"Reading complete {result.result()[1]} (elapsed time: {result.result()[2]}s)...")
+                    stdout_information(msg=f"Reading complete {result.result()[1]} (elapsed time: {result.result()[2]}s)...")
 
             check_all_dfs_in_list_has_same_cols(dfs=dfs, source='/project_folder/csv/targets_inserted', raise_error=True)
             col_headers = [list(x.columns) for x in dfs]
@@ -1737,7 +1736,7 @@ class TrainModelMixin(object):
             dfs = pd.concat(dfs, axis=0).round(4)
             if "scorer" in dfs.columns: dfs = dfs.drop(["scorer"], axis=1)
             memory_size = get_memory_usage_of_df(df=dfs)
-            print(f'Dataset size: {memory_size["megabytes"]}MB / {memory_size["gigabytes"]}GB')
+            stdout_information(msg=f'Dataset size: {memory_size["megabytes"]}MB / {memory_size["gigabytes"]}GB')
             return dfs, frm_number_list
 
         except Exception as e:
@@ -1798,7 +1797,7 @@ class TrainModelMixin(object):
                                verbose: bool) -> Tuple[np.ndarray, int]:
 
         if verbose:
-            print(f'Processing SHAP core batch {data[0] + 1}... ({len(data[1])} observations)')
+            stdout_information(msg=f'Processing SHAP core batch {data[0] + 1}... ({len(data[1])} observations)')
         _ = data[1].pop(clf_name).values.reshape(-1, 1)
         shap_batch_results = np.full(shape=(len(data[1]), len(data[1].columns)), fill_value=np.nan, dtype=np.float32)
         for idx in range(len(data[1])):
@@ -1807,7 +1806,7 @@ class TrainModelMixin(object):
             shap_batch_results[idx] = explainer.shap_values(obs, check_additivity=False)[1]
             timer.stop_timer()
             if verbose:
-                print(f'SHAP frame complete (core batch: {data[0] + 1}, core batch frame: {idx+1}/{len(data[1])}, frame processing time: {timer.elapsed_time_str}s)')
+                stdout_information(msg=f'SHAP frame complete (core batch: {data[0] + 1}, core batch frame: {idx+1}/{len(data[1])}, frame processing time: {timer.elapsed_time_str}s)')
 
         return shap_batch_results, data[0]
 
@@ -1903,7 +1902,7 @@ class TrainModelMixin(object):
             explainer = TrainModelMixin().define_tree_explainer(clf=rf_clf)
             expected_value = explainer.expected_value[1]
             shap_results, shap_raw = [], []
-            print(f"Computing {cnt_present + cnt_absent} SHAP values. Follow progress in OS terminal... (CORES: {core_cnt}, CHUNK SIZE: {chunk_size})")
+            stdout_information(msg=f"Computing {cnt_present + cnt_absent} SHAP values. Follow progress in OS terminal... (CORES: {core_cnt}, CHUNK SIZE: {chunk_size})")
             with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
                 constants = functools.partial(TrainModelMixin._create_shap_mp_helper, explainer=explainer, clf_name=clf_name, verbose=verbose)
                 for cnt, result in enumerate(pool.imap(constants, shap_data, chunksize=1)):
@@ -1912,7 +1911,7 @@ class TrainModelMixin(object):
                     batch_shap_results = np.hstack((result[0], np.full((result[0].shape[0]), expected_value).reshape(-1, 1), shap_sum + expected_value, proba, shap_data[result[1]][1][clf_name].values.reshape(-1, 1))).astype(np.float32)
                     shap_results.append(batch_shap_results)
                     shap_raw.append(shap_data[result[1]][1].drop(clf_name, axis=1))
-                    if verbose: print(f"Completed SHAP care batch (Batch {result[1] + 1}/{len(shap_data)}).")
+                    if verbose: stdout_information(msg=f"Completed SHAP care batch (Batch {result[1] + 1}/{len(shap_data)}).")
 
             terminate_cpu_pool(pool=pool, force=False)
             shap_df = pd.DataFrame(data=np.row_stack(shap_results), columns=list(x_names) + ["Expected_value", "Sum", "Prediction_probability", clf_name])
@@ -2607,7 +2606,7 @@ class TrainModelMixin(object):
                                           clf_name: str,
                                           verbose: bool) -> Tuple[np.ndarray, int]:
         if verbose:
-            print(f'Processing SHAP core batch {data[0] + 1}... ({len(data[1])} observations)')
+            stdout_information(msg=f'Processing SHAP core batch {data[0] + 1}... ({len(data[1])} observations)')
         _ = data[1].pop(clf_name).values.reshape(-1, 1)
         shap_batch_results = np.full(shape=(len(data[1]), len(data[1].columns)), fill_value=np.nan, dtype=np.float32)
         for idx in range(len(data[1])):
@@ -2616,7 +2615,7 @@ class TrainModelMixin(object):
             shap_batch_results[idx] = explainer.shap_values(obs, check_additivity=False)[1]
             timer.stop_timer()
             if verbose:
-                print(f'SHAP frame complete (core batch: {data[0] + 1}, core batch frame: {idx + 1}/{len(data[1])}, frame processing time: {timer.elapsed_time_str}s)')
+                stdout_information(msg=f'SHAP frame complete (core batch: {data[0] + 1}, core batch frame: {idx + 1}/{len(data[1])}, frame processing time: {timer.elapsed_time_str}s)')
         return shap_batch_results, data[0]
 
 
@@ -2725,7 +2724,7 @@ class TrainModelMixin(object):
             expected_value = explainer.expected_value[1]
             shap_results, shap_raw = [], []
             out_shap_path, out_raw_path, img_save_path, df_save_paths, summary_dfs, img = None, None, None, None, None, None
-            print(f"Computing {cnt_present + cnt_absent} SHAP values. Follow progress in OS terminal... (CORES: {core_cnt}, CHUNK SIZE: {chunk_size})")
+            stdout_information(msg=f"Computing {cnt_present + cnt_absent} SHAP values. Follow progress in OS terminal... (CORES: {core_cnt}, CHUNK SIZE: {chunk_size})")
             with concurrent.futures.ProcessPoolExecutor(max_workers=core_cnt) as executor:
                 results = [executor.submit(self._create_shap_mp_helper_concurrent, data, explainer, clf_name, verbose) for data in shap_data]
                 for result in concurrent.futures.as_completed(results):
@@ -2737,7 +2736,7 @@ class TrainModelMixin(object):
                     batch_shap_results = np.hstack((batch_shap, expected_arr, batch_shap_sum + expected_value, batch_proba, batch_y)).astype(np.float32)
                     shap_results.append(batch_shap_results)
                     shap_raw.append(batch_x)
-                    if verbose: print(f"Completed SHAP care batch (Batch {batch_id + 1 + 1}/{len(shap_data)})...")
+                    if verbose: stdout_information(msg=f"Completed SHAP care batch (Batch {batch_id + 1 + 1}/{len(shap_data)})...")
             shap_df = pd.DataFrame(data=np.row_stack(shap_results), columns=list(x_names) + ["Expected_value", "Sum", "Prediction_probability", clf_name])
             raw_df = pd.DataFrame(data=np.row_stack(shap_raw), columns=list(x_names))
             if save_dir is not None:

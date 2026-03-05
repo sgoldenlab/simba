@@ -1845,7 +1845,7 @@ Joins **only the videos you choose**, in the **order you set** (VIDEO PATH 1, th
 | **Video section** (seconds) | Optional start/end time to process only part of each video. |
 | **CPU count** / **Cores** | Number of cores for multiprocessing. |
 | **USE GPU** | **TRUE** / **FALSE** — Use GPU for video I/O when available. |
-| **Bounding box** | Draw bounding box around animal(s). |
+| **Bounding box** | **FALSE** = no bounding box. **AXIS-ALIGNED** = axis-aligned bounding box (aligned with video axes). **ANIMAL-ALIGNED** = minimum rotated rectangle that aligns with the animal's orientation. |
 | **Number of animals** | For multi-animal data. |
 | **Color palettes** | Colors per animal or body-part. |
 | **Run** | Start rendering. |

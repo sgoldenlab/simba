@@ -381,5 +381,16 @@
   "RUN_ML_MODEL_PATH_HEADER": "Path to the trained model file (.sav). Pick the model you exported after training each classifier. Use BROWSE to select the file.",
   "RUN_ML_THRESHOLD_HEADER": "Classification threshold (0.0–1.0). Predictions below this are rejected. Higher values (e.g., 0.5–0.9) = stricter; lower = more permissive. Typical range: 0.3–0.7.",
   "RUN_ML_MIN_BOUT_HEADER": "Minimum bout length in milliseconds. Predictions shorter than this are filtered out. Reduces brief false positives; use 0 to keep all predictions.",
-  "RUN_ML_CLASSIFIER_NAME": "Name of this behavior classifier as defined in the project. Set the model path, threshold, and minimum bout length for this classifier in the same row."
+  "RUN_ML_CLASSIFIER_NAME": "Name of this behavior classifier as defined in the project. Set the model path, threshold, and minimum bout length for this classifier in the same row.",
+  "ROI_LINE_TYPE": "Line style for ROI borders. Options include solid, dashed, dotted, and other line patterns. Affects how ROI boundaries appear when drawn on the video.",
+  "ROI_SELECT_COLOR": "Color used to highlight selected ROIs in the interface. Choose a color that contrasts well with your video background for easy visibility.",
+  "ROI_DUPLICATION_JUMP_SIZE": "Pixel offset when duplicating ROI shapes. Larger values create more spacing between duplicated shapes. Useful when creating multiple similar ROIs.",
+  "ROI_SHOW_TRACKING_DATA": "Display pose estimation data on the ROI interface. Options: FALSE (no tracking), KEYPOINTS (show body-part locations), BBOX (show bounding boxes), or KEYPOINTS & BBOX (show both).",
+  "ROI_OVERLAY_GRID_COLOR": "Color for grid overlay lines displayed on the ROI interface. Choose a color that contrasts with your video background.",
+  "ROI_SHOW_GRID_OVERLAY": "Display a measurement grid overlay on the ROI interface. Options include FALSE (no grid) or grid spacing in millimeters (10MM, 20MM, 40MM, 80MM, 160MM). Helps with spatial measurements.",
+  "ROI_SHOW_HEXAGON_OVERLAY": "Display a hexagonal grid overlay on the ROI interface. Options include FALSE (no overlay) or hexagon spacing in millimeters (10MM, 20MM, 40MM, 80MM, 160MM). Useful for hexagonal spatial analysis.",
+  "ROI_POLYGON_TOLERANCE": "Controls polygon simplification when creating ROI polygons. Higher values simplify polygons (fewer vertices, smoother shapes). Smaller values retain more polygon details (more vertices, sharper corners).",
+  "ROI_KEYBOARD_SENSITIVITY": "Number of pixels ROI borders move when editing via keyboard arrow keys. Higher values move borders faster; lower values provide finer control.",
+  "ROI_BUFFER_SIZE": "Size of the buffer zone in millimeters. ROIs will be expanded or contracted by this amount. Positive values expand ROIs outward; negative values shrink them inward.",
+  "ROI_PIXEL_PER_MM": "Conversion factor from pixels to millimeters. Used to convert buffer size from millimeters to pixels. Should match your video's spatial calibration (e.g., if 1 mm = 10 pixels, enter 10)."
 }

@@ -4,6 +4,10 @@ import os
 import platform
 from pathlib import Path
 from typing import Dict, Optional, Tuple, Union
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 
 import cv2
 import numpy as np
@@ -61,8 +65,12 @@ def pose_plotter_mp(data: pd.DataFrame,
                     clr = colors_dict[animal_cnt][cnt]
                     img = cv2.circle(img, bp_tuple, circle_size, clr, -1)
                     animal_bbox.append(list(bp_tuple))
-                if bbox and len(animal_bbox) > 4:
-                    animal_bbox = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=np.array(animal_bbox).reshape(-1, len(animal_bbox), 2).astype(np.int32))
+                if bbox is not None and len(animal_bbox) > 4:
+                    if bbox == 'axis-aligned':
+                        animal_bbox = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=np.array(animal_bbox).reshape(-1, len(animal_bbox), 2).astype(np.int32))
+                    elif bbox == 'animal-aligned':
+                        animal_bbox = GeometryMixin().minimum_rotated_rectangle(shape=np.array(animal_bbox).reshape(len(animal_bbox), 2), buffer=None)
+                        animal_bbox = np.round(np.array(animal_bbox.exterior.coords)).astype(np.int32)
                     img = cv2.polylines(img, [animal_bbox], True, colors_dict[animal_cnt][0], thickness=max(1, int(circle_size/1.5)), lineType=-1)
                 if center_of_mass is not None:
                     center_point = center_of_mass[animal_name][current_frm]
@@ -103,7 +111,7 @@ class PosePlotterMultiProcess():
                  circle_size: Optional[int] = None,
                  core_cnt: Optional[int] = -1,
                  gpu: Optional[bool] = False,
-                 bbox: Optional[bool] = False,
+                 bbox: Optional[Literal['axis-aligned', 'animal-aligned']] = None,
                  center_of_mass: Optional[Tuple[int, int, int]] = None,
                  sample_time: Optional[int] = None,
                  verbose: bool = True) -> None:
@@ -136,7 +144,8 @@ class PosePlotterMultiProcess():
         else:
             for cnt, (k, v) in enumerate(self.config.animal_bp_dict.items()):
                 self.color_dict[cnt] = self.config.animal_bp_dict[k]["colors"]
-        check_valid_boolean(value=bbox, source=f'{self.__class__.__name__} bbox')
+        if bbox is not None:
+            check_str(name=f'{self.__class__.__name__} bbox', value=bbox, options=['axis-aligned', 'animal-aligned'], allow_blank=False, raise_error=True)
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose', raise_error=True)
         if sample_time is not None:
             check_int(name='sample_time', value=sample_time, min_value=1)
@@ -249,3 +258,15 @@ class PosePlotterMultiProcess():
 #                    core_cnt=6,
 #                    color_settings={'Animal_1':  'Green', 'Animal_2':  'Red'})
 # test.run()
+
+
+if __name__ == "__main__":
+    test = PosePlotterMultiProcess(data_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/2022-06-20_NOB_DOT_4.csv",
+                                   out_dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location',
+                                   circle_size=8,
+                                   core_cnt=5,
+                                   palettes={'Animal_1':  'Set1'},
+                                   sample_time=10,
+                                   bbox='animal-aligned',
+                                   center_of_mass=None)
+    test.run()

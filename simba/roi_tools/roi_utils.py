@@ -325,14 +325,16 @@ def get_ear_tags_for_rectangle(center: Tuple[int, int], width: int, height: int)
     check_int(name='width', value=width, min_value=1)
     check_int(name='height', value=height, min_value=1)
     tags = {}
-    tags['Top left tag'] = (round((center[1] - (width/2))), round(center[0] - (height/2)))
-    tags['Bottom right tag'] = (round(center[1] + (width/2)), round(center[0] + (height/2)))
-    tags['Top right tag'] = (round(center[1] + (width/2)), round(center[0] - (height/2)))
-    tags['Bottom left tag'] = (round(center[1] - (width / 2)), round(center[0] + (height / 2)))
-    tags['Top tag'] = (round(center[1]), round(center[0] - (height / 2)))
-    tags['Right tag'] = (round(center[1] + (width / 2)), round(center[0]))
-    tags['Left tag'] = (round(center[1] - (width / 2)), round(center[0]))
-    tags['Bottom tag'] = (round(center[1]), round(center[0] + (height / 2)))
+    # center is (x, y) format, so use center[0] for x and center[1] for y
+    tags['Top left tag'] = (round(center[0] - (width/2)), round(center[1] - (height/2)))
+    tags['Bottom right tag'] = (round(center[0] + (width/2)), round(center[1] + (height/2)))
+    tags['Top right tag'] = (round(center[0] + (width/2)), round(center[1] - (height/2)))
+    tags['Bottom left tag'] = (round(center[0] - (width / 2)), round(center[1] + (height / 2)))
+    tags['Top tag'] = (round(center[0]), round(center[1] - (height / 2)))
+    tags['Right tag'] = (round(center[0] + (width / 2)), round(center[1]))
+    tags['Left tag'] = (round(center[0] - (width / 2)), round(center[1]))
+    tags['Bottom tag'] = (round(center[0]), round(center[1] + (height / 2)))
+    tags['Center tag'] = (round(center[0]), round(center[1]))
     return tags
 
 

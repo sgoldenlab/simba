@@ -752,7 +752,7 @@ Renders **videos with pose keypoints overlaid** on each frame. Use this to verif
 | **VIDEO SECTION (SECONDS)** | **ENTIRE VIDEO(S)** = full video. Or 10, 20, … 200 to render only the first N seconds per video. |
 | **CPU COUNT** | Cores for multiprocessing (2 to max minus one). More cores = faster but higher RAM/GPU use. |
 | **USE GPU** | If TRUE, uses GPU for concatenation when multiprocessing. |
-| **INCLUDE BOUNDING BOX** | If TRUE, draws rectangular boxes around each animal's body parts. |
+| **INCLUDE BOUNDING BOX** | **FALSE** = no bounding box. **AXIS-ALIGNED** = axis-aligned bounding box (aligned with video axes). **ANIMAL-ALIGNED** = minimum rotated rectangle that aligns with the animal's orientation. |
 | **SHOW CENTER OF MASS** | **FALSE** = no center dot. Or choose a color to draw the center of mass per animal (useful for verifying movement analysis). |
 | **SAVE DIRECTORY** | Folder where output videos are saved. User-selectable (e.g. desktop or a project subfolder). |
 | **NUMBER OF ANIMALS** | Number of tracked individuals (1–16). Must match the pose data. |

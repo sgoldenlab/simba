@@ -848,15 +848,15 @@ class ROI_mixin(ConfigReader):
         self.preferences_frm.iconphoto(False, self.menu_icons['settings']["img"])
 
         pref_frm_panel = CreateLabelFrameWithIcon(parent=self.preferences_frm, header="PREFERENCES", icon_name='settings', padx=5, pady=5)
-        self.line_type_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=ROI_SETTINGS.LINE_TYPE_OPTIONS.value, label="LINE TYPE: ", label_width=35, dropdown_width=35, value=self.settings['LINE_TYPE'])
-        self.roi_select_clr_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(self.color_option_dict.keys()), label="ROI SELECT COLOR: ", label_width=35, dropdown_width=35, value=next(key for key, val in self.color_option_dict.items() if val == self.settings['ROI_SELECT_CLR']))
-        self.duplication_jump_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(range(1, 100, 5)), label="DUPLICATION JUMP SIZE: ", label_width=35, dropdown_width=35, value=self.settings['DUPLICATION_JUMP_SIZE'])
-        self.show_tracking_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['FALSE', 'KEYPOINTS', 'BBOX', 'KEYPOINTS & BBOX'], label="SHOW TRACKING DATA: ", label_width=35, dropdown_width=35, value=self.settings[ROI_TRACKING_STYLE].upper())
-        self.overlay_color_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(self.color_option_dict.keys()), label="OVERLAY GRID COLOR: ", label_width=35, dropdown_width=35, value=next(key for key, val in self.color_option_dict.items() if val == self.settings[OVERLAY_GRID_COLOR]))
-        self.show_grid_overlay_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['FALSE', '10MM', '20MM', '40MM', '80MM', '160MM'], label="SHOW GRID OVERLAY: ", label_width=35, dropdown_width=35, value=self.settings[SHOW_GRID_OVERLAY])
-        self.show_hexagon_overlay_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['FALSE', '10MM', '20MM', '40MM', '80MM', '160MM'], label="SHOW HEXAGON OVERLAY: ", label_width=35, dropdown_width=35, value=self.settings[SHOW_GRID_OVERLAY])
-        self.polygon_tolerance_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(range(2, 22, 2)), label="POLYGON TOLERANCE: ", label_width=35, dropdown_width=35, value=self.settings[POLYGON_TOLERANCE], tooltip_txt='Higher values will simplify polygons. \n Smaller values will retain more polygon details')
-        self.keyboard_sensitivity_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(range(1, 52, 1)), label="KEYBOARD MOVEMENT SENSITIVITY: ", label_width=35, dropdown_width=35, value=self.settings[KEYBOARD_SENSITIVITY], tooltip_txt='How many pixels the ROI borders move when editing the borders visa the keyboard ')
+        self.line_type_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=ROI_SETTINGS.LINE_TYPE_OPTIONS.value, label="LINE TYPE: ", label_width=35, dropdown_width=35, value=self.settings['LINE_TYPE'], img='line', tooltip_key='ROI_LINE_TYPE')
+        self.roi_select_clr_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(self.color_option_dict.keys()), label="ROI SELECT COLOR: ", label_width=35, dropdown_width=35, value=next(key for key, val in self.color_option_dict.items() if val == self.settings['ROI_SELECT_CLR']), img='fill', tooltip_key='ROI_SELECT_COLOR')
+        self.duplication_jump_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(range(1, 100, 5)), label="DUPLICATION JUMP SIZE: ", label_width=35, dropdown_width=35, value=self.settings['DUPLICATION_JUMP_SIZE'], img='jump', tooltip_key='ROI_DUPLICATION_JUMP_SIZE')
+        self.show_tracking_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['FALSE', 'KEYPOINTS', 'BBOX', 'KEYPOINTS & BBOX'], label="SHOW TRACKING DATA: ", label_width=35, dropdown_width=35, value=self.settings[ROI_TRACKING_STYLE].upper(), img='pose', tooltip_key='ROI_SHOW_TRACKING_DATA')
+        self.overlay_color_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(self.color_option_dict.keys()), label="OVERLAY GRID COLOR: ", label_width=35, dropdown_width=35, value=next(key for key, val in self.color_option_dict.items() if val == self.settings[OVERLAY_GRID_COLOR]), img='paint', tooltip_key='ROI_OVERLAY_GRID_COLOR')
+        self.show_grid_overlay_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['FALSE', '10MM', '20MM', '40MM', '80MM', '160MM'], label="SHOW GRID OVERLAY: ", label_width=35, dropdown_width=35, value=self.settings[SHOW_GRID_OVERLAY], img='table_2', tooltip_key='ROI_SHOW_GRID_OVERLAY')
+        self.show_hexagon_overlay_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['FALSE', '10MM', '20MM', '40MM', '80MM', '160MM'], label="SHOW HEXAGON OVERLAY: ", label_width=35, dropdown_width=35, value=self.settings[SHOW_GRID_OVERLAY], img='hexagon', tooltip_key='ROI_SHOW_HEXAGON_OVERLAY')
+        self.polygon_tolerance_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(range(2, 22, 2)), label="POLYGON TOLERANCE: ", label_width=35, dropdown_width=35, value=self.settings[POLYGON_TOLERANCE], tooltip_key='ROI_POLYGON_TOLERANCE', img='polygon_2')
+        self.keyboard_sensitivity_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(range(1, 52, 1)), label="KEYBOARD MOVEMENT SENSITIVITY: ", label_width=35, dropdown_width=35, value=self.settings[KEYBOARD_SENSITIVITY], tooltip_key='ROI_KEYBOARD_SENSITIVITY', img='keyboard')
 
         pref_save_btn = SimbaButton(parent=pref_frm_panel, txt="SAVE", img='save_large', font=Formats.FONT_REGULAR.value, cmd=self.set_settings)
         pref_frm_panel.grid(row=0, column=0, sticky=NW)
@@ -917,50 +917,46 @@ class ROI_mixin(ConfigReader):
         self.fixed_roi_frm.wm_title("FIXED ROI PREFERENCES")
         self.fixed_roi_frm.iconphoto(False, self.menu_icons['size_black']["img"])
 
-        settings = LabelFrame(self.fixed_roi_frm, text="SETTINGS", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-
-        self.fixed_roi_name_eb = Entry_Box(parent=settings, fileDescription='ROI NAME: ', labelwidth=15, entry_box_width=25)
-        self.fixed_roi_clr_drpdwn = SimBADropDown(parent=settings, dropdown_options=list(self.color_option_dict.keys()), label='COLOR:', label_width=15, value='Red')
-        self.fixed_roi_thickness_drpdwn = SimBADropDown(parent=settings, dropdown_options=self.settings['SHAPE_THICKNESS_OPTIONS'], label='THICKNESS:', label_width=15, value=10)
-        self.fixed_roi_eartag_size_drpdwn = SimBADropDown(parent=settings, dropdown_options=self.settings['EAR_TAG_SIZE_OPTIONS'], label='EAR TAG SIZE:', label_width=15, value=15)
+        settings = CreateLabelFrameWithIcon(parent=self.fixed_roi_frm, header="SETTINGS", icon_name='settings', padx=5, pady=5)
+        self.fixed_roi_name_eb = Entry_Box(parent=settings, fileDescription='ROI NAME: ', labelwidth=15, entry_box_width=25, img='label_yellow')
+        self.fixed_roi_clr_drpdwn = SimBADropDown(parent=settings, dropdown_options=list(self.color_option_dict.keys()), label='COLOR:', label_width=15, value='Red', img='palette_small')
+        self.fixed_roi_thickness_drpdwn = SimBADropDown(parent=settings, dropdown_options=self.settings['SHAPE_THICKNESS_OPTIONS'], label='THICKNESS:', label_width=15, value=10, img='line')
+        self.fixed_roi_eartag_size_drpdwn = SimBADropDown(parent=settings, dropdown_options=self.settings['EAR_TAG_SIZE_OPTIONS'], label='EAR TAG SIZE:', label_width=15, value=15, img='ear_small')
         settings.grid(row=0, column=0, sticky=NW)
         self.fixed_roi_name_eb.grid(row=0, column=0, sticky=NW)
         self.fixed_roi_clr_drpdwn.grid(row=1, column=0, sticky=NW)
         self.fixed_roi_thickness_drpdwn.grid(row=1, column=1, sticky=NW)
         self.fixed_roi_eartag_size_drpdwn.grid(row=1, column=2, sticky=NW)
 
-        rectangle_frm = LabelFrame(self.fixed_roi_frm, text="ADD RECTANGLE", pady=10, font=Formats.FONT_HEADER.value, fg="black")
-        self.rectangle_width_eb = Entry_Box(rectangle_frm, '', 0, None, validation='numeric', entry_box_width='11')
-        self.rectangle_width_eb.entry_set('WIDTH (MM)')
-        self.rectangle_height_eb = Entry_Box(rectangle_frm, '', 0, None, validation='numeric', entry_box_width='11')
-        self.rectangle_height_eb.entry_set('HEIGHT (MM)')
+        rectangle_frm = CreateLabelFrameWithIcon(parent=self.fixed_roi_frm, header='ADD RECTANGLE', pady=10, icon_name='rectangle_small')
+        self.rectangle_width_eb = Entry_Box(rectangle_frm, '', 0, None, validation='numeric', entry_box_width='11', value='WIDTH (MM)', entry_font=Formats.FONT_REGULAR_ITALICS.value)
+        self.rectangle_height_eb = Entry_Box(rectangle_frm, '', 0, None, validation='numeric', entry_box_width='11', value='HEIGHT (MM)', entry_font=Formats.FONT_REGULAR_ITALICS.value)
         add_rect_btn = SimbaButton(parent=rectangle_frm, txt='ADD RECTANGLE', img='rectangle_small', txt_clr='black', cmd= lambda: self.fixed_roi_rectangle())
         rectangle_frm.grid(row=1, column=0, sticky=NW)
         self.rectangle_width_eb.grid(row=0, column=0, sticky=NW)
         self.rectangle_height_eb.grid(row=0, column=1, sticky=NW)
         add_rect_btn.grid(row=0, column=2, sticky=NW)
 
-        circle_frm = LabelFrame(self.fixed_roi_frm, text="ADD CIRCLE", pady=10, font=Formats.FONT_HEADER.value, fg="black")
-        self.fixed_roi_circle_radius_eb = Entry_Box(circle_frm, '', 0, None, validation='numeric', entry_box_width='11')
-        self.fixed_roi_circle_radius_eb.entry_set('RADIUS (MM)')
+        circle_frm = CreateLabelFrameWithIcon(parent=self.fixed_roi_frm, header="ADD CIRCLE", icon_name='circle_small', pady=10)
+        self.fixed_roi_circle_radius_eb = Entry_Box(circle_frm, '', 0, None, validation='numeric', entry_box_width='11', value='RADIUS (MM)', entry_font=Formats.FONT_REGULAR_ITALICS.value)
         add_circle_btn = SimbaButton(parent=circle_frm, txt='ADD CIRCLE', img='circle_small', txt_clr='black', cmd= lambda: self.fixed_roi_circle())
         circle_frm.grid(row=2, column=0, sticky=NW)
         self.fixed_roi_circle_radius_eb.grid(row=0, column=0, sticky=NW)
         add_circle_btn.grid(row=0, column=1, sticky=NW)
 
-        self.hexagon_frm = LabelFrame(self.fixed_roi_frm, text="ADD HEXAGON", pady=10, font=Formats.FONT_HEADER.value, fg="black")
-        self.hexagon_radius_eb = Entry_Box(self.hexagon_frm, '', 0, None, validation='numeric', entry_box_width='11')
-        self.hexagon_radius_eb.entry_set('RADIUS (MM)')
+
+        self.hexagon_frm = CreateLabelFrameWithIcon(parent=self.fixed_roi_frm, header="ADD HEXAGON", icon_name='hexagon_small', pady=10)
+        self.hexagon_radius_eb = Entry_Box(self.hexagon_frm, '', 0, None, validation='numeric', entry_box_width='11', value='RADIUS (MM)', entry_font=Formats.FONT_REGULAR_ITALICS.value)
         add_hex_btn = SimbaButton(parent=self.hexagon_frm, txt='ADD HEXAGON', img='hexagon_small', txt_clr='black', cmd= lambda: self.fixed_roi_hexagon())
         self.hexagon_frm.grid(row=3, column=0, sticky=NW)
         self.hexagon_radius_eb.grid(row=0, column=0, sticky=NW)
         add_hex_btn.grid(row=0, column=1, sticky=NW)
 
-        self.half_circle_frm = LabelFrame(self.fixed_roi_frm, text="ADD HALF CIRCLE", pady=10, font=Formats.FONT_HEADER.value, fg="black")
-        self.half_circle_radius_eb = Entry_Box(self.half_circle_frm, '', 0, None, validation='numeric', entry_box_width='11')
-        self.half_circle_radius_eb.entry_set('RADIUS (MM)')
-        self.half_circle_direction_drpdwn = DropDownMenu(self.half_circle_frm, 'DIRECTION:', ['NORTH', 'SOUTH', 'WEST', 'EAST', 'NORTH-EAST', 'NORTH-WEST', 'SOUTH-EAST', 'SOUTH-WEST'], 10)
-        self.half_circle_direction_drpdwn.setChoices('NORTH')
+
+        self.half_circle_frm = CreateLabelFrameWithIcon(parent=self.fixed_roi_frm, header="ADD HALF CIRCLE", icon_name='half_circle_small', pady=10)
+        self.half_circle_radius_eb = Entry_Box(self.half_circle_frm, '', 0, None, validation='numeric', entry_box_width='11', value='RADIUS (MM)', entry_font=Formats.FONT_REGULAR_ITALICS.value)
+
+        self.half_circle_direction_drpdwn = SimBADropDown(parent=self.half_circle_frm, label='DIRECTION:', dropdown_options=['NORTH', 'SOUTH', 'WEST', 'EAST', 'NORTH-EAST', 'NORTH-WEST', 'SOUTH-EAST', 'SOUTH-WEST'], value='NORTH')
         add_half_circle_btn = SimbaButton(parent=self.half_circle_frm, txt='ADD HALF CIRCLE', img='half_circle_small', txt_clr='black', cmd= lambda: self.fixed_roi_half_circle())
         self.half_circle_frm.grid(row=4, column=0, sticky=NW)
         self.half_circle_radius_eb.grid(row=0, column=0, sticky=NW)
@@ -968,11 +964,10 @@ class ROI_mixin(ConfigReader):
         add_half_circle_btn.grid(row=0, column=2, sticky=NW)
 
 
-        self.triangle_frm = LabelFrame(self.fixed_roi_frm, text="ADD EQUILATERAL TRIANGLE", pady=10, font=Formats.FONT_HEADER.value, fg="black")
-        self.triangle_side_length_eb = Entry_Box(self.triangle_frm, '', 0, None, validation='numeric', entry_box_width='15')
-        self.triangle_side_length_eb.entry_set('SIDE LENGTH (MM)')
-        self.triangle_direction_drpdwn = DropDownMenu(self.triangle_frm, 'DIRECTION DEGREES:', list(range(1, 361)), 18)
-        self.triangle_direction_drpdwn.setChoices('90')
+        self.triangle_frm = CreateLabelFrameWithIcon(parent=self.fixed_roi_frm, header="ADD EQUILATERAL TRIANGLE", icon_name='triangle_small', pady=10)
+        self.triangle_side_length_eb = Entry_Box(self.triangle_frm, '', 0, None, validation='numeric', entry_box_width='15', value='SIDE LENGTH (MM)', entry_font=Formats.FONT_REGULAR_ITALICS.value)
+        self.triangle_direction_drpdwn = SimBADropDown(parent=self.triangle_frm, dropdown_options=list(range(1, 361)), label='DIRECTION DEGREES:', value='90')
+
         add_triangle_btn = SimbaButton(parent=self.triangle_frm, txt='ADD TRIANGLE', img='triangle_small', txt_clr='black', cmd= lambda: self.fixed_roi_triangle())
 
         self.triangle_frm.grid(row=5, column=0, sticky=NW)
@@ -1003,6 +998,7 @@ class ROI_mixin(ConfigReader):
         self.ear_tag_size = int(self.fixed_roi_eartag_size_drpdwn.getChoices())
         self.ear_tag_size = int(self.fixed_roi_eartag_size_drpdwn.getChoices())
         self.shape_cnt = len(list(self.roi_dict.keys()))
+        # Calculate center: first shape at img_center, subsequent shapes offset by DUPLICATION_JUMP_SIZE
         self.shape_center = (round(self.img_center[0] + (self.settings['DUPLICATION_JUMP_SIZE'] * self.shape_cnt)), round(self.img_center[1] + (self.settings['DUPLICATION_JUMP_SIZE'] * self.shape_cnt)))
     def _fixed_roi_draw(self):
         self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
@@ -1020,8 +1016,8 @@ class ROI_mixin(ConfigReader):
         if not valid: self.fixed_roi_status_bar['text'] = error_msg; raise InvalidInputError(msg=error_msg, source=self.__class__.__name__)
         valid, error_msg = check_int(name='HEIGHT', value=self.rectangle_height_eb.entry_get, min_value=1)
         if not valid: self.fixed_roi_status_bar['text'] = error_msg; raise InvalidInputError(msg=error_msg, source=self.__class__.__name__)
-        mm_width, mm_height = round(self.rectangle_width_eb.entry_get), round(self.rectangle_height_eb.entry_get)
-        width, height = round(self.rectangle_width_eb.entry_get * (float(self.px_per_mm) * self.downscale_factor)), round(self.rectangle_height_eb.entry_get * (float(self.px_per_mm) * self.downscale_factor))
+        mm_width, mm_height = round(int(self.rectangle_width_eb.entry_get)), round(int(self.rectangle_height_eb.entry_get))
+        width, height = round(int(self.rectangle_width_eb.entry_get) * (float(self.px_per_mm) * self.downscale_factor)), round(int(self.rectangle_height_eb.entry_get) * (float(self.px_per_mm) * self.downscale_factor))
         tags = get_ear_tags_for_rectangle(center=self.shape_center, width=width, height=height)
         self.roi_dict[self.fixed_roi_name] =  {'Video':                self.video_meta['video_name'],
                                                'Shape_type':           ROI_SETTINGS.RECTANGLE.value,
@@ -1030,7 +1026,7 @@ class ROI_mixin(ConfigReader):
                                                'Color BGR':            self.clr_bgr,
                                                'Thickness':            self.thickness,
                                                'Center_X':             self.shape_center[0],
-                                               'Center_Y':             self.shape_center[0],
+                                               'Center_Y':             self.shape_center[1],
                                                'topLeftX':             tags['Top left tag'][0],
                                                'topLeftY':             tags['Top left tag'][1],
                                                'Bottom_right_X':       tags['Bottom right tag'][0],
@@ -1101,7 +1097,7 @@ class ROI_mixin(ConfigReader):
         self._fixed_roi_checks()
         valid, error_msg = check_int(name='RADIUS', value=self.half_circle_radius_eb.entry_get, min_value=1)
         if not valid: self.fixed_roi_status_bar['text'] = error_msg; raise InvalidInputError(msg=error_msg, source=self.__class__.__name__)
-        radius = round(round(self.half_circle_radius_eb.entry_get) * (float(self.px_per_mm) * self.downscale_factor))
+        radius = round(round(int(self.half_circle_radius_eb.entry_get)) * (float(self.px_per_mm) * self.downscale_factor))
         direction = self.half_circle_direction_drpdwn.getChoices()
         vertices, vertices_dict = get_half_circle_vertices(center=self.shape_center, radius=radius, direction=direction)
         area = Polygon(vertices).simplify(tolerance=20, preserve_topology=True).area
@@ -1127,7 +1123,7 @@ class ROI_mixin(ConfigReader):
         self._fixed_roi_checks()
         valid, error_msg = check_int(name='TRIANGLE SIDE LENGTH', value=self.triangle_side_length_eb.entry_get, min_value=1)
         if not valid: self.fixed_roi_status_bar['text'] = error_msg; raise InvalidInputError(msg=error_msg, source=self.__class__.__name__)
-        side_length = round(round(self.triangle_side_length_eb.entry_get) * (float(self.px_per_mm) * self.downscale_factor))
+        side_length = round(round(int(self.triangle_side_length_eb.entry_get)) * (float(self.px_per_mm) * self.downscale_factor))
         direction = int(self.triangle_direction_drpdwn.getChoices())
         vertices, vertices_dict = get_triangle_vertices(center=self.shape_center, side_length=side_length, direction=direction)
         area = Polygon(vertices).simplify(tolerance=20, preserve_topology=True).area
@@ -1202,9 +1198,8 @@ class ROI_mixin(ConfigReader):
         self.buffer_roi_frm.wm_title("BUFFER ROIs")
         self.buffer_roi_frm.iconphoto(False, self.menu_icons['resize']["img"])
         buffer_roi_settings_frm = CreateLabelFrameWithIcon(parent=self.buffer_roi_frm, header="BUFFER ROI SETTINGS", icon_name='resize', padx=5, pady=5)
-        self.buffer_size_eb = Entry_Box(parent=buffer_roi_settings_frm, fileDescription='BUFFER SIZE (MM):', labelwidth=35, entry_box_width=10, justify='center', value=20) #validation='numeric')
-        self.px_per_mm_eb = Entry_Box(parent=buffer_roi_settings_frm, fileDescription='PIXEL PER MM CONVERTION FACTOR:', labelwidth=35, entry_box_width=10, justify='center', value=self.px_per_mm)
-
+        self.buffer_size_eb = Entry_Box(parent=buffer_roi_settings_frm, fileDescription='BUFFER SIZE (MM):', labelwidth=35, entry_box_width=10, justify='center', value=20, img='resize', tooltip_key='ROI_BUFFER_SIZE') #validation='numeric')
+        self.px_per_mm_eb = Entry_Box(parent=buffer_roi_settings_frm, fileDescription='PIXEL PER MM CONVERTION FACTOR:', labelwidth=35, entry_box_width=10, justify='center', value=self.px_per_mm, img='calipher', tooltip_key='ROI_PIXEL_PER_MM')
         buffer_roi_settings_frm.grid(row=0, column=0, sticky=NW)
         self.buffer_size_eb.grid(row=0, column=0, sticky=NW, pady=5)
         self.px_per_mm_eb.grid(row=1, column=0, sticky=NW, pady=5)

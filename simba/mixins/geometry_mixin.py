@@ -1150,7 +1150,7 @@ class GeometryMixin(object):
            * For axis-aligned bboxes, see func:`simba.mixins.geometry_mixin.GeometryMixin.keypoints_to_axis_aligned_bounding_box`.
 
         :param Polygon shape: The Polygon for which the minimum rotated rectangle is to be calculated. Can be a shapely object or a 2D array of at least 3 vertices.
-        :param Polygon shape: If not None, then a buffer in pixels to increate the polygon area with proior to vomputing the minimum rotating rectangle.
+        :param Optional[int] buffer: If not None, then a buffer in pixels to increate the polygon area with proior to vomputing the minimum rotating rectangle.
         :return: The minimum rotated rectangle geometry that bounds the input polygon.
         :rtype: Polygon
 
@@ -1162,7 +1162,7 @@ class GeometryMixin(object):
         check_instance(source=f'{GeometryMixin.__name__} minimum_rotated_rectangle shape', instance=shape, accepted_types=(Polygon, np.ndarray))
         if isinstance(shape, (np.ndarray,)):
             check_valid_array(data=shape, source=f'{GeometryMixin.__name__} minimum_rotated_rectangle shape', accepted_ndims=(2,), min_axis_0=3, accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0, raise_error=True, max_axis_1=2)
-            shape = GeometryMixin().bodyparts_to_polygon(data=shape.reshape(1, len(shape), 2))[0]
+            shape = MultiPoint(shape.tolist()).convex_hull
         if buffer is not None:
             check_int(name=f'{GeometryMixin.__name__} minimum_rotated_rectangle buffer', min_value=1, value=buffer)
             shape = shape.buffer(distance=buffer)
