@@ -11,7 +11,8 @@ from PIL import Image, ImageTk
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.roi_tools.roi_utils import get_image_from_label
 from simba.ui.tkinter_functions import SimBALabel
-from simba.utils.checks import (check_float, check_if_valid_rgb_tuple, check_instance, check_int)
+from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
+                                check_instance, check_int)
 from simba.utils.enums import TkBinds
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
