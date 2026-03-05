@@ -3,6 +3,7 @@ __author__ = "Simon Nilsson"
 import os
 from copy import deepcopy
 from typing import Optional, Tuple, Union
+
 try:
     from typing import Literal
 except ImportError:
@@ -12,10 +13,10 @@ import cv2
 import numpy as np
 import pandas as pd
 
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_valid_rgb_tuple, check_int,
-                                check_str, check_float, check_valid_boolean,
-                                check_if_dir_exists, check_instance)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists, check_if_valid_rgb_tuple,
+                                check_instance, check_int, check_str,
+                                check_valid_boolean)
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 InvalidFileTypeError)
 from simba.utils.printing import SimbaTimer, stdout_success

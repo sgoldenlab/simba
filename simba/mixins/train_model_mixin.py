@@ -30,7 +30,8 @@ from sklearn.feature_selection import VarianceThreshold
 from sklearn.inspection import partial_dependence, permutation_importance
 from sklearn.metrics import classification_report, precision_recall_curve
 from sklearn.model_selection import ShuffleSplit, learning_curve
-from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer, StandardScaler)
+from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer,
+                                   StandardScaler)
 from sklearn.tree import export_graphviz
 from sklearn.utils import parallel_backend
 
