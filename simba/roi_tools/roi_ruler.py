@@ -11,8 +11,7 @@ from PIL import Image, ImageTk
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.roi_tools.roi_utils import get_image_from_label
 from simba.ui.tkinter_functions import SimBALabel
-from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
-                                check_instance, check_int)
+from simba.utils.checks import (check_float, check_if_valid_rgb_tuple, check_instance, check_int)
 from simba.utils.enums import TkBinds
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
@@ -47,12 +46,14 @@ class ROIRuler(object):
                  second_clr: Tuple[int, int, int] = None,
                  tolerance: int = 10,
                  px_per_mm: Optional[float] = None,
-                 info_label: Optional[SimBALabel] = None) -> None:
+                 info_label: Optional[SimBALabel] = None,
+                 img_scale_factor: float = 1.0) -> None:
 
         check_instance(source=self.__class__.__name__, instance=img_window, accepted_types=(Toplevel,))
         if thickness is not None: check_int(name=f'{self.__class__.__name__} thickness', value=thickness, min_value=1)
         if second_thickness is not None: check_int(name=f'{self.__class__.__name__} second_thickness', value=second_thickness, min_value=1)
         if px_per_mm is not None: check_float(name=f'{self.__class__.__name__} px_per_mm', value=px_per_mm, min_value=10e-16)
+        check_float(name=f'{self.__class__.__name__} img_scale_factor', value=img_scale_factor, allow_negative=False, allow_zero=False, raise_error=True)
         check_int(name=f'{self.__class__.__name__} tolerance', value=tolerance, min_value=1)
         #if info_label is not None: check_instance(source=f'{self.__class__.__name__} info_label', instance=info_label, accepted_types=type(SimBALabel), raise_error=True, warning=False)
         if clr is not None: check_if_valid_rgb_tuple(data=clr, raise_error=True, source=f'{self.__class__.__name__} clr')
@@ -62,7 +63,7 @@ class ROIRuler(object):
         self.drawing, self.clr, self.thickness, self.second_thickness, self.tolerance = False, clr, thickness, second_thickness, tolerance
         self.img_lbl = img_window.nametowidget("img_lbl")
         self.img, self.info_lbl = get_image_from_label(self.img_lbl), info_label
-        self.click_locs, self.px_per_mm = {'start': None, 'end': None}, px_per_mm
+        self.click_locs, self.px_per_mm, self.img_scale_factor = {'start': None, 'end': None}, px_per_mm, img_scale_factor
         self.move_tag, self.second_clr = None, second_clr
         self.auto_size = PlottingMixin().get_optimal_circle_size(frame_size=tuple(self.img.shape[0:2]), circle_frame_ratio=200)
         if thickness is None: self.thickness = self.auto_size
@@ -153,12 +154,13 @@ class ROIRuler(object):
 
     def _get_attributes(self):
         self.start_pos, self.end_pos = self.click_locs['start'], self.click_locs['end']
-        self.length_px = round(np.linalg.norm(np.array(self.click_locs['start']) - np.array(self.click_locs['end'])), 4)
+        self.length_px_display = round(np.linalg.norm(np.array(self.click_locs['start']) - np.array(self.click_locs['end'])), 4)
+        self.length_px = round(self.length_px_display / self.img_scale_factor, 4)
         if self.px_per_mm is not None: self.length_mm = round((self.length_px / self.px_per_mm), 4)
         else: self.length_mm = None
         self.got_attributes = True
         if self.info_lbl is not None:
-            self.info_lbl.configure(text=f'RULER LENGTH: {self.length_mm} mm, {self.length_px} pixels (Convertion factor: {self.px_per_mm})', fg='blue')
+            self.info_lbl.configure(text=f'RULER LENGTH: {self.length_mm} mm, {self.length_px} pixels (original), {self.length_px_display} pixels (display) (Conversion factor: {self.px_per_mm}, Scale: {self.img_scale_factor})', fg='blue')
             self.info_lbl.update_idletasks()
 
 

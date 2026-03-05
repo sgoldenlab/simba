@@ -577,7 +577,15 @@ class ROI_mixin(ConfigReader):
         self.root = parent_frame
         self.set_status_bar_panel(text="RULER MODE ENTERED", fg="blue")
         self.click_event = BooleanVar(value=False)
-        self.ruler = ROIRuler(img_window=self.img_window, thickness=int(self.thickness_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()], second_clr=(0, 0, 0), tolerance=int(self.settings[KEYBOARD_SENSITIVITY] * 2), px_per_mm=self.px_per_mm, info_label=self.status_bar)
+        self.ruler = ROIRuler(img_window=self.img_window,
+                              thickness=int(self.thickness_dropdown.getChoices()),
+                              clr=self.color_option_dict[self.color_dropdown.getChoices()],
+                              second_clr=(0, 0, 0),
+                              tolerance=int(self.settings[KEYBOARD_SENSITIVITY] * 2),
+                              px_per_mm=self.px_per_mm,
+                              info_label=self.status_bar,
+                              img_scale_factor=self.downscale_factor)
+
         self.root.bind(TkBinds.B1_PRESS.value, exit_click); self.root.bind(TkBinds.ESCAPE.value, exit_click); self.img_window.bind(TkBinds.ESCAPE.value, exit_click)
         self.root.wait_variable(self.click_event)
         self.ruler.unbind_mouse()
@@ -1000,6 +1008,7 @@ class ROI_mixin(ConfigReader):
         self.shape_cnt = len(list(self.roi_dict.keys()))
         # Calculate center: first shape at img_center, subsequent shapes offset by DUPLICATION_JUMP_SIZE
         self.shape_center = (round(self.img_center[0] + (self.settings['DUPLICATION_JUMP_SIZE'] * self.shape_cnt)), round(self.img_center[1] + (self.settings['DUPLICATION_JUMP_SIZE'] * self.shape_cnt)))
+
     def _fixed_roi_draw(self):
         self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
         self.roi_names = list(self.roi_dict.keys())
