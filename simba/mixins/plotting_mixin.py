@@ -17,9 +17,9 @@ import plotly.graph_objs as go
 import seaborn as sns
 from matplotlib import cm
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.collections import LineCollection
 from matplotlib.figure import Figure
 from matplotlib.ticker import FuncFormatter, MaxNLocator
-from matplotlib.collections import LineCollection
 from numba import bool_, njit, uint8
 from PIL import Image
 
@@ -38,7 +38,8 @@ from simba.utils.checks import (
     check_instance, check_int, check_str, check_that_column_exist,
     check_valid_array, check_valid_boolean, check_valid_dataframe,
     check_valid_lst, check_valid_tuple)
-from simba.utils.data import create_color_palette, detect_bouts, savgol_smoother
+from simba.utils.data import (create_color_palette, detect_bouts,
+                              savgol_smoother)
 from simba.utils.enums import Formats, Keys, Options, Paths
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
