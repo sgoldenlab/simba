@@ -204,7 +204,7 @@ Create videos that overlay your ROI shapes and **counters** (time spent in each 
 | **BODY-PART PROBABILITY THRESHOLD** | Minimum pose-estimation probability (0–1). Frames where the selected body-part’s probability is below this are excluded from ROI and pose drawing. Use 0.0 to include all frames. |
 | **SHOW POSE-ESTIMATED LOCATIONS** | **TRUE** — Draw pose keypoints (circles) on the video; **FALSE** — Do not draw. When TRUE, **COLOR** and **KEY-POINT SIZE** in the body-parts section become active. |
 | **SHOW ANIMAL NAMES** | **TRUE** — Display animal labels (e.g. Animal_1) on the video; **FALSE** — Do not show names. |
-| **SHOW ANIMAL BOUNDING BOXES** | **TRUE** — Draw bounding boxes around each animal; **FALSE** — Do not draw boxes. |
+| **SHOW ANIMAL BOUNDING BOXES** | **FALSE** = no bounding box. **axis-aligned** = axis-aligned bounding box (aligned with video axes). **animal-aligned** = minimum rotated rectangle that aligns with the animal's orientation. |
 | **BORDER BACKGROUND COLOR** | Color of the border/frame around the video (e.g. Black, White). Affects the appearance of the output video frame. |
 | **OUTSIDE ROI ZONES DATA** | **TRUE** — Treat all area not covered by any ROI as one combined zone and show time/entry counters for it; **FALSE** — Only show counters for user-drawn ROIs. |
 | **NUMBER OF CPU CORES** | Dropdown from 1 to your machine’s core count. Higher values speed up rendering when creating multiple videos but may use more RAM. |

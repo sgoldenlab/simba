@@ -1135,9 +1135,11 @@ class GeometryMixin(object):
         stdout_success(msg=msg, elapsed_time=timer.elapsed_time_str, source=GeometryMixin.geometry_video.__name__)
 
     @staticmethod
-    def minimum_rotated_rectangle(shape: Union[Polygon, np.ndarray], buffer: Optional[int] = None) -> Polygon:
+    def minimum_rotated_rectangle(shape: Union[Polygon, np.ndarray],
+                                  buffer: Optional[int] = None,
+                                  return_type: Literal['array', 'geometry'] = 'geometry') -> Polygon:
         """
-        Calculate the minimum rotated rectangle that bounds a given polygon.
+        Calculate the minimum rotated rectangle that bounds a given polygon or set of points.
 
         The minimum rotated rectangle, also known as the minimum bounding rectangle (MBR) or oriented bounding box (OBB), is the smallest rectangle that can fully contain a given polygon or set of points while allowing rotation. It is defined by its center, dimensions (length and width), and rotation angle.
 
@@ -1147,12 +1149,13 @@ class GeometryMixin(object):
 
         .. seealso::
            * For multicore call, use :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_minimum_rotated_rectangle`
-           * For axis-aligned bboxes, see func:`simba.mixins.geometry_mixin.GeometryMixin.keypoints_to_axis_aligned_bounding_box`.
+           * For axis-aligned bboxes, see :func:`simba.mixins.geometry_mixin.GeometryMixin.keypoints_to_axis_aligned_bounding_box`
 
-        :param Polygon shape: The Polygon for which the minimum rotated rectangle is to be calculated. Can be a shapely object or a 2D array of at least 3 vertices.
-        :param Optional[int] buffer: If not None, then a buffer in pixels to increate the polygon area with proior to vomputing the minimum rotating rectangle.
-        :return: The minimum rotated rectangle geometry that bounds the input polygon.
-        :rtype: Polygon
+        :param Union[Polygon, np.ndarray] shape: The polygon or points to bound. A Shapely ``Polygon`` or a 2D array of shape (N, 2) with at least 3 vertices (x, y). Arrays are converted to the convex hull of the points before computing the rectangle.
+        :param Optional[int] buffer: If not None, a buffer in pixels to expand the polygon area with prior to computing the minimum rotated rectangle. Must be >= 1.
+        :param Literal['array', 'geometry'] return_type: If ``'geometry'`` (default), return a Shapely ``Polygon``. If ``'array'``, return the rectangle as an integer array of shape (4, 2) or (5, 2) (exterior coords, last point may repeat first).
+        :return: The minimum rotated rectangle as a ``Polygon`` or ``np.ndarray`` of corner coordinates, depending on ``return_type``.
+        :rtype: Polygon | np.ndarray
 
         :example:
         >>> polygon = GeometryMixin().bodyparts_to_polygon(np.array([[364, 308],[383, 323],[403, 335],[423, 351]]))
@@ -1168,9 +1171,10 @@ class GeometryMixin(object):
             shape = shape.buffer(distance=buffer)
         rotated_rectangle = shape.minimum_rotated_rectangle
         if isinstance(rotated_rectangle, Point):
-            return Polygon([(0, 0), (0, 0), (0, 0)])
-        else:
-            return rotated_rectangle
+            rotated_rectangle = Polygon([(0, 0), (0, 0), (0, 0)])
+        if return_type == 'array':
+            rotated_rectangle = np.round(np.array(rotated_rectangle.exterior.coords)).astype(np.int32)
+        return rotated_rectangle
 
     @staticmethod
     def length(shape: Union[LineString, MultiLineString],

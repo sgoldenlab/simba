@@ -60,10 +60,10 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         self.threshold_entry_box = Entry_Box(self.settings_frm, "BODY-PART PROBABILITY THRESHOLD:", labelwidth=35, value='0.0', justify='center', entry_box_width=20, img='green_dice', tooltip_key='ROI_TRACKING_PROBABILITY_THRESHOLD')
         self.show_pose_estimation_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW POSE-ESTIMATED LOCATIONS:', label_width=35, value='TRUE', command=self._disable_clr, img='pose', tooltip_key='ROI_TRACKING_SHOW_POSE')
         self.show_animal_name_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL NAMES:', label_width=35, value='FALSE', img='label', tooltip_key='ROI_TRACKING_SHOW_ANIMAL_NAMES')
-        self.show_bbox_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL BOUNDING BOXES:', label_width=35, value='FALSE', tooltip_key='SHOW_ANIMAL_BBOX', img='rectangle_2')
+        self.show_bbox_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['FALSE', Options.AXIS_ALIGNED.value, Options.ANIMAL_ALIGNED.value], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL BOUNDING BOXES:', label_width=35, value='FALSE', tooltip_key='SHOW_ANIMAL_BBOX', img='rectangle_2')
         self.border_bg_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(self.bg_clr_options.keys()), dropdown_width=self.longest_animal_name_len, label='BORDER BACKGROUND COLOR:', label_width=35, value='Black', tooltip_key='BORDER_BG_COLOR', img='fill')
         self.outside_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='OUTSIDE ROI ZONES DATA:', label_width=35, value='FALSE', tooltip_key='ROI_TRACKING_OUTSIDE_ROI', img='outside')
-        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), dropdown_width=self.longest_animal_name_len, label='NUMBER OF CPU CORES:', label_width=35, value=find_core_cnt()[1], img='cpu_small', tooltip_key='ROI_TRACKING_CPU_CORES')
+        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(2, self.cpu_cnt)), dropdown_width=self.longest_animal_name_len, label='NUMBER OF CPU CORES:', label_width=35, value=find_core_cnt()[1], img='cpu_small', tooltip_key='ROI_TRACKING_CPU_CORES')
         self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='USE GPU:', label_width=35, value='FALSE', state=gpu_state, img='gpu_3', tooltip_key='USE_GPU')
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
@@ -155,7 +155,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         check_float(name="Body-part probability threshold", value=self.threshold_entry_box.entry_get, min_value=0.0, max_value=1.0)
         show_pose = str_2_bool(self.show_pose_estimation_dropdown.get_value())
         show_names = str_2_bool(self.show_animal_name_dropdown.get_value())
-        show_bbox = str_2_bool(self.show_bbox_dropdown.get_value())
+        show_bbox = None if self.show_bbox_dropdown.get_value() == 'FALSE' else self.show_bbox_dropdown.get_value()
         gpu = str_2_bool(self.gpu_dropdown.get_value())
         core_cnt = int(self.core_cnt_dropdown.get_value())
         outside_roi = str_2_bool(self.outside_dropdown.get_value())
@@ -177,7 +177,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
                                          bp_colors=bp_clrs,
                                          bp_sizes=bp_sizes,
                                          outside_roi=outside_roi,
-                                         show_bbox=show_bbox,
+                                         show_bbox=False,
                                          border_bg_clr=border_bg_clr)
                 threading.Thread(target=roi_plotter.run()).start()
 
@@ -191,7 +191,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
                                                   bp_colors=bp_clrs,
                                                   bp_sizes=bp_sizes,
                                                   core_cnt=core_cnt,
-                                                  show_bbox=show_bbox,
+                                                  bbox=show_bbox,
                                                   gpu=gpu,
                                                   outside_roi=outside_roi,
                                                   border_bg_clr=border_bg_clr)

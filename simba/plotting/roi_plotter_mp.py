@@ -7,6 +7,10 @@ import os
 import platform
 import shutil
 from typing import Dict, List, Optional, Tuple, Union
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 
 import cv2
 import numpy as np
@@ -22,11 +26,11 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_rgb_tuple,
                                 check_int, check_nvidea_gpu_available,
                                 check_valid_boolean, check_valid_lst,
-                                check_video_and_data_frm_count_align)
+                                check_video_and_data_frm_count_align, check_str)
 from simba.utils.data import (create_color_palettes, detect_bouts,
                               get_cpu_pool, slice_roi_dict_for_video,
                               terminate_cpu_pool)
-from simba.utils.enums import ROI_SETTINGS, Formats, Keys, Paths, TextOptions
+from simba.utils.enums import ROI_SETTINGS, Formats, Keys, Paths, TextOptions, Options
 from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError,
                                 NoFilesFoundError, NoROIDataError,
                                 ROICoordinatesNotFoundError)
@@ -60,7 +64,7 @@ def _roi_plotter_mp(data: Tuple[int, pd.DataFrame],
                     verbose: bool,
                     border_bg_clr: tuple,
                     animal_bp_dict: dict,
-                    show_bbox: bool):
+                    bbox: Optional[str]):
 
     def __insert_texts(roi_dict, img):
         for animal_name in animal_ids:
@@ -99,15 +103,17 @@ def _roi_plotter_mp(data: Tuple[int, pd.DataFrame],
                             img = cv2.circle(img, (x, y), circle_sizes[animal_cnt], bp_colors[animal_cnt], -1)
                         if show_animal_name:
                             img = cv2.putText(img, animal_name, (x, y), TextOptions.FONT.value, font_size, bp_colors[animal_cnt], TextOptions.TEXT_THICKNESS.value)
-                        if show_bbox:
+                        if bbox is not None:
                             x_cols, y_cols = animal_bp_dict[animal_name]['X_bps'], animal_bp_dict[animal_name]['Y_bps']
                             animal_cols = [x for pair in zip(x_cols, y_cols) for x in pair]
                             animal_cords = data_df.loc[current_frm, animal_cols].fillna(0.0).values.astype(np.int32).reshape(-1, 2)
                             try:
-                                bbox = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=animal_cords.reshape(-1, len(animal_cords), 2).astype(np.int32))
-                                img = cv2.polylines(img, [bbox], True, bp_colors[animal_cnt], thickness=circle_sizes[animal_cnt], lineType=cv2.LINE_AA)
+                                if bbox == Options.AXIS_ALIGNED.value:
+                                    animal_bbox = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=animal_cords.reshape(-1, len(animal_cords), 2).astype(np.int32))
+                                else:
+                                    animal_bbox = GeometryMixin().minimum_rotated_rectangle(shape=animal_cords, buffer=None, return_type='array')
+                                img = cv2.polylines(img, [animal_bbox], True, bp_colors[animal_cnt], thickness=circle_sizes[animal_cnt], lineType=cv2.LINE_AA)
                             except Exception as e:
-                                # print(e.args)
                                 pass
                 for shape_name in video_shape_names:
                     shape_color = TextOptions.WHITE.value if shape_name == ROI_SETTINGS.OUTSIDE_ROI.value else roi_dict[shape_name]["Color BGR"]
@@ -190,7 +196,7 @@ class ROIPlotMultiprocess(ConfigReader):
                  outside_roi: bool = False,
                  show_body_part: bool = True,
                  show_animal_name: bool = False,
-                 show_bbox: bool = False,
+                 bbox: Optional[Literal['axis-aligned', 'animal-aligned']] = None,
                  border_bg_clr: Tuple[int, int, int] = (0, 0, 0),
                  data_path: Optional[Union[str, os.PathLike]] = None,
                  save_path: Optional[Union[str, os.PathLike]] = None,
@@ -210,7 +216,11 @@ class ROIPlotMultiprocess(ConfigReader):
         check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
         check_valid_boolean(value=show_body_part, source=f'{self.__class__.__name__} show_body_part', raise_error=True)
         check_valid_boolean(value=show_animal_name, source=f'{self.__class__.__name__} show_animal_name', raise_error=True)
-        check_valid_boolean(value=show_bbox, source=f'{self.__class__.__name__} show_bbox', raise_error=True)
+        if bbox is not None:
+            check_str(name=f'{self.__class__.__name__} bbox', value=bbox, options=Options.BBOX_OPTIONS.value, allow_blank=False, raise_error=True)
+
+
+
         if gpu and not check_nvidea_gpu_available():
             GPUToolsWarning(msg='GPU not detected but GPU set to True - skipping GPU use.')
             gpu = False
@@ -263,7 +273,7 @@ class ROIPlotMultiprocess(ConfigReader):
         check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.video_name, raise_error=False)
         self.cap = cv2.VideoCapture(self.video_path)
         self.threshold, self.body_parts, self.show_animal_name, self.gpu, self.outside_roi, self.verbose, self.border_bg_clr = threshold, body_parts, show_animal_name, gpu, outside_roi, verbose, border_bg_clr
-        self.show_pose, self.show_bbox = show_body_part, show_bbox
+        self.show_pose, self.bbox = show_body_part, bbox
         self.roi_dict_ = get_roi_dict_from_dfs(rectangle_df=self.sliced_roi_dict[Keys.ROI_RECTANGLES.value], circle_df=self.sliced_roi_dict[Keys.ROI_CIRCLES.value], polygon_df=self.sliced_roi_dict[Keys.ROI_POLYGONS.value])
         self.temp_folder = os.path.join(os.path.dirname(self.save_path), self.video_name, "temp")
         if os.path.exists(self.temp_folder): shutil.rmtree(self.temp_folder)
@@ -387,7 +397,7 @@ class ROIPlotMultiprocess(ConfigReader):
                                       verbose=self.verbose,
                                       border_bg_clr=self.border_bg_clr,
                                       animal_bp_dict=self.animal_bp_dict,
-                                      show_bbox=self.show_bbox)
+                                      bbox=self.bbox)
 
         for cnt, batch_cnt in enumerate(self.pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
             if self.verbose: stdout_information(msg=f'Image batch {batch_cnt+1} / {self.core_cnt} complete...')
