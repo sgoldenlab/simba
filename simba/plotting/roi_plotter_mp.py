@@ -7,6 +7,7 @@ import os
 import platform
 import shutil
 from typing import Dict, List, Optional, Tuple, Union
+
 try:
     from typing import Literal
 except:
@@ -25,12 +26,14 @@ from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_rgb_tuple,
                                 check_int, check_nvidea_gpu_available,
-                                check_valid_boolean, check_valid_lst,
-                                check_video_and_data_frm_count_align, check_str)
+                                check_str, check_valid_boolean,
+                                check_valid_lst,
+                                check_video_and_data_frm_count_align)
 from simba.utils.data import (create_color_palettes, detect_bouts,
                               get_cpu_pool, slice_roi_dict_for_video,
                               terminate_cpu_pool)
-from simba.utils.enums import ROI_SETTINGS, Formats, Keys, Paths, TextOptions, Options
+from simba.utils.enums import (ROI_SETTINGS, Formats, Keys, Options, Paths,
+                               TextOptions)
 from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError,
                                 NoFilesFoundError, NoROIDataError,
                                 ROICoordinatesNotFoundError)
