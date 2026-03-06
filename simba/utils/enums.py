@@ -467,7 +467,9 @@ class Options(Enum):
                  cv2.FONT_HERSHEY_SCRIPT_COMPLEX]
 
     VALID_YOLO_FORMATS = ["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite", "torch"]
-
+    AXIS_ALIGNED = 'axis-aligned'
+    ANIMAL_ALIGNED = 'animal-aligned'
+    BBOX_OPTIONS = ['axis-aligned', 'animal-aligned']
 
 class TextOptions(Enum):
     FIRST_LINE_SPACING = (
@@ -495,6 +497,7 @@ class TextOptions(Enum):
 
     FONT = cv2.FONT_HERSHEY_SIMPLEX
     WHITE = (255, 255, 255)
+
 
 class Defaults(Enum):
     MAX_TASK_PER_CHILD = 10

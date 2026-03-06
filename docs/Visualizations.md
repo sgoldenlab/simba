@@ -156,7 +156,7 @@ The pop-up offers the following options:
 | **USE GPU** | If TRUE and a compatible NVIDIA GPU is available, use it to speed up video creation. Disabled if no compatible GPU is detected. |
 | **SHOW GANTT PLOT** | **NO GANTT** = no bar chart. **Static Gantt (final frame, faster)** = one bar chart at the end. **Dynamic Gantt (updated per frame)** = bar chart updates as the video plays. |
 | **SHOW TRACKING (POSE)** | If checked, draws tracked body parts (dots and skeleton) on the video. |
-| **SHOW ANIMAL BOUNDING BOXES** | If checked, draws a box around each animal. Helps see location and overlap. |
+| **SHOW ANIMAL BOUNDING BOXES** | **FALSE** = no bounding box. **axis-aligned** = axis-aligned bounding box (aligned with video axes). **animal-aligned** = minimum rotated rectangle that aligns with the animal's orientation. Helps see location and overlap. |
 | **SHOW CLASSIFICATION PROBABILITY** | If checked, displays the model's confidence (0–100%) for the predicted behavior on each frame. |
 | **SHOW ANIMAL NAME(S)** | If checked, displays labels like "Animal_1" so you can tell animals apart. |
 | **CREATE VIDEO** | If checked, generates an .mp4 with behavior labels and optional overlays. |

@@ -456,7 +456,7 @@ The **Visualize classifications** dialog offers the following options:
 | **ROTATE VIDEO 90°** | If checked, rotates the output 90°. Use for portrait (vertical) recordings. |
 | **SHOW TRACKING (POSE)** | If checked, draws tracked body parts (dots and skeleton) on the video. |
 | **SHOW ANIMAL NAME(S)** | If checked, displays labels like "Animal_1" so you can tell animals apart. |
-| **SHOW ANIMAL BOUNDING BOXES** | If checked, draws a box around each animal. Helps see location and overlap. |
+| **SHOW ANIMAL BOUNDING BOXES** | **FALSE** = no bounding box. **axis-aligned** = axis-aligned bounding box (aligned with video axes). **animal-aligned** = minimum rotated rectangle that aligns with the animal's orientation. Helps see location and overlap. |
 | **SHOW CLASSIFICATION PROBABILITY** | If checked, displays the model's confidence (0–100%) for the predicted behavior on each frame. |
 | **VIDEO** (Single Video) | Dropdown to select which video to create when using <kbd>Create single video</kbd>. You can also browse to pick a video file directly. |
 

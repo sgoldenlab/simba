@@ -94,6 +94,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.multiprocess_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(2, self.cpu_cnt+1)), label='CPU CORES: ', label_width=40, dropdown_width=30, value=int(self.cpu_cnt/2), img='cpu_small', tooltip_key='CLF_PLOT_CPU_CORES')
         self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ', label_width=40, dropdown_width=30, value='FALSE', state=DISABLED if not gpu_available else NORMAL, img='gpu_3', tooltip_key='CLF_PLOT_USE_GPU')
         self.gantt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(GANTT_OPTIONS.keys()), label='SHOW GANTT PLOT:', label_width=40, dropdown_width=30, value=list(GANTT_OPTIONS.keys())[0], img='gantt_small', tooltip_key='CLF_PLOT_GANTT')
+        self.bbox_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['FALSE', Options.AXIS_ALIGNED.value, Options.ANIMAL_ALIGNED.value], label='SHOW ANIMAL BOUNDING BOXES:', label_width=40, dropdown_width=30, value='FALSE', img='gantt_small', tooltip_key='CLF_PLOT_SHOW_BBOX')
 
         self.create_videos_cb, self.create_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEO', font=Formats.FONT_REGULAR.value, txt_img='video', val=True, tooltip_key='CLF_PLOT_CREATE_VIDEO')
         self.create_frames_cb, self.create_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', font=Formats.FONT_REGULAR.value, txt_img='frames', val=False, tooltip_key='CLF_PLOT_CREATE_FRAMES')
@@ -101,15 +102,14 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.rotate_cb, self.rotate_img_var = SimbaCheckbox(parent=self.settings_frm, txt="ROTATE VIDEO 90°", font=Formats.FONT_REGULAR.value, txt_img='rotate', val=False, tooltip_key='CLF_PLOT_ROTATE_VIDEO')
         self.show_pose_cb, self.show_pose_var = SimbaCheckbox(parent=self.settings_frm, txt="SHOW TRACKING (POSE)", font=Formats.FONT_REGULAR.value, txt_img='pose', val=True, tooltip_key='CLF_PLOT_SHOW_POSE')
         self.show_animal_names_cb, self.show_animal_names_var = SimbaCheckbox(parent=self.settings_frm, txt="SHOW ANIMAL NAME(S)", font=Formats.FONT_REGULAR.value, txt_img='label', val=False, tooltip_key='CLF_PLOT_SHOW_ANIMAL_NAMES')
-        self.show_bboxes_cb, self.show_bboxes_var = SimbaCheckbox(parent=self.settings_frm, txt="SHOW ANIMAL BOUNDING BOXES", font=Formats.FONT_REGULAR.value, txt_img='rectangle_2', val=False, tooltip_key='CLF_PLOT_SHOW_BBOX')
         self.conf_cb, self.conf_var = SimbaCheckbox(parent=self.settings_frm, txt="SHOW CLASSIFICATION PROBABILITY", font=Formats.FONT_REGULAR.value, txt_img='probability', val=False, tooltip_key='CLF_PLOT_SHOW_PROBABILITY')
 
         self.settings_frm.grid(row=3, column=0,  sticky=NW)
         self.multiprocess_dropdown.grid(row=0, column=0, sticky=NW)
         self.gpu_dropdown.grid(row=1, column=0, sticky=NW)
         self.gantt_dropdown.grid(row=2, column=0, sticky=NW)
-        self.show_pose_cb.grid(row=3, column=0, sticky=NW)
-        self.show_bboxes_cb.grid(row=4, column=0, sticky=NW)
+        self.bbox_dropdown.grid(row=3, column=0, sticky=NW)
+        self.show_pose_cb.grid(row=4, column=0, sticky=NW)
         self.conf_cb.grid(row=5, column=0, sticky=NW)
         self.show_animal_names_cb.grid(row=6, column=0, sticky=NW)
         self.create_videos_cb.grid(row=7, column=0,  sticky=NW)
@@ -162,7 +162,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         text_clr = self.clr_dict[self.text_clr_dropdown.get_value()]
         text_bg_clr = self.clr_dict[self.bg_clr_dropdown.get_value()]
         pose_palette = self.tracking_clr_palette_dropdown.get_value()
-        bbox = self.show_bboxes_var.get()
+        bbox = None if self.bbox_dropdown.get_value() == 'FALSE' else self.bbox_dropdown.get_value()
         show_confidence = self.conf_var.get()
         gantt = GANTT_OPTIONS[self.gantt_dropdown.get_value()]
         show_pose, show_animal_names = self.show_pose_var.get(), self.show_animal_names_var.get()
@@ -204,7 +204,6 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
                                                    text_bg_clr=text_bg_clr,
                                                    show_confidence=show_confidence,
                                                    pose_palette=pose_palette,
-                                                   show_bbox=bbox,
                                                    show_gantt=gantt)
 
         else:
@@ -228,10 +227,12 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
                                                      text_bg_clr=text_bg_clr,
                                                      gpu=gpu,
                                                      pose_palette=pose_palette,
-                                                     show_bbox=bbox,
+                                                     bbox=bbox,
                                                      show_gantt=gantt)
 
         plotter.run()
 
 #_ = SklearnVisualizationPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 #_ = SklearnVisualizationPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+
+#_ = SklearnVisualizationPopUp(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/project_config.ini")
