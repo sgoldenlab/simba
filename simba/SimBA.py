@@ -75,6 +75,7 @@ from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
     AddClfPopUp, PrintModelInfoPopUp, RemoveAClassifierPopUp)
 from simba.ui.pop_ups.clf_annotation_counts_pop_up import \
     ClfAnnotationCountPopUp
+from simba.ui.pop_ups.ez_path_plot_popup import EzPathPlotPopUp
 from simba.ui.pop_ups.clf_by_roi_pop_up import ClfByROIPopUp
 from simba.ui.pop_ups.clf_by_timebins_pop_up import TimeBinsClfPopUp
 from simba.ui.pop_ups.clf_descriptive_statistics_pop_up import \
@@ -392,7 +393,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         analyze_distances_velocity_btn = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE MOVEMENT / VELOCITY: AGGREGATES", img='metrics_green', txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=MovementAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         analyze_distances_velocity_timebins_btn = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE MOVEMENT / VELOCITY: TIME-BINS", img='metrics_blue', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=MovementAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         heatmaps_location_button = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="CREATE LOCATION HEATMAPS", txt_clr='red', img='heatmap', font=Formats.FONT_REGULAR.value, cmd=HeatmapLocationPopup, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_lineplot = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="CREATE PATH PLOTS", txt_clr='orange', img='path', font=Formats.FONT_REGULAR.value, cmd=QuickLineplotPopup, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_lineplot = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="CREATE PATH PLOTS", txt_clr='orange', img='path', font=Formats.FONT_REGULAR.value, cmd=EzPathPlotPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
         button_analyzeDirection = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE DIRECTIONALITY BETWEEN ANIMALS", img='direction', txt_clr='deeppink', font=Formats.FONT_REGULAR.value, cmd=AnimalDirectingAnimalPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         button_visualizeDirection = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="VISUALIZE DIRECTIONALITY BETWEEN ANIMALS", img='direction', txt_clr='brown', font=Formats.FONT_REGULAR.value, cmd=DirectingOtherAnimalsVisualizerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})

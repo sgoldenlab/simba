@@ -151,16 +151,16 @@ class ROI_ui(ROI_mixin, ConfigReader):
 #       video_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4.mp4",
 #       pose_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/2022-06-20_NOB_DOT_4.csv')
 
-
+#
 # ROI_ui(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/project_config.ini',
 #       video_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/videos/raw_clip1.mp4",
 #       pose_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/csv/outlier_corrected_movement_location/raw_clip1.csv')
-#
+
 
 # ROI_ui(config_path=r"C:\troubleshooting\open_field_below\project_folder\project_config.ini",
 #       video_path=r"C:\troubleshooting\open_field_below\project_folder\videos\raw_clip1.mp4",
 #       pose_path=r"C:\troubleshooting\open_field_below\project_folder\csv\outlier_corrected_movement_location\raw_clip1.csv")
-#
+
 #
 # ROI_ui(config_path=r"C:\troubleshooting\open_field_below\project_folder\project_config.ini",
 #        video_path=r"C:\troubleshooting\open_field_below\project_folder\videos\raw_clip1.mp4")

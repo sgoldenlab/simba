@@ -374,6 +374,9 @@ class FolderSelect(Frame):
     def folder_path(self):
         return self.folderPath.get()
 
+    def set_folder_path(self, folder_path):
+        self.folderPath.set(folder_path)
+        self.entPath.configure(width=len(folder_path) + 10)
 
 class ToolTip(object):
 

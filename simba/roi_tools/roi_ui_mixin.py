@@ -593,8 +593,6 @@ class ROI_mixin(ConfigReader):
         self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
 
 
-
-
     def change_img(self, stride: Union[int, str]):
         custom_s, new_frm_idx = self.custom_seconds_entry.entry_get.strip(), None
         if isinstance(stride, int):

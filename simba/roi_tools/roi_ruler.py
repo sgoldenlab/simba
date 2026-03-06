@@ -56,8 +56,10 @@ class ROIRuler(object):
         check_float(name=f'{self.__class__.__name__} img_scale_factor', value=img_scale_factor, allow_negative=False, allow_zero=False, raise_error=True)
         check_int(name=f'{self.__class__.__name__} tolerance', value=tolerance, min_value=1)
         #if info_label is not None: check_instance(source=f'{self.__class__.__name__} info_label', instance=info_label, accepted_types=type(SimBALabel), raise_error=True, warning=False)
-        if clr is not None: check_if_valid_rgb_tuple(data=clr, raise_error=True, source=f'{self.__class__.__name__} clr')
-        else: clr = (0, 255, 255)
+        if clr is not None:
+            check_if_valid_rgb_tuple(data=clr, raise_error=True, source=f'{self.__class__.__name__} clr')
+        else:
+            clr = (0, 255, 255)
         if second_clr is not None: check_if_valid_rgb_tuple(data=second_clr, raise_error=True, source=f'{self.__class__.__name__} second_clr')
         self.thickness, self.clr, self.img_window = thickness, clr, img_window
         self.drawing, self.clr, self.thickness, self.second_thickness, self.tolerance = False, clr, thickness, second_thickness, tolerance
@@ -160,7 +162,18 @@ class ROIRuler(object):
         else: self.length_mm = None
         self.got_attributes = True
         if self.info_lbl is not None:
-            self.info_lbl.configure(text=f'RULER LENGTH: {self.length_mm} mm, {self.length_px} pixels (original), {self.length_px_display} pixels (display) (Conversion factor: {self.px_per_mm}, Scale: {self.img_scale_factor})', fg='blue')
+            scale_pct = round(100 * self.img_scale_factor)
+            if self.length_mm is not None:
+                line1 = f'Real world: {self.length_mm} mm  |  Video: {self.length_px} px  |  On-screen: {self.length_px_display} px'
+            else:
+                line1 = f'Video: {self.length_px} px  |  On-screen: {self.length_px_display} px'
+            line2_parts = [f'ROI sizes and positions use full-frame coordinates (the Video value above)', f'Image at {scale_pct}% of video size']
+            if self.px_per_mm is not None:
+                line2_parts.append(f'px/mm = {self.px_per_mm}')
+            else:
+                line2_parts.append('no mm conversion set')
+            line2 = '  •  '.join(line2_parts)
+            self.info_lbl.configure(text=f'{line1}\n{line2}', fg='blue')
             self.info_lbl.update_idletasks()
 
 

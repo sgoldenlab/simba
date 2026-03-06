@@ -2345,7 +2345,7 @@ class PlottingMixin(object):
 
         if smoothing_time is not None:
             check_int(name=f"{PlottingMixin.get_path_img.__name__} smoothing_time", value=smoothing_time, min_value=1)
-            data = savgol_smoother(data=data, fps=1, time_window=smoothing_time, source=PlottingMixin.get_path_img.__name__.__name__)
+            data = savgol_smoother(data=data, fps=1, time_window=smoothing_time, source=PlottingMixin.get_path_img.__name__)
         x, y = data[:, 0], data[:, 1]
 
         if isinstance(bg_clr, np.ndarray):
@@ -2403,9 +2403,9 @@ class PlottingMixin(object):
 
         if save_path is not None:
             if isinstance(bg_clr, np.ndarray):
-                facecolor = (bg_clr[0] / 255.0, bg_clr[1] / 255.0, bg_clr[2] / 255.0)
+                facecolor = (1.0, 1.0, 1.0)
             else:
-                facecolor = 'white'
+                facecolor = (bg_clr[0] / 255.0, bg_clr[1] / 255.0, bg_clr[2] / 255.0)
             fig.savefig(save_path, dpi=dpi, bbox_inches='tight', pad_inches=0, format='svg' if svg else 'png', facecolor=facecolor)
             plt.close(fig)
             return None
