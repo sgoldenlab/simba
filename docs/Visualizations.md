@@ -488,6 +488,9 @@ Creates videos with ROI shapes overlaid on each frame, plus **counters** showing
 
 [outside_roi_example.webm](https://github.com/user-attachments/assets/6174e057-2476-498e-8e5b-2de1390acd8f)
 
+![animal_axis_aligned_bbox_roi](https://github.com/user-attachments/assets/c9f55de3-3b45-4f54-a77e-7e5cdafc5907)
+
+
 *Outside ROI zones data (treats areas not covered by an ROI as one additional zone).*
 
 ---
