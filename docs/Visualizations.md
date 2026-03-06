@@ -172,6 +172,9 @@ The pop-up offers the following options:
 
 [sklearn_visualization_2.webm](https://github.com/user-attachments/assets/a65c89ed-37ae-423d-a0b2-e470b55c7f15)
 
+![animal_vs_axis_aligned](https://github.com/user-attachments/assets/1036ef33-a365-4f7c-a252-bc77bdefd5b8)
+
+
 
 ---
 
