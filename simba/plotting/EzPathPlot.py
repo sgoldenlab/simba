@@ -2,21 +2,28 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import os
-from typing import Optional, Tuple, Union, List
+from typing import List, Optional, Tuple, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
 from copy import deepcopy
+
 import numpy as np
-from simba.utils.checks import (check_file_exist_and_readable, check_that_column_exist,
-                                check_if_dir_exists, check_if_valid_rgb_tuple,
-                                check_int, check_valid_tuple, check_str,
-                                check_float, check_valid_boolean, check_instance)
-from simba.utils.printing import stdout_success, stdout_information
-from simba.utils.read_write import (get_fn_ext, find_files_of_filetypes_in_directory, read_df, find_video_of_file, read_frm_of_video)
+
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists, check_if_valid_rgb_tuple,
+                                check_instance, check_int, check_str,
+                                check_that_column_exist, check_valid_boolean,
+                                check_valid_tuple)
 from simba.utils.errors import InvalidInputError
+from simba.utils.printing import stdout_information, stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    find_video_of_file, get_fn_ext, read_df,
+                                    read_frm_of_video)
 from simba.utils.warnings import VideoFileWarning
 
 H5 = ".h5"

@@ -75,7 +75,6 @@ from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
     AddClfPopUp, PrintModelInfoPopUp, RemoveAClassifierPopUp)
 from simba.ui.pop_ups.clf_annotation_counts_pop_up import \
     ClfAnnotationCountPopUp
-from simba.ui.pop_ups.ez_path_plot_popup import EzPathPlotPopUp
 from simba.ui.pop_ups.clf_by_roi_pop_up import ClfByROIPopUp
 from simba.ui.pop_ups.clf_by_timebins_pop_up import TimeBinsClfPopUp
 from simba.ui.pop_ups.clf_descriptive_statistics_pop_up import \
@@ -109,6 +108,7 @@ from simba.ui.pop_ups.dlc_to_yolo_keypoints_popup import DLCYoloKeypointsPopUp
 from simba.ui.pop_ups.egocentric_alignment_pop_up import EgocentricAlignPopUp
 from simba.ui.pop_ups.extract_annotation_frames_pop_up import \
     ExtractAnnotationFramesPopUp
+from simba.ui.pop_ups.ez_path_plot_popup import EzPathPlotPopUp
 from simba.ui.pop_ups.fsttc_pop_up import FSTTCPopUp
 from simba.ui.pop_ups.gantt_pop_up import GanttPlotPopUp
 from simba.ui.pop_ups.heatmap_clf_pop_up import HeatmapClfPopUp

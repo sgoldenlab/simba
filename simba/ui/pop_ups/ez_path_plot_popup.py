@@ -1,18 +1,21 @@
 import os
+from copy import deepcopy
 from tkinter import *
 from typing import Union
-from copy import deepcopy
+
 import numpy as np
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.EzPathPlot import EzPathPlot
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
-                                        SimBADropDown, SimBALabel, FolderSelect)
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FolderSelect,
+                                        SimBADropDown, SimBALabel)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
 from simba.utils.errors import NoFilesFoundError
 from simba.utils.lookups import get_color_dict
-from simba.utils.read_write import get_fn_ext, read_video_info, str_2_bool, bgr_to_rgb_tuple, get_desktop_path
-
+from simba.utils.read_write import (bgr_to_rgb_tuple, get_desktop_path,
+                                    get_fn_ext, read_video_info, str_2_bool)
 
 TIME, VELOCITY = 'TIME', 'VELOCITY'
 VIDEO = 'VIDEO'
