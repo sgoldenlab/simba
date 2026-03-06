@@ -468,6 +468,9 @@ The **Visualize classifications** dialog offers the following options:
 
 [sklearn_visualization_2.webm](https://github.com/user-attachments/assets/63acd686-7c56-4552-8850-3051f10d530b)
 
+![animal_vs_axis_aligned](https://github.com/user-attachments/assets/e961484f-1da4-4c50-bc67-87079e339553)
+
+
 ### VISUALIZE GANTT CHARTS
 
 Gantt charts are horizontal bar charts: one row per classifier, with bars indicating when each behavior occurred and for how long. Use Gantt charts to compare timing and duration across behaviors or videos. They can be static (one image for the whole video) or dynamic (a video where the chart updates over time). SimBA reads classifier data from the `project_folder/csv/machine_results/` directory. 
