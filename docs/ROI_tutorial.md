@@ -222,6 +222,10 @@ Use **CREATE SINGLE ROI VIDEO** for one video or **CREATE ALL ROI VIDEOS** to pr
 
 [ROI_OF.webm](https://github.com/user-attachments/assets/43dd9017-9621-4d15-a1a7-6b1845774858)
 
+![animal_axis_aligned_bbox_roi](https://github.com/user-attachments/assets/e7e8e9fe-cf5b-424f-8870-1e1b4ef8bc78)
+
+
+
 
 ---
 
