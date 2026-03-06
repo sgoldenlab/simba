@@ -18,20 +18,25 @@ import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
-from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.geometry_mixin import GeometryMixin
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.roi_tools.ROI_feature_analyzer import ROIFeatureCreator
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_valid_rgb_tuple, check_int, check_str,
-                                check_valid_boolean, check_valid_lst,
-                                check_video_and_data_frm_count_align, check_valid_dict,
                                 check_if_string_value_is_valid_video_timestamp,
-                                check_that_hhmmss_start_is_before_end)
-from simba.utils.data import slice_roi_dict_for_video, terminate_cpu_pool, get_cpu_pool, find_frame_numbers_from_time_stamp
-from simba.utils.enums import Formats, TextOptions, Options
+                                check_if_valid_rgb_tuple, check_int, check_str,
+                                check_that_hhmmss_start_is_before_end,
+                                check_valid_boolean, check_valid_dict,
+                                check_valid_lst,
+                                check_video_and_data_frm_count_align)
+from simba.utils.data import (find_frame_numbers_from_time_stamp, get_cpu_pool,
+                              slice_roi_dict_for_video, terminate_cpu_pool)
+from simba.utils.enums import Formats, Options, TextOptions
 from simba.utils.errors import BodypartColumnNotFoundError, NoFilesFoundError
 from simba.utils.printing import stdout_information, stdout_success
-from simba.utils.read_write import (seconds_to_timestamp, concatenate_videos_in_folder, find_core_cnt, get_fn_ext, get_video_meta_data, read_df, remove_a_folder)
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt, get_fn_ext,
+                                    get_video_meta_data, read_df,
+                                    remove_a_folder, seconds_to_timestamp)
 from simba.utils.warnings import DuplicateNamesWarning
 
 START_TIME, END_TIME = 'start_time', 'end_time'
