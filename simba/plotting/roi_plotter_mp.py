@@ -96,7 +96,7 @@ def _roi_plotter_mp(data: Tuple[int, pd.DataFrame],
             img = __insert_texts(roi_dict, img)
             img = PlottingMixin.roi_dict_onto_img(img=img, roi_dict=roi_dfs_dict)
             for animal_cnt, animal_name in enumerate(animal_ids):
-                if show_animal_name or show_pose:
+                if show_animal_name or show_pose or bbox is not None:
                     x, y, p = (data_df.loc[current_frm, body_part_dict[animal_name]].fillna(0.0).values.astype(np.int32))
                     if threshold <= p:
                         if show_pose:
@@ -169,6 +169,7 @@ class ROIPlotMultiprocess(ConfigReader):
     :param bool outside_roi: If True, SimBA will treat all areas NOT covered by a ROI drawing as a single additional ROI and visualize the stats for this single ROI. Default: False.
     :param bool show_body_part: If True, display body-part locations as circles on the video frames. Default: True.
     :param bool show_animal_name: If True, display animal names on the video frames. Default: False.
+    :param Optional[Literal['axis-aligned', 'animal-aligned']] bbox: If not None, draw bounding boxes around each animal. ``'axis-aligned'`` = rectangle aligned with video axes; ``'animal-aligned'`` = minimum rotated rectangle aligned with the animal's orientation. Default: None (no bounding boxes).
     :param Tuple[int, int, int] border_bg_clr: RGB tuple representing the background color of the border area where statistics are displayed. Default: (0, 0, 0).
     :param Optional[Union[str, os.PathLike]] data_path: Optional path to the pose-estimation data. If None, then locates file in ``outlier_corrected_movement_location`` directory. Default: None.
     :param Optional[Union[str, os.PathLike]] save_path: Optional path to where to save video. If None, then saves it in ``frames/output/roi_analysis`` directory of SimBA project. Default: None.

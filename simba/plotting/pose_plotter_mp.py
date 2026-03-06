@@ -89,19 +89,25 @@ def pose_plotter_mp(data: pd.DataFrame,
 
 class PosePlotterMultiProcess():
     """
-    Create pose-estimation visualizations from data within a SimBA project folder.
+    Create pose-estimation visualizations from data within a SimBA project folder using multiprocessing.
 
-    :param str in_directory: Path to SimBA project directory containing pose-estimation data in parquet or CSV format.
-    :param str out_directory: Directory to where to save the pose-estimation videos.
-    :param int Size of the circles denoting the location of the pose-estimated body-parts.
-    :param Optional[dict] clr_attr: Python dict where animals are keys and color attributes values. E.g., {'Animal_1':  (255, 107, 198)}. If None, random palettes will be used.
+    :param Union[str, os.PathLike] data_path: Path to a SimBA project directory containing pose-estimation data (parquet or CSV), or path to a single pose file. Must be under ``project_folder/csv/`` so that ``project_config.ini`` can be located.
+    :param Optional[Union[str, os.PathLike]] out_dir: Directory where pose-estimation videos are saved. If None, saves to a new folder under the input data directory. Default None.
+    :param Optional[Dict[str, str]] palettes: Dict mapping animal names to color palette names (e.g. ``{'Animal_1': 'Set1', 'Animal_2': 'Pastel1'}``). Must have one entry per animal. If None, uses project default body-part colors. Default None.
+    :param Optional[int] circle_size: Radius of circles drawn at each body-part location. If None, auto-computed from video resolution. Default None.
+    :param Optional[int] core_cnt: Number of CPU cores for multiprocessing. -1 uses all available cores. Default -1.
+    :param Optional[bool] gpu: If True, use GPU for video concatenation when available. Default False.
+    :param Optional[Literal['axis-aligned', 'animal-aligned']] bbox: If not None, draw bounding boxes around each animal. ``'axis-aligned'`` = rectangle aligned with video axes; ``'animal-aligned'`` = minimum rotated rectangle aligned with the animal's orientation. Default None (no bounding boxes).
+    :param Optional[Tuple[int, int, int]] center_of_mass: If not None, RGB tuple (e.g. (255, 0, 0)) for drawing a center-of-mass dot per animal. Default None (no center of mass).
+    :param Optional[int] sample_time: If not None, render only the first N seconds of each video (N = this value). Useful for quick previews. Default None (full video).
+    :param bool verbose: If True, print progress messages during video creation. Default True.
 
     .. image:: _static/img/pose_plotter.png
        :width: 600
        :align: center
 
     :example:
-    >>> test = PosePlotterMultiProcess(in_dir='project_folder/csv/input_csv', out_dir='/project_folder/test_viz', circle_size=10, core_cnt=1, color_settings={'Animal_1':  'Green', 'Animal_2':  'Red'})
+    >>> test = PosePlotterMultiProcess(data_path='project_folder/csv/outlier_corrected_movement_location', out_dir='/project_folder/test_viz', circle_size=10, core_cnt=1, palettes={'Animal_1': 'Set1', 'Animal_2': 'Pastel1'})
     >>> test.run()
     """
 

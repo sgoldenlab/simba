@@ -14,7 +14,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         SimbaButton, SimbaCheckbox,
                                         SimBADropDown, SimBALabel)
 from simba.utils.checks import check_float, check_nvidea_gpu_available
-from simba.utils.enums import Formats, Links
+from simba.utils.enums import Formats, Links, Options
 from simba.utils.errors import NoFilesFoundError, NoROIDataError
 from simba.utils.read_write import find_all_videos_in_directory, str_2_bool
 
@@ -62,6 +62,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
         self.show_roi_centers_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ROI CENTERS:', label_width=25, dropdown_width=15, value='TRUE', img='bullseye', tooltip_key='ROI_FEATURES_SHOW_ROI_CENTERS')
         self.show_roi_eartags_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ROI EAR TAGS:', label_width=25, dropdown_width=15, value='TRUE', img='ear_small', tooltip_key='ROI_FEATURES_SHOW_ROI_EARTAGS')
         self.show_animal_names_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ANIMAL NAMES:', label_width=25, dropdown_width=15, value='FALSE', img='id_card', tooltip_key='ROI_TRACKING_SHOW_ANIMAL_NAMES')
+        self.bbox_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['FALSE', Options.AXIS_ALIGNED.value, Options.ANIMAL_ALIGNED.value], label='SHOW ANIMAL BOUNDING BOXES:', label_width=25, dropdown_width=15, value='FALSE', img='rectangle', tooltip_key='CLF_PLOT_SHOW_BBOX')
         self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=25, dropdown_width=15, value='FALSE', state=self.gpu_available, img='gpu_3', tooltip_key='USE_GPU')
         self.cpu_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(2, self.cpu_cnt+1)), label='CPU CORES: ', label_width=25, dropdown_width=15, value=int(self.cpu_cnt/2), img='cpu_small', tooltip_key='ROI_TRACKING_CPU_CORES')
         self.settings_frm.grid(row=1, column=0, sticky=NW)
@@ -71,7 +72,8 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
         self.show_roi_centers_dropdown.grid(row=3, column=0, sticky=NW)
         self.show_roi_eartags_dropdown.grid(row=4, column=0, sticky=NW)
         self.show_animal_names_dropdown.grid(row=5, column=0, sticky=NW)
-        self.cpu_cnt_dropdown.grid(row=6, column=0, sticky=NW)
+        self.bbox_dropdown.grid(row=6, column=0, sticky=NW)
+        self.cpu_cnt_dropdown.grid(row=7, column=0, sticky=NW)
 
         self.body_parts_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PARTS", icon_name='pose', icon_link=Links.ROI_FEATURES_PLOT.value)
         self.animal_cnt_dropdown = SimBADropDown(parent=self.body_parts_frm, dropdown_options=list(range(1, self.animal_cnt + 1)), label='NUMBER OF ANIMALS:', label_width=25, dropdown_width=15, value=1, command=self.__populate_bp_dropdown, img='abacus', tooltip_key='ROI_TRACKING_NUMBER_OF_ANIMALS')
@@ -116,6 +118,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
         border_clr = self.colors_dict[self.border_clr_dropdown.getChoices()]
         show_animal_names = str_2_bool(self.show_animal_names_dropdown.get_value())
         show_pose = str_2_bool(self.show_pose_dropdown.get_value())
+        bbox = None if self.bbox_dropdown.get_value() == 'FALSE' else self.bbox_dropdown.get_value()
 
         if multiple:
             video_paths = [v for k, v in self.video_file_paths.items()]
@@ -132,6 +135,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
                                                                           show_animal_names=show_animal_names,
                                                                           show_roi_eartags=show_ear_tags,
                                                                           show_pose=show_pose,
+                                                                          bbox=bbox,
                                                                           border_bg_clr=border_clr,
                                                                           direction=direction)
 
@@ -144,7 +148,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
 
 
 
-#_ = VisualizeROIFeaturesPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
+#_ = VisualizeROIFeaturesPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/project_config.ini')
 
 
 #_ = VisualizeROIFeaturesPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
