@@ -43,7 +43,6 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_array, check_valid_boolean,
                                 check_valid_cpu_pool, check_valid_dataframe,
                                 check_valid_lst, check_valid_tuple, is_wsl)
-
 from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Formats, Keys,
                                Options)
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
