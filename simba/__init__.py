@@ -2,6 +2,10 @@
 SimBA (Simple Behavioral Analysis)
 Toolkit for computer classification and analysis of behaviors in experimental animals
 """
+import multiprocessing
+from simba.utils.checks import is_wsl
+if is_wsl():
+    multiprocessing.set_start_method('spawn', force=True)
 
 __author__ = "Simon Nilsson"
 __author_email__ = "sronilsson@gmail.com"

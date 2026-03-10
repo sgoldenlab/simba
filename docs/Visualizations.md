@@ -518,6 +518,7 @@ Creates videos showing **continuous and boolean ROI features** (rather than just
 | **SHOW ROI CENTERS** | Mark the center of each ROI with a circle. |
 | **SHOW ROI EAR TAGS** | Show ear-tag points of each ROI shape. |
 | **SHOW ANIMAL NAMES** | Display animal labels. |
+| **SHOW ANIMAL BOUNDING BOXES** | Draw no box (**FALSE**), axis-aligned boxes, or animal-aligned boxes around each animal. |
 | **USE GPU** | Use GPU for faster processing when available. |
 | **CPU CORES** | Number of cores for multiprocessing. |
 | **PROBABILITY THRESHOLD** | Filter body-part locations below this confidence (0.0–1.0). |

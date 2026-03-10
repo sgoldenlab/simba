@@ -69,7 +69,7 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
         TrainModelMixin.__init__(self)
         log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         if len(self.feature_file_paths) == 0:
-            raise NoFilesFoundError(f"Zero files found in the {self.features_dir}. Create features before running classifier.", source=self.__class__.__name__,)
+            raise NoFilesFoundError(msg=f"Zero files found in the {self.features_dir}. Create features before running classifier.", source=self.__class__.__name__,)
         self.verbose = verbose
         if verbose: stdout_information(msg=f"Analyzing {len(self.feature_file_paths)} file(s) with {self.clf_cnt} classifier(s)...")
         self.timer = SimbaTimer(start=True)

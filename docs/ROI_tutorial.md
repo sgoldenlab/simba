@@ -225,8 +225,6 @@ Use **CREATE SINGLE ROI VIDEO** for one video or **CREATE ALL ROI VIDEOS** to pr
 ![animal_axis_aligned_bbox_roi](https://github.com/user-attachments/assets/e7e8e9fe-cf5b-424f-8870-1e1b4ef8bc78)
 
 
-
-
 ---
 
 ## Part 6: Visualizing ROI features
@@ -250,6 +248,7 @@ Visualize **continuous and boolean ROI features** (distances to ROIs, inside/out
 | **SHOW ROI CENTERS** | **TRUE** — Mark the center of each ROI with a circle; **FALSE** — Do not show centers. |
 | **SHOW ROI EAR TAGS** | **TRUE** — Show [ear tags](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#shape-attributes) (orientation markers) for each ROI shape; **FALSE** — Do not show. |
 | **SHOW ANIMAL NAMES** | **TRUE** — Display animal labels on the video; **FALSE** — Do not show. |
+| **SHOW ANIMAL BOUNDING BOXES** | **FALSE** = no bounding box. **axis-aligned** = axis-aligned bounding box (aligned with video axes). **animal-aligned** = minimum rotated rectangle aligned with animal orientation. |
 | **USE GPU** | **TRUE** / **FALSE** — Use NVIDIA GPU for encoding if available. Disabled if no compatible GPU is detected. |
 | **CPU CORES** | Number of CPU cores (2 to max on your machine). Used when creating videos; higher values can speed up batch processing. |
 | **SELECT BODY-PARTS** | **NUMBER OF ANIMALS** dropdown — How many animals to visualize. Below it, one dropdown per animal (e.g. Animal_1, Animal_2) to choose which body-part represents that animal’s location for ROI feature drawing. |

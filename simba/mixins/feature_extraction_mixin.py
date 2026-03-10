@@ -348,7 +348,7 @@ class FeatureExtractionMixin(object):
 
         results = np.full(shape=(bp.shape[0]), fill_value=-1, dtype=np.int32)
         for i in prange(bp.shape[0]):
-            px_dist = int(np.sqrt((bp[i][0] - roi_center[0]) ** 2 + (bp[i][1] - roi_center[1]) ** 2))
+            px_dist = np.sqrt((bp[i][0] - roi_center[0]) ** 2 + (bp[i][1] - roi_center[1]) ** 2)
             if px_dist <= roi_radius:
                 results[i] = 1
             else:

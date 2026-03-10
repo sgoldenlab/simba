@@ -1522,6 +1522,7 @@ class TrainModelMixin(object):
                 clf: Union[RandomForestClassifier, cuRF],
                 x_df: pd.DataFrame,
                 y_df: pd.DataFrame,
+                selected_feature_names: Optional[List[str]] = None,
                 verbose: bool = False) -> Union[RandomForestClassifier, cuRF]:
 
         """
@@ -1540,23 +1541,23 @@ class TrainModelMixin(object):
         :param clf: Un-fitted random forest classifier object, either from sklearn or cuml.
         :param pd.DataFrame x_df: Pandas dataframe with features.
         :param pd.DataFrame y_df: Pandas dataframe/Series with target
+        :param Optional[List[str]] selected_feature_names: Optional subset of feature column names from ``x_df`` to fit on. If None, fits on all features. Default: None.
         :return: Fitted random forest classifier object
         :rtype: RandomForestClassifier
         """
 
         timer = SimbaTimer(start=True)
+        if selected_feature_names is not None:
+            check_valid_lst(data=selected_feature_names, source=self.__class__.__name__, valid_dtypes=(str,), valid_values=list(x_df.columns), min_len=1, raise_error=True)
+            x_df = x_df[selected_feature_names]
         nan_features = x_df[~x_df.applymap(np.isreal).all(1)]
         nan_target = y_df.loc[pd.to_numeric(y_df).isna()]
         using_cuda = True if CUML in str(clf.__class__.__module__).lower() else False
         if len(nan_features) > 0:
-            raise FaultyTrainingSetError(
-                msg=f"{len(nan_features)} frame(s) in your project_folder/csv/targets_inserted directory contains FEATURES with non-numerical values",
-                source=self.__class__.__name__)
+            raise FaultyTrainingSetError(msg=f"{len(nan_features)} frame(s) in your project_folder/csv/targets_inserted directory contains FEATURES with non-numerical values", source=self.__class__.__name__)
         if len(nan_target) > 0:
-            raise FaultyTrainingSetError(
-                msg=f"{len(nan_target)} frame(s) in your project_folder/csv/targets_inserted directory contains ANNOTATIONS with non-numerical values",
-                source=self.__class__.__name__)
-        if verbose: print(f'[{get_current_time()}] Fitting classifier for {len(x_df)} observations (cuda: {"True" if using_cuda else "False"})...')
+            raise FaultyTrainingSetError(msg=f"{len(nan_target)} frame(s) in your project_folder/csv/targets_inserted directory contains ANNOTATIONS with non-numerical values", source=self.__class__.__name__)
+        if verbose: stdout_information(msg=f'Fitting classifier for {len(x_df)} observations (cuda: {"True" if using_cuda else "False"})...')
         if using_cuda:
             x_data = x_df.values if isinstance(x_df, pd.DataFrame) else x_df
             y_data = y_df.values if isinstance(y_df, (pd.DataFrame, pd.Series)) else y_df
@@ -1565,7 +1566,7 @@ class TrainModelMixin(object):
             clf.fit(x_df, y_df)
 
         timer.stop_timer()
-        if verbose: print(f'[{get_current_time()}] Classifier fitted in {timer.elapsed_time_str}s.')
+        if verbose: stdout_information(msg=f'Classifier fitted in {timer.elapsed_time_str}s.')
         return clf
 
     @staticmethod

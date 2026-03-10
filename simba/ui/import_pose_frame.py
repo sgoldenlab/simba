@@ -91,7 +91,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
 
     def __show_smoothing_entry_box_from_dropdown(self, choice: str):
         if (choice == GAUSSIAN) or (choice == SAVITZKY_GOLAY):
-            self.smoothing_time_eb.grid(row=1, column=0, sticky=E)
+            self.smoothing_time_eb.grid(row=1, column=0, sticky=NW)
         else:
             self.smoothing_time_eb.grid_forget()
 
@@ -236,6 +236,8 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
 
         else:
             raise InvalidInputError(msg=f'pose estimation tool {pose_estimation_tool} not recognized', source=self.__class__.__name__)
+
+
         data_importer.run()
 
     def __create_animal_names_entry_boxes(self,
@@ -338,8 +340,8 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
 
             if data_type_choice == "H5 (multi-animal DLC)":
                 self.tracking_type_frm = LabelFrame(self.choice_frm, text="TRACKING DATA TYPE", font=Formats.FONT_HEADER.value, pady=5, padx=5)
-                self.dlc_data_type_option_dropdown = DropDownMenu(self.tracking_type_frm, "TRACKING TYPE", Options.MULTI_DLC_TYPE_IMPORT_OPTION.value, labelwidth=25, tooltip_key='IMPORT_POSE_DLC_TRACKING_TYPE')
-                self.dlc_data_type_option_dropdown.setChoices(Options.MULTI_DLC_TYPE_IMPORT_OPTION.value[1])
+                self.dlc_data_type_option_dropdown = SimBADropDown(parent=self.tracking_type_frm, dropdown_options=Options.MULTI_DLC_TYPE_IMPORT_OPTION.value, label="TRACKING TYPE", label_width=25, tooltip_key='IMPORT_POSE_DLC_TRACKING_TYPE', value=Options.MULTI_DLC_TYPE_IMPORT_OPTION.value[1])
+
                 self.tracking_type_frm.grid(row=5, column=0, sticky=NW)
                 self.dlc_data_type_option_dropdown.grid(row=0, column=0, sticky=NW)
                 self.data_dir_select = FolderSelect(self.data_dir_frm, "H5 DLC DIRECTORY: ", lblwidth=25, lbl_icon='folder', tooltip_key='IMPORT_POSE_MULTI_ANIMAL_DATA_DIRECTORY')
@@ -409,4 +411,4 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
             self.run_btn.grid(row=0, column=0, sticky=NW)
             self.choice_frm.grid(row=1, column=0, sticky=NW)
 
-#_ = ImportPoseFrame(config_path=r"C:\troubleshooting\facemap_project\project_folder\project_config.ini")
+#_ = ImportPoseFrame(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini")

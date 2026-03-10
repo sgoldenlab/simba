@@ -201,7 +201,7 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
                             roi_coords = np.array([[roi_data['topLeftX'], roi_data['topLeftY']], [roi_data['Bottom_right_X'], roi_data['Bottom_right_Y']]])
                             r = FeatureExtractionMixin.framewise_inside_rectangle_roi(bp_location=bp_arr, roi_coords=roi_coords)
                         elif roi_data[SHAPE_TYPE].lower() == ROI_SETTINGS.CIRCLE.value.lower():
-                            circle_center = np.array([roi_data['Center_X'], roi_data['Center_Y']]).astype(np.int32)
+                            circle_center = np.array([roi_data['Center_X'], roi_data['Center_Y']]).astype(np.float32)
                             r = FeatureExtractionMixin.is_inside_circle(bp=bp_arr, roi_center=circle_center, roi_radius=roi_data['radius'])
                         else:
                             vertices = roi_data['vertices'].astype(np.int32)

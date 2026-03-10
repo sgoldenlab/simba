@@ -377,7 +377,7 @@
   "IMPORT_POSE_INPUT_DATA_FILE": "Path to a single pose file to import. Use BROWSE to select one file; format must match the selected DATA TYPE.",
   "IMPORT_POSE_ANIMAL_COUNT": "Number of animals in the tracking data. Used for multi-animal formats (DLC H5, SLEAP, APT TRK, etc.) to create the correct number of animal name fields.",
   "IMPORT_POSE_ANIMAL_NAME": "Name or ID for this animal (e.g. Animal_1, mouse_A). Must match how your tracking tool labels individuals; used for multi-animal imports.",
-  "IMPORT_POSE_DLC_TRACKING_TYPE": "Multi-animal DLC export format. Choose the file type that matches your exported DLC data (e.g. h5, csv).",
+  "IMPORT_POSE_DLC_TRACKING_TYPE": "Multi-animal DLC tracking representation in the input data. Choose the format used by your DLC export (skeleton, box, or ellipse).",
   "IMPORT_POSE_MULTI_ANIMAL_DATA_DIRECTORY": "Folder containing multi-animal pose files (DLC H5, SLEAP SLP/CSV/H5, APT TRK, or SuperAnimal H5). File names should match project videos.",
   "LOAD_PROJECT_CONFIG_FILE": "Path to the project_config.ini file of the SimBA project you want to open. Use BROWSE to select the file; it is usually inside the project folder.",
   "LOAD_PROJECT_RECENT_CONFIG": "Previously loaded projects. Select one from the list and click LOAD RECENT PROJECT to open it without browsing.",

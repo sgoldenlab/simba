@@ -131,7 +131,8 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                                                        width=video_meta_data['width'],
                                                        height=video_meta_data['height'],
                                                        font_size=12,
-                                                       font_rotation=90,
+                                                       font_rotation=45,
+                                                       x_tick_lbl_rotation=45,
                                                        hhmmss=True,
                                                        video_name=video_meta_data['video_name'],
                                                        save_path=None,
@@ -369,7 +370,19 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             if self.show_gantt is not None:
                 self.gantt_clrs = create_color_palette(pallete_name=self.pose_palette, increments=len(self.clf_names) + 1, as_int=True, as_rgb_ratio=True)
                 self.bouts_df = detect_bouts(data_df=self.data_df, target_lst=list(self.clf_names), fps=int(self.video_meta_data["fps"]))
-                self.final_gantt_img = PlottingMixin().make_gantt_plot(x_length=len(self.data_df) + 1, bouts_df=self.bouts_df, clf_names=self.clf_names, fps=self.video_meta_data["fps"], width=self.video_meta_data["width"], height=self.video_meta_data["height"], font_size=12, font_rotation=90, video_name=self.video_meta_data["video_name"], save_path=None, palette=self.gantt_clrs)
+                self.final_gantt_img = PlottingMixin().make_gantt_plot(x_length=len(self.data_df) + 1,
+                                                                       bouts_df=self.bouts_df,
+                                                                       clf_names=self.clf_names,
+                                                                       fps=self.video_meta_data["fps"],
+                                                                       width=self.video_meta_data["width"],
+                                                                       height=self.video_meta_data["height"],
+                                                                       font_size=12,
+                                                                       font_rotation=45,
+                                                                       x_tick_lbl_rotation=45,
+                                                                       hhmmss=True,
+                                                                       video_name=self.video_meta_data["video_name"],
+                                                                       save_path=None,
+                                                                       palette=self.gantt_clrs)
                 self.final_gantt_img = self.resize_gantt(self.final_gantt_img, self.video_meta_data["height"])
             else:
                 self.bouts_df, self.final_gantt_img, self.gantt_clrs = None, None, None
@@ -433,16 +446,19 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
 
 
 if __name__ == "__main__":
-    clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
+    clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",
+                                                 video_paths=None, #r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\videos\2026-01-05 14-17-54 box1_1143_0_Gq_sal.mp4",
                                                  video_setting=True,
                                                  frame_setting=False,
-                                                 video_paths=None,
                                                  print_timers=True,
                                                  rotate=False,
-                                                 core_cnt=21,
+                                                 show_confidence=False,
+                                                 core_cnt=16,
                                                  animal_names=False,
-                                                 bbox=True,
-                                                 show_gantt=None)
+                                                 #time_slice={START_TIME: '00:00:00', END_TIME: '00:01:00'},
+                                                 bbox=None,
+                                                 text_opacity=0.6,
+                                                 show_gantt=2)
     clf_plotter.run()
 
 

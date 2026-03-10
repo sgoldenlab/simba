@@ -347,6 +347,7 @@ class PlottingMixin(object):
                         font_size: int = 8,
                         bar_opacity: float = 0.85,
                         font_rotation: int = 45,
+                        x_tick_lbl_rotation: int = 45,
                         font: Optional[str] = None,
                         save_path: Optional[str] = None,
                         edge_clr: Optional[str] = 'black',
@@ -373,6 +374,7 @@ class PlottingMixin(object):
         :param int font_size: Base font size for labels and ticks. Default: 8.
         :param float bar_opacity: Opacity of behavior bars (0.0-1.0). Default: 0.85.
         :param int font_rotation: Rotation angle in degrees for y-axis labels. Default: 45.
+        :param int x_tick_lbl_rotation: Rotation angle in degrees for x-axis tick labels. Default: 0.
         :param Optional[str] font: Font family name. If None, uses matplotlib default.
         :param Optional[str] save_path: Path to save the image. If None and ``as_svg=False``, returns NumPy array.
         :param Optional[str] edge_clr: Color of bar edges. Default: 'black'.
@@ -427,9 +429,10 @@ class PlottingMixin(object):
             x_lbls = [int(x) for x in x_ticks_seconds]
 
         ax.set_xticks(x_ticks_locs)
-        ax.set_xticklabels(x_lbls)
+        ax.set_xticklabels(x_lbls, rotation=x_tick_lbl_rotation)
         ax.set_ylim(0, colour_tuple_x[len(clf_names)])
         ax.set_yticks(np.arange(5, 5 * len(clf_names) + 1, 5))
+        print(font_rotation)
         ax.set_yticklabels(clf_names, rotation=font_rotation, ha='right', va='center')
         ax.tick_params(axis="both", labelsize=font_size)
         plt.xlabel(x_label, fontsize=font_size + 3)
