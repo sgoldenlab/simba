@@ -13,7 +13,7 @@ from simba.utils.checks import check_if_filepath_list_is_empty, check_int
 from simba.utils.enums import (ConfigKey, Dtypes, Formats, Links, Methods,
                                MLParamKeys, Options)
 from simba.utils.errors import ParametersFileError
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import read_config_entry, str_2_bool, write_df
 
 
