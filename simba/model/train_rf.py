@@ -13,7 +13,7 @@ from simba.utils.checks import check_if_filepath_list_is_empty, check_int
 from simba.utils.enums import (ConfigKey, Dtypes, Formats, Links, Methods,
                                MLParamKeys, Options)
 from simba.utils.errors import ParametersFileError
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import read_config_entry, str_2_bool, write_df
 
 
@@ -41,7 +41,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         self.read_model_settings_from_config(config=self.config)
         check_if_filepath_list_is_empty(filepaths=self.target_file_paths, error_msg=f"Zero annotation files found in directory {self.targets_folder}, cannot create model.")
         self.bp_config = read_config_entry(config=self.config, section=ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, option=ConfigKey.POSE_SETTING.value, default_value='user_defined', data_type=Dtypes.STR.value)
-        print(f"Reading in {len(self.target_file_paths)} annotated files...")
+        stdout_information(msg=f"Reading in {len(self.target_file_paths)} annotated files...")
         if (isinstance(self.clf_name, str)) and self.clf_name.lower() == Dtypes.NONE.value.lower():
             raise ParametersFileError(msg=f'The single classifier name is names "None". Have you set the model settings for a SINGLE model in SimBA? "None" is the name of a behavior if the behavior has not been set. Please set the hyperparameters and click "SAVE SETTINGS (SPECIFIC MODEL)" before training the model as detailed HERE: {Links.TRAIN_ML_MODEL.value}')
         self.data_df, self.frm_idx = self.read_all_files_in_folder_mp_futures(self.target_file_paths, self.file_type, [self.clf_name])
@@ -54,8 +54,8 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         self.x_df, self.y_df = self.split_df_to_x_y(self.x_y_df, self.clf_name)
         self.feature_names = self.x_df.columns
         self.check_sampled_dataset_integrity(x_df=self.x_df, y_df=self.y_df)
-        print(f"Number of features in dataset: {len(self.x_df.columns)}")
-        print(f"Number of {self.clf_name} frames in dataset: {int(self.y_df.sum())} ({str(round(self.y_df.sum() / len(self.y_df), 4) * 100)}%)")
+        stdout_information(msg=f"Number of features in dataset: {len(self.x_df.columns)}")
+        stdout_information(msg=f"Number of {self.clf_name} frames in dataset: {int(self.y_df.sum())} ({str(round(self.y_df.sum() / len(self.y_df), 4) * 100)}%)")
 
     def perform_sampling(self):
         """
@@ -85,7 +85,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         """
         Method for training single random forest model.
         """
-        print("Training and evaluating model...")
+        stdout_information(msg="Training and evaluating model...")
         self.timer = SimbaTimer(start=True)
         self.perform_sampling()
         if self.algo == "RF":
@@ -155,7 +155,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
                                           class_weight=class_weights,
                                           cuda=cuda)
 
-            print(f"Fitting {self.clf_name} model...")
+            stdout_information(msg=f"Fitting {self.clf_name} model...")
             self.rf_clf = self.clf_fit(clf=self.rf_clf, x_df=self.x_train, y_df=self.y_train)
 
             if compute_permutation_importance in Options.PERFORM_FLAGS.value:

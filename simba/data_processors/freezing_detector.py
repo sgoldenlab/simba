@@ -36,6 +36,13 @@ class FreezingDetector(ConfigReader):
        :muted:
        :align: center
 
+    .. video:: _static/img/FreezingDetector_2.webm
+       :width: 1000
+       :autoplay:
+       :loop:
+       :muted:
+       :align: center
+
     .. important::
         Freezing is detected as `present` when **the velocity (computed from the mean movement of the nape, nose, and tail-base body-parts) falls below
         the movement threshold for the duration (and longer) of the specified time-window**.

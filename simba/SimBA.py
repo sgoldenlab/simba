@@ -997,7 +997,7 @@ class App(object):
         video_process_menu.add_command(label="Get metric conversion factor (pixels/millimeter)", compound="left", image=self.menu_icons["calipher"]["img"], command=CalculatePixelsPerMMInVideoPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Change video brightness / contrast", compound="left", image=self.menu_icons["brightness"]["img"], command=BrightnessContrastPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Merge frames to video", compound="left", image=self.menu_icons["merge"]["img"], command=MergeFrames2VideoPopUp, font=Formats.FONT_REGULAR.value)
-        video_process_menu.add_command(label="Change video playback speed", compound="left", image=self.menu_icons["run"]["img"], command=ChangeSpeedPopup, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_command(label="Playback speed (video)", compound="left", image=self.menu_icons["run"]["img"], command=ChangeSpeedPopup, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Print classifier info", compound="left", image=self.menu_icons["print"]["img"], command=PrintModelInfoPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Show video file(s) meta data", compound="left", image=self.menu_icons["print"]["img"], command=PrintVideoMetaDataPopUp, font=Formats.FONT_REGULAR.value)
 

@@ -363,6 +363,13 @@ class PlottingMixin(object):
            :width: 1000
            :align: center
 
+        .. video:: _static/img/make_gantt_plot.webm
+          :width: 1000
+          :autoplay:
+          :loop:
+          :muted:
+          :align: center
+
         :param pd.DataFrame bouts_df: DataFrame containing bout data with columns 'Event', 'Start_time', and 'Bout_time'.
         :param List[str] clf_names: List of behavior/classifier names to display. Must match 'Event' values in ``bouts_df``.
         :param List[Tuple[int, int, int]] palette: List of RGB color tuples (0-255) for each behavior. Length should match ``clf_names``.
@@ -432,7 +439,6 @@ class PlottingMixin(object):
         ax.set_xticklabels(x_lbls, rotation=x_tick_lbl_rotation)
         ax.set_ylim(0, colour_tuple_x[len(clf_names)])
         ax.set_yticks(np.arange(5, 5 * len(clf_names) + 1, 5))
-        print(font_rotation)
         ax.set_yticklabels(clf_names, rotation=font_rotation, ha='right', va='center')
         ax.tick_params(axis="both", labelsize=font_size)
         plt.xlabel(x_label, fontsize=font_size + 3)
