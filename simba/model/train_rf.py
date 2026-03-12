@@ -171,9 +171,9 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
             if generate_classification_report in Options.PERFORM_FLAGS.value:
                 self.create_clf_report(self.rf_clf, self.x_test, self.y_test, self.class_names, self.eval_out_path)
             if generate_features_importance_log in Options.PERFORM_FLAGS.value:
-                self.create_x_importance_log(self.rf_clf, self.feature_names, self.clf_name, self.eval_out_path)
+                self.create_x_importance_log(rf_clf=self.rf_clf, x_names=self.feature_names, clf_name=self.clf_name, save_dir=self.eval_out_path)
             if generate_features_importance_bar_graph in Options.PERFORM_FLAGS.value:
-                self.create_x_importance_bar_chart(self.rf_clf, self.feature_names, self.clf_name, self.eval_out_path, feature_importance_bars)
+                self.create_x_importance_bar_chart(rf_clf=self.rf_clf, x_names=self.feature_names, clf_name=self.clf_name, save_dir=self.eval_out_path, n_bars=feature_importance_bars)
             if generate_example_decision_tree_fancy in Options.PERFORM_FLAGS.value:
                 self.dviz_classification_visualization(self.x_train, self.y_train, self.clf_name, self.class_names, self.eval_out_path)
             if generate_shap_scores in Options.PERFORM_FLAGS.value:
