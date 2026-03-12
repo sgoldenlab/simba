@@ -6,7 +6,7 @@ warnings.filterwarnings("ignore")
 import glob
 import math
 import os
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -20,7 +20,7 @@ import simba
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_filepath_list_is_empty, check_int,
                                 check_minimum_roll_windows, check_valid_array,
-                                check_valid_boolean)
+                                check_valid_boolean, check_instance, check_valid_dataframe)
 from simba.utils.enums import Formats, Options, Paths
 from simba.utils.errors import CountError
 from simba.utils.read_write import (get_bp_headers, read_config_file,
@@ -206,6 +206,56 @@ class FeatureExtractionMixin(object):
             else:
                 pass
         return 0
+
+
+    @staticmethod
+    def three_point_angle(bp_1: Union[np.ndarray, pd.DataFrame],
+                          bp_2: Union[np.ndarray, pd.DataFrame],
+                          bp_3: Union[np.ndarray, pd.DataFrame]):
+        """
+        Compute frame-wise 3-point angles from three body-part trajectories.
+
+        .. note::
+           Wrapper method that validates input array/dataframe shape and dtypes
+           before calling :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_vectorized`.
+
+        .. seealso::
+           For scalar (single-frame) angle computation, use :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt`.
+           For the numba-accelerated vectorized implementation used internally, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_vectorized`.
+
+        :param Union[np.ndarray, pd.DataFrame] bp_1: First body-part coordinates with shape ``(n_frames, 2)``.
+        :param Union[np.ndarray, pd.DataFrame] bp_2: Second body-part coordinates with shape ``(n_frames, 2)``. Must have same frame count as ``bp_1``.
+        :param Union[np.ndarray, pd.DataFrame] bp_3: Third body-part coordinates with shape ``(n_frames, 2)``. Must have same frame count as ``bp_1``.
+        :return: 1D array of frame-wise angles in degrees.
+        :rtype: np.ndarray
+
+        :example:
+        >>> bp_1 = np.array([[120, 200], [122, 198], [124, 197]], dtype=np.float32)
+        >>> bp_2 = np.array([[200, 180], [201, 179], [202, 178]], dtype=np.float32)
+        >>> bp_3 = np.array([[260, 140], [262, 139], [264, 138]], dtype=np.float32)
+        >>> FeatureExtractionMixin.three_point_angle(bp_1=bp_1, bp_2=bp_2, bp_3=bp_3)
+        """
+
+        check_instance(source=f'{FeatureExtractionMixin.__name__}', instance=bp_1, accepted_types=(np.ndarray, pd.DataFrame,), raise_error=True)
+        if isinstance(bp_1, (np.ndarray)):
+            check_valid_array(data=bp_1, source=f'{FeatureExtractionMixin.__name__} data', accepted_ndims=(2,), accepted_axis_1_shape=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0, raise_error=True)
+        else:
+            check_valid_dataframe(df=bp_1, source=f'{FeatureExtractionMixin.__name__} data', valid_dtypes=Formats.NUMERIC_DTYPES.value, min_axis_1=2, max_axis_1=2)
+            bp_1 = bp_1.values
+        check_instance(source=f'{FeatureExtractionMixin.__name__}', instance=bp_2, accepted_types=(np.ndarray, pd.DataFrame,), raise_error=True)
+        if isinstance(bp_2, (np.ndarray)):
+            check_valid_array(data=bp_2, source=f'{FeatureExtractionMixin.__name__} data', accepted_ndims=(2,), accepted_axis_1_shape=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0, raise_error=True, accepted_axis_0_shape=(bp_1.shape[0],))
+        else:
+            check_valid_dataframe(df=bp_2, source=f'{FeatureExtractionMixin.__name__} data', valid_dtypes=Formats.NUMERIC_DTYPES.value, min_axis_1=2, max_axis_1=2, accepted_rows=(bp_1.shape[0],))
+            bp_2 = bp_2.values
+        check_instance(source=f'{FeatureExtractionMixin.__name__}', instance=bp_3, accepted_types=(np.ndarray, pd.DataFrame,), raise_error=True)
+        if isinstance(bp_3, (np.ndarray)):
+            check_valid_array(data=bp_3, source=f'{FeatureExtractionMixin.__name__} data', accepted_ndims=(2,), accepted_axis_1_shape=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0, raise_error=True, accepted_axis_0_shape=(bp_1.shape[0],))
+        else:
+            check_valid_dataframe(df=bp_3, source=f'{FeatureExtractionMixin.__name__} data', valid_dtypes=Formats.NUMERIC_DTYPES.value, min_axis_1=2, max_axis_1=2, accepted_rows=(bp_3.shape[0],))
+            bp_3 = bp_3.values
+
+        return FeatureExtractionMixin.angle3pt_vectorized(data=np.concatenate([bp_1, bp_2, bp_3], axis=1).astype(np.float32))
 
     @staticmethod
     @jit(nopython=True)
@@ -925,6 +975,39 @@ class FeatureExtractionMixin(object):
         return results
 
     @staticmethod
+    def framewise_bodypart_movement(data: Union[np.ndarray, pd.DataFrame],
+                                    px_per_mm: float = 1,
+                                    centimeter: bool = False):
+        """
+        Compute frame-wise movement for a single body-part trajectory.
+
+        .. seealso::
+           For movement between two distinct body-parts, use func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.bodypart_distance`.
+           For direct per-frame distance computation between two coordinate arrays, use func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance`.
+
+        :param Union[np.ndarray, pd.DataFrame] data: Body-part coordinates with shape ``(n_frames, 2)`` where columns represent ``x`` and ``y`` pixel positions. Accepted as numpy array or pandas DataFrame.
+        :param float px_per_mm: Conversion factor from pixels to millimeters. Must be positive. Default: 1.
+        :param bool centimeter: If True, return movement in centimeters. If False, return movement in millimeters. Default: False.
+        :return: 1D array of frame-wise displacement values with shape ``(n_frames,)``.
+        :rtype: np.ndarray
+
+        :example:
+        >>> coords = np.array([[10, 10], [13, 14], [13, 20]], dtype=np.float32)
+        >>> FeatureExtractionMixin.framewise_bodypart_movement(data=coords, px_per_mm=2.0, centimeter=False)
+        """
+
+        check_instance(source=f'{FeatureExtractionMixin.__name__}', instance=data,accepted_types=(np.ndarray, pd.DataFrame,), raise_error=True)
+        if isinstance(data, (np.ndarray)):
+            check_valid_array(data=data, source=f'{FeatureExtractionMixin.__name__} data', accepted_ndims=(2,), accepted_axis_1_shape=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0, raise_error=True)
+        else:
+            check_valid_dataframe(df=data, source=f'{FeatureExtractionMixin.__name__} data', valid_dtypes=Formats.NUMERIC_DTYPES.value, min_axis_1=2, max_axis_1=2)
+            data = data.values
+        check_float(name=f'{FeatureExtractionMixin.__name__} px_per_mm', value=px_per_mm, allow_zero=False, allow_negative=False, raise_error=True)
+        check_valid_boolean(value=centimeter, source=f'{FeatureExtractionMixin.__name__} centimeter', raise_error=True)
+        data_shifted = FeatureExtractionMixin.create_shifted_array(data=data)
+        return FeatureExtractionMixin.framewise_euclidean_distance(location_1=data.astype(np.float64), location_2=data_shifted.astype(np.float64), px_per_mm=px_per_mm, centimeter=centimeter)
+
+    @staticmethod
     def bodypart_distance(bp1_coords: np.ndarray,
                           bp2_coords: np.ndarray,
                           px_per_mm: float = 1.0,
@@ -1046,8 +1129,7 @@ class FeatureExtractionMixin(object):
                                               location_2: np.ndarray,
                                               fps: int,
                                               px_per_mm: float,
-                                              time_windows: np.ndarray = np.array([0.2, 0.4, 0.8, 1.6]),
-    ) -> np.ndarray:
+                                              time_windows: np.ndarray = np.array([0.2, 0.4, 0.8, 1.6])) -> np.ndarray:
         """
         Computes the difference between the distances of two body-parts in the current frame versus N.N seconds ago.
         Used for computing if animal body-parts are traveling away or towards each other within defined time-windows.

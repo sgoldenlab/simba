@@ -750,7 +750,7 @@ class TrainModelMixin(object):
             save_file_path = os.path.join(save_dir, f"{clf_name}_{save_file_no}_feature_importance_bar_graph.png")
         else:
             save_file_path = os.path.join(save_dir, f"{clf_name}_feature_importance_bar_graph.png")
-        self.create_x_importance_log(rf_clf, x_names, clf_name, save_dir)
+        self.create_x_importance_log(rf_clf=rf_clf, x_names=x_names, clf_name=clf_name, save_dir=save_dir)
         importances_df = pd.read_csv(os.path.join(save_dir, f"{clf_name}_feature_importance_log.csv"))
         importances_head = importances_df.head(n_bars)
         _ = PlottingMixin.plot_bar_chart(df=importances_head,

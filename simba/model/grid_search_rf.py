@@ -1,18 +1,18 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import os
-from typing import Union
+from typing import Union, Optional
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import check_if_filepath_list_is_empty
+from simba.utils.checks import check_if_filepath_list_is_empty, check_str
 from simba.utils.enums import (ConfigKey, Dtypes, Formats, Methods,
                                MLParamKeys, Options)
 from simba.utils.errors import InvalidInputError, NoDataError
-from simba.utils.printing import stdout_success
+from simba.utils.printing import stdout_success, stdout_information
 from simba.utils.read_write import (read_config_entry, read_simba_meta_files,
                                     write_df)
 
@@ -32,7 +32,9 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
     >>> _ = GridSearchRandomForestClassifier(config_path='MyConfigPath').run()
     """
 
-    def __init__(self, config_path: Union[str, os.PathLike]):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 feature_subset_suffix: Optional[str] = None):
 
         ConfigReader.__init__(self, config_path=config_path, create_logger=False)
         TrainModelMixin.__init__(self)
@@ -41,12 +43,13 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
         if not os.path.exists(self.model_dir_out): os.makedirs(self.model_dir_out)
         check_if_filepath_list_is_empty(filepaths=self.target_file_paths, error_msg=f"Zero data files found in {self.targets_folder}, cannot create models.")
         if not os.path.exists(self.configs_meta_dir): os.makedirs(self.configs_meta_dir)
+        if feature_subset_suffix is not None: check_str(name=f'{self.__class__.__name__} feature_subset_suffix', value=feature_subset_suffix, allow_blank=False, raise_error=True)
         self.meta_file_lst = sorted(read_simba_meta_files(self.configs_meta_dir))
-        print(f"Reading in {len(self.target_file_paths)} annotated files found in the {self.targets_folder} directory...")
+        stdout_information(msg=f"Reading in {len(self.target_file_paths)} annotated files found in the {self.targets_folder} directory...")
         self.data_df, self.frm_idx = self.read_all_files_in_folder_mp_futures(self.target_file_paths, self.file_type)
         self.frm_idx = pd.DataFrame({"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx})
         _ = self.check_raw_dataset_integrity(self.data_df, logs_path=self.logs_path)
-        self.data_df = self.drop_bp_cords(df=self.data_df)
+        self.data_df, self.feature_subset_suffix = self.drop_bp_cords(df=self.data_df), feature_subset_suffix
 
     def perform_sampling(self, meta_dict: dict):
         if (meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value] == Methods.SPLIT_TYPE_FRAMES.value):
@@ -67,7 +70,7 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             test_data = self.frm_idx[self.frm_idx.index.isin(self.x_test.index)].set_index("VIDEO")
             write_df(df=train_data, file_type=Formats.CSV.value, save_path=os.path.join(self.model_dir_out, f"train_idx_model_{self.config_cnt}.csv"))
             write_df(df=test_data, file_type=Formats.CSV.value, save_path=os.path.join(self.model_dir_out, f"test_idx_{self.config_cnt}.csv"))
-            print(f"Frame index for train and test set in model {self.config_cnt} saved in {self.model_dir_out} directory...")
+            stdout_information(msg=f"Frame index for train and test set in model {self.config_cnt} saved in {self.model_dir_out} directory...")
 
     def run(self):
         self.meta_dicts = self.check_validity_of_meta_files(data_df=self.data_df, meta_file_paths=self.meta_file_lst)
@@ -76,17 +79,21 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
         for config_cnt, meta_dict in self.meta_dicts.items():
             self.config_cnt = config_cnt
             self.clf_name = meta_dict[MLParamKeys.CLASSIFIER_NAME.value]
-            print(f"Training model {config_cnt+1}/{len(self.meta_dicts.keys())} ({meta_dict[MLParamKeys.CLASSIFIER_NAME.value]})...")
+            stdout_information(msg=f"Training model {config_cnt+1}/{len(self.meta_dicts.keys())} ({meta_dict[MLParamKeys.CLASSIFIER_NAME.value]})...")
             self.class_names = [f"Not_{meta_dict[MLParamKeys.CLASSIFIER_NAME.value]}", meta_dict[MLParamKeys.CLASSIFIER_NAME.value]]
             annotation_cols_to_remove = self.read_in_all_model_names_to_remove(self.config, self.clf_cnt, meta_dict[MLParamKeys.CLASSIFIER_NAME.value])
             self.x_y_df = self.delete_other_annotation_columns(self.data_df, annotation_cols_to_remove)
             self.x_df, self.y_df = self.split_df_to_x_y(self.x_y_df, meta_dict[MLParamKeys.CLASSIFIER_NAME.value])
+            if self.feature_subset_suffix is not None:
+                self.x_df = self.x_df[[x for x in self.x_df.columns if x.endswith(self.feature_subset_suffix)]]
+                if len(list(self.x_df.columns)) < 1:
+                    raise InvalidInputError(msg=f'Cannot use feature_subset_suffix {self.feature_subset_suffix}: It produces zero columns for training.', source=self.__class__.__name__)
             self.feature_names = self.x_df.columns
             self.check_sampled_dataset_integrity(x_df=self.x_df, y_df=self.y_df)
             self.perform_sampling(meta_dict=meta_dict)
-            print(f"MODEL {config_cnt+1} settings")
+            stdout_information(msg=f"MODEL {config_cnt+1} settings")
             self.print_machine_model_information(meta_dict)
-            print(f"# {len(self.feature_names)} features.")
+            stdout_information(msg=f"# {len(self.feature_names)} features.")
             self.rf_clf = self.clf_define(n_estimators=meta_dict[MLParamKeys.RF_ESTIMATORS.value],
                                           max_depth=meta_dict[MLParamKeys.RF_MAX_DEPTH.value],
                                           max_features=meta_dict[MLParamKeys.RF_MAX_FEATURES.value],
@@ -96,9 +103,8 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                                           verbose=1,
                                           class_weight=meta_dict[MLParamKeys.CLASS_WEIGHTS.value],
                                           cuda=meta_dict[MLParamKeys.CUDA.value])
-            print(f"Fitting {self.clf_name} model...(follow progress in OS terminal)")
-
-            self.rf_clf = self.clf_fit(clf=self.rf_clf, x_df=self.x_train, y_df=self.y_train)
+            stdout_information(msg=f"Fitting {self.clf_name} model...(follow progress in OS terminal)")
+            self.rf_clf = self.clf_fit(clf=self.rf_clf, x_df=self.x_train, y_df=self.y_train, selected_feature_names=None)
             if (meta_dict[MLParamKeys.PERMUTATION_IMPORTANCE.value] in Options.PERFORM_FLAGS.value):
                 self.calc_permutation_importance(x_test=self.x_test,
                                                  y_test=self.y_test,
@@ -117,9 +123,10 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             if meta_dict[MLParamKeys.CLF_REPORT.value] in Options.PERFORM_FLAGS.value:
                 self.create_clf_report(self.rf_clf, self.x_test, self.y_test, self.class_names, self.model_dir_out, save_file_no=config_cnt)
             if (meta_dict[MLParamKeys.IMPORTANCE_LOG.value] in Options.PERFORM_FLAGS.value):
-                self.create_x_importance_log(self.rf_clf,self.feature_names,self.clf_name,self.model_dir_out,save_file_no=config_cnt)
+                self.create_x_importance_log(rf_clf=self.rf_clf, x_names=self.feature_names,clf_name=self.clf_name, save_dir=self.model_dir_out, save_file_no=config_cnt)
             if (meta_dict[MLParamKeys.IMPORTANCE_BAR_CHART.value] in Options.PERFORM_FLAGS.value):
-                self.create_x_importance_bar_chart(self.rf_clf, self.feature_names, self.clf_name, self.model_dir_out, meta_dict[MLParamKeys.N_FEATURE_IMPORTANCE_BARS.value], save_file_no=config_cnt)
+                print(meta_dict[MLParamKeys.N_FEATURE_IMPORTANCE_BARS.value])
+                self.create_x_importance_bar_chart(rf_clf=self.rf_clf, x_names=self.feature_names, clf_name=self.clf_name, save_dir=self.model_dir_out, n_bars=meta_dict[MLParamKeys.N_FEATURE_IMPORTANCE_BARS.value], save_file_no=config_cnt)
 
             if MLParamKeys.SHAP_SCORES.value in meta_dict.keys():
                 save_n = (meta_dict[MLParamKeys.SHAP_PRESENT.value] + meta_dict[MLParamKeys.SHAP_ABSENT.value])
@@ -162,8 +169,14 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                     self.partial_dependence_calculator(clf=self.rf_clf, x_df=self.x_train, clf_name=self.clf_name, save_dir=self.model_dir_out)
             self.create_meta_data_csv_training_multiple_models(meta_dict, self.clf_name, self.model_dir_out, save_file_no=config_cnt)
             self.save_rf_model(self.rf_clf, self.clf_name, self.model_dir_out, save_file_no=config_cnt)
-            print(f"Classifier {self.clf_name}_{config_cnt} saved in directory {self.model_dir_out} ...")
+            stdout_information(msg=f"Classifier {self.clf_name}_{config_cnt} saved in directory {self.model_dir_out} ...")
         stdout_success(msg=f"All {len(list(self.meta_dicts.keys()))} model(s) and their evaluations complete. The models/evaluation files are saved in {self.model_dir_out} directory", source=self.__class__.__name__)
+
+
+
+# test = GridSearchRandomForestClassifier(config_path=r"F:\troubleshooting\sophiaa\project_folder\project_config.ini", feature_subset_suffix='_animal_1')
+# test.run()
+
 
 #
 # test = GridSearchRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")

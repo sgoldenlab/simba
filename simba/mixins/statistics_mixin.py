@@ -1551,7 +1551,7 @@ class Statistics(FeatureExtractionMixin):
         >>> [[-1.][-1.][-1.][-1.][0.227][-0.319][-0.196][0.474][-0.061][0.713]]
         """
 
-        results = np.full((sample_1.shape[0], time_windows.shape[0]), 0.0)
+        results = np.full((sample_1.shape[0], time_windows.shape[0]), -1.0)
         for i in prange(time_windows.shape[0]):
             window_size = int(time_windows[i] * fps)
             for left, right in zip(

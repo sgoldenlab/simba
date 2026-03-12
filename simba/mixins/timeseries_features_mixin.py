@@ -1003,9 +1003,9 @@ class TimeseriesFeatureMixin(object):
 
         return frequencies[np.argsort(magnitude)[-(k + 1) : -1]]
 
+    @staticmethod
     def sliding_window_stats(data: np.ndarray, window_sizes: Union[List, np.ndarray], sample_rate: float,
-                             statistics: List[Literal[
-                                 "var", "max", "min", "std", "median", "mean", "mad", "sum", "mac", "rms", "absenergy"]]) -> np.ndarray:
+                             statistics: List[Literal["var", "max", "min", "std", "median", "mean", "mad", "sum", "mac", "rms", "absenergy"]]) -> np.ndarray:
         """
         Compute descriptive statistics over sliding windows in 1D data array.
 

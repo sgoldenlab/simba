@@ -1771,7 +1771,7 @@ class InitiateClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
             "OUTPUT DIRECTORY:",
             title="Select a folder for your output videos",
             lblwidth=30,
-            lbl_icon='folder'
+            lbl_icon='folder_2'
         )
         data_frm.grid(row=0, column=0, sticky=NW)
         self.input_folder.grid(row=0, column=0, sticky=NW)

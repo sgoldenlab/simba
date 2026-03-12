@@ -1487,6 +1487,7 @@ def check_valid_dataframe(
     max_axis_0: Optional[int] = None,
     max_axis_1: Optional[int] = None,
     allow_duplicate_col_names = True,
+    accepted_rows: Optional[Union[int, Tuple[int]]] = None
 ):
     """
     Validate a DataFrame against various criteria.
@@ -1571,7 +1572,15 @@ def check_valid_dataframe(
         if len(duplicate_col_names) > 0:
             raise InvalidInputError(msg=f"The dataframe {source} has duplicate column names {duplicate_col_names}.", source=source)
 
-
+    if accepted_rows is not None:
+        check_instance(source=f"{source} accepted_rows", instance=accepted_rows, accepted_types=(int, tuple))
+        if isinstance(accepted_rows, int):
+            accepted_rows = [accepted_rows]
+        else:
+            check_valid_tuple(x=accepted_rows, source=f"{source} accepted_rows", min_integer=1, valid_dtypes=Formats.INTEGER_DTYPES.value)
+            accepted_rows = list(accepted_rows)
+        if len(df) not in accepted_rows:
+            raise InvalidInputError(msg=f"The dataframe {source} has {len(df)} rows but only {accepted_rows} rows is eccepted.", source=source,)
 
 
 def check_valid_boolean(value: Union[Any, List[Any]], source: Optional[str] = '', raise_error: Optional[bool] = True):

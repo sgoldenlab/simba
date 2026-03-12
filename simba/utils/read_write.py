@@ -200,7 +200,7 @@ def read_df(file_path: Union[str, os.PathLike],
         )
     if verbose:
         timer.stop_timer()
-        stdout_success(msg=f'Read in file {file_path} (elapsed time: {timer.elapsed_time_str}s)')
+        stdout_information(msg=f'Read in file {file_path} (elapsed time: {timer.elapsed_time_str}s)', source=read_df.__name__)
     return df
 
 
