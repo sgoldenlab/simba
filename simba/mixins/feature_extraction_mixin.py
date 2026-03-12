@@ -18,9 +18,10 @@ from scipy.spatial.qhull import QhullError
 
 import simba
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_filepath_list_is_empty, check_int,
+                                check_if_filepath_list_is_empty,
+                                check_instance, check_int,
                                 check_minimum_roll_windows, check_valid_array,
-                                check_valid_boolean, check_instance, check_valid_dataframe)
+                                check_valid_boolean, check_valid_dataframe)
 from simba.utils.enums import Formats, Options, Paths
 from simba.utils.errors import CountError
 from simba.utils.read_write import (get_bp_headers, read_config_file,
