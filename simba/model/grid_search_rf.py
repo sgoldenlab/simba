@@ -1,7 +1,7 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import os
-from typing import Union, Optional
+from typing import Optional, Union
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -12,7 +12,7 @@ from simba.utils.checks import check_if_filepath_list_is_empty, check_str
 from simba.utils.enums import (ConfigKey, Dtypes, Formats, Methods,
                                MLParamKeys, Options)
 from simba.utils.errors import InvalidInputError, NoDataError
-from simba.utils.printing import stdout_success, stdout_information
+from simba.utils.printing import stdout_information, stdout_success
 from simba.utils.read_write import (read_config_entry, read_simba_meta_files,
                                     write_df)
 
