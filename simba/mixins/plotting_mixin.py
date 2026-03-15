@@ -1245,24 +1245,82 @@ class PlottingMixin(object):
                   fig_size: Tuple[int] = (10, 6),
                   error_opacity: float = 0.2,
                   palette: str = 'Set1',
-                  save_path: Optional[Union[str, os.PathLike]] = None):
+                  grid: bool = True,
+                  bg_clr: str = 'white',
+                  line_width: float = 1.5,
+                  save_path: Optional[Union[str, os.PathLike]] = None,
+                  dpi: Optional[int] = None,
+                  tight_layout: bool = True,
+                  show_legend: bool = True,
+                  legend_loc: Optional[str] = 'best',
+                  font_size: Optional[int] = None,
+                  title_font_size: Optional[int] = None,
+                  x_lim: Optional[Tuple[float, float]] = None,
+                  y_lim: Optional[Tuple[float, float]] = None,
+                  marker: Optional[str] = None,
+                  markersize: Optional[float] = None,
+                  linestyle: Optional[Union[str, List[str]]] = None,
+                  save_kwargs: Optional[Dict[str, Any]] = None,
+                  svg: bool = False):
+        """
+        Line plot from DataFrame with optional error bands.
+
+        Optional styling arguments (useful for publication or clearer plots):
+        - dpi: Resolution for saved figure (e.g. 150, 300). Ignored when svg=True.
+        - tight_layout: If True, call fig.tight_layout() before save (default True).
+        - show_legend: Whether to show the legend (default True).
+        - legend_loc: Legend position, e.g. 'best', 'upper right', 'lower left'.
+        - font_size: Font size for axis labels and tick labels.
+        - title_font_size: Font size for the title (default 15 if title set).
+        - x_lim, y_lim: (min, max) tuples to fix axis limits.
+        - marker: Matplotlib marker for data points (e.g. 'o', 's', '^').
+        - markersize: Size of markers when marker is set.
+        - linestyle: Single style or list of styles per series ('-', '--', '-.', ':').
+        - save_kwargs: Dict passed to plt.savefig (e.g. bbox_inches='tight', pad_inches=0.1).
+        - svg: If True and save_path is set, save as SVG (path extension becomes .svg).
+        """
 
         check_instance(source=f"{PlottingMixin.line_plot.__name__} df", instance=df, accepted_types=(pd.DataFrame))
         check_str(name=f"{PlottingMixin.line_plot.__name__} x", value=x, options=tuple(df.columns))
         check_instance(source=f"{PlottingMixin.line_plot.__name__} y", instance=y, accepted_types=(str, list))
-        sns.set_style(style="whitegrid", rc={"grid.linestyle": "--"})
+        check_float(name=f"{PlottingMixin.line_plot.__name__} line_width", value=line_width, allow_zero=False, allow_negative=False, raise_error=True)
+        check_valid_boolean(value=grid, source=f"{PlottingMixin.line_plot.__name__} grid", raise_error=True)
+        check_str(name=f"{PlottingMixin.line_plot.__name__} bg_clr", value=bg_clr.lower(), options=tuple(get_named_colors()))
+        bg_clr = bg_clr.lower()
+        if dpi is not None:
+            check_int(name=f"{PlottingMixin.line_plot.__name__} dpi", value=dpi, min_value=1, raise_error=True)
+        if font_size is not None:
+            check_int(name=f"{PlottingMixin.line_plot.__name__} font_size", value=font_size, min_value=1, raise_error=True)
+        if title_font_size is not None:
+            check_int(name=f"{PlottingMixin.line_plot.__name__} title_font_size", value=title_font_size, min_value=1, raise_error=True)
+        if legend_loc is not None:
+            check_str(name=f"{PlottingMixin.line_plot.__name__} legend_loc", value=legend_loc,
+                      options=('best', 'upper right', 'upper left', 'lower left', 'lower right', 'right', 'center left', 'center right', 'lower center', 'upper center', 'center'),
+                      raise_error=True)
+        if x_lim is not None:
+            check_valid_tuple(x=x_lim, source=f"{PlottingMixin.line_plot.__name__} x_lim", accepted_lengths=(2,), valid_dtypes=(int, float))
+        if y_lim is not None:
+            check_valid_tuple(x=y_lim, source=f"{PlottingMixin.line_plot.__name__} y_lim", accepted_lengths=(2,), valid_dtypes=(int, float))
+        if markersize is not None:
+            check_float(name=f"{PlottingMixin.line_plot.__name__} markersize", value=markersize, allow_zero=False, allow_negative=False, raise_error=True)
+        if linestyle is not None and isinstance(linestyle, list):
+            check_instance(source=f"{PlottingMixin.line_plot.__name__} linestyle", instance=linestyle, accepted_types=(list,))
+            if len(linestyle) != len(y):
+                raise ValueError(f"{PlottingMixin.line_plot.__name__} linestyle list length must match number of y series ({len(y)}).")
+        check_valid_boolean(value=svg, source=f"{PlottingMixin.line_plot.__name__} svg", raise_error=True)
+        if grid:
+            sns.set_style(style="whitegrid", rc={"grid.linestyle": "--"})
+        else:
+            sns.set_style(style="white")
 
         if isinstance(y, str):
             check_str(name=f"{PlottingMixin.line_plot.__name__} y", value=y, options=tuple(df.columns))
-            check_valid_lst(data=list(df[y]), source=f"{PlottingMixin.line_plot.__name__} y",
-                            valid_dtypes=Formats.NUMERIC_DTYPES.value)
+            check_valid_lst(data=list(df[y]), source=f"{PlottingMixin.line_plot.__name__} y", valid_dtypes=Formats.NUMERIC_DTYPES.value)
             y = [y]
             if error is not None:
-                check_instance(source=f"{PlottingMixin.line_plot.__name__} error", instance=error,
-                               accepted_types=(str,))
+                check_instance(source=f"{PlottingMixin.line_plot.__name__} error", instance=error, accepted_types=(str,))
                 check_str(name=f"{PlottingMixin.line_plot.__name__} error", value=error, options=tuple(df.columns))
-                check_valid_lst(data=list(df[error]), source=f"{PlottingMixin.line_plot.__name__} error",
-                                valid_dtypes=Formats.NUMERIC_DTYPES.value)
+                check_valid_lst(data=list(df[error]), source=f"{PlottingMixin.line_plot.__name__} error", valid_dtypes=Formats.NUMERIC_DTYPES.value)
                 error = [error]
         else:
             for i in y:
@@ -1275,24 +1333,59 @@ class PlottingMixin(object):
                     check_valid_lst(data=list(df[i]), source=f"{PlottingMixin.line_plot.__name__} error", valid_dtypes=Formats.NUMERIC_DTYPES.value)
 
         fig, ax = plt.subplots(figsize=fig_size)
+        fig.set_facecolor(bg_clr)
+        ax.set_facecolor(bg_clr)
+        colors = sns.color_palette(palette, n_colors=len(y))
         for i in range(len(y)):
-            sns.lineplot(data=df, x=x, y=y[i], label=y[i], palette=palette)
+            ls = linestyle[i] if isinstance(linestyle, list) else linestyle
+            plot_kw = dict(data=df, x=x, y=y[i], label=y[i], color=colors[i], linewidth=line_width)
+            if marker is not None:
+                plot_kw['marker'] = marker
+            if ls is not None:
+                plot_kw['linestyle'] = ls
+            sns.lineplot(**plot_kw)
             if error is not None:
-                ax.fill_between(df[x], df[y[i]] - df[error[i]], df[y[i]] + df[error[i]], alpha=error_opacity)
+                ax.fill_between(df[x], df[y[i]] - df[error[i]], df[y[i]] + df[error[i]], alpha=error_opacity, color=colors[i])
+        if marker is not None and markersize is not None:
+            for line in ax.get_lines():
+                line.set_markersize(markersize)
 
         if x_label is not None:
             check_str(name=f"{PlottingMixin.line_plot.__name__} x_label", value=x_label)
-            ax.set_xlabel(x_label)
+            ax.set_xlabel(x_label, fontsize=font_size)
         if y_label is not None:
             check_str(name=f"{PlottingMixin.line_plot.__name__} y_label", value=y_label)
-            ax.set_ylabel(y_label)
+            ax.set_ylabel(y_label, fontsize=font_size)
         if title is not None:
             check_str(name=f"{PlottingMixin.line_plot.__name__} title", value=title)
-            ax.set_title(title, ha="center", fontsize=15)
+            ax.set_title(title, ha="center", fontsize=title_font_size if title_font_size is not None else 15)
+        if font_size is not None:
+            ax.tick_params(axis='both', labelsize=font_size)
+        if x_lim is not None:
+            ax.set_xlim(x_lim[0], x_lim[1])
+        if y_lim is not None:
+            ax.set_ylim(y_lim[0], y_lim[1])
+        if not show_legend:
+            ax.legend_.remove() if ax.legend_ is not None else None
+        elif legend_loc is not None and ax.legend_ is not None:
+            ax.legend(loc=legend_loc, fontsize=font_size)
+        ax.grid(grid)
+        if tight_layout:
+            fig.tight_layout()
         if save_path is not None:
             check_str(name=f"{PlottingMixin.line_plot.__name__} save_path", value=save_path)
             check_if_dir_exists(in_dir=os.path.dirname(save_path))
-            plt.savefig(save_path)
+            out_path = save_path
+            save_opts = {}
+            if svg:
+                save_dir, save_name, _ = get_fn_ext(filepath=save_path)
+                out_path = os.path.join(save_dir, f'{save_name}.svg')
+                save_opts['format'] = 'svg'
+            elif dpi is not None:
+                save_opts['dpi'] = dpi
+            if isinstance(save_kwargs, dict):
+                save_opts.update(save_kwargs)
+            plt.savefig(out_path, **save_opts)
             plt.close("all")
         else:
             return fig

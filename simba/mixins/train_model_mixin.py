@@ -458,8 +458,7 @@ class TrainModelMixin(object):
         """
 
         if multiclass and classifier_map is None:
-            raise InvalidInputError(
-                msg="Creating PR curve for multi-classifier but classifier_map not defined. Pass classifier_map argument")
+            raise InvalidInputError(msg="Creating PR curve for multi-classifier but classifier_map not defined. Pass classifier_map argument")
         stdout_information(msg="Calculating PR curves...")
         timer = SimbaTimer(start=True)
         if not multiclass:
@@ -495,7 +494,24 @@ class TrainModelMixin(object):
             self.pr_save_path_plot = os.path.join(save_dir, f"{clf_name}_pr_curve.png")
         pr_df.to_csv(self.pr_save_path, index=False)
         if plot:
-            _ = PlottingMixin.line_plot(df=pr_df, x="DISCRIMINATION THRESHOLDS", y=['PRECISION', 'RECALL', 'F1'], x_label='discrimination threshold', y_label='PERFORMANCE', title=f'SimBA {clf_name} precision-recall curve', save_path=self.pr_save_path_plot)
+            _ = PlottingMixin.line_plot(df=pr_df,
+                                        x="DISCRIMINATION THRESHOLDS",
+                                        y=['PRECISION', 'RECALL', 'F1'],
+                                        x_label='DISCRIMINATION THRESHOLD',
+                                        y_label='PERFORMANCE',
+                                        title=f'SimBA {clf_name} precision-recall curve',
+                                        save_path=self.pr_save_path_plot,
+                                        grid=False,
+                                        bg_clr='white',
+                                        line_width=7,
+                                        dpi=150,
+                                        font_size=11,
+                                        title_font_size=14,
+                                        legend_loc='center right',
+                                        x_lim=(0.0, 1.0),
+                                        y_lim=(0.0, 1.0),
+                                        save_kwargs=dict(bbox_inches='tight', pad_inches=0.2),
+                                        svg=False)
         timer.stop_timer()
         stdout_information(msg=f"Precision-recall curve calculation complete (elapsed time: {timer.elapsed_time_str}s) ...")
 

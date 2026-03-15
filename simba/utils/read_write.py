@@ -3438,10 +3438,17 @@ def read_sleap_csv(file_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, li
     data_df = pd.read_csv(file_path)
     check_valid_dataframe(df=data_df, source=read_sleap_csv.__name__, required_fields=REQUIRED_COLUMNS)
     check_valid_dataframe(df=data_df.drop(REQUIRED_COLUMNS[0], axis=1), source=read_sleap_csv.__name__, valid_dtypes=Formats.NUMERIC_DTYPES.value)
-    data_df[REQUIRED_COLUMNS[0]] = data_df[REQUIRED_COLUMNS[0]].astype(str).str.replace(r"[^\d.]+", "", regex=True).astype(int)
+    all_track_missing = pd.to_numeric(data_df[REQUIRED_COLUMNS[0]], errors="coerce").isna().all()
+    if all_track_missing: data_df[REQUIRED_COLUMNS[0]] = 0
+    data_df[REQUIRED_COLUMNS[0]] = data_df[REQUIRED_COLUMNS[0]].astype(str).str.replace(r"[^\d.]+", "", regex=True).astype(np.int64)
     headers = list(data_df.drop(REQUIRED_COLUMNS, axis=1).columns)
     bp_names = np.unique([x.split('.', 1)[0] for x in headers])
     bp_headers = [(f'{x}.x', f'{x}.y') for x in bp_names]
+
+    bp_header_order = [(f'{x}.x', f'{x}.y', f'{x}.score') for x in bp_names]
+    bp_header_order = REQUIRED_COLUMNS + [i for t in bp_header_order for i in t]
+    data_df = data_df[bp_header_order]
+
 
     return data_df, bp_names, [i for t in bp_headers for i in t]
 

@@ -15,7 +15,7 @@ from simba.utils.checks import (
     check_if_keys_exist_in_dict, check_int, check_that_column_exist,
     check_valid_dict, check_valid_lst)
 from simba.utils.data import plug_holes_shortest_bout
-from simba.utils.enums import TagNames
+from simba.utils.enums import TagNames, ConfigKey
 from simba.utils.errors import InvalidInputError, NoFilesFoundError
 from simba.utils.printing import (SimbaTimer, log_event, stdout_information,
                                   stdout_success)
@@ -115,8 +115,13 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
                         if self.verbose: stdout_information(msg=f'Correcting minimum bouts in video {file_name} and classifier {m_hyp[MODEL_NAME]} ({clf_min_bout}ms)...')
                         out_df = plug_holes_shortest_bout(data_df=out_df, clf_name=m_hyp[MODEL_NAME], fps=fps, shortest_bout=clf_min_bout)
                 else:
-                    for model_subset_name, model_x in self.feature_subsets_by_clf[m_hyp[MODEL_NAME]].items():
+                    subset_cnts = len(self.feature_subsets_by_clf[m_hyp[MODEL_NAME]].keys())
+                    self.config.set(section=ConfigKey.SML_SETTINGS.value, option=ConfigKey.TARGET_CNT.value, value=str(subset_cnts))
+                    for mdl_cnt, (model_subset_name, model_x) in enumerate(self.feature_subsets_by_clf[m_hyp[MODEL_NAME]].items()):
                         probability_column = f"Probability_{m_hyp[MODEL_NAME]}_{model_subset_name}"
+                        self.config.set(section=ConfigKey.SML_SETTINGS.value, option=f'target_name_{mdl_cnt+1}', value=f'{m_hyp[MODEL_NAME]}_{model_subset_name}')
+                        self.config.set(section=ConfigKey.THRESHOLD_SETTINGS.value, option=f'threshold_{mdl_cnt+1}', value=f'{m_hyp[THRESHOLD]}')
+                        self.config.set(section=ConfigKey.MIN_BOUT_LENGTH.value, option=f'min_bout_{mdl_cnt+1}', value=f'{m_hyp[MINIMUM_BOUT_LENGTH]}')
                         check_that_column_exist(df=x_df, column_name=model_x, file_name=file_path, raise_error=True)
                         out_df[probability_column] = self.clf_predict_proba(clf=clf, x_df=x_df[model_x], data_path=file_path, model_name=model_subset_name)
                         out_df[f'{m_hyp[MODEL_NAME]}_{model_subset_name}'] = np.where(out_df[probability_column] > m_hyp[THRESHOLD], 1, 0)
@@ -124,6 +129,7 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
                         if int(clf_min_bout) > 0:
                             if self.verbose: stdout_information(msg=f'Correcting minimum bouts in video {file_name} and classifier {m_hyp[MODEL_NAME]} ({clf_min_bout}ms)...')
                             out_df = plug_holes_shortest_bout(data_df=out_df, clf_name=f'{m_hyp[MODEL_NAME]}_{model_subset_name}', fps=fps, shortest_bout=clf_min_bout)
+                    with open(self.config_path, "w") as f: self.config.write(f)
             write_df(df=out_df, file_type=self.file_type, save_path=file_save_path)
             video_timer.stop_timer()
             if self.verbose: stdout_information(msg=f"Predictions created for {file_name} (frame count: {len(in_df)}, elapsed time: {video_timer.elapsed_time_str}) ...")

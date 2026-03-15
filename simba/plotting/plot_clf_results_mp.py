@@ -329,7 +329,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         optimal_circle_size = self.get_optimal_circle_size(frame_size=(self.video_meta_data["width"], self.video_meta_data["height"]), circle_frame_ratio=100)
         longest_str = str(max(['TIMERS:', 'ENSEMBLE PREDICTION:'] + self.clf_names, key=len))
         self.video_text_thickness = TextOptions.TEXT_THICKNESS.value if self.text_thickness is None else int(max(self.text_thickness, 1))
-        optimal_font_size, _, optimal_spacing_scale = self.get_optimal_font_scales(text=longest_str, accepted_px_width=int(self.video_meta_data["width"] / 2), accepted_px_height=int(self.video_meta_data["height"] / 5), text_thickness=self.video_text_thickness)
+        optimal_font_size, _, optimal_spacing_scale = self.get_optimal_font_scales(text=longest_str, accepted_px_width=int(self.video_meta_data["width"] / 4), accepted_px_height=int(self.video_meta_data["height"] / 8), text_thickness=self.video_text_thickness)
         self.video_circle_size = optimal_circle_size if self.circle_size is None else int(max(1, self.circle_size))
         self.video_font_size = optimal_font_size if self.font_size is None else self.font_size
         self.video_space_size = optimal_spacing_scale if self.space_size is None else int(max(self.space_size, 1))
@@ -445,23 +445,39 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
 
 
 
+# if __name__ == "__main__":
+#     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",
+#                                                  video_paths=None, #r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\videos\2026-01-05 14-17-54 box1_1143_0_Gq_sal.mp4",
+#                                                  video_setting=True,
+#                                                  frame_setting=False,
+#                                                  print_timers=True,
+#                                                  rotate=False,
+#                                                  show_confidence=False,
+#                                                  core_cnt=16,
+#                                                  animal_names=False,
+#                                                  #time_slice={START_TIME: '00:00:00', END_TIME: '00:01:00'},python
+#                                                  bbox=None,
+#                                                  text_opacity=0.6,
+#                                                  show_gantt=2)
+#     clf_plotter.run()
+#
+
+
+
 if __name__ == "__main__":
-    clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",
-                                                 video_paths=None, #r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\videos\2026-01-05 14-17-54 box1_1143_0_Gq_sal.mp4",
-                                                 video_setting=True,
-                                                 frame_setting=False,
-                                                 print_timers=True,
-                                                 rotate=False,
-                                                 show_confidence=False,
-                                                 core_cnt=16,
-                                                 animal_names=False,
-                                                 #time_slice={START_TIME: '00:00:00', END_TIME: '00:01:00'},
-                                                 bbox=None,
-                                                 text_opacity=0.6,
-                                                 show_gantt=2)
+    clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"F:\troubleshooting\sophiaa\project_folder\project_config.ini",
+                                                video_setting=True,
+                                                frame_setting=False,
+                                                #video_paths=r"F:\troubleshooting\sophiaa\project_folder\videos\Choice222.mp4",
+                                                print_timers=True,
+                                                rotate=False,
+                                                animal_names=True,
+                                                core_cnt=6,
+                                                circle_size=4,
+                                                time_slice={START_TIME: '00:00:00', END_TIME: '00:01:00'},
+                                                bbox=None,#'animal-aligned',
+                                                show_gantt=None)
     clf_plotter.run()
-
-
 
 
 # if __name__ == "__main__":

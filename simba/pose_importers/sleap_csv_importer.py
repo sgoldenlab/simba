@@ -21,7 +21,7 @@ from simba.utils.printing import SimbaTimer, log_event, stdout_success
 from simba.utils.read_write import (clean_sleap_file_name,
                                     find_all_videos_in_project,
                                     find_files_of_filetypes_in_directory,
-                                    get_fn_ext, get_video_meta_data, write_df)
+                                    get_fn_ext, get_video_meta_data, write_df, read_sleap_csv)
 
 TRACK = "track"
 INSTANCE_SCORE = "instance.score"
@@ -93,7 +93,7 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
             video_timer = SimbaTimer(start=True)
             self.video_name = video_name
             self.save_path = os.path.join(os.path.join(self.input_csv_dir, f"{output_filename}.{self.file_type}"))
-            data_df = pd.read_csv(video_data["DATA"])
+            data_df, bp_names, headers = read_sleap_csv(file_path=video_data["DATA"])
             if INSTANCE_SCORE in data_df.columns:
                 data_df = data_df.drop([INSTANCE_SCORE], axis=1)
             idx = data_df.iloc[:, :2]
@@ -145,11 +145,11 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
 # test.run()
 
 
-# test = SLEAPImporterCSV(config_path=r"C:\troubleshooting\SLP_TEST0525\project_folder\project_config.ini",
-#                  data_folder=r'C:\troubleshooting\SLP_TEST0525\data_csv',
-#                  id_lst=['Animal_1', 'Animal_2', 'Animal_3', 'Animal_4'],
-#                  interpolation_settings={'type': 'body-parts', 'method': 'linear'},
-#                  smoothing_settings = {'time_window': 500, 'method': 'gaussian'})
+# test = SLEAPImporterCSV(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini",
+#                  data_folder=r'F:\troubleshooting\sam\raw_pose',
+#                  id_lst=['Animal_1',],
+#                  interpolation_settings={'type': 'body-parts', 'method': 'nearest'},
+#                  smoothing_settings = {'time_window': 200, 'method': 'savitzky-golay'})
 # test.run()
 #
 

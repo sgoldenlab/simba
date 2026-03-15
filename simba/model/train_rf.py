@@ -165,7 +165,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
                 self.calc_learning_curve(x_y_df=self.x_y_df, clf_name=self.clf_name, shuffle_splits=shuffle_splits, dataset_splits=dataset_splits, tt_size=self.tt_size, rf_clf=self.rf_clf, save_dir=self.eval_out_path)
 
             if generate_precision_recall_curve in Options.PERFORM_FLAGS.value:
-                self.calc_pr_curve(self.rf_clf,self.x_test,self.y_test,self.clf_name,self.eval_out_path)
+                self.calc_pr_curve(rf_clf=self.rf_clf, x_df=self.x_test, y_df=self.y_test, clf_name=self.clf_name, save_dir=self.eval_out_path)
             if generate_example_decision_tree in Options.PERFORM_FLAGS.value:
                 self.create_example_dt(self.rf_clf, self.clf_name, self.feature_names, self.class_names, self.eval_out_path)
             if generate_classification_report in Options.PERFORM_FLAGS.value:

@@ -140,18 +140,16 @@ class Statistics(FeatureExtractionMixin):
         window_size = int(time_window * fps)
         data = np.split(data, list(range(window_size, data.shape[0], window_size)))
         for cnt, i in enumerate(prange(1, len(data))):
-            start, end = int((cnt + 1) * window_size), int(
-                ((cnt + 1) * window_size) + window_size
-            )
+            start, end = int((cnt + 1) * window_size), int(((cnt + 1) * window_size) + window_size)
             mean_1, mean_2 = np.mean(data[i - 1]), np.mean(data[i])
             stdev_1, stdev_2 = np.std(data[i - 1]), np.std(data[i])
-            pooled_std = np.sqrt(
-                ((len(data[i - 1]) - 1) * stdev_1**2 + (len(data[i]) - 1) * stdev_2**2)
-                / (len(data[i - 1]) + len(data[i]) - 2)
-            )
-            results[start:end] = (mean_1 - mean_2) / (
-                pooled_std * np.sqrt(1 / len(data[i - 1]) + 1 / len(data[i]))
-            )
+            denom = len(data[i - 1]) + len(data[i]) - 2
+            num = ((len(data[i - 1]) - 1) * stdev_1**2 + (len(data[i]) - 1) * stdev_2**2)
+            if num <= 0:
+                results[start:end] = -1
+            else:
+                pooled_std = np.sqrt(((num / (denom))))
+                results[start:end] = (mean_1 - mean_2) / (pooled_std * np.sqrt(1 / len(data[i - 1]) + 1 / len(data[i])))
         return results
 
     @staticmethod
