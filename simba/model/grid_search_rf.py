@@ -1,20 +1,23 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import os
-from typing import Optional, Union
 from copy import deepcopy
+from typing import Optional, Union
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import check_if_filepath_list_is_empty, check_str, check_if_dir_exists
+from simba.utils.checks import (check_if_dir_exists,
+                                check_if_filepath_list_is_empty, check_str)
 from simba.utils.enums import (ConfigKey, Dtypes, Formats, Methods,
                                MLParamKeys, Options)
 from simba.utils.errors import InvalidInputError, NoDataError
 from simba.utils.printing import stdout_information, stdout_success
-from simba.utils.read_write import (read_config_entry, read_simba_meta_files,
-                                    write_df, find_files_of_filetypes_in_directory)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    read_config_entry, read_simba_meta_files,
+                                    write_df)
 
 
 class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
