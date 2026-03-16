@@ -17,7 +17,8 @@ from simba.utils.checks import (check_if_dir_exists,
                                 check_valid_lst)
 from simba.utils.enums import Methods, TagNames
 from simba.utils.errors import AnimalNumberError, CountError
-from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
+from simba.utils.printing import (SimbaTimer, log_event, stdout_information,
+                                  stdout_success)
 from simba.utils.read_write import (clean_sleap_file_name,
                                     find_all_videos_in_project,
                                     find_files_of_filetypes_in_directory,
