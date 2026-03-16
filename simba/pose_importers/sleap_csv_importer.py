@@ -21,7 +21,8 @@ from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_i
 from simba.utils.read_write import (clean_sleap_file_name,
                                     find_all_videos_in_project,
                                     find_files_of_filetypes_in_directory,
-                                    get_fn_ext, get_video_meta_data, write_df, read_sleap_csv)
+                                    get_fn_ext, get_video_meta_data,
+                                    read_sleap_csv, write_df)
 
 TRACK = "track"
 INSTANCE_SCORE = "instance.score"

@@ -15,7 +15,7 @@ from simba.utils.checks import (
     check_if_keys_exist_in_dict, check_int, check_that_column_exist,
     check_valid_dict, check_valid_lst)
 from simba.utils.data import plug_holes_shortest_bout
-from simba.utils.enums import TagNames, ConfigKey
+from simba.utils.enums import ConfigKey, TagNames
 from simba.utils.errors import InvalidInputError, NoFilesFoundError
 from simba.utils.printing import (SimbaTimer, log_event, stdout_information,
                                   stdout_success)
