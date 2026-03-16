@@ -26,6 +26,8 @@ from simba.utils.read_write import (find_all_videos_in_directory,
 AUTO = 'AUTO'
 TEXT_SIZE_OPTIONS = list(range(1, 101))
 TEXT_SIZE_OPTIONS.insert(0, 'AUTO')
+VALID_CLR = 'white'
+INVALID_CLR = 'lightsalmon'
 
 OPACITY_OPTIONS = list(np.arange(0.1, 1.1, 0.1))
 OPACITY_OPTIONS = [round(x, 1) for x in OPACITY_OPTIONS]
@@ -82,8 +84,8 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
 
         self.time_segment_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="TIME SEGMENT", icon_name='timer', icon_link=Links.SKLEARN_PLOTS.value, padx=5, pady=5, relief='solid', tooltip_key='CLF_PLOT_TIME_SEGMENT')
         self.time_cb, self.time_var = SimbaCheckbox(parent=self.time_segment_frm, txt='PLOT SPECIFIC TIME SEGMENT', txt_img='timer', cmd=self._set_timeslice_state, val=False, tooltip_key='CLF_PLOT_PLOT_SPECIFIC_TIME_SEGMENT')
-        self.start_eb = Entry_Box(parent=self.time_segment_frm, fileDescription='START TIME  (HH:MM:SS):', labelwidth=25, entry_box_width=20, value='00:00:00', justify='center', status=DISABLED, tooltip_key='CLF_PLOT_START_TIME')
-        self.end_eb = Entry_Box(parent=self.time_segment_frm, fileDescription='END TIME (HH:MM:SS):', labelwidth=25, entry_box_width=20, value='00:01:00', justify='center', status=DISABLED, tooltip_key='CLF_PLOT_END_TIME')
+        self.start_eb = Entry_Box(parent=self.time_segment_frm, fileDescription='START TIME  (HH:MM:SS):', labelwidth=25, entry_box_width=20, value='00:00:00', justify='center', status=DISABLED, tooltip_key='CLF_PLOT_START_TIME', trace=self._set_entry_clr)
+        self.end_eb = Entry_Box(parent=self.time_segment_frm, fileDescription='END TIME (HH:MM:SS):', labelwidth=25, entry_box_width=20, value='00:01:00', justify='center', status=DISABLED, tooltip_key='CLF_PLOT_END_TIME', trace=self._set_entry_clr)
 
         self.time_segment_frm.grid(row=2, column=0, sticky=NW)
         self.time_cb.grid(row=0, column=0, sticky=NW)
@@ -95,10 +97,10 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ', label_width=40, dropdown_width=30, value='FALSE', state=DISABLED if not gpu_available else NORMAL, img='gpu_3', tooltip_key='CLF_PLOT_USE_GPU')
         self.gantt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(GANTT_OPTIONS.keys()), label='SHOW GANTT PLOT:', label_width=40, dropdown_width=30, value=list(GANTT_OPTIONS.keys())[0], img='gantt_small', tooltip_key='CLF_PLOT_GANTT')
         self.bbox_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['FALSE', Options.AXIS_ALIGNED.value, Options.ANIMAL_ALIGNED.value], label='SHOW ANIMAL BOUNDING BOXES:', label_width=40, dropdown_width=30, value='FALSE', img='rectangle', tooltip_key='CLF_PLOT_SHOW_BBOX')
+        self.timer_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['FALSE', Options.SECONDS.value, Options.HHMMSSSSSS.value], label='SHOW CLASSIFICATION TIMERS:', label_width=40, dropdown_width=30, value=Options.SECONDS.value, img='timer', tooltip_key='CLF_PLOT_INCLUDE_TIMERS')
 
         self.create_videos_cb, self.create_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEO', font=Formats.FONT_REGULAR.value, txt_img='video', val=True, tooltip_key='CLF_PLOT_CREATE_VIDEO')
         self.create_frames_cb, self.create_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', font=Formats.FONT_REGULAR.value, txt_img='frames', val=False, tooltip_key='CLF_PLOT_CREATE_FRAMES')
-        self.timers_cb, self.include_timers_var = SimbaCheckbox(parent=self.settings_frm, txt='INCLUDE TIMERS OVERLAY', font=Formats.FONT_REGULAR.value, txt_img='timer', val=True, tooltip_key='CLF_PLOT_INCLUDE_TIMERS')
         self.rotate_cb, self.rotate_img_var = SimbaCheckbox(parent=self.settings_frm, txt="ROTATE VIDEO 90°", font=Formats.FONT_REGULAR.value, txt_img='rotate', val=False, tooltip_key='CLF_PLOT_ROTATE_VIDEO')
         self.show_pose_cb, self.show_pose_var = SimbaCheckbox(parent=self.settings_frm, txt="SHOW TRACKING (POSE)", font=Formats.FONT_REGULAR.value, txt_img='pose', val=True, tooltip_key='CLF_PLOT_SHOW_POSE')
         self.show_animal_names_cb, self.show_animal_names_var = SimbaCheckbox(parent=self.settings_frm, txt="SHOW ANIMAL NAME(S)", font=Formats.FONT_REGULAR.value, txt_img='label', val=False, tooltip_key='CLF_PLOT_SHOW_ANIMAL_NAMES')
@@ -109,14 +111,13 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.gpu_dropdown.grid(row=1, column=0, sticky=NW)
         self.gantt_dropdown.grid(row=2, column=0, sticky=NW)
         self.bbox_dropdown.grid(row=3, column=0, sticky=NW)
-        self.show_pose_cb.grid(row=4, column=0, sticky=NW)
-        self.conf_cb.grid(row=5, column=0, sticky=NW)
-        self.show_animal_names_cb.grid(row=6, column=0, sticky=NW)
-        self.create_videos_cb.grid(row=7, column=0,  sticky=NW)
-        self.create_frames_cb.grid(row=8, column=0,  sticky=NW)
-        self.timers_cb.grid(row=9, column=0, sticky=NW)
+        self.timer_dropdown.grid(row=4, column=0, sticky=NW)
+        self.show_pose_cb.grid(row=5, column=0, sticky=NW)
+        self.conf_cb.grid(row=6, column=0, sticky=NW)
+        self.show_animal_names_cb.grid(row=7, column=0, sticky=NW)
+        self.create_videos_cb.grid(row=8, column=0,  sticky=NW)
+        self.create_frames_cb.grid(row=9, column=0,  sticky=NW)
         self.rotate_cb.grid(row=10, column=0, sticky=NW)
-
 
         self.run_single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO",  icon_name='video', icon_link=Links.SKLEARN_PLOTS.value, padx=5,  pady=5, relief='solid')
         self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="CREATE SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__run, cmd_kwargs={'multiple': lambda: False})
@@ -134,6 +135,14 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.run_multiple_videos.grid(row=5, sticky=NW)
         self.run_multiple_video_btn.grid(row=0, sticky=NW)
         self.main_frm.mainloop()
+
+    def _set_entry_clr(self, entry_box: Entry_Box):
+        value = entry_box.entry_get
+        valid_timestamp = check_if_string_value_is_valid_video_timestamp(value=value, raise_error=False, name='')
+        if not valid_timestamp:
+            entry_box.set_bg_clr(clr=INVALID_CLR)
+        else:
+            entry_box.set_bg_clr(clr=VALID_CLR)
 
 
     def _set_timeslice_state(self):
@@ -163,12 +172,14 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         text_bg_clr = self.clr_dict[self.bg_clr_dropdown.get_value()]
         pose_palette = self.tracking_clr_palette_dropdown.get_value()
         bbox = None if self.bbox_dropdown.get_value() == 'FALSE' else self.bbox_dropdown.get_value()
+        timer = None if self.timer_dropdown.get_value() == 'FALSE' else self.timer_dropdown.get_value().lower()
         show_confidence = self.conf_var.get()
         gantt = GANTT_OPTIONS[self.gantt_dropdown.get_value()]
         show_pose, show_animal_names = self.show_pose_var.get(), self.show_animal_names_var.get()
         gpu = str_2_bool(self.gpu_dropdown.get_value())
         core_cnt = int(self.multiprocess_dropdown.get_value())
         frm_setting, video_setting = self.create_frames_var.get(), self.create_videos_var.get()
+
         if not frm_setting and not video_setting:
             raise NoSpecifiedOutputError(msg="Please choose to create a video and/or frames. SimBA found that you ticked neither video and/or frames", source=self.__class__.__name__)
 
@@ -192,7 +203,6 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
                                                    rotate=self.rotate_img_var.get(),
                                                    video_paths=video_path,
                                                    frame_setting=self.create_frames_var.get(),
-                                                   print_timers=self.include_timers_var.get(),
                                                    font_size=font_size,
                                                    space_size=space_size,
                                                    text_thickness=text_thickness,
@@ -212,7 +222,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
                                                      rotate=self.rotate_img_var.get(),
                                                      video_paths=video_path,
                                                      frame_setting=self.create_frames_var.get(),
-                                                     print_timers=self.include_timers_var.get(),
+                                                     print_timer=timer,
                                                      core_cnt=core_cnt,
                                                      font_size=font_size,
                                                      space_size=space_size,
@@ -235,4 +245,4 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
 #_ = SklearnVisualizationPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 #_ = SklearnVisualizationPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 
-#_ = SklearnVisualizationPopUp(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/project_config.ini")
+#_ = SklearnVisualizationPopUp(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini")

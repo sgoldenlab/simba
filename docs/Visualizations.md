@@ -466,6 +466,7 @@ Creates videos with ROI shapes overlaid on each frame, plus **counters** showing
 | **SHOW POSE-ESTIMATED LOCATIONS** | If TRUE, draws circles at the selected body-part locations. Disables KEY-POINT SIZE and COLOR when FALSE. |
 | **SHOW ANIMAL NAMES** | Display animal labels on the video. |
 | **SHOW ANIMAL BOUNDING BOXES** | **FALSE** = no bounding box. **axis-aligned** = axis-aligned bounding box (aligned with video axes). **animal-aligned** = minimum rotated rectangle that aligns with the animal's orientation. |
+| **SHOW CLASSIFICATION TIMERS** | Controls timer format shown with ROI counters. **SECONDS** = numeric seconds. **HH:MM:SS.SSSS** = clock-style timestamp with fractional seconds. |
 | **BORDER BACKGROUND COLOR** | Color of the side panel where ROI counters are shown. |
 | **OUTSIDE ROI ZONES DATA** | If TRUE, treats all areas NOT covered by an ROI as one additional ROI and shows its metrics. |
 | **NUMBER OF CPU CORES** | Cores for parallel processing (1 to max). |

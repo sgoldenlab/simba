@@ -40,11 +40,12 @@ from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError,
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_current_time,
-                                    get_video_meta_data, read_df)
+                                    get_video_meta_data, read_df, seconds_to_timestamp)
 from simba.utils.warnings import (DuplicateNamesWarning, FrameRangeWarning,
                                   GPUToolsWarning)
 
 pd.options.mode.chained_assignment = None
+SECONDS, HHMMSSSSSS = ['seconds', 'hh:mm:ss.ssss']
 
 
 
@@ -65,6 +66,7 @@ def _roi_plotter_mp(data: Tuple[int, pd.DataFrame],
                     threshold: float,
                     outside_roi: bool,
                     verbose: bool,
+                    print_timer: str,
                     border_bg_clr: tuple,
                     animal_bp_dict: dict,
                     bbox: Optional[str]):
@@ -121,6 +123,7 @@ def _roi_plotter_mp(data: Tuple[int, pd.DataFrame],
                 for shape_name in video_shape_names:
                     shape_color = TextOptions.WHITE.value if shape_name == ROI_SETTINGS.OUTSIDE_ROI.value else roi_dict[shape_name]["Color BGR"]
                     timer = round(data_df.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_time"], 2)
+                    if print_timer == HHMMSSSSSS: timer = seconds_to_timestamp(seconds=timer, hh_mm_ss_sss=True)
                     entries = data_df.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_entries"]
                     img = cv2.putText(img, str(timer), loc_dict[animal_name][shape_name]["timer_data_loc"], TextOptions.FONT.value, font_size, shape_color, TextOptions.TEXT_THICKNESS.value)
                     img = cv2.putText(img, str(entries), loc_dict[animal_name][shape_name]["entries_data_loc"], TextOptions.FONT.value, font_size, shape_color, TextOptions.TEXT_THICKNESS.value)
@@ -173,6 +176,7 @@ class ROIPlotMultiprocess(ConfigReader):
     :param bool show_body_part: If True, display body-part locations as circles on the video frames. Default: True.
     :param bool show_animal_name: If True, display animal names on the video frames. Default: False.
     :param Optional[Literal['axis-aligned', 'animal-aligned']] bbox: If not None, draw bounding boxes around each animal. ``'axis-aligned'`` = rectangle aligned with video axes; ``'animal-aligned'`` = minimum rotated rectangle aligned with the animal's orientation. Default: None (no bounding boxes).
+    :param Literal['seconds', 'hh:mm:ss.ssss'] print_timer: Timer format for behavior/ROI counters shown in the border panel. ``'seconds'`` = numeric seconds, ``'hh:mm:ss.ssss'`` = clock-style timestamp with fractional seconds. Default: ``'seconds'``.
     :param Tuple[int, int, int] border_bg_clr: RGB tuple representing the background color of the border area where statistics are displayed. Default: (0, 0, 0).
     :param Optional[Union[str, os.PathLike]] data_path: Optional path to the pose-estimation data. If None, then locates file in ``outlier_corrected_movement_location`` directory. Default: None.
     :param Optional[Union[str, os.PathLike]] save_path: Optional path to where to save video. If None, then saves it in ``frames/output/roi_analysis`` directory of SimBA project. Default: None.
@@ -201,6 +205,7 @@ class ROIPlotMultiprocess(ConfigReader):
                  show_body_part: bool = True,
                  show_animal_name: bool = False,
                  bbox: Optional[Literal['axis-aligned', 'animal-aligned']] = None,
+                 print_timer: Literal['seconds', 'hh:mm:ss.ssss'] = 'seconds',
                  border_bg_clr: Tuple[int, int, int] = (0, 0, 0),
                  data_path: Optional[Union[str, os.PathLike]] = None,
                  save_path: Optional[Union[str, os.PathLike]] = None,
@@ -220,11 +225,9 @@ class ROIPlotMultiprocess(ConfigReader):
         check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
         check_valid_boolean(value=show_body_part, source=f'{self.__class__.__name__} show_body_part', raise_error=True)
         check_valid_boolean(value=show_animal_name, source=f'{self.__class__.__name__} show_animal_name', raise_error=True)
+        check_str(name=f'{self.__class__.__name__} timer', value=print_timer, options=(SECONDS, HHMMSSSSSS,))
         if bbox is not None:
             check_str(name=f'{self.__class__.__name__} bbox', value=bbox, options=Options.BBOX_OPTIONS.value, allow_blank=False, raise_error=True)
-
-
-
         if gpu and not check_nvidea_gpu_available():
             GPUToolsWarning(msg='GPU not detected but GPU set to True - skipping GPU use.')
             gpu = False
@@ -277,7 +280,7 @@ class ROIPlotMultiprocess(ConfigReader):
         check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.video_name, raise_error=False)
         self.cap = cv2.VideoCapture(self.video_path)
         self.threshold, self.body_parts, self.show_animal_name, self.gpu, self.outside_roi, self.verbose, self.border_bg_clr = threshold, body_parts, show_animal_name, gpu, outside_roi, verbose, border_bg_clr
-        self.show_pose, self.bbox = show_body_part, bbox
+        self.show_pose, self.bbox, self.print_timer = show_body_part, bbox, print_timer
         self.roi_dict_ = get_roi_dict_from_dfs(rectangle_df=self.sliced_roi_dict[Keys.ROI_RECTANGLES.value], circle_df=self.sliced_roi_dict[Keys.ROI_CIRCLES.value], polygon_df=self.sliced_roi_dict[Keys.ROI_POLYGONS.value])
         self.temp_folder = os.path.join(os.path.dirname(self.save_path), self.video_name, "temp")
         if os.path.exists(self.temp_folder): shutil.rmtree(self.temp_folder)
@@ -393,6 +396,7 @@ class ROIPlotMultiprocess(ConfigReader):
                                       roi_dict = self.roi_dict_,
                                       video_shape_names=self.shape_names,
                                       bp_colors=self.color_lst,
+                                      print_timer=self.print_timer,
                                       show_animal_name=self.show_animal_name,
                                       show_pose=self.show_pose,
                                       animal_ids=self.animal_names,

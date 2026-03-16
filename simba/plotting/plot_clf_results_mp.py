@@ -41,9 +41,10 @@ from simba.utils.read_write import (concatenate_videos_in_folder,
                                     get_fn_ext, get_video_meta_data,
                                     read_config_entry, read_df,
                                     seconds_to_timestamp)
-from simba.utils.warnings import FrameRangeWarning
+from simba.utils.warnings import FrameRangeWarning, FileExistWarning
 
 START_TIME, END_TIME = 'start_time', 'end_time'
+SECONDS, HHMMSSSSSS = ['seconds', 'hh:mm:ss.ssss']
 
 
 def _multiprocess_sklearn_video(data: pd.DataFrame,
@@ -53,7 +54,6 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                                 clf_cumsum: dict,
                                 rotate: bool,
                                 video_path: str,
-                                print_timers: bool,
                                 video_setting: bool,
                                 frame_setting: bool,
                                 pose_threshold: float,
@@ -65,6 +65,7 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                                 font_size: int,
                                 space_size: int,
                                 text_thickness: int,
+                                timer: str,
                                 text_opacity: float,
                                 text_bg_clr: Tuple[int, int, int],
                                 text_color: Tuple[int, int, int],
@@ -138,13 +139,15 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                                                        save_path=None,
                                                        palette=gantt_clrs)
                 img = np.concatenate((img, gantt_plot), axis=1)
-            if print_timers:
+            if timer is not None:
                 img = PlottingMixin().put_text(img=img, text="TIMERS:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((video_meta_data["height"] - video_meta_data["height"]) + space_size)), font_size=font_size, font_thickness=text_thickness, font=font, text_bg_alpha=text_opacity, text_color_bg=text_bg_clr, text_color=text_color)
             add_spacer = 2
             for clf_name, clf_time_df in clf_cumsum.items():
                 frame_results = clf_time_df.loc[current_frm]
                 clf_time = round(frame_results / video_meta_data['fps'], 2)
-                if print_timers:
+                if timer is not None:
+                    if timer == HHMMSSSSSS:
+                        clf_time = seconds_to_timestamp(seconds=clf_time, hh_mm_ss_sss=True)
                     img = PlottingMixin().put_text(img=img, text=f"{clf_name} {clf_time}",pos=(TextOptions.BORDER_BUFFER_Y.value, ((video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer)), font_size=font_size,  font_thickness=text_thickness, font=font, text_bg_alpha=text_opacity, text_color_bg=text_bg_clr, text_color=text_color)
                     add_spacer += 1
                 if clf_confidence is not None:
@@ -213,18 +216,22 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
     :param bool rotate: If True, rotates output videos 90 degrees clockwise. Default False.
     :param bool animal_names: If True, displays animal names on the video frames. Default False.
     :param bool show_pose: If True, overlays pose-estimation keypoints on the video. Default True.
+    :param bool show_confidence: If True, displays per-frame classifier confidence values (probabilities) for each behavior. Default False.
     :param Optional[Union[int, float]] font_size: Font size for text overlays. If None, auto-computed based on video resolution. Default None.
     :param Optional[Union[int, float]] space_size: Vertical spacing between text lines. If None, auto-computed. Default None.
     :param Optional[Union[int, float]] text_thickness: Thickness of text characters. If None, uses default. Default None.
     :param Optional[Union[int, float]] text_opacity: Opacity of text background (0.0-1.0). If None, defaults to 0.8. Default None.
     :param Optional[Union[int, float]] circle_size: Radius of pose keypoint circles. If None, auto-computed based on video resolution. Default None.
     :param Optional[str] pose_palette: Name of color palette for pose keypoints. Must be from :class:`simba.utils.enums.Options.PALETTE_OPTIONS_CATEGORICAL` or :class:`simba.utils.enums.Options.PALETTE_OPTIONS`. Default 'Set1'.
-    :param bool print_timers: If True, displays cumulative time for each classifier behavior on each frame. Default True.
+    :param Optional[Literal['seconds', 'hh:mm:ss.ssss']] print_timer: Timer display mode for cumulative classifier durations. ``'seconds'`` shows numeric seconds, ``'hh:mm:ss.ssss'`` shows clock-style timestamps with sub-second precision, and ``None`` disables timer display. Default ``'seconds'``.
+    :param bool overwrite: If True, existing output files in the target output location may be overwritten. Default True.
     :param Optional[Literal['axis-aligned', 'animal-aligned']] bbox: If not None, draw bounding boxes around each animal. ``'axis-aligned'`` = rectangle aligned with video axes; ``'animal-aligned'`` = minimum rotated rectangle aligned with the animal's orientation. Default None (no bounding boxes).
+    :param Optional[Dict[str, str]] time_slice: Optional time interval to render in ``{'start_time': 'HH:MM:SS', 'end_time': 'HH:MM:SS'}`` format. If None, processes full video duration. Default None.
     :param Optional[int] show_gantt: If 1, appends static Gantt chart to video. If 2, appends dynamic Gantt chart that updates per frame. If None, no Gantt chart. Default None.
     :param Tuple[int, int, int] text_clr: RGB color tuple for text foreground. Default (255, 255, 255) (white).
     :param Tuple[int, int, int] text_bg_clr: RGB color tuple for text background. Default (0, 0, 0) (black).
     :param bool gpu: If True, uses GPU acceleration for video concatenation (requires CUDA-capable GPU). Default False.
+    :param bool verbose: If True, prints progress and status messages during processing. Default True.
     :param int core_cnt: Number of CPU cores to use for parallel processing. Pass -1 to use all available cores. Default -1.
 
     :example:
@@ -258,7 +265,8 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                  text_opacity: Optional[Union[int, float]] = None,
                  circle_size: Optional[Union[int, float]] = None,
                  pose_palette: Optional[str] = 'Set1',
-                 print_timers: bool = True,
+                 print_timer: Optional[Literal['seconds', 'hh:mm:ss.ssss']] = 'seconds',
+                 overwrite: bool = True,
                  bbox: Optional[Literal['axis-aligned', 'animal-aligned']] = None,
                  time_slice: Optional[Dict[str, str]] = None,
                  show_gantt: Optional[int] = None,
@@ -273,7 +281,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         TrainModelMixin.__init__(self)
         PlottingMixin.__init__(self)
         log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
-        for i in [video_setting, frame_setting, rotate, print_timers, animal_names, show_pose, gpu, show_confidence]:
+        for i in [video_setting, frame_setting, rotate, animal_names, show_pose, gpu, show_confidence]:
             check_valid_boolean(value=i, source=self.__class__.__name__, raise_error=True)
         if (not video_setting) and (not frame_setting):
             raise NoSpecifiedOutputError(msg="Please choose to create a video and/or frames. SimBA found that you ticked neither video and/or frames", source=self.__class__.__name__)
@@ -285,10 +293,12 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         if text_opacity is not None: check_float(name=f'{self.__class__.__name__} text_opacity', value=text_opacity, min_value=0.1)
         pose_palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
         check_str(name=f'{self.__class__.__name__} pose_palette', value=pose_palette, options=pose_palettes)
+        if print_timer is not None: check_str(name=f'{self.__class__.__name__} timer', value=print_timer, options=(SECONDS, HHMMSSSSSS,))
         self.clr_lst = create_color_palette(pallete_name=pose_palette, increments=len(self.body_parts_lst)+1)
         check_if_valid_rgb_tuple(data=text_clr, source=f'{self.__class__.__name__} text_clr')
         check_if_valid_rgb_tuple(data=text_bg_clr, source=f'{self.__class__.__name__} text_bg_clr')
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose', raise_error=True)
+        check_valid_boolean(value=overwrite, source=f'{self.__class__.__name__} overwrite', raise_error=True)
         if show_gantt is not None: check_int(name=f"{self.__class__.__name__} show_gantt", value=show_gantt, max_value=2, min_value=1)
         if time_slice is not None:
             check_valid_dict(x=time_slice, valid_key_dtypes=(str,), valid_values_dtypes=(str,), valid_keys=(START_TIME, END_TIME), required_keys=(START_TIME, END_TIME),)
@@ -297,13 +307,13 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             check_that_hhmmss_start_is_before_end(start_time=time_slice[START_TIME], end_time=time_slice[END_TIME], name=f'TIME SLICE', raise_error=True)
         if bbox is not None:
             check_str(name=f'{self.__class__.__name__} bbox', value=bbox, options=Options.BBOX_OPTIONS.value, allow_blank=False, raise_error=True)
-        self.video_setting, self.frame_setting, self.rotate, self.print_timers = video_setting, frame_setting, rotate, print_timers
+        self.video_setting, self.frame_setting, self.rotate = video_setting, frame_setting, rotate
         self.circle_size, self.font_size, self.animal_names, self.text_opacity = circle_size, font_size, animal_names, text_opacity
         self.text_thickness, self.space_size, self.show_pose, self.pose_palette, self.verbose = text_thickness, space_size, show_pose, pose_palette, verbose
         self.text_color, self.text_bg_color, self.bbox, self.show_gantt, self.show_confidence = text_clr, text_bg_clr, bbox, show_gantt, show_confidence
         self.gpu = True if check_nvidea_gpu_available() and gpu else False
         self.pose_threshold = read_config_entry(self.config, ConfigKey.THRESHOLD_SETTINGS.value, ConfigKey.SKLEARN_BP_PROB_THRESH.value, Dtypes.FLOAT.value, 0.00)
-        self.time_slice = time_slice
+        self.time_slice, self.overwrite, self.print_timer = time_slice, overwrite, print_timer
         if not os.path.exists(self.sklearn_plot_dir):
             os.makedirs(self.sklearn_plot_dir)
         if isinstance(video_paths, str): self.video_paths = [video_paths]
@@ -356,6 +366,9 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             self.save_path = os.path.join(self.sklearn_plot_dir, f"{self.video_name}.mp4")
             self.video_frame_dir, self.video_temp_dir = None, None
             if self.video_setting:
+                if os.path.isfile(self.save_path) and not self.overwrite:
+                    FileExistWarning(msg=f'Skipping video {self.video_name}: The output video exist ({self.save_path}) and overwrite is FALSE', source=self.__class__.__name__)
+                    continue
                 self.video_save_path = os.path.join(self.sklearn_plot_dir, f"{self.video_name}.mp4")
                 self.video_temp_dir = os.path.join(self.sklearn_plot_dir, self.video_name, "temp")
                 create_directory(paths=self.video_temp_dir, overwrite=True)
@@ -405,7 +418,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                                           rotate=self.rotate,
                                           video_path=video_path,
                                           clf_confidence=self.clf_p,
-                                          print_timers=self.print_timers,
+                                          timer=self.print_timer,
                                           video_setting=self.video_setting,
                                           frame_setting=self.frame_setting,
                                           pose_threshold=self.pose_threshold,
@@ -446,38 +459,37 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
 
 
 # if __name__ == "__main__":
-#     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",
+#     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini",
 #                                                  video_paths=None, #r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\videos\2026-01-05 14-17-54 box1_1143_0_Gq_sal.mp4",
 #                                                  video_setting=True,
 #                                                  frame_setting=False,
-#                                                  print_timers=True,
 #                                                  rotate=False,
 #                                                  show_confidence=False,
-#                                                  core_cnt=16,
+#                                                  core_cnt=6,
 #                                                  animal_names=False,
+#                                                  overwrite=False,
 #                                                  #time_slice={START_TIME: '00:00:00', END_TIME: '00:01:00'},python
 #                                                  bbox=None,
 #                                                  text_opacity=0.6,
 #                                                  show_gantt=2)
 #     clf_plotter.run()
-#
 
 
 
-if __name__ == "__main__":
-    clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"F:\troubleshooting\sophiaa\project_folder\project_config.ini",
-                                                video_setting=True,
-                                                frame_setting=False,
-                                                #video_paths=r"F:\troubleshooting\sophiaa\project_folder\videos\Choice222.mp4",
-                                                print_timers=True,
-                                                rotate=False,
-                                                animal_names=True,
-                                                core_cnt=6,
-                                                circle_size=4,
-                                                time_slice={START_TIME: '00:00:00', END_TIME: '00:01:00'},
-                                                bbox=None,#'animal-aligned',
-                                                show_gantt=None)
-    clf_plotter.run()
+# if __name__ == "__main__":
+#     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"F:\troubleshooting\sophiaa\project_folder\project_config.ini",
+#                                                 video_setting=True,
+#                                                 frame_setting=False,
+#                                                 #video_paths=r"F:\troubleshooting\sophiaa\project_folder\videos\Choice222.mp4",
+#                                                 print_timers=True,
+#                                                 rotate=False,
+#                                                 animal_names=True,
+#                                                 core_cnt=6,
+#                                                 circle_size=4,
+#                                                 time_slice={START_TIME: '00:00:00', END_TIME: '00:01:00'},
+#                                                 bbox=None,#'animal-aligned',
+#                                                 show_gantt=None)
+#     clf_plotter.run()
 
 
 # if __name__ == "__main__":

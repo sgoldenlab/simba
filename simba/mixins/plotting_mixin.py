@@ -40,7 +40,7 @@ from simba.utils.checks import (
     check_valid_lst, check_valid_tuple)
 from simba.utils.data import (create_color_palette, detect_bouts,
                               savgol_smoother)
-from simba.utils.enums import Formats, Keys, Options, Paths
+from simba.utils.enums import Formats, Keys, Options
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
                                  get_fonts, get_named_colors)

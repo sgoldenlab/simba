@@ -2407,9 +2407,14 @@ def copy_files_to_directory(file_paths: Union[List[Union[str, os.PathLike]], Uni
     return destinations
 
 
-def seconds_to_timestamp(seconds: Union[int, float, List[Union[int, float]]]) -> Union[str, List[str]]:
+def seconds_to_timestamp(seconds: Union[int, float, List[Union[int, float]]],
+                         hh_mm_ss_sss: bool = False) -> Union[str, List[str]]:
     """
-    Convert an integer number representing seconds, or a list of integers representing seconds, to a HH:MM:SS format.
+    Convert an integer/float number of seconds, or a list of seconds, to a timestamp string.
+
+    :param Union[int, float, List[Union[int, float]]] seconds: Input seconds.
+    :param bool hh_mm_ss_sss: If True, include milliseconds in output and ormat as ``HH:MM:SS:SSS``. If False, format as ``HH:MM:SS``.
+    :returns Union[str, List[str]]: Timestamp(s) as string or list of strings.
     """
     if isinstance(seconds, (int, float)):
         check_float(name=f"{seconds_to_timestamp.__name__} seconds", value=seconds, min_value=0)
@@ -2421,10 +2426,14 @@ def seconds_to_timestamp(seconds: Union[int, float, List[Union[int, float]]]) ->
         raise InvalidInputError(msg=f'Got {type(seconds)} for seconds. Only list or float or integer accepted.', source=seconds_to_timestamp.__name__)
     results = []
     for i in data:
-        hours = int(i / 3600)
-        minutes = int((i % 3600) / 60)
-        seconds = int(i % 60)
-        results.append("{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds))
+        total_milliseconds = int(round(i * 1000))
+        hours, remainder = divmod(total_milliseconds, 3_600_000)
+        minutes, remainder = divmod(remainder, 60_000)
+        secs, milliseconds = divmod(remainder, 1_000)
+        if hh_mm_ss_sss:
+            results.append("{:02d}:{:02d}:{:02d}.{:03d}".format(hours, minutes, secs, milliseconds))
+        else:
+            results.append("{:02d}:{:02d}:{:02d}".format(hours, minutes, secs))
     return results[0] if len(data) == 1 else results
 
 

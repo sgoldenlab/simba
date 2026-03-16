@@ -17,7 +17,7 @@ from simba.utils.checks import (check_if_dir_exists,
                                 check_valid_lst)
 from simba.utils.enums import Methods, TagNames
 from simba.utils.errors import AnimalNumberError, CountError
-from simba.utils.printing import SimbaTimer, log_event, stdout_success
+from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
 from simba.utils.read_write import (clean_sleap_file_name,
                                     find_all_videos_in_project,
                                     find_files_of_filetypes_in_directory,
@@ -84,7 +84,7 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
                 self.update_bp_headers_file(update_bp_headers=True)
         else:
             self.data_and_videos_lk = dict([(get_fn_ext(file_path)[1], {"DATA": file_path, "VIDEO": None}) for file_path in self.input_data_paths])
-        print(f"Importing {len(list(self.data_and_videos_lk.keys()))} SLEAP CSV file(s)...")
+        stdout_information(msg=f"Importing {len(list(self.data_and_videos_lk.keys()))} SLEAP CSV file(s)...")
 
     def run(self):
         for file_cnt, (video_name, video_data) in enumerate(self.data_and_videos_lk.items()):

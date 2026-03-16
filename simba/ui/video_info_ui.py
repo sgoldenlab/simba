@@ -22,7 +22,7 @@ from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_video_meta_data, read_config_entry,
                                     read_frm_of_video, read_video_info_csv)
 
-VALID_CLR = 'white'
+VALID_CLR = 'yellowgreen'
 INVALID_CLR = 'lightsalmon'
 
 
@@ -137,9 +137,9 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
 
     def _get_quick_set(self):
         self.quick_set_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BATCH QUICK SET", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_PARAMETERS.value)
-        self.quick_set_frm_known_distance_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='KNOWN DISTANCE (MM):', labelwidth=30, value='', entry_box_width=10, img='distance_red', justify='center', tooltip_key='VIDEO_INFO_KNOWN_DISTANCE', trace=self._check_float_bg, allow_blank=True)
+        self.quick_set_frm_known_distance_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='KNOWN DISTANCE (MM):', labelwidth=30, value='', entry_box_width=10, img='distance_red', justify='center', tooltip_key='VIDEO_INFO_KNOWN_DISTANCE', trace=self._check_float_bg, bg_clr=INVALID_CLR, allow_blank=True)
         self.quick_set_frm_known_distance_btn = SimbaButton(parent=self.quick_set_frm, txt="APPLY", txt_clr='black', img='tick', font=Formats.FONT_REGULAR_BOLD.value, cmd=self._set_known_distance, cmd_kwargs={'distance': lambda: self.quick_set_frm_known_distance_eb.entry_get})
-        self.quick_set_px_mm_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='PIXEL PER MILLIMETER:', labelwidth=30, value='', entry_box_width=10, img='ruler', justify='center', tooltip_key='VIDEO_INFO_PIXEL_PER_MM', trace=self._check_float_bg, allow_blank=True)
+        self.quick_set_px_mm_eb = Entry_Box(parent=self.quick_set_frm, fileDescription='PIXEL PER MILLIMETER:', labelwidth=30, value='', entry_box_width=10, img='ruler', justify='center', tooltip_key='VIDEO_INFO_PIXEL_PER_MM', bg_clr=INVALID_CLR, trace=self._check_float_bg, allow_blank=True)
         self.quick_set_px_mm_btn = SimbaButton(parent=self.quick_set_frm, txt="APPLY", txt_clr='black', img='tick', font=Formats.FONT_REGULAR_BOLD.value, cmd=self._set_px_per_mm, cmd_kwargs={'px_per_mm': lambda: self.quick_set_px_mm_eb.entry_get})
         self.quick_set_frm.grid(row=1, column=0, sticky=NW)
         self.quick_set_frm_known_distance_eb.grid(row=0, column=0, sticky=NW)
@@ -274,7 +274,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
             self.video_info_df.to_csv(self.video_info_path)
         except PermissionError:
             raise PermissionError(msg=f"SimBA tried to write to {self.video_info_path}, but was not allowed. If this file is open in another program, try closing it.", source=self.__class__.__name__)
-        stdout_success(msg=f"Video info saved at {self.video_info_path}", source=self.__class__.__name__)
+        stdout_success(msg=f"VIDEO INFO saved at {self.video_info_path}", source=self.__class__.__name__)
 
     def run(self):
         self._get_video_meta_data()

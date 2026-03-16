@@ -470,6 +470,9 @@ class Options(Enum):
     AXIS_ALIGNED = 'axis-aligned'
     ANIMAL_ALIGNED = 'animal-aligned'
     BBOX_OPTIONS = ['axis-aligned', 'animal-aligned']
+    HHMMSSSSSS = 'HH:MM:SS.SSSS'
+    SECONDS = 'SECONDS'
+    TIMER_OPTIONS = ['HH:MM:SS.SSSS', 'seconds']
 
 class TextOptions(Enum):
     FIRST_LINE_SPACING = (

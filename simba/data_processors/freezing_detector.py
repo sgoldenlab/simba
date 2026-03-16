@@ -165,8 +165,9 @@ class FreezingDetector(ConfigReader):
 
 
 # FreezingDetector(
-#     data_dir=r'E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\csv\outlier_corrected_movement_location',
-#     config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",
+#     data_dir=r'F:\troubleshooting\sam\sam\project_folder\csv\outlier_corrected_movement_location',
+#     config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini",
+#     save_dir=r'F:\troubleshooting\sam\sam\project_folder\logs\freezing_500',
 #     time_window=3,
 #     movement_threshold=5,
 #     shortest_bout=100
