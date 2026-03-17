@@ -39,8 +39,11 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     get_fn_ext, get_video_meta_data, read_df,
-                                    read_pickle, write_df)
+                                    read_pickle, write_df, seconds_to_timestamp)
 from simba.utils.warnings import FrameRangeWarning
+
+
+SECONDS, HHMMSSSSSS = ['seconds', 'hh:mm:ss.ssss']
 
 
 def _validation_video_mp(data: pd.DataFrame,
@@ -53,6 +56,7 @@ def _validation_video_mp(data: pd.DataFrame,
                         text_spacing: int,
                         circle_size: int,
                         show_pose: bool,
+                        timer_format: str,
                         show_animal_bounding_boxes: bool,
                         show_animal_names: bool,
                         gantt_setting: Union[int, None],
@@ -154,6 +158,7 @@ def _validation_video_mp(data: pd.DataFrame,
                     except:
                         pass
             target_timer = round((1 / video_meta_data["fps"]) * clf_frm_cnt, 2)
+            if target_timer == HHMMSSSSSS: target_timer = seconds_to_timestamp(seconds=target_timer, hh_mm_ss_sss=True)
             img = _put_text(img=img, text="BEHAVIOR TIMER:", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value)
             addSpacer = 2
             img = _put_text(img=img, text=f"{clf_name} {target_timer}s", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing * addSpacer), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_bg_alpha=text_opacity)
@@ -258,6 +263,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
                  show_animal_bounding_boxes: bool = False,
                  show_clf_confidence: bool = False,
                  font_size: Optional[bool] = None,
+                 timer_format: Literal['seconds', 'hh:mm:ss.ssss'] = 'seconds',
                  circle_size: Optional[int] = None,
                  text_spacing: Optional[int] = None,
                  text_thickness: Optional[int] = None,
@@ -279,6 +285,8 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         check_valid_boolean(value=[show_animal_names], source=f'{self.__class__.__name__} show_animal_names', raise_error=True)
         check_valid_boolean(value=[show_animal_bounding_boxes], source=f'{self.__class__.__name__} show_animal_bounding_boxes', raise_error=True)
         check_valid_boolean(value=[show_clf_confidence], source=f'{self.__class__.__name__} show_clf_confidence', raise_error=True)
+        check_str(name=f'{self.__class__.__name__} timer', value=timer_format, options=(SECONDS, HHMMSSSSSS,))
+
         check_int(name=f"{self.__class__.__name__} core_cnt", value=core_cnt, min_value=-1, unaccepted_vals=[0])
         if font_size is not None: check_int(name=f'{self.__class__.__name__} font_size', value=font_size)
         if circle_size is not None: check_int(name=f'{self.__class__.__name__} circle_size', value=circle_size)
@@ -304,7 +312,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         self.clf_name, self.feature_file_path = (os.path.basename(model_path).replace(".sav", ""), feature_path)
         self.vid_output_path = os.path.join(self.single_validation_video_save_dir, f"{self.feature_filename} {self.clf_name}.mp4")
         self.clf_data_save_path = os.path.join(self.clf_data_validation_dir, f"{self.feature_filename }.csv")
-        self.show_pose, self.show_animal_names = show_pose, show_animal_names
+        self.show_pose, self.show_animal_names, self.timer_format = show_pose, show_animal_names, timer_format
         self.font_size, self.circle_size, self.text_spacing, self.show_clf_confidence = font_size, circle_size, text_spacing, show_clf_confidence
         self.text_opacity, self.text_thickness, self.show_animal_bounding_boxes = text_opacity, text_thickness, show_animal_bounding_boxes
         self.clf = read_pickle(data_path=model_path, verbose=True)
@@ -361,6 +369,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
                                           circle_size=self.video_circle_size,
                                           video_path=self.video_path,
                                           show_pose=self.show_pose,
+                                          timer_format = self.timer_format,
                                           show_animal_names=self.show_animal_names,
                                           show_animal_bounding_boxes=self.show_animal_bounding_boxes,
                                           gantt_setting=self.create_gantt,

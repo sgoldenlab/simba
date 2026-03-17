@@ -66,14 +66,14 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         PopUpMixin.__init__(self, title="VISUALIZE ROI TRACKING", size=(800, 500), icon='shapes_small')
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_DATA_PLOT.value)
         self.threshold_entry_box = Entry_Box(self.settings_frm, "BODY-PART PROBABILITY THRESHOLD:", labelwidth=35, value='0.0', justify='center', entry_box_width=20, img='green_dice', tooltip_key='ROI_TRACKING_PROBABILITY_THRESHOLD')
-        self.show_pose_estimation_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW POSE-ESTIMATED LOCATIONS:', label_width=35, value='TRUE', command=self._disable_clr, img='pose', tooltip_key='ROI_TRACKING_SHOW_POSE')
-        self.show_animal_name_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL NAMES:', label_width=35, value='FALSE', img='label', tooltip_key='ROI_TRACKING_SHOW_ANIMAL_NAMES')
-        self.show_bbox_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['FALSE', Options.AXIS_ALIGNED.value, Options.ANIMAL_ALIGNED.value], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL BOUNDING BOXES:', label_width=35, value='FALSE', tooltip_key='SHOW_ANIMAL_BBOX', img='rectangle_2')
-        self.timer_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=[Options.SECONDS.value, Options.HHMMSSSSSS.value], label='SHOW CLASSIFICATION TIMERS:', label_width=35, dropdown_width=self.longest_animal_name_len, value=Options.SECONDS.value, img='timer', tooltip_key='ROI_TRACKING_INCLUDE_TIMERS')
-        self.border_bg_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(self.bg_clr_options.keys()), dropdown_width=self.longest_animal_name_len, label='BORDER BACKGROUND COLOR:', label_width=35, value='Black', tooltip_key='BORDER_BG_COLOR', img='fill')
-        self.outside_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='OUTSIDE ROI ZONES DATA:', label_width=35, value='FALSE', tooltip_key='ROI_TRACKING_OUTSIDE_ROI', img='outside')
-        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(2, self.cpu_cnt)), dropdown_width=self.longest_animal_name_len, label='NUMBER OF CPU CORES:', label_width=35, value=find_core_cnt()[1], img='cpu_small', tooltip_key='ROI_TRACKING_CPU_CORES')
-        self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='USE GPU:', label_width=35, value='FALSE', state=gpu_state, img='gpu_3', tooltip_key='USE_GPU')
+        self.show_pose_estimation_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW POSE-ESTIMATED LOCATIONS:', label_width=40, value='TRUE', command=self._disable_clr, img='pose', tooltip_key='ROI_TRACKING_SHOW_POSE')
+        self.show_animal_name_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL NAMES:', label_width=40, value='FALSE', img='label', tooltip_key='ROI_TRACKING_SHOW_ANIMAL_NAMES')
+        self.show_bbox_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['FALSE', Options.AXIS_ALIGNED.value, Options.ANIMAL_ALIGNED.value], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL BOUNDING BOXES:', label_width=40, value='FALSE', tooltip_key='SHOW_ANIMAL_BBOX', img='rectangle_2')
+        self.timer_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=[Options.SECONDS.value, Options.HHMMSSSSSS.value], label='CLASSIFICATION TIMERS FORMAT:', label_width=40, dropdown_width=self.longest_animal_name_len, value=Options.SECONDS.value, img='timer', tooltip_key='ROI_TRACKING_INCLUDE_TIMERS')
+        self.border_bg_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(self.bg_clr_options.keys()), dropdown_width=self.longest_animal_name_len, label='BORDER BACKGROUND COLOR:', label_width=40, value='Black', tooltip_key='BORDER_BG_COLOR', img='fill')
+        self.outside_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='OUTSIDE ROI ZONES DATA:', label_width=40, value='FALSE', tooltip_key='ROI_TRACKING_OUTSIDE_ROI', img='outside')
+        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(2, self.cpu_cnt)), dropdown_width=self.longest_animal_name_len, label='NUMBER OF CPU CORES:', label_width=40, value=find_core_cnt()[1], img='cpu_small', tooltip_key='ROI_TRACKING_CPU_CORES')
+        self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='USE GPU:', label_width=40, value='FALSE', state=gpu_state, img='gpu_3', tooltip_key='USE_GPU')
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         self.threshold_entry_box.grid(row=0, column=0, sticky=NW)
@@ -93,15 +93,23 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
 
         self.single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name='video', icon_link=Links.ROI_DATA_PLOT.value)
-        self.single_video_dropdown = DropDownMenu(self.single_video_frm, "SELECT VIDEO", self.videos_with_rois_and_data, "15", com=lambda x: self.update_file_select_box_from_dropdown(filename=x, fileselectbox=self.select_video_file_select))
+
+
+
+
+        #self.single_video_dropdown = DropDownMenu(self.single_video_frm, "SELECT VIDEO", self.videos_with_rois_and_data, "15", com=lambda x: self.update_file_select_box_from_dropdown(filename=x, fileselectbox=self.select_video_file_select))
+        self.single_video_dropdown = SimBADropDown(parent=self.single_video_frm, label="SELECT VIDEO", dropdown_options=self.videos_with_rois_and_data, label_width=15, command=lambda x: self.update_file_select_box_from_dropdown(filename=x, fileselectbox=self.select_video_file_select), value=self.videos_with_rois_and_data[0])
 
 
         self.select_video_file_select = FileSelect(self.single_video_frm, "", lblwidth="1", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], dropdown=self.single_video_dropdown, initialdir=self.video_dir)
         self.select_video_file_select.filePath.set(self.videos_with_rois_and_data[0])
+
+
+
         self.single_video_dropdown.setChoices(self.videos_with_rois_and_data[0])
         tooltips = get_tooltips()
         if 'ROI_TRACKING_SINGLE_VIDEO' in tooltips:
-            CreateToolTip(widget=self.single_video_dropdown.lblName, text=tooltips['ROI_TRACKING_SINGLE_VIDEO'])
+            CreateToolTip(widget=self.single_video_dropdown.dropdown_lbl, text=tooltips['ROI_TRACKING_SINGLE_VIDEO'])
         self.single_video_btn = SimbaButton(parent=self.single_video_frm, txt="CREATE SINGLE ROI VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': False})
         self.single_video_frm.grid(row=3, column=0, sticky=NW)
         self.single_video_dropdown.grid(row=0, column=0, sticky=NW)

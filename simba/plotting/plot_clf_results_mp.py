@@ -460,15 +460,16 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
 
 # if __name__ == "__main__":
 #     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini",
-#                                                  video_paths=None, #r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\videos\2026-01-05 14-17-54 box1_1143_0_Gq_sal.mp4",
+#                                                  video_paths=None,#r"F:\troubleshooting\sam\sam\project_folder\videos\20251212_150730_380_cam1_CROPPED.mp4",
 #                                                  video_setting=True,
 #                                                  frame_setting=False,
 #                                                  rotate=False,
 #                                                  show_confidence=False,
-#                                                  core_cnt=6,
+#                                                  core_cnt=8,
 #                                                  animal_names=False,
+#                                                  print_timer=HHMMSSSSSS,
 #                                                  overwrite=False,
-#                                                  #time_slice={START_TIME: '00:00:00', END_TIME: '00:01:00'},python
+#                                                  time_slice=None,#{START_TIME: '00:00:00', END_TIME: '00:01:00'},
 #                                                  bbox=None,
 #                                                  text_opacity=0.6,
 #                                                  show_gantt=2)

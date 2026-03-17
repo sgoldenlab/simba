@@ -152,7 +152,7 @@ class CirclingDetector(ConfigReader):
         stdout_success(msg=f'Results saved in {self.save_dir} directory.')
 
 
-# detector = CirclingDetector(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini")
+# detector = CirclingDetector(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini")
 # detector.run()
 
 # detector = CirclingDetector(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini")

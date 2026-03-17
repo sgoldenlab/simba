@@ -58,7 +58,7 @@ class DLC2Yolo:
                  save_dir: Union[str, os.PathLike],
                  train_size: float = 0.7,
                  verbose: bool = False,
-                 padding: float = 0.00,
+                 padding: float = 0.15,
                  flip_idx: Optional[Tuple[int, ...]] = None,
                  names: Tuple[str, ...] = ('mouse',),
                  greyscale: bool = False,

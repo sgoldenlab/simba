@@ -116,6 +116,20 @@ DeepLabCut predictions -> YOLO pose-estimation annotations
    :members:
    :show-inheritance:
 
+Lightning Pose annotations -> YOLO pose-estimation annotations
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.litpose_to_yolo_keypoints.LitPose2YOLO
+   :members:
+   :show-inheritance:
+
+Lightning Pose annotations -> YOLO bounding box annotations
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.litpose_to_yolo_bbox.LitPose2YOLOBbox
+   :members:
+   :show-inheritance:
+
 
 Multi-animal DeepLabCut -> YOLO pose-estimation annotations
 ---------------------------------------
