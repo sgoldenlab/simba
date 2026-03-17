@@ -41,7 +41,7 @@ from simba.utils.read_write import (concatenate_videos_in_folder,
                                     get_fn_ext, get_video_meta_data,
                                     read_config_entry, read_df,
                                     seconds_to_timestamp)
-from simba.utils.warnings import FrameRangeWarning, FileExistWarning
+from simba.utils.warnings import FileExistWarning, FrameRangeWarning
 
 START_TIME, END_TIME = 'start_time', 'end_time'
 SECONDS, HHMMSSSSSS = ['seconds', 'hh:mm:ss.ssss']

@@ -40,7 +40,8 @@ from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError,
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_current_time,
-                                    get_video_meta_data, read_df, seconds_to_timestamp)
+                                    get_video_meta_data, read_df,
+                                    seconds_to_timestamp)
 from simba.utils.warnings import (DuplicateNamesWarning, FrameRangeWarning,
                                   GPUToolsWarning)
 
