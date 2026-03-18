@@ -349,6 +349,8 @@ class PlottingMixin(object):
                         font_rotation: int = 45,
                         x_tick_lbl_rotation: int = 45,
                         font: Optional[str] = None,
+                        title: Optional[str] = None,
+                        title_font_size: int = 24,
                         save_path: Optional[str] = None,
                         edge_clr: Optional[str] = 'black',
                         hhmmss: bool = False,
@@ -441,6 +443,7 @@ class PlottingMixin(object):
         ax.set_yticks(np.arange(5, 5 * len(clf_names) + 1, 5))
         ax.set_yticklabels(clf_names, rotation=font_rotation, ha='right', va='center')
         ax.tick_params(axis="both", labelsize=font_size)
+        if title is not None: ax.set_title(title, fontsize=title_font_size)
         plt.xlabel(x_label, fontsize=font_size + 3)
         ax.grid(True, axis='both', linewidth=1.0, color='gray', alpha=0.2, linestyle='--', which='major')
         plt.subplots_adjust(left=0.1, right=0.95, top=0.9, bottom=0.15)
@@ -690,7 +693,7 @@ class PlottingMixin(object):
 
     def get_bouts_for_gantt(
         self, data_df: pd.DataFrame, clf_name: str, fps: int
-    ) -> np.ndarray:
+    ) -> pd.DataFrame:
         """
         Helper to detect all behavior bouts for a specific classifier.
 

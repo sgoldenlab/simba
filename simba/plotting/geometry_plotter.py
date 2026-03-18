@@ -190,7 +190,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
                  time_slice: Optional[Dict[str, str]] = None,
                  palette: Optional[str] = None,
                  colors: Optional[List[Union[str, Tuple[int, int, int]]]] = None,
-                 verbose: Optional[bool] = True):
+                 verbose: bool = True):
 
         PlottingMixin.__init__(self)
         check_instance(source=self.__class__.__name__, instance=geometries, accepted_types=list)

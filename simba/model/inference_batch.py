@@ -145,6 +145,9 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 
 
 
+# test = InferenceBatch(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini")
+# test.run()
+
 #
 # test = InferenceBatch(config_path=r"E:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
 # test.run()

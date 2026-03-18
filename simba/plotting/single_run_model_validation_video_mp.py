@@ -9,10 +9,9 @@ import multiprocessing
 import os
 import platform
 from copy import deepcopy
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Union
 
 import cv2
-import imutils
 import pandas as pd
 
 try:
@@ -20,10 +19,7 @@ try:
 except:
     from typing_extensions import Literal
 
-import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
@@ -35,7 +31,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.data import (create_color_palette, plug_holes_shortest_bout,
                               terminate_cpu_pool)
 from simba.utils.enums import Options, TextOptions
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     get_fn_ext, get_video_meta_data, read_df,
@@ -44,6 +40,7 @@ from simba.utils.warnings import FrameRangeWarning
 
 
 SECONDS, HHMMSSSSSS = ['seconds', 'hh:mm:ss.ssss']
+CLF_CLR = tuple((x/255 for x in TextOptions.FLAMINGO.value))
 
 
 def _validation_video_mp(data: pd.DataFrame,
@@ -57,7 +54,7 @@ def _validation_video_mp(data: pd.DataFrame,
                         circle_size: int,
                         show_pose: bool,
                         timer_format: str,
-                        show_animal_bounding_boxes: bool,
+                        bbox: bool,
                         show_animal_names: bool,
                         gantt_setting: Union[int, None],
                         final_gantt: Optional[np.ndarray],
@@ -67,58 +64,7 @@ def _validation_video_mp(data: pd.DataFrame,
                         bouts_df: pd.DataFrame,
                         conf_data: np.ndarray):
 
-    def _put_text(img: np.ndarray,
-                  text: str,
-                  pos: Tuple[int, int],
-                  font_size: int,
-                  font_thickness: Optional[int] = 2,
-                  font: Optional[int] = cv2.FONT_HERSHEY_DUPLEX,
-                  text_color: Optional[Tuple[int, int, int]] = (255, 255, 255),
-                  text_color_bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
-                  text_bg_alpha: float = 0.8):
 
-        x, y = pos
-        text_size, px_buffer = cv2.getTextSize(text, font, font_size, font_thickness)
-        w, h = text_size
-        overlay, output = img.copy(), img.copy()
-        cv2.rectangle(overlay, (x, y-h), (x + w, y + px_buffer), text_color_bg, -1)
-        cv2.addWeighted(overlay, text_bg_alpha, output, 1 - text_bg_alpha, 0, output)
-        cv2.putText(output, text, (x, y), font, font_size, text_color, font_thickness)
-        return output
-
-
-    def _create_gantt(bouts_df: pd.DataFrame,
-                      clf_name: str,
-                      image_index: int,
-                      fps: int,
-                      header_font_size: int = 24,
-                      label_font_size: int = 12):
-
-        fig, ax = plt.subplots(figsize=(final_gantt.shape[1] / dpi, final_gantt.shape[0] / dpi))
-        matplotlib.font_manager._get_font.cache_clear()
-        relRows = bouts_df.loc[bouts_df["End_frame"] <= image_index]
-        for i, event in enumerate(relRows.groupby("Event")):
-            data_event = event[1][["Start_time", "Bout_time"]]
-            ax.broken_barh(data_event.values, (4, 4), facecolors="red")
-        xLength = (round(image_index / fps)) + 1
-        if xLength < 10:
-            xLength = 10
-
-        ax.set_xlim(0, xLength)
-        ax.set_ylim([0, 12])
-        ax.set_xlabel("Session (s)", fontsize=label_font_size)
-        ax.set_ylabel(clf_name, fontsize=label_font_size)
-        ax.set_title(f"{clf_name} GANTT CHART", fontsize=header_font_size)
-        ax.set_yticks([])
-        ax.yaxis.set_ticklabels([])
-        ax.yaxis.grid(True)
-        canvas = FigureCanvas(fig)
-        canvas.draw()
-        img = np.array(np.uint8(np.array(canvas.renderer._renderer)))[:, :, :3]
-        plt.close(fig)
-        return img
-
-    dpi = plt.rcParams["figure.dpi"]
     fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_DUPLEX
     cap = cv2.VideoCapture(video_path)
     video_meta_data = get_video_meta_data(video_path=video_path, fps_as_int=False)
@@ -148,42 +94,47 @@ def _validation_video_mp(data: pd.DataFrame,
                     x_header, y_header = (animal_data["X_bps"][0], animal_data["Y_bps"][0],)
                     animal_cords = tuple(batch_data.loc[current_frm, [x_header, y_header]])
                     cv2.putText(img, animal_name, (int(animal_cords[0]), int(animal_cords[1])), font, font_size, clrs[animal_cnt][0], text_thickness)
-            if show_animal_bounding_boxes:
+            if bbox is not None:
                 for animal_cnt, (animal_name, animal_data) in enumerate(bp_dict.items()):
                     animal_headers = [val for pair in zip(animal_data["X_bps"], animal_data["Y_bps"]) for val in pair]
                     animal_cords = batch_data.loc[current_frm, animal_headers].values.reshape(-1, 2).astype(np.int32)
                     try:
-                        bbox = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=animal_cords.reshape(-1, len(animal_cords), 2).astype(np.int32))
-                        cv2.polylines(img, [bbox], True, clrs[animal_cnt][0], thickness=text_thickness, lineType=-1)
-                    except:
+                        if bbox == Options.AXIS_ALIGNED.value:
+                            animal_bbox = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=animal_cords.reshape(-1, len(animal_cords), 2).astype(np.int32))
+                        else:
+                            animal_bbox = GeometryMixin().minimum_rotated_rectangle(shape=animal_cords, buffer=None)
+                            animal_bbox = np.round(np.array(animal_bbox.exterior.coords)).astype(np.int32)
+                        img = cv2.polylines(img, [animal_bbox], True, clrs[animal_cnt][0], thickness=circle_size, lineType=cv2.LINE_AA)
+                    except Exception as e:
                         pass
             target_timer = round((1 / video_meta_data["fps"]) * clf_frm_cnt, 2)
-            if target_timer == HHMMSSSSSS: target_timer = seconds_to_timestamp(seconds=target_timer, hh_mm_ss_sss=True)
-            img = _put_text(img=img, text="BEHAVIOR TIMER:", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value)
+            if timer_format == HHMMSSSSSS: target_timer = seconds_to_timestamp(seconds=target_timer, hh_mm_ss_sss=True)
+            img = PlottingMixin().put_text(img=img, text="BEHAVIOR TIMER:", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_bg_alpha=text_opacity)
             addSpacer = 2
-            img = _put_text(img=img, text=f"{clf_name} {target_timer}s", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing * addSpacer), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_bg_alpha=text_opacity)
+            img = PlottingMixin().put_text(img=img, text=f"{clf_name} {target_timer}s", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing * addSpacer), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_bg_alpha=text_opacity)
             addSpacer += 1
             if conf_data is not None:
-                img = _put_text(img=img, text=f"{clf_name} PROBABILITY: {round(conf_data[current_frm], 4)}", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing * addSpacer), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_bg_alpha=text_opacity)
+                img = PlottingMixin().put_text(img=img, text=f"{clf_name} PROBABILITY: {round(conf_data[current_frm], 4)}", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing * addSpacer), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_bg_alpha=text_opacity)
                 addSpacer += 1
-            img = _put_text(img=img, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing * addSpacer), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_bg_alpha=text_opacity)
+            img = PlottingMixin().put_text(img=img, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing * addSpacer), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_bg_alpha=text_opacity)
             addSpacer += 1
             if clf_data[current_frm] == 1:
-                img = _put_text(img=img, text=clf_name, pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing * addSpacer), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=TextOptions.COLOR.value, text_bg_alpha=text_opacity)
+                img = PlottingMixin().put_text(img=img, text=clf_name, pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing * addSpacer), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_bg_alpha=text_opacity, text_color=TextOptions.COLOR.value)
             addSpacer += 1
             if gantt_setting == 1:
                 img = np.concatenate((img, final_gantt), axis=1)
             elif gantt_setting == 2:
-                gantt_img = _create_gantt(bouts_df, clf_name, current_frm, video_meta_data["fps"], header_font_size=9, label_font_size=12)
-                gantt_img = imutils.resize(gantt_img, height=video_meta_data["height"])
+                bout_rows = bouts_df.loc[bouts_df["End_frame"] <= current_frm]
+                gantt_img = PlottingMixin().make_gantt_plot(bouts_df=bout_rows, clf_names=[clf_name], fps=video_meta_data["fps"], width=video_meta_data["width"], height=video_meta_data["height"],font_size=12, font_rotation=45, x_tick_lbl_rotation=45, hhmmss=True, video_name=video_meta_data['video_name'], save_path=None, x_length=current_frm + 1, title=f"{clf_name} GANTT CHART", as_svg=False, palette=[CLF_CLR])
                 img = np.concatenate((img, gantt_img), axis=1)
             img = cv2.resize(img, video_size, interpolation=cv2.INTER_LINEAR)
             writer.write(np.uint8(img))
             current_frm += 1
             frm_timer.stop_timer()
-            print(f"Multi-processing video frame {current_frm} on core {batch_id}...(elapsed time: {frm_timer.elapsed_time_str}s)")
+            s = seconds_to_timestamp(seconds=int(current_frm/video_meta_data['fps']), hh_mm_ss_sss=True)
+            stdout_information(msg=f"Multi-processing video frame {current_frm} on core {batch_id}...(time-stamp: {s}, elapsed time: {frm_timer.elapsed_time_str}s)")
         else:
-            FrameRangeWarning(msg=f'Frame {current_frm} could not be read in video {video_path}. The video contains {video_meta_data["frame_count"]} frames while the data file contains data for {len(batch_data)} frames. Consider re-encoding the video, or make sure the pose-estimation data and associated video contains the same number of frames. ', source=_validation_video_mp.__name__)
+            FrameRangeWarning(msg=f'Frame {current_frm} could not be read in video {video_path}. The video contains {video_meta_data["frame_count"]} frames while the data file contains data for {len(batch_data)} frames. Consider re-encoding the video, or make sure the pose-estimation data and associated video contains the same number of frames. You can reencode the video in SimBA, by converting e.g., the MP4 to a new MP4.', source=_validation_video_mp.__name__)
             break
 
     cap.release()
@@ -260,7 +211,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
                  model_path: Union[str, os.PathLike],
                  show_pose: bool = True,
                  show_animal_names: bool = False,
-                 show_animal_bounding_boxes: bool = False,
+                 bbox: Optional[Literal['axis-aligned', 'animal-aligned']] = None,
                  show_clf_confidence: bool = False,
                  font_size: Optional[bool] = None,
                  timer_format: Literal['seconds', 'hh:mm:ss.ssss'] = 'seconds',
@@ -283,7 +234,6 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         check_file_exist_and_readable(file_path=model_path)
         check_valid_boolean(value=[show_pose], source=f'{self.__class__.__name__} show_pose', raise_error=True)
         check_valid_boolean(value=[show_animal_names], source=f'{self.__class__.__name__} show_animal_names', raise_error=True)
-        check_valid_boolean(value=[show_animal_bounding_boxes], source=f'{self.__class__.__name__} show_animal_bounding_boxes', raise_error=True)
         check_valid_boolean(value=[show_clf_confidence], source=f'{self.__class__.__name__} show_clf_confidence', raise_error=True)
         check_str(name=f'{self.__class__.__name__} timer', value=timer_format, options=(SECONDS, HHMMSSSSSS,))
 
@@ -293,6 +243,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         if text_spacing is not None: check_int(name=f'{self.__class__.__name__} text_spacing', value=text_spacing)
         if text_opacity is not None: check_float(name=f'{self.__class__.__name__} text_opacity', value=text_opacity, min_value=0.1)
         if text_thickness is not None: check_float(name=f'{self.__class__.__name__} text_thickness', value=text_thickness, min_value=0.1)
+        if bbox is not None: check_str(name=f'{self.__class__.__name__} bbox', value=bbox, options=Options.BBOX_OPTIONS.value, allow_blank=False, raise_error=True)
         check_float(name=f"{self.__class__.__name__} discrimination_threshold", value=discrimination_threshold, min_value=0, max_value=1.0)
         check_int(name=f"{self.__class__.__name__} shortest_bout", value=shortest_bout, min_value=0)
         if create_gantt is not None:
@@ -314,7 +265,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         self.clf_data_save_path = os.path.join(self.clf_data_validation_dir, f"{self.feature_filename }.csv")
         self.show_pose, self.show_animal_names, self.timer_format = show_pose, show_animal_names, timer_format
         self.font_size, self.circle_size, self.text_spacing, self.show_clf_confidence = font_size, circle_size, text_spacing, show_clf_confidence
-        self.text_opacity, self.text_thickness, self.show_animal_bounding_boxes = text_opacity, text_thickness, show_animal_bounding_boxes
+        self.text_opacity, self.text_thickness, self.bbox = text_opacity, text_thickness, bbox
         self.clf = read_pickle(data_path=model_path, verbose=True)
         self.data_df = read_df(feature_path, self.file_type)
         self.x_df = self.drop_bp_cords(df=self.data_df)
@@ -323,6 +274,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
         self.temp_dir = os.path.join(self.single_validation_video_save_dir, "temp")
         self.video_save_path = os.path.join(self.single_validation_video_save_dir, f"{self.feature_filename}.mp4")
+
         create_directory(paths=self.temp_dir, overwrite=True)
         if platform.system() == "Darwin":
             multiprocessing.set_start_method("spawn", force=True)
@@ -344,12 +296,13 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         if self.shortest_bout > 1:
             self.data_df = plug_holes_shortest_bout(data_df=self.data_df, clf_name=self.clf_name, fps=self.video_meta_data['fps'], shortest_bout=self.shortest_bout)
         _ = write_df(df=self.data_df, file_type=self.file_type, save_path=self.clf_data_save_path)
-        print(f"Predictions created for video {self.feature_filename} (creating video, follow progressin OS terminal)...")
+        stdout_information(msg=f"Predictions created for video {self.feature_filename} (creating video, follow progressin OS terminal)...")
         self._get_styles()
         if self.create_gantt is not None:
             self.bouts_df = self.get_bouts_for_gantt(data_df=self.data_df, clf_name=self.clf_name, fps=self.video_meta_data['fps'])
-            self.final_gantt_img = self.create_gantt_img(self.bouts_df ,self.clf_name,len(self.data_df), self.video_meta_data['fps'],f"Behavior gantt chart (entire session, length (s): {self.video_meta_data['video_length_s']}, frames: {self.video_meta_data['frame_count']})", header_font_size=9, label_font_size=12)
-            self.final_gantt_img = self.resize_gantt(self.final_gantt_img, self.video_meta_data["height"])
+            self.final_gantt_img = PlottingMixin().make_gantt_plot(bouts_df=self.bouts_df, clf_names=[self.clf_name], palette=[CLF_CLR], fps=self.video_meta_data['fps'], x_length=len(self.data_df)+1, video_name=self.feature_filename, width=self.video_meta_data['width'], height=self.video_meta_data['height'], font_size=9, font_rotation=45, x_tick_lbl_rotation=45, save_path=None, hhmmss=True, as_svg=False, title=f"Behavior gantt chart (entire session, length (s): {self.video_meta_data['video_length_s']}, frames: {self.video_meta_data['frame_count']})", title_font_size=9)
+            #self.final_gantt_img = self.create_gantt_img(self.bouts_df ,self.clf_name,len(self.data_df), self.video_meta_data['fps'],f"Behavior gantt chart (entire session, length (s): {self.video_meta_data['video_length_s']}, frames: {self.video_meta_data['frame_count']})", header_font_size=9, label_font_size=12)
+            #self.final_gantt_img = self.resize_gantt(self.final_gantt_img, self.video_meta_data["height"])
         else:
             self.bouts_df, self.final_gantt_img = None, None
         conf_data = self.data_df[self.prob_col_name].values if self.show_clf_confidence else None
@@ -371,7 +324,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
                                           show_pose=self.show_pose,
                                           timer_format = self.timer_format,
                                           show_animal_names=self.show_animal_names,
-                                          show_animal_bounding_boxes=self.show_animal_bounding_boxes,
+                                          bbox=self.bbox,
                                           gantt_setting=self.create_gantt,
                                           final_gantt=self.final_gantt_img,
                                           clf_data=self.data_df[self.clf_name].values,

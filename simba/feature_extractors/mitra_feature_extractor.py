@@ -22,13 +22,13 @@ from simba.utils.read_write import (SimbaTimer, get_fn_ext, read_df,
                                     write_df)
 
 NOSE = 'nose'
-LEFT_SIDE = 'lat_left'
-RIGHT_SIDE = 'lat_right'
+LEFT_SIDE = 'left_side'
+RIGHT_SIDE = 'right side'
 LEFT_EAR = 'left_ear'
 RIGHT_EAR = 'right_ear'
 CENTER = 'center'
 TAIL_BASE = 'tail_base'
-TAIL_CENTER = 'tail_center'
+TAIL_CENTER = 'tail_mid'
 TAIL_TIP = 'tail_end'
 
 TIME_WINDOWS = np.array([0.25, 0.5, 1.0, 2.0])
@@ -221,7 +221,8 @@ class MitraFeatureExtractor(ConfigReader,
 #     feature_extractor = MitraFeatureExtractor(config_path=args.config_path)
 #     feature_extractor.run()
 #
-
+#feature_extractor = MitraFeatureExtractor(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini")
+#feature_extractor.run()
 
 
 # feature_extractor = MitraFeatureExtractor(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini")

@@ -406,5 +406,17 @@
   "ROI_POLYGON_TOLERANCE": "Controls polygon simplification when creating ROI polygons. Higher values simplify polygons (fewer vertices, smoother shapes). Smaller values retain more polygon details (more vertices, sharper corners).",
   "ROI_KEYBOARD_SENSITIVITY": "Number of pixels ROI borders move when editing via keyboard arrow keys. Higher values move borders faster; lower values provide finer control.",
   "ROI_BUFFER_SIZE": "Size of the buffer zone in millimeters. ROIs will be expanded or contracted by this amount. Positive values expand ROIs outward; negative values shrink them inward.",
-  "ROI_PIXEL_PER_MM": "Conversion factor from pixels to millimeters. Used to convert buffer size from millimeters to pixels. Should match your video's spatial calibration (e.g., if 1 mm = 10 pixels, enter 10)."
+  "ROI_PIXEL_PER_MM": "Conversion factor from pixels to millimeters. Used to convert buffer size from millimeters to pixels. Should match your video's spatial calibration (e.g., if 1 mm = 10 pixels, enter 10).",
+  "VALIDATION_VIDEO_FONT_SIZE": "Font size for classifier labels and overlays. AUTO lets SimBA scale text based on video resolution.",
+  "VALIDATION_VIDEO_TEXT_SPACING": "Spacing between overlay text elements. Increase if labels look crowded.",
+  "VALIDATION_VIDEO_CIRCLE_SIZE": "Size of pose keypoint circles. AUTO scales with video size.",
+  "VALIDATION_VIDEO_TEXT_OPACITY": "Transparency of text overlays (0.1-1.0). Lower values make text less obtrusive.",
+  "VALIDATION_VIDEO_TEXT_THICKNESS": "Thickness of overlay text strokes. Higher values improve readability on busy frames.",
+  "VALIDATION_VIDEO_BODY_PART_PALETTE": "Color palette used for pose keypoints and related body-part overlays.",
+  "VALIDATION_VIDEO_SHOW_POSE": "If TRUE, draws pose keypoints/skeleton on each frame. If FALSE, only behavior overlays are shown.",
+  "VALIDATION_VIDEO_SHOW_ANIMAL_NAMES": "If TRUE, prints animal IDs/names next to tracked animals.",
+  "VALIDATION_VIDEO_CPU_COUNT": "Number of CPU cores used for multiprocess rendering of the validation video. More cores are usually faster but use more memory.",
+  "VALIDATION_VIDEO_SHOW_BBOX": "Bounding-box overlay mode: FALSE disables boxes, AXIS_ALIGNED draws horizontal rectangles, ANIMAL_ALIGNED draws rotated boxes aligned to animal orientation.",
+  "VALIDATION_VIDEO_SHOW_CONFIDENCE": "If TRUE, displays classifier confidence scores on the video.",
+  "VALIDATION_VIDEO_GANTT_TYPE": "Choose Gantt overlay mode: NO GANTT, final-frame-only chart (faster), or full video Gantt chart."
 }

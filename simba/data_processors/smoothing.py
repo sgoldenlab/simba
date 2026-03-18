@@ -17,7 +17,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_int,
 from simba.utils.data import df_smoother, savgol_smoother
 from simba.utils.enums import TagNames
 from simba.utils.errors import InvalidInputError, NoFilesFoundError
-from simba.utils.printing import SimbaTimer, log_event, stdout_success
+from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
 from simba.utils.read_write import (copy_files_to_directory,
                                     find_files_of_filetypes_in_directory,
                                     find_video_of_file, get_fn_ext,
@@ -97,7 +97,7 @@ class Smoothing(ConfigReader):
         return df
 
     def run(self):
-        print(f'Running smoothing on {len(self.file_paths)} data file(s)...')
+        stdout_information(msg=f'Running smoothing on {len(self.file_paths)} data file(s)...')
         for file_cnt, file_path in enumerate(self.file_paths):
             df = read_df(file_path=file_path, file_type=self.file_type, check_multiindex=True)
             video_timer = SimbaTimer(start=True)
@@ -124,7 +124,7 @@ class Smoothing(ConfigReader):
                 copy_files_to_directory(file_paths=[file_path], dir=self.originals_dir)
             write_df(df=df, file_type=self.file_type, save_path=file_path, multi_idx_header=self.multi_index_df_headers)
             video_timer.stop_timer()
-            print(f"Video {video_name} smoothed ({self.method}: {str(self.time_window)}ms) (elapsed time {video_timer.elapsed_time_str})...")
+            stdout_information(msg=f"Video {video_name} smoothed ({self.method}: {str(self.time_window)}ms) (elapsed time {video_timer.elapsed_time_str})...")
         self.timer.stop_timer()
         if self.copy_originals:
             msg = f"{len(self.file_paths)} data file(s) smoothened using {self.method} method and {self.time_window} time-window. Originals saved in {self.originals_dir} directory."

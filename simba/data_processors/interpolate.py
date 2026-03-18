@@ -18,7 +18,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_str,
 from simba.utils.data import animal_interpolator, body_part_interpolator
 from simba.utils.enums import TagNames
 from simba.utils.errors import DataHeaderError, InvalidInputError
-from simba.utils.printing import SimbaTimer, log_event, stdout_success
+from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
 from simba.utils.read_write import (copy_files_to_directory,
                                     find_files_of_filetypes_in_directory,
                                     get_fn_ext, read_df, write_df)
@@ -88,7 +88,7 @@ class Interpolate(ConfigReader):
         return df
 
     def run(self):
-        print(f'Running interpolation on {len(self.file_paths)} data files...')
+        stdout_information(msg=f'Running interpolation on {len(self.file_paths)} data files...')
         for file_cnt, file_path in enumerate(self.file_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(filepath=file_path)
@@ -109,7 +109,7 @@ class Interpolate(ConfigReader):
                 copy_files_to_directory(file_paths=[file_path], dir=self.originals_dir)
             write_df(df=df.astype(np.float32), file_type=self.file_type, save_path=file_path, multi_idx_header=self.multi_index_df_headers)
             video_timer.stop_timer()
-            print(f"Video {self.video_name} interpolated (elapsed time {video_timer.elapsed_time_str}) ...")
+            stdout_information(msg=f"Video {self.video_name} interpolated (elapsed time {video_timer.elapsed_time_str}) ...")
         self.timer.stop_timer()
         if self.copy_originals:
             msg = f"{len(self.file_paths)} data file(s) interpolated using {self.type} {self.method} methods. Originals saved in {self.originals_dir} directory."

@@ -54,12 +54,12 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
         PopUpMixin.__init__(self, title="CREATE VALIDATION VIDEO", icon='tick')
         self.discrimination_threshold, self.shortest_bout = float(discrimination_threshold), int(shortest_bout)
         style_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name='style', icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value, padx=5, pady=5, relief='solid')
-        self.font_size_dropdown = SimBADropDown(parent=style_frm, dropdown_options=FONT_SIZE_OPTIONS, label='FONT SIZE: ', label_width=30, dropdown_width=40, value=AUTO, img='text')
-        self.space_dropdown = SimBADropDown(parent=style_frm, dropdown_options=TEXT_SPACE_OPTIONS, label='TEXT SPACING: ', label_width=30, dropdown_width=40, value=AUTO, img='text_spacing')
-        self.circle_size_dropdown = SimBADropDown(parent=style_frm, dropdown_options=TEXT_SPACE_OPTIONS, label='CIRCLE SIZE: ', label_width=30, dropdown_width=40, value=AUTO, img='circle_small')
-        self.text_opacity_dropdown = SimBADropDown(parent=style_frm, dropdown_options=OPACITY_OPTIONS, label='TEXT OPACITY: ', label_width=30, dropdown_width=40, value=0.8, img='opacity')
-        self.text_thickness_dropdown = SimBADropDown(parent=style_frm, dropdown_options=FONT_SIZE_OPTIONS, label='TEXT THICKNESS: ', label_width=30, dropdown_width=40, value=2, img='bold')
-        self.bp_palette_dropdown = SimBADropDown(parent=style_frm, dropdown_options=POSE_PALETTE_OPTIONS, label='BODY-PART PALETTE: ', label_width=30, dropdown_width=40, value=POSE_PALETTE_OPTIONS[0], img='color_wheel')
+        self.font_size_dropdown = SimBADropDown(parent=style_frm, dropdown_options=FONT_SIZE_OPTIONS, label='FONT SIZE: ', label_width=30, dropdown_width=40, value=AUTO, img='text', tooltip_key='VALIDATION_VIDEO_FONT_SIZE')
+        self.space_dropdown = SimBADropDown(parent=style_frm, dropdown_options=TEXT_SPACE_OPTIONS, label='TEXT SPACING: ', label_width=30, dropdown_width=40, value=AUTO, img='text_spacing', tooltip_key='VALIDATION_VIDEO_TEXT_SPACING')
+        self.circle_size_dropdown = SimBADropDown(parent=style_frm, dropdown_options=TEXT_SPACE_OPTIONS, label='CIRCLE SIZE: ', label_width=30, dropdown_width=40, value=AUTO, img='circle_small', tooltip_key='VALIDATION_VIDEO_CIRCLE_SIZE')
+        self.text_opacity_dropdown = SimBADropDown(parent=style_frm, dropdown_options=OPACITY_OPTIONS, label='TEXT OPACITY: ', label_width=30, dropdown_width=40, value=0.8, img='opacity', tooltip_key='VALIDATION_VIDEO_TEXT_OPACITY')
+        self.text_thickness_dropdown = SimBADropDown(parent=style_frm, dropdown_options=FONT_SIZE_OPTIONS, label='TEXT THICKNESS: ', label_width=30, dropdown_width=40, value=2, img='bold', tooltip_key='VALIDATION_VIDEO_TEXT_THICKNESS')
+        self.bp_palette_dropdown = SimBADropDown(parent=style_frm, dropdown_options=POSE_PALETTE_OPTIONS, label='BODY-PART PALETTE: ', label_width=30, dropdown_width=40, value=POSE_PALETTE_OPTIONS[0], img='color_wheel', tooltip_key='VALIDATION_VIDEO_BODY_PART_PALETTE')
 
         style_frm.grid(row=0, column=0, sticky=NW, padx=10, pady=10)
         self.font_size_dropdown.grid(row=0, column=0, sticky=NW)
@@ -70,11 +70,11 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
         self.bp_palette_dropdown.grid(row=5, column=0, sticky=NW)
 
         tracking_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="TRACKING OPTIONS", icon_name='pose', icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value, padx=5, pady=5, relief='solid')
-        self.show_pose_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW POSE: ', label_width=30, dropdown_width=40, value='TRUE', img='pose')
-        self.show_animal_names_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ANIMAL NAMES: ', label_width=30, dropdown_width=40, value='FALSE', img='id_card')
-        self.core_cnt_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=list(range(1, self.cpu_cnt + 1)), label='CPU COUNT: ', label_width=30, dropdown_width=40, value=int(self.cpu_cnt/2), img='cpu_small')
-        self.show_bbox_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW BOUNDING BOX: ', label_width=30, dropdown_width=40, value='FALSE', img='rectangle_red')
-        self.show_clf_conf_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW CONFIDENCE: ', label_width=30, dropdown_width=40, value='FALSE', img='green_dice')
+        self.show_pose_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW POSE: ', label_width=30, dropdown_width=40, value='TRUE', img='pose', tooltip_key='VALIDATION_VIDEO_SHOW_POSE')
+        self.show_animal_names_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ANIMAL NAMES: ', label_width=30, dropdown_width=40, value='FALSE', img='id_card', tooltip_key='VALIDATION_VIDEO_SHOW_ANIMAL_NAMES')
+        self.core_cnt_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=list(range(2, self.cpu_cnt + 1)), label='CPU COUNT: ', label_width=30, dropdown_width=40, value=int(np.ceil(self.cpu_cnt/3)), img='cpu_small', tooltip_key='VALIDATION_VIDEO_CPU_COUNT')
+        self.show_bbox_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=['FALSE', Options.AXIS_ALIGNED.value, Options.ANIMAL_ALIGNED.value], label='SHOW BOUNDING BOX: ', label_width=30, dropdown_width=40, value='FALSE', img='rectangle_red', tooltip_key='VALIDATION_VIDEO_SHOW_BBOX')
+        self.show_clf_conf_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW CONFIDENCE: ', label_width=30, dropdown_width=40, value='TRUE', img='green_dice', tooltip_key='VALIDATION_VIDEO_SHOW_CONFIDENCE')
 
         tracking_frm.grid(row=1, column=0, sticky=NW, padx=10, pady=10)
         self.show_pose_dropdown.grid(row=0, column=0, sticky=NW)
@@ -84,7 +84,7 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
         self.core_cnt_dropdown.grid(row=4, column=0, sticky=NW)
 
         gantt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GANTT SETTINGS", icon_name='gantt_small', icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value, padx=5, pady=5, relief='solid')
-        self.gantt_dropdown = SimBADropDown(parent=gantt_frm, dropdown_options= Options.GANTT_VALIDATION_OPTIONS.value, label='GANTT TYPE:', label_width=30, dropdown_width=40, img='gantt_small', value=Options.GANTT_VALIDATION_OPTIONS.value[2])
+        self.gantt_dropdown = SimBADropDown(parent=gantt_frm, dropdown_options= Options.GANTT_VALIDATION_OPTIONS.value, label='GANTT TYPE:', label_width=30, dropdown_width=40, img='gantt_small', value=Options.GANTT_VALIDATION_OPTIONS.value[2], tooltip_key='VALIDATION_VIDEO_GANTT_TYPE')
         gantt_frm.grid(row=3, column=0, sticky=NW, padx=10, pady=10)
         self.gantt_dropdown.grid(row=0, column=0, sticky=NW)
 
@@ -102,7 +102,7 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
         text_opacity = float(self.text_opacity_dropdown.getChoices())
         core_cnt = int(self.core_cnt_dropdown.getChoices())
         bp_palette = self.bp_palette_dropdown.getChoices()
-        bbox = str_2_bool(self.show_bbox_dropdown.getChoices())
+        bbox = None if self.show_bbox_dropdown.get_value() == 'FALSE' else self.show_bbox_dropdown.get_value()
         clf_conf = str_2_bool(self.show_clf_conf_dropdown.getChoices())
         create_gantt = self.gantt_dropdown.getChoices()
         if create_gantt.strip() == GANTT_FRAME: create_gantt = 1
@@ -134,7 +134,7 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
                                                                          shortest_bout=self.shortest_bout,
                                                                          font_size=font_size,
                                                                          create_gantt=create_gantt,
-                                                                         show_animal_bounding_boxes=bbox,
+                                                                         bbox=bbox,
                                                                          circle_size=circle_size,
                                                                          text_spacing=text_space_scale,
                                                                          show_pose=show_pose,

@@ -187,6 +187,23 @@ class YoloInference():
             if self.verbose:
                 stdout_success(f'YOLO results saved in {self.save_dir} directory', elapsed_time=timer.elapsed_time_str)
 
+
+# VIDEO_PATH = r"Z:\home\simon\lp_300126\videos\6.01.001_2026_03_11_23_25_00_000_2\6.01.001_2026_03_11_23_25_00_000_2_cam1.mp4"
+# WEIGHTS_PATH = r"E:\litpose_yolo\bbox\mdl\train3\weights\best.pt"
+# SAVE_DIR = r"E:\litpose_yolo\bbox\out_videos"
+# i = YoloInference(weights=WEIGHTS_PATH,
+#                   video_path=VIDEO_PATH,
+#                   save_dir=SAVE_DIR,
+#                   stream=True,
+#                   verbose=True,
+#                   core_cnt=18,
+#                   imgsz=256,
+#                   batch_size=500)
+# i.run()
+#
+
+
+
 # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
 # video_path = "/mnt/d/netholabs/yolo_videos/input/mp4_20250606083508/2025-05-28_19-50-23.mp4"
 # video_path = r"E:\maplight_videos\yolo_runtime_test\videos"

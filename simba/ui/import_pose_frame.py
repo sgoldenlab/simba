@@ -252,7 +252,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
         self.animal_names_frm = Frame(self.animal_settings_frm, pady=5, padx=5)
         self.animal_name_entry_boxes = {}
         for i in range(int(animal_cnt)):
-            self.animal_name_entry_boxes[i + 1] = Entry_Box(self.animal_names_frm, f"Animal {str(i+1)} name: ", "25", tooltip_key='IMPORT_POSE_ANIMAL_NAME')
+            self.animal_name_entry_boxes[i + 1] = Entry_Box(self.animal_names_frm, f"Animal {str(i+1)} name: ", "25", tooltip_key='IMPORT_POSE_ANIMAL_NAME', justify='center')
             if i <= len(self.multi_animal_id_list) - 1:
                 self.animal_name_entry_boxes[i + 1].entry_set(self.multi_animal_id_list[i])
             self.animal_name_entry_boxes[i + 1].grid(row=i, column=0, sticky=NW)
@@ -327,8 +327,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
 
         else: # DATA TYPES WHERE TRACKS HAVE TO BE SPECIFIED
             self.animal_settings_frm = LabelFrame(self.choice_frm, text="ANIMAL SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
-            animal_cnt_entry_box = Entry_Box(self.animal_settings_frm, "ANIMAL COUNT:", "25", validation="numeric", tooltip_key='IMPORT_POSE_ANIMAL_COUNT')
-            animal_cnt_entry_box.entry_set(val=self.animal_cnt)
+            animal_cnt_entry_box = Entry_Box(self.animal_settings_frm, "ANIMAL COUNT:", "25", validation="numeric", tooltip_key='IMPORT_POSE_ANIMAL_COUNT', justify='center', value=self.animal_cnt)
             animal_cnt_confirm = Button(self.animal_settings_frm, text="CONFIRM", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.create_animal_names_entry_boxes( animal_cnt=animal_cnt_entry_box.entry_get))
             self.create_animal_names_entry_boxes(animal_cnt=animal_cnt_entry_box.entry_get)
             self.animal_settings_frm.grid(row=4, column=0, sticky=NW)

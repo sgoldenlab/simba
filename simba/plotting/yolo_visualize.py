@@ -12,6 +12,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.errors import FrameRangeError
 from simba.utils.read_write import (find_core_cnt, get_fn_ext,
                                     get_video_meta_data)
+from simba.utils.data import get_cpu_pool, terminate_cpu_pool
 
 EXPECTED_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 FRAME = 'FRAME'
@@ -54,31 +55,31 @@ class YOLOVisualizer():
                  palette: Optional[str] = 'Set1',
                  core_cnt: Optional[int] = -1,
                  threshold: float = 0.0,
+                 padding: Optional[int] = 20,
                  thickness: Optional[int] = None,
-                 verbose: Optional[bool] = False):
-
-
+                 verbose: bool = True):
 
         check_file_exist_and_readable(file_path=data_path)
         self.video_meta_data = get_video_meta_data(video_path=video_path)
         self.data_path, self.video_path = data_path, video_path
         self.video_name = get_fn_ext(filepath=data_path)[1]
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
+        if padding is not None: check_int(name=f'{self.__class__.__name__} padding', value=padding, min_value=-1, unaccepted_vals=[0])
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
         self.core_cnt = core_cnt
-        if core_cnt == -1 or core_cnt > find_core_cnt()[0]:
-            self.core_cnt = find_core_cnt()[0]
+        if core_cnt == -1 or core_cnt > find_core_cnt()[0]: self.core_cnt = find_core_cnt()[0]
         if thickness is not None:
             check_int(name=f'{self.__class__.__name__} thickness', value=thickness, min_value=0, unaccepted_vals=[0])
         check_if_dir_exists(in_dir=save_dir)
         check_valid_boolean(value=[verbose], source=self.__class__.__name__, raise_error=True)
         self.save_dir, self.verbose, self.palette, self.thickness = save_dir, verbose, palette, thickness
-        self.threshold = threshold
+        self.threshold, self.padding = threshold, padding
 
     def run(self):
         data_df = pd.read_csv(self.data_path, index_col=0)
         check_valid_dataframe(df=data_df, source=self.__class__.__name__, required_fields=EXPECTED_COLS)
         df_frm_cnt = np.unique(data_df[FRAME].values).shape[0]
+        pool = get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__)
         if self.video_meta_data['frame_count'] != df_frm_cnt:
             raise FrameRangeError(
                 msg=f'The bounding boxes contain data for {df_frm_cnt} frames, while the video is {self.video_meta_data["frame_count"]} frames',
@@ -96,7 +97,7 @@ class YOLOVisualizer():
             cls_df.loc[cls_df[CONFIDENCE] < self.threshold, CORD_FIELDS] = -1
             cls_arr = cls_df[CORD_FIELDS].values
             cls_arr = cls_arr.reshape(cls_arr.shape[0], 4, 2)
-            geometries.append(GeometryMixin().multiframe_bodyparts_to_polygon(data=cls_arr, video_name=self.video_name, core_cnt=self.core_cnt, verbose=self.verbose))
+            geometries.append(GeometryMixin().multiframe_bodyparts_to_polygon(data=cls_arr, video_name=self.video_name, core_cnt=self.core_cnt, verbose=self.verbose, parallel_offset=self.padding, pool=pool))
         plotter = GeometryPlotter(geometries=geometries,
                                   video_name=self.video_path,
                                   core_cnt=self.core_cnt,
@@ -104,8 +105,10 @@ class YOLOVisualizer():
                                   verbose=self.verbose,
                                   colors=[(0, 255, 255)],
                                   thickness=self.thickness,
-                                  shape_opacity=0.6)
+                                  shape_opacity=0.6,
+                                  pool=pool)
         plotter.run()
+        terminate_cpu_pool(pool=pool, source=self.__class__.__name__)
 
 
 
@@ -115,9 +118,11 @@ class YOLOVisualizer():
 
 
 
-#
-# test = YOLOVisualizer(data_path=r"/mnt/d/netholabs/yolo_test/results/2025-04-17_17-05-07.csv",
-#                       video_path=r"/mnt/d/netholabs/out/2025-04-17_17-05-07.mp4",
-#                       save_dir=r"/mnt/d/netholabs/yolo_test/yolo_videos",
-#                       threshold=0.64)
+
+# test = YOLOVisualizer(data_path=r"E:\litpose_yolo\bbox\out_pose\6.01.001_2026_03_11_23_25_00_000_2_cam1.csv",
+#                       video_path=r"Z:\home\simon\lp_300126\videos\6.01.001_2026_03_11_23_25_00_000_2\6.01.001_2026_03_11_23_25_00_000_2_cam1.mp4",
+#                       save_dir=r"E:\litpose_yolo\bbox\out_pose",
+#                       threshold=0.3,
+#                       padding=10,
+#                       core_cnt=10)
 # test.run()

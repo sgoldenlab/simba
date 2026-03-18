@@ -12,7 +12,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import TagNames
-from simba.utils.printing import log_event, stdout_success
+from simba.utils.printing import log_event, stdout_success, stdout_information
 from simba.utils.read_write import get_fn_ext, read_df, write_df
 
 
@@ -37,7 +37,7 @@ class InferenceValidation(ConfigReader, TrainModelMixin):
                  input_file_path: Union[str, os.PathLike],
                  clf_path: Union[str, os.PathLike]):
 
-        print('Running validation inference ...')
+        stdout_information(msg='Running validation inference ...')
         ConfigReader.__init__(self, config_path=config_path)
         TrainModelMixin.__init__(self)
         log_event(
@@ -67,9 +67,7 @@ class InferenceValidation(ConfigReader, TrainModelMixin):
             elapsed_time=self.timer.elapsed_time_str,
             source=self.__class__.__name__,
         )
-        print(
-            'Click on "Interactive probability plot" to inspect classifier probability thresholds. If satisfactory proceed to specify threshold and minimum bout length and click on "Validate" to create video.'
-        )
+        stdout_information(msg='Click on "Interactive probability plot" to inspect classifier probability thresholds. If satisfactory proceed to specify threshold and minimum bout length and click on "Validate" to create video.')
 
 
 #

@@ -495,14 +495,14 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_train_multimodel = SimbaButton(parent=label_trainmachinemodel, width=Formats.BUTTON_WIDTH_XXL.value, txt="TRAIN MULTIPLE MODELS (ONE FOR EACH SAVED SETTING)", img='multiple_green', txt_clr='green', cmd=self.train_multiple_models_from_meta, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
 
         label_model_validation = CreateLabelFrameWithIcon( parent=tab9, header="VALIDATE MODEL ON SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value, padx=5, pady=5, relief='solid')
-        self.csvfile = FileSelect(label_model_validation,fileDescription="SELECT DATA FEATURE FILE PATH", color="blue",lblwidth=40,file_types=[("SimBA CSV", "*.csv"), ("SimBA PARQUET", "*.parquet")], initialdir=os.path.join(self.project_path, Paths.FEATURES_EXTRACTED_DIR.value))
-        self.modelfile = FileSelect(label_model_validation,fileDescription="SELECT MODEL FILE PATH", color="blue", lblwidth=40, initialdir=self.project_path)
+        self.csvfile = FileSelect(label_model_validation,fileDescription="SELECT DATA FEATURE FILE PATH", color="blue",lblwidth=40,file_types=[("SimBA CSV", "*.csv"), ("SimBA PARQUET", "*.parquet")], initialdir=os.path.join(self.project_path, Paths.FEATURES_EXTRACTED_DIR.value), title='SELECT FEATURE DATA PATH (E.G. CSV FILE)')
+        self.modelfile = FileSelect(label_model_validation,fileDescription="SELECT MODEL FILE PATH", color="blue", lblwidth=40, initialdir=self.project_path, title='SELECT MODEL FILE (E.G. SAV FILE)')
 
         button_runvalidmodel = SimbaButton(parent=label_model_validation, width=Formats.BUTTON_WIDTH_XL.value, txt="RUN MODEL", txt_clr='blue', img='rocket', cmd=self.validate_model_first_step, thread=False)
         button_generateplot = SimbaButton(parent=label_model_validation, width=Formats.BUTTON_WIDTH_XL.value, txt="INTERACTIVE PROBABILITY PLOT",  img='interactive_blue', txt_clr='blue', cmd=self.launch_interactive_plot, thread=False)
 
-        self.dis_threshold = Entry_Box(label_model_validation, "DISCRIMINATION THRESHOLD (0.0-1.0):", labelwidth=40, entry_box_width=30)
-        self.min_behaviorbout = Entry_Box(label_model_validation,"MINIMUM BOUT LENGTH (MS):",labelwidth=40, validation="numeric", entry_box_width=30)
+        self.dis_threshold = Entry_Box(label_model_validation, "DISCRIMINATION THRESHOLD (0.0-1.0):", labelwidth=40, entry_box_width=30, justify='center')
+        self.min_behaviorbout = Entry_Box(label_model_validation,"MINIMUM BOUT LENGTH (MS):",labelwidth=40, validation="numeric", entry_box_width=30, justify='center')
         button_validate_model = SimbaButton(parent=label_model_validation, width=Formats.BUTTON_WIDTH_XL.value, txt="CREATE VALIDATION VIDEO", txt_clr='blue', img='visualize_blue', cmd=ValidationVideoPopUp, cmd_kwargs={'config_path': lambda: config_path,
                                                                                                                                                                                                                            'feature_path': lambda: self.csvfile.file_path,
                                                                                                                                                                                                                            'model_path': lambda: self.modelfile.file_path,
