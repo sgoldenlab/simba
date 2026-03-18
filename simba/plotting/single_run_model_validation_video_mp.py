@@ -35,9 +35,9 @@ from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     get_fn_ext, get_video_meta_data, read_df,
-                                    read_pickle, write_df, seconds_to_timestamp)
+                                    read_pickle, seconds_to_timestamp,
+                                    write_df)
 from simba.utils.warnings import FrameRangeWarning
-
 
 SECONDS, HHMMSSSSSS = ['seconds', 'hh:mm:ss.ssss']
 CLF_CLR = tuple((x/255 for x in TextOptions.FLAMINGO.value))

@@ -13,7 +13,9 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_tuple)
 from simba.utils.enums import Formats
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
-from simba.utils.read_write import (create_directory, get_fn_ext, read_img, recursive_file_search)
+from simba.utils.read_write import (create_directory, get_fn_ext, read_img,
+                                    recursive_file_search)
+
 
 class LitPose2YOLOBbox:
     """
