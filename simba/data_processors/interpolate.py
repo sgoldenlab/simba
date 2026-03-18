@@ -18,7 +18,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_str,
 from simba.utils.data import animal_interpolator, body_part_interpolator
 from simba.utils.enums import TagNames
 from simba.utils.errors import DataHeaderError, InvalidInputError
-from simba.utils.printing import SimbaTimer, log_event, stdout_success, stdout_information
+from simba.utils.printing import (SimbaTimer, log_event, stdout_information,
+                                  stdout_success)
 from simba.utils.read_write import (copy_files_to_directory,
                                     find_files_of_filetypes_in_directory,
                                     get_fn_ext, read_df, write_df)
