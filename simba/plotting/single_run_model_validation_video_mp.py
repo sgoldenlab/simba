@@ -31,7 +31,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.data import (create_color_palette, plug_holes_shortest_bout,
                               terminate_cpu_pool)
 from simba.utils.enums import Options, TextOptions
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_information
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     get_fn_ext, get_video_meta_data, read_df,

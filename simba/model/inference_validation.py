@@ -12,7 +12,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import TagNames
-from simba.utils.printing import log_event, stdout_success, stdout_information
+from simba.utils.printing import log_event, stdout_information, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df, write_df
 
 
