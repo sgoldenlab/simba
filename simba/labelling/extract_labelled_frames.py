@@ -11,12 +11,18 @@ except:
 import cv2
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_file_exist_and_readable, check_float, check_str, check_that_column_exist, check_valid_lst, check_valid_boolean, check_if_df_field_is_boolean)
-from simba.utils.printing import stdout_success, stdout_information
-from simba.utils.read_write import (find_video_of_file, get_fn_ext, get_video_meta_data, read_df, read_frm_of_video, create_directory, check_valid_dataframe)
-from simba.utils.warnings import FrameRangeWarning
-from simba.utils.data import detect_bouts
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_df_field_is_boolean, check_str,
+                                check_that_column_exist, check_valid_boolean,
+                                check_valid_lst)
+from simba.utils.data import detect_bouts
+from simba.utils.printing import stdout_information, stdout_success
+from simba.utils.read_write import (check_valid_dataframe, create_directory,
+                                    find_video_of_file, get_fn_ext,
+                                    get_video_meta_data, read_df,
+                                    read_frm_of_video)
+from simba.utils.warnings import FrameRangeWarning
 
 IMG_FORMATS = ('png', 'webp', 'jpg')
 VIDEO_FORMATS = ('mp4', 'avi', 'webm')
