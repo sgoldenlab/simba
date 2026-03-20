@@ -59,6 +59,8 @@ from simba.ui.machine_model_settings_ui import MachineModelSettingsPopUp
 from simba.ui.pop_ups.about_simba_pop_up import AboutSimBAPopUp
 from simba.ui.pop_ups.animal_directing_other_animals_pop_up import \
     AnimalDirectingAnimalPopUp
+from simba.ui.pop_ups.annotated_bouts_videos_pop_up import \
+    AnnotatedBoutsVideoPopUp
 from simba.ui.pop_ups.append_roi_features_animals_pop_up import \
     AppendROIFeaturesByAnimalPopUp
 from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import \
@@ -480,6 +482,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
         lbl_tools_frm = CreateLabelFrameWithIcon(parent=tab7, header="LABELLING TOOLS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ADVANCED_LBL.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
         visualize_annotation_img_btn = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="VISUALIZE ANNOTATIONS", cmd=ExtractAnnotationFramesPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
+        visualize_annotation_video_btn = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="VISUALIZE ANNOTATION BOUTS", txt_clr='blue', cmd=AnnotatedBoutsVideoPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
         third_party_annotations_btn = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="APPEND THIRD-PARTY ANNOTATIONS", txt_clr='purple', cmd=ThirdPartyAnnotatorAppenderPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
         remove_roi_features_from_annotation_set = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="REMOVE ROI FEATURES FROM LABEL SET", txt_clr='darkred', cmd=RemoveROIFeaturesPopUp, cmd_kwargs={'config_path': lambda:self.config_path, 'dataset': lambda:'targets_inserted'}, thread=False)
         compute_annotation_statistics = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="COUNT ANNOTATIONS IN PROJECT", txt_clr='orange', cmd=ClfAnnotationCountPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
@@ -636,9 +639,10 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
         lbl_tools_frm.grid(row=10, column=0, sticky=NW, padx=10, pady=10)
         visualize_annotation_img_btn.grid(row=0, column=0, sticky=NW)
-        third_party_annotations_btn.grid(row=0, column=1, sticky=NW)
-        remove_roi_features_from_annotation_set.grid(row=1, column=0, sticky=NW)
-        compute_annotation_statistics.grid(row=1, column=1, sticky=NW)
+        visualize_annotation_video_btn.grid(row=0, column=1, sticky=NW)
+        third_party_annotations_btn.grid(row=1, column=0, sticky=NW)
+        remove_roi_features_from_annotation_set.grid(row=1, column=1, sticky=NW)
+        compute_annotation_statistics.grid(row=2, column=0, sticky=NW)
 
         label_trainmachinemodel.grid(row=6, sticky=W, padx=10, pady=10)
         button_trainmachinesettings.grid(row=0, column=0, sticky=NW, padx=5)

@@ -165,6 +165,10 @@ Select which classifier annotatated frames you wish to extract by ticking the ap
 
 Once complete, the images annotated as **behavior present** will be stored within sub-directories of the `project_folder/frames/output/annotated_frames` folder in the hierarchy of `video name` -> `classifier behavior name`. The file names of the frames are the frame number of the annotated behaviour. E.g., a file at the path `project_folder/frames/output/annotated_frames/My_video/Attack/28.png` represents an **behavior-present** annotation for the behavior `Attack` at the 28th frame of video `My_video`.  
 
+> **Note:** SimBA also includes `Visualize annotation bouts` in the same `LABELLING TOOLS` submenu.  
+> This tool creates per-bout video clips (with optional pre/post bout windows) from annotations in `project_folder/csv/targets_inserted`, and saves outputs in `project_folder/frames/output/annotated_frames/videos/`.
+> Full documentation: [Visualize annotation bouts (Label behavior tab)](Visualizations.md#visualize-annotation-bouts-label-behavior-tab).
+
 ### Removing ROI data from the annotated data sets
 
 We may have created ROI features, which have been appended to our annotated data files inside the `project_folder/csv/targets_inserted` directory, and now we feel like we don't have any use for them and want to remove them. To do this click the `Remove ROI features from label set` button. 

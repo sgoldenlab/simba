@@ -189,6 +189,13 @@ Classification plotter - multiprocess
    :members:
    :show-inheritance:
 
+Annotation bout plotter
+--------------------------------------------
+
+.. automodule:: simba.plotting.annotation_videos.PlotAnnotatedBouts
+   :members:
+   :show-inheritance:
+
 Pose-estimation plotter
 -----------------------------------------
 

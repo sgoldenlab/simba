@@ -14,7 +14,7 @@ This document serves as a central location documenting many pose-dependent visua
 |-----|------------------------|
 | **[Visualizations]** | Most tools: classifications, Gantt, probability, path, distance, classification heatmaps, data tables, merge |
 | **[ROI]** | **ROI tracking** — Time in/entries per ROI; **ROI features** — Distances, inside/outside, directionality towards ROIs; **Heatmap locations** — Time per arena region; **Directionality** — Animals directing towards each other; **Create path plots** — Simple single-body-part path plots (quick, minimal options) |
-| **[Label behavior]** | **Visualize annotations** — Extract frames where behavior was annotated as present |
+| **[Label behavior]** | **Visualize annotations** — Extract frames where behavior was annotated as present; **Visualize annotation bouts** — Create per-bout videos from behavior annotations |
 | **Process Videos** | **Blob tracking...** → **Visualize blob tracking** — Overlay blob shapes on videos; **YOLO tracking...** → **Visualize YOLO model results** — Overlay YOLO pose keypoints on videos |
 | **Tools menu** | **Visualize pose-estimation in folder** — Overlay pose keypoints on videos; **Create path plot** — Simple single-body-part path plots (no project required); **Egocentrically align pose and video** — Rotate poses and videos to a fixed egocentric view; **Concatenate (stack) videos** → **Concatenate two videos** — Join two videos horizontally or vertically |
 
@@ -52,6 +52,7 @@ This document serves as a central location documenting many pose-dependent visua
 - [Merge (concatenate) multiple videos](#merge-concatenate-multiple-videos)
 - [Post-classification validation (Scenario 4)](#post-classification-validation-scenario-4)
 - [Visualize annotations (Label behavior tab)](#visualize-annotations-label-behavior-tab)
+- [Visualize annotation bouts (Label behavior tab)](#visualize-annotation-bouts-label-behavior-tab)
 - [Visualize pose-estimation in folder (Tools menu)](#visualize-pose-estimation-in-folder-tools-menu)
 - [Visualize blob tracking (Process Videos menu)](#visualize-blob-tracking-process-videos-menu)
 - [Visualize YOLO model results (Process Videos menu)](#visualize-yolo-model-results-process-videos-menu)
@@ -750,6 +751,36 @@ Extracts and saves **frames where behavior was annotated as present** (behavior-
 
 ---
 
+## VISUALIZE ANNOTATION BOUTS (Label behavior tab)
+
+*Available under the **[Label behavior]** tab → **LABELLING TOOLS** → **VISUALIZE ANNOTATION BOUTS**.*
+
+Creates **one video clip per annotated bout** for selected classifier(s). Each clip can include optional pre/post context windows and overlays such as pose, animal names, bounding boxes, and timer text.
+
+**Prerequisites:**
+- **Behavior annotations** — Annotated target files must exist in `project_folder/csv/targets_inserted/` and contain the selected classifier columns.
+- **Videos** — Matching source videos must exist in `project_folder/videos/` (same base filename as target file).
+
+| Option | Description |
+|--------|-------------|
+| **VIDEO** | Process one selected video or **ALL VIDEOS** with annotation target files. |
+| **PRE-BOUT WINDOW (SECONDS)** | Integer seconds to include before each detected annotation bout. |
+| **POST-BOUT WINDOW (SECONDS)** | Integer seconds to include after each detected annotation bout. |
+| **TEXT SIZE / SPACING / THICKNESS** | Overlay text styling. **AUTO** lets SimBA adapt values to video size. |
+| **CIRCLE SIZE** | Size of pose keypoint circles. **AUTO** scales by resolution. |
+| **TEXT OPACITY / TEXT COLOR / TEXT BG COLOR** | Overlay readability controls for timer and bout labels. |
+| **TRACKING COLOR PALETTE** | Color palette for pose/body-part overlays. |
+| **CPU CORES** | Number of CPU cores for multiprocessing clip rendering. |
+| **USE GPU** | Uses GPU-enabled path when available (if supported). |
+| **SHOW ANIMAL BBOX** | **FALSE**, **axis-aligned**, or **animal-aligned** boxes. |
+| **SHOW VIDEO TIMER** | **FALSE**, **seconds**, or **hh:mm:ss.ssss** timer overlay format. |
+| **SHOW TRACKING (POSE)** | Draw pose keypoints on the output clips. |
+| **SHOW ANIMAL NAME(S)** | Draw animal labels near tracked keypoints. |
+
+**Where output is saved:** `project_folder/frames/output/annotated_frames/videos/`. Filenames follow `{video_name}_{classifier}_{bout_id}.mp4`.
+
+---
+
 ## VISUALIZE POSE-ESTIMATION IN FOLDER (Tools menu)
 
 *Available under **Tools** → **Visualize pose-estimation in folder...**. See [Tools: Visualize pose estimation in folder](Tools.md#visualize-pose-estimation-in-folder).*
@@ -1014,6 +1045,7 @@ Joins **two videos** into a single output video, either **horizontally** (side b
 | Data tables | `DataPlotter` | [simba.plotting](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.plotting.html) |
 | Merge videos | `FrameMergererFFmpeg`, `ConcatenatorPopUp` | [simba.plotting](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.plotting.html), [simba.ui](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.ui.html) |
 | Annotated frames (Label behavior tab) | `AnnotationFrameExtractor` | [simba.labelling](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.labelling.html) |
+| Annotated bout videos (Label behavior tab) | `PlotAnnotatedBouts` | [simba.plotting](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.plotting.html) |
 | Pose visualization (Tools menu) | `PosePlotter`, `PosePlotterMultiProcess` | [simba.plotting](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.plotting.html) |
 | Blob tracking (Process Videos menu) | `BlobVisualizer` | [simba.plotting](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.plotting.html) |
 | YOLO model results (Process Videos menu) | `YOLOPoseVisualizer`, `YOLOPoseTrackVisualizer` | [simba.plotting](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.plotting.html) |
@@ -1046,6 +1078,7 @@ Full API index: [SimBA API Reference](https://simba-uw-tf-dev.readthedocs.io/en/
 | Validation video (Scenario 1) | `project_folder/frames/output/validation/` |
 | Post-classification validation clips (Scenario 4) | `project_folder/frames/output/classifier_validation/` |
 | Annotated frames (Label behavior tab) | `project_folder/frames/output/annotated_frames/` |
+| Annotated bout videos (Label behavior tab) | `project_folder/frames/output/annotated_frames/videos/` |
 | Create path plots (ROI tab) | `project_folder/frames/output/path_plots/` |
 | Pose visualization (Tools menu) | User-selected save directory |
 | Blob tracking (Process Videos menu) | User-selected save directory |

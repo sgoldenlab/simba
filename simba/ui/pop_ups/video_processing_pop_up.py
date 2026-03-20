@@ -1352,9 +1352,9 @@ class ExtractAnnotationFramesPopUp(PopUpMixin, ConfigReader):
 
         frame_extractor = AnnotationFrameExtractor(config_path=self.config_path,
                                                    clfs=clfs,
-                                                   downsample=downsample,
+                                                   img_downsample_factor=downsample,
                                                    img_format=img_format,
-                                                   greyscale=greyscale,
+                                                   img_greyscale=greyscale,
                                                    data_paths=data_paths)
         frame_extractor.run()
 

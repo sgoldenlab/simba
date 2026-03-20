@@ -19,7 +19,7 @@ except ModuleNotFoundError:
     import numpy as cp
 
 import multiprocessing
-
+from copy import deepcopy
 import cv2
 import numpy as np
 import pandas as pd
@@ -1436,44 +1436,55 @@ def check_video_has_rois(roi_dict: Dict[str, pd.DataFrame],
 
 
 def check_if_df_field_is_boolean(df: pd.DataFrame,
-                                 field: str,
+                                 field: Union[str, List[str]],
                                  raise_error: bool = True,
                                  bool_values: Optional[Tuple[Any]] = (0, 1),
                                  df_name: Optional[str] = ''):
     """
-    Check if a DataFrame field contains only boolean values.
+    Validate that one or more DataFrame columns only contain accepted boolean labels.
 
-    This function validates that a specified column in a DataFrame contains only
-    the expected boolean values (e.g., 0/1, True/False). It checks for any
-    unexpected values that are not in the allowed boolean values set.
+    Accepted values are defined by ``bool_values`` (defaults to ``(0, 1)``), so this
+    utility supports both numeric and custom binary encodings.
 
-    :param pd.DataFrame df: The DataFrame to check.
-    :param str field: Name of the column to validate for boolean values.
-    :param bool raise_error: If True, raises CountError when non-boolean values are found. If False, returns False. Default: True.
-    :param Optional[Tuple[Any]] bool_values: Tuple of accepted boolean values. Default: (0, 1).
-    :param Optional[str] df_name: Name of the DataFrame for error messaging. Default: ''.
-    :return: True if field contains only boolean values, False if non-boolean values found and raise_error=False.
+    :param pd.DataFrame df: DataFrame to validate.
+    :param Union[str, List[str]] field: Column name or list of column names to check.
+    :param bool raise_error: If ``True``, raise ``CountError`` on invalid values.
+        If ``False``, return ``False`` when invalid values are detected.
+    :param Optional[Tuple[Any]] bool_values: Accepted values representing boolean
+        labels.
+    :param Optional[str] df_name: Optional DataFrame name included in error text.
+    :return: ``True`` when validation succeeds, else ``False`` if
+        ``raise_error=False`` and invalid values are found.
     :rtype: bool
-    :raises CountError: If non-boolean values are found in the field and raise_error=True.
+    :raises InvalidInputError: If ``field`` is neither ``str`` nor ``List[str]``.
+    :raises CountError: If invalid values are found and ``raise_error=True``.
 
     :example:
-    >>> df = pd.DataFrame({'binary_col': [0, 1, 0, 1], 'mixed_col': [0, 1, 2, 0]})
-    >>> check_if_df_field_is_boolean(df=df, field='binary_col')
+    >>> df = pd.DataFrame({'binary_col': [0, 1, 0, 1], 'mixed_col': [0, 1, 2, 0], 'flag': [1, 0, 1, 0]})
+    >>> check_if_df_field_is_boolean(df=df, field='binary_col', bool_values=(0, 1))
     True
     >>> check_if_df_field_is_boolean(df=df, field='mixed_col', raise_error=False)
     False
-    >>> check_if_df_field_is_boolean(df=df, field='mixed_col', bool_values=(0, 1, 2))
+    >>> check_if_df_field_is_boolean(df=df, field=['binary_col', 'flag'], bool_values=(0, 1))
     True
     """
     check_instance(source=f'{check_if_df_field_is_boolean.__name__} df', instance=df, accepted_types=(pd.DataFrame,))
-    check_str(name=f"{check_if_df_field_is_boolean.__name__} field", value=field)
-    check_that_column_exist(df=df, column_name=field, file_name=check_if_df_field_is_boolean.__name__)
-    additional = list((set(list(df[field])) - set(bool_values)))
-    if len(additional) > 0:
-        if raise_error:
-            raise CountError(msg=f"Field {field} not a boolean in {df_name}. Found values {additional}. Accepted: {bool_values}", source=check_if_df_field_is_boolean.__name__)
-        else:
-            return False
+    if isinstance(field, str):
+        fields = [field]
+    elif isinstance(field, list):
+        check_valid_lst(data=field, source=check_if_df_field_is_boolean.__name__, valid_dtypes=(str,), raise_error=True)
+        fields = deepcopy(field)
+    else:
+        raise InvalidInputError(msg=f'Field is not of valid type. Accepted list or string got {type(field)}', source=check_if_df_field_is_boolean.__name__)
+    for field in fields:
+        check_that_column_exist(df=df, column_name=field, file_name=check_if_df_field_is_boolean.__name__)
+        additional = list((set(list(df[field])) - set(bool_values)))
+        if len(additional) > 0:
+            if raise_error:
+                raise CountError(msg=f"Field {field} not a boolean in {df_name}. Found values {additional}. Accepted: {bool_values}", source=check_if_df_field_is_boolean.__name__)
+            else:
+                return False
+        return True
     return True
 
 

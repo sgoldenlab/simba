@@ -418,5 +418,20 @@
   "VALIDATION_VIDEO_CPU_COUNT": "Number of CPU cores used for multiprocess rendering of the validation video. More cores are usually faster but use more memory.",
   "VALIDATION_VIDEO_SHOW_BBOX": "Bounding-box overlay mode: FALSE disables boxes, AXIS_ALIGNED draws horizontal rectangles, ANIMAL_ALIGNED draws rotated boxes aligned to animal orientation.",
   "VALIDATION_VIDEO_SHOW_CONFIDENCE": "If TRUE, displays classifier confidence scores on the video.",
-  "VALIDATION_VIDEO_GANTT_TYPE": "Choose Gantt overlay mode: NO GANTT, final-frame-only chart (faster), or full video Gantt chart."
+  "VALIDATION_VIDEO_GANTT_TYPE": "Choose Gantt overlay mode: NO GANTT, final-frame-only chart (faster), or full video Gantt chart.",
+  "ANNOTATION_BOUTS_VIDEO": "Select the target file/video to visualize. Choose ALL VIDEOS to process every available annotation target file in the project.",
+  "ANNOTATION_BOUTS_PRE_WINDOW": "Seconds to include before each detected classifier bout. Must be an integer (e.g., 5).",
+  "ANNOTATION_BOUTS_POST_WINDOW": "Seconds to include after each detected classifier bout. Must be an integer (e.g., 5).",
+  "ANNOTATION_BOUTS_TEXT_SIZE": "Overlay text font size. AUTO lets SimBA scale text by video size.",
+  "ANNOTATION_BOUTS_TEXT_SPACING": "Vertical spacing between overlay text rows. AUTO lets SimBA pick a readable spacing.",
+  "ANNOTATION_BOUTS_TEXT_THICKNESS": "Overlay text stroke thickness. Higher values make text bolder and easier to read.",
+  "ANNOTATION_BOUTS_CIRCLE_SIZE": "Body-part circle radius in pixels. AUTO scales marker size by video resolution.",
+  "ANNOTATION_BOUTS_TEXT_OPACITY": "Opacity of text background overlays (0.1-1.0). Lower values are more transparent.",
+  "ANNOTATION_BOUTS_TEXT_COLOR": "Text color used for timer and bout labels.",
+  "ANNOTATION_BOUTS_TEXT_BG_COLOR": "Background color behind overlay text to improve readability.",
+  "ANNOTATION_BOUTS_TRACKING_PALETTE": "Color palette used for pose/body-part markers and optional animal overlays.",
+  "ANNOTATION_BOUTS_CPU_CORES": "Number of CPU cores used for rendering. More cores are often faster but use more memory.",
+  "ANNOTATION_BOUTS_USE_GPU": "If TRUE and a compatible NVIDIA GPU is available, SimBA uses GPU-enabled path where supported.",
+  "ANNOTATION_BOUTS_SHOW_BBOX": "Bounding box mode: FALSE disables boxes, AXIS_ALIGNED draws horizontal boxes, ANIMAL_ALIGNED draws rotated animal-oriented boxes.",
+  "ANNOTATION_BOUTS_TIMER": "Timer format shown in output clips. FALSE disables timer; SECONDS shows numeric seconds; HH:MM:SS.SSSS shows formatted timestamp."
 }
