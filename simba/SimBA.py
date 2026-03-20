@@ -481,16 +481,13 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         targeted_clip_annotator_btn = SimbaButton(parent=targeted_clip_annotator_frm, txt="Select video", cmd=select_labelling_video_targeted_clips, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
 
         lbl_tools_frm = CreateLabelFrameWithIcon(parent=tab7, header="LABELLING TOOLS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ADVANCED_LBL.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
-        visualize_annotation_img_btn = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="VISUALIZE ANNOTATIONS", cmd=ExtractAnnotationFramesPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
-        visualize_annotation_video_btn = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="VISUALIZE ANNOTATION BOUTS", txt_clr='blue', cmd=AnnotatedBoutsVideoPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
+        visualize_annotation_img_btn = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="VISUALIZE ANNOTATIONS FRAMES", cmd=ExtractAnnotationFramesPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
+        visualize_annotation_video_btn = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="VISUALIZE ANNOTATION VIDEO BOUTS", txt_clr='blue', cmd=AnnotatedBoutsVideoPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
         third_party_annotations_btn = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="APPEND THIRD-PARTY ANNOTATIONS", txt_clr='purple', cmd=ThirdPartyAnnotatorAppenderPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
         remove_roi_features_from_annotation_set = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="REMOVE ROI FEATURES FROM LABEL SET", txt_clr='darkred', cmd=RemoveROIFeaturesPopUp, cmd_kwargs={'config_path': lambda:self.config_path, 'dataset': lambda:'targets_inserted'}, thread=False)
         compute_annotation_statistics = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="COUNT ANNOTATIONS IN PROJECT", txt_clr='orange', cmd=ClfAnnotationCountPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
 
-
-
         label_trainmachinemodel = CreateLabelFrameWithIcon(parent=tab8, header="TRAIN MACHINE MODELS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.TRAIN_ML_MODEL.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
-
 
         button_trainmachinesettings = SimbaButton(parent=label_trainmachinemodel, width=Formats.BUTTON_WIDTH_XXL.value, txt="SETTINGS", img='settings', txt_clr='darkorange', cmd=self.trainmachinemodelsetting, thread=False)
         button_trainmachinemodel = SimbaButton(parent=label_trainmachinemodel, width=Formats.BUTTON_WIDTH_XXL.value, txt="TRAIN SINGLE MODEL (GLOBAL ENVIRONMENT)", img='one_blue', txt_clr='blue', cmd=self.train_single_model, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
