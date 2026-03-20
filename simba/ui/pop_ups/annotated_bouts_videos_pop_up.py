@@ -13,8 +13,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         SimbaButton, SimbaCheckbox,
                                         SimBADropDown)
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_int,
-                                check_nvidea_gpu_available)
+                                check_int, check_nvidea_gpu_available)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoChoosenClassifierError, NoFilesFoundError
 from simba.utils.lookups import get_color_dict
