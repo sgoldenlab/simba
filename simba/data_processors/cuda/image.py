@@ -361,6 +361,13 @@ def img_stack_brightness(x: np.ndarray,
     .. seealso::
        For CPU function see :func:`~simba.mixins.image_mixin.ImageMixin.brightness_intensity`.
 
+    .. video:: _static/img/brightness_intensity.mp4
+       :width: 800
+       :autoplay:
+       :loop:
+       :muted:
+       :align: center
+
     :param np.ndarray x: A 4D array of images with dimensions (N, H, W, C), where N is the number of images, H and W are the height and width, and C is the number of channels (RGB).
     :param Optional[Literal['photometric', 'digital']] method:  The method to use for calculating brightness. It can be 'photometric' for  the standard luminance calculation or 'digital' for an alternative set of coefficients. Default is 'digital'.
     :param Optional[bool] ignore_black: If True, black pixels (i.e., pixels with brightness value 0) will be ignored in the calculation of the average brightness. Default is True.

@@ -63,6 +63,13 @@ class ImageMixin(object):
         """
         Compute the average brightness intensity within each image within a list.
 
+        .. video:: _static/img/brightness_intensity.mp4
+           :width: 800
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         For example, (i) create a list of images containing a light cue ROI, (ii) compute brightness in each image, (iii) perform kmeans on brightness, and get the frames when the light cue is on vs off.
 
         .. seealso::

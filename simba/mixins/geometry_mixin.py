@@ -2444,6 +2444,13 @@ class GeometryMixin(object):
            :width: 500
            :align: center
 
+        .. video:: _static/img/brightness_intensity.mp4
+           :width: 800
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            For direct image brightness comparisons without geometry slicing, see :func:`simba.mixins.image_mixin.ImageMixin.brightness_intensity`.
            For GPU acceleration, see :func:`simba.data_processors.cuda.image.img_stack_brightness()`
