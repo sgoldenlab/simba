@@ -20,12 +20,21 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import (check_float, check_if_valid_rgb_tuple, check_int, check_nvidea_gpu_available, check_str, check_valid_boolean, check_valid_lst, check_valid_dataframe, check_if_df_field_is_boolean)
-from simba.utils.data import (create_color_palette, detect_bouts, get_cpu_pool, terminate_cpu_pool)
+from simba.utils.checks import (check_float, check_if_df_field_is_boolean,
+                                check_if_valid_rgb_tuple, check_int,
+                                check_nvidea_gpu_available, check_str,
+                                check_valid_boolean, check_valid_dataframe,
+                                check_valid_lst)
+from simba.utils.data import (create_color_palette, detect_bouts, get_cpu_pool,
+                              terminate_cpu_pool)
 from simba.utils.enums import ConfigKey, Dtypes, Options, TagNames, TextOptions
-from simba.utils.errors import (InvalidInputError, NoDataError, FrameRangeError)
-from simba.utils.printing import (log_event, stdout_information, stdout_success)
-from simba.utils.read_write import (create_directory, find_core_cnt, get_fn_ext, get_video_meta_data, read_config_entry, read_df, seconds_to_timestamp, find_video_of_file, read_frm_of_video)
+from simba.utils.errors import FrameRangeError, InvalidInputError, NoDataError
+from simba.utils.printing import log_event, stdout_information, stdout_success
+from simba.utils.read_write import (create_directory, find_core_cnt,
+                                    find_video_of_file, get_fn_ext,
+                                    get_video_meta_data, read_config_entry,
+                                    read_df, read_frm_of_video,
+                                    seconds_to_timestamp)
 from simba.utils.warnings import FrameRangeWarning
 
 START_TIME, END_TIME = 'start_time', 'end_time'
