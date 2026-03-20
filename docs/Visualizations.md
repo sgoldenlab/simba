@@ -757,6 +757,10 @@ Extracts and saves **frames where behavior was annotated as present** (behavior-
 
 Creates **one video clip per annotated bout** for selected classifier(s). Each clip can include optional pre/post context windows and overlays such as pose, animal names, bounding boxes, and timer text.
 
+<p align="center">
+  <img src="images/visualizations/visualize_annotation_bouts.png" width="600" alt="Visualize annotation bouts">
+</p>
+
 **Prerequisites:**
 - **Behavior annotations** — Annotated target files must exist in `project_folder/csv/targets_inserted/` and contain the selected classifier columns.
 - **Videos** — Matching source videos must exist in `project_folder/videos/` (same base filename as target file).
