@@ -268,6 +268,13 @@ Spontaneous alternation plotter
    :members:
    :show-inheritance:
 
+YOLO bounding-box plotter
+---------------------------------------------------------------
+
+.. autoclass:: simba.plotting.yolo_visualize.YOLOVisualizer
+   :members:
+   :show-inheritance:
+
 
 Plotting methods
 -----------------------------------

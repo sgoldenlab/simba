@@ -50,7 +50,6 @@ class YOLOVisualizer():
        :muted:
        :align: center
 
-
     :param Union[str, os.PathLike] data_path: Path to YOLO results CSV. Expected columns: ``FRAME, CLASS_ID, CLASS_NAME, CONFIDENCE, X1..Y4``.
     :param Union[str, os.PathLike] video_path: Path to the video from which the data was produced.
     :param Union[str, os.PathLike] save_dir: Directory where to save visualization output.

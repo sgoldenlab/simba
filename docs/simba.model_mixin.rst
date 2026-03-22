@@ -94,3 +94,10 @@ Fit YOLO model
    :members:
    :undoc-members:
 
+YOLO bounding-box inference
+-------------------------------------------------
+
+.. autoclass:: simba.model.yolo_inference.YoloInference
+   :members:
+   :undoc-members:
+
