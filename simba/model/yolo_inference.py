@@ -55,7 +55,7 @@ class YoloInference():
     .. seealso::
        To perform bounding box and **keypoint (pose) detection**, see :func:`~simba.bounding_box_tools.yolo.yolo_pose_inference.YOLOPoseInference`.
        To perform keypoint (pose) detection with tracking, see :func:`~simba.model.yolo_pose_track_inference.YOLOPoseTrackInference`
-       To
+       To visualize bounding boxes only, see :func:`~simba.plotting.yolo_visualize.YOLOVisualizer`
 
     .. csv-table::
        :header: EXPECTED RUNTIMES
