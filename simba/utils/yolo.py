@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-from typing import Optional, Union
+from typing import Optional, Union, Tuple
 
 try:
     from typing import Literal
@@ -25,7 +25,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_device)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import (InvalidFileTypeError, InvalidInputError,
-                                SimBAGPUError)
+                                SimBAGPUError, SimBAPAckageVersionError)
 from simba.utils.read_write import find_core_cnt, get_video_meta_data
 
 
@@ -284,6 +284,109 @@ def keypoint_array_to_yolo_annotation_str(x: np.ndarray,
     return instance_str.strip() + '\n'
 
 
+def apply_fixed_bbox_size(data: pd.DataFrame,
+                          video_name: str,
+                          img_w: int,
+                          img_h: int,
+                          bbox_size: Tuple[int, int]) -> pd.DataFrame:
+    """
+    Apply a fixed axis-aligned bounding-box size to detected rows in a results table.
+
+    The current box center is preserved, then the box is resized to ``bbox_size`` (``h, w``). If the resized box would exceed frame boundaries, the box is shifted so it remains fully inside the image while preserving the requested size.
+
+    The function expects YOLO corner columns ``X1..Y4`` and updates them in-place on the input dataframe before returning it.
+
+    :param pd.DataFrame data: Detection dataframe containing ``CONFIDENCE`` and corner coordinate columns ``X1, Y1, X2, Y2, X3, Y3, X4, Y4``.
+    :param str video_name: Video identifier used in error messages.
+    :param int img_w: Image width in pixels.
+    :param int img_h: Image height in pixels.
+    :param Tuple[int, int] bbox_size: Target fixed bounding-box size as ``(height, width)`` in pixels.
+    :return: Input dataframe with updated fixed-size bbox coordinates for detected rows.
+    :rtype: pd.DataFrame
+    :raises InvalidInputError: If required columns are missing or if ``bbox_size`` is larger than image dimensions.
+    """
+
+    CONFIDENCE = "CONFIDENCE"
+    COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
+
+    if not set(COORD_COLS).issubset(data.columns):
+        raise InvalidInputError(msg=f"Missing bbox coordinate columns in data. Required: {COORD_COLS}", source=apply_fixed_bbox_size.__name__)
+    if CONFIDENCE not in data.columns:
+        raise InvalidInputError(msg=f"Missing {CONFIDENCE} column in data.", source=apply_fixed_bbox_size.__name__)
+    check_int(name=f"{apply_fixed_bbox_size.__name__} img_w", value=img_w, min_value=1)
+    check_int(name=f"{apply_fixed_bbox_size.__name__} img_h", value=img_h, min_value=1)
+    box_h, box_w = int(bbox_size[0]), int(bbox_size[1])
+    if box_h > int(img_h) or box_w > int(img_w):
+        raise InvalidInputError(msg=f"bbox_size {bbox_size} is larger than video dimensions ({img_h}, {img_w}) for video {video_name}", source=apply_fixed_bbox_size.__name__)
+    conf = pd.to_numeric(data[CONFIDENCE], errors="coerce").to_numpy(dtype=np.float32)
+    detected_mask = np.isfinite(conf) & (conf >= 0.0)
+    if not np.any(detected_mask):
+        return data
+    coords = data.loc[detected_mask, COORD_COLS].to_numpy(dtype=np.float32)
+    cxs = np.mean(coords[:, [0, 2, 4, 6]], axis=1)
+    cys = np.mean(coords[:, [1, 3, 5, 7]], axis=1)
+    half_w, half_h = box_w / 2.0, box_h / 2.0
+    max_x, max_y = float(img_w - 1), float(img_h - 1)
+    x1, x2 = cxs - half_w, cxs + half_w
+    y1, y2 = cys - half_h, cys + half_h
+    left_shift = np.where(x1 < 0, -x1, 0.0)
+    x1, x2 = x1 + left_shift, x2 + left_shift
+    right_shift = np.where(x2 > max_x, x2 - max_x, 0.0)
+    x1, x2 = x1 - right_shift, x2 - right_shift
+    top_shift = np.where(y1 < 0, -y1, 0.0)
+    y1, y2 = y1 + top_shift, y2 + top_shift
+    bottom_shift = np.where(y2 > max_y, y2 - max_y, 0.0)
+    y1, y2 = y1 - bottom_shift, y2 - bottom_shift
+    x1 = np.clip(np.round(x1), 0, max_x).astype(np.int32)
+    x2 = np.clip(np.round(x2), 0, max_x).astype(np.int32)
+    y1 = np.clip(np.round(y1), 0, max_y).astype(np.int32)
+    y2 = np.clip(np.round(y2), 0, max_y).astype(np.int32)
+    fixed_coords = np.column_stack((x1, y1, x2, y1, x2, y2, x1, y2))
+    data.loc[detected_mask, COORD_COLS] = fixed_coords
+
+    return data
+
+
+
+
+def export_yolo_model(model_path: Union[str, os.PathLike],
+                      export_format: Literal["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite", "torch"],
+                      imgsz: int = 640,
+                      device: int = 0,
+                      half: bool = False) -> Union[str, os.PathLike]:
+    """
+    Export a YOLO model to the requested format.
+
+    :param Union[str, os.PathLike] model_path: Path to source YOLO weights.
+    :param str export_format: Export format string.
+    :param int imgsz: Export image size.
+    :param str device: Device identifier passed to Ultralytics export.
+    :param bool half: If True, export with FP16 where supported.
+    :return: Path to exported artifact returned by Ultralytics.
+    :rtype: Union[str, os.PathLike]
+
+    :example:
+    >>> export_yolo_model(model_path=r"F://netholabs\primintellect_test\mdl\weights\best.pt", export_format='onnx', imgsz=256, half=True)
+    """
+
+    if YOLO is None:
+        raise SimBAPAckageVersionError(msg='YOLO/Ultralytics not detected in SimBA environment', source=export_yolo_model.__name__)
+    check_file_exist_and_readable(file_path=model_path)
+    check_int(name=f"{export_yolo_model.__name__} imgsz", value=imgsz, min_value=1)
+    check_valid_device(device=device)
+    check_valid_boolean(value=half, source=f"{export_yolo_model.__name__} half", raise_error=True)
+    export_format = str(export_format).lower()
+    if export_format not in Options.VALID_YOLO_FORMATS.value:
+        raise InvalidInputError(msg=f"Unsupported format '{export_format}'. Valid: {Options.VALID_YOLO_FORMATS.value}", source=export_yolo_model.__name__)
+
+    model = YOLO(model_path)
+    _ = model.export(format=export_format, imgsz=imgsz, device=device, half=half)
+
+
+
+
+
+#export_yolo_model(model_path=r"F:\netholabs\primintellect_test\mdl\weights\best.pt", export_format='engine', imgsz=256, half=True)
 
 #fit_yolo(weights_path="D:\yolo_weights\yolo11n-pose.pt", model_yaml=r"D:\rat_resident_intruder\yolo_3\map.yaml", save_path=r"D:\rat_resident_intruder\yolo_3\mdl", batch=12, epochs=100)
 

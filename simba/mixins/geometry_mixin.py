@@ -1217,7 +1217,7 @@ class GeometryMixin(object):
                                         data: np.ndarray,
                                         video_name: Optional[str] = None,
                                         animal_name: Optional[str] = None,
-                                        verbose: Optional[bool] = False,
+                                        verbose: bool = False,
                                         cap_style: Optional[Literal["round", "square", "flat"]] = "round",
                                         parallel_offset: Optional[int] = 1,
                                         pixels_per_mm: Optional[float] = None,
@@ -1291,13 +1291,13 @@ class GeometryMixin(object):
         for cnt, mp_return in enumerate(pool.imap(constants, data, chunksize=1)):
             if verbose:
                 if not video_name and not animal_name:
-                    print(f"Computing polygon batch {cnt + 1}/{len(data)}...")
+                    if verbose: stdout_information(msg=f"Computing polygon batch {cnt + 1}/{len(data)}...")
                 elif not video_name and animal_name:
-                    print(f"Computing polygon batch {cnt + 1}/{len(data)} (Animal: {animal_name})...")
+                    if verbose: stdout_information(msg=f"Computing polygon batch {cnt + 1}/{len(data)} (Animal: {animal_name})...")
                 elif video_name and not animal_name:
-                    print(f"Computing polygon batch {cnt + 1}/{len(data)} (Video: {video_name})...")
+                    if verbose: stdout_information(msg=f"Computing polygon batch {cnt + 1}/{len(data)} (Video: {video_name})...")
                 else:
-                    print(f"Computing polygon batch {cnt + 1}/{len(data)} (Video: {video_name}, Animal: {animal_name})...")
+                    if verbose: stdout_information(msg=f"Computing polygon batch {cnt + 1}/{len(data)} (Video: {video_name}, Animal: {animal_name})...")
             results.append(mp_return)
 
         timer.stop_timer()

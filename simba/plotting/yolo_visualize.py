@@ -24,10 +24,10 @@ CORD_FIELDS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 class YOLOVisualizer():
 
     """
-    Visualize the results of YOLO bounding box model.
+    Visualize YOLO bounding-box inference results on a source video.
 
     .. seealso::
-       For inference, see :func:`simba.model.yolo_inference.YoloInference`
+       For bounding-box inference, see :class:`simba.model.yolo_inference.YoloInference`.
 
     .. video:: _static/img/YOLOVisualizer.webm
       :width: 500
@@ -36,15 +36,40 @@ class YOLOVisualizer():
       :muted:
       :align: center
 
-    :param Union[str, os.PathLike] data_path: Path to YOLO results CSV results. Produced by :func:`simba.bounding_box_tools.yolo.model.inference_yolo`
+    .. video:: _static/img/YoloInference_1.webm
+       :width: 500
+       :loop:
+       :autoplay:
+       :muted:
+       :align: center
+
+    .. video:: _static/img/YoloInference_2.webm
+       :width: 500
+       :loop:
+       :autoplay:
+       :muted:
+       :align: center
+
+
+    :param Union[str, os.PathLike] data_path: Path to YOLO results CSV. Expected columns: ``FRAME, CLASS_ID, CLASS_NAME, CONFIDENCE, X1..Y4``.
     :param Union[str, os.PathLike] video_path: Path to the video from which the data was produced.
-    :param Union[str, os.PathLike] save_dir: Directory where to save the video results.
-    :param Optional[str] palette: Color palette from where to draw the colors for the bounding polygons/boxes. Default: `Set1`.
-    :param Optional[int] core_cnt: The number of CPU cores use dto produce the video. -1 for all available cores. Default: -1.
-    :param Optional[bool] verbose: If True, prints progress (useful for debugging). Default: False.
+    :param Union[str, os.PathLike] save_dir: Directory where to save visualization output.
+    :param Optional[str] palette: Palette option (reserved for compatibility). Current implementation uses a fixed color.
+    :param Optional[int] core_cnt: CPU core count for parallel processing. Use ``-1`` for all available cores.
+    :param float threshold: Confidence threshold in ``[0.0, 1.0]``. Detections below threshold are masked before polygon conversion.
+    :param Optional[int] padding: Polygon padding offset in pixels used during multiframe bbox-to-polygon conversion for rendering. Positive values expand polygons outward, negative values shrink polygons inward. If ``None``, no padding offset is applied. This affects visualization geometry only, not the underlying YOLO detections in the input CSV.
+    :param Optional[int] thickness: Polygon line thickness. If ``None``, default geometry plotter thickness is used.
+    :param bool verbose: If True, prints progress information. Default: True.
+    :raises FrameRangeError: If YOLO result frame coverage does not match video frame count.
 
     :example:
-    >>> test = YOLOVisualizer(data_path=r"/mnt/c/troubleshooting/yolo_inference/08102021_DOT_Rat7_8(2).csv", video_path=r'/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/08102021_DOT_Rat7_8(2).mp4', save_dir="/mnt/c/troubleshooting/yolo_videos")
+    >>> test = YOLOVisualizer(
+    ...     data_path=r"/mnt/c/troubleshooting/yolo_inference/08102021_DOT_Rat7_8(2).csv",
+    ...     video_path=r"/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/08102021_DOT_Rat7_8(2).mp4",
+    ...     save_dir="/mnt/c/troubleshooting/yolo_videos",
+    ...     threshold=0.25,
+    ...     core_cnt=4
+    ... )
     >>> test.run()
     """
 
@@ -122,7 +147,6 @@ class YOLOVisualizer():
 # test = YOLOVisualizer(data_path=r"E:\litpose_yolo\bbox\out_pose\6.01.001_2026_03_11_23_25_00_000_2_cam1.csv",
 #                       video_path=r"Z:\home\simon\lp_300126\videos\6.01.001_2026_03_11_23_25_00_000_2\6.01.001_2026_03_11_23_25_00_000_2_cam1.mp4",
 #                       save_dir=r"E:\litpose_yolo\bbox\out_pose",
-#                       threshold=0.3,
-#                       padding=10,
-#                       core_cnt=10)
+#                       threshold=0.0,
+#                       core_cnt=4)
 # test.run()
