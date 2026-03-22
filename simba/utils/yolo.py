@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-from typing import Optional, Union, Tuple
+from typing import Optional, Tuple, Union
 
 try:
     from typing import Literal
