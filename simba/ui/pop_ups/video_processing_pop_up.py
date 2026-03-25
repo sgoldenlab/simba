@@ -342,10 +342,10 @@ class SuperImposeFrameCountPopUp(PopUpMixin):
         self.LOCS = {'TOP LEFT': 'top_left', 'TOP MIDDLE': 'top_middle', 'TOP RIGHT': 'top_right', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM MIDDLE': 'bottom_middle', 'BOTTOM RIGHT': 'bottom_right'}
         gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
         self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=25, dropdown_width=35, value='FALSE', img='gpu_3', state=gpu_available, tooltip_key='USE_GPU')
-        self.font_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=list(range(1, 101, 2)), label="FONT SIZE:", label_width=25, value=20, img='font_size')
-        self.font_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=color_dict, label="FONT COLOR:", label_width=25, value='Black', img='text_color')
-        self.font_bg_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=color_dict, label="FONT BACKGROUND COLOR:", label_width=25, value='White', img='fill')
-        self.font_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=list(font_dict.keys()), label="FONT:", label_width=25, value='Arial', img='font')
+        self.font_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=list(range(1, 101, 2)), label="FONT SIZE:", label_width=25, value=20, img='font_size', tooltip_key='SUPERIMPOSE_FRAME_COUNT_FONT_SIZE')
+        self.font_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=color_dict, label="FONT COLOR:", label_width=25, value='Black', img='text_color', tooltip_key='SUPERIMPOSE_FRAME_COUNT_FONT_COLOR')
+        self.font_bg_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=color_dict, label="FONT BACKGROUND COLOR:", label_width=25, value='White', img='fill', tooltip_key='SUPERIMPOSE_FRAME_COUNT_FONT_BACKGROUND_COLOR')
+        self.font_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=list(font_dict.keys()), label="FONT:", label_width=25, value='Arial', img='font', tooltip_key='SUPERIMPOSE_FRAME_COUNT_FONT')
         self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY: ", label_width=25, dropdown_width=35, value=60, img='pct_2', tooltip_key='OUTPUT_VIDEO_QUALITY')
         self.loc_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.LOCS.keys()), label="FRAME COUNT POSITION: ", label_width=25, dropdown_width=35, value='BOTTOM MIDDLE', img='location', tooltip_key='LOCATION_FRAME_COUNT')
 
@@ -767,13 +767,13 @@ class MultiCropPopUp(PopUpMixin):
     def __init__(self):
 
         PopUpMixin.__init__(self, title="MULTI-CROP", size=(500, 300), icon='crop')
-        self.input_folder = FolderSelect(self.main_frm, "INPUT VIDEO FOLDER: ", lblwidth=25, lbl_icon='browse')
-        self.output_folder = FolderSelect(self.main_frm, "OUTPUT FOLDER: ", lblwidth=25, lbl_icon='browse')
+        self.input_folder = FolderSelect(self.main_frm, "INPUT VIDEO FOLDER: ", lblwidth=25, lbl_icon='browse', tooltip_key='MULTICROP_INPUT_FOLDER')
+        self.output_folder = FolderSelect(self.main_frm, "OUTPUT FOLDER: ", lblwidth=25, lbl_icon='browse', tooltip_key='MULTICROP_OUTPUT_FOLDER')
         video_options = Options.ALL_VIDEO_FORMAT_OPTIONS_2.value
-        self.video_type_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=video_options, label="INPUT VIDEO FORMAT: ", label_width=25, dropdown_width=25, value='mp4', img='file_type')
-        self.crop_cnt_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=list(range(2, 31)), label="CROPS PER VIDEO: ", label_width=25, dropdown_width=25, value=2, img='abacus')
+        self.video_type_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=video_options, label="INPUT VIDEO FORMAT: ", label_width=25, dropdown_width=25, value='mp4', img='file_type', tooltip_key='MULTICROP_INPUT_VIDEO_FORMAT')
+        self.crop_cnt_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=list(range(2, 31)), label="CROPS PER VIDEO: ", label_width=25, dropdown_width=25, value=2, img='abacus', tooltip_key='MULTICROP_CROPS_PER_VIDEO')
         quality_options = list(percent_to_crf_lookup().keys())
-        self.quality_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=quality_options, label="CROP OUTPUT QUALITY: ", label_width=25, dropdown_width=25, value=60, img='pct')
+        self.quality_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=quality_options, label="CROP OUTPUT QUALITY: ", label_width=25, dropdown_width=25, value=60, img='pct', tooltip_key='MULTICROP_OUTPUT_QUALITY')
         gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
 
         self.gpu_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=25, dropdown_width=25, value='FALSE', img='gpu_3', state=gpu_available, tooltip_key='USE_GPU')
@@ -1022,12 +1022,12 @@ class ConcatenatingVideosPopUp(PopUpMixin):
         PopUpMixin.__init__(self, title="CONCATENATE TWO VIDEOS", size=(600, 300), icon='concat_videos')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
-        self.video_path_1 = FileSelect(settings_frm, "FIRST VIDEO PATH: ", title="Select a video file", lblwidth=35, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='one')
-        self.video_path_2 = FileSelect(settings_frm, "SECOND VIDEO PATH: ", title="Select a video file", lblwidth=35, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='two')
+        self.video_path_1 = FileSelect(settings_frm, "FIRST VIDEO PATH: ", title="Select a video file", lblwidth=35, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='one', tooltip_key='CONCAT_VIDEO_PATH_1')
+        self.video_path_2 = FileSelect(settings_frm, "SECOND VIDEO PATH: ", title="Select a video file", lblwidth=35, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='two', tooltip_key='CONCAT_VIDEO_PATH_2')
         resolutions = ["VIDEO 1", "VIDEO 2", 240, 320, 480, 640, 720, 800, 960, 1120, 1080, 1980]
         self.resolution_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=resolutions, label="RESOLUTION (ASPECT RATIO RETAINED):", label_width=35, dropdown_width=35, value=resolutions[0], img='monitor', tooltip_key='RESOLUTION_CONCAT')
-        self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY:", label_width=35, dropdown_width=35, value=60, img='pct_2', tooltip_key='OUPUT_VIDEO_QUALITY')
-        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU (REDUCED RUN-TIME):", label_width=35, dropdown_width=35, value='FALSE', img='gpu_3', state=self.gpu_available)
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY:", label_width=35, dropdown_width=35, value=60, img='pct_2', tooltip_key='OUTPUT_VIDEO_QUALITY')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU (REDUCED RUN-TIME):", label_width=35, dropdown_width=35, value='FALSE', img='gpu_3', state=self.gpu_available, tooltip_key='CONCAT_VIDEOS_USE_GPU')
         self.horizontal = BooleanVar(value=False)
         horizontal_radio_btn = SimBARadioButton(parent=settings_frm, txt="HORIZONTAL concatenation", variable=self.horizontal, img='horizontal', value=True, compound='left')
         vertical_radio_btn = SimBARadioButton(parent=settings_frm, txt="VERTICAL concatenation", variable=self.horizontal, img='vertical', value=False, compound='left')
@@ -1173,8 +1173,8 @@ class VideoRotatorPopUp(PopUpMixin):
         self.save_dir = FolderSelect(self.save_dir_frm, "SAVE DIRECTORY:", lblwidth=20, lbl_icon='browse')
         self.setting_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
-        self.gpu_dropdown = SimBADropDown(parent=self.setting_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU (REDUCED RUN-TIME):", label_width=35, dropdown_width=35, value='FALSE', img='gpu_3', state=self.gpu_available)
-        self.ffmpeg_dropdown = SimBADropDown(parent=self.setting_frm, dropdown_options=['TRUE', 'FALSE'], label="USE FFMPEG:", label_width=35, dropdown_width=35, value='FALSE', img='ffmpeg')
+        self.gpu_dropdown = SimBADropDown(parent=self.setting_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU (REDUCED RUN-TIME):", label_width=35, dropdown_width=35, value='FALSE', img='gpu_3', state=self.gpu_available, tooltip_key='VIDEO_ROTATOR_USE_GPU')
+        self.ffmpeg_dropdown = SimBADropDown(parent=self.setting_frm, dropdown_options=['TRUE', 'FALSE'], label="USE FFMPEG:", label_width=35, dropdown_width=35, value='FALSE', img='ffmpeg', tooltip_key='VIDEO_ROTATOR_USE_FFMPEG')
         self.gpu_dropdown.grid(row=0, column=0, sticky=NW)
         self.ffmpeg_dropdown.grid(row=1, column=0, sticky=NW)
 
@@ -2435,9 +2435,9 @@ class Convert2MP4PopUp(PopUpMixin):
         super().__init__(title="CONVERT VIDEOS TO MP4", icon='mp4')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5, relief='solid')
 
-        self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=self.cpu_codec_qualities, label="OUTPUT VIDEO QUALITY:", label_width=30, dropdown_width=40, value=60, img='pct')
-        self.codec_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.MP4_CODEC_LK.keys()), label="COMPRESSION CODEC:", label_width=30, dropdown_width=40, value='H.264 (AVC)', command=self.update_quality_dropdown, img='file_type')
-        self.keep_audio_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['FALSE', 'TRUE'], label="KEEP AUDIO (IF EXIST):", label_width=30, dropdown_width=40, value='FALSE', img='audio')
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=self.cpu_codec_qualities, label="OUTPUT VIDEO QUALITY:", label_width=30, dropdown_width=40, value=60, img='pct', tooltip_key='CONVERT2MP4_QUALITY')
+        self.codec_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.MP4_CODEC_LK.keys()), label="COMPRESSION CODEC:", label_width=30, dropdown_width=40, value='H.264 (AVC)', command=self.update_quality_dropdown, img='file_type', tooltip_key='CONVERT2MP4_CODEC')
+        self.keep_audio_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['FALSE', 'TRUE'], label="KEEP AUDIO (IF EXIST):", label_width=30, dropdown_width=40, value='FALSE', img='audio', tooltip_key='CONVERT2MP4_KEEP_AUDIO')
 
         settings_frm.grid(row=0, column=0, sticky=NW, padx=10, pady=10)
         self.quality_dropdown.grid(row=0, column=0, sticky=NW)
@@ -2445,7 +2445,7 @@ class Convert2MP4PopUp(PopUpMixin):
         self.keep_audio_dropdown.grid(row=2, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name='video', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5, relief='solid')
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=30, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=30, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file', tooltip_key='CONVERT2MP4_VIDEO_PATH')
 
         single_video_run = SimbaButton(parent=single_video_frm, txt="RUN - SINGLE VIDEO", img='rocket', cmd=self.run, cmd_kwargs={'multiple': False})
 
@@ -2454,7 +2454,7 @@ class Convert2MP4PopUp(PopUpMixin):
         single_video_run.grid(row=1, column=0, sticky=NW)
 
         multiple_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO DIRECTORY", icon_name='stack', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5, relief='solid')
-        self.selected_video_dir = FolderSelect(multiple_video_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=30, lbl_icon='browse')
+        self.selected_video_dir = FolderSelect(multiple_video_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=30, lbl_icon='browse', tooltip_key='CONVERT2MP4_VIDEO_DIR_PATH')
 
         multiple_video_run = SimbaButton(parent=multiple_video_frm, txt="RUN - VIDEO DIRECTORY", img='rocket', cmd=self.run, cmd_kwargs={'multiple': True})
         multiple_video_frm.grid(row=2, column=0, sticky=NW, padx=10, pady=10)
@@ -2621,12 +2621,12 @@ class SuperimposeWatermarkPopUp(PopUpMixin):
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         opacities = [round(x, 1) for x in list(np.arange(0.1, 1.1, 0.1))]
         self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
-        self.selected_img = FileSelect(settings_frm, "WATERMARK IMAGE PATH:", title="Select an image file", file_types=[("VIDEO", Options.ALL_IMAGE_FORMAT_OPTIONS.value)], lblwidth=25, lbl_icon='frames')
+        self.selected_img = FileSelect(settings_frm, "WATERMARK IMAGE PATH:", title="Select an image file", file_types=[("VIDEO", Options.ALL_IMAGE_FORMAT_OPTIONS.value)], lblwidth=25, lbl_icon='frames', tooltip_key='WATERMARK_IMAGE_PATH')
 
 
-        self.location_dropdown = SimBADropDown(parent=settings_frm, label="WATERMARK LOCATION:", dropdown_options=list(self.LOCATIONS.keys()), label_width=25, dropdown_width=30, img='location', value='TOP LEFT')
-        self.opacity_dropdown = SimBADropDown(parent=settings_frm, label="WATERMARK OPACITY:", dropdown_options=opacities, label_width=25, dropdown_width=30, img='opacity', value=0.5)
-        self.size_dropdown = SimBADropDown(parent=settings_frm, label="WATERMARK SCALE %:", dropdown_options=list(range(5, 100, 5)), label_width=25, dropdown_width=30, img='size_black', value=5)
+        self.location_dropdown = SimBADropDown(parent=settings_frm, label="WATERMARK LOCATION:", dropdown_options=list(self.LOCATIONS.keys()), label_width=25, dropdown_width=30, img='location', value='TOP LEFT', tooltip_key='WATERMARK_LOCATION')
+        self.opacity_dropdown = SimBADropDown(parent=settings_frm, label="WATERMARK OPACITY:", dropdown_options=opacities, label_width=25, dropdown_width=30, img='opacity', value=0.5, tooltip_key='WATERMARK_OPACITY')
+        self.size_dropdown = SimBADropDown(parent=settings_frm, label="WATERMARK SCALE %:", dropdown_options=list(range(5, 100, 5)), label_width=25, dropdown_width=30, img='size_black', value=5, tooltip_key='WATERMARK_SCALE')
         self.gpu_dropdown = SimBADropDown(parent=settings_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], label_width=25, dropdown_width=30, img='gpu_3', value='FALSE', state=self.gpu_available, tooltip_key='USE_GPU')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
@@ -2765,10 +2765,10 @@ class SuperimposeProgressBarPopUp(PopUpMixin):
         self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
 
 
-        self.bar_loc_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.LOCATIONS.keys()), label_width=25, value='BOTTOM', label="PROGRESS BAR LOCATION:", img='location')
-        self.bar_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='Red', label="PROGRESS BAR COLOR:", img='color_wheel')
-        self.bar_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=size_lst, label_width=25, value=10, label="PROGRESS BAR HEIGHT (%):", img='height')
-        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label_width=25, value='FALSE', label="USE GPU:", img='gpu_3', state=self.gpu_available)
+        self.bar_loc_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.LOCATIONS.keys()), label_width=25, value='BOTTOM', label="PROGRESS BAR LOCATION:", img='location', tooltip_key='PROGRESS_BAR_LOCATION')
+        self.bar_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='Red', label="PROGRESS BAR COLOR:", img='color_wheel', tooltip_key='PROGRESS_BAR_COLOR')
+        self.bar_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=size_lst, label_width=25, value=10, label="PROGRESS BAR HEIGHT (%):", img='height', tooltip_key='PROGRESS_BAR_HEIGHT')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label_width=25, value='FALSE', label="USE GPU:", img='gpu_3', state=self.gpu_available, tooltip_key='USE_GPU')
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.bar_loc_dropdown.grid(row=0, column=0, sticky=NW)
         self.bar_color_dropdown.grid(row=1, column=0, sticky=NW)
@@ -2822,12 +2822,12 @@ class SuperimposeVideoPopUp(PopUpMixin):
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         opacities = [round(x, 1) for x in list(np.arange(0.1, 1.1, 0.1))]
         scales = [round(x, 2) for x in list(np.arange(0.05, 1.0, 0.05))]
-        self.main_video_path = FileSelect(settings_frm, "MAIN VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=25, lbl_icon='video_2')
-        self.overlay_video_path = FileSelect(settings_frm, "OVERLAY VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=25, lbl_icon='video_2')
+        self.main_video_path = FileSelect(settings_frm, "MAIN VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=25, lbl_icon='video_2', tooltip_key='SUPERIMPOSE_VIDEO_MAIN_VIDEO_PATH')
+        self.overlay_video_path = FileSelect(settings_frm, "OVERLAY VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=25, lbl_icon='video_2', tooltip_key='SUPERIMPOSE_VIDEO_OVERLAY_VIDEO_PATH')
         gpu_state = NORMAL if check_nvidea_gpu_available(raise_error=False) else DISABLED
-        self.location_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.LOCATIONS.keys()), label="OVERLAY VIDEO LOCATION:", label_width=25, dropdown_width=30, value='TOP LEFT', img='location')
-        self.opacity_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=opacities, label="OVERLAY VIDEO OPACITY:", label_width=25, dropdown_width=30, value=0.5, img='opacity')
-        self.size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=scales, label="OVERLAY VIDEO SCALE (%):", label_width=25, dropdown_width=30, value=0.05, img='size_black')
+        self.location_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.LOCATIONS.keys()), label="OVERLAY VIDEO LOCATION:", label_width=25, dropdown_width=30, value='TOP LEFT', img='location', tooltip_key='SUPERIMPOSE_VIDEO_OVERLAY_LOCATION')
+        self.opacity_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=opacities, label="OVERLAY VIDEO OPACITY:", label_width=25, dropdown_width=30, value=0.5, img='opacity', tooltip_key='SUPERIMPOSE_VIDEO_OVERLAY_OPACITY')
+        self.size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=scales, label="OVERLAY VIDEO SCALE (%):", label_width=25, dropdown_width=30, value=0.05, img='size_black', tooltip_key='SUPERIMPOSE_VIDEO_OVERLAY_SCALE')
         self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU:", label_width=25, dropdown_width=30, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
@@ -2866,14 +2866,14 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
         self.font_dict = get_fonts()
         self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
 
-        self.location_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.LOCATIONS.keys()), label_width=25, value='TOP LEFT', label="VIDEO NAME TEXT LOCATION:", img='location')
-        self.font_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.font_dict.keys()), label_width=25, value='Arial', label="FONT:", img='font')
+        self.location_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.LOCATIONS.keys()), label_width=25, value='TOP LEFT', label="VIDEO NAME TEXT LOCATION:", img='location', tooltip_key='SUPERIMPOSE_VIDEO_NAME_TEXT_LOCATION')
+        self.font_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.font_dict.keys()), label_width=25, value='Arial', label="FONT:", img='font', tooltip_key='SUPERIMPOSE_VIDEO_NAME_FONT')
 
-        self.font_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(5, 105, 5)), label_width=25, value=20, label="FONT SIZE:", img='font_size')
-        self.font_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='White', label="FONT COLOR:", img='color_wheel')
+        self.font_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(5, 105, 5)), label_width=25, value=20, label="FONT SIZE:", img='font_size', tooltip_key='SUPERIMPOSE_VIDEO_NAME_FONT_SIZE')
+        self.font_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='White', label="FONT COLOR:", img='color_wheel', tooltip_key='SUPERIMPOSE_VIDEO_NAME_FONT_COLOR')
 
-        self.font_border_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='Black', label="FONT BORDER COLOR:", img='text')
-        self.font_border_width_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(2, 52, 2)), label_width=25, value=2, label="FONT BORDER WIDTH:", img='width')
+        self.font_border_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='Black', label="FONT BORDER COLOR:", img='text', tooltip_key='SUPERIMPOSE_VIDEO_NAME_FONT_BORDER_COLOR')
+        self.font_border_width_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(2, 52, 2)), label_width=25, value=2, label="FONT BORDER WIDTH:", img='width', tooltip_key='SUPERIMPOSE_VIDEO_NAME_FONT_BORDER_WIDTH')
         self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY: ", label_width=25, dropdown_width=30, value=60, img='pct_2', tooltip_key='OUTPUT_VIDEO_QUALITY')
         self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label_width=25, value='FALSE', label="USE GPU:", img='gpu_3', state=self.gpu_available, tooltip_key='USE_GPU')
 
@@ -2944,13 +2944,13 @@ class SuperimposeTextPopUp(PopUpMixin):
         self.font_dict = get_fonts()
         self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
 
-        self.location_dropdown = SimBADropDown(parent=settings_frm, label="TEXT LOCATION:", dropdown_options=list(self.LOCATIONS.keys()), label_width=25, value='TOP LEFT', img='location')
-        self.text_eb = Entry_Box(parent=settings_frm, labelwidth=25, entry_box_width=50, fileDescription='TEXT:', img='text')
-        self.font_dropdown = SimBADropDown(parent=settings_frm, label="FONT:", dropdown_options=list(self.font_dict.keys()), label_width=25, value='Arial', img='font')
-        self.font_size_dropdown = SimBADropDown(parent=settings_frm, label="FONT SIZE:", dropdown_options=list(range(5, 105, 5)), label_width=25, value=20, img='font_size')
-        self.font_color_dropdown = SimBADropDown(parent=settings_frm, label="FONT COLOR:", dropdown_options=list(self.color_dict.keys()), label_width=25, value='White', img='text_color')
-        self.font_border_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='Black', label="FONT BORDER COLOR:", img='line')
-        self.font_border_width_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(2, 52, 2)), label_width=25, value=2, label="FONT BORDER WIDTH:", img='width')
+        self.location_dropdown = SimBADropDown(parent=settings_frm, label="TEXT LOCATION:", dropdown_options=list(self.LOCATIONS.keys()), label_width=25, value='TOP LEFT', img='location', tooltip_key='SUPERIMPOSE_TEXT_LOCATION')
+        self.text_eb = Entry_Box(parent=settings_frm, labelwidth=25, entry_box_width=50, fileDescription='TEXT:', img='text', tooltip_key='SUPERIMPOSE_TEXT_VALUE')
+        self.font_dropdown = SimBADropDown(parent=settings_frm, label="FONT:", dropdown_options=list(self.font_dict.keys()), label_width=25, value='Arial', img='font', tooltip_key='SUPERIMPOSE_TEXT_FONT')
+        self.font_size_dropdown = SimBADropDown(parent=settings_frm, label="FONT SIZE:", dropdown_options=list(range(5, 105, 5)), label_width=25, value=20, img='font_size', tooltip_key='SUPERIMPOSE_TEXT_FONT_SIZE')
+        self.font_color_dropdown = SimBADropDown(parent=settings_frm, label="FONT COLOR:", dropdown_options=list(self.color_dict.keys()), label_width=25, value='White', img='text_color', tooltip_key='SUPERIMPOSE_TEXT_FONT_COLOR')
+        self.font_border_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='Black', label="FONT BORDER COLOR:", img='line', tooltip_key='SUPERIMPOSE_TEXT_FONT_BORDER_COLOR')
+        self.font_border_width_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(2, 52, 2)), label_width=25, value=2, label="FONT BORDER WIDTH:", img='width', tooltip_key='SUPERIMPOSE_TEXT_FONT_BORDER_WIDTH')
         self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY: ", label_width=25, dropdown_width=30, value=60, img='pct_2', tooltip_key='OUTPUT_VIDEO_QUALITY')
         self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label_width=25, value='FALSE', label="USE GPU:", img='gpu_3', state=self.gpu_available, tooltip_key='USE_GPU')
 
@@ -3023,14 +3023,14 @@ class BoxBlurPopUp(PopUpMixin):
         blur_lvl = [round(x, 2) for x in list(np.arange(0.05, 1.0, 0.05))]
 
 
-        self.blur_lvl_dropdown = SimBADropDown(parent=settings_frm, label="BLUR LEVEL:", dropdown_options=blur_lvl, label_width=25, dropdown_width=30, value=0.02, img='smooth')
-        self.invert_dropdown = SimBADropDown(parent=settings_frm, label="INVERT BLUR REGION:", dropdown_options=['TRUE', 'FALSE'], label_width=25, dropdown_width=30, value='FALSE', img='invert')
+        self.blur_lvl_dropdown = SimBADropDown(parent=settings_frm, label="BLUR LEVEL:", dropdown_options=blur_lvl, label_width=25, dropdown_width=30, value=0.02, img='smooth', tooltip_key='BOX_BLUR_BLUR_LEVEL')
+        self.invert_dropdown = SimBADropDown(parent=settings_frm, label="INVERT BLUR REGION:", dropdown_options=['TRUE', 'FALSE'], label_width=25, dropdown_width=30, value='FALSE', img='invert', tooltip_key='BOX_BLUR_INVERT_REGION')
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.blur_lvl_dropdown.grid(row=0, column=0, sticky=NW)
         self.invert_dropdown.grid(row=1, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="APPLY BOX-BLUR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file', tooltip_key='BOX_BLUR_VIDEO_PATH')
         single_video_run = SimbaButton(parent=single_video_frm, txt="RUN", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run())
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
@@ -3259,10 +3259,10 @@ class BackgroundRemoverDirectoryPopUp(PopUpMixin):
 
 class RotateVideoSetDegreesPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="ROTATE VIDEOS", icon='rotate')
+        PopUpMixin.__init__(self, title="INTERACTIVELY ROTATE VIDEOS", icon='rotate')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         gpu_state = NORMAL if check_nvidea_gpu_available(raise_error=False) else DISABLED
-        self.degrees_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 360, 1)), label="CLOCKWISE DEGREES:", label_width=25, dropdown_width=25, value=90, img='rotate')
+        self.degrees_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 360, 1)), label="CLOCKWISE DEGREES:", label_width=25, dropdown_width=25, value=90, img='rotate', tooltip_key='ROTATE_VIDEO_DEGREES')
         self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY:", label_width=25, dropdown_width=25, value=60, img='pct_2', tooltip_key='OUTPUT_VIDEO_QUALITY')
         self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU:", label_width=25, dropdown_width=25, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
 
@@ -3310,8 +3310,8 @@ class FlipVideosPopUp(PopUpMixin):
         PopUpMixin.__init__(self, title="FLIP VIDEOS", icon='flip_green')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         gpu_state = NORMAL if check_nvidea_gpu_available(raise_error=False) else DISABLED
-        self.horizontal_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="HORIZONTAL FLIP:", label_width=25, dropdown_width=25, value='FALSE', img='flip_green')
-        self.vertical_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERTICAL FLIP:", label_width=25, dropdown_width=25, value='FALSE', img='flip_green')
+        self.horizontal_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="HORIZONTAL FLIP:", label_width=25, dropdown_width=25, value='FALSE', img='flip_green', tooltip_key='HORIZONTAL_FLIP')
+        self.vertical_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERTICAL FLIP:", label_width=25, dropdown_width=25, value='FALSE', img='flip_green', tooltip_key='VERTICAL_FLIP')
         self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY:", label_width=25, dropdown_width=25, value=60, img='pct_2', tooltip_key='OUTPUT_VIDEO_QUALITY')
         self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU:", label_width=25, dropdown_width=25, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
 
@@ -3455,14 +3455,14 @@ class Convert2BlackWhitePopUp(PopUpMixin):
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         threshold = [round(x, 2) for x in list(np.arange(0.01, 1.01, 0.01))]
         gpu_state = NORMAL if check_nvidea_gpu_available(raise_error=False) else DISABLED
-        self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=threshold, label="BLACK THRESHOLD:", label_width=25, dropdown_width=25, value=0.5, img='threshold')
+        self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=threshold, label="BLACK THRESHOLD:", label_width=25, dropdown_width=25, value=0.5, img='threshold', tooltip_key='CONVERT2BW_THRESHOLD')
         self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU:", label_width=25, dropdown_width=25, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.threshold_dropdown.grid(row=0, column=0, sticky=NW)
         self.gpu_dropdown.grid(row=1, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - CONVERT TO BLACK & WHITE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], tooltip_key='CONVERT2BW_VIDEO_PATH')
         single_video_run = SimbaButton(parent=single_video_frm, txt="RUN - SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=False))
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
@@ -3470,7 +3470,7 @@ class Convert2BlackWhitePopUp(PopUpMixin):
         single_video_run.grid(row=1, column=0, sticky="NW")
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - CONVERT TO BLACK & WHITE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, tooltip_key='CONVERT2BW_VIDEO_DIR_PATH')
         multiple_videos_run = SimbaButton(parent=multiple_videos_frm, txt="RUN - MULTIPLE VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
@@ -3497,9 +3497,9 @@ class CreateAverageFramePopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="CREATE AVERAGE VIDEO FRAME", icon='average')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.save_dir = FolderSelect(settings_frm, "AVERAGE FRAME SAVE DIRECTORY:", title="Select a video directory", lblwidth=35, lbl_icon='folder')
-        self.section_start_time_eb = Entry_Box(settings_frm, fileDescription="SAMPLE START TIME:", labelwidth=35, value='00:00:00', img='play')
-        self.section_end_time_eb = Entry_Box(settings_frm, fileDescription="SAMPLE END TIME:", labelwidth=35, value='00:00:00', img='stop')
+        self.save_dir = FolderSelect(settings_frm, "AVERAGE FRAME SAVE DIRECTORY:", title="Select a video directory", lblwidth=35, lbl_icon='folder', tooltip_key='AVG_FRAME_SAVE_DIR')
+        self.section_start_time_eb = Entry_Box(settings_frm, fileDescription="SAMPLE START TIME:", labelwidth=35, value='00:00:00', img='play', tooltip_key='AVG_FRAME_START_TIME')
+        self.section_end_time_eb = Entry_Box(settings_frm, fileDescription="SAMPLE END TIME:", labelwidth=35, value='00:00:00', img='stop', tooltip_key='AVG_FRAME_END_TIME')
 
         settings_frm.grid(row=0, column=0, sticky=NW, pady=10)
         self.save_dir.grid(row=0, column=0, sticky=NW)
@@ -3507,7 +3507,7 @@ class CreateAverageFramePopUp(PopUpMixin):
         self.section_end_time_eb.grid(row=2, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - CREATE AVERAGE FRAME", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file', tooltip_key='AVG_FRAME_VIDEO_PATH')
         single_video_run = SimbaButton(parent=single_video_frm, txt="RUN - SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=False))
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
@@ -3515,7 +3515,7 @@ class CreateAverageFramePopUp(PopUpMixin):
         single_video_run.grid(row=1, column=0, sticky="NW")
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - CREATE AVERAGE FRAMES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder')
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder', tooltip_key='AVG_FRAME_VIDEO_DIR_PATH')
         multiple_videos_run = SimbaButton(parent=multiple_videos_frm, txt="RUN - MULTIPLE VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
@@ -3622,13 +3622,13 @@ class CrossfadeVideosPopUp(PopUpMixin):
         PopUpMixin.__init__(self, title="CROSS-FADE VIDEOS", icon='crossfade')
         crossfade_methods = get_ffmpeg_crossfade_methods()
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="NUMBER OF VIDEOS TO JOIN", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.video_path_1 = FileSelect(settings_frm, f"VIDEO PATH 1:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
-        self.video_path_2 = FileSelect(settings_frm, f"VIDEO PATH 2:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
-        self.quality_dropdown = SimBADropDown(parent=settings_frm, label="OUTPUT VIDEO QUALITY:", dropdown_options=list(range(10, 110, 10)), label_width=25, img='pct', dropdown_width=35, value=60)
-        self.out_format_dropdown = SimBADropDown(parent=settings_frm, label="OUTPUT VIDEO FORMAT:", dropdown_options=['mp4', 'avi', 'webm'], label_width=25, img='file_type', dropdown_width=35, value='mp4')
-        self.fade_method_dropdown = SimBADropDown(parent=settings_frm, label="CROSS-FADE METHOD:", dropdown_options=crossfade_methods, label_width=25, img='crossfade', dropdown_width=35, value='fade')
-        self.duration_dropdown = SimBADropDown(parent=settings_frm, label="CROSS-FADE DURATION:", dropdown_options=list(range(2, 22, 2)), label_width=25, img='timer', dropdown_width=35, value=6)
-        self.offset_eb = Entry_Box(settings_frm, fileDescription="CROSS-FADE OFFSET:", labelwidth=25, value='00:00:00', img='timer_2', entry_box_width=35, justify='center')
+        self.video_path_1 = FileSelect(settings_frm, f"VIDEO PATH 1:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file', tooltip_key='CROSSFADE_VIDEO_PATH_1')
+        self.video_path_2 = FileSelect(settings_frm, f"VIDEO PATH 2:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file', tooltip_key='CROSSFADE_VIDEO_PATH_2')
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, label="OUTPUT VIDEO QUALITY:", dropdown_options=list(range(10, 110, 10)), label_width=25, img='pct', dropdown_width=35, value=60, tooltip_key='OUTPUT_VIDEO_QUALITY')
+        self.out_format_dropdown = SimBADropDown(parent=settings_frm, label="OUTPUT VIDEO FORMAT:", dropdown_options=['mp4', 'avi', 'webm'], label_width=25, img='file_type', dropdown_width=35, value='mp4', tooltip_key='CROSSFADE_OUTPUT_FORMAT')
+        self.fade_method_dropdown = SimBADropDown(parent=settings_frm, label="CROSS-FADE METHOD:", dropdown_options=crossfade_methods, label_width=25, img='crossfade', dropdown_width=35, value='fade', tooltip_key='CROSSFADE_METHOD')
+        self.duration_dropdown = SimBADropDown(parent=settings_frm, label="CROSS-FADE DURATION:", dropdown_options=list(range(2, 22, 2)), label_width=25, img='timer', dropdown_width=35, value=6, tooltip_key='CROSSFADE_DURATION')
+        self.offset_eb = Entry_Box(settings_frm, fileDescription="CROSS-FADE OFFSET:", labelwidth=25, value='00:00:00', img='timer_2', entry_box_width=35, justify='center', tooltip_key='CROSSFADE_OFFSET')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.video_path_1.grid(row=0, column=0, sticky=NW)

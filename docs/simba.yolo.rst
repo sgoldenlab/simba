@@ -178,3 +178,19 @@ SLEAP annotations -> YOLO pose-estimation annotations
 .. autoclass:: simba.third_party_label_appenders.transform.sleap_to_yolo.SleapAnnotations2Yolo
    :members:
    :show-inheritance:
+
+
+LightningPose keypoints -> YOLO bounding box conversion
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.litpose_to_yolo_bbox.LitPose2YOLOBbox
+   :members:
+   :show-inheritance:
+
+
+LightningPose keypoints -> YOLO pose-estimation annotations
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.litpose_to_yolo_keypoints.LitPose2YOLO
+   :members:
+   :show-inheritance:

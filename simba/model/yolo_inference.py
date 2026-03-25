@@ -227,21 +227,21 @@ class YoloInference():
                 stdout_success(f'YOLO results for {len(self.video_path)} video(s) saved in {self.save_dir} directory', elapsed_time=timer.elapsed_time_str)
 
 
-VIDEO_PATH = r"Z:\home\simon\lp_300126\videos\6.01.001_2026_03_11_23_25_00_000_2\6.01.001_2026_03_11_23_25_00_000_2_cam1.mp4"
-WEIGHTS_PATH = r"E:\litpose_yolo\bbox\mdl\train3\weights\best.pt"
-SAVE_DIR = r"E:\litpose_yolo\bbox\out_pose"
-i = YoloInference(weights=WEIGHTS_PATH,
-                  video_path=VIDEO_PATH,
-                  save_dir=SAVE_DIR,
-                  stream=True,
-                  threshold=0.10,
-                  verbose=True,
-                  core_cnt=18,
-                  imgsz=256,
-                  bbox_size=(512, 512),
-                  interpolate=True,
-                  batch_size=100)
-i.run()
+# VIDEO_PATH = r"Z:\home\simon\lp_300126\videos\6.01.001_2026_03_11_23_25_00_000_2\6.01.001_2026_03_11_23_25_00_000_2_cam1.mp4"
+# WEIGHTS_PATH = r"E:\litpose_yolo\bbox\mdl\train3\weights\best.pt"
+# SAVE_DIR = r"E:\litpose_yolo\bbox\out_pose"
+# i = YoloInference(weights=WEIGHTS_PATH,
+#                   video_path=VIDEO_PATH,
+#                   save_dir=SAVE_DIR,
+#                   stream=True,
+#                   threshold=0.10,
+#                   verbose=True,
+#                   core_cnt=18,
+#                   imgsz=256,
+#                   bbox_size=(512, 512),
+#                   interpolate=True,
+#                   batch_size=100)
+# i.run()
 
 
 
