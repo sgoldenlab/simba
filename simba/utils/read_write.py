@@ -2365,6 +2365,8 @@ def get_unique_values_in_iterable(
 def copy_files_to_directory(file_paths: Union[List[Union[str, os.PathLike]], Union[str, os.PathLike]],
                             dir: Union[str, os.PathLike],
                             verbose: Optional[bool] = True,
+                            overwrite: bool = True,
+                            check_validity: bool = True,
                             integer_save_names: Optional[bool] = False) -> List[Union[str, os.PathLike]]:
     """
     Copy a list of files to a specified directory.
@@ -2380,28 +2382,28 @@ def copy_files_to_directory(file_paths: Union[List[Union[str, os.PathLike]], Uni
     if isinstance(file_paths, (str,)):
         file_paths = [file_paths]
     check_valid_lst(data=file_paths, source=f'{copy_files_to_directory.__name__} file_paths', min_len=1, valid_dtypes=(str, np.str_,))
-    _ = [check_file_exist_and_readable(x) for x in file_paths]
+    if check_validity:
+        _ = [check_file_exist_and_readable(x) for x in file_paths]
     check_if_dir_exists(in_dir=dir, source=copy_files_to_directory)
     destinations = []
     for cnt, file_path in enumerate(file_paths):
         if verbose:
-            print(
-                f"Copying file {os.path.basename(file_path)} ({cnt+1}/{len(file_paths)})..."
-            )
+            stdout_information(msg=f"Copying file {os.path.basename(file_path)} ({cnt+1}/{len(file_paths)})...")
         if not integer_save_names:
             destination = os.path.join(dir, os.path.basename(file_path))
         else:
             _, file_name, ext = get_fn_ext(filepath=file_path)
             destination = os.path.join(dir, f"{cnt}{ext}")
+        if os.path.isfile(destination) and not overwrite:
+            if verbose:
+                stdout_information(msg=f'Skipping {destination}, file already exist....')
+            continue
         try:
             if os.path.isfile(destination):
                 os.remove(destination)
         except Exception as e:
             print(e.args)
-            raise PermissionError(
-                msg=f"Not allowed to overwrite file {destination}. Try running SimBA in terminal opened in admin mode or delete existing file before copying.",
-                source=copy_files_to_directory.__name__,
-            )
+            raise PermissionError(msg=f"Not allowed to overwrite file {destination}. Try running SimBA in terminal opened in admin mode or delete existing file before copying.", source=copy_files_to_directory.__name__,)
         destinations.append(destination)
         shutil.copy(file_path, destination)
     return destinations

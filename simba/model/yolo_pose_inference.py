@@ -29,7 +29,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_instance, check_int,
                                 check_valid_boolean, check_valid_lst,
                                 check_valid_tuple, get_fn_ext)
-from simba.utils.enums import Options
+from simba.utils.enums import Options, Formats
 from simba.utils.errors import (CountError, InvalidFilepathError,
                                 InvalidFileTypeError, SimBAGPUError,
                                 SimBAPAckageVersionError)
@@ -39,7 +39,7 @@ from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_video_meta_data, recursive_file_search)
 from simba.utils.warnings import FileExistWarning, NoDataFoundWarning
 from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data,
-                              load_yolo_model, yolo_predict)
+                              load_yolo_model, yolo_predict, apply_fixed_bbox_size)
 
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
@@ -104,6 +104,7 @@ class YOLOPoseInference():
                  half_precision: bool = True,
                  stream: bool = False,
                  box_threshold: float = 0.5,
+                 bbox_size: Optional[Tuple[int, int]] = None,
                  max_tracks: Optional[int] = None,
                  max_per_class: Optional[int] = None,
                  interpolate: bool = False,
@@ -166,6 +167,8 @@ class YOLOPoseInference():
         if smoothing is not None and smoothing is not False:
             check_int(name=f'{self.__class__.__name__} smoothing', value=smoothing, min_value=0, raise_error=True)
             smoothing = smoothing if smoothing > 0 else False
+        if bbox_size is not None:
+            check_valid_tuple(x=bbox_size, source=f'{self.__class__.__name__} bbox_size', accepted_lengths=(2,), valid_dtypes=Formats.INTEGER_DTYPES.value, min_integer=1, raise_error=True)
         self.keypoint_col_names = [f'{i}_{s}'.upper() for i in keypoint_names for s in ['x', 'y', 'p']]
         self.keypoint_cord_col_names = [f'{i}_{s}'.upper() for i in keypoint_names for s in ['x', 'y']]
         self.out_cols, self.cord_cols = deepcopy(OUT_COLS), deepcopy(COORD_COLS)
@@ -174,7 +177,7 @@ class YOLOPoseInference():
         torch.set_num_threads(torch_threads)
         self.half_precision, self.stream, self.video_path, self.raise_error, self.smoothing = half_precision, stream, video_path, raise_error, smoothing
         self.device, self.batch_size, self.threshold, self.max_tracks, self.iou = device, batch_size, box_threshold, max_tracks, iou
-        self.verbose, self.save_dir, self.imgsz, self.interpolate, self.overwrite, self.max_per_class = verbose, save_dir, imgsz, interpolate, overwrite, max_per_class
+        self.verbose, self.save_dir, self.imgsz, self.interpolate, self.overwrite, self.max_per_class, self.bbox_size = verbose, save_dir, imgsz, interpolate, overwrite, max_per_class, bbox_size
         if self.model.model.task != 'pose':
             raise InvalidFileTypeError(msg=f'The model {weights} is not a pose model. It is a {self.model.model.task} model', source=self.__class__.__name__)
 
@@ -250,6 +253,8 @@ class YOLOPoseInference():
                         for cord_col in self.cord_cols:
                             class_df[cord_col] = class_df[cord_col].rolling(window=frms_in_smoothing_window, win_type='gaussian', center=True).mean(std=5).fillna(results[video_name][cord_col]).abs()
                         results[video_name].update(class_df)
+            if self.bbox_size is not None:
+                results[video_name] = apply_fixed_bbox_size(data=results[video_name], video_name=video_name, img_w=int(video_meta["width"]), img_h=int(video_meta["height"]), bbox_size=self.bbox_size)
 
             results[video_name] = results[video_name].replace([-1, -1.0, '-1'], 0).reset_index(drop=True)
             if self.save_dir:

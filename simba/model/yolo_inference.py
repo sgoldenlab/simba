@@ -154,7 +154,8 @@ class YoloInference():
         check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
         check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
-        check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=1, max_value=find_core_cnt()[0])
+        check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1)
+        
         check_valid_device(device=device)
         if bbox_size is not None:
             check_valid_tuple(x=bbox_size, source=f'{self.__class__.__name__} bbox_size', accepted_lengths=(2,), valid_dtypes=Formats.INTEGER_DTYPES.value, min_integer=1, raise_error=True)
@@ -195,8 +196,6 @@ class YoloInference():
                     video_out.append([frm_cnt, cls_data[-1], class_dict[cls_data[-1]], cls_data[-2]] + list(box))
             results[video_name] = pd.DataFrame(video_out, columns=OUT_COLS)
             results[video_name]["CLASS_ID"] = (pd.to_numeric(results[video_name]["CLASS_ID"], errors="coerce").fillna(-1).astype(np.int32))
-            if self.bbox_size is not None:
-                results[video_name] = apply_fixed_bbox_size(data=results[video_name], video_name=video_name, img_w=int(video_meta_data["width"]), img_h=int(video_meta_data["height"]), bbox_size=self.bbox_size)
             if self.interpolate:
                 for class_id in class_dict.keys():
                     class_df = results[video_name][results[video_name]["CLASS_ID"] == int(class_id)].copy()
@@ -213,6 +212,8 @@ class YoloInference():
                 else:
                     smoothened = savgol_smoother(data=results[video_name][COORD_COLS], fps=video_meta_data['fps'], time_window=self.smoothing_time_window, source=self.__class__.__name__)
                 results[video_name].update(smoothened)
+            if self.bbox_size is not None:
+                results[video_name] = apply_fixed_bbox_size(data=results[video_name], video_name=video_name, img_w=int(video_meta_data["width"]), img_h=int(video_meta_data["height"]), bbox_size=self.bbox_size)
         timer.stop_timer()
         if not self.save_dir:
             if self.verbose:
@@ -225,20 +226,22 @@ class YoloInference():
             if self.verbose:
                 stdout_success(f'YOLO results for {len(self.video_path)} video(s) saved in {self.save_dir} directory', elapsed_time=timer.elapsed_time_str)
 
-#
-# VIDEO_PATH = r"Z:\home\simon\lp_300126\videos\6.01.001_2026_03_11_23_25_00_000_2\6.01.001_2026_03_11_23_25_00_000_2_cam1.mp4"
-# WEIGHTS_PATH = r"E:\litpose_yolo\bbox\mdl\train3\weights\best.pt"
-# SAVE_DIR = r"E:\litpose_yolo\bbox\out_pose"
-# i = YoloInference(weights=WEIGHTS_PATH,
-#                   video_path=VIDEO_PATH,
-#                   save_dir=SAVE_DIR,
-#                   stream=True,
-#                   verbose=True,
-#                   core_cnt=18,
-#                   imgsz=256,
-#                   interpolate=True,
-#                   batch_size=500)
-# i.run()
+
+VIDEO_PATH = r"Z:\home\simon\lp_300126\videos\6.01.001_2026_03_11_23_25_00_000_2\6.01.001_2026_03_11_23_25_00_000_2_cam1.mp4"
+WEIGHTS_PATH = r"E:\litpose_yolo\bbox\mdl\train3\weights\best.pt"
+SAVE_DIR = r"E:\litpose_yolo\bbox\out_pose"
+i = YoloInference(weights=WEIGHTS_PATH,
+                  video_path=VIDEO_PATH,
+                  save_dir=SAVE_DIR,
+                  stream=True,
+                  threshold=0.10,
+                  verbose=True,
+                  core_cnt=18,
+                  imgsz=256,
+                  bbox_size=(512, 512),
+                  interpolate=True,
+                  batch_size=100)
+i.run()
 
 
 

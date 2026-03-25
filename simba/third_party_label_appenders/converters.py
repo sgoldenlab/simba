@@ -701,8 +701,16 @@ def split_yolo_train_test_val(data_dir: Union[str, os.PathLike],
     if len(missing_lbls) > 0: raise InvalidInputError(
         msg=f'{len(missing_lbls)} images(s) are missing a label: {missing_lbls}',
         source=split_yolo_train_test_val.__name__)
-    train_cnt, test_cnt, val_cnt = int(np.ceil(len(img_names) * split[0])), int(
-        np.ceil(len(img_names) * split[1])), int(np.ceil(len(img_names) * split[2]))
+    sample_cnt = len(img_names)
+    raw_split_counts = np.array(split) * sample_cnt
+    split_counts = np.floor(raw_split_counts).astype(np.int32)
+    remainder = sample_cnt - int(split_counts.sum())
+    if remainder > 0:
+        # Distribute remaining samples to buckets with largest fractional parts.
+        fractional_parts = raw_split_counts - split_counts
+        for idx in np.argsort(fractional_parts)[::-1][:remainder]:
+            split_counts[idx] += 1
+    train_cnt, test_cnt, val_cnt = int(split_counts[0]), int(split_counts[1]), int(split_counts[2])
     lbl_idx = np.arange(0, len(img_names))
     np.random.shuffle(lbl_idx)
     train_idx, test_idx, val_idx = lbl_idx[:train_cnt], lbl_idx[train_cnt:train_cnt + test_cnt], lbl_idx[train_cnt + test_cnt:train_cnt + test_cnt + val_cnt]

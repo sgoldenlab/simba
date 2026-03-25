@@ -26,7 +26,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import (InvalidFileTypeError, InvalidInputError,
                                 SimBAGPUError, SimBAPAckageVersionError)
-from simba.utils.read_write import find_core_cnt, get_video_meta_data
+from simba.utils.read_write import find_core_cnt, get_video_meta_data, get_fn_ext
 
 
 def fit_yolo(weights_path: Union[str, os.PathLike],
@@ -98,19 +98,19 @@ def load_yolo_model(weights_path: Union[str, os.PathLike],
     >>> load_yolo_model(weights_path=r"/mnt/c/troubleshooting/coco_data/mdl/train8/weights/best.pt", format="onnx", device=0)
     """
 
-
     check_file_exist_and_readable(file_path=weights_path)
     check_valid_boolean(value=verbose, source=f'{load_yolo_model.__name__} verbose', raise_error=True)
     if format is not None: check_str(name=f'{load_yolo_model.__name__} format', value=format.lower(), options=Options.VALID_YOLO_FORMATS.value, raise_error=True)
     check_valid_device(device=device)
+    _, mdl_name, mdl_ext = get_fn_ext(filepath=weights_path)
     try:
         model = YOLO(weights_path, verbose=verbose)
     except Exception as e:
         raise InvalidFileTypeError(msg=f'Could not load {weights_path} as a valid YOLO model: {e.args}', source=load_yolo_model.__name__)
-    model.to(device=device)
+    if mdl_ext.lower() == '.pt':
+        model.to(device=device)
     if format is not None:
         model.export(format=format)
-
     return model
 
 def _get_undetected_obs(frm_id: int, class_id: int, class_name: str, value_cnt: int) -> np.ndarray:
@@ -325,22 +325,27 @@ def apply_fixed_bbox_size(data: pd.DataFrame,
     coords = data.loc[detected_mask, COORD_COLS].to_numpy(dtype=np.float32)
     cxs = np.mean(coords[:, [0, 2, 4, 6]], axis=1)
     cys = np.mean(coords[:, [1, 3, 5, 7]], axis=1)
-    half_w, half_h = box_w / 2.0, box_h / 2.0
-    max_x, max_y = float(img_w - 1), float(img_h - 1)
-    x1, x2 = cxs - half_w, cxs + half_w
-    y1, y2 = cys - half_h, cys + half_h
-    left_shift = np.where(x1 < 0, -x1, 0.0)
+    max_x, max_y = np.int32(img_w - 1), np.int32(img_h - 1)
+    cx_i = np.round(cxs).astype(np.int32)
+    cy_i = np.round(cys).astype(np.int32)
+    x1 = cx_i - np.int32(box_w // 2)
+    y1 = cy_i - np.int32(box_h // 2)
+    x2 = x1 + np.int32(box_w - 1)
+    y2 = y1 + np.int32(box_h - 1)
+    left_shift = np.where(x1 < 0, -x1, 0).astype(np.int32)
     x1, x2 = x1 + left_shift, x2 + left_shift
-    right_shift = np.where(x2 > max_x, x2 - max_x, 0.0)
+    right_shift = np.where(x2 > max_x, x2 - max_x, 0).astype(np.int32)
     x1, x2 = x1 - right_shift, x2 - right_shift
-    top_shift = np.where(y1 < 0, -y1, 0.0)
+
+    top_shift = np.where(y1 < 0, -y1, 0).astype(np.int32)
     y1, y2 = y1 + top_shift, y2 + top_shift
-    bottom_shift = np.where(y2 > max_y, y2 - max_y, 0.0)
+    bottom_shift = np.where(y2 > max_y, y2 - max_y, 0).astype(np.int32)
     y1, y2 = y1 - bottom_shift, y2 - bottom_shift
-    x1 = np.clip(np.round(x1), 0, max_x).astype(np.int32)
-    x2 = np.clip(np.round(x2), 0, max_x).astype(np.int32)
-    y1 = np.clip(np.round(y1), 0, max_y).astype(np.int32)
-    y2 = np.clip(np.round(y2), 0, max_y).astype(np.int32)
+
+    x1 = np.clip(x1, 0, max_x).astype(np.int32)
+    x2 = np.clip(x2, 0, max_x).astype(np.int32)
+    y1 = np.clip(y1, 0, max_y).astype(np.int32)
+    y2 = np.clip(y2, 0, max_y).astype(np.int32)
     fixed_coords = np.column_stack((x1, y1, x2, y1, x2, y2, x1, y2))
     data.loc[detected_mask, COORD_COLS] = fixed_coords
 
@@ -351,42 +356,80 @@ def apply_fixed_bbox_size(data: pd.DataFrame,
 
 def export_yolo_model(model_path: Union[str, os.PathLike],
                       export_format: Literal["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite", "torch"],
-                      imgsz: int = 640,
-                      device: int = 0,
+                      imgsz: int = 256,
+                      device: Union[Literal['cpu'], int] = 0,
+                      int8: bool = False,
+                      batch: int = 1,
+                      workspace: int = 8,
+                      data: Optional[Union[str, os.PathLike]] = None,
+                      task: Optional[Literal["detect", "segment", "classify", "pose", "obb"]] = None,
+                      dynamic: bool = False,
                       half: bool = False) -> Union[str, os.PathLike]:
     """
-    Export a YOLO model to the requested format.
+    Export a YOLO model using Ultralytics ``model.export``.
 
-    :param Union[str, os.PathLike] model_path: Path to source YOLO weights.
-    :param str export_format: Export format string.
-    :param int imgsz: Export image size.
-    :param str device: Device identifier passed to Ultralytics export.
-    :param bool half: If True, export with FP16 where supported.
-    :return: Path to exported artifact returned by Ultralytics.
+    Wrapper around Ultralytics export that supports common deployment formats (including ONNX and TensorRT engine).
+
+    .. note::
+       INT8 export is only valid for ``engine`` format and cannot be combined with ``half=True``.
+
+    :param Union[str, os.PathLike] model_path: Path to source YOLO weights (typically ``.pt``).
+    :param Literal["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite", "torch"] export_format: Target export format.
+    :param int imgsz: Export input image size in pixels.
+    :param Union[Literal['cpu'], int] device: Export device (``'cpu'`` or CUDA index).
+    :param bool int8: If True, request INT8 TensorRT export. Requires ``export_format='engine'``.
+    :param int batch: Export batch/profile size (must be >= 1). For INT8, ensure calibration data size is at least this value.
+    :param int workspace: TensorRT workspace budget in GB (must be >= 1).
+    :param Optional[Union[str, os.PathLike]] data: Optional dataset yaml path used for export/calibration.
+    :param Optional[Literal["detect", "segment", "classify", "pose", "obb"]] task: Optional explicit YOLO task. Set this to avoid backend task auto-guessing warnings.
+    :param bool dynamic: If True, build with dynamic input profiles.
+    :param bool half: If True, request FP16 export where supported.
+    :return: Path-like export artifact returned by Ultralytics.
     :rtype: Union[str, os.PathLike]
+    :raises SimBAPAckageVersionError: If Ultralytics is unavailable.
+    :raises InvalidInputError: On unsupported format or invalid precision combination.
 
     :example:
-    >>> export_yolo_model(model_path=r"F://netholabs\primintellect_test\mdl\weights\best.pt", export_format='onnx', imgsz=256, half=True)
+    >>> export_yolo_model(
+    ...     model_path=r"F://netholabs\\primintellect_test\\mdl\\weights\\best.pt",
+    ...     export_format='engine',
+    ...     imgsz=256,
+    ...     device=0,
+    ...     int8=True,
+    ...     batch=4,
+    ...     workspace=8,
+    ...     task='detect',
+    ...     dynamic=False,
+    ...     half=False
+    ... )
     """
 
     if YOLO is None:
         raise SimBAPAckageVersionError(msg='YOLO/Ultralytics not detected in SimBA environment', source=export_yolo_model.__name__)
     check_file_exist_and_readable(file_path=model_path)
     check_int(name=f"{export_yolo_model.__name__} imgsz", value=imgsz, min_value=1)
+    check_int(name=f"{export_yolo_model.__name__} batch", value=batch, min_value=1)
+    check_int(name=f"{export_yolo_model.__name__} workspace", value=workspace, min_value=1)
     check_valid_device(device=device)
-    check_valid_boolean(value=half, source=f"{export_yolo_model.__name__} half", raise_error=True)
+    check_valid_boolean(value=[half, int8, dynamic], source=export_yolo_model.__name__, raise_error=True)
+    if task is not None:
+        check_str(name=f"{export_yolo_model.__name__} task", value=task, options=("detect", "segment", "classify", "pose", "obb"), raise_error=True)
     export_format = str(export_format).lower()
+    if data is not None: check_file_exist_and_readable(file_path=data, raise_error=True)
     if export_format not in Options.VALID_YOLO_FORMATS.value:
         raise InvalidInputError(msg=f"Unsupported format '{export_format}'. Valid: {Options.VALID_YOLO_FORMATS.value}", source=export_yolo_model.__name__)
+    if int8 and export_format != "engine":
+        raise InvalidInputError(msg=f"INT8 export requires 'engine' format. Got '{export_format}'.", source=export_yolo_model.__name__)
+    if int8 and half:
+        raise InvalidInputError(msg="Choose one precision mode: INT8 or FP16 (half).", source=export_yolo_model.__name__)
 
-    model = YOLO(model_path)
-    _ = model.export(format=export_format, imgsz=imgsz, device=device, half=half)
+    model = YOLO(model_path) if task is None else YOLO(model_path, task=task)
+    out = model.export(format=export_format, imgsz=imgsz, device=device, half=half, int8=int8, dynamic=dynamic, batch=batch, workspace=workspace, data=data)
+    return out
 
 
 
-
-
-#export_yolo_model(model_path=r"F:\netholabs\primintellect_test\mdl\weights\best.pt", export_format='engine', imgsz=256, half=True)
+#export_yolo_model(model_path=r"E:\litpose_yolo\bbox\mdl\train3\weights\best.pt", export_format='engine', imgsz=256, int8=True, batch=10, workspace=8, data=r"E:\litpose_yolo\bbox\map.yaml", task='detect', dynamic=True)
 
 #fit_yolo(weights_path="D:\yolo_weights\yolo11n-pose.pt", model_yaml=r"D:\rat_resident_intruder\yolo_3\map.yaml", save_path=r"D:\rat_resident_intruder\yolo_3\mdl", batch=12, epochs=100)
 
