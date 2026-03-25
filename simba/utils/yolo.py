@@ -26,7 +26,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import (InvalidFileTypeError, InvalidInputError,
                                 SimBAGPUError, SimBAPAckageVersionError)
-from simba.utils.read_write import find_core_cnt, get_video_meta_data, get_fn_ext
+from simba.utils.read_write import (find_core_cnt, get_fn_ext,
+                                    get_video_meta_data)
 
 
 def fit_yolo(weights_path: Union[str, os.PathLike],
