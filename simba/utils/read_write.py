@@ -59,7 +59,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_valid_array, check_valid_boolean,
                                 check_valid_dataframe, check_valid_lst,
                                 check_valid_tuple, check_valid_url,
-                                is_video_color)
+                                is_video_color, check_valid_cpu_pool)
 from simba.utils.enums import (ENV_VARS, OS, ConfigKey, Defaults, Dtypes,
                                Formats, Keys, Links, Options, Paths)
 from simba.utils.errors import (CorruptedFileError, DataHeaderError,
@@ -3277,8 +3277,16 @@ def get_downloads_path(raise_error: bool = False):
         return downloads_path
 
 
-def _read_img_batch_from_video_helper(frm_idx: np.ndarray, video_path: Union[str, os.PathLike], greyscale: bool, verbose: bool, black_and_white: bool, clahe: bool):
+def _read_img_batch_from_video_helper(frm_idx: np.ndarray,
+                                      video_path: Union[str, os.PathLike],
+                                      greyscale: bool,
+                                      verbose: bool,
+                                      black_and_white: bool,
+                                      clahe: bool,
+                                      size: Optional[Tuple[int, int]] = None):
+
     """Multiprocess helper used by read_img_batch_from_video to read in images from video file."""
+
     start_idx, end_frm, current_frm = frm_idx[0], frm_idx[-1] + 1, frm_idx[0]
     results = {}
     video_meta_data = get_video_meta_data(video_path=video_path)
@@ -3303,6 +3311,8 @@ def _read_img_batch_from_video_helper(frm_idx: np.ndarray, video_path: Union[str
                 img = np.full(shape=(video_meta_data['height'], video_meta_data['width']), fill_value=0, dtype=np.uint8)
             else:
                 img = np.full(shape=(video_meta_data['height'], video_meta_data['width'], 3), fill_value=0, dtype=np.uint8)
+        if size is not None:
+            img = cv2.resize(img, dsize=size, interpolation=cv2.INTER_LINEAR)
         results[current_frm] = img
         current_frm += 1
     return results
@@ -3314,6 +3324,8 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
                               black_and_white: bool = False,
                               clahe: bool = False,
                               core_cnt: int = -1,
+                              size: Optional[Tuple[int, int]] = None,
+                              pool: Optional[multiprocessing.Pool] = None,
                               verbose: bool = False) -> Dict[int, np.ndarray]:
     """
     Read a batch of frames from a video file. This method reads frames from a specified range of frames within a video file using multiprocessing.
@@ -3365,27 +3377,30 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
     check_int(name=read_img_batch_from_video.__name__, value=core_cnt, min_value=-1)
     check_valid_boolean(value=[greyscale, black_and_white], source=f'{read_img_batch_from_video.__name__} greyscale black_and_white')
     check_valid_boolean(value=clahe, source=f'{read_img_batch_from_video.__name__} clahe')
+    if pool is not None: check_valid_cpu_pool(value=pool, max_cores=find_core_cnt()[0], raise_error=True)
+    if size is not None: check_valid_tuple(x=size, source=f'{read_img_batch_from_video.__name__} size', accepted_lengths=(2,), valid_dtypes=Formats.INTEGER_DTYPES.value, min_integer=1, raise_error=True)
     if core_cnt < 0:
         core_cnt = multiprocessing.cpu_count()
     if end_frm <= start_frm:
         FrameRangeError(msg=f"Start frame ({start_frm}) has to be before end frame ({end_frm})", source=read_img_batch_from_video.__name__)
     frm_lst = np.array_split(np.arange(start_frm, end_frm + 1), core_cnt)
-    pool = multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value)
+    pool_terminate_flag = True if pool is None else False
+    pool = pool if pool is not None else  get_cpu_pool(core_cnt=core_cnt, source=read_img_batch_from_video.__name__)
     results = {}
     constants = functools.partial(_read_img_batch_from_video_helper,
                                   video_path=video_path,
                                   greyscale=greyscale,
                                   black_and_white=black_and_white,
                                   clahe=clahe,
-                                  verbose=verbose)
+                                  verbose=verbose,
+                                  size=size)
     for cnt, result in enumerate(pool.imap(constants, frm_lst, chunksize=1)):
         results.update(result)
-    pool.close()
-    pool.join()
-    pool.terminate()
+    if pool_terminate_flag:
+        terminate_cpu_pool(pool=pool, source=read_img_batch_from_video.__name__)
     timer.stop_timer()
     if verbose:
-        print(f'[{get_current_time()}] Read frames {start_frm}-{end_frm} (video: {video_meta_data["video_name"]}, elapsed time: {timer.elapsed_time_str}s)')
+        stdout_information(msg=f'[{get_current_time()}] Read frames {start_frm}-{end_frm} (video: {video_meta_data["video_name"]}, elapsed time: {timer.elapsed_time_str}s)')
     return results
 
 def read_yolo_bp_names_file(file_path: Union[str, os.PathLike]) -> Tuple[str]:
@@ -3870,6 +3885,106 @@ def find_closest_readable_frame(video_path: Union[str, os.PathLike],
                 return img, test_frame
 
     return None, None
+
+
+def terminate_cpu_pool(pool: multiprocessing.Pool,
+                       force: bool = False,
+                       verbose: bool = True,
+                       source: Optional[str] = None) -> None:
+    """
+    Safely terminates a multiprocessing.Pool instance with optional graceful shutdown.
+
+    .. note::
+       If pool is None or invalid, function returns without action. Exceptions during termination are silently caught.
+
+    :param multiprocessing.pool.Pool pool: The multiprocessing pool to terminate. If None, function returns without action.
+    :param bool force: If True, skips graceful shutdown (close/join) and immediately terminates. Default: False.
+    :param bool verbose: If True, prints termination message with timestamp. Default: True.
+    :param Optional[str] source: Optional identifier string for logging purposes (e.g., 'VideoProcessor'). Default: None.
+
+    :example:
+    >>> import multiprocessing
+    >>> pool = multiprocessing.Pool(4)
+    >>> terminate_cpu_pool(pool=pool, force=False, verbose=True, source='FeatureExtractor')
+    """
+    if pool is None:
+        return
+    if not check_valid_cpu_pool(value=pool, source=terminate_cpu_pool.__name__, raise_error=False):
+        return
+    try:
+        core_cnt = pool._processes if hasattr(pool, '_processes') else None
+        if not force:
+            pool.close()
+            pool.join()
+        pool.terminate()
+        if verbose: print(f'[{get_current_time()}] {"" if source is None else f"{core_cnt} core"} SimBA CPU pool {"" if source is None else source} terminated.')
+    except (ValueError, AssertionError, AttributeError):
+        pass
+    gc.collect()
+
+
+
+def get_cpu_pool(core_cnt: int = -1,
+                 maxtasksperchild: int = Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value,
+                 context: Literal['fork', 'spawn', 'forkserver'] = None,
+                 verbose: bool = True,
+                 source: Optional[str] = None) -> multiprocessing.Pool:
+    """
+    Creates and returns a multiprocessing.Pool instance with platform-appropriate defaults and validation.
+
+    :param int core_cnt: Number of worker processes. -1 uses all available cores. Default: -1.
+    :param int maxtasksperchild: Maximum number of tasks a worker process can complete before being replaced. Default: From Defaults.MAXIMUM_MAX_TASK_PER_CHILD.
+    :param Optional[Literal['fork', 'spawn', 'forkserver']] context: Multiprocessing start method. None uses platform default. Default: None.
+    :param bool verbose: If True, prints pool creation message with timestamp. Default: True.
+    :param Optional[str] source: Optional identifier string for logging purposes (e.g., 'VideoProcessor'). Default: None.
+    :return: Configured multiprocessing.Pool instance.
+    :rtype: multiprocessing.Pool
+
+    :example:
+    >>> pool = get_cpu_pool(core_cnt=4, source='FeatureExtractor')
+    >>> pool = get_cpu_pool(core_cnt=-1, context='spawn', verbose=True)
+    >>> pool = get_cpu_pool(core_cnt=8, maxtasksperchild=100, source='VideoProcessor')
+    """
+
+    check_int(name=f'{get_cpu_pool.__name__} core_cnt', min_value=-1, unaccepted_vals=[0], value=core_cnt, raise_error=True)
+    check_int(name=f'{get_cpu_pool.__name__} maxtasksperchild', min_value=1, value=maxtasksperchild, raise_error=True)
+    check_valid_boolean(value=verbose, source=f'{get_cpu_pool.__name__} verbose', raise_error=True)
+    if source is not None: check_str(name=f'{get_cpu_pool.__name__} source', value=source, raise_error=True, allow_blank=True)
+    current_process = multiprocessing.current_process()
+    if current_process.name != 'MainProcess': core_cnt = 1
+    core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
+    if verbose: print(f'[{get_current_time()}] {core_cnt} core SimBA CPU pool {"" if source is None else source} started.')
+    if context is not None:
+        check_str(name=f'{get_cpu_pool.__name__} context', value=context, options=('fork', 'spawn', 'forkserver'), raise_error=True)
+    elif context is None:
+        multiprocessing.set_start_method(OS.SPAWN.value, force=True)
+    else:
+        existing_method = multiprocessing.get_start_method(allow_none=True)
+        if existing_method is not None:
+            context = existing_method
+        else:
+            system = platform.system()
+            if system == OS.WINDOWS.value: context = OS.SPAWN.value
+            elif system == OS.MAC.value: context = OS.SPAWN.value
+            else: context = OS.FORK.value
+
+    if context is not None:
+        try:
+            ctx = multiprocessing.get_context(context)
+        except ValueError:
+            system = platform.system()
+            if system == OS.WINDOWS.value: fallback_context = OS.SPAWN.value
+            elif system == OS.MAC.value: fallback_context = OS.SPAWN.value
+            else: fallback_context = OS.FORK.value
+            try:
+                ctx = multiprocessing.get_context(fallback_context)
+            except ValueError:
+                pool = multiprocessing.Pool(processes=core_cnt, maxtasksperchild=maxtasksperchild)
+                return pool
+        pool = ctx.Pool(processes=core_cnt, maxtasksperchild=maxtasksperchild)
+    else:
+        pool = multiprocessing.Pool(processes=core_cnt, maxtasksperchild=maxtasksperchild)
+    return pool
 
 
 #copy_multiple_videos_to_project(config_path=r"C:\troubleshooting\multi_animal_dlc_two_c57\project_folder\project_config.ini", source=r'E:\maplight_videos\video_test', file_type='mp4', recursive_search=False)

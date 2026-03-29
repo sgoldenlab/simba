@@ -7,13 +7,12 @@ import numpy as np
 
 from simba.utils.checks import (check_instance, check_int,
                                 check_nvidea_gpu_available,
-                                check_valid_boolean)
+                                check_valid_boolean, check_valid_tuple)
 from simba.utils.errors import SimBAGPUError
-from simba.utils.lookups import get_current_time
-from simba.utils.printing import SimbaTimer
-from simba.utils.read_write import (get_video_meta_data,
-                                    read_img_batch_from_video,
-                                    read_img_batch_from_video_gpu)
+from simba.utils.printing import SimbaTimer, stdout_information
+from simba.utils.read_write import (get_video_meta_data, read_img_batch_from_video, read_img_batch_from_video_gpu)
+from simba.utils.enums import Formats
+from simba.utils.data import get_cpu_pool, terminate_cpu_pool
 
 
 class AsyncVideoFrameReader:
@@ -50,6 +49,7 @@ class AsyncVideoFrameReader:
                  end_idx: Optional[int] = None,
                  gpu: bool = True,
                  verbose: bool = True,
+                 img_size: Optional[Tuple[int, int]] = None,
                  greyscale: bool = False,
                  black_and_white: bool = False,
                  clahe: bool = False):
@@ -65,14 +65,16 @@ class AsyncVideoFrameReader:
         check_valid_boolean(value=greyscale, source=f'{self.__class__.__name__} greyscale', raise_error=True)
         check_valid_boolean(value=black_and_white, source=f'{self.__class__.__name__} black_and_white', raise_error=True)
         check_valid_boolean(value=clahe, source=f'{self.__class__.__name__} clahe', raise_error=True)
+        if img_size is not None: check_valid_tuple(x=img_size, source=f'{self.__class__.__name__} img_size', accepted_lengths=(2,), valid_dtypes=Formats.INTEGER_DTYPES.value, min_integer=1, raise_error=True)
         self.frame_queue = Queue(maxsize=max_que_size)
         self.batch_size, self.video_path, self.gpu, self.clahe = batch_size, video_path, gpu, clahe
-        self.verbose, self.greyscale, self.black_and_white = verbose, greyscale, black_and_white
+        self.verbose, self.greyscale, self.black_and_white, self.img_size = verbose, greyscale, black_and_white, img_size
         if self.gpu and not check_nvidea_gpu_available():
             raise SimBAGPUError(msg=f'GPU passed but no GPU device detected on machine', source=self.__class__.__name__)
         self.batches = [(i, min(i + batch_size, self.end_idx)) for i in range(self.start_idx, self.end_idx, batch_size)]
         self.batch_cnt = len(self.batches)
         self._stop, self._thread = False, None
+        self.pool = get_cpu_pool(core_cnt=-1, source=self.__class__.__name__)
 
     def run(self):
         try:
@@ -83,15 +85,15 @@ class AsyncVideoFrameReader:
                 if self.gpu:
                     imgs = read_img_batch_from_video_gpu(video_path=self.video_path, start_frm=batch_start_idx, end_frm=batch_end_idx-1, greyscale=self.greyscale, black_and_white=self.black_and_white, verbose=False)
                 else:
-                    imgs = read_img_batch_from_video(video_path=self.video_path, start_frm=batch_start_idx, end_frm=batch_end_idx-1, greyscale=self.greyscale, black_and_white=self.black_and_white, clahe=self.clahe, verbose=False)
+                    imgs = read_img_batch_from_video(video_path=self.video_path, start_frm=batch_start_idx, end_frm=batch_end_idx-1, greyscale=self.greyscale, black_and_white=self.black_and_white, clahe=self.clahe, verbose=False, size=self.img_size, pool=self.pool)
                 imgs = np.stack(list(imgs.values()), axis=0)
                 self.frame_queue.put((batch_start_idx, batch_end_idx-1, imgs))
                 batch_timer.stop_timer()
                 if self.verbose:
-                    print(f'{get_current_time()} [{self.__class__.__name__}] ({self.video_meta_data["video_name"]}) frames queued {batch_start_idx}-{batch_end_idx-1} (of: {self.video_meta_data["frame_count"]}, elapsed time: {batch_timer.elapsed_time_str}s).')
+                    stdout_information(msg=f'[{self.__class__.__name__}] ({self.video_meta_data["video_name"]}) frames queued {batch_start_idx}-{batch_end_idx-1} (of: {self.video_meta_data["frame_count"]}, elapsed time: {batch_timer.elapsed_time_str}s).')
         except Exception as e:
             if self.verbose:
-                print(f"{get_current_time()} [{self.__class__.__name__}] ERROR: {e.args}")
+                stdout_information(msg=f"[{self.__class__.__name__}] ERROR: {e.args}")
             self.frame_queue.put(e)
         finally:
             self.frame_queue.put(None)
@@ -114,7 +116,9 @@ class AsyncVideoFrameReader:
         self.frame_queue, self.batch_end_idxs, self.video_meta_data  = None, None, None
         self.video_path, self._stop = None, None
         if self.verbose:
-            print(f"{get_current_time()} [{self.__class__.__name__}] Reader thread killed and state cleared.")
+            stdout_information(f"[{self.__class__.__name__}] Reader thread killed and state cleared.")
+        terminate_cpu_pool(pool=self.pool, source=self.__class__.__name__)
+
 
     def is_running(self) -> bool:
         return self._thread is not None and self._thread.is_alive() and not self._stop

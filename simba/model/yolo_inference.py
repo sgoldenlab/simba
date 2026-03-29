@@ -172,12 +172,12 @@ class YoloInference():
 
     def run(self):
         class_dict = self.model.names
-        results = {}
+        results, fps_speeds = {}, []
         timer = SimbaTimer(start=True)
         for path in self.video_path:
             _, video_name, _ = get_fn_ext(filepath=path)
             video_meta_data = get_video_meta_data(video_path=path)
-            video_out = []
+            video_out, video_timer = [], SimbaTimer(start=True)
             video_predictions = yolo_predict(model=self.model, source=path, half=self.half_precision, batch_size=self.batch_size, stream=self.stream, imgsz=self.imgsz, device=self.device, threshold=self.threshold, max_detections=self.max_detections, verbose=self.verbose)
             for frm_cnt, video_prediction in enumerate(video_predictions):
                 boxes = video_prediction.obb.data if video_prediction.obb is not None else video_prediction.boxes.data
@@ -214,6 +214,9 @@ class YoloInference():
                 results[video_name].update(smoothened)
             if self.bbox_size is not None:
                 results[video_name] = apply_fixed_bbox_size(data=results[video_name], video_name=video_name, img_w=int(video_meta_data["width"]), img_h=int(video_meta_data["height"]), bbox_size=self.bbox_size)
+            video_timer.stop_timer()
+            fps_speeds.append(len(results[video_name]) / video_timer.elapsed_time)
+
         timer.stop_timer()
         if not self.save_dir:
             if self.verbose:
@@ -227,6 +230,11 @@ class YoloInference():
                 stdout_success(f'YOLO results for {len(self.video_path)} video(s) saved in {self.save_dir} directory', elapsed_time=timer.elapsed_time_str)
 
 
+
+
+
+
+#
 # VIDEO_PATH = r"Z:\home\simon\lp_300126\videos\6.01.001_2026_03_11_23_25_00_000_2\6.01.001_2026_03_11_23_25_00_000_2_cam1.mp4"
 # WEIGHTS_PATH = r"E:\litpose_yolo\bbox\mdl\train3\weights\best.pt"
 # SAVE_DIR = r"E:\litpose_yolo\bbox\out_pose"
@@ -242,7 +250,7 @@ class YoloInference():
 #                   interpolate=True,
 #                   batch_size=100)
 # i.run()
-
+#
 
 
 # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"

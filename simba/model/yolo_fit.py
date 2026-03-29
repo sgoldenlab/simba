@@ -182,16 +182,16 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 
 
 
-# fitter = FitYolo(weights_path=r"C:\Users\sroni\Downloads\yolo11m.pt",
-#                  model_yaml=r"F:\netholabs\moira\yolo_projects\0324\map.yaml",
-#                  save_path=r"F:\netholabs\moira\yolo_projects\0324\mdl",
+# fitter = FitYolo(weights_path=r"C:\Users\sroni\Downloads\yolo26n.pt",
+#                  model_yaml=r"E:\litpose_yolo\bbox\map.yaml",
+#                  save_path=r'E:\litpose_yolo\bbox\mdl',
 #                  epochs=1500,
-#                  batch=32,
+#                  batch=16,
 #                  format=None,
 #                  device=0,
-#                  imgsz=264)
+#                  imgsz=196)
 # fitter.run()
-
+#
 
 
 

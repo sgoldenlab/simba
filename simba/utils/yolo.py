@@ -430,6 +430,31 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
 
 
 
+#export_yolo_model(model_path=r"E:\litpose_yolo\bbox\mdl\train6\weights\best.pt", export_format='engine', imgsz=256, int8=False, batch=10, workspace=8, data=r"E:\litpose_yolo\bbox\map.yaml", task='detect', dynamic=True)
+
+#
+# export_yolo_model(
+#     model_path=r"E:\litpose_yolo\bbox\mdl\train6\weights\best.pt",
+#     export_format='engine',
+#     imgsz=256,
+#     int8=True,
+#     batch=16,
+#     workspace=8,
+#     data=r"E:\litpose_yolo\bbox\map.yaml",
+#     task='detect',
+#     dynamic=False,
+#     half=False
+# )
+# export_yolo_model(
+#     model_path=r"E:\litpose_yolo\bbox\mdl\train6\weights\best.pt",
+#     export_format='onnx',
+#     imgsz=256,
+#     batch=16,
+#     task='detect'
+# )
+
+
+
 #export_yolo_model(model_path=r"E:\litpose_yolo\bbox\mdl\train3\weights\best.pt", export_format='engine', imgsz=256, int8=True, batch=10, workspace=8, data=r"E:\litpose_yolo\bbox\map.yaml", task='detect', dynamic=True)
 
 #fit_yolo(weights_path="D:\yolo_weights\yolo11n-pose.pt", model_yaml=r"D:\rat_resident_intruder\yolo_3\map.yaml", save_path=r"D:\rat_resident_intruder\yolo_3\mdl", batch=12, epochs=100)
