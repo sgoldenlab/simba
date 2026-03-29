@@ -8,11 +8,13 @@ import numpy as np
 from simba.utils.checks import (check_instance, check_int,
                                 check_nvidea_gpu_available,
                                 check_valid_boolean, check_valid_tuple)
+from simba.utils.data import get_cpu_pool, terminate_cpu_pool
+from simba.utils.enums import Formats
 from simba.utils.errors import SimBAGPUError
 from simba.utils.printing import SimbaTimer, stdout_information
-from simba.utils.read_write import (get_video_meta_data, read_img_batch_from_video, read_img_batch_from_video_gpu)
-from simba.utils.enums import Formats
-from simba.utils.data import get_cpu_pool, terminate_cpu_pool
+from simba.utils.read_write import (get_video_meta_data,
+                                    read_img_batch_from_video,
+                                    read_img_batch_from_video_gpu)
 
 
 class AsyncVideoFrameReader:
