@@ -1,15 +1,17 @@
 import os
-from simba.utils.checks import check_if_dir_exists, check_float, check_valid_tuple
-from typing import Union, Tuple
 import random
-
-from simba.utils.enums import Options
+from typing import Tuple, Union
 
 from simba.third_party_label_appenders.converters import create_yolo_yaml
+from simba.utils.checks import (check_float, check_if_dir_exists,
+                                check_valid_tuple)
+from simba.utils.enums import Options
 from simba.utils.errors import InvalidInputError
-from simba.utils.read_write import find_files_of_filetypes_in_directory, create_directory, copy_files_to_directory
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
+from simba.utils.read_write import (copy_files_to_directory, create_directory,
+                                    find_files_of_filetypes_in_directory)
 from simba.utils.warnings import MissingFileWarning
-from simba.utils.printing import stdout_information, stdout_success, SimbaTimer
+
 
 class YoloLabels2YoloProject:
     """
