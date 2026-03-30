@@ -365,6 +365,7 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
                       data: Optional[Union[str, os.PathLike]] = None,
                       task: Optional[Literal["detect", "segment", "classify", "pose", "obb"]] = None,
                       dynamic: bool = False,
+                      simplify: bool = True,
                       half: bool = False) -> Union[str, os.PathLike]:
     """
     Export a YOLO model using Ultralytics ``model.export``.
@@ -412,7 +413,7 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
     check_int(name=f"{export_yolo_model.__name__} batch", value=batch, min_value=1)
     check_int(name=f"{export_yolo_model.__name__} workspace", value=workspace, min_value=1)
     check_valid_device(device=device)
-    check_valid_boolean(value=[half, int8, dynamic], source=export_yolo_model.__name__, raise_error=True)
+    check_valid_boolean(value=[half, int8, dynamic, simplify], source=export_yolo_model.__name__, raise_error=True)
     if task is not None:
         check_str(name=f"{export_yolo_model.__name__} task", value=task, options=("detect", "segment", "classify", "pose", "obb"), raise_error=True)
     export_format = str(export_format).lower()
@@ -425,7 +426,7 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
         raise InvalidInputError(msg="Choose one precision mode: INT8 or FP16 (half).", source=export_yolo_model.__name__)
 
     model = YOLO(model_path) if task is None else YOLO(model_path, task=task)
-    out = model.export(format=export_format, imgsz=imgsz, device=device, half=half, int8=int8, dynamic=dynamic, batch=batch, workspace=workspace, data=data)
+    out = model.export(format=export_format, imgsz=imgsz, device=device, half=half, int8=int8, dynamic=dynamic, batch=batch, workspace=workspace, data=data, simplify=simplify)
     return out
 
 
