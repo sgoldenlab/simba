@@ -83,19 +83,30 @@ def stdout_information(msg: str, source: Optional[str] = "", elapsed_time: Optio
 class SimbaTimer(object):
     """Timer class for keeping track of start and end-times of calls"""
 
-    def __init__(self, start: bool = False):
+    def __init__(self,
+                 start: bool = False,
+                 perf_counter: bool = False):
+
+        self.perf_counter = perf_counter
+
         if start:
             self.start_timer()
 
     def start_timer(self):
-        self.timer = time.time()
+        if not self.perf_counter:
+            self.timer = time.time()
+        else:
+            self.timer = time.perf_counter()
 
     def stop_timer(self):
         if not hasattr(self, "timer"):
             self.elapsed_time = -1
             self.elapsed_time_str = "-1"
         else:
-            self.elapsed_time = round(time.time() - self.timer, 4)
+            if self.perf_counter:
+                self.elapsed_time = round(time.perf_counter() - self.timer, 4)
+            else:
+                self.elapsed_time = round(time.time() - self.timer, 4)
             self.elapsed_time_str = str(self.elapsed_time)
 
 

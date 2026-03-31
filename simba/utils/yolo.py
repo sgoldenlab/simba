@@ -361,7 +361,7 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
                       device: Union[Literal['cpu'], int] = 0,
                       int8: bool = False,
                       batch: int = 1,
-                      workspace: int = 8,
+                      workspace: Optional[int] = 8,
                       data: Optional[Union[str, os.PathLike]] = None,
                       task: Optional[Literal["detect", "segment", "classify", "pose", "obb"]] = None,
                       dynamic: bool = False,
@@ -411,7 +411,7 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
     check_file_exist_and_readable(file_path=model_path)
     check_int(name=f"{export_yolo_model.__name__} imgsz", value=imgsz, min_value=1)
     check_int(name=f"{export_yolo_model.__name__} batch", value=batch, min_value=1)
-    check_int(name=f"{export_yolo_model.__name__} workspace", value=workspace, min_value=1)
+    if workspace is not None: check_int(name=f"{export_yolo_model.__name__} workspace", value=workspace, min_value=1)
     check_valid_device(device=device)
     check_valid_boolean(value=[half, int8, dynamic, simplify], source=export_yolo_model.__name__, raise_error=True)
     if task is not None:
@@ -431,7 +431,7 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
 
 
 
-#export_yolo_model(model_path=r"E:\litpose_yolo\bbox\mdl\train6\weights\best.pt", export_format='engine', imgsz=256, int8=False, batch=10, workspace=8, data=r"E:\litpose_yolo\bbox\map.yaml", task='detect', dynamic=True)
+#export_yolo_model(model_path=r"E:\litpose_yolo\pi\yolo\mdl\train3\weights\best.pt", export_format='engine', imgsz=256, int8=False, batch=10, workspace=None, data=r"E:\litpose_yolo\pi\yolo\map.yaml", task='detect', dynamic=True, simplify=True)
 
 #
 # export_yolo_model(

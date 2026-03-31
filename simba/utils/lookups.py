@@ -1268,3 +1268,78 @@ def get_ffmpeg_codec(file_name: Union[str, os.PathLike],
         return codec_map[ext[1:]]
     else:
         return fallback
+
+
+def get_nvdec_count(gpu_name: Optional[str] = None) -> int:
+    """
+    Return the number of concurrent NVDEC (hardware video decode) sessions typical for the GPU model.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES SINGLE NVDEC
+       :file: ../../docs/tables/NVDECYoloInference.csv
+       :widths: 10, 10, 40, 40
+       :align: center
+       :header-rows: 1
+
+    .. note::
+       When ``gpu_name`` is None, the first GPU name reported by ``nvidia-smi`` is used. Matching is done by
+       substring: the longest dictionary key contained in ``gpu_name`` wins, so shorter names do not shadow
+       longer ones (e.g. ``RTX 4070 Ti Super`` before ``RTX 4070 Ti``). Unknown or unmatched GPUs return ``1``.
+
+    :param str | None gpu_name: Full GPU product string, or None to query the local GPU.
+    :return: NVDEC engine count used for capacity hints (defaults to 1 if unknown).
+    :rtype: int
+    """
+
+    NVDEC = {
+        "A10": 1,
+        "L4": 1,
+        "RTX 3060": 1,
+        "RTX 3060 Ti": 1,
+        "RTX 3070": 1,
+        "RTX 3070 Ti": 1,
+        "RTX 4060": 1,
+        "RTX 4060 Ti": 1,
+        "RTX 4070": 1,
+        "RTX 4070 Super": 1,
+        "RTX 4070 Ti": 1,
+        "RTX 4070 Ti Super": 1,
+        "RTX 5000 Ada": 1,
+        "RTX A4000": 1,
+        "RTX 5070": 1,
+        "RTX 5070 Ti": 1,
+        "RTX 5080": 2,
+        "A40": 3,
+        "L40": 3,
+        "L40S": 3,
+        "RTX 3080": 3,
+        "RTX 3080 Ti": 3,
+        "RTX 3090": 3,
+        "RTX 3090 Ti": 3,
+        "RTX 4080": 3,
+        "RTX 4080 Super": 3,
+        "RTX 4090": 3,
+        "RTX 5090": 3,
+        "RTX 5880 Ada": 3,
+        "RTX 6000 Ada": 3,
+        "RTX 6000 Pro": 3,
+        "RTX A5000": 3,
+        "RTX A6000": 3,
+        "A30": 4,
+        "A100": 5,
+        "B100": 7,
+        "B200": 7,
+        "GB200": 7,
+        "H100": 7,
+        "H200": 7,
+    }
+
+    if gpu_name is None:
+        result = subprocess.run(["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"], capture_output=True, text=True)
+        gpu_name = result.stdout.strip().split("\n")[0]
+
+    for key in sorted(NVDEC, key=len, reverse=True):
+        if key in gpu_name:
+            return NVDEC[key]
+
+    return 1
