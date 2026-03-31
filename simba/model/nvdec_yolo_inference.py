@@ -1,31 +1,37 @@
 from __future__ import annotations
 
 import os
-from typing import Tuple, Union, Optional
 from multiprocessing import Process, Queue, current_process
+from typing import Optional, Tuple, Union
+
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+import time
+
 import numpy as np
 import pandas as pd
-import time
+
 try:
-    from PyNvVideoCodec import SimpleDecoder, OutputColorType
-    from ultralytics import YOLO
     import torch
     import torch.nn.functional as F
+    from PyNvVideoCodec import OutputColorType, SimpleDecoder
+    from ultralytics import YOLO
 except:
     ultralytics = None
     SimpleDecoder = None
     OutputColorType = None
     torch = None
     F = None
-from simba.utils.printing import stdout_information
-from simba.utils.lookups import get_nvdec_count
-from simba.utils.read_write import find_files_of_filetypes_in_directory, get_video_meta_data, get_fn_ext, get_pkg_version
-from simba.utils.enums import Formats, Options
 from simba.utils.checks import (check_float, check_if_dir_exists, check_int,
-                                check_nvidea_gpu_available, check_valid_boolean,
-                                check_valid_device, check_valid_tuple)
+                                check_nvidea_gpu_available,
+                                check_valid_boolean, check_valid_device,
+                                check_valid_tuple)
+from simba.utils.enums import Formats, Options
 from simba.utils.errors import InvalidVideoFileError
+from simba.utils.lookups import get_nvdec_count
+from simba.utils.printing import stdout_information
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, get_pkg_version,
+                                    get_video_meta_data)
 from simba.utils.yolo import apply_fixed_bbox_size
 
 DETECTION_COLUMNS = ("frame", "x1", "y1", "x2", "y2", "confidence", "class_id")
