@@ -28,7 +28,10 @@ from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 InvalidVideoFileError, NoSpecifiedOutputError)
 from simba.utils.printing import (SimbaTimer, log_event, stdout_information,
                                   stdout_success)
-from simba.utils.read_write import (concatenate_videos_in_folder, create_directory, find_core_cnt, find_video_of_file, get_current_time, get_fn_ext, read_df, read_frm_of_video)
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    create_directory, find_core_cnt,
+                                    find_video_of_file, get_current_time,
+                                    get_fn_ext, read_df, read_frm_of_video)
 from simba.utils.warnings import ROIWarning
 
 STYLE_WIDTH = "width"
