@@ -1,20 +1,25 @@
+import argparse
 import os
+import sys
 from copy import deepcopy
+from typing import Optional, Union
+
 import numpy as np
 import pandas as pd
-from typing import Union, Optional
-import sys
-import argparse
+
+from simba.feature_extractors.perimeter_jit import get_hull_sizes
+from simba.mixins.abstract_classes import AbstractFeatureExtraction
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
 from simba.mixins.statistics_mixin import Statistics
-from simba.mixins.abstract_classes import AbstractFeatureExtraction
-from simba.feature_extractors.perimeter_jit import get_hull_sizes
-from simba.utils.read_write import find_files_of_filetypes_in_directory, read_df, read_video_info, write_df
-from simba.utils.checks import check_all_file_names_are_represented_in_video_log, check_instance, check_valid_dataframe, check_valid_array
-from simba.utils.printing import stdout_success, stdout_information
+from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log, check_instance,
+    check_valid_array, check_valid_dataframe)
 from simba.utils.enums import Formats
+from simba.utils.printing import stdout_information, stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    read_df, read_video_info, write_df)
 
 WING_LEFT, WING_RIGHT = 'wing_L', 'wing_R'
 HEAD, THORAX, ABDOMEN = 'head', 'thorax', 'abdomen'
