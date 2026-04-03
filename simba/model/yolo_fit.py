@@ -92,7 +92,7 @@ class FitYolo():
                  device:  Union[Literal['cpu'], int] = 0,
                  verbose: bool = True,
                  workers: int = 8,
-                 patience: int = 100):
+                 patience: int = 300):
 
         os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
         if not _is_cuda_available()[0]:

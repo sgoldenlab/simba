@@ -112,6 +112,14 @@ SAM3 -> YOLO bounding-box (detection) project
    :show-inheritance:
 
 
+Merge multiple YOLO projects
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.merge_yolo_projects.MergeYoloProjects
+   :members:
+   :show-inheritance:
+
+
 Multi-animal DeepLabCut predictions -> YOLO pose-estimation annotations format conversion
 ---------------------------------------
 

@@ -3,7 +3,11 @@ Generate a YOLO bounding-box (detection) project from videos using SAM3.
 
 Takes a directory of videos and a text prompt, samples N random frames per video,
 runs SAM3 semantic segmentation, and writes the detected bounding boxes as a
-YOLO-format detection project with images/, labels/, and map.yaml.
+YOLO-format detection project with ``images/``, ``labels/``, and ``map.yaml``.
+
+To merge this project with others that share the same class names and task type, use
+:class:`~simba.third_party_label_appenders.transform.merge_yolo_projects.MergeYoloProjects`
+(see also :mod:`simba.third_party_label_appenders.transform.sam3_to_yolo_seg`).
 """
 
 import os
@@ -42,6 +46,11 @@ class SAM3ToYoloBBox:
 
     .. note::
        To fit a YOLO detection model, see :class:`~simba.model.yolo_fit.FitYolo`.
+
+    .. seealso::
+
+       * :class:`~simba.third_party_label_appenders.transform.merge_yolo_projects.MergeYoloProjects` — merge multiple YOLO ``map.yaml`` projects into one training set.
+       * :class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_seg.SAM3ToYoloSeg` — SAM3 to YOLO **segmentation** labels from the same predictor stack.
 
     :param Union[str, os.PathLike] video_dir: Directory containing input videos.
     :param Union[str, os.PathLike] sam_path: Path to SAM3 model weights (e.g. sam3.pt).

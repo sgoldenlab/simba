@@ -3,7 +3,12 @@ Generate a YOLO segmentation project from videos using SAM3.
 
 Takes a directory of videos and a text prompt, samples N random frames per video,
 runs SAM3 semantic segmentation, and writes the results as a YOLO-format segmentation
-project with images/, labels/, and map.yaml.
+project with ``images/``, ``labels/``, and ``map.yaml``.
+
+To combine this output with other compatible YOLO projects (e.g. another SAM3 run or
+:class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_bbox.SAM3ToYoloBBox`
+runs with the same class names and task type), use
+:class:`~simba.third_party_label_appenders.transform.merge_yolo_projects.MergeYoloProjects`.
 """
 
 import os
@@ -41,6 +46,10 @@ class SAM3ToYoloSeg:
     .. note::
        To fit a YOLO segmentation model, see :class:`~simba.model.yolo_fit.FitYolo`.
        For YOLO segmentation inference, see :class:`~simba.model.yolo_seg_inference.YOLOSegmentationInference`.
+
+    .. seealso::
+
+       * :class:`~simba.third_party_label_appenders.transform.merge_yolo_projects.MergeYoloProjects` — merge several ``map.yaml`` projects (same classes and task) into one dataset.
 
     :param Union[str, os.PathLike] video_dir: Directory containing input videos.
     :param Union[str, os.PathLike] sam_path: Path to SAM3 model weights (e.g. sam3.pt).

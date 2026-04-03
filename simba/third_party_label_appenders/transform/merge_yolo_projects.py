@@ -1,3 +1,13 @@
+"""
+Merge independent YOLO-format projects (detection, segmentation, or pose) into one dataset.
+
+Each input project must supply a ``map.yaml`` (or equivalent Ultralytics YAML) pointing at
+``images/train``, ``images/val``, and matching ``labels/`` trees. Class names and task type
+must match across inputs. Typical sources include
+:class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_seg.SAM3ToYoloSeg` and
+:class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_bbox.SAM3ToYoloBBox` outputs.
+"""
+
 import os
 import random
 from typing import Dict, List, Optional, Tuple, Union
@@ -28,6 +38,11 @@ class MergeYoloProjects:
     Merge multiple YOLO projects into a single YOLO project.
 
     Reads each project's YAML, validates that all projects share the same task type (bounding-box detection, segmentation, or keypoint pose) and class names, then copies all images and labels into a single output project with train/val splits.
+
+    .. seealso::
+
+       * :class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_seg.SAM3ToYoloSeg`
+       * :class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_bbox.SAM3ToYoloBBox`
 
     :param List[Union[str, os.PathLike]] yaml_paths: List of paths to YOLO project YAML files.
     :param Union[str, os.PathLike] save_dir: Root output directory for the merged project.

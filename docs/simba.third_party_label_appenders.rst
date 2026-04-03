@@ -101,6 +101,30 @@ COCO key-points -> YOLO segmentation conversion
    :show-inheritance:
 
 
+SAM3 -> YOLO segmentation project
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.sam3_to_yolo_seg.SAM3ToYoloSeg
+   :members:
+   :show-inheritance:
+
+
+SAM3 -> YOLO bounding-box (detection) project
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.sam3_to_yolo_bbox.SAM3ToYoloBBox
+   :members:
+   :show-inheritance:
+
+
+Merge multiple YOLO projects
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.merge_yolo_projects.MergeYoloProjects
+   :members:
+   :show-inheritance:
+
+
 Multi-animal DeepLabCut predictions -> YOLO pose-estimation annotations format conversion
 ---------------------------------------
 

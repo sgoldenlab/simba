@@ -14,8 +14,10 @@ import numpy as np
 
 try:
     from ultralytics import YOLO
+    import torch
 except ModuleNotFoundError:
     YOLO = None
+    torch = None
 
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
@@ -104,6 +106,8 @@ def load_yolo_model(weights_path: Union[str, os.PathLike],
     if format is not None: check_str(name=f'{load_yolo_model.__name__} format', value=format.lower(), options=Options.VALID_YOLO_FORMATS.value, raise_error=True)
     check_valid_device(device=device)
     _, mdl_name, mdl_ext = get_fn_ext(filepath=weights_path)
+    if device != 'cpu':
+        torch.cuda.set_device(device)
     try:
         model = YOLO(weights_path, verbose=verbose)
     except Exception as e:

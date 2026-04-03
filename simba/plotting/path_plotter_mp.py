@@ -28,10 +28,7 @@ from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 InvalidVideoFileError, NoSpecifiedOutputError)
 from simba.utils.printing import (SimbaTimer, log_event, stdout_information,
                                   stdout_success)
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    create_directory, find_core_cnt,
-                                    find_video_of_file, get_current_time,
-                                    get_fn_ext, read_df, read_frm_of_video)
+from simba.utils.read_write import (concatenate_videos_in_folder, create_directory, find_core_cnt, find_video_of_file, get_current_time, get_fn_ext, read_df, read_frm_of_video)
 from simba.utils.warnings import ROIWarning
 
 STYLE_WIDTH = "width"
@@ -235,10 +232,12 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
 
     def __get_styles(self, style_attr):
         video_styles = {}
-        optimal_font_size, _, _ = PlottingMixin().get_optimal_font_scales(text='MY LONG TEXT STRING', accepted_px_width=int(self.video_info["Resolution_width"] / 10), accepted_px_height=int(self.video_info["Resolution_width"] / 10))
-        optimal_circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_info["Resolution_width"]), int(self.video_info["Resolution_height"])), circle_frame_ratio=100)
-        video_styles[STYLE_WIDTH] = int(self.video_info["Resolution_width"].values[0]) if style_attr[STYLE_WIDTH] == None else int(style_attr[STYLE_WIDTH])
-        video_styles[STYLE_HEIGHT] = int(self.video_info["Resolution_height"].values[0]) if style_attr[STYLE_HEIGHT] == None else int(style_attr[STYLE_HEIGHT])
+        res_w = int(self.video_info["Resolution_width"].iloc[0])
+        res_h = int(self.video_info["Resolution_height"].iloc[0])
+        optimal_font_size, _, _ = PlottingMixin().get_optimal_font_scales(text='MY LONG TEXT STRING', accepted_px_width=int(res_w / 10), accepted_px_height=int(res_w / 10))
+        optimal_circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(res_w, res_h), circle_frame_ratio=100)
+        video_styles[STYLE_WIDTH] = res_w if style_attr[STYLE_WIDTH] == None else int(style_attr[STYLE_WIDTH])
+        video_styles[STYLE_HEIGHT] = res_h if style_attr[STYLE_HEIGHT] == None else int(style_attr[STYLE_HEIGHT])
         video_styles[STYLE_CIRCLE_SIZE] = optimal_circle_size if style_attr[STYLE_CIRCLE_SIZE] == None else int(style_attr[STYLE_CIRCLE_SIZE])
         video_styles[STYLE_LINE_WIDTH] = 2 if style_attr[STYLE_LINE_WIDTH] == None else int(style_attr[STYLE_LINE_WIDTH])
         video_styles[STYLE_FONT_THICKNESS] = 2 if style_attr[STYLE_FONT_THICKNESS] == None else int(style_attr[STYLE_FONT_THICKNESS])
@@ -367,7 +366,6 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
                     print(f"[{get_current_time()}] Path batch {result+1}/{self.core_cnt} complete...")
                 if self.video_setting:
                     stdout_information(msg=f"Joining {self.video_name} multi-processed video...", source=self.__class__.__name__)
-                    print(self.video_temp_dir, self.video_save_path)
                     concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.video_save_path, remove_splits=True)
                 video_timer.stop_timer()
                 stdout_information(msg=f'Path plot video {self.video_name} complete...', source=self.__class__.__name__, elapsed_time=video_timer.elapsed_time_str)
@@ -408,32 +406,32 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
 
 
 
-# if __name__ == "__main__":
-#     style_attr = {STYLE_WIDTH: None,
-#                   STYLE_HEIGHT: None,
-#                   STYLE_LINE_WIDTH: 5,
-#                   STYLE_FONT_SIZE: 5,
-#                   STYLE_FONT_THICKNESS: 2,
-#                   STYLE_CIRCLE_SIZE: 5,
-#                   STYLE_BG: 'video',
-#                   STYLE_BG_OPACITY: 100,
-#                   STYLE_MAX_LINES: None}
-#
-#     animal_attr = {0: {'body_part': 'Ear_right', 'color': (255, 0, 0)}, 1: {'body_part': 'Center', 'color': (0, 0, 255)}}  #['Ear_right_1', 'Red'], 1: ['Ear_right_2', 'Green']}
-#     clf_attr = {'Rearing': {'color': (155, 1, 10), 'size': 30}}
-#     test = PathPlotterMulticore(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini",
-#                                  frame_setting=False,
-#                                  video_setting=True,
-#                                  last_frame=False,
-#                                  slicing={'start_time': '00:00:00', 'end_time': '00:00:05'},#{'start_time': '00:00:00', 'end_time': '00:00:05'}, #{'start_time': '00:00:00', 'end_time': '00:00:50'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},, #{'start_time': '00:00:00', 'end_time': '00:00:01'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},
-#                                  style_attr=style_attr,
-#                                  animal_attr=animal_attr,
-#                                  clf_attr=clf_attr,
-#                                  print_animal_names=False,
-#                                  core_cnt=-1,
-#                                  roi=True,
-#                                  data_paths=[r"C:\troubleshooting\RAT_NOR\project_folder\csv\machine_results\03152021_NOB_IOT_8.csv"])
-#     test.run()
+if __name__ == "__main__":
+    style_attr = {STYLE_WIDTH: None,
+                  STYLE_HEIGHT: None,
+                  STYLE_LINE_WIDTH: 2,
+                  STYLE_FONT_SIZE: 5,
+                  STYLE_FONT_THICKNESS: 1,
+                  STYLE_CIRCLE_SIZE: 5,
+                  STYLE_BG: (255, 255, 255),
+                  STYLE_BG_OPACITY: 100,
+                  STYLE_MAX_LINES: None}
+
+    animal_attr = {0: {'body_part': 'center', 'color': 'coolwarm'}} #, 1: {'body_part': 'Center', 'color': (0, 0, 255)}}  #['Ear_right_1', 'Red'], 1: ['Ear_right_2', 'Green']}
+    clf_attr = None
+    test = PathPlotterMulticore(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini",
+                                 frame_setting=False,
+                                 video_setting=False,
+                                 last_frame=True,
+                                 slicing=None,#{'start_time': '00:00:00', 'end_time': '00:00:05'},#{'start_time': '00:00:00', 'end_time': '00:00:05'}, #{'start_time': '00:00:00', 'end_time': '00:00:50'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},, #{'start_time': '00:00:00', 'end_time': '00:00:01'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},
+                                 style_attr=style_attr,
+                                 animal_attr=animal_attr,
+                                 clf_attr=clf_attr,
+                                 print_animal_names=False,
+                                 core_cnt=10,
+                                 roi=False,
+                                 data_paths=[r"F:\troubleshooting\sam\sam\project_folder\csv\outlier_corrected_movement_location\20251204_171113_751_cam1_CROPPED.csv"])
+    test.run()
 
 
 
