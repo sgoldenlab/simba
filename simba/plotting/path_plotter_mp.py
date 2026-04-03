@@ -406,33 +406,33 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
 
 
 
-if __name__ == "__main__":
-    style_attr = {STYLE_WIDTH: None,
-                  STYLE_HEIGHT: None,
-                  STYLE_LINE_WIDTH: 2,
-                  STYLE_FONT_SIZE: 5,
-                  STYLE_FONT_THICKNESS: 1,
-                  STYLE_CIRCLE_SIZE: 5,
-                  STYLE_BG: (255, 255, 255),
-                  STYLE_BG_OPACITY: 100,
-                  STYLE_MAX_LINES: None}
-
-    animal_attr = {0: {'body_part': 'center', 'color': 'coolwarm'}} #, 1: {'body_part': 'Center', 'color': (0, 0, 255)}}  #['Ear_right_1', 'Red'], 1: ['Ear_right_2', 'Green']}
-    clf_attr = None
-    test = PathPlotterMulticore(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini",
-                                 frame_setting=False,
-                                 video_setting=False,
-                                 last_frame=True,
-                                 slicing=None,#{'start_time': '00:00:00', 'end_time': '00:00:05'},#{'start_time': '00:00:00', 'end_time': '00:00:05'}, #{'start_time': '00:00:00', 'end_time': '00:00:50'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},, #{'start_time': '00:00:00', 'end_time': '00:00:01'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},
-                                 style_attr=style_attr,
-                                 animal_attr=animal_attr,
-                                 clf_attr=clf_attr,
-                                 print_animal_names=False,
-                                 core_cnt=10,
-                                 roi=False,
-                                 data_paths=[r"F:\troubleshooting\sam\sam\project_folder\csv\outlier_corrected_movement_location\20251204_171113_751_cam1_CROPPED.csv"])
-    test.run()
-
+# if __name__ == "__main__":
+#     style_attr = {STYLE_WIDTH: None,
+#                   STYLE_HEIGHT: None,
+#                   STYLE_LINE_WIDTH: 2,
+#                   STYLE_FONT_SIZE: 5,
+#                   STYLE_FONT_THICKNESS: 1,
+#                   STYLE_CIRCLE_SIZE: 5,
+#                   STYLE_BG: (255, 255, 255),
+#                   STYLE_BG_OPACITY: 100,
+#                   STYLE_MAX_LINES: None}
+#
+#     animal_attr = {0: {'body_part': 'center', 'color': 'coolwarm'}} #, 1: {'body_part': 'Center', 'color': (0, 0, 255)}}  #['Ear_right_1', 'Red'], 1: ['Ear_right_2', 'Green']}
+#     clf_attr = None
+#     test = PathPlotterMulticore(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini",
+#                                  frame_setting=False,
+#                                  video_setting=False,
+#                                  last_frame=True,
+#                                  slicing=None,#{'start_time': '00:00:00', 'end_time': '00:00:05'},#{'start_time': '00:00:00', 'end_time': '00:00:05'}, #{'start_time': '00:00:00', 'end_time': '00:00:50'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},, #{'start_time': '00:00:00', 'end_time': '00:00:01'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},
+#                                  style_attr=style_attr,
+#                                  animal_attr=animal_attr,
+#                                  clf_attr=clf_attr,
+#                                  print_animal_names=False,
+#                                  core_cnt=10,
+#                                  roi=False,
+#                                  data_paths=[r"F:\troubleshooting\sam\sam\project_folder\csv\outlier_corrected_movement_location\20251204_171113_751_cam1_CROPPED.csv"])
+#     test.run()
+#
 
 
 

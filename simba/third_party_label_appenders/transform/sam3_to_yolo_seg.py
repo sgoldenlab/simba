@@ -1,16 +1,3 @@
-"""
-Generate a YOLO segmentation project from videos using SAM3.
-
-Takes a directory of videos and a text prompt, samples N random frames per video,
-runs SAM3 semantic segmentation, and writes the results as a YOLO-format segmentation
-project with ``images/``, ``labels/``, and ``map.yaml``.
-
-To combine this output with other compatible YOLO projects (e.g. another SAM3 run or
-:class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_bbox.SAM3ToYoloBBox`
-runs with the same class names and task type), use
-:class:`~simba.third_party_label_appenders.transform.merge_yolo_projects.MergeYoloProjects`.
-"""
-
 import os
 import random
 from typing import Optional, Tuple, Union
@@ -24,19 +11,23 @@ except:
     from typing_extensions import Literal
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-
-from ultralytics.models.sam import SAM3SemanticPredictor
+try:
+    from ultralytics.models.sam import SAM3SemanticPredictor
+except:
+    SAM3SemanticPredictor = None
 
 from simba.third_party_label_appenders.converters import create_yolo_yaml
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_int, check_str,
+                                check_if_dir_exists, check_int,
+                                check_nvidea_gpu_available, check_str,
                                 check_valid_boolean, check_valid_tuple)
 from simba.utils.data import resample_geometry_vertices
-from simba.utils.errors import NoFilesFoundError
+from simba.utils.errors import NoFilesFoundError, SimBAPAckageVersionError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (create_directory,
                                     find_all_videos_in_directory, get_fn_ext,
-                                    get_video_meta_data, read_frm_of_video)
+                                    get_pkg_version, get_video_meta_data,
+                                    read_frm_of_video)
 
 
 class SAM3ToYoloSeg:
@@ -50,6 +41,9 @@ class SAM3ToYoloSeg:
     .. seealso::
 
        * :class:`~simba.third_party_label_appenders.transform.merge_yolo_projects.MergeYoloProjects` — merge several ``map.yaml`` projects (same classes and task) into one dataset.
+
+    :raises SimBAGPUError: If no NVIDIA GPU is detected (via ``nvidia-smi``).
+    :raises SimBAPAckageVersionError: If ``ultralytics`` is not installed, or ``SAM3SemanticPredictor`` cannot be imported.
 
     :param Union[str, os.PathLike] video_dir: Directory containing input videos.
     :param Union[str, os.PathLike] sam_path: Path to SAM3 model weights (e.g. sam3.pt).
@@ -87,6 +81,10 @@ class SAM3ToYoloSeg:
                  seed: Optional[int] = None,
                  verbose: bool = True):
 
+        check_nvidea_gpu_available(raise_error=True)
+        _ = get_pkg_version(pkg="ultralytics", raise_error=True)
+        if SAM3SemanticPredictor is None:
+            raise SimBAPAckageVersionError(msg="Could not import SAM3SemanticPredictor from ultralytics.models.sam. Install a compatible ultralytics build with SAM3 support.", source=self.__class__.__name__,)
         check_if_dir_exists(in_dir=video_dir, source=f'{self.__class__.__name__} video_dir')
         check_file_exist_and_readable(file_path=sam_path)
         check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
