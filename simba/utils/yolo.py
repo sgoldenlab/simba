@@ -13,8 +13,8 @@ except:
 import numpy as np
 
 try:
-    from ultralytics import YOLO
     import torch
+    from ultralytics import YOLO
 except ModuleNotFoundError:
     YOLO = None
     torch = None
