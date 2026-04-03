@@ -12,7 +12,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_str, check_valid_boolean,
                                 check_valid_dataframe, check_valid_lst,
                                 check_valid_tuple)
-from simba.utils.data import create_color_palette, get_cpu_pool, terminate_cpu_pool
+from simba.utils.data import (create_color_palette, get_cpu_pool,
+                              terminate_cpu_pool)
 from simba.utils.enums import Defaults, Options
 from simba.utils.errors import CountError, DataHeaderError, FrameRangeError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
