@@ -203,6 +203,13 @@ Pose-estimation plotter
    :members:
    :show-inheritance:
 
+Skeleton video creator
+-----------------------------------------
+
+.. autoclass:: simba.plotting.skeleton_video_creator.SkeletonVideoCreator
+   :members:
+   :show-inheritance:
+
 Classification probability plotter
 ------------------------------------------------
 

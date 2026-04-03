@@ -19,7 +19,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.data import resample_geometry_vertices
 from simba.utils.enums import Options
 from simba.utils.errors import InvalidFileTypeError
-from simba.utils.printing import SimbaTimer
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_video_meta_data)
 from simba.utils.yolo import load_yolo_model, yolo_predict
@@ -75,7 +75,7 @@ class YOLOSegmentationInference():
                  half_precision: bool = True,
                  stream: bool = False,
                  threshold: float = 0.5,
-                 max_tracks: Optional[int] = None,
+                 max_tracks: int = 300,
                  interpolate: bool = False,
                  imgsz: int = 640,
                  iou: float = 0.5,
@@ -99,12 +99,11 @@ class YOLOSegmentationInference():
         check_int(name=f'{self.__class__.__name__} vertice_cnt', value=vertice_cnt, min_value=3)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=10e-6, max_value=1.0)
         check_float(name=f'{self.__class__.__name__} iou', value=iou, min_value=10e-6, max_value=1.0)
-        if max_tracks is not None:
-            check_int(name=f'{self.__class__.__name__} max_tracks', value=max_tracks, min_value=1)
+        check_int(name=f'{self.__class__.__name__} max_tracks', value=max_tracks, min_value=1)
         if save_dir is not None:
             check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
         torch.set_num_threads(torch_threads)
-        print(weights_path)
+        if verbose: stdout_information(msg=f'Loading YOLO model from {weights_path}...')
         self.model = load_yolo_model(weights_path=weights_path, device=device, format=format)
         self.half_precision, self.stream, self.video_path, self.retina_msk = half_precision, stream, video_path, retina_msk
         self.device, self.batch_size, self.threshold, self.max_tracks, self.iou = device, batch_size, threshold, max_tracks, iou
@@ -117,7 +116,6 @@ class YOLOSegmentationInference():
             self.vertice_col_names.append(f"VERTICE_{i}_X"); self.vertice_col_names.append(f"VERTICE_{i}_Y")
     def run(self):
         results = {}
-        class_dict = self.model.names
         timer = SimbaTimer(start=True)
         for path in self.video_path:
             _, video_name, _ = get_fn_ext(filepath=path)
@@ -137,7 +135,7 @@ class YOLOSegmentationInference():
                                              retina_msk=self.retina_msk)
             for frm_cnt, video_prediction in enumerate(video_predictions):
                 if video_prediction.masks is not None:
-                    boxes = video_prediction.obb.data if video_prediction.obb is not None else video_prediction.boxes.data
+                    boxes = video_prediction.boxes.data
                     boxes = boxes.cpu().numpy().astype(np.float32)
                     detected_classes = boxes[:, -1].astype(int) if boxes.size > 0 else []
                     detected_masks = video_prediction.masks.xy
@@ -149,6 +147,8 @@ class YOLOSegmentationInference():
                         video_results.append(vertices)
 
             vertices = pd.DataFrame(video_results, columns=self.vertice_col_names)
+            if self.interpolate:
+                vertices = self._interpolate_missing_frames(vertices=vertices, total_frames=int(video_meta_data['frame_count']))
             if self.save_dir:
                 save_path = os.path.join(self.save_dir, f'{video_name}.csv')
                 vertices.to_csv(save_path)
@@ -157,26 +157,42 @@ class YOLOSegmentationInference():
 
         timer.stop_timer()
         if not self.save_dir:
-            if self.verbose: print(f'YOLO results created', timer.elapsed_time_str)
+            if self.verbose: stdout_success(f'YOLO results created', timer.elapsed_time_str)
             return results
         else:
             if self.verbose:
-                print(f'YOLO results saved in {self.save_dir} directory', timer.elapsed_time_str)
+                stdout_success(f'YOLO results saved in {self.save_dir} directory', timer.elapsed_time_str)
             return None
 
-# weights_path = r"D:\platea\yolo_071525\mdl\train3\weights\best.pt"
-# video_path = r"D:\platea\platea_videos\videos\clipped\10B_Mouse_5-choice_MustTouchTrainingNEWFINAL_a7.mp4"
-# save_dir=r"D:\platea\platea_videos\videos\yolo_results"
-# i = YOLOSegmentationInference(weights_path=weights_path,
-#                              video_path=video_path,
-#                              save_dir=save_dir,
-#                              verbose=True,
-#                              device=0,
-#                              format=None,
-#                              stream=True,
-#                              batch_size=10,
-#                              imgsz=320,
-#                              interpolate=True,
-#                              threshold=0.8,
-#                              retina_msk=True)
-# i.run()
+    def _interpolate_missing_frames(self, vertices: pd.DataFrame, total_frames: int) -> pd.DataFrame:
+        if vertices.empty:
+            return vertices
+        coord_cols = [c for c in self.vertice_col_names if c not in ('FRAME', 'ID')]
+        unique_ids = vertices['ID'].unique()
+        all_results = []
+        for track_id in unique_ids:
+            id_data = vertices[vertices['ID'] == track_id].drop_duplicates(subset='FRAME', keep='first').copy()
+            id_data = id_data.set_index('FRAME').reindex(range(total_frames))
+            id_data['ID'] = track_id
+            id_data[coord_cols] = id_data[coord_cols].interpolate(method='linear', limit_direction='both')
+            id_data = id_data.reset_index().rename(columns={'index': 'FRAME'})
+            all_results.append(id_data)
+        return pd.concat(all_results, axis=0).reset_index(drop=True)[self.vertice_col_names]
+
+weights_path = r"E:\litpose_yolo\yolo_from_sam3\mdl\train\weights\best.pt"
+video_path = r'E:\litpose_yolo\pi\videos'
+save_dir=r"E:\litpose_yolo\yolo_from_sam3\csv_results"
+i = YOLOSegmentationInference(weights_path=weights_path,
+                             video_path=video_path,
+                             save_dir=save_dir,
+                             verbose=True,
+                             device=0,
+                             format=None,
+                             stream=True,
+                             max_tracks=1,
+                             batch_size=10,
+                             imgsz=320,
+                             interpolate=True,
+                             threshold=0.8,
+                             retina_msk=False)
+i.run()

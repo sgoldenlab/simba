@@ -458,25 +458,26 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
 
 
 
-#
+
 # if __name__ == "__main__":
 #     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini",
-#                                                  video_paths=None, #r"E:\troubleshooting\mitra_emergence_hour\project_folder\videos\Box1_180mISOcontrol_Females.mp4",#,
+#                                                  video_paths=r"E:\troubleshooting\mitra_emergence_hour\project_folder\videos\Box3_180mISOcontrol_Females.mp4", #,#,
 #                                                  video_setting=True,
 #                                                  frame_setting=False,
 #                                                  rotate=False,
 #                                                  show_confidence=False,
-#                                                  core_cnt=4,
+#                                                  core_cnt=12,
+#                                                  show_pose=False,
 #                                                  animal_names=False,
 #                                                  print_timer=HHMMSSSSSS,
 #                                                  overwrite=False,
 #                                                  time_slice=None, #,{START_TIME: '00:00:00', END_TIME: '00:01:00'}
 #                                                  bbox=None,
 #                                                  text_opacity=0.6,
-#                                                  show_gantt=2)
+#                                                  show_gantt=None)
 #     clf_plotter.run()
 #
-#
+
 
 # if __name__ == "__main__":
 #     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini",

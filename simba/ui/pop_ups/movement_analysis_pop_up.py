@@ -43,10 +43,14 @@ class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
         distance_cb.grid(row=0, column=0, sticky=NW)
         velocity_cb.grid(row=1, column=0, sticky=NW)
 
-        self.transpose_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="TRANSPOSE OUTPUT CSV", icon_name='rotate', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        transpose_cb, self.transpose_var = SimbaCheckbox(parent=self.transpose_frm, txt='TRANSPOSE OUTPUT CSV', txt_img='rotate', val=False, tooltip_key='MOVEMENT_TRANSPOSE')
-        self.transpose_frm.grid(row=4, column=0, sticky=NW)
+        self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
+        transpose_cb, self.transpose_var = SimbaCheckbox(parent=self.settings_frm, txt='TRANSPOSE OUTPUT CSV', txt_img='rotate', val=True, tooltip_key='MOVEMENT_TRANSPOSE')
+        frm_cnt_cb, self.frm_cnt_var = SimbaCheckbox(parent=self.settings_frm, txt='INCLUDE VIDEO FRAME COUNT', txt_img='abacus', val=False, tooltip_key='MOVEMENT_INCLUDE_FRAME_COUNT')
+        video_len_cb, self.video_len_var = SimbaCheckbox(parent=self.settings_frm, txt='INCLUDE VIDEO LENGTH (HH:MM:SS)', txt_img='timer', val=False, tooltip_key='MOVEMENT_INCLUDE_VIDEO_LENGTH')
+        self.settings_frm.grid(row=4, column=0, sticky=NW)
         transpose_cb.grid(row=0, column=0, sticky=NW)
+        frm_cnt_cb.grid(row=1, column=0, sticky=NW)
+        video_len_cb.grid(row=2, column=0, sticky=NW)
 
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
@@ -81,12 +85,18 @@ class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
         distance, velocity, transpose = self.distance_var.get(), self.velocity_var.get(), self.transpose_var.get()
         if not distance and not velocity:
             raise InvalidInputError(msg='distance AND velocity are both un-checked. To compute movement metrics, check at least one value.', source=self.__class__.__name__)
+
+        frame_count = self.frm_cnt_var.get()
+        video_length = self.video_len_var.get()
+
         movement_processor = MovementCalculator(config_path=self.config_path,
                                                 threshold=threshold,
                                                 body_parts=body_parts,
                                                 distance=distance,
                                                 velocity=velocity,
-                                                transpose=transpose)
+                                                transpose=transpose,
+                                                video_length=video_length,
+                                                frame_count=frame_count)
         movement_processor.run()
         movement_processor.save()
 

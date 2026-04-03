@@ -31,6 +31,8 @@
   "MOVEMENT_DISTANCE": "If checked, calculates the total distance traveled (in centimeters) for each animal throughout the entire video. Distance is measured as cumulative path length of the selected body-part.",
   "MOVEMENT_VELOCITY": "If checked, calculates the average velocity (in cm/s) for each animal throughout the entire video. Velocity is computed as distance divided by time.",
   "MOVEMENT_TRANSPOSE": "If checked, transposes the output CSV so that videos are in rows and animal/body-part/measurement combinations are in columns. Default: each row is a video-animal-bodypart-measurement combination.",
+  "MOVEMENT_INCLUDE_FRAME_COUNT": "If checked, includes the total number of frames in each video as a metadata column in the output.",
+  "MOVEMENT_INCLUDE_VIDEO_LENGTH": "If checked, includes each video's length in HH:MM:SS format as a metadata column in the output.",
   "DISTANCE_ANALYSIS_NUMBER_OF_PAIRS": "How many body-part pairs to analyze. SimBA creates one BODY-PART 1 / BODY-PART 2 row per pair.",
   "DISTANCE_ANALYSIS_BODY_PART": "Pick one body-part for this side of the pair. Each row must use two different body-parts.",
   "DISTANCE_ANALYSIS_BP_THRESHOLD": "Pose confidence cutoff (0.0-1.0). Frames where either body-part is below this value are ignored for this pair.",

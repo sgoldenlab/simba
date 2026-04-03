@@ -18,8 +18,7 @@ from simba.utils.checks import (
     check_valid_tuple)
 from simba.utils.errors import InvalidInputError, NoDataError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext, read_df)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, read_df, seconds_to_timestamp)
 
 
 class MovementCalculator(ConfigReader, FeatureExtractionMixin):
@@ -58,7 +57,9 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
                  distance: bool = True,
                  velocity: bool = True,
                  transpose: bool = False,
-                 verbose: bool = True):
+                 verbose: bool = True,
+                 frame_count: bool = False,
+                 video_length: bool = False):
 
         ConfigReader.__init__(self, config_path=config_path)
         FeatureExtractionMixin.__init__(self)
@@ -89,6 +90,8 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
         check_valid_boolean(value=velocity, source=f'{self.__class__.__name__} velocity', raise_error=True)
         check_valid_boolean(value=transpose, source=f'{self.__class__.__name__} transpose', raise_error=True)
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose', raise_error=True)
+        check_valid_boolean(value=frame_count, source=f'{self.__class__.__name__} frame_count', raise_error=True)
+        check_valid_boolean(value=video_length, source=f'{self.__class__.__name__} video_length', raise_error=True)
         if not distance and not velocity:
             raise InvalidInputError(msg='distance AND velocity are both False. To compute movement metrics, set at least one value to True.', source=self.__class__.__name__)
         self.distance, self.velocity, = distance, velocity
@@ -99,6 +102,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
         else:
             raise InvalidInputError(msg='Body-parts has to be a list of tuple of strings', source=f'{self.__class__.__name__} body_parts')
         self.body_parts, self.threshold, self.body_parts, self.transpose, self.verbose = file_paths, threshold, body_parts, transpose, verbose
+        self.frame_count, self.video_length = frame_count, video_length
 
     def __find_body_part_columns(self):
         self.body_parts_dict, self.bp_list = {}, []
@@ -129,9 +133,9 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
                     animal_df = animal_df.iloc[:, 0:2].reset_index(drop=True)
                     distance, velocity = FeatureExtractionSupplemental.distance_and_velocity(x=animal_df.values, fps=self.fps, pixels_per_mm=self.px_per_mm, centimeters=True)
                     if self.distance:
-                        self.results.loc[len(self.results)] = [video_name, animal_data["ANIMAL NAME"], animal_data["BODY-PART"], "Distance (cm)", distance]
+                        self.results.loc[len(self.results)] = [video_name, animal_data["ANIMAL NAME"], animal_data["BODY-PART"], "DISTANCE (CM)", distance]
                     if self.velocity:
-                        self.results.loc[len(self.results)] = [video_name, animal_data["ANIMAL NAME"], animal_data["BODY-PART"], "Velocity (cm/s)", velocity]
+                        self.results.loc[len(self.results)] = [video_name, animal_data["ANIMAL NAME"], animal_data["BODY-PART"], "VELOCITY (CM/S)", velocity]
             else:
                 for animal in self.body_parts:
                     animal_name = animal.split("CENTER OF GRAVITY")[0].strip()
@@ -141,16 +145,23 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
                     df = self.dataframe_savgol_smoother(df=df, fps=self.fps).astype(np.int32)
                     distance, velocity = FeatureExtractionSupplemental.distance_and_velocity(x=df.values, fps=self.fps, pixels_per_mm=self.px_per_mm, centimeters=True)
                     if self.distance:
-                        self.results.loc[len(self.results)] = [video_name, animal_name, "GRAVITY CENTER", "Distance (cm)", distance]
+                        self.results.loc[len(self.results)] = [video_name, animal_name, "GRAVITY CENTER", "DISTANCE (CM)", distance]
                     if self.velocity:
-                        self.results.loc[len(self.results)] = [video_name, animal_name, "GRAVITY CENTER", "Velocity (cm/s)", velocity]
+                        self.results.loc[len(self.results)] = [video_name, animal_name, "GRAVITY CENTER", "VELOCITY (CM/S)", velocity]
+
+            if self.frame_count:
+                self.results.loc[len(self.results)] = [video_name, "", "", "VIDEO FRAME COUNT", len(self.data_df)]
+            if self.video_length:
+                timestamp = seconds_to_timestamp(seconds=int(np.ceil(len(self.data_df) / self.fps)), hh_mm_ss_sss=False)
+                self.results.loc[len(self.results)] = [video_name, "", "", "VIDEO LENGTH (HH:MM:SS)", timestamp]
+
             video_timer.stop_timer()
             if self.verbose:
                 stdout_information(msg=f'Movement analysis in video {video_name} complete', elapsed_time=video_timer.elapsed_time_str)
 
     def save(self):
         if self.transpose:
-            self.results = (self.results.assign(col=lambda x: x["ANIMAL"] + "_" + x["BODY-PART"] + "_" + x["MEASUREMENT"]).pivot(index="VIDEO", columns="col", values="VALUE").reset_index())
+            self.results = (self.results.assign(col=lambda x: (x["ANIMAL"] + "_" + x["BODY-PART"] + "_" + x["MEASUREMENT"]).str.strip("_")).pivot(index="VIDEO", columns="col", values="VALUE").reset_index())
         self.results.set_index("VIDEO").to_csv(self.save_path)
         self.timer.stop_timer()
         if self.verbose: stdout_success(msg=f"Movement log saved in {self.save_path}", elapsed_time=self.timer.elapsed_time_str)
@@ -171,9 +182,12 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     runner.save()
 
 
-# test = MovementCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                           body_parts=['Animal_1 CENTER OF GRAVITY', 'Nose'], #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
-#                           threshold=0.00)
+# test = MovementCalculator(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini",
+#                           body_parts=['center', 'nose'], #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
+#                           threshold=0.00,
+#                           frame_count=True,
+#                           video_length=True,
+#                           transpose=False)
 # test.run()
 # test.save()
 

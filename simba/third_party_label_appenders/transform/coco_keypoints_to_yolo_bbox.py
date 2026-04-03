@@ -239,9 +239,9 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
                                     train_size=args.train_size)
     runner.run()
 
-#
-# runner = COCOKeypoints2YoloBbox(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\merged\merged_07032025.json",
-#                                 img_dir=r"D:\cvat_annotations\frames",
+
+# runner = COCOKeypoints2YoloBbox(coco_path=r"F:\netholabs\moira\original\moira_lbls",
+#                                 img_dir=r"F:\netholabs\moira\original\images",
 #                                 save_dir=r"D:\cvat_annotations\yolo_07032025\bbox_annot",
 #                                 clahe=False,
 #                                 bbox_pad=0.2,

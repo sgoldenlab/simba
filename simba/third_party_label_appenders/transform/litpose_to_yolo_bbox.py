@@ -147,8 +147,14 @@ class LitPose2YOLOBbox:
         stdout_success(msg=f'YOLO formated data saved in {self.save_dir} directory', source=self.__class__.__name__, elapsed_time=timer.elapsed_time_str)
 
 
-# runner = LitPose2YOLOBbox(litpose_dir=r'Z:\home\simon\lp_300126', save_dir=r'E:\litpose_yolo\bbox', verbose=True, clahe=False, greyscale=False, sample_n=1000, padding=0.15)
-# runner.run()
+runner = LitPose2YOLOBbox(litpose_dir=r'Z:\home\simon\lp_300126',
+                          save_dir=r'F:\netholabs\moira\original\litpose_yolo_project',
+                          verbose=True,
+                          clahe=False,
+                          greyscale=False,
+                          sample_n=1000,
+                          padding=0.15)
+runner.run()
 
 
 #
