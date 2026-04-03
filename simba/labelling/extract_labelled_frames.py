@@ -55,7 +55,7 @@ class AnnotationFrameExtractor(ConfigReader):
                  data_paths: List[Union[str, os.PathLike]],
                  clfs: List[str],
                  img_downsample_factor: Optional[Union[float, int]] = None,
-                 img_format: Optional[Literal['png', 'webp', 'jpg']] = None,
+                 img_format: Literal['png', 'webp', 'jpg'] = 'png',
                  img_greyscale: Optional[bool] = False):
 
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
@@ -65,7 +65,7 @@ class AnnotationFrameExtractor(ConfigReader):
         if img_downsample_factor is not None: check_float(name=f'{self.__class__.__name__} img_downsample_factor', value=img_downsample_factor, min_value=1.0)
         if img_format is not None: check_str(name=f'{self.__class__.__name__} img_format', value=img_format, options=IMG_FORMATS)
         if img_greyscale is not None: check_valid_boolean(value=img_greyscale, source=f'{self.__class__.__name__} img_greyscale', raise_error=True)
-        self.img_downsample_factor, self.img_format, self.video_format = img_downsample_factor, img_format
+        self.img_downsample_factor, self.img_format = img_downsample_factor, img_format
         self.img_greyscale, self.data_paths, self.clfs = img_greyscale, data_paths, clfs
 
         self.video_lk = {}
@@ -103,6 +103,5 @@ class AnnotationFrameExtractor(ConfigReader):
 #                                 clfs=['grooming'],
 #                                 img_downsample_factor=4,
 #                                 data_paths=[r"E:\troubleshooting\mitra\project_folder\csv\targets_inserted\grooming\502_MA141_Gi_Saline_0517.csv"],
-#                                 img_format=None,
 #                                 img_greyscale=True)
 # test.run()
