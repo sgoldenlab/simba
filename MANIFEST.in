@@ -9,6 +9,8 @@ prune */pose_configurations_archive
 recursive-exclude */pose_configurations_archive *
 global-exclude pose_configurations_archive/*
 global-exclude */pose_configurations_archive/*
+prune simba/.claude
+recursive-exclude simba/.claude *
 prune docs
 prune misc
 prune images

@@ -71,6 +71,13 @@ Bounding box plotting
    :members:
    :show-inheritance:
 
+YOLO annotation visualizer
+-----------------------------------------------------------------------
+
+.. autoclass:: simba.plotting.yolo_annotation_visualizer.YOLOAnnotationVisualizer
+   :members:
+   :show-inheritance:
+
 COCO key-points -> YOLO pose-estimation format conversion
 ---------------------------------------
 

@@ -1,9 +1,9 @@
 import os
+from typing import Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-from typing import Optional, Tuple, Union
 
 try:
     from typing import Literal
@@ -24,11 +24,13 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_img,
                                 check_instance, check_int, check_str,
                                 check_valid_array, check_valid_boolean,
-                                check_valid_device)
+                                check_valid_device, check_valid_lst,
+                                check_valid_tuple)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import (InvalidFileTypeError, InvalidInputError,
                                 SimBAGPUError, SimBAPAckageVersionError)
-from simba.utils.read_write import (find_core_cnt, get_fn_ext,
+from simba.utils.printing import stdout_information
+from simba.utils.read_write import (create_directory, find_core_cnt, get_fn_ext,
                                     get_video_meta_data)
 
 
@@ -357,7 +359,116 @@ def apply_fixed_bbox_size(data: pd.DataFrame,
     return data
 
 
+def detect_yolo_project_type(label_path: str) -> str:
+    """
+    Detect YOLO project type (bbox, keypoint, or segmentation) from a single label file.
 
+    - bbox: class_id + 4 values (x_center, y_center, w, h)
+    - keypoint: class_id + 4 values + N*3 keypoints (x, y, visibility)
+    - segmentation: class_id + N*2 polygon vertices (N >= 3)
+    """
+    check_file_exist_and_readable(file_path=label_path)
+
+    BBOX_VALUE_CNT = 4
+    KPT_DIM = 3
+    with open(label_path, 'r') as f:
+        for line in f:
+            parts = line.strip().split()
+            if len(parts) < 2:
+                continue
+            n_values = len(parts) - 1
+            if n_values == BBOX_VALUE_CNT:
+                return 'bbox'
+            elif n_values > BBOX_VALUE_CNT and (n_values - BBOX_VALUE_CNT) % KPT_DIM == 0:
+                return 'keypoint'
+            elif n_values >= 6 and n_values % 2 == 0:
+                return 'segmentation'
+            else:
+                return 'bbox'
+    return 'bbox'
+
+
+def create_yolo_sample_visualizations(samples: List[Tuple[str, np.ndarray, str]],
+                                      save_dir: Union[str, os.PathLike],
+                                      names: Tuple[str, ...],
+                                      palette: str = 'Set1',
+                                      seg_opacity: float = 0.5,
+                                      verbose: bool = True,
+                                      source: str = '') -> None:
+    """
+    Create annotated visualizations from YOLO-format (image, label_str) samples.
+
+    Auto-detects annotation type (bounding-box or segmentation) from the label string format and draws the appropriate overlays. Images are saved as PNG files in ``save_dir``.
+
+    :param List[Tuple[str, np.ndarray, str]] samples: List of ``(sample_name, image, label_str)`` tuples produced by a SAM3-to-YOLO converter.
+    :param Union[str, os.PathLike] save_dir: Directory where annotated images are saved. Created if it does not exist.
+    :param Tuple[str, ...] names: Class names in index order.
+    :param str palette: Color palette name. Default ``'Set1'``.
+    :param float seg_opacity: Opacity of filled segmentation polygons (0.0–1.0). Default ``0.5``.
+    :param bool verbose: Print progress messages. Default ``True``.
+    :param str source: Caller class name for log messages.
+    """
+
+    import cv2
+    from simba.mixins.plotting_mixin import PlottingMixin
+    from simba.utils.data import create_color_palette
+
+    check_valid_lst(data=list(samples), source=f'{source} samples', min_len=1)
+    for i, s in enumerate(samples):
+        if not isinstance(s, (list, tuple)) or len(s) != 3:
+            raise InvalidInputError(msg=f'Each sample must be a 3-element tuple (name, image, label_str), got {type(s)} with length {len(s) if hasattr(s, "__len__") else "N/A"} at index {i}', source=source)
+        if not isinstance(s[0], str):
+            raise InvalidInputError(msg=f'Sample name at index {i} must be a str, got {type(s[0])}', source=source)
+        check_if_valid_img(data=s[1], source=f'{source} sample image index {i}', raise_error=True)
+        if not isinstance(s[2], str):
+            raise InvalidInputError(msg=f'Sample label_str at index {i} must be a str, got {type(s[2])}', source=source)
+    check_if_dir_exists(in_dir=os.path.dirname(save_dir), source=f'{source} save_dir')
+    check_valid_tuple(x=names, source=f'{source} names', minimum_length=1, valid_dtypes=(str,))
+    check_str(name=f'{source} palette', value=palette, options=Options.PALETTE_OPTIONS_CATEGORICAL.value)
+    check_float(name=f'{source} seg_opacity', value=seg_opacity, min_value=0.0, max_value=1.0)
+    check_valid_boolean(value=[verbose], source=f'{source} verbose', raise_error=True)
+
+    create_directory(paths=[save_dir], overwrite=False)
+    class_colors = create_color_palette(pallete_name=palette, increments=max(len(names), 10))
+    if verbose:
+        stdout_information(msg=f'Creating {len(samples)} annotation visualizations in {save_dir}...', source=source)
+
+    for cnt, (sample_name, img, label_str) in enumerate(samples):
+        img_h, img_w = img.shape[:2]
+        thickness = max(1, PlottingMixin().get_optimal_circle_size(frame_size=(img_w, img_h), circle_frame_ratio=100))
+        vis_img = img.copy()
+        for line in label_str.strip().split('\n'):
+            parts = line.strip().split()
+            if len(parts) < 5:
+                continue
+            cls_id = int(parts[0])
+            color = tuple(int(c) for c in class_colors[cls_id % len(class_colors)])
+            label = names[cls_id] if cls_id < len(names) else str(cls_id)
+            n_values = len(parts) - 1
+            if n_values == 4:
+                xc, yc, w, h = float(parts[1]), float(parts[2]), float(parts[3]), float(parts[4])
+                x1 = int((xc - w / 2) * img_w)
+                y1 = int((yc - h / 2) * img_h)
+                x2 = int((xc + w / 2) * img_w)
+                y2 = int((yc + h / 2) * img_h)
+                cv2.rectangle(vis_img, (x1, y1), (x2, y2), color, thickness, lineType=cv2.LINE_AA)
+                cv2.putText(vis_img, label, (x1, max(y1 - 5, 0)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, max(1, thickness // 2), cv2.LINE_AA)
+            else:
+                coords = [float(v) for v in parts[1:]]
+                points = []
+                for i in range(0, len(coords), 2):
+                    points.append([int(coords[i] * img_w), int(coords[i + 1] * img_h)])
+                polygon = np.array(points, dtype=np.int32)
+                pts = polygon.reshape((-1, 1, 2))
+                overlay = vis_img.copy()
+                cv2.polylines(vis_img, [pts], isClosed=True, color=color, thickness=thickness, lineType=cv2.LINE_AA)
+                cv2.fillPoly(overlay, [pts], color=color)
+                cv2.addWeighted(overlay, seg_opacity, vis_img, 1 - seg_opacity, 0, vis_img)
+                cx, cy = int(polygon[:, 0].mean()), int(polygon[:, 1].mean())
+                cv2.putText(vis_img, label, (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, max(1, thickness // 2), cv2.LINE_AA)
+        cv2.imwrite(os.path.join(save_dir, f'{sample_name}.png'), vis_img)
+    if verbose:
+        stdout_information(msg=f'{len(samples)} visualizations saved in {save_dir}', source=source)
 
 def export_yolo_model(model_path: Union[str, os.PathLike],
                       export_format: Literal["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite", "torch"],
@@ -428,7 +539,6 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
         raise InvalidInputError(msg=f"INT8 export requires 'engine' format. Got '{export_format}'.", source=export_yolo_model.__name__)
     if int8 and half:
         raise InvalidInputError(msg="Choose one precision mode: INT8 or FP16 (half).", source=export_yolo_model.__name__)
-
     model = YOLO(model_path) if task is None else YOLO(model_path, task=task)
     out = model.export(format=export_format, imgsz=imgsz, device=device, half=half, int8=int8, dynamic=dynamic, batch=batch, workspace=workspace, data=data, simplify=simplify)
     return out

@@ -27,6 +27,8 @@ try:
 except:
     SAM3SemanticPredictor = None
 
+import numpy as np
+
 from simba.third_party_label_appenders.converters import create_yolo_yaml
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
@@ -34,6 +36,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_boolean, check_valid_tuple)
 from simba.utils.errors import NoFilesFoundError, SimBAPAckageVersionError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
+from simba.utils.yolo import create_yolo_sample_visualizations
 from simba.utils.read_write import (create_directory,
                                     find_all_videos_in_directory,
                                     get_pkg_version, get_video_meta_data,
@@ -68,6 +71,7 @@ class SAM3ToYoloBBox:
     :param bool recursive: If True, search video_dir and all subdirectories for videos. Default False.
     :param Optional[int] seed: Random seed for reproducible frame sampling.
     :param Optional[int] max_detections: Maximum number of detections to keep per frame (sorted by confidence descending). If None, all detections above ``conf`` are kept. Default None.
+    :param bool visualize: If True, saves annotated images with bounding-box overlays to a ``visualizations`` subfolder inside ``save_dir``. Useful for verifying SAM3 annotation quality. Default False.
     :param bool verbose: If True, print progress updates. Default True.
 
     :raises SimBAGPUError: If no NVIDIA GPU is detected (via ``nvidia-smi``).
@@ -95,6 +99,7 @@ class SAM3ToYoloBBox:
                  max_detections: Optional[int] = None,
                  recursive: bool = False,
                  seed: Optional[int] = None,
+                 visualize: bool = False,
                  verbose: bool = True):
 
         check_nvidea_gpu_available(raise_error=True)
@@ -116,11 +121,12 @@ class SAM3ToYoloBBox:
         check_float(name=f'{self.__class__.__name__} buffer_pct', value=buffer_pct, min_value=0.0, max_value=1.0)
         check_int(name=f'{self.__class__.__name__} consecutive_miss_limit', value=consecutive_miss_limit, min_value=1)
         check_valid_boolean(value=recursive, source=f'{self.__class__.__name__} recursive')
+        check_valid_boolean(value=visualize, source=f'{self.__class__.__name__} visualize')
         if max_detections is not None: check_int(name=f'{self.__class__.__name__} max_detections', value=max_detections, min_value=1)
         if seed is not None: check_int(name=f'{self.__class__.__name__} seed', value=seed)
         self.video_dir, self.sam_path, self.save_dir, self.txt_prompt = video_dir, sam_path, save_dir, txt_prompt
         self.n_frames, self.names, self.train_val_split, self.conf, self.imgsz = n_frames, names, train_val_split, conf, sam_imgsz
-        self.greyscale, self.clahe, self.buffer_pct, self.consecutive_miss_limit, self.max_detections, self.seed, self.verbose = greyscale, clahe, buffer_pct, consecutive_miss_limit, max_detections, seed, verbose
+        self.greyscale, self.clahe, self.buffer_pct, self.consecutive_miss_limit, self.max_detections, self.seed, self.verbose, self.visualize = greyscale, clahe, buffer_pct, consecutive_miss_limit, max_detections, seed, verbose, visualize
         self.name_map = {name: idx for idx, name in enumerate(names)}
         if recursive:
             self.video_paths = recursive_file_search(directory=video_dir, extensions=[".avi", ".mp4", ".mov", ".flv", ".m4v", ".webm", ".h264"], as_dict=True, raise_error=True)
@@ -213,6 +219,9 @@ class SAM3ToYoloBBox:
 
         map_path = os.path.join(self.save_dir, 'map.yaml')
         create_yolo_yaml(path=self.save_dir, train_path=img_train_dir, val_path=img_val_dir, names=self.name_map, save_path=map_path)
+
+        if self.visualize:
+            create_yolo_sample_visualizations(samples=all_samples, save_dir=os.path.join(self.save_dir, 'visualizations'), names=self.names, verbose=self.verbose, source=self.__class__.__name__)
 
         timer.stop_timer()
         stdout_success(msg=f'YOLO bbox detection project created at {self.save_dir}. ' f'{len(train_samples)} train, {len(val_samples)} val samples.', source=self.__class__.__name__, elapsed_time=timer.elapsed_time_str)

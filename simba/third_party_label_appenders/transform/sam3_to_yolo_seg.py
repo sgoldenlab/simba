@@ -24,10 +24,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.data import resample_geometry_vertices
 from simba.utils.errors import NoFilesFoundError, SimBAPAckageVersionError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
-from simba.utils.read_write import (create_directory,
-                                    find_all_videos_in_directory, get_fn_ext,
-                                    get_pkg_version, get_video_meta_data,
-                                    read_frm_of_video)
+from simba.utils.yolo import create_yolo_sample_visualizations
+from simba.utils.read_write import (create_directory, find_all_videos_in_directory, get_pkg_version, get_video_meta_data, read_frm_of_video)
 
 
 class SAM3ToYoloSeg:
@@ -58,6 +56,7 @@ class SAM3ToYoloSeg:
     :param Optional[Union[Tuple[int, int, int], bool]] clahe: If True, applies CLAHE with default params. If tuple of (clip_limit, tile_x, tile_y), applies CLAHE with those params. Default False.
     :param Optional[int] vertice_cnt: If not None, resample each mask polygon to this many vertices. Default 40.
     :param Optional[int] seed: Random seed for reproducible frame sampling.
+    :param bool visualize: If True, saves annotated images with segmentation polygon overlays to a ``visualizations`` subfolder inside ``save_dir``. Useful for verifying SAM3 annotation quality. Default False.
     :param bool verbose: If True, print progress updates. Default True.
 
     :example:
@@ -79,6 +78,7 @@ class SAM3ToYoloSeg:
                  clahe: Optional[Union[Tuple[int, int, int], bool]] = False,
                  vertice_cnt: Optional[int] = 40,
                  seed: Optional[int] = None,
+                 visualize: bool = False,
                  verbose: bool = True):
 
         check_nvidea_gpu_available(raise_error=True)
@@ -98,9 +98,10 @@ class SAM3ToYoloSeg:
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose')
         if vertice_cnt is not None: check_int(name=f'{self.__class__.__name__} vertice_cnt', value=vertice_cnt, min_value=3)
         if seed is not None: check_int(name=f'{self.__class__.__name__} seed', value=seed)
+        check_valid_boolean(value=visualize, source=f'{self.__class__.__name__} visualize')
         self.video_dir, self.sam_path, self.save_dir, self.txt_prompt = video_dir, sam_path, save_dir, txt_prompt
         self.n_frames, self.names, self.train_val_split, self.conf, self.imgsz = n_frames, names, train_val_split, conf, sam_imgsz
-        self.greyscale, self.clahe, self.vertice_cnt, self.seed, self.verbose = greyscale, clahe, vertice_cnt, seed, verbose
+        self.greyscale, self.clahe, self.vertice_cnt, self.seed, self.verbose, self.visualize = greyscale, clahe, vertice_cnt, seed, verbose, visualize
         self.name_map = {name: idx for idx, name in enumerate(names)}
         self.video_paths = find_all_videos_in_directory(directory=video_dir, as_dict=True, raise_error=True)
 
@@ -170,6 +171,9 @@ class SAM3ToYoloSeg:
         map_path = os.path.join(self.save_dir, 'map.yaml')
         create_yolo_yaml(path=self.save_dir, train_path=img_train_dir, val_path=img_val_dir, names=self.name_map, save_path=map_path)
 
+        if self.visualize:
+            create_yolo_sample_visualizations(samples=all_samples, save_dir=os.path.join(self.save_dir, 'visualizations'), names=self.names, verbose=self.verbose, source=self.__class__.__name__)
+
         timer.stop_timer()
         stdout_success(msg=f'YOLO segmentation project created at {self.save_dir}. ' f'{len(train_samples)} train, {len(val_samples)} val samples.', source=self.__class__.__name__, elapsed_time=timer.elapsed_time_str)
 
@@ -210,8 +214,6 @@ class SAM3ToYoloSeg:
             lines.append(f'{cls_id} {coord_str}')
 
         return '\n'.join(lines) + '\n' if lines else ''
-
-
 
 
 # runner = SAM3ToYoloSeg(video_dir=r'E:\litpose_yolo\pi\videos',

@@ -1,13 +1,3 @@
-"""
-Merge independent YOLO-format projects (detection, segmentation, or pose) into one dataset.
-
-Each input project must supply a ``map.yaml`` (or equivalent Ultralytics YAML) pointing at
-``images/train``, ``images/val``, and matching ``labels/`` trees. Class names and task type
-must match across inputs. Typical sources include
-:class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_seg.SAM3ToYoloSeg` and
-:class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_bbox.SAM3ToYoloBBox` outputs.
-"""
-
 import os
 import random
 import shutil
@@ -16,19 +6,14 @@ from typing import Dict, List, Optional, Tuple, Union
 import yaml
 
 from simba.third_party_label_appenders.converters import create_yolo_yaml
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_int,
-                                check_valid_boolean, check_valid_lst)
+from simba.utils.checks import (check_file_exist_and_readable, check_float, check_if_dir_exists, check_int, check_valid_boolean, check_valid_lst)
 from simba.utils.enums import Options
 from simba.utils.errors import InvalidInputError, NoFilesFoundError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
-from simba.utils.read_write import (create_directory,
-                                    find_files_of_filetypes_in_directory)
+from simba.utils.read_write import (create_directory, find_files_of_filetypes_in_directory)
 from simba.utils.warnings import DuplicateNamesWarning
+from simba.utils.yolo import detect_yolo_project_type
 
-BBOX_FIELD_CNT = 5
-SEG_MIN_FIELD_CNT = 7
-KPT_FIELD_MODULO = 3
 TRAIN = 'train'
 VAL = 'val'
 IMAGES = 'images'
@@ -151,39 +136,15 @@ class MergeYoloProjects:
                     if os.path.isfile(lbl_path):
                         pairs[split].append((img_path, lbl_path, stem))
 
-            task_type = self._detect_task_type(pairs, yaml_path)
+            all_label_paths = [p[1] for s in (TRAIN, VAL) for p in pairs[s]]
+            if len(all_label_paths) == 0:
+                raise NoFilesFoundError(msg=f'No matched image/label pairs found in {yaml_path}.', source=self.__class__.__name__)
+            task_type = detect_yolo_project_type(label_path=all_label_paths[0])
             project = {'yaml_path': yaml_path, 'names': names, 'task_type': task_type, 'pairs': pairs}
             if self.verbose:
                 stdout_information(msg=f'Project {yaml_path}: {len(pairs[TRAIN])} train, {len(pairs[VAL])} val pairs, task={task_type}, classes={list(names.keys())}')
             projects.append(project)
         return projects
-
-    def _detect_task_type(self, pairs: Dict[str, List[Tuple]], yaml_path: str) -> str:
-        all_pairs = pairs[TRAIN] + pairs[VAL]
-        if len(all_pairs) == 0:
-            raise NoFilesFoundError(msg=f'No matched image/label pairs found in {yaml_path}.', source=self.__class__.__name__)
-        sample_paths = [p[1] for p in all_pairs[:20]]
-        field_counts = set()
-        for lbl_path in sample_paths:
-            with open(lbl_path, 'r') as f:
-                for line in f:
-                    line = line.strip()
-                    if line:
-                        field_counts.add(len(line.split()))
-                        break
-
-        if not field_counts:
-            raise InvalidInputError(msg=f'All sampled label files in {yaml_path} are empty.', source=self.__class__.__name__)
-
-        if field_counts == {BBOX_FIELD_CNT}:
-            return 'bbox'
-        elif all(c >= SEG_MIN_FIELD_CNT and c % 2 == 1 for c in field_counts):
-            return 'segment'
-        elif all((c - 1) % KPT_FIELD_MODULO == 0 or (c - BBOX_FIELD_CNT) % KPT_FIELD_MODULO == 0 for c in field_counts):
-            return 'keypoint'
-        else:
-            unique_counts = sorted(field_counts)
-            raise InvalidInputError(msg=f'Cannot determine task type for {yaml_path}. Label field counts: {unique_counts}. Expected 5 for bbox, odd >5 for segmentation, or multiples of 3 (+bbox) for keypoint.', source=self.__class__.__name__)
 
     def _validate_projects(self, projects: List[Dict]):
         task_types = set(p['task_type'] for p in projects)

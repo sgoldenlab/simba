@@ -39,3 +39,6 @@ docs/_build
 
 # ignore recent projects file anywhere
 **/.recent_projects.txt
+
+# Claude Code
+simba/.claude/
