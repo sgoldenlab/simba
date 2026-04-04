@@ -74,6 +74,7 @@ class AnnotationFrameExtractor(ConfigReader):
             video_path = find_video_of_file(video_dir=self.video_dir, filename=video_name, raise_error=True)
             self.video_lk[video_name] = video_path
 
+
     def run(self):
         create_directory(paths=os.path.join(self.annotated_frm_dir, 'images'), overwrite=False, verbose=False)
         for file_cnt, data_path in enumerate(self.data_paths):
@@ -91,9 +92,9 @@ class AnnotationFrameExtractor(ConfigReader):
                     continue
                 for frm_cnt, frm in enumerate(clf_annot_idx):
                     img = read_frm_of_video(video_path=cap, frame_index=frm, size=size, greyscale=self.img_greyscale)
-                    img_save_path = os.path.join(self.annotated_frm_dir, 'imgs', f'{video_name}_{clf}_{frm_cnt}.{self.img_format}')
+                    img_save_path = os.path.join(self.annotated_frm_dir, 'images', f'{video_name}_{clf}_{frm_cnt}.{self.img_format}')
                     cv2.imwrite(img_save_path, img)
-                    stdout_information(f"Saved {clf} annotated image for classifier {clf} ({str(frm_cnt)}/{str(len(clf_annot_idx))}), video: {file_cnt+1}/{len(self.data_paths)}, ({video_name}) ...")
+                    stdout_information(f"Saved {clf} annotated image for classifier {clf} at location {img_save_path} ({str(frm_cnt)}/{str(len(clf_annot_idx))}), video: {file_cnt+1}/{len(self.data_paths)}, ({video_name}) ...")
         self.timer.stop_timer()
         stdout_success(msg=f"Annotated frames saved in {self.annotated_frm_dir} directory", elapsed_time=self.timer.elapsed_time_str)
 
