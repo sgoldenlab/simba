@@ -12,12 +12,15 @@ import numpy as np
 import yaml
 
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_int, check_str, check_valid_boolean)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists, check_int, check_str,
+                                check_valid_boolean)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import Options
 from simba.utils.errors import InvalidInputError, NoDataError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext)
 from simba.utils.yolo import detect_yolo_project_type
 
 BBOX_VALUE_CNT = 4

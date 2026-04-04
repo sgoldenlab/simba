@@ -24,8 +24,11 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.data import resample_geometry_vertices
 from simba.utils.errors import NoFilesFoundError, SimBAPAckageVersionError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
+from simba.utils.read_write import (create_directory,
+                                    find_all_videos_in_directory,
+                                    get_pkg_version, get_video_meta_data,
+                                    read_frm_of_video)
 from simba.utils.yolo import create_yolo_sample_visualizations
-from simba.utils.read_write import (create_directory, find_all_videos_in_directory, get_pkg_version, get_video_meta_data, read_frm_of_video)
 
 
 class SAM3ToYoloSeg:
