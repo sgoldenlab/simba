@@ -1,6 +1,7 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import os
+
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 from typing import Dict, List, Optional, Tuple, Union
 

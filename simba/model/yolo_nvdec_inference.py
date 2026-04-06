@@ -12,27 +12,30 @@ except:
 
 import numpy as np
 import pandas as pd
+
 try:
     import torch
     import torch.nn.functional as F
-    from PyNvVideoCodec import SimpleDecoder, OutputColorType
+    from PyNvVideoCodec import OutputColorType, SimpleDecoder
 except:
     torch = None
     F = None
     SimpleDecoder = None
     OutputColorType = None
 from ultralytics import YOLO
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_int, check_str,
-                                check_nvidea_gpu_available, check_valid_boolean,
-                                check_valid_tuple)
+
 from simba.data_processors.cuda.utils import _is_cuda_available
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists, check_int,
+                                check_nvidea_gpu_available, check_str,
+                                check_valid_boolean, check_valid_tuple)
 from simba.utils.data import df_smoother, savgol_smoother
-from simba.utils.errors import InvalidInputError, NoFilesFoundError, SimBAGPUError
+from simba.utils.errors import (InvalidInputError, NoFilesFoundError,
+                                SimBAGPUError)
 from simba.utils.lookups import get_nvdec_count
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
-from simba.utils.read_write import (find_all_videos_in_directory, find_core_cnt,
-                                    get_fn_ext, get_pkg_version,
+from simba.utils.read_write import (find_all_videos_in_directory,
+                                    find_core_cnt, get_fn_ext, get_pkg_version,
                                     get_video_meta_data, write_df)
 
 DETECT = 'detect'
