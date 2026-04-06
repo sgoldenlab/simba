@@ -30,8 +30,8 @@ from simba.utils.enums import Formats, Options
 from simba.utils.errors import (InvalidFileTypeError, InvalidInputError,
                                 SimBAGPUError, SimBAPAckageVersionError)
 from simba.utils.printing import stdout_information
-from simba.utils.read_write import (create_directory, find_core_cnt, get_fn_ext,
-                                    get_video_meta_data)
+from simba.utils.read_write import (create_directory, find_core_cnt,
+                                    get_fn_ext, get_video_meta_data)
 
 
 def fit_yolo(weights_path: Union[str, os.PathLike],
@@ -410,6 +410,7 @@ def create_yolo_sample_visualizations(samples: List[Tuple[str, np.ndarray, str]]
     """
 
     import cv2
+
     from simba.mixins.plotting_mixin import PlottingMixin
     from simba.utils.data import create_color_palette
 
