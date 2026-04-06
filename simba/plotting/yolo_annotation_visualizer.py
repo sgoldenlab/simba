@@ -282,7 +282,7 @@ class YOLOAnnotationVisualizer(object):
 
 
 #if __name__ == '__main__':
-# viz = YOLOAnnotationVisualizer(map_yaml_path=r'F:\netholabs\moira_lp_sam\map.yaml',
-#                                    save_dir=r'F:\netholabs\annotation_visualizations',
-#                                n=400)
+# viz = YOLOAnnotationVisualizer(map_yaml_path=r"E:\open_video\open_field_2\yolo_bbox_project\map.yaml",
+#                                    save_dir=r"E:\open_video\open_field_2\yolo_bbox_project\annotations_imgs",
+#                                    n=150)
 # viz.run()

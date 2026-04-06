@@ -19,6 +19,13 @@ Bounding-box inference
    :members:
    :show-inheritance:
 
+NVDEC GPU-accelerated YOLO inference
+-----------------------------------------------------------------------
+
+.. autoclass:: simba.model.yolo_nvdec_inference.YoloNVDECInference
+   :members:
+   :show-inheritance:
+
 Pose-estimation inference
 -----------------------------------------------------------------------
 

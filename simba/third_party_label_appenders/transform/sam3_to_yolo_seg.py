@@ -72,7 +72,7 @@ class SAM3ToYoloSeg:
                  n_frames: int = 50,
                  names: Tuple[str, ...] = ('animal',),
                  train_val_split: float = 0.7,
-                 conf: float = 0.25,
+                 conf: float = 0.50,
                  sam_imgsz: int = 644,
                  greyscale: bool = False,
                  clahe: Optional[Union[Tuple[int, int, int], bool]] = False,
@@ -162,11 +162,15 @@ class SAM3ToYoloSeg:
         train_samples = all_samples[:split_idx]
         val_samples = all_samples[split_idx:]
 
-        for samples, img_dir, lbl_dir in [(train_samples, img_train_dir, lbl_train_dir), (val_samples, img_val_dir, lbl_val_dir)]:
-            for sample_name, img, label_str in samples:
+        for split_name, samples, img_dir, lbl_dir in [('train', train_samples, img_train_dir, lbl_train_dir), ('val', val_samples, img_val_dir, lbl_val_dir)]:
+            for cnt, (sample_name, img, label_str) in enumerate(samples):
                 cv2.imwrite(os.path.join(img_dir, f'{sample_name}.png'), img)
                 with open(os.path.join(lbl_dir, f'{sample_name}.txt'), 'w') as f:
                     f.write(label_str)
+                if self.verbose and (cnt + 1) % 10 == 0:
+                    stdout_information(msg=f'Writing {split_name}: {cnt + 1}/{len(samples)}...')
+            if self.verbose:
+                stdout_information(msg=f'Writing {split_name}: {len(samples)}/{len(samples)} complete.')
 
         map_path = os.path.join(self.save_dir, 'map.yaml')
         create_yolo_yaml(path=self.save_dir, train_path=img_train_dir, val_path=img_val_dir, names=self.name_map, save_path=map_path)
@@ -216,14 +220,15 @@ class SAM3ToYoloSeg:
         return '\n'.join(lines) + '\n' if lines else ''
 
 
-# runner = SAM3ToYoloSeg(video_dir=r'E:\litpose_yolo\pi\videos',
-#                        sam_path=r'D:\sam3\sam3.pt',
-#                        save_dir=r'E:\litpose_yolo\yolo_from_sam3',
-#                        txt_prompt='mouse',
-#                        n_frames=75,
-#                        verbose=True)
-#
-# runner.run()
+runner = SAM3ToYoloSeg(video_dir=r'E:\open_video\open_field_2',
+                       sam_path=r'D:\sam3\sam3.pt',
+                       save_dir=r'E:\open_video\open_field_2\yolo_seg_project',
+                       txt_prompt='mouse',
+                       n_frames=50,
+                       verbose=True,
+                       vertice_cnt=40)
+
+runner.run()
 
 
 ### EXAMPLE

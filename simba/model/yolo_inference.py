@@ -1,7 +1,6 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import os
-
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -31,8 +30,7 @@ from simba.utils.enums import Formats, Options
 from simba.utils.errors import (InvalidVideoFileError, SimBAGPUError,
                                 SimBAPAckageVersionError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_core_cnt,
-                                    find_files_of_filetypes_in_directory,
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_video_meta_data)
 from simba.utils.yolo import (_get_undetected_obs, apply_fixed_bbox_size,
                               check_valid_device, load_yolo_model,
@@ -217,27 +215,28 @@ class YoloInference():
             video_timer.stop_timer()
             fps_speeds.append(len(results[video_name]) / video_timer.elapsed_time)
 
-        timer.stop_timer()
-        if not self.save_dir:
-            if self.verbose:
-                stdout_success(f'YOLO results created', elapsed_time=timer.elapsed_time_str)
-            return results
-        else:
+        if self.save_dir:
             for k, v in results.items():
                 save_path = os.path.join(self.save_dir, f'{k}.csv')
                 v.to_csv(save_path)
-            if self.verbose:
+        timer.stop_timer()
+        if self.verbose:
+            if self.save_dir:
                 stdout_success(f'YOLO results for {len(self.video_path)} video(s) saved in {self.save_dir} directory', elapsed_time=timer.elapsed_time_str)
+            else:
+                stdout_success(f'YOLO results created for {len(self.video_path)} video(s)', elapsed_time=timer.elapsed_time_str)
+        if not self.save_dir:
+            return results
 
 
 
 
 
 
-#
-# VIDEO_PATH = r"Z:\home\simon\lp_300126\videos\6.01.001_2026_03_11_23_25_00_000_2\6.01.001_2026_03_11_23_25_00_000_2_cam1.mp4"
-# WEIGHTS_PATH = r"E:\litpose_yolo\bbox\mdl\train3\weights\best.pt"
-# SAVE_DIR = r"E:\litpose_yolo\bbox\out_pose"
+
+# VIDEO_PATH = r"E:\open_video\open_field_2\sample\clips"
+# WEIGHTS_PATH = r'E:\open_video\open_field_2\yolo_bbox_project\mdl\train2\weights\best.pt'
+# SAVE_DIR = r'E:\open_video\open_field_2\yolo_bbox_project\results'
 # i = YoloInference(weights=WEIGHTS_PATH,
 #                   video_path=VIDEO_PATH,
 #                   save_dir=SAVE_DIR,
@@ -246,9 +245,9 @@ class YoloInference():
 #                   verbose=True,
 #                   core_cnt=18,
 #                   imgsz=256,
-#                   bbox_size=(512, 512),
+#                   bbox_size=None,#(512, 512),
 #                   interpolate=True,
-#                   batch_size=100)
+#                   batch_size=8)
 # i.run()
 #
 

@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Union
+from typing import Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -50,14 +50,23 @@ class YOLOVisualizer():
        :muted:
        :align: center
 
+    .. video:: _static/img/YoloInference_3.mp4
+       :width: 500
+       :loop:
+       :autoplay:
+       :muted:
+       :align: center
+
     :param Union[str, os.PathLike] data_path: Path to YOLO results CSV. Expected columns: ``FRAME, CLASS_ID, CLASS_NAME, CONFIDENCE, X1..Y4``.
     :param Union[str, os.PathLike] video_path: Path to the video from which the data was produced.
     :param Union[str, os.PathLike] save_dir: Directory where to save visualization output.
-    :param Optional[str] palette: Palette option (reserved for compatibility). Current implementation uses a fixed color.
+    :param Optional[str] palette: Matplotlib color palette name for per-class geometry colors (e.g., ``'Set1'``, ``'tab10'``). Default: ``'Set1'``.
     :param Optional[int] core_cnt: CPU core count for parallel processing. Use ``-1`` for all available cores.
     :param float threshold: Confidence threshold in ``[0.0, 1.0]``. Detections below threshold are masked before polygon conversion.
     :param Optional[int] padding: Polygon padding offset in pixels used during multiframe bbox-to-polygon conversion for rendering. Positive values expand polygons outward, negative values shrink polygons inward. If ``None``, no padding offset is applied. This affects visualization geometry only, not the underlying YOLO detections in the input CSV.
     :param Optional[int] thickness: Polygon line thickness. If ``None``, default geometry plotter thickness is used.
+    :param float opacity: Polygon fill opacity in ``[0.0, 1.0]``. Default: 0.6.
+    :param Optional[Tuple[int, int, int]] outline_color: BGR color for polygon outlines. If ``None``, no outlines are drawn. Default: None.
     :param bool verbose: If True, prints progress information. Default: True.
     :raises FrameRangeError: If YOLO result frame coverage does not match video frame count.
 
@@ -81,6 +90,8 @@ class YOLOVisualizer():
                  threshold: float = 0.0,
                  padding: Optional[int] = 20,
                  thickness: Optional[int] = None,
+                 opacity: float = 0.6,
+                 outline_color: Optional[Tuple[int, int, int]] = None,
                  verbose: bool = True):
 
         check_file_exist_and_readable(file_path=data_path)
@@ -96,8 +107,9 @@ class YOLOVisualizer():
             check_int(name=f'{self.__class__.__name__} thickness', value=thickness, min_value=0, unaccepted_vals=[0])
         check_if_dir_exists(in_dir=save_dir)
         check_valid_boolean(value=[verbose], source=self.__class__.__name__, raise_error=True)
+        check_float(name=f'{self.__class__.__name__} opacity', value=opacity, min_value=0.0, max_value=1.0)
         self.save_dir, self.verbose, self.palette, self.thickness = save_dir, verbose, palette, thickness
-        self.threshold, self.padding = threshold, padding
+        self.threshold, self.padding, self.opacity, self.outline_color = threshold, padding, opacity, outline_color
 
     def run(self):
         data_df = pd.read_csv(self.data_path, index_col=0)
@@ -127,25 +139,66 @@ class YOLOVisualizer():
                                   core_cnt=self.core_cnt,
                                   save_dir=self.save_dir,
                                   verbose=self.verbose,
-                                  colors=[(0, 255, 255)],
+                                  palette=self.palette,
                                   thickness=self.thickness,
-                                  shape_opacity=0.6,
+                                  shape_opacity=self.opacity,
+                                  outline_clr=self.outline_color,
                                   pool=pool)
         plotter.run()
         terminate_cpu_pool(pool=pool, source=self.__class__.__name__)
-
-
-
-
-
-
-
-
-
-
-# test = YOLOVisualizer(data_path=r"E:\litpose_yolo\bbox\out_pose\6.01.001_2026_03_11_23_25_00_000_2_cam1.csv",
-#                       video_path=r"Z:\home\simon\lp_300126\videos\6.01.001_2026_03_11_23_25_00_000_2\6.01.001_2026_03_11_23_25_00_000_2_cam1.mp4",
-#                       save_dir=r"E:\litpose_yolo\bbox\out_pose",
-#                       threshold=0.0,
-#                       core_cnt=4)
-# test.run()
+#
+#
+# if __name__ == '__main__':
+#     DATA_PATH = r"E:\open_video\open_field_2\yolo_bbox_project\results\1_clip_1min.csv"
+#     VIDEO_PATH = r"E:\open_video\open_field_2\sample\clips\1_clip_1min.mp4"
+#     SAVE_DIR = r"E:\open_video\open_field_2\sample\clips\results"
+#
+#     CONFIGS = [
+#         {"palette": "Set1",     "outline_color": None,            "opacity": 0.3, "thickness": None},
+#         {"palette": "Set1",     "outline_color": (0, 0, 255),     "opacity": 0.5, "thickness": 2},
+#         {"palette": "Set1",     "outline_color": (255, 255, 255), "opacity": 0.8, "thickness": 3},
+#         {"palette": "Set1",     "outline_color": (0, 255, 0),     "opacity": 1.0, "thickness": 4},
+#         {"palette": "tab10",    "outline_color": None,            "opacity": 0.3, "thickness": None},
+#         {"palette": "tab10",    "outline_color": (0, 0, 0),       "opacity": 0.5, "thickness": 2},
+#         {"palette": "tab10",    "outline_color": (255, 0, 0),     "opacity": 0.8, "thickness": 3},
+#         {"palette": "tab10",    "outline_color": (0, 255, 255),   "opacity": 1.0, "thickness": 4},
+#         {"palette": "Pastel1",  "outline_color": None,            "opacity": 0.3, "thickness": None},
+#         {"palette": "Pastel1",  "outline_color": (128, 128, 128), "opacity": 0.5, "thickness": 2},
+#         {"palette": "Pastel1",  "outline_color": (0, 0, 255),     "opacity": 0.8, "thickness": 3},
+#         {"palette": "Pastel1",  "outline_color": (255, 255, 0),   "opacity": 1.0, "thickness": 4},
+#         {"palette": "Dark2",    "outline_color": None,            "opacity": 0.3, "thickness": None},
+#         {"palette": "Dark2",    "outline_color": (255, 0, 255),   "opacity": 0.5, "thickness": 2},
+#         {"palette": "Dark2",    "outline_color": (0, 128, 255),   "opacity": 0.8, "thickness": 3},
+#         {"palette": "Dark2",    "outline_color": (255, 255, 255), "opacity": 1.0, "thickness": 4},
+#     ]
+#
+#     COLLECTED_DIR = os.path.join(SAVE_DIR, "collected")
+#     os.makedirs(COLLECTED_DIR, exist_ok=True)
+#     for idx, cfg in enumerate(CONFIGS):
+#         cfg_save_dir = os.path.join(SAVE_DIR, f"config_{idx+1:02d}")
+#         os.makedirs(cfg_save_dir, exist_ok=True)
+#         print(f"--- Config {idx+1}/16: palette={cfg['palette']}, outline={cfg['outline_color']}, opacity={cfg['opacity']}, thickness={cfg['thickness']} ---")
+#         viz = YOLOVisualizer(data_path=DATA_PATH,
+#                              video_path=VIDEO_PATH,
+#                              save_dir=cfg_save_dir,
+#                              threshold=0.0,
+#                              core_cnt=2,
+#                              palette=cfg["palette"],
+#                              outline_color=cfg["outline_color"],
+#                              opacity=cfg["opacity"],
+#                              thickness=cfg["thickness"])
+#         viz.run()
+#         output_path = os.path.join(cfg_save_dir, get_fn_ext(filepath=VIDEO_PATH)[1] + ".mp4")
+#         shutil.copy2(output_path, os.path.join(COLLECTED_DIR, f"{idx}.mp4"))
+#
+#     from simba.video_processors.video_processing import clip_video_in_range, mosaic_concatenator
+#     COLLECTED_DIR = r"E:\open_video\open_field_2\sample\clips\results\collected"
+#     CLIP_DIR = os.path.join(COLLECTED_DIR, "clips_10s")
+#     os.makedirs(CLIP_DIR, exist_ok=True)
+#     clipped_paths = []
+#     for idx in range(16):
+#         src = os.path.join(COLLECTED_DIR, f"{idx}.mp4")
+#         clip_save = os.path.join(CLIP_DIR, f"{idx}.mp4")
+#         clip_video_in_range(file_path=src, start_time="00:00:00", end_time="00:00:10", save_path=clip_save, overwrite=True)
+#         clipped_paths.append(clip_save)
+#     mosaic_concatenator(video_paths=clipped_paths, save_path=os.path.join(COLLECTED_DIR, "mosaic_10s.mp4"), width_idx=0, height_idx=0)

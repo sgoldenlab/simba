@@ -35,7 +35,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_nvidea_gpu_available, check_str,
                                 check_valid_boolean, check_valid_tuple)
 from simba.utils.errors import NoFilesFoundError, SimBAPAckageVersionError
-from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success, stdout_warning
 from simba.utils.yolo import create_yolo_sample_visualizations
 from simba.utils.read_write import (create_directory,
                                     find_all_videos_in_directory,
@@ -162,7 +162,13 @@ class SAM3ToYoloBBox:
                     if self.verbose:
                         stdout_information(msg=f'Video {video_cnt}/{total_videos} ({video_name}): {self.consecutive_miss_limit} consecutive misses, skipping to next video...')
                     break
-                frame = read_frm_of_video(video_path=video_path, frame_index=frame_idx)
+                try:
+                    frame = read_frm_of_video(video_path=video_path, frame_index=frame_idx)
+                except Exception as e:
+                    if self.verbose:
+                        stdout_warning(msg=f'Video {video_cnt}/{total_videos} ({video_name}), frame idx {frame_idx}: could not read frame ({e}), skipping...')
+                    consecutive_misses += 1
+                    continue
                 if frame is None:
                     consecutive_misses += 1
                     continue
@@ -264,16 +270,18 @@ class SAM3ToYoloBBox:
         return '\n'.join(lines) + '\n' if lines else ''
 
 
-# runner = SAM3ToYoloBBox(video_dir=r'F:\netholabs\V6\batch_1\cage_2\mp4',
+
+
+# runner = SAM3ToYoloBBox(video_dir=r'E:\open_video\open_field_2',
 #                         sam_path=r'D:\sam3\sam3.pt',
-#                         save_dir=r'F:\netholabs\sam3_to_bbox',
+#                         save_dir=r'E:\open_video\open_field_2\yolo_bbox_project',
 #                         txt_prompt='mouse',
-#                         n_frames=50,
+#                         n_frames=25,
 #                         verbose=True,
 #                         conf=0.25,
-#                         max_detections=2,
+#                         max_detections=1,
 #                         buffer_pct=0.15,
-#                         recursive=True)
+#                         recursive=False)
 # runner.run()
 
 
