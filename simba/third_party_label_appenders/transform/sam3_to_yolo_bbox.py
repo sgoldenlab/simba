@@ -12,6 +12,7 @@ To merge this project with others that share the same class names and task type,
 
 import os
 import random
+import time
 from typing import Optional, Tuple, Union
 
 import cv2
@@ -72,6 +73,9 @@ class SAM3ToYoloBBox:
     :param Optional[int] seed: Random seed for reproducible frame sampling.
     :param Optional[int] max_detections: Maximum number of detections to keep per frame (sorted by confidence descending). If None, all detections above ``conf`` are kept. Default None.
     :param bool visualize: If True, saves annotated images with bounding-box overlays to a ``visualizations`` subfolder inside ``save_dir``. Useful for verifying SAM3 annotation quality. Default False.
+    :param Optional[int] min_frame_gap: Minimum number of frames between sampled frames. Enforces temporal diversity so samples are spread across the video rather than clustered. If ``None``, frames are sampled purely at random. Default ``None``.
+    :param bool shuffle_videos: If True, randomize the order in which videos are processed. Default False.
+    :param float io_timeout: Seconds to keep retrying file I/O (read/write) when the operation fails (e.g. temporary drive disconnect). Default 30.0.
     :param bool verbose: If True, print progress updates. Default True.
 
     :raises SimBAGPUError: If no NVIDIA GPU is detected (via ``nvidia-smi``).
@@ -100,6 +104,9 @@ class SAM3ToYoloBBox:
                  recursive: bool = False,
                  seed: Optional[int] = None,
                  visualize: bool = False,
+                 min_frame_gap: Optional[int] = None,
+                 shuffle_videos: bool = False,
+                 io_timeout: float = 30.0,
                  verbose: bool = True):
 
         check_nvidea_gpu_available(raise_error=True)
@@ -122,16 +129,41 @@ class SAM3ToYoloBBox:
         check_int(name=f'{self.__class__.__name__} consecutive_miss_limit', value=consecutive_miss_limit, min_value=1)
         check_valid_boolean(value=recursive, source=f'{self.__class__.__name__} recursive')
         check_valid_boolean(value=visualize, source=f'{self.__class__.__name__} visualize')
+        check_valid_boolean(value=shuffle_videos, source=f'{self.__class__.__name__} shuffle_videos')
+        if min_frame_gap is not None: check_int(name=f'{self.__class__.__name__} min_frame_gap', value=min_frame_gap, min_value=1)
+        check_float(name=f'{self.__class__.__name__} io_timeout', value=io_timeout, min_value=0.0)
         if max_detections is not None: check_int(name=f'{self.__class__.__name__} max_detections', value=max_detections, min_value=1)
         if seed is not None: check_int(name=f'{self.__class__.__name__} seed', value=seed)
         self.video_dir, self.sam_path, self.save_dir, self.txt_prompt = video_dir, sam_path, save_dir, txt_prompt
         self.n_frames, self.names, self.train_val_split, self.conf, self.imgsz = n_frames, names, train_val_split, conf, sam_imgsz
-        self.greyscale, self.clahe, self.buffer_pct, self.consecutive_miss_limit, self.max_detections, self.seed, self.verbose, self.visualize = greyscale, clahe, buffer_pct, consecutive_miss_limit, max_detections, seed, verbose, visualize
+        self.greyscale, self.clahe, self.buffer_pct, self.consecutive_miss_limit, self.max_detections, self.seed, self.verbose, self.visualize, self.min_frame_gap, self.io_timeout = greyscale, clahe, buffer_pct, consecutive_miss_limit, max_detections, seed, verbose, visualize, min_frame_gap, io_timeout
         self.name_map = {name: idx for idx, name in enumerate(names)}
         if recursive:
             self.video_paths = recursive_file_search(directory=video_dir, extensions=[".avi", ".mp4", ".mov", ".flv", ".m4v", ".webm", ".h264"], as_dict=True, raise_error=True)
         else:
             self.video_paths = find_all_videos_in_directory(directory=video_dir, as_dict=True, raise_error=True)
+        if shuffle_videos:
+            items = list(self.video_paths.items())
+            random.shuffle(items)
+            self.video_paths = dict(items)
+
+
+    @staticmethod
+    def _write_label(path: str, content: str):
+        with open(path, 'w') as f:
+            f.write(content)
+
+    def _io_with_retry(self, func, *args, **kwargs):
+        deadline = time.time() + self.io_timeout
+        while True:
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                if time.time() >= deadline:
+                    raise
+                if self.verbose:
+                    stdout_warning(msg=f'I/O error ({e}), retrying for {max(0, deadline - time.time()):.0f}s ...')
+                time.sleep(1)
 
     def run(self):
         timer = SimbaTimer(start=True)
@@ -140,13 +172,24 @@ class SAM3ToYoloBBox:
         lbl_train_dir, lbl_val_dir = os.path.join(self.save_dir, 'labels', 'train'), os.path.join(self.save_dir, 'labels', 'val')
         create_directory(paths=[img_train_dir, img_val_dir, lbl_train_dir, lbl_val_dir], overwrite=False)
 
+        map_path = os.path.join(self.save_dir, 'map.yaml')
+        create_yolo_yaml(path=self.save_dir, train_path=img_train_dir, val_path=img_val_dir, names=self.name_map, save_path=map_path)
+        if self.verbose:
+            stdout_information(msg=f'map.yaml written to {map_path}')
+
         overrides = dict(conf=self.conf, task='segment', mode='predict', imgsz=self.imgsz, model=str(self.sam_path), half=True, save=False, verbose=False)
         predictor = SAM3SemanticPredictor(overrides=overrides)
 
         all_samples, video_cnt, total_videos = [], 0, len(self.video_paths)
+        train_cnt, val_cnt = 0, 0
         for video_name, video_path in self.video_paths.items():
             video_cnt += 1
-            video_meta = get_video_meta_data(video_path=video_path)
+            try:
+                video_meta = self._io_with_retry(get_video_meta_data, video_path=video_path)
+            except Exception as e:
+                if self.verbose:
+                    stdout_warning(msg=f'Video {video_cnt}/{total_videos} ({video_name}): could not read video ({e}), skipping...')
+                continue
             total_frames = int(video_meta['frame_count'])
             img_w, img_h = int(video_meta['width']), int(video_meta['height'])
             candidate_indices = list(range(total_frames))
@@ -155,6 +198,7 @@ class SAM3ToYoloBBox:
             if self.verbose:
                 stdout_information(msg=f'Video {video_cnt}/{total_videos} ({video_name}): targeting {self.n_frames} valid frames from {total_frames} total...')
             valid_cnt, consecutive_misses = 0, 0
+            used_indices = []
             for frame_idx in candidate_indices:
                 if valid_cnt >= self.n_frames:
                     break
@@ -162,13 +206,14 @@ class SAM3ToYoloBBox:
                     if self.verbose:
                         stdout_information(msg=f'Video {video_cnt}/{total_videos} ({video_name}): {self.consecutive_miss_limit} consecutive misses, skipping to next video...')
                     break
+                if self.min_frame_gap is not None and any(abs(frame_idx - u) < self.min_frame_gap for u in used_indices):
+                    continue
                 try:
-                    frame = read_frm_of_video(video_path=video_path, frame_index=frame_idx)
+                    frame = self._io_with_retry(read_frm_of_video, video_path=video_path, frame_index=frame_idx)
                 except Exception as e:
                     if self.verbose:
-                        stdout_warning(msg=f'Video {video_cnt}/{total_videos} ({video_name}), frame idx {frame_idx}: could not read frame ({e}), skipping...')
-                    consecutive_misses += 1
-                    continue
+                        stdout_warning(msg=f'Video {video_cnt}/{total_videos} ({video_name}), frame idx {frame_idx}: could not read frame after retries ({e}), skipping video...')
+                    break
                 if frame is None:
                     consecutive_misses += 1
                     continue
@@ -191,46 +236,43 @@ class SAM3ToYoloBBox:
                     continue
 
                 consecutive_misses = 0
-                img_out = read_frm_of_video(video_path=video_path, frame_index=frame_idx, greyscale=self.greyscale, clahe=self.clahe)
+                try:
+                    img_out = self._io_with_retry(read_frm_of_video, video_path=video_path, frame_index=frame_idx, greyscale=self.greyscale, clahe=self.clahe)
+                except Exception as e:
+                    if self.verbose:
+                        stdout_warning(msg=f'Video {video_cnt}/{total_videos} ({video_name}), frame idx {frame_idx}: could not read frame for output after retries ({e}), skipping video...')
+                    break
                 sample_name = f'{video_name}_frm{frame_idx:08d}'
-                all_samples.append((sample_name, img_out, label_str))
+
+                is_train = random.random() < self.train_val_split
+                if is_train:
+                    img_dir, lbl_dir = img_train_dir, lbl_train_dir
+                    train_cnt += 1
+                else:
+                    img_dir, lbl_dir = img_val_dir, lbl_val_dir
+                    val_cnt += 1
+                self._io_with_retry(cv2.imwrite, os.path.join(img_dir, f'{sample_name}.png'), img_out)
+                self._io_with_retry(self._write_label, os.path.join(lbl_dir, f'{sample_name}.txt'), label_str)
+
+                if self.visualize:
+                    all_samples.append((sample_name, img_out, label_str))
+
+                used_indices.append(frame_idx)
                 valid_cnt += 1
                 if self.verbose:
-                    stdout_information(msg=f'Video {video_cnt}/{total_videos} ({video_name}), frame {valid_cnt}/{self.n_frames} collected (frame idx {frame_idx}, total samples: {len(all_samples)})')
+                    stdout_information(msg=f'Video {video_cnt}/{total_videos} ({video_name}), frame {valid_cnt}/{self.n_frames} collected (frame idx {frame_idx}, total samples: {train_cnt + val_cnt}, split: {"train" if is_train else "val"})')
             if self.verbose:
                 stdout_information(msg=f'Video {video_cnt}/{total_videos} ({video_name}): collected {valid_cnt}/{self.n_frames} valid labeled frames')
 
-        if len(all_samples) == 0:
-
+        total_samples = train_cnt + val_cnt
+        if total_samples == 0:
             raise NoFilesFoundError(msg='No boxes detected in any sampled frame. No project created.', source=self.__class__.__name__)
-
-        if self.verbose:
-            stdout_information(msg=f'All videos processed. {len(all_samples)} total samples collected. Shuffling and splitting...')
-        random.shuffle(all_samples)
-        split_idx = int(len(all_samples) * self.train_val_split)
-        train_samples = all_samples[:split_idx]
-        val_samples = all_samples[split_idx:]
-        if self.verbose:
-            stdout_information(msg=f'Split: {len(train_samples)} train, {len(val_samples)} val. Writing to disk...')
-
-        for split_name, samples, img_dir, lbl_dir in [('train', train_samples, img_train_dir, lbl_train_dir), ('val', val_samples, img_val_dir, lbl_val_dir)]:
-            for cnt, (sample_name, img, label_str) in enumerate(samples):
-                cv2.imwrite(os.path.join(img_dir, f'{sample_name}.png'), img)
-                with open(os.path.join(lbl_dir, f'{sample_name}.txt'), 'w') as f:
-                    f.write(label_str)
-                if self.verbose and (cnt + 1) % 10 == 0:
-                    stdout_information(msg=f'Writing {split_name}: {cnt + 1}/{len(samples)}...')
-            if self.verbose:
-                stdout_information(msg=f'Writing {split_name}: {len(samples)}/{len(samples)} complete.')
-
-        map_path = os.path.join(self.save_dir, 'map.yaml')
-        create_yolo_yaml(path=self.save_dir, train_path=img_train_dir, val_path=img_val_dir, names=self.name_map, save_path=map_path)
 
         if self.visualize:
             create_yolo_sample_visualizations(samples=all_samples, save_dir=os.path.join(self.save_dir, 'visualizations'), names=self.names, verbose=self.verbose, source=self.__class__.__name__)
 
         timer.stop_timer()
-        stdout_success(msg=f'YOLO bbox detection project created at {self.save_dir}. ' f'{len(train_samples)} train, {len(val_samples)} val samples.', source=self.__class__.__name__, elapsed_time=timer.elapsed_time_str)
+        stdout_success(msg=f'YOLO bbox detection project created at {self.save_dir}. ' f'{train_cnt} train, {val_cnt} val samples.', source=self.__class__.__name__, elapsed_time=timer.elapsed_time_str)
 
     def _boxes_to_yolo_label(self, result, img_w: int, img_h: int) -> str:
         box_indices = list(range(len(result.boxes)))
@@ -255,15 +297,14 @@ class SAM3ToYoloBBox:
                 y1 -= bh * self.buffer_pct
                 x2 += bw * self.buffer_pct
                 y2 += bh * self.buffer_pct
+            x1 = max(0.0, min(float(img_w), x1))
+            y1 = max(0.0, min(float(img_h), y1))
+            x2 = max(0.0, min(float(img_w), x2))
+            y2 = max(0.0, min(float(img_h), y2))
             x_center = ((x1 + x2) / 2.0) / img_w
             y_center = ((y1 + y2) / 2.0) / img_h
             w = (x2 - x1) / img_w
             h = (y2 - y1) / img_h
-
-            x_center = max(0.0, min(1.0, x_center))
-            y_center = max(0.0, min(1.0, y_center))
-            w = max(0.0, min(1.0, w))
-            h = max(0.0, min(1.0, h))
 
             lines.append(f'{cls_id} {x_center:.6f} {y_center:.6f} {w:.6f} {h:.6f}')
 
@@ -271,17 +312,19 @@ class SAM3ToYoloBBox:
 
 
 
-
-# runner = SAM3ToYoloBBox(video_dir=r'E:\open_video\open_field_2',
+#
+# runner = SAM3ToYoloBBox(video_dir=r'F:\netholabs\V6\cage_3\samples',
 #                         sam_path=r'D:\sam3\sam3.pt',
-#                         save_dir=r'E:\open_video\open_field_2\yolo_bbox_project',
+#                         save_dir=r'F:\netholabs\V6\cage_3\yolo_project_0406',
 #                         txt_prompt='mouse',
-#                         n_frames=25,
+#                         n_frames=50,
 #                         verbose=True,
 #                         conf=0.25,
-#                         max_detections=1,
+#                         max_detections=2,
 #                         buffer_pct=0.15,
-#                         recursive=False)
+#                         recursive=False,
+#                         consecutive_miss_limit=100,
+#                         shuffle_videos=True)
 # runner.run()
 
 

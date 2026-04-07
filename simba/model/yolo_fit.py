@@ -181,10 +181,10 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     yolo_fitter.run()
 
 
-
-# fitter = FitYolo(weights_path=r"C:\Users\sroni\Downloads\yolo26n (1).pt",
-#                  model_yaml=r"E:\open_video\open_field_2\yolo_bbox_project\map.yaml",
-#                  save_path=r'E:\open_video\open_field_2\yolo_bbox_project\mdl',
+#
+# fitter = FitYolo(weights_path=r"C:\Users\sroni\Downloads\yolo26m-seg.pt",
+#                  model_yaml=r"E:\open_video\open_field_2\yolo_seg_project\map.yaml",
+#                  save_path=r'E:\open_video\open_field_2\yolo_seg_project\mdl',
 #                  epochs=1500,
 #                  batch=8,
 #                  format=None,

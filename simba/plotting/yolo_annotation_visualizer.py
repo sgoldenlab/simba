@@ -45,6 +45,8 @@ class YOLOAnnotationVisualizer(object):
     :param str palette: Color palette name (e.g. ``'Set1'``). Default ``'Set1'``.
     :param str img_format: Output image format extension. Default ``'.png'``.
     :param float seg_opacity: Opacity of filled segmentation polygons (0.0–1.0). Default ``0.5``.
+    :param bool show_names: If True, draw class name labels on each annotation. Default False.
+    :param bool show_outline: If True, draw polygon outline for segmentation annotations. Default False.
     :param bool verbose: Print progress messages. Default ``True``.
 
     :example:
@@ -66,6 +68,8 @@ class YOLOAnnotationVisualizer(object):
                  palette: str = 'Set1',
                  img_format: str = '.png',
                  seg_opacity: float = 0.5,
+                 show_names: bool = False,
+                 show_outline: bool = False,
                  verbose: bool = True):
 
         check_file_exist_and_readable(file_path=map_yaml_path)
@@ -101,6 +105,8 @@ class YOLOAnnotationVisualizer(object):
         self.palette = palette
         self.img_format = img_format.lower()
         self.seg_opacity = seg_opacity
+        self.show_names = show_names
+        self.show_outline = show_outline
         self.verbose = verbose
 
     def _find_image_label_pairs(self) -> List[Tuple[str, str]]:
@@ -187,15 +193,17 @@ class YOLOAnnotationVisualizer(object):
 
     def _draw_bbox(self, img: np.ndarray, class_id: int, bbox: np.ndarray, color: tuple, thickness: int) -> np.ndarray:
         cv2.rectangle(img, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, thickness, lineType=cv2.LINE_AA)
-        label = self.names.get(class_id, str(class_id))
-        cv2.putText(img, label, (bbox[0], max(bbox[1] - 5, 0)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, max(1, thickness // 2), cv2.LINE_AA)
+        if self.show_names:
+            label = self.names.get(class_id, str(class_id))
+            cv2.putText(img, label, (bbox[0], max(bbox[1] - 5, 0)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, max(1, thickness // 2), cv2.LINE_AA)
         return img
 
     def _draw_keypoints(self, img: np.ndarray, class_id: int, bbox: np.ndarray, kps: np.ndarray, colors: list, circle_size: int, thickness: int) -> np.ndarray:
         color = tuple(int(c) for c in colors[0])
         cv2.rectangle(img, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, thickness, lineType=cv2.LINE_AA)
-        label = self.names.get(class_id, str(class_id))
-        cv2.putText(img, label, (bbox[0], max(bbox[1] - 5, 0)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, max(1, thickness // 2), cv2.LINE_AA)
+        if self.show_names:
+            label = self.names.get(class_id, str(class_id))
+            cv2.putText(img, label, (bbox[0], max(bbox[1] - 5, 0)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, max(1, thickness // 2), cv2.LINE_AA)
         for kp_idx, kp in enumerate(kps):
             if kp[2] > 0:
                 clr_idx = min(kp_idx + 1, len(colors) - 1)
@@ -206,12 +214,14 @@ class YOLOAnnotationVisualizer(object):
     def _draw_segmentation(self, img: np.ndarray, class_id: int, polygon: np.ndarray, color: tuple, thickness: int) -> np.ndarray:
         overlay = img.copy()
         pts = polygon.reshape((-1, 1, 2))
-        cv2.polylines(img, [pts], isClosed=True, color=color, thickness=thickness, lineType=cv2.LINE_AA)
+        if self.show_outline:
+            cv2.polylines(img, [pts], isClosed=True, color=color, thickness=thickness, lineType=cv2.LINE_AA)
         cv2.fillPoly(overlay, [pts], color=color)
         cv2.addWeighted(overlay, self.seg_opacity, img, 1 - self.seg_opacity, 0, img)
-        label = self.names.get(class_id, str(class_id))
-        cx, cy = int(polygon[:, 0].mean()), int(polygon[:, 1].mean())
-        cv2.putText(img, label, (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, max(1, thickness // 2), cv2.LINE_AA)
+        if self.show_names:
+            label = self.names.get(class_id, str(class_id))
+            cx, cy = int(polygon[:, 0].mean()), int(polygon[:, 1].mean())
+            cv2.putText(img, label, (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, max(1, thickness // 2), cv2.LINE_AA)
         return img
 
     def run(self):
@@ -220,6 +230,7 @@ class YOLOAnnotationVisualizer(object):
 
         first_lbl_path = pairs[0][1]
         project_type = detect_yolo_project_type(label_path=first_lbl_path)
+        print(project_type)
         if self.verbose:
             stdout_information(msg=f'Detected YOLO project type: {project_type} ({len(pairs)} image/label pairs found)', source=self.__class__.__name__)
 
@@ -258,6 +269,7 @@ class YOLOAnnotationVisualizer(object):
                 parts = line.strip().split()
                 if len(parts) < 2:
                     continue
+                print(project_type)
 
                 if project_type == 'bbox':
                     class_id, bbox = self._parse_bbox_line(parts, img_w, img_h)
@@ -285,7 +297,9 @@ class YOLOAnnotationVisualizer(object):
 
 
 #if __name__ == '__main__':
-# viz = YOLOAnnotationVisualizer(map_yaml_path=r"E:\open_video\open_field_2\yolo_bbox_project\map.yaml",
-#                                    save_dir=r"E:\open_video\open_field_2\yolo_bbox_project\annotations_imgs",
-#                                    n=150)
+# viz = YOLOAnnotationVisualizer(map_yaml_path=r"E:\open_video\open_field_2\yolo_seg_project\map.yaml",
+#                                    save_dir=r"E:\open_video\open_field_2\yolo_seg_project\annotation_imgs",
+#                                    n=150,
+#                                    show_names=False,
+#                                show_outline=False)
 # viz.run()

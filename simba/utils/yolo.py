@@ -380,11 +380,13 @@ def detect_yolo_project_type(label_path: str) -> str:
             if n_values == BBOX_VALUE_CNT:
                 return 'bbox'
             elif n_values > BBOX_VALUE_CNT and (n_values - BBOX_VALUE_CNT) % KPT_DIM == 0:
-                return 'keypoint'
-            elif n_values >= 6 and n_values % 2 == 0:
+                kp_values = [float(v) for v in parts[5:]]
+                is_kpt = all(v in (0.0, 1.0, 2.0) for v in kp_values[2::3])
+                if is_kpt:
+                    return 'keypoint'
+            if n_values >= 6 and n_values % 2 == 0:
                 return 'segmentation'
-            else:
-                return 'bbox'
+            return 'bbox'
     return 'bbox'
 
 

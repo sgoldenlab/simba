@@ -1,8 +1,7 @@
 import os
 import time
 from multiprocessing import Process, Queue, current_process
-from typing import Dict, List, Optional, Tuple, Union
-
+from typing import Optional, Tuple, Union
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 try:
@@ -10,6 +9,7 @@ try:
 except:
     from typing_extensions import Literal
 
+import cv2
 import numpy as np
 import pandas as pd
 try:
@@ -27,7 +27,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_nvidea_gpu_available, check_valid_boolean,
                                 check_valid_tuple)
 from simba.data_processors.cuda.utils import _is_cuda_available
-from simba.utils.data import df_smoother, savgol_smoother
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.utils.data import df_smoother, resample_geometry_vertices, savgol_smoother
 from simba.utils.errors import InvalidInputError, NoFilesFoundError, SimBAGPUError
 from simba.utils.lookups import get_nvdec_count
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
@@ -57,7 +58,7 @@ def _xyxy_to_corners(x1, y1, x2, y2):
 
 def _process_one_video(video_path, trt_model, batch_buf, batch_size, imsz,
                        gpu_id, conf_threshold, max_detections,
-                       task, class_names):
+                       task, class_names, vertice_cnt=30, segment_smoothing=None):
 
     tag = current_process().name
     decoder = SimpleDecoder(video_path, gpu_id=gpu_id, use_device_memory=True, output_color_type=OutputColorType.RGBP)
@@ -137,7 +138,8 @@ def _process_one_video(video_path, trt_model, batch_buf, batch_size, imsz,
 
             detected_class_ids = set()
             for j in range(len(v_det)):
-                x1_lb, y1_lb, x2_lb, y2_lb, conf, cls_id = v_det[j].cpu().tolist()
+                vals = v_det[j]
+                x1_lb, y1_lb, x2_lb, y2_lb, conf, cls_id = vals[:6].cpu().tolist()
                 cls_id = int(cls_id)
                 detected_class_ids.add(cls_id)
                 cls_name = class_names.get(cls_id, str(cls_id))
@@ -149,6 +151,38 @@ def _process_one_video(video_path, trt_model, batch_buf, batch_size, imsz,
                 if task == DETECT:
                     row = [frm_idx, cls_id, cls_name, conf] + _xyxy_to_corners(x1, y1, x2, y2)
                     all_rows.append(row)
+
+                elif task == SEGMENT and proto is not None:
+                    mask_coeffs = vals[6:]
+                    proto_i = proto[i]
+                    n_coeffs = proto_i.shape[0]
+                    mask_h, mask_w = proto_i.shape[1], proto_i.shape[2]
+                    mask_pred = (mask_coeffs[:n_coeffs] @ proto_i.reshape(n_coeffs, -1)).reshape(mask_h, mask_w)
+                    mask_pred = torch.sigmoid(mask_pred)
+                    scale_h, scale_w = imsz / mask_h, imsz / mask_w
+                    x1_m, y1_m = max(0, int(x1_lb / scale_w)), max(0, int(y1_lb / scale_h))
+                    x2_m, y2_m = min(mask_w, int(x2_lb / scale_w) + 1), min(mask_h, int(y2_lb / scale_h) + 1)
+                    crop_h, crop_w = y2_m - y1_m, x2_m - x1_m
+                    if crop_h < 1 or crop_w < 1:
+                        continue
+                    crop_pred = mask_pred[y1_m:y2_m, x1_m:x2_m]
+                    tgt_h = int(round(crop_h * scale_h))
+                    tgt_w = int(round(crop_w * scale_w))
+                    crop_up = F.interpolate(crop_pred.unsqueeze(0).unsqueeze(0), size=(tgt_h, tgt_w), mode='bilinear', align_corners=False)[0, 0]
+                    mask_np = (crop_up > 0.5).cpu().numpy().astype(np.uint8)
+                    contours, _ = cv2.findContours(mask_np, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+                    if contours:
+                        largest = max(contours, key=cv2.contourArea)
+                        pts = largest.squeeze().astype(np.float64)
+                        if pts.ndim == 1:
+                            pts = pts.reshape(1, 2)
+                        pts[:, 0] = (pts[:, 0] + x1_m * scale_w - lb_pad_left) / lb_scale
+                        pts[:, 1] = (pts[:, 1] + y1_m * scale_h - lb_pad_top) / lb_scale
+                        if segment_smoothing is not None and len(pts) >= 4:
+                            pts = GeometryMixin.smooth_geometry_bspline(data=pts, smooth_factor=segment_smoothing, points=len(pts))[0]
+                        vertices = resample_geometry_vertices(vertices=pts.reshape(1, -1, 2), vertice_cnt=vertice_cnt).flatten()
+                        row = [frm_idx, cls_id] + [int(round(v)) for v in vertices.tolist()]
+                        all_rows.append(row)
 
             if task == DETECT:
                 for cls_id, cls_name in class_names.items():
@@ -170,7 +204,7 @@ def _process_one_video(video_path, trt_model, batch_buf, batch_size, imsz,
 
 def _worker(task_queue, result_queue, ready_queue, engine_path,
             batch_size, imsz, gpu_id, conf_threshold,
-            max_detections, task):
+            max_detections, task, vertice_cnt=30, segment_smoothing=None):
 
     tag = current_process().name
     dev = f"cuda:{gpu_id}"
@@ -202,6 +236,7 @@ def _worker(task_queue, result_queue, ready_queue, engine_path,
                 batch_size=batch_size, imsz=imsz, gpu_id=gpu_id,
                 conf_threshold=conf_threshold,
                 max_detections=max_detections, task=task, class_names=class_names,
+                vertice_cnt=vertice_cnt, segment_smoothing=segment_smoothing,
             )
             result_queue.put((video_path, rows, timings, None))
         except Exception as exc:
@@ -216,11 +251,8 @@ class YoloNVDECInference(object):
     Decodes video frames on GPU via NVDEC (PyNvVideoCodec), runs YOLO detection, pose-estimation, or segmentation through a TensorRT engine with GPU-side letterboxing and NMS, and stores per-frame results as DataFrames.
 
     .. important::
-       The number of parallel NVDEC hardware decode engines varies by GPU (e.g., 1 on RTX 4070, 3 on RTX 4090,
-       7 on H100) and directly controls how many videos can be decoded simultaneously. More NVDEC engines means
-       higher throughput when processing multiple videos. The count is auto-detected via
-       :func:`~simba.utils.lookups.get_nvdec_count`. If your GPU is not listed or the count is incorrect,
-       pass ``max_workers`` explicitly.
+       The number of parallel NVDEC hardware decode engines varies by GPU (e.g., 1 on RTX 4070, 3 on RTX 4090, 7 on H100) and directly controls how many videos can be decoded simultaneously. More NVDEC engines means higher throughput when processing multiple videos. The count is auto-detected via
+       :func:`~simba.utils.lookups.get_nvdec_count`. If your GPU is not listed or the count is incorrect, pass ``max_workers`` explicitly.
 
     .. seealso::
        * :class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_bbox.SAM3ToYoloBBox` — create a YOLO bounding-box project from SAM3 annotations.
@@ -237,7 +269,7 @@ class YoloNVDECInference(object):
        :header-rows: 1
 
     :param Union[str, os.PathLike] video_path: Directory containing input video files, or path to a single video file.
-    :param Union[str, os.PathLike] engine_path: Path to TensorRT engine file (.engine).
+    :param Union[str, os.PathLike] engine_path: Path to TensorRT engine file (.engine). If alternative model file exist, convert it to engine ysing `simba.utils.yolo.export_yolo_model`.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory for per-video CSV output. If None, results kept in memory only. Default None.
     :param Literal['detect', 'pose', 'segment'] task: YOLO task type. Default ``'detect'``.
     :param int imsz: Model input image size (square). Default 256.
@@ -246,9 +278,11 @@ class YoloNVDECInference(object):
     :param int gpu_id: CUDA device index. Default 0.
     :param float conf_threshold: Confidence threshold for detections. Default 0.05.
     :param float iou_threshold: IoU threshold for NMS. Default 0.45.
-    :param Optional[Tuple[str, ...]] keypoint_names: Keypoint names for pose task. Required when ``task='pose'``.
-    :param int vertice_cnt: Number of resampled polygon vertices for segment task. Default 30.
+    :param Optional[Tuple[str, ...]] keypoint_names: Keypoint names in index order, used only when ``task='pose'`` (ignored otherwise). Required when ``task='pose'``, raises error if not provided.
+    :param int vertice_cnt: Number of resampled polygon vertices, used only when ``task='segment'`` (ignored otherwise). Default 30.
     :param Optional[int] max_detections: Maximum number of detections to keep per frame after NMS (sorted by confidence). If None, keep all. Default None.
+    :param Optional[int] segment_smoothing: B-spline smoothing factor for segmentation polygon vertices, used only when ``task='segment'`` (ignored otherwise). Higher values produce smoother contours. If ``None``, no smoothing is applied. Default ``None``.
+    :param bool interpolate: If True, linearly interpolate missing detections across frames, used only when ``task='detect'`` (ignored otherwise). Default True.
     :param bool verbose: Print progress messages. Default True.
 
     :example:
@@ -279,6 +313,7 @@ class YoloNVDECInference(object):
                  keypoint_names: Optional[Tuple[str, ...]] = None,
                  vertice_cnt: int = 30,
                  max_detections: Optional[int] = None,
+                 segment_smoothing: Optional[int] = None,
                  interpolate: bool = True,
                  smoothing_method: Optional[Literal['savitzky-golay', 'bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential']] = None,
                  smoothing_time_window: Optional[int] = None,
@@ -313,6 +348,8 @@ class YoloNVDECInference(object):
             check_int(name=f'{self.__class__.__name__} vertice_cnt', value=vertice_cnt, min_value=3)
         if max_detections is not None:
             check_int(name=f'{self.__class__.__name__} max_detections', value=max_detections, min_value=1)
+        if segment_smoothing is not None:
+            check_int(name=f'{self.__class__.__name__} segment_smoothing', value=segment_smoothing, min_value=1)
         if smoothing_method is not None:
             check_str(name=f'{self.__class__.__name__} smoothing_method', value=smoothing_method, options=SMOOTHING_METHODS)
             check_float(name=f'{self.__class__.__name__} smoothing_time_window', value=smoothing_time_window, min_value=10e-6)
@@ -321,7 +358,7 @@ class YoloNVDECInference(object):
         self.save_dir = str(save_dir) if save_dir is not None else None
         self.task, self.imsz, self.batch_size, self.max_workers, self.gpu_id = task, imsz, batch_size, max_workers, gpu_id
         self.conf_threshold, self.iou_threshold, self.verbose = conf_threshold, iou_threshold, verbose
-        self.keypoint_names, self.vertice_cnt, self.max_detections, self.interpolate = keypoint_names, vertice_cnt, max_detections, interpolate
+        self.keypoint_names, self.vertice_cnt, self.max_detections, self.segment_smoothing, self.interpolate = keypoint_names, vertice_cnt, max_detections, segment_smoothing, interpolate
         self.smoothing_method, self.smoothing_time_window = smoothing_method, smoothing_time_window
         if os.path.isfile(str(video_path)):
             check_file_exist_and_readable(file_path=str(video_path))
@@ -359,7 +396,7 @@ class YoloNVDECInference(object):
                 args=(task_queue, result_queue, ready_queue, self.engine_path,
                       self.batch_size, self.imsz, self.gpu_id,
                       self.conf_threshold,
-                      self.max_detections, self.task),
+                      self.max_detections, self.task, self.vertice_cnt, self.segment_smoothing),
                 name=f"Worker-{i}",
             )
             p.start()
@@ -454,14 +491,16 @@ class YoloNVDECInference(object):
 
 # if __name__ == "__main__":
 #     detector = YoloNVDECInference(video_path=r"E:\open_video\open_field_2\sample\clips",
-#                                  engine_path=r'E:\\open_video\\open_field_2\\yolo_bbox_project\\mdl\\train2\\weights\\best.engine',
-#                                  task='detect',
+#                                  engine_path=r'E:\open_video\open_field_2\yolo_seg_project\mdl\train2\weights\best.engine',
+#                                  task='segment',
 #                                  batch_size=8,
 #                                  imsz=256,
 #                                  conf_threshold=0.5,
 #                                  max_detections=1,
-#                                  save_dir=r'E:\open_video\open_field_2\yolo_bbox_project\results',
-#                                  vertice_cnt=30)
+#                                  interpolate=True,
+#                                  segment_smoothing=10,
+#                                  save_dir=r'E:\open_video\open_field_2\yolo_seg_project\results',
+#                                  vertice_cnt=200)
 #     detector.run()
 
 # detector = YoloNVDECInference(video_path=r'/videos',

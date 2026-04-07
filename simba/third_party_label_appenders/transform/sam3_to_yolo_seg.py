@@ -1,5 +1,6 @@
 import os
 import random
+import time
 from typing import Optional, Tuple, Union
 
 import cv2
@@ -23,7 +24,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_boolean, check_valid_tuple)
 from simba.utils.data import resample_geometry_vertices
 from simba.utils.errors import NoFilesFoundError, SimBAPAckageVersionError
-from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success, stdout_warning
 from simba.utils.read_write import (create_directory,
                                     find_all_videos_in_directory,
                                     get_pkg_version, get_video_meta_data,
@@ -60,6 +61,7 @@ class SAM3ToYoloSeg:
     :param Optional[int] vertice_cnt: If not None, resample each mask polygon to this many vertices. Default 40.
     :param Optional[int] seed: Random seed for reproducible frame sampling.
     :param bool visualize: If True, saves annotated images with segmentation polygon overlays to a ``visualizations`` subfolder inside ``save_dir``. Useful for verifying SAM3 annotation quality. Default False.
+    :param float io_timeout: Seconds to keep retrying file I/O (read/write) when the operation fails (e.g. temporary drive disconnect). Default 30.0.
     :param bool verbose: If True, print progress updates. Default True.
 
     :example:
@@ -82,6 +84,7 @@ class SAM3ToYoloSeg:
                  vertice_cnt: Optional[int] = 40,
                  seed: Optional[int] = None,
                  visualize: bool = False,
+                 io_timeout: float = 30.0,
                  verbose: bool = True):
 
         check_nvidea_gpu_available(raise_error=True)
@@ -102,11 +105,29 @@ class SAM3ToYoloSeg:
         if vertice_cnt is not None: check_int(name=f'{self.__class__.__name__} vertice_cnt', value=vertice_cnt, min_value=3)
         if seed is not None: check_int(name=f'{self.__class__.__name__} seed', value=seed)
         check_valid_boolean(value=visualize, source=f'{self.__class__.__name__} visualize')
+        check_float(name=f'{self.__class__.__name__} io_timeout', value=io_timeout, min_value=0.0)
         self.video_dir, self.sam_path, self.save_dir, self.txt_prompt = video_dir, sam_path, save_dir, txt_prompt
         self.n_frames, self.names, self.train_val_split, self.conf, self.imgsz = n_frames, names, train_val_split, conf, sam_imgsz
-        self.greyscale, self.clahe, self.vertice_cnt, self.seed, self.verbose, self.visualize = greyscale, clahe, vertice_cnt, seed, verbose, visualize
+        self.greyscale, self.clahe, self.vertice_cnt, self.seed, self.verbose, self.visualize, self.io_timeout = greyscale, clahe, vertice_cnt, seed, verbose, visualize, io_timeout
         self.name_map = {name: idx for idx, name in enumerate(names)}
         self.video_paths = find_all_videos_in_directory(directory=video_dir, as_dict=True, raise_error=True)
+
+    @staticmethod
+    def _write_label(path: str, content: str):
+        with open(path, 'w') as f:
+            f.write(content)
+
+    def _io_with_retry(self, func, *args, **kwargs):
+        deadline = time.time() + self.io_timeout
+        while True:
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                if time.time() >= deadline:
+                    raise
+                if self.verbose:
+                    stdout_warning(msg=f'I/O error ({e}), retrying for {max(0, deadline - time.time()):.0f}s ...')
+                time.sleep(1)
 
     def run(self):
         timer = SimbaTimer(start=True)
@@ -115,13 +136,24 @@ class SAM3ToYoloSeg:
         lbl_train_dir, lbl_val_dir = os.path.join(self.save_dir, 'labels', 'train'), os.path.join(self.save_dir, 'labels', 'val')
         create_directory(paths=[img_train_dir, img_val_dir, lbl_train_dir, lbl_val_dir], overwrite=False)
 
+        map_path = os.path.join(self.save_dir, 'map.yaml')
+        create_yolo_yaml(path=self.save_dir, train_path=img_train_dir, val_path=img_val_dir, names=self.name_map, save_path=map_path)
+        if self.verbose:
+            stdout_information(msg=f'map.yaml written to {map_path}')
+
         overrides = dict(conf=self.conf, task='segment', mode='predict', imgsz=self.imgsz, model=str(self.sam_path), half=True, save=False, verbose=False)
         predictor = SAM3SemanticPredictor(overrides=overrides)
 
         all_samples, video_cnt, total_videos = [], 0, len(self.video_paths)
+        train_cnt, val_cnt = 0, 0
         for video_name, video_path in self.video_paths.items():
             video_cnt += 1
-            video_meta = get_video_meta_data(video_path=video_path)
+            try:
+                video_meta = self._io_with_retry(get_video_meta_data, video_path=video_path)
+            except Exception as e:
+                if self.verbose:
+                    stdout_warning(msg=f'Video {video_cnt}/{total_videos} ({video_name}): could not read video ({e}), skipping...')
+                continue
             total_frames = int(video_meta['frame_count'])
             img_w, img_h = int(video_meta['width']), int(video_meta['height'])
             candidate_indices = list(range(total_frames))
@@ -133,7 +165,12 @@ class SAM3ToYoloSeg:
             for frame_idx in candidate_indices:
                 if valid_cnt >= self.n_frames:
                     break
-                frame = read_frm_of_video(video_path=video_path, frame_index=frame_idx)
+                try:
+                    frame = self._io_with_retry(read_frm_of_video, video_path=video_path, frame_index=frame_idx)
+                except Exception as e:
+                    if self.verbose:
+                        stdout_warning(msg=f'Video {video_cnt}/{total_videos} ({video_name}), frame idx {frame_idx}: could not read frame after retries ({e}), skipping video...')
+                    break
                 if frame is None:
                     continue
 
@@ -148,41 +185,40 @@ class SAM3ToYoloSeg:
                 if not label_str:
                     continue
 
-                img_out = read_frm_of_video(video_path=video_path, frame_index=frame_idx, greyscale=self.greyscale, clahe=self.clahe)
+                try:
+                    img_out = self._io_with_retry(read_frm_of_video, video_path=video_path, frame_index=frame_idx, greyscale=self.greyscale, clahe=self.clahe)
+                except Exception as e:
+                    if self.verbose:
+                        stdout_warning(msg=f'Video {video_cnt}/{total_videos} ({video_name}), frame idx {frame_idx}: could not read frame for output after retries ({e}), skipping video...')
+                    break
                 sample_name = f'{video_name}_frm{frame_idx:08d}'
-                all_samples.append((sample_name, img_out, label_str))
+
+                is_train = random.random() < self.train_val_split
+                if is_train:
+                    img_dir, lbl_dir = img_train_dir, lbl_train_dir
+                    train_cnt += 1
+                else:
+                    img_dir, lbl_dir = img_val_dir, lbl_val_dir
+                    val_cnt += 1
+                self._io_with_retry(cv2.imwrite, os.path.join(img_dir, f'{sample_name}.png'), img_out)
+                self._io_with_retry(self._write_label, os.path.join(lbl_dir, f'{sample_name}.txt'), label_str)
+
+                if self.visualize:
+                    all_samples.append((sample_name, img_out, label_str))
+
                 valid_cnt += 1
                 if self.verbose:
-                    stdout_information(msg=f'Video {video_cnt}/{total_videos} ({video_name}), frame {valid_cnt}/{self.n_frames} collected (frame idx {frame_idx}, total samples: {len(all_samples)})')
+                    stdout_information(msg=f'Video {video_cnt}/{total_videos} ({video_name}), frame {valid_cnt}/{self.n_frames} collected (frame idx {frame_idx}, total samples: {train_cnt + val_cnt}, split: {"train" if is_train else "val"})')
             if self.verbose:
                 stdout_information(msg=f'Video {video_cnt}/{total_videos} ({video_name}): collected {valid_cnt}/{self.n_frames} valid labeled frames')
 
-        if len(all_samples) == 0:
+        total_samples = train_cnt + val_cnt
+        if total_samples == 0:
             raise NoFilesFoundError(msg='No masks detected in any sampled frame. No project created.', source=self.__class__.__name__)
-
-        random.shuffle(all_samples)
-        split_idx = int(len(all_samples) * self.train_val_split)
-        train_samples = all_samples[:split_idx]
-        val_samples = all_samples[split_idx:]
-
-        for split_name, samples, img_dir, lbl_dir in [('train', train_samples, img_train_dir, lbl_train_dir), ('val', val_samples, img_val_dir, lbl_val_dir)]:
-            for cnt, (sample_name, img, label_str) in enumerate(samples):
-                cv2.imwrite(os.path.join(img_dir, f'{sample_name}.png'), img)
-                with open(os.path.join(lbl_dir, f'{sample_name}.txt'), 'w') as f:
-                    f.write(label_str)
-                if self.verbose and (cnt + 1) % 10 == 0:
-                    stdout_information(msg=f'Writing {split_name}: {cnt + 1}/{len(samples)}...')
-            if self.verbose:
-                stdout_information(msg=f'Writing {split_name}: {len(samples)}/{len(samples)} complete.')
-
-        map_path = os.path.join(self.save_dir, 'map.yaml')
-        create_yolo_yaml(path=self.save_dir, train_path=img_train_dir, val_path=img_val_dir, names=self.name_map, save_path=map_path)
-
         if self.visualize:
             create_yolo_sample_visualizations(samples=all_samples, save_dir=os.path.join(self.save_dir, 'visualizations'), names=self.names, verbose=self.verbose, source=self.__class__.__name__)
-
         timer.stop_timer()
-        stdout_success(msg=f'YOLO segmentation project created at {self.save_dir}. ' f'{len(train_samples)} train, {len(val_samples)} val samples.', source=self.__class__.__name__, elapsed_time=timer.elapsed_time_str)
+        stdout_success(msg=f'YOLO segmentation project created at {self.save_dir}. ' f'{train_cnt} train, {val_cnt} val samples.', source=self.__class__.__name__, elapsed_time=timer.elapsed_time_str)
 
     def _masks_to_yolo_label(self, result, img_w: int, img_h: int) -> str:
         lines = []
@@ -204,15 +240,23 @@ class SAM3ToYoloSeg:
                 if det_cls < len(self.names):
                     cls_id = det_cls
 
-            pts = np.unique(polygon, axis=0)
+            seen = set()
+            unique_idx = []
+            for i, pt in enumerate(polygon):
+                key = (pt[0], pt[1])
+                if key not in seen:
+                    seen.add(key)
+                    unique_idx.append(i)
+            pts = polygon[unique_idx]
             if pts.shape[0] < 3:
                 continue
-            center = np.mean(pts, axis=0)
-            angles = np.arctan2(pts[:, 1] - center[1], pts[:, 0] - center[0])
-            pts = pts[np.argsort(angles)]
 
             if self.vertice_cnt is not None:
-                pts = resample_geometry_vertices(vertices=[pts.astype(np.int32)], vertice_cnt=self.vertice_cnt)[0].astype(np.float64)
+                pts = resample_geometry_vertices(vertices=[pts], vertice_cnt=self.vertice_cnt)[0].astype(np.int32).astype(np.float64)
+                _, unique_idx = np.unique(pts, axis=0, return_index=True)
+                pts = pts[np.sort(unique_idx)]
+                if pts.shape[0] < 3:
+                    continue
 
             norm_x = np.clip(pts[:, 0] / img_w, 0, 1)
             norm_y = np.clip(pts[:, 1] / img_h, 0, 1)
@@ -223,15 +267,14 @@ class SAM3ToYoloSeg:
         return '\n'.join(lines) + '\n' if lines else ''
 
 
-runner = SAM3ToYoloSeg(video_dir=r'E:\open_video\open_field_2',
-                       sam_path=r'D:\sam3\sam3.pt',
-                       save_dir=r'E:\open_video\open_field_2\yolo_seg_project',
-                       txt_prompt='mouse',
-                       n_frames=50,
-                       verbose=True,
-                       vertice_cnt=40)
-
-runner.run()
+# runner = SAM3ToYoloSeg(video_dir=r'E:\open_video\open_field_2',
+#                        sam_path=r'D:\sam3\sam3.pt',
+#                        save_dir=r'E:\open_video\open_field_2\yolo_seg_project',
+#                        txt_prompt='mouse',
+#                        n_frames=50,
+#                        verbose=True)
+#
+# runner.run()
 
 
 ### EXAMPLE

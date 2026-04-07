@@ -35,6 +35,7 @@ def _yolo_seg_visualizer(frm_range: tuple,
                          color: tuple,
                          shape_opacity: 0.5,
                          verbose: bool = False):
+
     batch_id, frame_rng = frm_range[0], frm_range[1]
     start_frm, end_frm, current_frm = frame_rng[0], frame_rng[-1], frame_rng[0]
     video_meta_data = get_video_meta_data(video_path=video_path)
@@ -171,8 +172,9 @@ class YOLOSegmentationVisualizer():
 
 
 # if __name__ == "__main__":
-#     runner = YOLOSegmentationVisualizer(data_path=r'E:\litpose_yolo\yolo_from_sam3\csv_results',
-#                                         video_path=r'E:\litpose_yolo\pi\videos',
-#                                         save_dir=r'E:\litpose_yolo\yolo_from_sam3\videos',
-#                                         verbose=True)
+#     runner = YOLOSegmentationVisualizer(data_path=r"E:\open_video\open_field_2\yolo_seg_project\results\1_clip_1min.csv",
+#                                         video_path=r"E:\open_video\open_field_2\sample\clips\1_clip_1min.mp4",
+#                                         save_dir=r'E:\open_video\open_field_2\yolo_seg_project\video_results',
+#                                         verbose=True,
+#                                         core_cnt=4)
 #     runner.run()

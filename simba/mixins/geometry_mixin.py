@@ -4150,7 +4150,8 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def smooth_geometry_bspline(data: Union[np.ndarray, Polygon, List[Polygon]], smooth_factor: float = 1.0,
+    def smooth_geometry_bspline(data: Union[np.ndarray, Polygon, List[Polygon]],
+                                smooth_factor: float = 1.0,
                                 points: int = 50) -> List[Polygon]:
         """
         Smooths the geometry of polygons or coordinate arrays using B-spline interpolation.
