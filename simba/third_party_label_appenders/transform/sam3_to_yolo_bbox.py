@@ -36,12 +36,13 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_nvidea_gpu_available, check_str,
                                 check_valid_boolean, check_valid_tuple)
 from simba.utils.errors import NoFilesFoundError, SimBAPAckageVersionError
-from simba.utils.printing import SimbaTimer, stdout_information, stdout_success, stdout_warning
-from simba.utils.yolo import create_yolo_sample_visualizations
+from simba.utils.printing import (SimbaTimer, stdout_information,
+                                  stdout_success, stdout_warning)
 from simba.utils.read_write import (create_directory,
                                     find_all_videos_in_directory,
                                     get_pkg_version, get_video_meta_data,
                                     read_frm_of_video, recursive_file_search)
+from simba.utils.yolo import create_yolo_sample_visualizations
 
 
 class SAM3ToYoloBBox:
