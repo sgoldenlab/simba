@@ -267,13 +267,13 @@ class PosePlotterMultiProcess():
 # test.run()
 
 
-if __name__ == "__main__":
-    test = PosePlotterMultiProcess(data_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/2022-06-20_NOB_DOT_4.csv",
-                                   out_dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location',
-                                   circle_size=8,
-                                   core_cnt=5,
-                                   palettes={'Animal_1':  'Set1'},
-                                   sample_time=10,
-                                   bbox='animal-aligned',
-                                   center_of_mass=None)
-    test.run()
+# if __name__ == "__main__":
+#     test = PosePlotterMultiProcess(data_path=r"F:\troubleshooting\sam\sam\project_folder\csv\outlier_corrected_movement_location",
+#                                    out_dir=r'F:\troubleshooting\sam\sam\project_folder\frames\output\pose_validation_2',
+#                                    circle_size=8,
+#                                    core_cnt=5,
+#                                    palettes={'Animal_1':  'Set1'},
+#                                    sample_time=60,
+#                                    bbox=None, #'animal-aligned',
+#                                    center_of_mass=None)
+#     test.run()

@@ -252,7 +252,7 @@ class SAM3ToYoloSeg:
                 continue
 
             if self.vertice_cnt is not None:
-                pts = resample_geometry_vertices(vertices=[pts], vertice_cnt=self.vertice_cnt)[0].astype(np.int32).astype(np.float64)
+                pts = resample_geometry_vertices(vertices=[pts], vertice_cnt=self.vertice_cnt)[0].astype(np.float64)
                 _, unique_idx = np.unique(pts, axis=0, return_index=True)
                 pts = pts[np.sort(unique_idx)]
                 if pts.shape[0] < 3:

@@ -110,9 +110,10 @@ class Smoothing(ConfigReader):
                 else:
                     self.video_info_df = self.read_video_info_csv(file_path=self.video_info_path)
                     video_info = read_video_info(vid_info_df=self.video_info_df,video_name=video_name, raise_error=False)
-                    if video_info is None:
-                        raise NoFilesFoundError(msg=f"To perform smoothing, SimBA needs to read the video FPS. SimBA could not find the video {video_name} in represented in the {self.video_dir} directory or in {self.video_info_path} file. Please import the video and/or include it in the video_logs.csv file so SimBA can know the video FPS", source=self.__class__.__name__)
-                    fps = video_info[2]
+                    if video_info[2] is None:
+                        raise NoFilesFoundError(msg=f"To perform smoothing, SimBA needs to read the video FPS. SimBA could not find the video {video_name} represented in the {self.video_dir} directory or in {self.video_info_path} file. Please import the video and/or include it in the video_logs.csv file so SimBA can know the video FPS", source=self.__class__.__name__)
+                    else:
+                        fps = video_info[2]
             else:
                 fps = get_video_meta_data(video_path=video_path)['fps']
             if self.method == 'savitzky-golay':

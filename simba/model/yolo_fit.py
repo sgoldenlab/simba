@@ -182,7 +182,7 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 
 
 #
-# fitter = FitYolo(weights_path=r"C:\Users\sroni\Downloads\yolo26m-seg.pt",
+# fitter = FitYolo(weights_path=r"C:\Users\sroni\Downloads\yolo26x-seg.pt",
 #                  model_yaml=r"E:\open_video\open_field_2\yolo_seg_project\map.yaml",
 #                  save_path=r'E:\open_video\open_field_2\yolo_seg_project\mdl',
 #                  epochs=1500,

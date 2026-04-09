@@ -548,15 +548,15 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
 
 
 
-# export_yolo_model(model_path=r"E:\open_video\open_field_2\yolo_bbox_project\mdl\train2\weights\best.pt",
+# export_yolo_model(model_path=r"E:\open_video\open_field_2\yolo_seg_project\mdl\train2\weights\best.pt",
 #                   export_format='engine',
 #                   imgsz=256,
 #                   int8=False,
 #                   batch=8,
 #                   workspace=None,
-#                   data=r"E:\open_video\open_field_2\yolo_bbox_project\map.yaml",
-#                   task='detect',
-#                   dynamic=True,
+#                   data=r"E:\open_video\open_field_2\yolo_seg_project\map.yaml",
+#                   task='segment',
+#                   dynamic=False,
 #                   simplify=True)
 
 #

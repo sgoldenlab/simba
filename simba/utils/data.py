@@ -1385,7 +1385,7 @@ def savgol_smoother(data: Union[pd.DataFrame, np.ndarray],
     >>> savgol_smoother(data=data.values, fps=15, time_window=1000)
     """
 
-    check_float(name='fps', value=fps, min_value=10e-16, raise_error=True)
+    check_float(name='fps', value=fps, allow_negative=False, allow_zero=False, raise_error=True)
     check_int(name='time_window', value=time_window, min_value=1, raise_error=True)
     check_str(name='mode', value=mode, options=('mirror', 'constant', 'nearest', 'wrap', 'interp'), raise_error=True)
     check_int(name='time_window', value=time_window, min_value=1, raise_error=True)
@@ -1767,11 +1767,12 @@ def resample_geometry_vertices(vertices: Union[List[np.ndarray], np.ndarray], ve
     for idx in range(len(vertices)):
         try:
             coords = vertices[idx]
-            distances = np.cumsum(np.r_[0, np.linalg.norm(np.diff(coords, axis=0), axis=1)])
-            uniform_distances = np.linspace(0, distances[-1], vertice_cnt)
-            interp_x = interp1d(distances, coords[:, 0], kind='linear')
-            interp_y = interp1d(distances, coords[:, 1], kind='linear')
-            results[idx] = np.column_stack([interp_x(uniform_distances), interp_y(uniform_distances)]).astype(np.int32)
+            closed = np.vstack([coords, coords[0:1]])
+            distances = np.cumsum(np.r_[0, np.linalg.norm(np.diff(closed, axis=0), axis=1)])
+            uniform_distances = np.linspace(0, distances[-1], vertice_cnt, endpoint=False)
+            interp_x = interp1d(distances, closed[:, 0], kind='linear')
+            interp_y = interp1d(distances, closed[:, 1], kind='linear')
+            results[idx] = np.column_stack([interp_x(uniform_distances), interp_y(uniform_distances)])
         except:
             pass
     return results

@@ -290,7 +290,9 @@ Compute **total distance moved** and **average velocity** (e.g. cm, cm/s) per an
 | **SELECT BODY-PARTS** | For each animal, choose which body part to track (e.g. Nose, Center, Tail_base, **Animal N CENTER OF GRAVITY**). |
 | **DISTANCE (CM)** | If checked, calculates total distance traveled (cm) per animal per video. |
 | **VELOCITY (CM/S)** | If checked, calculates average velocity (cm/s) per animal per video. At least one of DISTANCE or VELOCITY must be checked. |
-| **TRANSPOSE OUTPUT CSV** | If checked, each video is one row; animal–body-part–measurement combinations are columns. |
+| **TRANSPOSE OUTPUT CSV** (SETTINGS) | If checked, each video is one row; animal–body-part–measurement combinations are columns. |
+| **INCLUDE VIDEO FRAME COUNT** (SETTINGS) | If checked, adds an extra row per video with measurement **VIDEO FRAME COUNT** (frame count from the pose CSV). Default: off. |
+| **INCLUDE VIDEO LENGTH (HH:MM:SS)** (SETTINGS) | If checked, adds an extra row per video with measurement **VIDEO LENGTH (HH:MM:SS)** (duration from frames ÷ fps). Default: off. |
 
 **Time-bins options:**
 

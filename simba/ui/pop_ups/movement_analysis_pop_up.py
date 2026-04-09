@@ -14,6 +14,10 @@ from simba.utils.errors import InvalidInputError, NoDataError
 
 
 class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
+    """
+    **ANALYZE MOVEMENT / VELOCITY: AGGREGATES** UI. **SETTINGS** can add **VIDEO FRAME COUNT** and **VIDEO LENGTH (HH:MM:SS)** rows to ``Movement_log_*.csv`` (see Scenario 2 and ``ROI_tutorial`` — *Distances / velocity*).
+    """
+
     def __init__(self,
                  config_path: Union[str, os.PathLike]):
 

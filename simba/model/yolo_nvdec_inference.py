@@ -491,7 +491,7 @@ class YoloNVDECInference(object):
 
 # if __name__ == "__main__":
 #     detector = YoloNVDECInference(video_path=r"E:\open_video\open_field_2\sample\clips",
-#                                  engine_path=r'E:\open_video\open_field_2\yolo_seg_project\mdl\train2\weights\best.engine',
+#                                  engine_path=r'E:\\open_video\\open_field_2\\yolo_seg_project\\mdl\\train2\\weights\\best.engine',
 #                                  task='segment',
 #                                  batch_size=8,
 #                                  imsz=256,
@@ -500,7 +500,7 @@ class YoloNVDECInference(object):
 #                                  interpolate=True,
 #                                  segment_smoothing=10,
 #                                  save_dir=r'E:\open_video\open_field_2\yolo_seg_project\results',
-#                                  vertice_cnt=200)
+#                                  vertice_cnt=500)
 #     detector.run()
 
 # detector = YoloNVDECInference(video_path=r'/videos',

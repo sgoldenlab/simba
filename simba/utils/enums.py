@@ -349,17 +349,17 @@ class Options(Enum):
     ]
     IMPORT_TYPE_OPTIONS = [
         "CSV (DLC/DeepPoseKit)",
-        "JSON (BENTO)",
-        "H5 (multi-animal DLC)",
-        "SLP (SLEAP)",
-        "CSV (SLEAP)",
-        "H5 (SLEAP)",
-        "TRK (multi-animal APT)",
-        "MAT (DANNCE 3D)",
         "CSV (SimBA BLOB)",
+        "CSV (SimBA YOLO)",
+        "CSV (SLEAP)",
         "H5 (FaceMap)",
+        "H5 (multi-animal DLC)",
+        "H5 (SLEAP)",
         "H5 (SuperAnimal-TopView)",
-        'CSV (SimBA YOLO)',
+        "JSON (BENTO)",
+        "MAT (DANNCE 3D)",
+        "SLP (SLEAP)",
+        "TRK (multi-animal APT)",
     ]
     SMOOTHING_OPTIONS = ["Gaussian", "Savitzky Golay"]
     MULTI_DLC_TYPE_IMPORT_OPTION = ["skeleton", "box", "ellipse"]
