@@ -1,14 +1,14 @@
 import glob
 import os
-import shutil
 import random
+import shutil
 from typing import Optional, Tuple, Union
 
 import cv2
 import numpy as np
 import pandas as pd
 
-from simba.utils.checks import (check_if_dir_exists, check_int)
+from simba.utils.checks import check_if_dir_exists, check_int
 from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success, stdout_warning
 from simba.utils.read_write import get_fn_ext
