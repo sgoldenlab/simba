@@ -94,3 +94,10 @@ Interactive brightness / contrast interface
 .. automodule:: simba.video_processors.brightness_contrast_ui
    :members:
    :show-inheritance:
+
+Asynchronous frame reader (GPU)
+------------------------------------------------
+
+.. automodule:: simba.video_processors.async_frame_reader_gpu
+   :members:
+   :show-inheritance:

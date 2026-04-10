@@ -1291,8 +1291,7 @@ def check_if_keys_exist_in_dict(
                     msg=f"{k} does not exist in object {name}",
                     source=check_if_keys_exist_in_dict.__class__.__name__,
                 )
-        else:
-            pass
+            return False
     return True
 
 

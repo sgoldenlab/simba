@@ -122,11 +122,16 @@ def _process_one_video(video_path, trt_model, batch_buf, batch_size, imsz,
         t_infer += t3 - t2
 
         if task == SEGMENT:
-            if isinstance(raw_pred, (list, tuple)) and len(raw_pred) >= 2:
+            first = raw_pred[0] if isinstance(raw_pred, (list, tuple)) else raw_pred
+            if isinstance(first, (list, tuple)) and len(first) >= 2:
+                pred_tensor, proto = first[0], first[1]
+            elif isinstance(raw_pred, (list, tuple)) and len(raw_pred) >= 2:
                 pred_tensor, proto = raw_pred[0], raw_pred[1]
             else:
-                pred_tensor = raw_pred[0] if isinstance(raw_pred, (list, tuple)) else raw_pred
+                pred_tensor = first
                 proto = None
+            if isinstance(pred_tensor, torch.Tensor) and pred_tensor.ndim == 3 and pred_tensor.shape[1] < pred_tensor.shape[2]:
+                pred_tensor = pred_tensor.transpose(1, 2)
         else:
             pred_tensor = raw_pred[0] if isinstance(raw_pred, (list, tuple)) else raw_pred
 
@@ -259,6 +264,12 @@ class YoloNVDECInference(object):
        The number of parallel NVDEC hardware decode engines varies by GPU (e.g., 1 on RTX 4070, 3 on RTX 4090, 7 on H100) and directly controls how many videos can be decoded simultaneously. More NVDEC engines means higher throughput when processing multiple videos. The count is auto-detected via
        :func:`~simba.utils.lookups.get_nvdec_count`. If your GPU is not listed or the count is incorrect, pass ``max_workers`` explicitly.
 
+    .. important::
+       When running **segmentation** (``task='segment'``), the ``imsz`` parameter is critical for mask quality.
+       Segmentation requires pixel-level precision along object boundaries, so spatial detail lost to downscaling
+       hurts segmentation far more than detection or pose tasks. Set ``imsz`` as large as your GPU memory allows.
+       The default ``256`` may be too coarse for high-quality segmentation masks.
+
     .. seealso::
        * :class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_bbox.SAM3ToYoloBBox` — create a YOLO bounding-box project from SAM3 annotations.
        * :class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_seg.SAM3ToYoloSeg` — create a YOLO segmentation project from SAM3 annotations.
@@ -316,7 +327,7 @@ class YoloNVDECInference(object):
                  conf_threshold: float = 0.05,
                  iou_threshold: float = 0.45,
                  keypoint_names: Optional[Tuple[str, ...]] = None,
-                 vertice_cnt: int = 30,
+                 vertice_cnt: int = 60,
                  max_detections: Optional[int] = None,
                  segment_smoothing: Optional[int] = None,
                  interpolate: bool = True,
@@ -496,10 +507,10 @@ class YoloNVDECInference(object):
 
 # if __name__ == "__main__":
 #     detector = YoloNVDECInference(video_path=r"E:\open_video\open_field_2\sample\clips",
-#                                  engine_path=r'E:\\open_video\\open_field_2\\yolo_seg_project\\mdl\\train2\\weights\\best.engine',
+#                                  engine_path=r"E:\open_video\open_field_2\yolo_seg_project\mdl\train\weights\best.engine",
 #                                  task='segment',
-#                                  batch_size=8,
-#                                  imsz=256,
+#                                  batch_size=1,
+#                                  imsz=1240,
 #                                  conf_threshold=0.5,
 #                                  max_detections=1,
 #                                  interpolate=True,

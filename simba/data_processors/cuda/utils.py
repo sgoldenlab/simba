@@ -1,8 +1,14 @@
 import math
-from typing import Any, Dict, Tuple
+import os
+from typing import Any, Dict, Tuple, Union
 
 import numpy as np
 from numba import cuda, float64
+try:
+    import PyNvVideoCodec as nvc
+except ImportError:
+    nvc = None
+
 
 
 @cuda.jit(device=True)
@@ -303,6 +309,22 @@ def _cuda_are_rows_equal(x, y, idx_1, idx_2):
     return True
 
 
+def get_nvc_decoder(video_path: Union[str, os.PathLike],
+                    gpu_id: int = 0,
+                    use_device_memory: bool = False,
+                    output_color_type: nvc.OutputColorType = nvc.OutputColorType.RGB):
+
+    from simba.utils.checks import check_file_exist_and_readable, check_instance, check_int
+    from simba.utils.errors import SimBAGPUError
+    if nvc is None:
+        raise SimBAGPUError(msg='PyNvVideoCodec is not installed. Install it to use GPU accelerated video decoding.', source=get_nvc_decoder.__name__)
+    if not _is_cuda_available()[0]:
+        raise SimBAGPUError(msg='No GPU detected.', source=get_nvc_decoder.__name__)
+    check_file_exist_and_readable(file_path=video_path)
+    check_int(name=f'{get_nvc_decoder.__name__} gpu_id', value=gpu_id, min_value=0)
+    check_instance(source=f'{get_nvc_decoder.__name__} use_device_memory', instance=use_device_memory, accepted_types=(bool,))
+    return nvc.SimpleDecoder(video_path, gpu_id=gpu_id, use_device_memory=use_device_memory, output_color_type=output_color_type)
 
 
-#_is_cuda_available()
+
+

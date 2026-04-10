@@ -493,6 +493,12 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
     .. note::
        INT8 export is only valid for ``engine`` format and cannot be combined with ``half=True``.
 
+    .. important::
+       When exporting a **segmentation** model, the ``imgsz`` parameter is critical for mask quality. Segmentation
+       requires pixel-level precision along object boundaries, so spatial detail lost to downscaling hurts
+       segmentation far more than detection or pose tasks. Set ``imgsz`` as large as your GPU memory allows.
+       The default ``256`` may be too coarse for high-quality segmentation masks.
+
     :param Union[str, os.PathLike] model_path: Path to source YOLO weights (typically ``.pt``).
     :param Literal["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite", "torch"] export_format: Target export format.
     :param int imgsz: Export input image size in pixels.
@@ -548,11 +554,11 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
 
 
 
-# export_yolo_model(model_path=r"E:\open_video\open_field_2\yolo_seg_project\mdl\train2\weights\best.pt",
+# export_yolo_model(model_path=r"E:\open_video\open_field_2\yolo_seg_project\mdl\train\weights\best.pt",
 #                   export_format='engine',
-#                   imgsz=256,
+#                   imgsz=1240,
 #                   int8=False,
-#                   batch=8,
+#                   batch=1,
 #                   workspace=None,
 #                   data=r"E:\open_video\open_field_2\yolo_seg_project\map.yaml",
 #                   task='segment',

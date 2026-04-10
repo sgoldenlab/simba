@@ -71,3 +71,10 @@ Asynchronous frame reader
 .. automodule:: simba.video_processors.async_frame_reader
    :members:
    :show-inheritance:
+
+Asynchronous frame reader (GPU)
+------------------------------------------------
+
+.. automodule:: simba.video_processors.async_frame_reader_gpu
+   :members:
+   :show-inheritance:

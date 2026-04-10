@@ -155,6 +155,22 @@ Lightning Pose annotations -> YOLO bounding box annotations
    :show-inheritance:
 
 
+Merge Lightning Pose projects
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.litpose_merge_projects.LitPoseMergeProjects
+   :members:
+   :show-inheritance:
+
+
+Crop Lightning Pose annotations
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.litpose_crop_annotations.CropLPAnnotations
+   :members:
+   :show-inheritance:
+
+
 Multi-animal DeepLabCut -> YOLO pose-estimation annotations
 ---------------------------------------
 

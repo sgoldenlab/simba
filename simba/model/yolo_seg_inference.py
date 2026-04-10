@@ -49,6 +49,12 @@ class YOLOSegmentationInference():
     :param bool retina_msk: Whether to use high-resolution Retina-style masks.
     :param int vertice_cnt: Number of vertices used to approximate the segmentation mask polygon.
 
+    .. important::
+       The ``imgsz`` parameter is critical for mask quality. Segmentation requires pixel-level precision along
+       object boundaries, so spatial detail lost to downscaling hurts segmentation far more than detection or pose
+       tasks. Set ``imgsz`` as large as your GPU memory allows. The default ``640`` may be too coarse for
+       high-quality segmentation masks.
+
     .. note::
        To **create** YOLO segmentation dataset for fitting, use :func:`simba.third_party_label_appenders.transform.labelme_to_yolo_seg.LabelmeKeypoints2YoloSeg`.
        To fit YOLO model, see `:func:`simba.model.yolo_fit.FitYolo`.
@@ -179,20 +185,20 @@ class YOLOSegmentationInference():
             all_results.append(id_data)
         return pd.concat(all_results, axis=0).reset_index(drop=True)[self.vertice_col_names]
 
-weights_path = r"E:\litpose_yolo\yolo_from_sam3\mdl\train\weights\best.pt"
-video_path = r'E:\litpose_yolo\pi\videos'
-save_dir=r"E:\litpose_yolo\yolo_from_sam3\csv_results"
-i = YOLOSegmentationInference(weights_path=weights_path,
-                             video_path=video_path,
-                             save_dir=save_dir,
-                             verbose=True,
-                             device=0,
-                             format=None,
-                             stream=True,
-                             max_tracks=1,
-                             batch_size=10,
-                             imgsz=320,
-                             interpolate=True,
-                             threshold=0.8,
-                             retina_msk=False)
-i.run()
+# weights_path = r"E:\litpose_yolo\yolo_from_sam3\mdl\train\weights\best.pt"
+# video_path = r'E:\litpose_yolo\pi\videos'
+# save_dir=r"E:\litpose_yolo\yolo_from_sam3\csv_results"
+# i = YOLOSegmentationInference(weights_path=weights_path,
+#                              video_path=video_path,
+#                              save_dir=save_dir,
+#                              verbose=True,
+#                              device=0,
+#                              format=None,
+#                              stream=True,
+#                              max_tracks=1,
+#                              batch_size=10,
+#                              imgsz=320,
+#                              interpolate=True,
+#                              threshold=0.8,
+#                              retina_msk=False)
+# i.run()

@@ -171,10 +171,10 @@ class YOLOSegmentationVisualizer():
         terminate_cpu_pool(pool=pool, force=False, source=self.__class__.__name__)
 
 
-# if __name__ == "__main__":
-#     runner = YOLOSegmentationVisualizer(data_path=r"E:\open_video\open_field_2\yolo_seg_project\results\1_clip_1min.csv",
-#                                         video_path=r"E:\open_video\open_field_2\sample\clips\1_clip_1min.mp4",
-#                                         save_dir=r'E:\open_video\open_field_2\yolo_seg_project\video_results',
-#                                         verbose=True,
-#                                         core_cnt=4)
-#     runner.run()
+if __name__ == "__main__":
+    runner = YOLOSegmentationVisualizer(data_path=r"E:\open_video\open_field_2\yolo_seg_project\results\1_clip_1min.csv",
+                                        video_path=r"E:\open_video\open_field_2\sample\clips\1_clip_1min.mp4",
+                                        save_dir=r'E:\open_video\open_field_2\yolo_seg_project\results',
+                                        verbose=True,
+                                        core_cnt=4)
+    runner.run()

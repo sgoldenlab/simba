@@ -1325,6 +1325,7 @@ def get_nvdec_count(gpu_name: Optional[str] = None) -> int:
         "RTX 5880 Ada": 3,
         "RTX 6000 Ada": 3,
         "RTX 6000 Pro": 4,
+        "RTX PRO 6000": 4,
         "A30": 4,
         "A100": 5,
         "B100": 7,

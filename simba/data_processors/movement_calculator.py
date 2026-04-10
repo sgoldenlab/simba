@@ -2,7 +2,7 @@ __author__ = "Simon Nilsson; sronilsson@gmail.com"
 import argparse
 import os
 import sys
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Dict
 
 import numpy as np
 import pandas as pd
@@ -15,12 +15,13 @@ from simba.mixins.feature_extraction_supplement_mixin import \
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log, check_float, check_str,
     check_that_column_exist, check_valid_boolean, check_valid_lst,
-    check_valid_tuple)
-from simba.utils.errors import InvalidInputError, NoDataError
+    check_valid_tuple, check_instance, check_valid_dict, check_if_keys_exist_in_dict)
+from simba.utils.errors import InvalidInputError, NoDataError, FrameRangeError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext, read_df, seconds_to_timestamp)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, read_df, seconds_to_timestamp)
 
+
+START, END = 'START', 'END'
 
 class MovementCalculator(ConfigReader, FeatureExtractionMixin):
     """
@@ -33,8 +34,11 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
     :param Optional[Union[str, os.PathLike]] save_path: Path to save the movement log. If None, saves to ``project_folder/logs/Movement_log_{datetime}.csv``. Default: None
     :param bool distance: If True, calculate distance metrics. Default: True
     :param bool velocity: If True, calculate velocity metrics. Default: True
+    :param Optional[Dict[str, dict]] video_time_stamps: Dictionary mapping video file names (without extension) to time windows. Each value is a dict with ``START`` and ``END`` keys (in seconds). Only frames within the time window are analyzed. If None, all frames are used. Default: None.
     :param bool transpose: If True, transpose the results DataFrame. Default: False
     :param bool verbose: If True, print progress messages. Default: True
+    :param bool frame_count: If True, include frame count in results. Default: False
+    :param bool video_length: If True, include video length in results. Default: False
 
     .. note::
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results>`__.
@@ -48,6 +52,10 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
     >>> movement_processor = MovementCalculator(config_path='project_folder/project_config.ini', body_parts=body_parts)
     >>> movement_processor.run()
     >>> movement_processor.save()
+    >>> time_stamps = pd.read_csv('mastersheet.csv')[['VIDEO_FILE_NAME', 'START', 'END']].set_index('VIDEO_FILE_NAME').to_dict(orient='index')
+    >>> movement_processor = MovementCalculator(config_path='project_folder/project_config.ini', body_parts=['center'], video_time_stamps=time_stamps)
+    >>> movement_processor.run()
+    >>> movement_processor.save()
     """
     def __init__(self,
                  config_path: Union[str, os.PathLike],
@@ -57,6 +65,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
                  save_path: Optional[Union[str, os.PathLike]] = None,
                  distance: bool = True,
                  velocity: bool = True,
+                 video_time_stamps: Optional[Dict[str, tuple]] = None,
                  transpose: bool = False,
                  verbose: bool = True,
                  frame_count: bool = False,
@@ -86,6 +95,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
         else:
             check_str(name=f'{self.__class__.__name__} save_path', value=save_path, raise_error=True)
             self.save_path = save_path
+        file_names = [get_fn_ext(x)[1] for x in self.file_paths]
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
         check_valid_boolean(value=distance, source=f'{self.__class__.__name__} distance', raise_error=True)
         check_valid_boolean(value=velocity, source=f'{self.__class__.__name__} velocity', raise_error=True)
@@ -93,6 +103,14 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose', raise_error=True)
         check_valid_boolean(value=frame_count, source=f'{self.__class__.__name__} frame_count', raise_error=True)
         check_valid_boolean(value=video_length, source=f'{self.__class__.__name__} video_length', raise_error=True)
+        if video_time_stamps is not None:
+            check_instance(source=f'{self.__class__.__name__} time_stamps', instance=video_time_stamps, accepted_types=(dict,))
+            for k, v in video_time_stamps.items():
+                if k not in file_names:
+                    raise InvalidInputError(msg=f'time_stamps key {k} not found among input files: {file_names}', source=self.__class__.__name__)
+                check_valid_dict(x=v, required_keys=(START, END,), valid_values_dtypes=(int, float,), min_value=0, source=f'{self.__class__.__name__} time_stamps')
+                if v[START] >= v[END]:
+                    raise InvalidInputError(msg=f'time_stamps for {k}: START ({v[START]}) must be less than END ({v[END]})', source=self.__class__.__name__)
         if not distance and not velocity:
             raise InvalidInputError(msg='distance AND velocity are both False. To compute movement metrics, set at least one value to True.', source=self.__class__.__name__)
         self.distance, self.velocity, = distance, velocity
@@ -103,7 +121,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
         else:
             raise InvalidInputError(msg='Body-parts has to be a list of tuple of strings', source=f'{self.__class__.__name__} body_parts')
         self.body_parts, self.threshold, self.body_parts, self.transpose, self.verbose = file_paths, threshold, body_parts, transpose, verbose
-        self.frame_count, self.video_length = frame_count, video_length
+        self.frame_count, self.video_length, self.time_stamps = frame_count, video_length, video_time_stamps
 
     def __find_body_part_columns(self):
         self.body_parts_dict, self.bp_list = {}, []
@@ -125,6 +143,16 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
             if self.verbose: stdout_information(msg=f"Analysing {video_name}... (Video {file_cnt+1}/{len(self.file_paths)})")
             self.data_df = read_df(file_path=file_path, file_type=self.file_type)
             self.video_info, self.px_per_mm, self.fps = self.read_video_info(video_name=video_name)
+            if self.time_stamps is not None and check_if_keys_exist_in_dict(data=self.time_stamps, key=video_name, name=f'{self.__class__.__name__} time_stamps', raise_error=False):
+                start_time, end_time = self.time_stamps[video_name][START], self.time_stamps[video_name][END]
+                start_frm, end_frm = int(self.time_stamps[video_name][START] * self.fps), int(self.time_stamps[video_name][END] * self.fps)
+                if start_frm > len(self.data_df) or end_frm > len(self.data_df):
+                    raise FrameRangeError(msg=f'Cannot compute movement between frame {start_frm} (time s: {start_time}) and frame {end_frm} (time s: {end_time}) in video {video_name}. The data only has {len(self.data_df)} frames.', source=self.__class__.__name__)
+                self.data_df = self.data_df.loc[start_frm:end_frm].reset_index()
+                if self.verbose: stdout_information(msg=f"Slicing video {video_name} between frames {start_frm} and {end_frm}...)")
+            # else:
+            #     start_frm, end_frm = int(0 * self.fps), int(899 * self.fps)
+            #     self.data_df = self.data_df.loc[start_frm:end_frm].reset_index()
             if self.bp_list:
                 check_that_column_exist(df=self.data_df, column_name=self.bp_list, file_name=file_path)
                 self.data_df = self.data_df[self.bp_list]
@@ -183,12 +211,15 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     runner.save()
 
 
+# TIME_TIME_PATH = r"F:\troubleshooting\sam\sam\project_folder\DATA MASTERSHEET (1).csv"
+# time_stamps = pd.read_csv(TIME_TIME_PATH)[['VIDEO_FILE_NAME', 'START', 'END']].set_index('VIDEO_FILE_NAME').to_dict(orient='index')
 # test = MovementCalculator(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini",
-#                           body_parts=['center', 'nose'], #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
+#                           body_parts=['center'],  #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
 #                           threshold=0.00,
 #                           frame_count=True,
+#                           video_time_stamps=time_stamps,
 #                           video_length=True,
-#                           transpose=False)
+#                           transpose=True)
 # test.run()
 # test.save()
 

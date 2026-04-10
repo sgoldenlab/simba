@@ -44,6 +44,12 @@ class FitYolo():
        - Download starter weights from `HuggingFace <https://huggingface.co/Ultralytics>`__.
        - Example dataset YAMLs: `bbox <https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model.yaml>`__, `pose <https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model_keypoints.yaml>`__.
 
+    .. important::
+       When fitting a **segmentation** model, the ``imgsz`` parameter is critical for mask quality. Segmentation
+       requires pixel-level precision along object boundaries, so spatial detail lost to downscaling hurts
+       segmentation far more than detection or pose tasks. Set ``imgsz`` as large as your GPU memory allows.
+       The default ``640`` may be too coarse for high-quality segmentation masks.
+
     .. seealso::
        :func:`simba.bounding_box_tools.yolo.utils.fit_yolo` for the functional API.
        :func:`simba.bounding_box_tools.yolo.utils.load_yolo_model` to load trained weights.
@@ -182,16 +188,17 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 
 
 #
-# fitter = FitYolo(weights_path=r"C:\Users\sroni\Downloads\yolo26x-seg.pt",
+# fitter = FitYolo(weights_path=r"C:\Users\sroni\Downloads\yolo26n-seg.pt",
 #                  model_yaml=r"E:\open_video\open_field_2\yolo_seg_project\map.yaml",
 #                  save_path=r'E:\open_video\open_field_2\yolo_seg_project\mdl',
 #                  epochs=1500,
-#                  batch=8,
+#                  batch=2,
+#                  workers=1,
 #                  format=None,
 #                  device=0,
-#                  imgsz=256)
+#                  imgsz=1248)
 # fitter.run()
-
+#
 
 
 
