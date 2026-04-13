@@ -21,8 +21,10 @@ class CropLPAnnotations:
     output project is ready for training/inference: configs, calibrations, models,
     scripts, and ``project.yaml`` are copied, config paths are updated to the new
     location, and all ``CollectedData_*.csv`` keypoint coordinates are shifted to
-    match the cropped frames. Rows that are invalid in any camera view are dropped
-    so that all per-view CSVs stay aligned.
+    match the cropped frames. A row is only dropped when it is all-NaN in every
+    camera view; in any other case each view is processed independently. For a
+    view that has all-NaN keypoints but valid keypoints in some other view, the
+    image is center-cropped and the keypoint coords stay NaN.
 
     :param str lp_project_dir:  Root of the source LP project (e.g. ``Z:/home/simon/lp_300126``).
     :param str save_dir:        Root of the new cropped LP project.
@@ -59,10 +61,9 @@ class CropLPAnnotations:
         timer = SimbaTimer(start=True)
         self._copy_project_files(lp_project_dir=self.lp_project_dir, save_dir=self.save_dir)
         self._update_config_paths(lp_project_dir=self.lp_project_dir, save_dir=self.save_dir)
-        valid_indices = self._find_common_valid_indices(csv_paths=self.csv_paths,
-                                                        lp_project_dir=self.lp_project_dir,
-                                                        crop_size=self.crop_size)
-        stdout_success(msg=f"Found {len(valid_indices)} rows valid across all {len(self.csv_paths)} CSV files.")
+        drop_positions = self._find_all_nan_positions(csv_paths=self.csv_paths)
+        if drop_positions:
+            stdout_warning(msg=f"Dropping {len(drop_positions)} row position(s) all-NaN in every view: {sorted(drop_positions)}")
         viz_candidates = []
         for csv_path in self.csv_paths:
             self._process_csv(csv_path=csv_path,
@@ -70,7 +71,7 @@ class CropLPAnnotations:
                               save_dir=self.save_dir,
                               crop_size=self.crop_size,
                               viz_candidates=viz_candidates,
-                              valid_indices=valid_indices)
+                              drop_positions=drop_positions)
         if self.visualize and len(viz_candidates) > 0:
             viz_dir = os.path.join(self.save_dir, "visualizations")
             os.makedirs(viz_dir, exist_ok=True)
@@ -151,37 +152,26 @@ class CropLPAnnotations:
             stdout_success(msg=f"Updated paths in {n_updated} config file(s) to {new_posix}", source="CropLPAnnotations")
 
     @staticmethod
-    def _row_is_valid(idx, df, lp_project_dir, crop_size):
-        """Check if a row has valid keypoints, a readable image, and the image is large enough for the crop."""
-        coords = df.loc[idx].values.astype(float)
+    def _row_all_nan(coords: np.ndarray) -> bool:
         xs, ys = coords[0::2], coords[1::2]
-        if not np.any(~np.isnan(xs) & ~np.isnan(ys)):
-            return False
-        img_rel = str(idx)
-        img_path = os.path.join(lp_project_dir, img_rel.replace("/", os.sep))
-        if not os.path.isfile(img_path):
-            return False
-        img = cv2.imread(img_path)
-        if img is None:
-            return False
-        h, w = img.shape[:2]
-        if w < crop_size[0] or h < crop_size[1]:
-            return False
-        return True
+        return not np.any(~np.isnan(xs) & ~np.isnan(ys))
 
-    def _find_common_valid_indices(self, csv_paths, lp_project_dir, crop_size):
-        """Return the row-position indices (ints) that are valid across ALL CSVs."""
-        per_csv_valid = []
+    @staticmethod
+    def _find_all_nan_positions(csv_paths):
+        """Return the set of row positions that are all-NaN in EVERY CSV."""
+        per_csv_nan = []
         for csv_path in csv_paths:
             df = pd.read_csv(csv_path, header=[0, 1, 2], index_col=0)
-            valid = set()
+            nan_set = set()
             for row_pos in range(len(df)):
-                idx = df.index[row_pos]
-                if self._row_is_valid(idx, df, lp_project_dir, crop_size):
-                    valid.add(row_pos)
-            per_csv_valid.append(valid)
-        common = per_csv_valid[0]
-        for s in per_csv_valid[1:]:
+                coords = df.iloc[row_pos].values.astype(float)
+                if CropLPAnnotations._row_all_nan(coords):
+                    nan_set.add(row_pos)
+            per_csv_nan.append(nan_set)
+        if not per_csv_nan:
+            return set()
+        common = per_csv_nan[0]
+        for s in per_csv_nan[1:]:
             common = common & s
         return common
 
@@ -191,14 +181,14 @@ class CropLPAnnotations:
                      save_dir: str,
                      crop_size: Tuple[int, int],
                      viz_candidates: list,
-                     valid_indices: set):
+                     drop_positions: set):
 
         _, csv_fn, csv_ext = get_fn_ext(filepath=csv_path)
         df = pd.read_csv(csv_path, header=[0, 1, 2], index_col=0)
         bp_names = [df.columns[i][1] for i in range(0, len(df.columns), 2)]
         out_rows = []
         for row_pos in range(len(df)):
-            if row_pos not in valid_indices:
+            if row_pos in drop_positions:
                 continue
             idx = df.index[row_pos]
             coords = df.loc[idx].values.astype(float)
@@ -208,15 +198,31 @@ class CropLPAnnotations:
 
             img_rel = str(idx)
             img_path = os.path.join(lp_project_dir, img_rel.replace("/", os.sep))
+            if not os.path.isfile(img_path):
+                stdout_warning(msg=f"{csv_fn}: skipped row_pos={row_pos} idx={idx} (image file not found)")
+                continue
             img = cv2.imread(img_path)
+            if img is None:
+                stdout_warning(msg=f"{csv_fn}: skipped row_pos={row_pos} idx={idx} (cv2.imread returned None)")
+                continue
             h, w = img.shape[:2]
 
-            x_valid, y_valid = xs[valid], ys[valid]
-            x_min, x_max = float(np.min(x_valid)), float(np.max(x_valid))
-            y_min, y_max = float(np.min(y_valid)), float(np.max(y_valid))
+            if w < crop_size[0] or h < crop_size[1]:
+                scale = max(crop_size[0] / w, crop_size[1] / h)
+                new_w, new_h = int(np.ceil(w * scale)), int(np.ceil(h * scale))
+                img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+                xs = np.where(np.isnan(xs), np.nan, xs * scale)
+                ys = np.where(np.isnan(ys), np.nan, ys * scale)
+                h, w = img.shape[:2]
 
-            cx = (x_min + x_max) / 2.0
-            cy = (y_min + y_max) / 2.0
+            if np.any(valid):
+                x_valid, y_valid = xs[valid], ys[valid]
+                x_min, x_max = float(np.min(x_valid)), float(np.max(x_valid))
+                y_min, y_max = float(np.min(y_valid)), float(np.max(y_valid))
+                cx = (x_min + x_max) / 2.0
+                cy = (y_min + y_max) / 2.0
+            else:
+                cx, cy = w / 2.0, h / 2.0
             half_w = crop_size[0] / 2.0
             half_h = crop_size[1] / 2.0
             crop_x1 = int(np.floor(cx - half_w))
@@ -260,10 +266,10 @@ class CropLPAnnotations:
         out_df.to_csv(out_csv_path)
         stdout_success(msg=f"Saved {out_csv_path} ({len(out_df)} rows).")
 
-
+#
 # if __name__ == "__main__":
-#     cropper = CropLPAnnotations(lp_project_dir=r"F:\netholabs\litpose_projects\projects_lp_compressed.8.4.2026",
-#                                 save_dir=r"F:\netholabs\litpose_projects\projects_lp_compressed.8.4.2026_cropped",
+#     cropper = CropLPAnnotations(lp_project_dir=r"F:\netholabs\projects_lp_compressed_13.4.2028",
+#                                 save_dir=r"Z:\home\simon\LPProjects\projects_lp_compressed_13.4.2028_cropped",
 #                                 crop_size=(512, 512),
 #                                 visualize=40)
 #     cropper.run()

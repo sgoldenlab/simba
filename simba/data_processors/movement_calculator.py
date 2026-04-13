@@ -212,17 +212,17 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     runner.save()
 
 
-TIME_TIME_PATH = r"F:\troubleshooting\sam\sam\project_folder\DATA MASTERSHEET (1).csv"
-time_stamps = pd.read_csv(TIME_TIME_PATH)[['VIDEO_FILE_NAME', 'START', 'END']].set_index('VIDEO_FILE_NAME').to_dict(orient='index')
-test = MovementCalculator(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini",
-                          body_parts=['center'],  #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
-                          threshold=0.00,
-                          frame_count=True,
-                          video_time_stamps=time_stamps,
-                          video_length=True,
-                          transpose=True)
-test.run()
-test.save()
+# TIME_TIME_PATH = r"F:\troubleshooting\sam\sam\project_folder\DATA MASTERSHEET (1).csv"
+# time_stamps = pd.read_csv(TIME_TIME_PATH)[['VIDEO_FILE_NAME', 'START', 'END']].set_index('VIDEO_FILE_NAME').to_dict(orient='index')
+# test = MovementCalculator(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini",
+#                           body_parts=['center'],  #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
+#                           threshold=0.00,
+#                           frame_count=True,
+#                           video_time_stamps=time_stamps,
+#                           video_length=True,
+#                           transpose=True)
+# test.run()
+# test.save()
 
 
 # test = MovementCalculator(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",

@@ -393,9 +393,10 @@ def detect_yolo_project_type(label_path: str) -> str:
 
 def create_yolo_sample_visualizations(samples: List[Tuple[str, np.ndarray, str]],
                                       save_dir: Union[str, os.PathLike],
-                                      names: Tuple[str, ...],
+                                      names: Optional[Tuple[str, ...]] = None,
                                       palette: str = 'Set1',
                                       seg_opacity: float = 0.5,
+                                      draw_labels: bool = True,
                                       verbose: bool = True,
                                       source: str = '') -> None:
     """
@@ -405,9 +406,10 @@ def create_yolo_sample_visualizations(samples: List[Tuple[str, np.ndarray, str]]
 
     :param List[Tuple[str, np.ndarray, str]] samples: List of ``(sample_name, image, label_str)`` tuples produced by a SAM3-to-YOLO converter.
     :param Union[str, os.PathLike] save_dir: Directory where annotated images are saved. Created if it does not exist.
-    :param Tuple[str, ...] names: Class names in index order.
+    :param Optional[Tuple[str, ...]] names: Class names in index order. Required when ``draw_labels=True``; otherwise optional and only used to size the color palette. Default ``None``.
     :param str palette: Color palette name. Default ``'Set1'``.
     :param float seg_opacity: Opacity of filled segmentation polygons (0.0–1.0). Default ``0.5``.
+    :param bool draw_labels: If True, draw the class name text alongside each box/polygon. Default ``True``.
     :param bool verbose: Print progress messages. Default ``True``.
     :param str source: Caller class name for log messages.
     """
@@ -427,13 +429,17 @@ def create_yolo_sample_visualizations(samples: List[Tuple[str, np.ndarray, str]]
         if not isinstance(s[2], str):
             raise InvalidInputError(msg=f'Sample label_str at index {i} must be a str, got {type(s[2])}', source=source)
     check_if_dir_exists(in_dir=os.path.dirname(save_dir), source=f'{source} save_dir')
-    check_valid_tuple(x=names, source=f'{source} names', minimum_length=1, valid_dtypes=(str,))
+    if draw_labels and names is None:
+        raise InvalidInputError(msg='names must be provided when draw_labels=True', source=source)
+    if names is not None:
+        check_valid_tuple(x=names, source=f'{source} names', minimum_length=1, valid_dtypes=(str,))
     check_str(name=f'{source} palette', value=palette, options=Options.PALETTE_OPTIONS_CATEGORICAL.value)
     check_float(name=f'{source} seg_opacity', value=seg_opacity, min_value=0.0, max_value=1.0)
+    check_valid_boolean(value=[draw_labels], source=f'{source} draw_labels', raise_error=True)
     check_valid_boolean(value=[verbose], source=f'{source} verbose', raise_error=True)
 
     create_directory(paths=[save_dir], overwrite=False)
-    class_colors = create_color_palette(pallete_name=palette, increments=max(len(names), 10))
+    class_colors = create_color_palette(pallete_name=palette, increments=max(len(names) if names is not None else 0, 10))
     if verbose:
         stdout_information(msg=f'Creating {len(samples)} annotation visualizations in {save_dir}...', source=source)
 
@@ -447,7 +453,7 @@ def create_yolo_sample_visualizations(samples: List[Tuple[str, np.ndarray, str]]
                 continue
             cls_id = int(parts[0])
             color = tuple(int(c) for c in class_colors[cls_id % len(class_colors)])
-            label = names[cls_id] if cls_id < len(names) else str(cls_id)
+            label = names[cls_id] if (names is not None and cls_id < len(names)) else str(cls_id)
             n_values = len(parts) - 1
             if n_values == 4:
                 xc, yc, w, h = float(parts[1]), float(parts[2]), float(parts[3]), float(parts[4])
@@ -456,7 +462,8 @@ def create_yolo_sample_visualizations(samples: List[Tuple[str, np.ndarray, str]]
                 x2 = int((xc + w / 2) * img_w)
                 y2 = int((yc + h / 2) * img_h)
                 cv2.rectangle(vis_img, (x1, y1), (x2, y2), color, thickness, lineType=cv2.LINE_AA)
-                cv2.putText(vis_img, label, (x1, max(y1 - 5, 0)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, max(1, thickness // 2), cv2.LINE_AA)
+                if draw_labels:
+                    cv2.putText(vis_img, label, (x1, max(y1 - 5, 0)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, max(1, thickness // 2), cv2.LINE_AA)
             else:
                 coords = [float(v) for v in parts[1:]]
                 points = []
@@ -468,8 +475,9 @@ def create_yolo_sample_visualizations(samples: List[Tuple[str, np.ndarray, str]]
                 cv2.polylines(vis_img, [pts], isClosed=True, color=color, thickness=thickness, lineType=cv2.LINE_AA)
                 cv2.fillPoly(overlay, [pts], color=color)
                 cv2.addWeighted(overlay, seg_opacity, vis_img, 1 - seg_opacity, 0, vis_img)
-                cx, cy = int(polygon[:, 0].mean()), int(polygon[:, 1].mean())
-                cv2.putText(vis_img, label, (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, max(1, thickness // 2), cv2.LINE_AA)
+                if draw_labels:
+                    cx, cy = int(polygon[:, 0].mean()), int(polygon[:, 1].mean())
+                    cv2.putText(vis_img, label, (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, max(1, thickness // 2), cv2.LINE_AA)
         cv2.imwrite(os.path.join(save_dir, f'{sample_name}.png'), vis_img)
     if verbose:
         stdout_information(msg=f'{len(samples)} visualizations saved in {save_dir}', source=source)

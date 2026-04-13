@@ -181,7 +181,11 @@ class SAM3ToYoloBBox:
         overrides = dict(conf=self.conf, task='segment', mode='predict', imgsz=self.imgsz, model=str(self.sam_path), half=True, save=False, verbose=False)
         predictor = SAM3SemanticPredictor(overrides=overrides)
 
-        all_samples, video_cnt, total_videos = [], 0, len(self.video_paths)
+        vis_dir = os.path.join(self.save_dir, 'visualizations')
+        if self.visualize:
+            create_directory(paths=[vis_dir], overwrite=False)
+
+        video_cnt, total_videos = 0, len(self.video_paths)
         train_cnt, val_cnt = 0, 0
         for video_name, video_path in self.video_paths.items():
             video_cnt += 1
@@ -256,7 +260,7 @@ class SAM3ToYoloBBox:
                 self._io_with_retry(self._write_label, os.path.join(lbl_dir, f'{sample_name}.txt'), label_str)
 
                 if self.visualize:
-                    all_samples.append((sample_name, img_out, label_str))
+                    create_yolo_sample_visualizations(samples=[(sample_name, img_out, label_str)], save_dir=vis_dir, names=self.names, verbose=False, source=self.__class__.__name__, draw_labels=False)
 
                 used_indices.append(frame_idx)
                 valid_cnt += 1
@@ -268,9 +272,6 @@ class SAM3ToYoloBBox:
         total_samples = train_cnt + val_cnt
         if total_samples == 0:
             raise NoFilesFoundError(msg='No boxes detected in any sampled frame. No project created.', source=self.__class__.__name__)
-
-        if self.visualize:
-            create_yolo_sample_visualizations(samples=all_samples, save_dir=os.path.join(self.save_dir, 'visualizations'), names=self.names, verbose=self.verbose, source=self.__class__.__name__)
 
         timer.stop_timer()
         stdout_success(msg=f'YOLO bbox detection project created at {self.save_dir}. ' f'{train_cnt} train, {val_cnt} val samples.', source=self.__class__.__name__, elapsed_time=timer.elapsed_time_str)
@@ -312,21 +313,21 @@ class SAM3ToYoloBBox:
         return '\n'.join(lines) + '\n' if lines else ''
 
 
-# runner = SAM3ToYoloBBox(video_dir=r'F:\netholabs\V6\batch_3',
+# runner = SAM3ToYoloBBox(video_dir=r'F:\netholabs\V6\batch_5\mp4s',
 #                         sam_path=r'D:\sam3\sam3.pt',
-#                         save_dir=r'F:\netholabs\V6\cage_3\yolo_project_0412',
+#                         save_dir=r'F:\netholabs\V6\cage_3\yolo_project_0413',
 #                         txt_prompt='mouse',
 #                         n_frames=25,
 #                         verbose=True,
 #                         conf=0.25,
-#                         max_detections=2,
+#                         max_detections=1,
 #                         buffer_pct=0.15,
 #                         recursive=True,
 #                         consecutive_miss_limit=50,
 #                         shuffle_videos=True,
 #                         visualize=True)
 # runner.run()
-
+#
 
 
 # runner = SAM3ToYoloBBox(video_dir=r'F:\netholabs\V6\cage_3\samples',

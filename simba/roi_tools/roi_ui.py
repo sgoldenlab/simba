@@ -114,9 +114,9 @@ class ROI_ui(ROI_mixin, ConfigReader):
 #        video_path=r"C:\troubleshooting\open_field_below\project_folder\videos\raw_clip1.mp4")
 #
 
-ROI_ui(video_dir=r'F:\troubleshooting\ares\videos',
-       video_path=r"F:\troubleshooting\ares\videos\2205202517811786_clip2.mp4",
-       roi_coordinates_path=r"F:\troubleshooting\ares\roi_coordinates\roi_coordinates.h5")
+# ROI_ui(video_dir=r'F:\troubleshooting\ares\videos',
+#        video_path=r"F:\troubleshooting\ares\videos\2205202517811786_clip2.mp4",
+#        roi_coordinates_path=r"F:\troubleshooting\ares\roi_coordinates\roi_coordinates.h5")
 
 
 

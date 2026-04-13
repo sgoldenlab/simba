@@ -190,5 +190,9 @@ class MergeYoloProjects:
             stdout_information(msg=f'{display_name}: copied {len(unique_pairs)}/{len(unique_pairs)} complete.')
         return len(unique_pairs)
 
-# merger = MergeYoloProjects(yaml_paths=[r'F:\netholabs\moira\original\moira_litpose\map.yaml', r"F:\netholabs\sam3_to_bbox\map.yaml"], save_dir=r'F:\netholabs\moira_lp_sam', train_val_split=0.75)
+# merger = MergeYoloProjects(yaml_paths=[r"F:\netholabs\moira_lp_sam\map.yaml",
+#                                        r"F:\netholabs\V6\cage_3\yolo_project_0406\map.yaml",
+#                                        r"F:\netholabs\V6\cage_3\yolo_project_0412\map.yaml",
+#                                        r"F:\netholabs\V6\cage_3\yolo_project_0413\map.yaml"],
+#                            save_dir=r'F:\netholabs\yolo_0413', train_val_split=0.75)
 # merger.run()

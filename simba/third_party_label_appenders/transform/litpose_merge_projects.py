@@ -110,8 +110,12 @@ class LitPoseMergeProjects:
 
     @staticmethod
     def _find_collected_data_csvs(directory: str) -> Dict[str, str]:
-        """Return dict keyed by camera suffix -> file path. E.g. 'cam1' -> '/.../CollectedData_cam1.csv'."""
-        paths = glob.glob(os.path.join(directory, '**', 'CollectedData*.csv'), recursive=True)
+        """Return dict keyed by camera suffix -> file path. E.g. 'cam1' -> '/.../CollectedData_cam1.csv'.
+
+        Only looks at the project root — copies inside ``models/`` or ``outputs/`` are ignored
+        so they don't shadow the canonical root file.
+        """
+        paths = glob.glob(os.path.join(directory, 'CollectedData*.csv'))
         result = {}
         for p in paths:
             fn = os.path.splitext(os.path.basename(p))[0]
@@ -169,11 +173,15 @@ class LitPoseMergeProjects:
                 img_paths = self._get_csv_image_paths(csv_path)
                 missing_imgs = self._check_images_exist(project_dir, img_paths)
                 if missing_imgs:
-                    raise FileNotFoundError(f'{len(missing_imgs)} image(s) referenced in {os.path.basename(csv_path)} from {project_label} '
-                                            f'not found on disk. First missing: {missing_imgs[0]}')
+                    if self.verbose:
+                        _log(f'{len(missing_imgs)} image(s) referenced in {os.path.basename(csv_path)} from {project_label} '
+                             f'not found on disk and will be skipped during merge. First missing: {missing_imgs[0]}',
+                             level='WARNING')
+                missing_set = set(missing_imgs)
+                present_paths = [p for p in img_paths if p not in missing_set]
 
                 resolutions = set()
-                for img_path in img_paths:
+                for img_path in present_paths:
                     res = self._get_image_resolution(os.path.join(project_dir, img_path))
                     resolutions.add(res)
                 if len(resolutions) > 1:
@@ -275,6 +283,15 @@ class LitPoseMergeProjects:
             return
         for suffix, other_csv_path in other_csvs.items():
             other_df = pd.read_csv(other_csv_path, header=[0, 1, 2])
+            missing_imgs = self._check_images_exist(other_dir, other_df.iloc[:, 0].values.tolist())
+            if missing_imgs:
+                if self.verbose:
+                    _log(f'Skipping {len(missing_imgs)} row(s) in {os.path.basename(other_csv_path)} with missing image files. First: {missing_imgs[0]}', level='WARNING')
+                other_df = other_df[~other_df.iloc[:, 0].isin(set(missing_imgs))]
+            if len(other_df) == 0:
+                if self.verbose:
+                    _log(f'No rows with existing images for {os.path.basename(other_csv_path)}; nothing to merge.')
+                continue
             other_img_paths = set(other_df.iloc[:, 0].values)
             if suffix in master_csvs:
                 master_csv_path = master_csvs[suffix]
@@ -291,8 +308,11 @@ class LitPoseMergeProjects:
                     continue
                 merged_df = pd.concat([master_df, other_df], axis=0, ignore_index=True)
                 merged_df.to_csv(master_csv_path, index=False)
+                verify_df = pd.read_csv(master_csv_path, header=[0, 1, 2])
+                if len(verify_df) != len(merged_df):
+                    _log(f'WRITE MISMATCH for {os.path.basename(master_csv_path)}: in-memory {len(merged_df)} rows, on-disk {len(verify_df)} rows after re-read.', level='WARNING')
                 if self.verbose:
-                    _log(f'Appended {len(other_df)} rows to {os.path.basename(master_csv_path)} (total: {len(merged_df)})')
+                    _log(f'Appended {len(other_df)} rows to {os.path.basename(master_csv_path)} (in-memory total: {len(merged_df)}, on-disk re-read total: {len(verify_df)})')
             else:
                 new_csv_path = os.path.join(self.master_dir, os.path.basename(other_csv_path))
                 shutil.copy2(other_csv_path, new_csv_path)
@@ -319,9 +339,11 @@ class LitPoseMergeProjects:
 
 
 
-merger = LitPoseMergeProjects(master_dir=r'Z:\home\simon\LPProjects\cropped_0408',
-                              other_dirs=[r"F:\netholabs\litpose_projects\projects_lp_compressed.8.4.2026_cropped"],
-                              duplicate_method='skip',
-                              verbose=True,
-                              skip_videos=True)
-merger.run()
+# merger = LitPoseMergeProjects(master_dir=r'Z:\home\simon\LPProjects\cropped_0408',
+#                               other_dirs=[r"Z:\home\simon\LPProjects\lp_300126_cropped",
+#                                           r'Z:\home\simon\LPProjects\mini_project_0410_cropped',
+#                                           r'Z:\home\simon\LPProjects\projects_lp_compressed_13.4.2028_cropped'],
+#                               duplicate_method='skip',
+#                               verbose=True,
+#                               skip_videos=True)
+# merger.run()
