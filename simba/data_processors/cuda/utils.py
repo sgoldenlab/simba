@@ -311,13 +311,13 @@ def _cuda_are_rows_equal(x, y, idx_1, idx_2):
 
 
 def get_nvc_decoder(video_path: Union[str, os.PathLike],
+                    output_color_type,
                     gpu_id: int = 0,
-                    use_device_memory: bool = False,
-                    output_color_type: nvc.OutputColorType = nvc.OutputColorType.RGB):
+                    use_device_memory: bool = False):
 
-    from simba.utils.checks import (check_file_exist_and_readable,
-                                    check_instance, check_int)
+    from simba.utils.checks import (check_file_exist_and_readable, check_instance, check_int)
     from simba.utils.errors import SimBAGPUError
+
     if nvc is None:
         raise SimBAGPUError(msg='PyNvVideoCodec is not installed. Install it to use GPU accelerated video decoding.', source=get_nvc_decoder.__name__)
     if not _is_cuda_available()[0]:
