@@ -1,10 +1,12 @@
 import os
+
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 import queue
 import threading
 from typing import Generator, Optional, Union
-import numpy as np
+
 import cv2
+import numpy as np
 
 try:
     import PyNvVideoCodec as nvc
@@ -14,8 +16,10 @@ except ImportError:
     torch = None
 
 from simba.data_processors.cuda.utils import get_nvc_decoder
-from simba.utils.checks import check_int, check_nvidea_gpu_available, check_valid_boolean
+from simba.utils.checks import (check_int, check_nvidea_gpu_available,
+                                check_valid_boolean)
 from simba.utils.errors import SimBAGPUError, SimBAModuleNotFoundError
+
 
 class NvDecReader:
     """
@@ -195,6 +199,7 @@ class NvDecReader:
 if __name__ == "__main__":
     import glob
     import time
+
     from simba.utils.printing import stdout_information
     from simba.utils.read_write import get_fn_ext
 

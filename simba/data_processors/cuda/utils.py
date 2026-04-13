@@ -4,6 +4,7 @@ from typing import Any, Dict, Tuple, Union
 
 import numpy as np
 from numba import cuda, float64
+
 try:
     import PyNvVideoCodec as nvc
 except ImportError:
@@ -314,7 +315,8 @@ def get_nvc_decoder(video_path: Union[str, os.PathLike],
                     use_device_memory: bool = False,
                     output_color_type: nvc.OutputColorType = nvc.OutputColorType.RGB):
 
-    from simba.utils.checks import check_file_exist_and_readable, check_instance, check_int
+    from simba.utils.checks import (check_file_exist_and_readable,
+                                    check_instance, check_int)
     from simba.utils.errors import SimBAGPUError
     if nvc is None:
         raise SimBAGPUError(msg='PyNvVideoCodec is not installed. Install it to use GPU accelerated video decoding.', source=get_nvc_decoder.__name__)
