@@ -144,15 +144,15 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
             self.data_df = read_df(file_path=file_path, file_type=self.file_type)
             self.video_info, self.px_per_mm, self.fps = self.read_video_info(video_name=video_name)
             if self.time_stamps is not None and check_if_keys_exist_in_dict(data=self.time_stamps, key=video_name, name=f'{self.__class__.__name__} time_stamps', raise_error=False):
-                start_time, end_time = self.time_stamps[video_name][START], self.time_stamps[video_name][END]
-                start_frm, end_frm = int(self.time_stamps[video_name][START] * self.fps), int(self.time_stamps[video_name][END] * self.fps)
+                start_time, end_time = self.time_stamps[video_name][START], self.time_stamps[video_name][END] -1
+                start_frm, end_frm = int(start_time * self.fps), int(end_time * self.fps)
                 if start_frm > len(self.data_df) or end_frm > len(self.data_df):
                     raise FrameRangeError(msg=f'Cannot compute movement between frame {start_frm} (time s: {start_time}) and frame {end_frm} (time s: {end_time}) in video {video_name}. The data only has {len(self.data_df)} frames.', source=self.__class__.__name__)
                 self.data_df = self.data_df.loc[start_frm:end_frm].reset_index()
                 if self.verbose: stdout_information(msg=f"Slicing video {video_name} between frames {start_frm} and {end_frm}...)")
-            # else:
-            #     start_frm, end_frm = int(0 * self.fps), int(899 * self.fps)
-            #     self.data_df = self.data_df.loc[start_frm:end_frm].reset_index()
+            else:
+                start_frm, end_frm = int(0 * self.fps), int(899 * self.fps)
+                self.data_df = self.data_df.loc[start_frm:end_frm].reset_index()
             if self.bp_list:
                 check_that_column_exist(df=self.data_df, column_name=self.bp_list, file_name=file_path)
                 self.data_df = self.data_df[self.bp_list]
@@ -211,17 +211,17 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     runner.save()
 
 
-# TIME_TIME_PATH = r"F:\troubleshooting\sam\sam\project_folder\DATA MASTERSHEET (1).csv"
-# time_stamps = pd.read_csv(TIME_TIME_PATH)[['VIDEO_FILE_NAME', 'START', 'END']].set_index('VIDEO_FILE_NAME').to_dict(orient='index')
-# test = MovementCalculator(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini",
-#                           body_parts=['center'],  #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
-#                           threshold=0.00,
-#                           frame_count=True,
-#                           video_time_stamps=time_stamps,
-#                           video_length=True,
-#                           transpose=True)
-# test.run()
-# test.save()
+TIME_TIME_PATH = r"F:\troubleshooting\sam\sam\project_folder\DATA MASTERSHEET (1).csv"
+time_stamps = pd.read_csv(TIME_TIME_PATH)[['VIDEO_FILE_NAME', 'START', 'END']].set_index('VIDEO_FILE_NAME').to_dict(orient='index')
+test = MovementCalculator(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini",
+                          body_parts=['center'],  #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
+                          threshold=0.00,
+                          frame_count=True,
+                          video_time_stamps=time_stamps,
+                          video_length=True,
+                          transpose=True)
+test.run()
+test.save()
 
 
 # test = MovementCalculator(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini",

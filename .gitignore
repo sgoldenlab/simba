@@ -42,3 +42,4 @@ docs/_build
 
 # Claude Code
 simba/.claude/
+.claude/

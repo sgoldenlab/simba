@@ -604,7 +604,6 @@ class GeometryMixin(object):
         return shape.area / pixels_per_mm
 
     @staticmethod
-    @staticmethod
     def shape_distance(shapes: Union[List[List[Union[LineString, Polygon, Point]]], np.ndarray],
                        pixels_per_mm: float,
                        unit: Literal["mm", "cm", "dm", "m"] = "mm") -> List[float]:

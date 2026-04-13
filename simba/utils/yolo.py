@@ -11,7 +11,7 @@ except:
     from typing_extensions import Literal
 
 import numpy as np
-
+import json
 try:
     import torch
     from ultralytics import YOLO
@@ -33,6 +33,7 @@ from simba.utils.printing import stdout_information
 from simba.utils.read_write import (create_directory, find_core_cnt,
                                     get_fn_ext, get_video_meta_data)
 
+YOLO_EXTENSIONS = ('.engine', '.pt', '.onnx', '.torchscript', '.xml', '.pb', '.tflite', '.edgetpu', '.paddle', '.ncnn', '.mnn', '.imx', '.rknn')
 
 def fit_yolo(weights_path: Union[str, os.PathLike],
              model_yaml: Union[str, os.PathLike],
@@ -553,6 +554,83 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
     return out
 
 
+def read_yolo_metadata(model: Union[str, os.PathLike, YOLO]) -> dict:
+    """
+    Read metadata from a YOLO model file or loaded YOLO instance.
+
+    Supports ``.engine`` (TensorRT), ``.pt`` (PyTorch), ``.onnx``, ``.torchscript``,
+    and any other format that :class:`ultralytics.YOLO` can load. For ``.engine``
+    files the embedded JSON header is read directly without loading the model.
+    For all other formats the model is loaded via Ultralytics to extract metadata.
+
+    :param Union[str, os.PathLike, YOLO] model: Path to a YOLO model file, or an already-loaded :class:`ultralytics.YOLO` instance.
+    :return: Dictionary of model metadata. Common keys: ``batch``, ``imgsz``, ``task``, ``names``, ``stride``, ``fp16``, ``dynamic``.
+    :rtype: dict
+    :raises InvalidInputError: If ``model`` is not a YOLO instance, not a valid path, or has an unsupported extension.
+
+    :example:
+    >>> meta = read_yolo_metadata('/models/best.engine')
+    >>> meta['batch']
+    192
+    >>> meta['imgsz']
+    [256, 256]
+    >>> meta = read_yolo_metadata('/models/best.pt')
+    >>> meta['task']
+    'detect'
+    """
+
+    META_KEYS = ('batch', 'imgsz', 'stride', 'task', 'names', 'fp16', 'dynamic')
+
+    if isinstance(model, YOLO):
+        meta = {}
+        if hasattr(model, 'predictor') and model.predictor is not None and hasattr(model.predictor, 'model'):
+            backend = model.predictor.model
+            for key in META_KEYS:
+                if hasattr(backend, key):
+                    meta[key] = getattr(backend, key)
+        if hasattr(model, 'overrides'):
+            for key in META_KEYS:
+                if key not in meta and key in model.overrides:
+                    meta[key] = model.overrides[key]
+        if hasattr(model, 'ckpt') and isinstance(model.ckpt, dict):
+            train_args = model.ckpt.get('train_args', {})
+            for key in META_KEYS:
+                if key not in meta and key in train_args:
+                    meta[key] = train_args[key]
+        return meta
+
+    if not isinstance(model, (str, os.PathLike)):
+        raise InvalidInputError(msg=f'model must be a YOLO instance, str, or os.PathLike, got {type(model).__name__}.', source=read_yolo_metadata.__name__)
+
+    path = str(model)
+    check_file_exist_and_readable(file_path=path)
+    ext = os.path.splitext(path)[1].lower()
+    if ext not in YOLO_EXTENSIONS:
+        raise InvalidInputError(msg=f'Unsupported model extension {ext}. Supported: {", ".join(YOLO_EXTENSIONS)}.', source=read_yolo_metadata.__name__)
+
+    if ext == '.engine':
+        with open(path, 'rb') as f:
+            meta_len = int.from_bytes(f.read(4), byteorder='little', signed=False)
+            if 0 < meta_len < 10_000:
+                return json.loads(f.read(meta_len).decode('utf-8'))
+        return {}
+
+    loaded = YOLO(path)
+    meta = {}
+    if hasattr(loaded, 'overrides'):
+        for key in META_KEYS:
+            if key in loaded.overrides:
+                meta[key] = loaded.overrides[key]
+    if hasattr(loaded, 'ckpt') and isinstance(loaded.ckpt, dict):
+        train_args = loaded.ckpt.get('train_args', {})
+        for key in META_KEYS:
+            if key not in meta and key in train_args:
+                meta[key] = train_args[key]
+    if hasattr(loaded, 'model'):
+        for key in META_KEYS:
+            if key not in meta and hasattr(loaded.model, key):
+                meta[key] = getattr(loaded.model, key)
+    return meta
 
 # export_yolo_model(model_path=r"E:\open_video\open_field_2\yolo_seg_project\mdl\train\weights\best.pt",
 #                   export_format='engine',

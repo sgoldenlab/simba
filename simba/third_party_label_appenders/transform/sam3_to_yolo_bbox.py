@@ -312,8 +312,23 @@ class SAM3ToYoloBBox:
         return '\n'.join(lines) + '\n' if lines else ''
 
 
+# runner = SAM3ToYoloBBox(video_dir=r'F:\netholabs\V6\batch_3',
+#                         sam_path=r'D:\sam3\sam3.pt',
+#                         save_dir=r'F:\netholabs\V6\cage_3\yolo_project_0412',
+#                         txt_prompt='mouse',
+#                         n_frames=25,
+#                         verbose=True,
+#                         conf=0.25,
+#                         max_detections=2,
+#                         buffer_pct=0.15,
+#                         recursive=True,
+#                         consecutive_miss_limit=50,
+#                         shuffle_videos=True,
+#                         visualize=True)
+# runner.run()
 
-#
+
+
 # runner = SAM3ToYoloBBox(video_dir=r'F:\netholabs\V6\cage_3\samples',
 #                         sam_path=r'D:\sam3\sam3.pt',
 #                         save_dir=r'F:\netholabs\V6\cage_3\yolo_project_0406',

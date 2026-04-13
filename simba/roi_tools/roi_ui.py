@@ -26,10 +26,17 @@ SHOW_GRID_OVERLAY = 'SHOW_GRID_OVERLAY'
 class ROI_ui(ROI_mixin, ConfigReader):
 
     """
-    Main antry-point for drawing ROIs on videos.
+    Main entry-point for drawing ROIs on videos.
 
-    ..note::
-      See ROI tutorial on `GitHub <https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md>`_ or `ReadTheDocs https://simba-uw-tf-dev.readthedocs.io/en/latest/tutorials_rst/roi_tutorial_new_2025.html>`_
+    .. note::
+       See ROI tutorial on `GitHub <https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md>`_ or `ReadTheDocs <https://simba-uw-tf-dev.readthedocs.io/en/latest/tutorials_rst/roi_tutorial_new_2025.html>`_
+
+    :param Union[str, os.PathLike] video_path: Path to the video file to draw ROIs on.
+    :param Optional[Union[str, os.PathLike]] config_path: Path to the SimBA project config INI file. If None, then ``roi_coordinates_path`` and ``video_dir`` must be provided.
+    :param Optional[Union[str, os.PathLike]] roi_coordinates_path: Path to an existing ROI definitions HDF5 file. Used when ``config_path`` is None.
+    :param Optional[Union[str, os.PathLike]] pose_path: Path to pose-estimation data file. If provided, pose landmarks are overlaid on the video frame in the ROI interface.
+    :param Optional[Union[str, os.PathLike]] video_dir: Directory containing project videos. Used to enable copying ROIs from other videos. Required when ``config_path`` is None.
+    :param Optional[Any] roi_table_popup: Reference to the parent ROI table popup window. If provided, :meth:`refresh_window` is called on close.
 
     :example:
     >>> ROI_ui(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini", video_path=r"C:\troubleshooting\mouse_open_field\project_folder\videos\Video1.mp4")
@@ -107,7 +114,9 @@ class ROI_ui(ROI_mixin, ConfigReader):
 #        video_path=r"C:\troubleshooting\open_field_below\project_folder\videos\raw_clip1.mp4")
 #
 
-
+ROI_ui(video_dir=r'F:\troubleshooting\ares\videos',
+       video_path=r"F:\troubleshooting\ares\videos\2205202517811786_clip2.mp4",
+       roi_coordinates_path=r"F:\troubleshooting\ares\roi_coordinates\roi_coordinates.h5")
 
 
 
