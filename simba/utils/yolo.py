@@ -10,8 +10,10 @@ try:
 except:
     from typing_extensions import Literal
 
-import numpy as np
 import json
+
+import numpy as np
+
 try:
     import torch
     from ultralytics import YOLO
