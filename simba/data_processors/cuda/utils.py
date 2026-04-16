@@ -315,7 +315,8 @@ def get_nvc_decoder(video_path: Union[str, os.PathLike],
                     gpu_id: int = 0,
                     use_device_memory: bool = False):
 
-    from simba.utils.checks import (check_file_exist_and_readable, check_instance, check_int)
+    from simba.utils.checks import (check_file_exist_and_readable,
+                                    check_instance, check_int)
     from simba.utils.errors import SimBAGPUError
 
     if nvc is None:
