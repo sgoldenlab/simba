@@ -28,7 +28,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_int,
                                 check_valid_dataframe, check_valid_dict,
                                 check_video_and_data_frm_count_align)
 from simba.utils.enums import Formats, TagNames
-from simba.utils.errors import FrameRangeError, NoDataError, NoFilesFoundError, SimbaError
+from simba.utils.errors import (FrameRangeError, NoDataError,
+                                NoFilesFoundError, SimbaError)
 from simba.utils.lookups import (get_current_time, get_display_resolution,
                                  get_img_resize_info,
                                  get_labelling_img_kbd_bindings,
