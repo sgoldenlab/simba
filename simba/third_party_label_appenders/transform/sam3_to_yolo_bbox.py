@@ -13,7 +13,7 @@ To merge this project with others that share the same class names and task type,
 import os
 import random
 import time
-from typing import Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import cv2
 
@@ -32,16 +32,18 @@ import numpy as np
 
 from simba.third_party_label_appenders.converters import create_yolo_yaml
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_int,
-                                check_nvidea_gpu_available, check_str,
-                                check_valid_boolean, check_valid_tuple)
+                                check_if_dir_exists, check_instance,
+                                check_int, check_nvidea_gpu_available,
+                                check_str, check_valid_boolean,
+                                check_valid_lst, check_valid_tuple)
 from simba.utils.errors import NoFilesFoundError, SimBAPAckageVersionError
 from simba.utils.printing import (SimbaTimer, stdout_information,
                                   stdout_success, stdout_warning)
 from simba.utils.read_write import (create_directory,
                                     find_all_videos_in_directory,
-                                    get_pkg_version, get_video_meta_data,
-                                    read_frm_of_video, recursive_file_search)
+                                    get_fn_ext, get_pkg_version,
+                                    get_video_meta_data, read_frm_of_video,
+                                    recursive_file_search)
 from simba.utils.yolo import create_yolo_sample_visualizations
 
 
@@ -57,7 +59,7 @@ class SAM3ToYoloBBox:
        * :class:`~simba.third_party_label_appenders.transform.merge_yolo_projects.MergeYoloProjects` — merge multiple YOLO ``map.yaml`` projects into one training set.
        * :class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_seg.SAM3ToYoloSeg` — SAM3 to YOLO **segmentation** labels from the same predictor stack.
 
-    :param Union[str, os.PathLike] video_dir: Directory containing input videos.
+    :param Union[str, os.PathLike, List[Union[str, os.PathLike]]] video_data: Input videos. Accepts: (1) a directory containing video files (combine with ``recursive=True`` to also search subdirectories), (2) a path to a single video file, or (3) a list of video file paths.
     :param Union[str, os.PathLike] sam_path: Path to SAM3 model weights (e.g. sam3.pt).
     :param Union[str, os.PathLike] save_dir: Root output directory for the YOLO project.
     :param str txt_prompt: Text prompt for SAM3 (e.g. "mouse", "mouse tail").
@@ -70,7 +72,7 @@ class SAM3ToYoloBBox:
     :param Optional[Union[Tuple[int, int, int], bool]] clahe: If True, applies CLAHE with default params. If tuple of (clip_limit, tile_x, tile_y), applies CLAHE with those params. Default False.
     :param float buffer_pct: Fraction to expand each box by (e.g. 0.1 adds 10% of width/height on each side). Default 0.0.
     :param int consecutive_miss_limit: If this many consecutive frames yield no detection, skip to the next video. Default 100.
-    :param bool recursive: If True, search video_dir and all subdirectories for videos. Default False.
+    :param bool recursive: If True and ``video_data`` is a directory, search it and all subdirectories for videos. Ignored if ``video_data`` is a file path or a list. Default False.
     :param Optional[int] seed: Random seed for reproducible frame sampling.
     :param Optional[int] max_detections: Maximum number of detections to keep per frame (sorted by confidence descending). If None, all detections above ``conf`` are kept. Default None.
     :param bool visualize: If True, saves annotated images with bounding-box overlays to a ``visualizations`` subfolder inside ``save_dir``. Useful for verifying SAM3 annotation quality. Default False.
@@ -83,12 +85,12 @@ class SAM3ToYoloBBox:
     :raises SimBAPAckageVersionError: If ``ultralytics`` is not installed, or ``SAM3SemanticPredictor`` cannot be imported.
 
     :example:
-    >>> runner = SAM3ToYoloBBox(video_dir=r'/path/to/videos', sam_path=r'/path/to/sam3.pt', save_dir=r'/path/to/yolo_project', txt_prompt='mouse', n_frames=50)
+    >>> runner = SAM3ToYoloBBox(video_data=r'/path/to/videos', sam_path=r'/path/to/sam3.pt', save_dir=r'/path/to/yolo_project', txt_prompt='mouse', n_frames=50)
     >>> runner.run()
     """
 
     def __init__(self,
-                 video_dir: Union[str, os.PathLike],
+                 video_data: Union[str, os.PathLike, List[Union[str, os.PathLike]]],
                  sam_path: Union[str, os.PathLike],
                  save_dir: Union[str, os.PathLike],
                  txt_prompt: str = 'mouse',
@@ -115,7 +117,15 @@ class SAM3ToYoloBBox:
         if SAM3SemanticPredictor is None:
             raise SimBAPAckageVersionError(msg='Could not import SAM3SemanticPredictor from ultralytics.models.sam. Install a compatible ultralytics build with SAM3 support.', source=self.__class__.__name__)
 
-        check_if_dir_exists(in_dir=video_dir, source=f'{self.__class__.__name__} video_dir')
+        check_instance(source=f'{self.__class__.__name__} video_data', instance=video_data, accepted_types=(str, os.PathLike, list))
+        if isinstance(video_data, list):
+            check_valid_lst(data=video_data, source=f'{self.__class__.__name__} video_data', valid_dtypes=(str, os.PathLike), min_len=1)
+            for v in video_data:
+                check_file_exist_and_readable(file_path=v)
+        elif os.path.isfile(video_data):
+            check_file_exist_and_readable(file_path=video_data)
+        else:
+            check_if_dir_exists(in_dir=video_data, source=f'{self.__class__.__name__} video_data')
         check_file_exist_and_readable(file_path=sam_path)
         check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
         check_str(name=f'{self.__class__.__name__} txt_prompt', value=txt_prompt)
@@ -135,14 +145,18 @@ class SAM3ToYoloBBox:
         check_float(name=f'{self.__class__.__name__} io_timeout', value=io_timeout, min_value=0.0)
         if max_detections is not None: check_int(name=f'{self.__class__.__name__} max_detections', value=max_detections, min_value=1)
         if seed is not None: check_int(name=f'{self.__class__.__name__} seed', value=seed)
-        self.video_dir, self.sam_path, self.save_dir, self.txt_prompt = video_dir, sam_path, save_dir, txt_prompt
+        self.video_data, self.sam_path, self.save_dir, self.txt_prompt = video_data, sam_path, save_dir, txt_prompt
         self.n_frames, self.names, self.train_val_split, self.conf, self.imgsz = n_frames, names, train_val_split, conf, sam_imgsz
         self.greyscale, self.clahe, self.buffer_pct, self.consecutive_miss_limit, self.max_detections, self.seed, self.verbose, self.visualize, self.min_frame_gap, self.io_timeout = greyscale, clahe, buffer_pct, consecutive_miss_limit, max_detections, seed, verbose, visualize, min_frame_gap, io_timeout
         self.name_map = {name: idx for idx, name in enumerate(names)}
-        if recursive:
-            self.video_paths = recursive_file_search(directory=video_dir, extensions=[".avi", ".mp4", ".mov", ".flv", ".m4v", ".webm", ".h264"], as_dict=True, raise_error=True)
+        if isinstance(video_data, list):
+            self.video_paths = {get_fn_ext(filepath=v)[1]: str(v) for v in video_data}
+        elif isinstance(video_data, (str, os.PathLike)) and os.path.isfile(video_data):
+            self.video_paths = {get_fn_ext(filepath=video_data)[1]: str(video_data)}
+        elif recursive:
+            self.video_paths = recursive_file_search(directory=video_data, extensions=[".avi", ".mp4", ".mov", ".flv", ".m4v", ".webm", ".h264"], as_dict=True, raise_error=True)
         else:
-            self.video_paths = find_all_videos_in_directory(directory=video_dir, as_dict=True, raise_error=True)
+            self.video_paths = find_all_videos_in_directory(directory=video_data, as_dict=True, raise_error=True)
         if shuffle_videos:
             items = list(self.video_paths.items())
             random.shuffle(items)
@@ -313,10 +327,10 @@ class SAM3ToYoloBBox:
         return '\n'.join(lines) + '\n' if lines else ''
 
 
-# runner = SAM3ToYoloBBox(video_dir=r'F:\netholabs\V6\batch_5\mp4s',
+# runner = SAM3ToYoloBBox(video_data=r'F:\irondog\data\uncompressed',
 #                         sam_path=r'D:\sam3\sam3.pt',
-#                         save_dir=r'F:\netholabs\V6\cage_3\yolo_project_0413',
-#                         txt_prompt='mouse',
+#                         save_dir=r'F:\irondog\data\yolo',
+#                         txt_prompt='dog',
 #                         n_frames=25,
 #                         verbose=True,
 #                         conf=0.25,
@@ -327,7 +341,7 @@ class SAM3ToYoloBBox:
 #                         shuffle_videos=True,
 #                         visualize=True)
 # runner.run()
-#
+
 
 
 # runner = SAM3ToYoloBBox(video_dir=r'F:\netholabs\V6\cage_3\samples',

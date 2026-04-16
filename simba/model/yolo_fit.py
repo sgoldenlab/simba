@@ -200,6 +200,19 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 # fitter.run()
 #
 
+#
+# fitter = FitYolo(weights_path=r"F:\yolo_weights\yolo26n.pt",
+#                  model_yaml=r"F:\irondog\data\yolo\map.yaml",
+#                  save_path=r"F:\irondog\data\yolo\mdl",
+#                  epochs=1500,
+#                  batch=16,
+#                  workers=3,
+#                  format=None,
+#                  device=0,
+#                  imgsz=256)
+# fitter.run()
+#
+
 
 
 # fitter = FitYolo(weights_path=r"C:\Users\sroni\Downloads\yolo26n.pt",

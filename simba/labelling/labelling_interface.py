@@ -317,9 +317,8 @@ class LabellingInterface(ConfigReader):
         start_frm, end_frm = int(start_frm), int(end_frm)
         if start_frm >= end_frm:
             raise FrameRangeError(msg=f'The RANGE START FRAME ({start_frm}) has to be smaller than the RANGE END FRAME ({end_frm})', source=self.__class__.__name__)
-        for frm_no in range(int(start_frm), int(end_frm) + 1):
-            for target in self.clf_names:
-                self.data_df_targets[target].loc[frm_no] = self.clf_cbs[target].get()
+        for target in self.clf_names:
+            self.data_df_targets[target].loc[start_frm:end_frm] = int(self.clf_cbs[target].get())
         self.set_img(img_lbl=self.img_lbl, video_path=self.video_path, img_idx=end_frm)
         self.current_frm_eb.entry_set(end_frm)
         self.img_idx = deepcopy(end_frm)

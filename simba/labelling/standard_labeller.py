@@ -28,7 +28,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_int,
                                 check_valid_dataframe, check_valid_dict,
                                 check_video_and_data_frm_count_align)
 from simba.utils.enums import Formats, TagNames
-from simba.utils.errors import FrameRangeError, NoDataError, NoFilesFoundError
+from simba.utils.errors import FrameRangeError, NoDataError, NoFilesFoundError, SimbaError
 from simba.utils.lookups import (get_current_time, get_display_resolution,
                                  get_img_resize_info,
                                  get_labelling_img_kbd_bindings,
@@ -166,7 +166,7 @@ class LabellingInterface(ConfigReader):
         self.forward_btn = SimbaButton(parent=self.navigation_frm, txt="", img='play_large_green', tooltip_txt="+1 FRAME", cmd=self.__advance_frame, cmd_kwargs={'frm_id': lambda: self.img_idx + 1})
         self.last_frm_btn = SimbaButton(parent=self.navigation_frm, txt="", img='skip_forward_large', tooltip_txt="GO TO LAST FRAME", cmd=self.__advance_frame, cmd_kwargs={'frm_id': self.max_frm_id})
 
-        self.set_img(img_lbl=self.img_lbl, video_path=self.video_path, img_idx=self.img_idx, display_size=self.img_display_size)
+        self.set_img(img_lbl=self.img_lbl, video_path=self.cap, img_idx=self.img_idx, display_size=self.img_display_size)
 
         self.navigation_frm.grid(row=2, column=0, sticky=NSEW, pady=10, padx=10, columnspan=1)
         self.current_frm_eb.grid(row=0, column=0, sticky=EW, columnspan=4)
@@ -350,7 +350,7 @@ class LabellingInterface(ConfigReader):
                 else:
                     self.clf_cbs[clf].set(bool(self.data_df_targets[clf].loc[frm_id]))
             self.img_idx = deepcopy(frm_id)
-            self.set_img(img_lbl=self.img_lbl, video_path=self.video_path, img_idx=frm_id, display_size=self.img_display_size)
+            self.set_img(img_lbl=self.img_lbl, video_path=self.cap, img_idx=frm_id, display_size=self.img_display_size)
 
     def __save_behavior_in_range(self,
                                  start_frm: int,
@@ -361,13 +361,12 @@ class LabellingInterface(ConfigReader):
         start_frm, end_frm = int(start_frm), int(end_frm)
         if start_frm >= end_frm:
             raise FrameRangeError(msg=f'The RANGE START FRAME ({start_frm}) has to be smaller than the RANGE END FRAME ({end_frm})', source=self.__class__.__name__)
-        for frm_no in range(int(start_frm), int(end_frm) + 1):
-            for target in self.clf_names:
-                self.data_df_targets[target].loc[frm_no] = int(self.clf_cbs[target].get())
-        self.set_img(img_lbl=self.img_lbl, video_path=self.video_path, img_idx=end_frm, display_size=self.img_display_size)
+        for target in self.clf_names:
+            self.data_df_targets[target].loc[start_frm:end_frm] = int(self.clf_cbs[target].get())
         self.current_frm_eb.entry_set(end_frm)
         self.img_idx = deepcopy(end_frm)
         self.__create_print_statements(frame=(start_frm, end_frm))
+        self.main_window.after(1, lambda: self.set_img(img_lbl=self.img_lbl, video_path=self.cap, img_idx=end_frm, display_size=self.img_display_size))
 
     def save_behavior_in_frm(self,
                              frame_idx: int,
@@ -380,8 +379,7 @@ class LabellingInterface(ConfigReader):
         try:
             write_df(self.save_df, self.file_type, self.targets_inserted_file_path)
         except Exception as e:
-            print(e, f"SIMBA ERROR: File for video {self.video_name} could not be saved.")
-            raise FileExistsError
+            raise SimbaError(msg=f"Annotation file for video {self.video_name} could not be saved at {self.targets_inserted_file_path}. {e}", source=self.__class__.__name__)
         stdout_success(msg=f"SAVED: Annotation file for video {self.video_name} saved within the {self.targets_folder} directory at file path: {self.targets_inserted_file_path}.", source=self.__class__.__name__)
         if not self.config.has_section("Last saved frames"):
             self.config.add_section("Last saved frames")
@@ -455,3 +453,7 @@ class LabellingInterface(ConfigReader):
 #                               threshold_dict={'Attack': 0.4},
 #                               setting='from_scratch',
 #                               continuing=False)
+# _ = LabellingInterface(config_path=r"F:\troubleshooting\sophiaa\project_folder\project_config.ini",
+#                        file_path=r"F:\troubleshooting\sophiaa\project_folder\videos\Choice222.mp4",
+#                        thresholds=None,
+#                        continuing=False)
