@@ -18,9 +18,9 @@ from simba.utils.checks import (
     check_that_column_exist, check_valid_boolean, check_valid_dict,
     check_valid_lst, check_valid_tuple)
 from simba.utils.errors import FrameRangeError, InvalidInputError, NoDataError
+from simba.utils.warnings import MissingFileWarning
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext, read_df, seconds_to_timestamp)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, read_df, seconds_to_timestamp)
 
 START, END = 'START', 'END'
 
@@ -151,9 +151,6 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
                     raise FrameRangeError(msg=f'Cannot compute movement between frame {start_frm} (time s: {start_time}) and frame {end_frm} (time s: {end_time}) in video {video_name}. The data only has {len(self.data_df)} frames.', source=self.__class__.__name__)
                 self.data_df = self.data_df.loc[start_frm:end_frm].reset_index()
                 if self.verbose: stdout_information(msg=f"Slicing video {video_name} between frames {start_frm} and {end_frm}...)")
-            else:
-                start_frm, end_frm = int(0 * self.fps), int(899 * self.fps)
-                self.data_df = self.data_df.loc[start_frm:end_frm].reset_index()
             if self.bp_list:
                 check_that_column_exist(df=self.data_df, column_name=self.bp_list, file_name=file_path)
                 self.data_df = self.data_df[self.bp_list]
@@ -212,7 +209,7 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     runner.save()
 
 
-# TIME_TIME_PATH = r"F:\troubleshooting\sam\sam\project_folder\DATA MASTERSHEET (1).csv"
+# TIME_TIME_PATH = r"F:\troubleshooting\sam\sam\project_folder\DATA MASTERSHEET_0428_PRE_ISO.csv"
 # time_stamps = pd.read_csv(TIME_TIME_PATH)[['VIDEO_FILE_NAME', 'START', 'END']].set_index('VIDEO_FILE_NAME').to_dict(orient='index')
 # test = MovementCalculator(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini",
 #                           body_parts=['center'],  #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
