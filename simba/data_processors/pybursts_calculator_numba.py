@@ -3,7 +3,7 @@ import math
 from typing import Union
 
 import numpy as np
-from numba import njit, float64, int64
+from numba import float64, int64, njit
 
 from simba.utils.checks import check_float
 from simba.utils.errors import ArrayError, FloatError, InvalidInputError
