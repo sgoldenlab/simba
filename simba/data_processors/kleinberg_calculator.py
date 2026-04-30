@@ -1,18 +1,16 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
-import glob
 import os
-import shutil
 from copy import deepcopy
 from typing import List, Optional, Union
 
 import numpy as np
 import pandas as pd
 
-from simba.data_processors.pybursts_calculator import kleinberg_burst_detection
+from simba.data_processors.pybursts_calculator import kleinberg_burst_detection as kleinberg_burst_detection_og
+from simba.data_processors.pybursts_calculator_numba import kleinberg_burst_detection as kleinberg_burst_detection_numba
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_float, check_if_dir_exists,
-                                check_if_filepath_list_is_empty, check_int,
+from simba.utils.checks import (check_float, check_if_dir_exists,check_int,
                                 check_that_column_exist, check_valid_boolean,
                                 check_valid_lst)
 from simba.utils.enums import Paths, TagNames
@@ -49,6 +47,7 @@ class KleinbergCalculator(ConfigReader):
     :param Optional[Union[str, os.PathLike]] input_dir: The directory with files to perform kleinberg smoothing on. If None, defaults to `project_folder/csv/machine_results`
     :param Optional[Union[str, os.PathLike]] output_dir: Location to save smoothened data in. If None, defaults to `project_folder/csv/machine_results`
     :param Optional[bool] save_originals: If True, saves the original data in sub-directory of the ouput directory.`
+    :param bool numba: If True, uses Numba JIT-accelerated burst detection for faster computation. Default: False.
 
     :example I:
     >>> kleinberg_calculator = KleinbergCalculator(config_path='MySimBAConfigPath', classifier_names=['Attack'], sigma=2, gamma=0.3, hierarchy=2, hierarchical_search=False)
@@ -81,7 +80,8 @@ class KleinbergCalculator(ConfigReader):
                  save_originals: bool = True,
                  hierarchical_search: Optional[bool] = False,
                  input_dir: Optional[Union[str, os.PathLike]] = None,
-                 output_dir: Optional[Union[str, os.PathLike]] = None):
+                 output_dir: Optional[Union[str, os.PathLike]] = None,
+                 numba: bool = True):
 
         ConfigReader.__init__(self, config_path=config_path)
         log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
@@ -96,7 +96,9 @@ class KleinbergCalculator(ConfigReader):
         check_valid_boolean(value=save_originals, source=f'{self.__class__.__name__} save_originals', raise_error=True)
         self.hierarchical_search, sigma, gamma, hierarchy, self.output_dir = (hierarchical_search, float(sigma), float(gamma), int(hierarchy), output_dir)
         self.sigma, self.gamma, self.hierarchy, self.clfs = ( float(sigma), float(gamma), int(hierarchy), classifier_names)
+        check_valid_boolean(value=numba, source=f'{self.__class__.__name__} numba', raise_error=True)
         self.verbose, self.save_originals = verbose, save_originals
+        self.kleinberg_burst_detection = kleinberg_burst_detection_numba if numba else kleinberg_burst_detection_og
         if input_dir is None:
             self.input_dir = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
         else:
@@ -157,7 +159,7 @@ class KleinbergCalculator(ConfigReader):
                 clf_offsets = data_df.index[data_df[clf] == 1].values
                 if len(clf_offsets) > 0:
                     video_out_df[clf] = 0
-                    self.kleinberg_bouts = pd.DataFrame(kleinberg_burst_detection(offsets=clf_offsets, s=self.sigma, gamma=self.gamma), columns=["Hierarchy", "Start", "Stop"])
+                    self.kleinberg_bouts = pd.DataFrame(self.kleinberg_burst_detection(offsets=clf_offsets, s=self.sigma, gamma=self.gamma), columns=["Hierarchy", "Start", "Stop"])
                     self.kleinberg_bouts["Stop"] += 1
                     self.kleinberg_bouts.insert(loc=0, column="Classifier", value=clf)
                     self.kleinberg_bouts.insert(loc=0, column="Video", value=video_name)
@@ -167,10 +169,12 @@ class KleinbergCalculator(ConfigReader):
                         self.hierarchical_searcher()
                     else:
                         self.clf_bouts_in_hierarchy = self.kleinberg_bouts[self.kleinberg_bouts["Hierarchy"] == self.hierarchy]
-                    hierarchy_idx = list(self.clf_bouts_in_hierarchy.apply(lambda x: list(range(x["Start"], x["Stop"] + 1)), 1))
-                    hierarchy_idx = [x for xs in hierarchy_idx for x in xs]
-                    hierarchy_idx = [x for x in hierarchy_idx if x in list(data_df.index)]
-                    video_out_df.loc[hierarchy_idx, clf] = 1
+                    if len(self.clf_bouts_in_hierarchy) > 0:
+                        starts = self.clf_bouts_in_hierarchy["Start"].values
+                        stops = self.clf_bouts_in_hierarchy["Stop"].values + 1
+                        hierarchy_idx = np.concatenate([np.arange(s, e) for s, e in zip(starts, stops)])
+                        hierarchy_idx = hierarchy_idx[np.isin(hierarchy_idx, data_df.index)]
+                        video_out_df.loc[hierarchy_idx, clf] = 1
             write_df(video_out_df, self.file_type, save_path)
             video_timer.stop_timer()
             if self.verbose: print(f'[{get_current_time()}] Kleinberg analysis complete for video {video_name} (saved at {save_path}), elapsed time: {video_timer.elapsed_time_str}s.')

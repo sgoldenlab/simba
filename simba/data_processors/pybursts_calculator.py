@@ -6,9 +6,45 @@ import numpy as np
 
 def kleinberg_burst_detection(offsets: np.ndarray, s: float, gamma: float):
     """
-    Burst detection using `pyburst <https://pypi.org/project/pybursts/>`_.
-    Private method called by ``simba.data_processors.kleinberg_calculator.KleinbergCalculator``.
+    Detect hierarchical bursts in a 1D sequence of event times using Kleinberg's two-state infinite-state automaton (modified from `pybursts <https://pypi.org/project/pybursts/>`_).
 
+    Bursts are intervals where events arrive at a higher-than-baseline rate. The algorithm assigns each inter-event gap to a discrete *level* ``q``: level ``0`` is baseline, higher levels (1, 2, …) are progressively faster (higher-rate) bursts. Each level transition opens or closes a burst at that level, producing a hierarchy of nested bursts.
+
+    .. note::
+       Private helper used by :class:`~simba.data_processors.kleinberg_calculator.KleinbergCalculator`.
+       For an end-to-end pipeline (frame indices → bouts → bursts), use that class.
+
+    :param np.ndarray offsets: 1D numeric array of event times (seconds, frame indices, or any monotonically meaningful unit). May be unsorted; sorted internally. Must have **strictly positive gaps** (no two events at the same time).
+    :param float s: Base of the rate scale (``> 1``). The candidate rate at level ``j`` is ``s**j / mean_gap``, so larger ``s`` means levels grow farther apart and bursts must be more pronounced to reach higher levels. Common choice: ``s = 2``.
+    :param float gamma: Cost of moving up one level (``>= 0``). Higher ``gamma`` penalizes rising into a burst, producing fewer / shorter bursts. Lower ``gamma`` makes the detector more sensitive. Common choice: ``gamma = 1``.
+
+    :returns: 2D ``np.ndarray`` of shape ``(N, 3)`` and ``dtype=object`` with one row per detected burst, columns ``[level, start_offset, end_offset]``:
+
+        * ``level`` — integer burst level (``0`` is the baseline level, higher levels are nested faster bursts).
+        * ``start_offset`` — value from ``offsets`` where this burst opens.
+        * ``end_offset`` — value from ``offsets`` where this burst closes (inclusive of the last event in the run).
+
+        For a single-event input, returns a single row ``[0, offsets[0], offsets[0]]``.
+    :rtype: np.ndarray
+
+    :raises ValueError: If ``offsets`` contains two or more events at the same time (zero gap).
+
+    .. seealso::
+       :func:`~simba.data_processors.pybursts_calculator_numba.kleinberg_burst_detection` for Numba JIT-accelerated version.
+
+    .. csv-table:: EXPECTED RUNTIMES
+       :file: ../../docs/tables/kleinberg_burst_detection.csv
+       :widths: 20, 15, 20, 20, 15
+       :align: center
+       :header-rows: 1
+
+    :example:
+    >>> import numpy as np
+    >>> from simba.data_processors.pybursts_calculator import kleinberg_burst_detection
+    >>> offsets = np.array([1.0, 1.1, 1.2, 5.0, 9.0, 9.05, 9.1])
+    >>> bursts = kleinberg_burst_detection(offsets=offsets, s=2.0, gamma=1.0)
+    >>> bursts.shape[1]
+    3
     """
 
     offsets = np.array(offsets, dtype=object)
@@ -41,8 +77,7 @@ def kleinberg_burst_detection(offsets: np.ndarray, s: float, gamma: float):
     alpha_function = np.vectorize(lambda x: s**x / g_hat)
     alpha = alpha_function(np.arange(k))
 
-    def f(j, x):
-        return alpha[j] * math.exp(-alpha[j] * x)
+    log_alpha = np.log(alpha)
 
     C = np.repeat(float("inf"), k)
     C[0] = 0
@@ -59,8 +94,7 @@ def kleinberg_burst_detection(offsets: np.ndarray, s: float, gamma: float):
 
             el = np.argmin(cost)
 
-            if f(j, gaps[t]) > 0:
-                C_prime[j] = cost[el] - math.log(f(j, gaps[t]))
+            C_prime[j] = cost[el] - log_alpha[j] + alpha[j] * gaps[t]
 
             if t > 0:
                 q_prime[j, :t] = q[el, :]
@@ -111,3 +145,18 @@ def kleinberg_burst_detection(offsets: np.ndarray, s: float, gamma: float):
         stack_counter -= 1
 
     return bursts
+#
+#
+# if __name__ == "__main__":
+#     import time
+#
+#     np.random.seed(42)
+#     sizes = [100, 1_000, 10_000, 100_000, 1_000_000]
+#     s, gamma = 2.0, 0.3
+#
+#     for n in sizes:
+#         offsets = np.sort(np.cumsum(np.random.exponential(scale=1.0, size=n)))
+#         start = time.perf_counter()
+#         result = kleinberg_burst_detection(offsets=offsets, s=s, gamma=gamma)
+#         elapsed = time.perf_counter() - start
+#         print(f"n={n:>10,}  bursts={result.shape[0]:>6,}  time={elapsed:.4f}s")
