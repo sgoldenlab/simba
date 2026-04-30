@@ -18,9 +18,10 @@ from simba.utils.checks import (
     check_that_column_exist, check_valid_boolean, check_valid_dict,
     check_valid_lst, check_valid_tuple)
 from simba.utils.errors import FrameRangeError, InvalidInputError, NoDataError
-from simba.utils.warnings import MissingFileWarning
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, read_df, seconds_to_timestamp)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_df, seconds_to_timestamp)
+from simba.utils.warnings import MissingFileWarning
 
 START, END = 'START', 'END'
 
