@@ -7,10 +7,12 @@ from typing import List, Optional, Union
 import numpy as np
 import pandas as pd
 
-from simba.data_processors.pybursts_calculator import kleinberg_burst_detection as kleinberg_burst_detection_og
-from simba.data_processors.pybursts_calculator_numba import kleinberg_burst_detection as kleinberg_burst_detection_numba
+from simba.data_processors.pybursts_calculator import \
+    kleinberg_burst_detection as kleinberg_burst_detection_og
+from simba.data_processors.pybursts_calculator_numba import \
+    kleinberg_burst_detection as kleinberg_burst_detection_numba
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_float, check_if_dir_exists,check_int,
+from simba.utils.checks import (check_float, check_if_dir_exists, check_int,
                                 check_that_column_exist, check_valid_boolean,
                                 check_valid_lst)
 from simba.utils.enums import Paths, TagNames
