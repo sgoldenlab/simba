@@ -228,7 +228,7 @@ class ProjectConfigCreator(object):
             MLParamKeys.LEARNING_CURVE_K_SPLITS.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            MLParamKeys.LEARNING_DATA_SPLITS.value
+            MLParamKeys.LEARNING_CURVE_DATA_SPLITS.value
         ] = Dtypes.NONE.value
 
         self.config.add_section(ConfigKey.MULTI_ANIMAL_ID_SETTING.value)

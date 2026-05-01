@@ -2107,7 +2107,7 @@ class TrainModelMixin(object):
             self.dataset_splits = read_config_entry(
                 config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.LEARNING_DATA_SPLITS.value,
+                MLParamKeys.LEARNING_CURVE_DATA_SPLITS.value,
                 data_type=Dtypes.INT.value,
                 default_value=Dtypes.NAN.value,
             )
@@ -2116,7 +2116,7 @@ class TrainModelMixin(object):
                 value=self.shuffle_splits,
             )
             check_int(
-                name=MLParamKeys.LEARNING_DATA_SPLITS.value, value=self.dataset_splits
+                name=MLParamKeys.LEARNING_CURVE_DATA_SPLITS.value, value=self.dataset_splits
             )
         else:
             self.shuffle_splits, self.dataset_splits = (

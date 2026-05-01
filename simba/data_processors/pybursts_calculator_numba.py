@@ -178,4 +178,4 @@ def kleinberg_burst_detection(offsets: np.ndarray, s: float, gamma: float) -> np
 #         start = time.perf_counter()
 #         result = kleinberg_burst_detection(offsets=offsets, s=s, gamma=gamma)
 #         elapsed = time.perf_counter() - start
-#         print(f"n={n:>10,}  bursts={result.shape[0]:>6,}  time={elapsed:.4f}s")
+#         print(f"n={n:>10,}python   bursts={result.shape[0]:>6,}  time={elapsed:.4f}s")

@@ -120,9 +120,9 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
 
             if generate_learning_curve in Options.PERFORM_FLAGS.value:
                 shuffle_splits = read_config_entry(self.config,ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,MLParamKeys.LEARNING_CURVE_K_SPLITS.value,data_type=Dtypes.INT.value,default_value=Dtypes.NAN.value)
-                dataset_splits = read_config_entry(self.config,ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,MLParamKeys.LEARNING_DATA_SPLITS.value,data_type=Dtypes.INT.value,default_value=Dtypes.NAN.value)
+                dataset_splits = read_config_entry(self.config,ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,MLParamKeys.LEARNING_CURVE_DATA_SPLITS.value,data_type=Dtypes.INT.value,default_value=Dtypes.NAN.value)
                 check_int(name=MLParamKeys.LEARNING_CURVE_K_SPLITS.value, value=shuffle_splits)
-                check_int(name=MLParamKeys.LEARNING_DATA_SPLITS.value, value=dataset_splits)
+                check_int(name=MLParamKeys.LEARNING_CURVE_DATA_SPLITS.value, value=dataset_splits)
             else:
                 shuffle_splits, dataset_splits = Dtypes.NAN.value, Dtypes.NAN.value
             if generate_features_importance_bar_graph in Options.PERFORM_FLAGS.value:
