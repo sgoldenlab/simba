@@ -97,7 +97,7 @@ def _roi_directing_visualizer_mp(frm_range: Tuple[int, np.ndarray],
                 cv2.putText(img, str(is_directing), text_locations[animal_name][shape_name]["directing_data_loc"], font, font_size, shape_clr, 1)
                 cum_key = (animal_name, shape_name)
                 cum_frms = cumulative_directing[cum_key][current_frm] if current_frm < len(cumulative_directing[cum_key]) else cumulative_directing[cum_key][-1]
-                cum_time = seconds_to_timestamp(seconds=cum_frms / fps)
+                cum_time = seconds_to_timestamp(seconds=cum_frms / fps, hh_mm_ss_sss=True)
                 cv2.putText(img, text_locations[animal_name][shape_name]["total_time_text"], text_locations[animal_name][shape_name]["total_time_text_loc"], font, font_size, shape_clr, 1)
                 cv2.putText(img, cum_time, text_locations[animal_name][shape_name]["total_time_data_loc"], font, font_size, shape_clr, 1)
                 if is_directing:
@@ -111,7 +111,7 @@ def _roi_directing_visualizer_mp(frm_range: Tuple[int, np.ndarray],
                                                               style=direction_style)
             writer.write(np.uint8(img))
             if verbose:
-                seconds = seconds_to_timestamp(seconds=current_frm / video_meta_data['fps'])
+                seconds = seconds_to_timestamp(seconds=current_frm / video_meta_data['fps'], hh_mm_ss_sss=True)
                 stdout_information(msg=f"Multiprocessing frame: {current_frm}, time-stamp: {seconds} on core {group_cnt}...")
             current_frm += 1
         else:
@@ -148,7 +148,7 @@ class DirectingROIVisualizer(ConfigReader, PlottingMixin):
     :param bool verbose: If True, print progress messages during visualization. Default True.
 
     .. video:: _static/img/DirectingROIVisualizer.webm
-       :width: 600
+       :width: 1000
        :autoplay:
        :loop:
        :muted:
