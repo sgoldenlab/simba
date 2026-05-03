@@ -641,6 +641,9 @@ Creates videos showing when each animal is **directing towards user-defined ROIs
   <img src="images/visualizations/visualize_roi_directionality.webp" width="600" alt="Visualize ROI directionality pop-up">
 </p>
 
+[DirectingROIVisualizer.webm](https://github.com/user-attachments/assets/58506f7c-096c-47ae-9012-d30f64ecc0ac)
+
+
 **Prerequisites:**
 - **Pose data** — Tracking data in `project_folder/csv/outlier_corrected_movement_location/` (one file per video).
 - **ROI definitions** — ROIs must be drawn for the video(s) you want to visualize. SimBA reads ROI definitions from `project_folder/logs/measures/ROI_definitions.h5`.

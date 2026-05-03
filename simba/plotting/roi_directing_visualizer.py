@@ -29,13 +29,13 @@ from simba.utils.checks import (check_file_exist_and_readable,
 from simba.utils.data import (find_frame_numbers_from_time_stamp, get_cpu_pool,
                               slice_roi_dict_for_video, terminate_cpu_pool)
 from simba.utils.enums import Formats, TextOptions
-from simba.utils.errors import NoFilesFoundError, NoROIDataError, ROICoordinatesNotFoundError
+from simba.utils.errors import (NoFilesFoundError, NoROIDataError,
+                                ROICoordinatesNotFoundError)
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_fn_ext,
                                     get_video_meta_data, read_df,
                                     remove_a_folder, seconds_to_timestamp)
-
 
 START_TIME, END_TIME = 'start_time', 'end_time'
 

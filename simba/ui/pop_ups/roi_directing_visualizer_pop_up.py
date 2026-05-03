@@ -6,17 +6,19 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.roi_directing_visualizer import DirectingROIVisualizer
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, CreateToolTip,
-                                        Entry_Box, SimbaButton, SimbaCheckbox,
-                                        SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
+                                        CreateToolTip, Entry_Box, SimbaButton,
+                                        SimbaCheckbox, SimBADropDown)
 from simba.utils.checks import (check_if_string_value_is_valid_video_timestamp,
                                 check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end)
 from simba.utils.enums import Formats, Keys, Links
-from simba.utils.errors import FrameRangeError, NoFilesFoundError, NoROIDataError
+from simba.utils.errors import (FrameRangeError, NoFilesFoundError,
+                                NoROIDataError)
 from simba.utils.lookups import find_closest_string, get_tooltips
 from simba.utils.printing import stdout_warning
-from simba.utils.read_write import find_all_videos_in_directory, find_core_cnt, get_fn_ext, str_2_bool
+from simba.utils.read_write import (find_all_videos_in_directory,
+                                    find_core_cnt, get_fn_ext, str_2_bool)
 
 NOSE, EAR_LEFT, EAR_RIGHT = Keys.NOSE.value, Keys.EAR_LEFT.value, Keys.EAR_RIGHT.value
 
