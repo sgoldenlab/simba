@@ -57,9 +57,10 @@ from simba.ui.import_pose_frame import ImportPoseFrame
 from simba.ui.import_videos_frame import ImportVideosFrame
 from simba.ui.machine_model_settings_ui import MachineModelSettingsPopUp
 from simba.ui.pop_ups.about_simba_pop_up import AboutSimBAPopUp
-from simba.ui.pop_ups.animal_directing_other_animals_pop_up import AnimalDirectingAnimalPopUp
-from simba.ui.pop_ups.roi_directing_visualizer_pop_up import DirectingROIVisualizerPopUp
-from simba.ui.pop_ups.animal_directing_roi_pop_up import AnimalDirectingROIPopUp
+from simba.ui.pop_ups.animal_directing_other_animals_pop_up import \
+    AnimalDirectingAnimalPopUp
+from simba.ui.pop_ups.animal_directing_roi_pop_up import \
+    AnimalDirectingROIPopUp
 from simba.ui.pop_ups.annotated_bouts_videos_pop_up import \
     AnnotatedBoutsVideoPopUp
 from simba.ui.pop_ups.append_roi_features_animals_pop_up import \
@@ -146,6 +147,8 @@ from simba.ui.pop_ups.roi_aggregate_stats_popup import \
     ROIAggregateDataAnalyzerPopUp
 from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import \
     ROIAnalysisTimeBinsPopUp
+from simba.ui.pop_ups.roi_directing_visualizer_pop_up import \
+    DirectingROIVisualizerPopUp
 from simba.ui.pop_ups.roi_features_plot_pop_up import VisualizeROIFeaturesPopUp
 from simba.ui.pop_ups.roi_tracking_plot_pop_up import VisualizeROITrackingPopUp
 from simba.ui.pop_ups.roi_video_table_pop_up import ROIVideoTable

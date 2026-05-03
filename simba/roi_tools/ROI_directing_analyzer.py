@@ -9,13 +9,20 @@ from numba import jit, prange
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.checks import check_file_exist_and_readable, check_instance, check_str, check_valid_boolean, check_valid_dataframe, check_all_file_names_are_represented_in_video_log
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_instance, check_str,
+    check_valid_boolean, check_valid_dataframe)
 from simba.utils.data import slice_roi_dict_for_video
 from simba.utils.enums import ROI_SETTINGS, Formats
-from simba.utils.errors import (InvalidInputError, NoDataError, ROICoordinatesNotFoundError)
+from simba.utils.errors import (InvalidInputError, NoDataError,
+                                ROICoordinatesNotFoundError)
 from simba.utils.lookups import create_directionality_cords
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_information, stdout_warning
-from simba.utils.read_write import get_fn_ext, read_data_paths, read_df, read_roi_data, read_video_info, seconds_to_timestamp
+from simba.utils.printing import (SimbaTimer, stdout_information,
+                                  stdout_success, stdout_warning)
+from simba.utils.read_write import (get_fn_ext, read_data_paths, read_df,
+                                    read_roi_data, read_video_info,
+                                    seconds_to_timestamp)
 
 EAR_LEFT, EAR_RIGHT, NOSE = "Ear_left", "Ear_right", "Nose"
 X_BPS, Y_BPS = "X_bps", "Y_bps"
