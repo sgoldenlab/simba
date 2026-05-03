@@ -26,6 +26,13 @@ ROI feature visualization - multiprocess
    :members:
    :show-inheritance:
 
+ROI directing visualization
+--------------------------------------------------
+
+.. autoclass:: simba.plotting.roi_directing_visualizer.DirectingROIVisualizer
+   :members:
+   :show-inheritance:
+
 ROI visualizer
 ----------------------------------
 

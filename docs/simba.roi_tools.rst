@@ -50,6 +50,10 @@ ROI Directing Analyzer
    :members:
    :show-inheritance:
 
+.. autoclass:: simba.roi_tools.ROI_directing_analyzer.DirectingROIAnalyzer
+   :members:
+   :show-inheritance:
+
 ROI Time-Bin Calculator
 -----------------------
 
@@ -99,6 +103,13 @@ ROI Feature Visualizer - Multiprocess
 ---------------------------------------
 
 .. autoclass:: simba.plotting.ROI_feature_visualizer_mp.ROIfeatureVisualizerMultiprocess
+   :members:
+   :show-inheritance:
+
+ROI Directing Visualizer
+-------------------------
+
+.. autoclass:: simba.plotting.roi_directing_visualizer.DirectingROIVisualizer
    :members:
    :show-inheritance:
 
