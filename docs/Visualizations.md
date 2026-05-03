@@ -48,6 +48,7 @@ This document serves as a central location documenting many pose-dependent visua
 - [Visualize ROI features (ROI tab)](#visualize-roi-features-roi-tab)
 - [Visualize heatmap locations (ROI tab)](#visualize-heatmap-locations-roi-tab)
 - [Visualize directionality (ROI tab)](#visualize-directionality-roi-tab)
+- [Visualize ROI directionality (ROI tab)](#visualize-roi-directionality-roi-tab)
 - [Visualize data tables](#visualize-data-tables)
 - [Merge (concatenate) multiple videos](#merge-concatenate-multiple-videos)
 - [Post-classification validation (Scenario 4)](#post-classification-validation-scenario-4)
@@ -627,6 +628,42 @@ Creates videos showing when each animal is **directing towards other animals** (
 [visualize_directionality_2.webm](https://github.com/user-attachments/assets/cf73b602-932b-4ab4-82e0-2fa9f963531b)
 
 ![visualize_directionality_3](https://github.com/user-attachments/assets/e607adf8-3227-4316-88da-cd6075f17a3c)
+
+---
+
+## VISUALIZE ROI DIRECTIONALITY (ROI tab)
+
+*Available under the **[ROI]** tab → **OTHER ANALYSES / VISUALIZATIONS** → **VISUALIZE ROI DIRECTIONALITY**.*
+
+Creates videos showing when each animal is **directing towards user-defined ROIs**. Draws lines or funnels from the animal's eye midpoint to the ROI when the animal is directing towards it. A side panel displays the directing boolean (True/False) and cumulative total directing time for each animal-ROI combination, updating in real time per frame.
+
+<p align="center">
+  <img src="images/visualizations/visualize_roi_directionality.webp" width="600" alt="Visualize ROI directionality pop-up">
+</p>
+
+**Prerequisites:**
+- **Pose data** — Tracking data in `project_folder/csv/outlier_corrected_movement_location/` (one file per video).
+- **ROI definitions** — ROIs must be drawn for the video(s) you want to visualize. SimBA reads ROI definitions from `project_folder/logs/measures/ROI_definitions.h5`.
+- **Nose and ear body parts** — The pose configuration must include **nose**, **left ear**, and **right ear** (or equivalent) body parts so SimBA can estimate head direction.
+
+| Option | Description |
+|--------|-------------|
+| **LEFT EAR / RIGHT EAR / NOSE** | Body parts used to estimate head direction. SimBA auto-guesses from your body-part names; adjust if needed. All three must be unique. |
+| **DIRECTION STYLE** | Style of the directing indicator. **LINES** draws a straight line from the eye midpoint to the ROI center. **FUNNEL** draws a filled triangle from the eye midpoint to the ROI boundary edges. |
+| **BORDER COLOR** | Background color of the text panel on the right side of the video. |
+| **DIRECTION COLOR** | Color of the directing line or funnel. |
+| **SHOW POSE** | If TRUE, draw pose-estimation keypoints on the video. |
+| **SHOW ROI CENTERS** | If TRUE, draw the center point of each ROI. |
+| **SHOW ANIMAL NAMES** | If TRUE, display animal name labels on the video. |
+| **CIRCLE SIZE** | Size of pose keypoint circles. **AUTO** computes an optimal size based on video resolution. |
+| **DIRECTION LINE THICKNESS** | Thickness of the directing line. **AUTO** computes an optimal thickness based on video resolution. |
+| **USE GPU** | If TRUE, use GPU acceleration for video concatenation (requires compatible hardware). |
+| **CPU CORES** | Number of CPU cores for multiprocessing. |
+| **Visualize ONLY defined time-segment** | If checked, only the specified time window (start/end in HH:MM:SS) is visualized instead of the full video. |
+
+**Where output is saved:** `project_folder/frames/output/ROI_directing_visualizations/`
+
+To **analyze** directionality towards ROIs (aggregate statistics, detailed tables), see [ROI Tutorial — Directionality towards ROIs](ROI_tutorial.md#directionality-towards-rois).
 
 ---
 

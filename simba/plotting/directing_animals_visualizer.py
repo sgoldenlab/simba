@@ -3,6 +3,7 @@ __author__ = "Simon Nilsson; sronilsson@gmail.com"
 import os
 from typing import Any, Dict, Optional, Union
 
+
 import cv2
 import numpy as np
 

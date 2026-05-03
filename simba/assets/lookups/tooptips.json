@@ -499,5 +499,13 @@
   "MULTICROP_OUTPUT_FOLDER": "Folder where the cropped video clips will be saved.",
   "MULTICROP_INPUT_VIDEO_FORMAT": "Input video file format inside the input folder (e.g. mp4).",
   "MULTICROP_CROPS_PER_VIDEO": "How many cropped clips to create per input video (minimum 2).",
-  "MULTICROP_OUTPUT_QUALITY": "Encoding quality for the cropped output videos (1–100)."
+  "MULTICROP_OUTPUT_QUALITY": "Encoding quality for the cropped output videos (1–100).",
+  "ROI_DIRECTING_DETAILED_TABLE": "If checked, saves a detailed frame-level CSV table with directing events for each animal and ROI, including frame number, eye coordinates, ROI coordinates, and directing boolean.",
+  "ROI_DIRECTING_AGGREGATE_STATS": "If checked, saves aggregate directing statistics (first directing time, last directing time, total directing time, directing bout count) for each animal-ROI combination per video.",
+  "ROI_DIRECTING_TRANSPOSE": "If checked, pivots the aggregate statistics table so that each measure (first/last directing time, total directing time, directing bouts) becomes its own column rather than its own row. Default: each row is a video-animal-ROI-measure combination.",
+  "ROI_DIRECTING_VIS_DIRECTION_STYLE": "Style of the directing line drawn from the animal eye to the ROI. LINES draws a straight line; FUNNEL draws a filled triangle (convex hull) from the eye midpoint to the ROI boundary edges.",
+  "ROI_DIRECTING_VIS_DIRECTION_COLOR": "Color of the directing line or funnel drawn when the animal is directing towards a ROI.",
+  "ROI_DIRECTING_VIS_TIME_SEGMENT": "If checked, only the specified time segment (start to end time in HH:MM:SS format) will be visualized. If unchecked, the entire video is visualized.",
+  "ROI_DIRECTING_VIS_CIRCLE_SIZE": "Size of the pose-estimation keypoint circles drawn on the video. AUTO computes an optimal size based on the video resolution.",
+  "ROI_DIRECTING_VIS_LINE_THICKNESS": "Thickness of the directing line drawn from the animal eye to the ROI. AUTO computes an optimal thickness based on the video resolution."
 }

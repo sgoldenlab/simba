@@ -57,6 +57,7 @@ To use ROI analysis or ROI-based features in SimBA, tracking data must be proces
   - [Path plots](#path-plots)
   - [Heatmaps (location)](#heatmaps-location)
   - [Directionality between animals](#directionality-between-animals)
+  - [Directionality towards ROIs](#directionality-towards-rois)
   - [Directionality between body parts](#directionality-between-body-parts)
   - [Aggregate conditional statistics from boolean fields](#compute-aggregate-conditional-statistics-from-boolean-fields)
   - [Spontaneous alternation](#spontaneous-alternation)
@@ -409,6 +410,34 @@ Also described in [Visualizations.md — Directionality](Visualizations.md#visua
 
 ---
 
+### Directionality towards ROIs
+
+**Where:** **[ROI]** tab → **OTHER ANALYSES / VISUALIZATIONS** → **ANALYZE DIRECTIONALITY BETWEEN ANIMALS AND ROIs**
+
+Compute aggregate statistics for when each animal is **directing towards user-defined ROIs**. SimBA uses nose and left/right ear coordinates to estimate head direction (line of sight) and determines whether the animal's gaze cone intersects each ROI on a per-frame basis.
+
+<p align="center">
+  <img src="images/visualizations/analyze_roi_directionality.webp" width="500" alt="Analyze ROI directionality pop-up">
+</p>
+
+**Prerequisites:**
+- **ROI definitions** — ROIs must be drawn and saved for the video(s) you want to analyze.
+- **Nose and ear body parts** — The pose configuration must include **nose**, **left ear**, and **right ear** (or equivalent) for each animal.
+- **Pose data** — Tracking data in `project_folder/csv/outlier_corrected_movement_location/`.
+
+| Option | Description |
+|--------|-------------|
+| **LEFT EAR / RIGHT EAR / NOSE** | Body parts used to estimate head direction. SimBA auto-guesses from your body-part names; adjust if needed. All three must be unique. |
+| **DETAILED TABLE** | If checked, saves a frame-level CSV with directing events for each animal and ROI, including frame number, eye coordinates, ROI coordinates, and directing boolean. |
+| **AGGREGATE STATISTICS** | If checked, saves aggregate directing statistics (first directing time, last directing time, total directing time, directing bout count) for each animal-ROI combination per video. |
+| **TRANSPOSE AGGREGATE STATISTICS** | If checked, pivots the aggregate table so each measure becomes its own column (one row per video-animal-ROI combination) rather than one row per measure. |
+
+**Where output is saved:** `project_folder/logs/` — files named `ROI_directionality_summary_{datetime}.csv` (detailed) and `ROI_directionality_aggregate_stats_{datetime}.csv` (aggregate).
+
+To **visualize** ROI directionality on video, see [Visualize ROI Directionality](Visualizations.md#visualize-roi-directionality-roi-tab).
+
+---
+
 ### Directionality between body parts
 
 **Where:** **[ROI]** tab → **OTHER ANALYSES / VISUALIZATIONS** → **ANALYZE DIRECTIONALITY BETWEEN BODY PARTS** / **VISUALIZE DIRECTIONALITY BETWEEN BODY PARTS**
@@ -531,6 +560,8 @@ Classes, methods, and modules used in this workflow and their Read the Docs link
 | Analyze distances/velocity (time-bins) | `TimeBinsMovementCalculator`, `TimeBinsMovementCalculatorMultiprocess` | [simba.data_processors](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.data_processors.html) |
 | Create path plots (ROI tab) | `EzPathPlot` | [simba.plotting](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.plotting.html) |
 | Create location heatmaps | `HeatmapperLocationSingleCore`, `HeatMapperLocationMultiprocess` | [simba.plotting](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.plotting.html) |
+| Analyze directionality towards ROIs | `DirectingROIAnalyzer` | [simba.roi_tools](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.roi_tools.html) |
+| Visualize directionality towards ROIs | `DirectingROIVisualizer` | [simba.plotting](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.plotting.html) |
 | Analyze directionality between animals | `DirectingOtherAnimalsAnalyzer` | [simba.data_processors](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.data_processors.html) |
 | Visualize directionality between animals | `DirectingOtherAnimalsVisualizer`, `DirectingOtherAnimalsVisualizerMultiprocess` | [simba.plotting](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.plotting.html) |
 | Analyze directionality between body parts | `DirectingAnimalsToBodyPartAnalyzer` | [simba.data_processors](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.data_processors.html) |

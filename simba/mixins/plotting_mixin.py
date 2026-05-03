@@ -1891,7 +1891,6 @@ class PlottingMixin(object):
             if isinstance(row["Color BGR"], str): row["Color BGR"] = ast.literal_eval(row["Color BGR"])
             img = cv2.polylines( img, [row["vertices"].astype(np.int32)], True, row["Color BGR"], thickness=int(row["Thickness"]), lineType=polygon_line_type)
             if show_center:
-                print(row['Name'], omitted_centers)
                 if omitted_centers is not None and row['Name'] in omitted_centers: continue
                 img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), tag_size, row["Color BGR"], polygon_line_type)
             if show_tags:

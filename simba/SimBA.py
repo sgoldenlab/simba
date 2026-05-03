@@ -57,8 +57,9 @@ from simba.ui.import_pose_frame import ImportPoseFrame
 from simba.ui.import_videos_frame import ImportVideosFrame
 from simba.ui.machine_model_settings_ui import MachineModelSettingsPopUp
 from simba.ui.pop_ups.about_simba_pop_up import AboutSimBAPopUp
-from simba.ui.pop_ups.animal_directing_other_animals_pop_up import \
-    AnimalDirectingAnimalPopUp
+from simba.ui.pop_ups.animal_directing_other_animals_pop_up import AnimalDirectingAnimalPopUp
+from simba.ui.pop_ups.roi_directing_visualizer_pop_up import DirectingROIVisualizerPopUp
+from simba.ui.pop_ups.animal_directing_roi_pop_up import AnimalDirectingROIPopUp
 from simba.ui.pop_ups.annotated_bouts_videos_pop_up import \
     AnnotatedBoutsVideoPopUp
 from simba.ui.pop_ups.append_roi_features_animals_pop_up import \
@@ -398,9 +399,13 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_lineplot = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="CREATE PATH PLOTS", txt_clr='orange', img='path', font=Formats.FONT_REGULAR.value, cmd=EzPathPlotPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
         button_analyzeDirection = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE DIRECTIONALITY BETWEEN ANIMALS", img='direction', txt_clr='deeppink', font=Formats.FONT_REGULAR.value, cmd=AnimalDirectingAnimalPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_visualizeDirection = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="VISUALIZE DIRECTIONALITY BETWEEN ANIMALS", img='direction', txt_clr='brown', font=Formats.FONT_REGULAR.value, cmd=DirectingOtherAnimalsVisualizerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_analyzeDirection_bp = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE DIRECTIONALITY BETWEEN BODY PARTS", img='direction', txt_clr='purple', font=Formats.FONT_REGULAR.value, cmd=DirectionAnimalToBodyPartSettingsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_visualizeDirection_bp = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="VISUALIZE DIRECTIONALITY BETWEEN BODY PARTS", img='direction', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=DirectingAnimalToBodyPartVisualizerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_visualizeDirection = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="VISUALIZE DIRECTIONALITY BETWEEN ANIMALS", img='eye', txt_clr='deeppink', font=Formats.FONT_REGULAR.value, cmd=DirectingOtherAnimalsVisualizerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_analyzeDirection_bp = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE DIRECTIONALITY BETWEEN BODY PARTS", img='direction', txt_clr='brown', font=Formats.FONT_REGULAR.value, cmd=DirectionAnimalToBodyPartSettingsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_visualizeDirection_bp = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="VISUALIZE DIRECTIONALITY BETWEEN BODY PARTS", img='eye', txt_clr='brown', font=Formats.FONT_REGULAR.value, cmd=DirectingAnimalToBodyPartVisualizerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_analyze_roi_direction = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE DIRECTIONALITY BETWEEN ANIMALS & ROI", img='direction', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=AnimalDirectingROIPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_visualize_roi_direction = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="VISUALIZE DIRECTIONALITY BETWEEN ANIMALS & ROI", img='eye', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=DirectingROIVisualizerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+
+
 
         btn_agg_boolean_conditional_statistics = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="AGGREGATE BOOLEAN CONDITIONAL STATISTICS", img='details', txt_clr='grey', font=Formats.FONT_REGULAR.value, cmd=BooleanConditionalSlicerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         spontaneous_alternation_pop_up_btn = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_XL.value, txt="SPONTANEOUS ALTERNATION", img='t', txt_clr='navy', font=Formats.FONT_REGULAR.value, cmd=SpontaneousAlternationPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
@@ -416,10 +421,12 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_visualizeDirection.grid(row=5, sticky=NW)
         button_analyzeDirection_bp.grid(row=6, sticky=NW)
         button_visualizeDirection_bp.grid(row=7, sticky=NW)
-        btn_agg_boolean_conditional_statistics.grid(row=8, sticky=NW)
-        spontaneous_alternation_pop_up_btn.grid(row=9, sticky=NW)
-        button_distances_agg.grid(row=10, sticky=NW)
-        button_distances_timebins.grid(row=11, sticky=NW)
+        button_analyze_roi_direction.grid(row=8, sticky=NW)
+        button_visualize_roi_direction.grid(row=9, sticky=NW)
+        btn_agg_boolean_conditional_statistics.grid(row=10, sticky=NW)
+        spontaneous_alternation_pop_up_btn.grid(row=11, sticky=NW)
+        button_distances_agg.grid(row=12, sticky=NW)
+        button_distances_timebins.grid(row=13, sticky=NW)
 
         label_outliercorrection = CreateLabelFrameWithIcon(parent=tab4, header="OUTLIER CORRECTION", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.OUTLIERS_DOC.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
         button_settings_outlier = SimbaButton(parent=label_outliercorrection, width=Formats.BUTTON_WIDTH_L.value, txt="SETTINGS", txt_clr='blue', img='settings', font=Formats.FONT_REGULAR.value, cmd=OutlierSettingsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
