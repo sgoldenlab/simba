@@ -586,8 +586,10 @@ class PlottingMixin(object):
                                    legend_lbl: str = "location (seconds)",
                                    heatmap_opacity: Optional[float] = 0.99,
                                    color_legend: bool = True,
-                                   leg_width: Optional[int] = None) -> Union[np.ndarray, None]:
+                                   leg_width: Optional[int] = None,
+                                   hh_mm_ss: bool = False) -> Union[np.ndarray, None]:
 
+        check_valid_boolean(value=hh_mm_ss, source=f'{PlottingMixin.make_location_heatmap_plot.__name__} hh_mm_ss', raise_error=True)
         cum_df = pd.DataFrame(frm_data).reset_index()
         cum_df = cum_df.melt(id_vars="index", value_vars=None, var_name=None, value_name="seconds", col_level=None).rename(columns={"index": "vertical_idx", "variable": "horizontal_idx"})
         below_min = cum_df["seconds"] < min_seconds if min_seconds is not None else pd.Series(False, index=cum_df.index)
@@ -653,6 +655,13 @@ class PlottingMixin(object):
             cb.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
 
             def _legend_formatter(x, pos):
+                if hh_mm_ss:
+                    from simba.utils.read_write import seconds_to_timestamp
+                    if x >= max_scale - 1e-9:
+                        return f">{seconds_to_timestamp(max_scale)}"
+                    if min_seconds is not None and x <= vmin_plot + 1e-9:
+                        return f"<{seconds_to_timestamp(min_seconds)}"
+                    return seconds_to_timestamp(float(x))
                 if x >= max_scale - 1e-9:
                     return f">{int(round(max_scale))}"
                 if min_seconds is not None and x <= vmin_plot + 1e-9:
@@ -1251,6 +1260,7 @@ class PlottingMixin(object):
                   grid: bool = True,
                   bg_clr: str = 'white',
                   line_width: float = 1.5,
+                  line_opacity: float = 1.0,
                   save_path: Optional[Union[str, os.PathLike]] = None,
                   dpi: Optional[int] = None,
                   tight_layout: bool = True,
@@ -1264,7 +1274,9 @@ class PlottingMixin(object):
                   markersize: Optional[float] = None,
                   linestyle: Optional[Union[str, List[str]]] = None,
                   save_kwargs: Optional[Dict[str, Any]] = None,
-                  svg: bool = False):
+                  svg: bool = False,
+                  x_tick_lbl_rotation: Optional[int] = None,
+                  x_tick_interval: Optional[int] = None):
         """
         Line plot from DataFrame with optional error bands.
 
@@ -1287,6 +1299,7 @@ class PlottingMixin(object):
         check_str(name=f"{PlottingMixin.line_plot.__name__} x", value=x, options=tuple(df.columns))
         check_instance(source=f"{PlottingMixin.line_plot.__name__} y", instance=y, accepted_types=(str, list))
         check_float(name=f"{PlottingMixin.line_plot.__name__} line_width", value=line_width, allow_zero=False, allow_negative=False, raise_error=True)
+        check_float(name=f"{PlottingMixin.line_plot.__name__} line_opacity", value=line_opacity, min_value=0.0, max_value=1.0)
         check_valid_boolean(value=grid, source=f"{PlottingMixin.line_plot.__name__} grid", raise_error=True)
         check_str(name=f"{PlottingMixin.line_plot.__name__} bg_clr", value=bg_clr.lower(), options=tuple(get_named_colors()))
         bg_clr = bg_clr.lower()
@@ -1311,6 +1324,10 @@ class PlottingMixin(object):
             if len(linestyle) != len(y):
                 raise ValueError(f"{PlottingMixin.line_plot.__name__} linestyle list length must match number of y series ({len(y)}).")
         check_valid_boolean(value=svg, source=f"{PlottingMixin.line_plot.__name__} svg", raise_error=True)
+        if x_tick_lbl_rotation is not None:
+            check_int(name=f"{PlottingMixin.line_plot.__name__} x_tick_lbl_rotation", value=x_tick_lbl_rotation, min_value=0, max_value=360)
+        if x_tick_interval is not None:
+            check_int(name=f"{PlottingMixin.line_plot.__name__} x_tick_interval", value=x_tick_interval, min_value=1)
         if grid:
             sns.set_style(style="whitegrid", rc={"grid.linestyle": "--"})
         else:
@@ -1341,7 +1358,7 @@ class PlottingMixin(object):
         colors = sns.color_palette(palette, n_colors=len(y))
         for i in range(len(y)):
             ls = linestyle[i] if isinstance(linestyle, list) else linestyle
-            plot_kw = dict(data=df, x=x, y=y[i], label=y[i], color=colors[i], linewidth=line_width)
+            plot_kw = dict(data=df, x=x, y=y[i], label=y[i], color=colors[i], linewidth=line_width, alpha=line_opacity)
             if marker is not None:
                 plot_kw['marker'] = marker
             if ls is not None:
@@ -1373,6 +1390,12 @@ class PlottingMixin(object):
         elif legend_loc is not None and ax.legend_ is not None:
             ax.legend(loc=legend_loc, fontsize=font_size)
         ax.grid(grid)
+        if x_tick_interval is not None:
+            x_vals = df[x].values
+            ax.set_xticks(range(0, len(x_vals), x_tick_interval))
+            ax.set_xticklabels(x_vals[::x_tick_interval])
+        if x_tick_lbl_rotation is not None:
+            plt.setp(ax.get_xticklabels(), rotation=x_tick_lbl_rotation, ha='right')
         if tight_layout:
             fig.tight_layout()
         if save_path is not None:

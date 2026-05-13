@@ -17,8 +17,15 @@ from simba.utils.read_write import get_fn_ext
 class CropLPAnnotations:
     """
     Creates a new, self-contained Lightning Pose project from an existing one where
-    every labeled image is cropped to a fixed size around the annotated animal. The
-    output project is ready for training/inference: configs, calibrations, models,
+    every labeled image is cropped to a fixed size around the annotated animal.
+
+    When running inference on cropped frames (e.g. from an object detector), the
+    training data should also be cropped so the model sees the same distribution
+    at train and test time. This class produces a new LP project where every
+    labeled frame is cropped around the animal's keypoints, ready for training
+    a model that will run inference on crops — without any re-labeling.
+
+    The output project is ready for training/inference: configs, calibrations, models,
     scripts, and ``project.yaml`` are copied, config paths are updated to the new
     location, and all ``CollectedData_*.csv`` keypoint coordinates are shifted to
     match the cropped frames. A row is only dropped when it is all-NaN in every
@@ -33,23 +40,32 @@ class CropLPAnnotations:
     :param Optional[Union[bool, int]] visualize: If ``True``, save annotated overlay images for every
                                 cropped frame to ``save_dir/visualizations/``. If ``int``, save that many
                                 randomly sampled overlays. ``None`` / ``False`` disables visualization.
+    :param Optional[int] padding: Minimum number of pixels between any keypoint and the crop edge.
+                        The crop window is shifted (within image bounds) so that all keypoints
+                        are at least ``padding`` pixels from each border. If the keypoint span
+                        plus ``2 * padding`` exceeds ``crop_size`` in either dimension, a warning
+                        is printed and the padding is best-effort. ``None`` is treated as ``0``.
     """
 
     def __init__(self,
                  lp_project_dir: str,
                  save_dir: str,
                  crop_size: Tuple[int, int] = (512, 512),
-                 visualize: Optional[Union[bool, int]] = None):
+                 visualize: Optional[Union[bool, int]] = None,
+                 padding: Optional[int] = None):
 
         check_if_dir_exists(in_dir=lp_project_dir)
         check_int(name="CropLPAnnotations crop_size width", value=crop_size[0], min_value=1)
         check_int(name="CropLPAnnotations crop_size height", value=crop_size[1], min_value=1)
         if isinstance(visualize, int) and not isinstance(visualize, bool):
             check_int(name="CropLPAnnotations visualize", value=visualize, min_value=1)
+        if padding is not None:
+            check_int(name="CropLPAnnotations padding", value=padding, min_value=0)
         self.lp_project_dir = lp_project_dir
         self.save_dir = save_dir
         self.crop_size = crop_size
         self.visualize = visualize
+        self.padding = padding if padding is not None else 0
         self.csv_paths = sorted([os.path.join(lp_project_dir, f) for f in os.listdir(lp_project_dir)
                                  if f.startswith("CollectedData_") and f.endswith(".csv")])
         if len(self.csv_paths) == 0:
@@ -71,7 +87,8 @@ class CropLPAnnotations:
                               save_dir=self.save_dir,
                               crop_size=self.crop_size,
                               viz_candidates=viz_candidates,
-                              drop_positions=drop_positions)
+                              drop_positions=drop_positions,
+                              padding=self.padding)
         if self.visualize and len(viz_candidates) > 0:
             viz_dir = os.path.join(self.save_dir, "visualizations")
             os.makedirs(viz_dir, exist_ok=True)
@@ -181,7 +198,8 @@ class CropLPAnnotations:
                      save_dir: str,
                      crop_size: Tuple[int, int],
                      viz_candidates: list,
-                     drop_positions: set):
+                     drop_positions: set,
+                     padding: int = 0):
 
         _, csv_fn, csv_ext = get_fn_ext(filepath=csv_path)
         df = pd.read_csv(csv_path, header=[0, 1, 2], index_col=0)
@@ -223,6 +241,8 @@ class CropLPAnnotations:
                 cy = (y_min + y_max) / 2.0
             else:
                 cx, cy = w / 2.0, h / 2.0
+                x_min, x_max = cx, cx
+                y_min, y_max = cy, cy
             half_w = crop_size[0] / 2.0
             half_h = crop_size[1] / 2.0
             crop_x1 = int(np.floor(cx - half_w))
@@ -237,6 +257,36 @@ class CropLPAnnotations:
                 crop_x2, crop_x1 = w, w - crop_size[0]
             if crop_y2 > h:
                 crop_y2, crop_y1 = h, h - crop_size[1]
+
+            if padding > 0 and np.any(valid):
+                kp_span_w = (x_max - x_min) + 2 * padding
+                kp_span_h = (y_max - y_min) + 2 * padding
+                if kp_span_w > crop_size[0] or kp_span_h > crop_size[1]:
+                    stdout_warning(msg=f"{csv_fn}: row_pos={row_pos} keypoint span + 2*padding ({kp_span_w:.0f}x{kp_span_h:.0f}) exceeds crop_size {crop_size}; padding is best-effort.")
+                need_x1 = x_min - padding
+                need_x2 = x_max + padding
+                if need_x1 < crop_x1:
+                    crop_x1 = max(int(np.floor(need_x1)), 0)
+                    crop_x2 = crop_x1 + crop_size[0]
+                    if crop_x2 > w:
+                        crop_x2, crop_x1 = w, w - crop_size[0]
+                if need_x2 > crop_x2:
+                    crop_x2 = min(int(np.ceil(need_x2)), w)
+                    crop_x1 = crop_x2 - crop_size[0]
+                    if crop_x1 < 0:
+                        crop_x1, crop_x2 = 0, crop_size[0]
+                need_y1 = y_min - padding
+                need_y2 = y_max + padding
+                if need_y1 < crop_y1:
+                    crop_y1 = max(int(np.floor(need_y1)), 0)
+                    crop_y2 = crop_y1 + crop_size[1]
+                    if crop_y2 > h:
+                        crop_y2, crop_y1 = h, h - crop_size[1]
+                if need_y2 > crop_y2:
+                    crop_y2 = min(int(np.ceil(need_y2)), h)
+                    crop_y1 = crop_y2 - crop_size[1]
+                    if crop_y1 < 0:
+                        crop_y1, crop_y2 = 0, crop_size[1]
 
             cropped = img[crop_y1:crop_y2, crop_x1:crop_x2]
             out_img_path = os.path.join(save_dir, img_rel.replace("/", os.sep))
@@ -267,9 +317,10 @@ class CropLPAnnotations:
         stdout_success(msg=f"Saved {out_csv_path} ({len(out_df)} rows).")
 
 #
-# if __name__ == "__main__":
-#     cropper = CropLPAnnotations(lp_project_dir=r"F:\netholabs\projects_lp_compressed_13.4.2028",
-#                                 save_dir=r"Z:\home\simon\LPProjects\projects_lp_compressed_13.4.2028_cropped",
-#                                 crop_size=(512, 512),
-#                                 visualize=40)
-#     cropper.run()
+if __name__ == "__main__":
+    cropper = CropLPAnnotations(lp_project_dir=r"Z:\home\simon\LPProjects\mini_project_0504",
+                                save_dir=r"Z:\home\simon\LPProjects\mini_project_0504_cropped_2",
+                                crop_size=(512, 512),
+                                visualize=True,
+                                padding=20)
+    cropper.run()

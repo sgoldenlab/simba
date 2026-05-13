@@ -502,6 +502,12 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture],
             raise InvalidInputError(msg=f'video_path is neither a file path or a cv2.VideoCapture: {type(video_path)}', source=get_video_meta_data.__name__)
         else:
             return None
+    if not cap.isOpened():
+        cap.release()
+        if raise_error:
+            raise InvalidVideoFileError(msg=f'Video {video_path} could not be opened by OpenCV. The file may be corrupted or in an unsupported codec.', source=get_video_meta_data.__name__)
+        else:
+            return None
     video_data["fps"] = cap.get(cv2.CAP_PROP_FPS)
     if fps_as_int:
         video_data["fps"] = int(video_data["fps"])

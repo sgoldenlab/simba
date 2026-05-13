@@ -44,12 +44,6 @@ class FitYolo():
        - Download starter weights from `HuggingFace <https://huggingface.co/Ultralytics>`__.
        - Example dataset YAMLs: `bbox <https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model.yaml>`__, `pose <https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model_keypoints.yaml>`__.
 
-    .. important::
-       When fitting a **segmentation** model, the ``imgsz`` parameter is critical for mask quality. Segmentation
-       requires pixel-level precision along object boundaries, so spatial detail lost to downscaling hurts
-       segmentation far more than detection or pose tasks. Set ``imgsz`` as large as your GPU memory allows.
-       The default ``640`` may be too coarse for high-quality segmentation masks.
-
     .. seealso::
        :func:`simba.bounding_box_tools.yolo.utils.fit_yolo` for the functional API.
        :func:`simba.bounding_box_tools.yolo.utils.load_yolo_model` to load trained weights.
@@ -98,11 +92,20 @@ class FitYolo():
                  device:  Union[Literal['cpu'], int] = 0,
                  verbose: bool = True,
                  workers: int = 8,
-                 patience: int = 300):
+                 patience: int = 500,
+                 device_id: Optional[int] = None):
 
         os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-        if not _is_cuda_available()[0]:
+        gpu_available, gpus = _is_cuda_available()
+        if not gpu_available:
             raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
+        if device_id is not None:
+            check_int(name=f'{self.__class__.__name__} device_id', value=device_id, min_value=0)
+            gpu_ids = list(gpus.keys())
+            if device_id not in gpu_ids:
+                raise SimBAGPUError(msg=f'GPU device_id {device_id} not found. Available GPU id(s): {gpu_ids}', source=self.__class__.__name__)
+            os.environ["CUDA_VISIBLE_DEVICES"] = str(device_id)
+            device = 0
         if YOLO is None:
             raise SimBAPAckageVersionError(msg='Ultralytics package not detected.', source=self.__class__.__name__)
         if weights_path is not None:
@@ -155,77 +158,72 @@ class FitYolo():
                         patience=self.patience)
 
 
-if __name__ == "__main__" and not hasattr(sys, 'ps1'):
-    parser = argparse.ArgumentParser(description="Fit YOLO model using ultralytics package.")
-    parser.add_argument('--weights_path', type=str, default=None, help='Path to the trained YOLO model weights (e.g., yolo11n-pose.pt). Omit to download default starter weights.')
-    parser.add_argument('--model_yaml', type=str, required=True, help='Path to map.yaml (model structure and label definitions)')
-    parser.add_argument('--save_path', type=str, required=True, help='Directory where trained model and logs will be saved')
-    parser.add_argument('--epochs', type=int, default=25, help='Number of epochs to train the model. Default is 25')
-    parser.add_argument('--batch', type=int, default=16, help='Batch size for training. Default is 16')
-    parser.add_argument('--plots', type=lambda x: str(x).lower() == 'true', default=True, help='Whether to plot training results. Use "True" or "False". Default is True')
-    parser.add_argument('--imgsz', type=int, default=640, help='Image size for training. Default is 640')
-    parser.add_argument('--format', type=str, default=None,  help=f'Format of the YOLO model. Must be one of: {", ".join(Options.VALID_YOLO_FORMATS.value)}')
-    parser.add_argument('--device', type=str, default='0', help='Device to train on. Use "cpu" or GPU index (e.g., "0"). Default is "0"')
-    parser.add_argument('--verbose', type=lambda x: str(x).lower() == 'true', default=True, help='Print verbose messages. Use "True" or "False". Default is True')
-    parser.add_argument('--workers', type=int, default=8, help='Number of data loader workers. Default is 8. Use -1 for max cores')
-    parser.add_argument('--patience', type=int, default=100, help='Number of epochs to wait without improvement in validation metrics before early stopping the training. Default is 100')
-
-    args = parser.parse_args()
-
-    yolo_fitter = FitYolo(weights_path=args.weights_path,
-                          model_yaml=args.model_yaml,
-                          save_path=args.save_path,
-                          epochs=args.epochs,
-                          batch=args.batch,
-                          plots=args.plots,
-                          imgsz=args.imgsz,
-                          format=args.format,
-                          device=int(args.device) if args.device != 'cpu' else 'cpu',
-                          verbose=args.verbose,
-                          workers=args.workers,
-                          patience=args.patience)
-    yolo_fitter.run()
-
-
+# if __name__ == "__main__" and not hasattr(sys, 'ps1'):
+#     parser = argparse.ArgumentParser(description="Fit YOLO model using ultralytics package.")
+#     parser.add_argument('--weights_path', type=str, default=None, help='Path to the trained YOLO model weights (e.g., yolo11n-pose.pt). Omit to download default starter weights.')
+#     parser.add_argument('--model_yaml', type=str, required=True, help='Path to map.yaml (model structure and label definitions)')
+#     parser.add_argument('--save_path', type=str, required=True, help='Directory where trained model and logs will be saved')
+#     parser.add_argument('--epochs', type=int, default=25, help='Number of epochs to train the model. Default is 25')
+#     parser.add_argument('--batch', type=int, default=16, help='Batch size for training. Default is 16')
+#     parser.add_argument('--plots', type=lambda x: str(x).lower() == 'true', default=True, help='Whether to plot training results. Use "True" or "False". Default is True')
+#     parser.add_argument('--imgsz', type=int, default=640, help='Image size for training. Default is 640')
+#     parser.add_argument('--format', type=str, default=None,  help=f'Format of the YOLO model. Must be one of: {", ".join(Options.VALID_YOLO_FORMATS.value)}')
+#     parser.add_argument('--device', type=str, default='0', help='Device to train on. Use "cpu" or GPU index (e.g., "0"). Default is "0"')
+#     parser.add_argument('--verbose', type=lambda x: str(x).lower() == 'true', default=True, help='Print verbose messages. Use "True" or "False". Default is True')
+#     parser.add_argument('--workers', type=int, default=8, help='Number of data loader workers. Default is 8. Use -1 for max cores')
+#     parser.add_argument('--patience', type=int, default=100, help='Number of epochs to wait without improvement in validation metrics before early stopping the training. Default is 100')
 #
-# fitter = FitYolo(weights_path=r"C:\Users\sroni\Downloads\yolo26n-seg.pt",
-#                  model_yaml=r"E:\open_video\open_field_2\yolo_seg_project\map.yaml",
-#                  save_path=r'E:\open_video\open_field_2\yolo_seg_project\mdl',
-#                  epochs=1500,
-#                  batch=2,
-#                  workers=1,
-#                  format=None,
-#                  device=0,
-#                  imgsz=1248)
-# fitter.run()
+#     args = parser.parse_args()
 #
+#     yolo_fitter = FitYolo(weights_path=args.weights_path,
+#                           model_yaml=args.model_yaml,
+#                           save_path=args.save_path,
+#                           epochs=args.epochs,
+#                           batch=args.batch,
+#                           plots=args.plots,
+#                           imgsz=args.imgsz,
+#                           format=args.format,
+#                           device=int(args.device) if args.device != 'cpu' else 'cpu',
+#                           verbose=args.verbose,
+#                           workers=args.workers,
+#                           patience=args.patience)
+#     yolo_fitter.run()
 
+
+
+fitter = FitYolo(weights_path=r"/home/cat/simon/yolo_0413/yolo26s.pt",
+                  model_yaml=r"/home/cat/simon/yolo_0413/map.yaml",
+                  save_path=r'/home/cat/simon/yolo_0413/mdl',
+                  epochs=5000,
+                  batch=2000,
+                  format=None,
+                  device_id=0,
+                  imgsz=256)
+fitter.run()
+
+
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser(description="Fit YOLO model")
+#     parser.add_argument('--weights_path', type=str, default=r"/home/cat/simon/yolo_0413/yolo26s.pt")
+#     parser.add_argument('--model_yaml', type=str, default=r"/home/cat/simon/yolo_0413/map.yaml")
+#     parser.add_argument('--save_path', type=str, default=r'/home/cat/simon/yolo_0413/mdl')
+#     parser.add_argument('--epochs', type=int, default=3000)
+#     parser.add_argument('--batch', type=int, default=2000)
+#     parser.add_argument('--imgsz', type=int, default=256)
+#     parser.add_argument('--device_id', type=int, default=0)
+#     parser.add_argument('--patience', type=int, default=500)
+#     args = parser.parse_args()
 #
-# fitter = FitYolo(weights_path=r"F:\yolo_weights\yolo26n.pt",
-#                  model_yaml=r"F:\irondog\data\yolo\map.yaml",
-#                  save_path=r"F:\irondog\data\yolo\mdl",
-#                  epochs=1500,
-#                  batch=16,
-#                  workers=3,
-#                  format=None,
-#                  device=0,
-#                  imgsz=256)
-# fitter.run()
-#
-
-
-
-# fitter = FitYolo(weights_path=r"C:\Users\sroni\Downloads\yolo26n.pt",
-#                  model_yaml=r"E:\litpose_yolo\bbox\map.yaml",
-#                  save_path=r'E:\litpose_yolo\bbox\mdl',
-#                  epochs=1500,
-#                  batch=16,
-#                  format=None,
-#                  device=0,
-#                  imgsz=196)
-# fitter.run()
-#
-
+#     fitter = FitYolo(weights_path=args.weights_path,
+#                       model_yaml=args.model_yaml,
+#                       save_path=args.save_path,
+#                       epochs=args.epochs,
+#                       batch=args.batch,
+#                       format=None,
+#                       imgsz=args.imgsz,
+#                       patience=args.patience,
+#                       device_id=args.device_id)
+#     fitter.run()
 
 
 # fitter = FitYolo(weights_path=r"D:\maplight_tg2576_yolo\yolo_mdl\original_weight_oct\best.pt",

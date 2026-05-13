@@ -78,6 +78,7 @@ class SAM3ToYoloBBox:
     :param Optional[int] min_frame_gap: Minimum number of frames between sampled frames. Enforces temporal diversity so samples are spread across the video rather than clustered. If ``None``, frames are sampled purely at random. Default ``None``.
     :param bool shuffle_videos: If True, randomize the order in which videos are processed. Default False.
     :param float io_timeout: Seconds to keep retrying file I/O (read/write) when the operation fails (e.g. temporary drive disconnect). Default 30.0.
+    :param bool preview: If True, opens a ``cv2`` window displaying each evaluated frame at its original resolution with any detected bounding boxes drawn. Frames with no detection are labelled ``NO DETECTION``. Press ``q`` to abort. Useful for spotting false negatives. Default False.
     :param bool verbose: If True, print progress updates. Default True.
 
     :raises SimBAGPUError: If no NVIDIA GPU is detected (via ``nvidia-smi``).
@@ -109,6 +110,7 @@ class SAM3ToYoloBBox:
                  min_frame_gap: Optional[int] = None,
                  shuffle_videos: bool = False,
                  io_timeout: float = 30.0,
+                 preview: bool = False,
                  verbose: bool = True):
 
         check_nvidea_gpu_available(raise_error=True)
@@ -144,6 +146,8 @@ class SAM3ToYoloBBox:
         check_float(name=f'{self.__class__.__name__} io_timeout', value=io_timeout, min_value=0.0)
         if max_detections is not None: check_int(name=f'{self.__class__.__name__} max_detections', value=max_detections, min_value=1)
         if seed is not None: check_int(name=f'{self.__class__.__name__} seed', value=seed)
+        check_valid_boolean(value=preview, source=f'{self.__class__.__name__} preview')
+        self.preview = preview
         self.video_data, self.sam_path, self.save_dir, self.txt_prompt = video_data, sam_path, save_dir, txt_prompt
         self.n_frames, self.names, self.train_val_split, self.conf, self.imgsz = n_frames, names, train_val_split, conf, sam_imgsz
         self.greyscale, self.clahe, self.buffer_pct, self.consecutive_miss_limit, self.max_detections, self.seed, self.verbose, self.visualize, self.min_frame_gap, self.io_timeout = greyscale, clahe, buffer_pct, consecutive_miss_limit, max_detections, seed, verbose, visualize, min_frame_gap, io_timeout
@@ -166,6 +170,30 @@ class SAM3ToYoloBBox:
     def _write_label(path: str, content: str):
         with open(path, 'w') as f:
             f.write(content)
+
+    def _preview_frame(self, frame: np.ndarray, result, img_w: int, img_h: int, video_name: str, frame_idx: int) -> bool:
+        """Show a preview window with detections drawn at original resolution. Auto-advances. Returns False if user pressed 'q' to quit."""
+        vis = frame.copy()
+        has_det = result is not None and result.boxes is not None and len(result.boxes) > 0
+        if has_det:
+            for i in range(len(result.boxes)):
+                if float(result.boxes.conf[i].cpu()) < self.conf:
+                    continue
+                xyxy = result.boxes.xyxy[i].cpu().numpy()
+                x1, y1, x2, y2 = int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3])
+                cv2.rectangle(vis, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                conf_val = float(result.boxes.conf[i].cpu())
+                cv2.putText(vis, f'{conf_val:.2f}', (x1, max(y1 - 5, 12)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+        else:
+            cv2.putText(vis, 'NO DETECTION', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
+        title = f'{video_name} | frm {frame_idx}'
+        cv2.putText(vis, title, (10, img_h - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1)
+        cv2.imshow('SAM3 Preview', vis)
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q'):
+            cv2.destroyAllWindows()
+            return False
+        return True
 
     def _io_with_retry(self, func, *args, **kwargs):
         deadline = time.time() + self.io_timeout
@@ -242,6 +270,9 @@ class SAM3ToYoloBBox:
 
                 if r.boxes is None or len(r.boxes) == 0:
                     consecutive_misses += 1
+                    if self.preview:
+                        if not self._preview_frame(frame, r, img_w, img_h, video_name, frame_idx):
+                            break
                     if self.verbose:
                         stdout_information(msg=f'Video {video_cnt}/{total_videos} ({video_name}), frame idx {frame_idx}: no detection found (consecutive misses: {consecutive_misses}/{self.consecutive_miss_limit})')
                     continue
@@ -249,10 +280,16 @@ class SAM3ToYoloBBox:
                 label_str = self._boxes_to_yolo_label(r, img_w, img_h)
                 if not label_str:
                     consecutive_misses += 1
+                    if self.preview:
+                        if not self._preview_frame(frame, None, img_w, img_h, video_name, frame_idx):
+                            break
                     if self.verbose:
                         stdout_information(msg=f'Video {video_cnt}/{total_videos} ({video_name}), frame idx {frame_idx}: detections below conf threshold (consecutive misses: {consecutive_misses}/{self.consecutive_miss_limit})')
                     continue
 
+                if self.preview:
+                    if not self._preview_frame(frame, r, img_w, img_h, video_name, frame_idx):
+                        break
                 consecutive_misses = 0
                 try:
                     img_out = self._io_with_retry(read_frm_of_video, video_path=video_path, frame_index=frame_idx, greyscale=self.greyscale, clahe=self.clahe)
@@ -282,6 +319,8 @@ class SAM3ToYoloBBox:
             if self.verbose:
                 stdout_information(msg=f'Video {video_cnt}/{total_videos} ({video_name}): collected {valid_cnt}/{self.n_frames} valid labeled frames')
 
+        if self.preview:
+            cv2.destroyAllWindows()
         total_samples = train_cnt + val_cnt
         if total_samples == 0:
             raise NoFilesFoundError(msg='No boxes detected in any sampled frame. No project created.', source=self.__class__.__name__)
@@ -324,6 +363,23 @@ class SAM3ToYoloBBox:
             lines.append(f'{cls_id} {x_center:.6f} {y_center:.6f} {w:.6f} {h:.6f}')
 
         return '\n'.join(lines) + '\n' if lines else ''
+
+
+runner = SAM3ToYoloBBox(video_data=r'F:\irondog\data\uncompressed',
+                        sam_path=r'D:\sam3\sam3.pt',
+                        save_dir=r"F:\irondog\data\dog_toy",
+                        txt_prompt='dog toy',
+                        n_frames=25,
+                        verbose=True,
+                        conf=0.01,
+                        max_detections=1,
+                        buffer_pct=0.15,
+                        recursive=True,
+                        consecutive_miss_limit=50,
+                        shuffle_videos=True,
+                        visualize=True,
+                        preview=True)
+runner.run()
 
 
 # runner = SAM3ToYoloBBox(video_data=r'F:\irondog\data\uncompressed',
