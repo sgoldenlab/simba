@@ -171,6 +171,20 @@ Crop Lightning Pose annotations
    :show-inheritance:
 
 
+Crop Lightning Pose annotations (bounding box square)
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.litpose_crop_annotations_bbox_square.CropLPAnnotationsBboxSquare
+   :members:
+   :show-inheritance:
+
+
+Create Lightning Pose bounding box files
+---------------------------------------
+
+.. autofunction:: simba.third_party_label_appenders.transform.utils.get_litpose_project_bboxes
+
+
 Multi-animal DeepLabCut -> YOLO pose-estimation annotations
 ---------------------------------------
 

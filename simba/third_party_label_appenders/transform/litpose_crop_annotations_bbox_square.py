@@ -1,28 +1,3 @@
-"""
-Variant of CropLPAnnotations that crops using the keypoint bounding box,
-padded to a square, then resized to crop_size. This matches what the
-inference pipeline should do — tight crop around the animal,
-aspect-ratio preserved, resized to a fixed square.
-
-The original CropLPAnnotations takes a fixed 512x512 region from the
-full-frame image. This version instead:
-  1. Uses the keypoint bounding box to find the animal
-  2. Pads the bbox by a fraction (default 15%) for context
-  3. Extends the shorter side to make a square crop
-  4. Resizes to crop_size (e.g. 512x512)
-  5. Transforms keypoint coordinates accordingly
-
-Usage:
-    cropper = CropLPAnnotationsBboxSquare(
-        lp_project_dir="/path/to/original/lp_project",
-        save_dir="/path/to/new/cropped_project",
-        crop_size=(512, 512),
-        bbox_pad_frac=0.15,
-        visualize=40,
-    )
-    cropper.run()
-"""
-
 import glob
 import os
 import random
@@ -45,6 +20,14 @@ class CropLPAnnotationsBboxSquare:
     cropped to a square region around the keypoint bounding box, then resized
     to crop_size. This produces training images that match the inference
     pipeline's crop-and-resize behavior.
+
+    Unlike :class:`~simba.third_party_label_appenders.transform.litpose_crop_annotations.CropLPAnnotations`,
+    which takes a fixed-size crop centered on the keypoint centroid, this class
+    computes a tight bounding box around the keypoints, pads it by a fraction,
+    extends the shorter side to make a square, and resizes to ``crop_size``.
+
+    .. seealso::
+       :class:`~simba.third_party_label_appenders.transform.litpose_crop_annotations.CropLPAnnotations` Fixed-size center crop around keypoint centroid.
 
     :param str lp_project_dir:  Root of the source LP project.
     :param str save_dir:        Root of the new cropped LP project.

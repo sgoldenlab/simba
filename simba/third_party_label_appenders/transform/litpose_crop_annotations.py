@@ -45,6 +45,10 @@ class CropLPAnnotations:
                         are at least ``padding`` pixels from each border. If the keypoint span
                         plus ``2 * padding`` exceeds ``crop_size`` in either dimension, a warning
                         is printed and the padding is best-effort. ``None`` is treated as ``0``.
+
+    .. seealso::
+       :class:`~simba.third_party_label_appenders.transform.litpose_crop_annotations_bbox_square.CropLPAnnotationsBboxSquare`
+          Bounding-box-based square crop that pads and resizes — matches inference-time crop behavior.
     """
 
     def __init__(self,

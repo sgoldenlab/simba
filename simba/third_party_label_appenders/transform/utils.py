@@ -7,6 +7,7 @@ except:
 
 import base64
 import io
+import random
 import math
 import os
 from collections import Counter
@@ -24,11 +25,12 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_keys_exist_in_dict,
                                 check_if_valid_img, check_int,
                                 check_valid_array, check_valid_dict,
-                                check_valid_lst, check_valid_tuple)
+                                check_valid_lst, check_valid_tuple,
+                                check_filepaths_in_iterable_exist, check_valid_boolean, check_float)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import (FaultyTrainingSetError, InvalidInputError,
                                 NoFilesFoundError)
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_information, stdout_warning
 from simba.utils.read_write import (copy_files_in_directory, create_directory,
                                     find_files_of_filetypes_in_directory,
                                     get_fn_ext, read_img, read_json,
@@ -553,6 +555,152 @@ def concatenate_dlc_annotations(data_dir: Union[str, os.PathLike], save_dir: Uni
     print(f'DLC annotation concatenated (elapsed time: {timer.elapsed_time_str}s)')
 
 
+
+def get_litpose_project_bboxes(project_dir: Union[str, os.PathLike],
+                               padding: Optional[float] = 0.15,
+                               visualize: Optional[Union[bool, int]] = None,
+                               verbose: Optional[bool] = True):
+    """
+    Create per-view bounding box CSV files for a Lightning Pose multiview project.
+
+    .. seealso::
+       `Lightning Pose bounding box format <https://lightning-pose.readthedocs.io/en/latest/source/directory_structure_reference/bounding_box_file_format.html>`_
+       `Lightning Pose multiview data organization <https://lightning-pose.readthedocs.io/en/latest/source/user_guide_multiview/organizing_data.html#bounding-boxes>`_
+
+    :param Union[str, os.PathLike] project_dir: Root of the Lightning Pose project (must contain ``project.yaml`` and ``CollectedData_*.csv`` files).
+    :param Optional[float] padding: Fractional padding applied to each side of the keypoint bounding box (default 0.15 = 15%).
+    :param Optional[Union[bool, int]] visualize: If True, save bbox overlay images for all frames. If int, save overlays for that many randomly sampled frames per view. If None/False, skip visualization. Default None.
+    :param Optional[bool] verbose: If True, print progress messages. Default True.
+
+    :example:
+    >>> get_litpose_project_bboxes(project_dir=r'Z:\home\simon\LPProjects\mini_project_0504', padding=0.15, verbose=True, visualize=20)
+    """
+
+    timer = SimbaTimer(start=True)
+    check_if_dir_exists(in_dir=str(project_dir))
+    check_valid_boolean(value=verbose, source=get_litpose_project_bboxes.__name__)
+    if padding is not None: check_float(name="padding", value=padding, min_value=0.0)
+    if isinstance(visualize, int) and not isinstance(visualize, bool):
+        check_int(name="visualize", value=visualize, min_value=1)
+    yaml_path = os.path.join(project_dir, "project.yaml")
+    if not os.path.isfile(yaml_path):
+        raise InvalidInputError(msg=f"project.yaml not found in {project_dir}. Expected path: {yaml_path}")
+    with open(yaml_path, "r") as f:
+        project_cfg = yaml.safe_load(f)
+    view_names = project_cfg.get("view_names", None)
+    if view_names is None or len(view_names) == 0:
+        raise InvalidInputError(msg=f"project.yaml at {yaml_path} does not contain 'view_names' key or it is empty.")
+    check_if_dir_exists(in_dir=os.path.join(project_dir, "labeled-data"))
+
+    csv_paths = {}
+    for view in view_names:
+        csv_path = os.path.join(project_dir, f"CollectedData_{view}.csv")
+        check_file_exist_and_readable(file_path=csv_path)
+        csv_paths[view] = csv_path
+
+    img_paths = set()
+    for view, csv_path in csv_paths.items():
+        df = pd.read_csv(csv_path, header=[0, 1, 2], index_col=0)
+        if len(df) == 0:
+            raise InvalidInputError(msg=f"CollectedData_{view}.csv has no data rows at {csv_path}.")
+        for img_rel in df.index:
+            img_paths.add(os.path.join(project_dir, str(img_rel).replace("/", os.sep)))
+
+    check_filepaths_in_iterable_exist(file_paths=list(img_paths), name="labeled images")
+    for img_path in img_paths:
+        check_file_exist_and_readable(file_path=img_path)
+    if verbose:
+        stdout_information(msg=f"Validated {len(view_names)} annotation CSVs and {len(img_paths)} images in {project_dir}.")
+
+    viz_dir = None
+    if visualize:
+        viz_dir = os.path.join(project_dir, "bbox_visualizations")
+        os.makedirs(viz_dir, exist_ok=True)
+
+    for view, csv_path in csv_paths.items():
+        df = pd.read_csv(csv_path, header=[0, 1, 2], index_col=0)
+        bp_names = [df.columns[i][1] for i in range(0, len(df.columns), 2)]
+        bbox_rows = []
+        viz_candidates = []
+        for row_idx in range(len(df)):
+            img_rel = str(df.index[row_idx])
+            img_path = os.path.join(project_dir, img_rel.replace("/", os.sep))
+            img = read_img(img_path=img_path)
+            img_h, img_w = img.shape[:2]
+
+            coords = df.iloc[row_idx].values.astype(float)
+            xs = coords[0::2]
+            ys = coords[1::2]
+            valid = ~np.isnan(xs) & ~np.isnan(ys)
+
+            if not np.any(valid):
+                bbox_rows.append((img_rel, 0, 0, img_h, img_w))
+                if visualize:
+                    viz_candidates.append((img_path, img_rel, 0, 0, img_h, img_w, xs, ys, valid))
+                continue
+
+            x_min = float(np.floor(np.min(xs[valid])))
+            y_min = float(np.floor(np.min(ys[valid])))
+            x_max = float(np.ceil(np.max(xs[valid])))
+            y_max = float(np.ceil(np.max(ys[valid])))
+
+            if padding and padding > 0:
+                bw = x_max - x_min
+                bh = y_max - y_min
+                px = bw * padding
+                py = bh * padding
+                x_min -= px
+                y_min -= py
+                x_max += px
+                y_max += py
+
+            x_min = max(0, int(x_min))
+            y_min = max(0, int(y_min))
+            x_max = min(img_w, int(x_max))
+            y_max = min(img_h, int(y_max))
+            bbox_h = y_max - y_min
+            bbox_w = x_max - x_min
+            bbox_rows.append((img_rel, x_min, y_min, bbox_h, bbox_w))
+            if visualize:
+                viz_candidates.append((img_path, img_rel, x_min, y_min, bbox_h, bbox_w, xs, ys, valid))
+
+        if len(bbox_rows) == 0:
+            if verbose:
+                stdout_warning(msg=f"No valid bounding boxes for view '{view}'.")
+            continue
+
+        out_df = pd.DataFrame(bbox_rows, columns=["", "x", "y", "h", "w"])
+        out_path = os.path.join(project_dir, f"bboxes_{view}.csv")
+        out_df.to_csv(out_path, index=False)
+        if verbose:
+            stdout_information(msg=f"Saved {out_path} ({len(out_df)} rows).")
+
+        if visualize and len(viz_candidates) > 0:
+            if isinstance(visualize, int) and not isinstance(visualize, bool):
+                sample = random.sample(viz_candidates, min(visualize, len(viz_candidates)))
+            else:
+                sample = viz_candidates
+            for img_path, img_rel, bx, by, bh, bw, xs, ys, valid_mask in sample:
+                viz_img = read_img(img_path=img_path)
+                cv2.rectangle(viz_img, (bx, by), (bx + bw, by + bh), (0, 255, 0), 2)
+                for bp_idx in range(len(bp_names)):
+                    if not valid_mask[bp_idx]:
+                        continue
+                    pt = (int(round(xs[bp_idx])), int(round(ys[bp_idx])))
+                    cv2.circle(viz_img, pt, 4, (0, 0, 255), -1)
+                    cv2.putText(viz_img, bp_names[bp_idx], (pt[0] + 6, pt[1] - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (255, 255, 255), 1, cv2.LINE_AA)
+                parts = img_rel.replace("/", os.sep).split(os.sep)
+                viz_fn = f"{view}_{parts[-2]}_{parts[-1]}" if len(parts) >= 2 else f"{view}_{parts[-1]}"
+                cv2.imwrite(os.path.join(viz_dir, viz_fn), viz_img)
+            if verbose:
+                stdout_information(msg=f"Saved {len(sample)} bbox visualizations for view '{view}' in {viz_dir}.")
+
+    timer.stop_timer()
+    if verbose:
+        stdout_success(msg=f"Bounding box CSVs created in {project_dir}", elapsed_time=timer.elapsed_time_str)
+
+
+#get_litpose_project_bboxes(project_dir=r'Z:\home\simon\LPProjects\mini_project_0504', padding=0.15, verbose=True, visualize=20)
 
 #concatenate_dlc_annotations(data_dir=r'E:\rgb_white_vs_black_imgs\GB_labelled_images.zip\labeled-data', save_dir=r'E:\rgb_white_vs_black_imgs\combined')
 
