@@ -601,6 +601,10 @@ def get_litpose_project_bboxes(project_dir: Union[str, os.PathLike],
     img_paths = set()
     for view, csv_path in csv_paths.items():
         df = pd.read_csv(csv_path, header=[0, 1, 2], index_col=0)
+        if df.index.name is not None and str(df.index.name).startswith("labeled-data/"):
+            nan_row = pd.DataFrame([[np.nan] * len(df.columns)], columns=df.columns, index=[df.index.name])
+            df = pd.concat([nan_row, df])
+            df.index.name = None
         if len(df) == 0:
             raise InvalidInputError(msg=f"CollectedData_{view}.csv has no data rows at {csv_path}.")
         for img_rel in df.index:
@@ -619,6 +623,10 @@ def get_litpose_project_bboxes(project_dir: Union[str, os.PathLike],
 
     for view, csv_path in csv_paths.items():
         df = pd.read_csv(csv_path, header=[0, 1, 2], index_col=0)
+        if df.index.name is not None and str(df.index.name).startswith("labeled-data/"):
+            nan_row = pd.DataFrame([[np.nan] * len(df.columns)], columns=df.columns, index=[df.index.name])
+            df = pd.concat([nan_row, df])
+            df.index.name = None
         bp_names = [df.columns[i][1] for i in range(0, len(df.columns), 2)]
         bbox_rows = []
         viz_candidates = []
@@ -700,7 +708,7 @@ def get_litpose_project_bboxes(project_dir: Union[str, os.PathLike],
         stdout_success(msg=f"Bounding box CSVs created in {project_dir}", elapsed_time=timer.elapsed_time_str)
 
 
-#get_litpose_project_bboxes(project_dir=r'Z:\home\simon\LPProjects\mini_project_0504', padding=0.15, verbose=True, visualize=20)
+#get_litpose_project_bboxes(project_dir=r"Z:\home\simon\LPProjects\mini_project_0513", padding=0.25, verbose=True, visualize=20)
 
 #concatenate_dlc_annotations(data_dir=r'E:\rgb_white_vs_black_imgs\GB_labelled_images.zip\labeled-data', save_dir=r'E:\rgb_white_vs_black_imgs\combined')
 

@@ -1,6 +1,7 @@
 import os
 import random
 import shutil
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, List, Optional, Tuple, Union
 
 import yaml
@@ -179,20 +180,30 @@ class MergeYoloProjects:
         for img_path, lbl_path, stem in pairs:
             if stem not in unique_pairs:
                 unique_pairs[stem] = (img_path, lbl_path)
+        total = len(unique_pairs)
         if self.verbose:
-            stdout_information(msg=f'Copying {len(unique_pairs)} {display_name} image/label pairs...')
-        for cnt, (stem, (img_path, lbl_path)) in enumerate(unique_pairs.items()):
+            stdout_information(msg=f'Copying {total} {display_name} image/label pairs...')
+
+        def _copy_one(item):
+            stem, (img_path, lbl_path) = item
             shutil.copy(img_path, os.path.join(img_dir, os.path.basename(img_path)))
             shutil.copy(lbl_path, os.path.join(lbl_dir, os.path.basename(lbl_path)))
-            if self.verbose and (cnt + 1) % 10 == 0:
-                stdout_information(msg=f'{display_name}: copied {cnt + 1}/{len(unique_pairs)}...')
-        if self.verbose:
-            stdout_information(msg=f'{display_name}: copied {len(unique_pairs)}/{len(unique_pairs)} complete.')
-        return len(unique_pairs)
 
-# merger = MergeYoloProjects(yaml_paths=[r"F:\netholabs\moira_lp_sam\map.yaml",
-#                                        r"F:\netholabs\V6\cage_3\yolo_project_0406\map.yaml",
-#                                        r"F:\netholabs\V6\cage_3\yolo_project_0412\map.yaml",
-#                                        r"F:\netholabs\V6\cage_3\yolo_project_0413\map.yaml"],
-#                            save_dir=r'F:\netholabs\yolo_0413', train_val_split=0.75)
+        completed = 0
+        with ThreadPoolExecutor(max_workers=16) as executor:
+            futures = {executor.submit(_copy_one, item): item for item in unique_pairs.items()}
+            for future in as_completed(futures):
+                future.result()
+                completed += 1
+                if self.verbose and completed % 500 == 0:
+                    stdout_information(msg=f'{display_name}: copied {completed}/{total}...')
+        if self.verbose:
+            stdout_information(msg=f'{display_name}: copied {total}/{total} complete.')
+        return total
+
+# merger = MergeYoloProjects(yaml_paths=[r"G:\netholabs\yolo_project_0516\map.yaml",
+#                                        r"G:\netholabs\yolo_project_0516_2\map.yaml",
+#                                        r'F:\netholabs\yolo_0413\map.yaml'],
+#                            save_dir=r"G:\netholabs\yolo_project_0516_3",
+#                            train_val_split=0.75)
 # merger.run()

@@ -79,6 +79,8 @@ class SAM3ToYoloBBox:
     :param bool shuffle_videos: If True, randomize the order in which videos are processed. Default False.
     :param float io_timeout: Seconds to keep retrying file I/O (read/write) when the operation fails (e.g. temporary drive disconnect). Default 30.0.
     :param bool preview: If True, opens a ``cv2`` window displaying each evaluated frame at its original resolution with any detected bounding boxes drawn. Frames with no detection are labelled ``NO DETECTION``. Press ``q`` to abort. Useful for spotting false negatives. Default False.
+    :param Optional[Tuple[str, ...]] skip_substr: If provided, any video whose filename contains one of these substrings (case-insensitive) is skipped. Default None.
+    :param Optional[Tuple[int, int]] video_size: If provided, a ``(height, width)`` tuple. Only videos matching this exact resolution are kept; all others are skipped. Default None.
     :param bool verbose: If True, print progress updates. Default True.
 
     :raises SimBAGPUError: If no NVIDIA GPU is detected (via ``nvidia-smi``).
@@ -111,6 +113,8 @@ class SAM3ToYoloBBox:
                  shuffle_videos: bool = False,
                  io_timeout: float = 30.0,
                  preview: bool = False,
+                 skip_substr: Optional[Tuple[str, ...]] = None,
+                 video_size: Optional[Tuple[int, int]] = None,
                  verbose: bool = True):
 
         check_nvidea_gpu_available(raise_error=True)
@@ -147,7 +151,13 @@ class SAM3ToYoloBBox:
         if max_detections is not None: check_int(name=f'{self.__class__.__name__} max_detections', value=max_detections, min_value=1)
         if seed is not None: check_int(name=f'{self.__class__.__name__} seed', value=seed)
         check_valid_boolean(value=preview, source=f'{self.__class__.__name__} preview')
+        if skip_substr is not None:
+            check_valid_tuple(x=skip_substr, source=f'{self.__class__.__name__} skip_substr', minimum_length=1, valid_dtypes=(str,))
+        if video_size is not None:
+            check_valid_tuple(x=video_size, source=f'{self.__class__.__name__} video_size', minimum_length=2, valid_dtypes=(int,))
         self.preview = preview
+        self.skip_substr = skip_substr
+        self.video_size = video_size
         self.video_data, self.sam_path, self.save_dir, self.txt_prompt = video_data, sam_path, save_dir, txt_prompt
         self.n_frames, self.names, self.train_val_split, self.conf, self.imgsz = n_frames, names, train_val_split, conf, sam_imgsz
         self.greyscale, self.clahe, self.buffer_pct, self.consecutive_miss_limit, self.max_detections, self.seed, self.verbose, self.visualize, self.min_frame_gap, self.io_timeout = greyscale, clahe, buffer_pct, consecutive_miss_limit, max_detections, seed, verbose, visualize, min_frame_gap, io_timeout
@@ -164,6 +174,29 @@ class SAM3ToYoloBBox:
             items = list(self.video_paths.items())
             random.shuffle(items)
             self.video_paths = dict(items)
+        if self.skip_substr is not None:
+            skip_lower = tuple(s.lower() for s in self.skip_substr)
+            before_cnt = len(self.video_paths)
+            self.video_paths = {k: v for k, v in self.video_paths.items() if not any(s in k.lower() for s in skip_lower)}
+            if self.verbose and before_cnt != len(self.video_paths):
+                stdout_information(msg=f'skip_substr filtered {before_cnt - len(self.video_paths)} of {before_cnt} videos (remaining: {len(self.video_paths)})')
+        if self.video_size is not None:
+            target_h, target_w = self.video_size
+            before_cnt = len(self.video_paths)
+            filtered = {}
+            for k, v in self.video_paths.items():
+                try:
+                    meta = get_video_meta_data(video_path=v)
+                    if int(meta['height']) == target_h and int(meta['width']) == target_w:
+                        filtered[k] = v
+                    elif self.verbose:
+                        stdout_information(msg=f'video_size filter: skipping {k} ({int(meta["width"])}x{int(meta["height"])}), expected {target_w}x{target_h}')
+                except Exception as e:
+                    if self.verbose:
+                        stdout_warning(msg=f'video_size filter: could not read {k} ({e}), skipping...')
+            self.video_paths = filtered
+            if len(self.video_paths) == 0:
+                raise NoFilesFoundError(msg=f'No videos found with resolution {target_w}x{target_h}. {before_cnt} videos were checked.', source=self.__class__.__name__)
 
 
     @staticmethod
@@ -176,14 +209,29 @@ class SAM3ToYoloBBox:
         vis = frame.copy()
         has_det = result is not None and result.boxes is not None and len(result.boxes) > 0
         if has_det:
-            for i in range(len(result.boxes)):
+            box_indices = sorted(range(len(result.boxes)), key=lambda i: float(result.boxes.conf[i].cpu()), reverse=True)
+            drawn = 0
+            for i in box_indices:
                 if float(result.boxes.conf[i].cpu()) < self.conf:
                     continue
+                if self.max_detections is not None and drawn >= self.max_detections:
+                    break
                 xyxy = result.boxes.xyxy[i].cpu().numpy()
-                x1, y1, x2, y2 = int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3])
+                bx1, by1, bx2, by2 = float(xyxy[0]), float(xyxy[1]), float(xyxy[2]), float(xyxy[3])
+                if self.buffer_pct > 0:
+                    bw, bh = bx2 - bx1, by2 - by1
+                    bx1 -= bw * self.buffer_pct
+                    by1 -= bh * self.buffer_pct
+                    bx2 += bw * self.buffer_pct
+                    by2 += bh * self.buffer_pct
+                x1 = int(max(0.0, min(float(img_w), bx1)))
+                y1 = int(max(0.0, min(float(img_h), by1)))
+                x2 = int(max(0.0, min(float(img_w), bx2)))
+                y2 = int(max(0.0, min(float(img_h), by2)))
                 cv2.rectangle(vis, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 conf_val = float(result.boxes.conf[i].cpu())
                 cv2.putText(vis, f'{conf_val:.2f}', (x1, max(y1 - 5, 12)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+                drawn += 1
         else:
             cv2.putText(vis, 'NO DETECTION', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
         title = f'{video_name} | frm {frame_idx}'
@@ -364,22 +412,42 @@ class SAM3ToYoloBBox:
 
         return '\n'.join(lines) + '\n' if lines else ''
 
+# runner = SAM3ToYoloBBox(video_data=r'F:\netholabs\tars_0506',
+#                         sam_path=r'D:\sam3\sam3.pt',
+#                         save_dir=r'G:\netholabs\yolo_project_0516_4',
+#                         txt_prompt='black mouse',
+#                         n_frames=25,
+#                         verbose=True,
+#                         conf=0.05,
+#                         max_detections=1,
+#                         buffer_pct=0.15,
+#                         recursive=True,
+#                         consecutive_miss_limit=25,
+#                         skip_substr=('mosaic',),
+#                         video_size=(896, 2016),
+#                         shuffle_videos=True,
+#                         visualize=False,
+#                         preview=True)
+# runner.run()
 
-runner = SAM3ToYoloBBox(video_data=r'F:\irondog\data\uncompressed',
-                        sam_path=r'D:\sam3\sam3.pt',
-                        save_dir=r"F:\irondog\data\dog_toy",
-                        txt_prompt='dog toy',
-                        n_frames=25,
-                        verbose=True,
-                        conf=0.01,
-                        max_detections=1,
-                        buffer_pct=0.15,
-                        recursive=True,
-                        consecutive_miss_limit=50,
-                        shuffle_videos=True,
-                        visualize=True,
-                        preview=True)
-runner.run()
+
+#NEXCT F:\netholabs\tars_0506
+
+# runner = SAM3ToYoloBBox(video_data=r'F:\irondog\data\uncompressed',
+#                         sam_path=r'D:\sam3\sam3.pt',
+#                         save_dir=r"F:\irondog\data\dog_toy",
+#                         txt_prompt='dog toy',
+#                         n_frames=25,
+#                         verbose=True,
+#                         conf=0.01,
+#                         max_detections=1,
+#                         buffer_pct=0.15,
+#                         recursive=True,
+#                         consecutive_miss_limit=50,
+#                         shuffle_videos=True,
+#                         visualize=True,
+#                         preview=True)
+# runner.run()
 
 
 # runner = SAM3ToYoloBBox(video_data=r'F:\irondog\data\uncompressed',
