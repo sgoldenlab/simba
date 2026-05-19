@@ -33,7 +33,6 @@ from simba.utils.yolo import load_yolo_model
 YOLO_M_PATH = "https://huggingface.co/Ultralytics/YOLO11/resolve/main/yolo11m-pose.pt"
 
 
-
 class FitYolo():
 
     """
@@ -191,15 +190,15 @@ class FitYolo():
 
 
 
-fitter = FitYolo(weights_path=r"/home/cat/simon/yolo_0413/yolo26s.pt",
-                  model_yaml=r"/home/cat/simon/yolo_0413/map.yaml",
-                  save_path=r'/home/cat/simon/yolo_0413/mdl',
-                  epochs=5000,
-                  batch=2000,
-                  format=None,
-                  device_id=0,
-                  imgsz=256)
-fitter.run()
+# fitter = FitYolo(weights_path=r"/home/cat/simon/yolo_0413/yolo26s.pt",
+#                   model_yaml=r"/home/cat/simon/yolo_0413/map.yaml",
+#                   save_path=r'/home/cat/simon/yolo_0413/mdl',
+#                   epochs=5000,
+#                   batch=2000,
+#                   format=None,
+#                   device_id=0,
+#                   imgsz=256)
+# fitter.run()
 
 
 # if __name__ == "__main__":

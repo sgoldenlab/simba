@@ -11,6 +11,7 @@ import sys
 import tkinter as tk
 from copy import copy
 from datetime import datetime
+from itertools import groupby
 from multiprocessing import Lock, Value
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -21,6 +22,7 @@ except:
     from typing_extensions import Literal
 
 import matplotlib.font_manager
+import numpy as np
 import pandas as pd
 import psutil
 import pyglet
@@ -1344,3 +1346,119 @@ def get_nvdec_count(gpu_name: Optional[str] = None) -> int:
             return NVDEC[key]
 
     return 1
+
+
+def find_best_multi_animal_assignment_frame(h5_path: Union[str, os.PathLike],
+                                            expected_animals: int,
+                                            strategy: Literal['longest_run_middle', 'first'] = 'longest_run_middle',
+                                            min_bodyparts_per_animal: int = 1) -> Optional[int]:
+    """
+    Find a frame index suitable for the SimBA multi-animal identity-assignment UI.
+
+    Scans a DeepLabCut multi-animal H5 (e.g. ``_el.h5`` / ``_full.h5``) and returns a
+    frame index where all ``expected_animals`` individuals have at least
+    ``min_bodyparts_per_animal`` non-NaN body-part detections. Useful for jumping the
+    multi-animal assignment UI straight to a frame where every animal is clearly
+    tracked, skipping the manual "x"-stepping loop in
+    :meth:`simba.mixins.pose_importer_mixin.PoseImporterMixin.multianimal_identification`.
+
+    The recommendation can be used as the ``initial_frame_no`` argument to
+    :class:`simba.pose_importers.superanimal_import.SuperAnimalTopViewImporter` (or any
+    other multi-animal importer that exposes the same parameter).
+
+    .. note::
+       The function expects a modern DLC PyTorch / multi-animal pandas H5 layout with
+       at least an ``individuals`` column level. Single-animal files and legacy DLC
+       TF files without ``individuals`` cannot be analysed this way and return
+       ``None`` with a warning.
+
+    :param Union[str, os.PathLike] h5_path: Path to a DLC multi-animal H5 file with an
+        ``individuals`` column level (typically modern DLC PyTorch backend output).
+    :param int expected_animals: Number of animals the SimBA project is configured for,
+        i.e. the number of distinct individuals that must all be simultaneously detected
+        on the returned frame. Must be >= 1.
+    :param Literal['longest_run_middle', 'first'] strategy: How to pick among candidate
+        frames. ``'longest_run_middle'`` (default) returns the midpoint of the longest
+        consecutive run of frames where all animals meet the body-part threshold (most
+        robust for the assignment UI). ``'first'`` returns the first qualifying frame.
+    :param int min_bodyparts_per_animal: Minimum number of non-NaN body-parts that each
+        animal must have on a candidate frame. Default ``1`` reproduces the original
+        "at least one body-part visible per animal" behaviour. Higher values yield
+        frames where animals are more completely tracked, which makes click-based
+        identity assignment more reliable (e.g. for SuperAnimal-TopView with 27 body
+        parts per animal, ``min_bodyparts_per_animal=14`` requires that more than half
+        of every animal's body-parts are tracked on the returned frame).
+    :returns: Frame index recommended for the assignment UI, or ``None`` if no frame in
+        the file satisfies the constraint, or if the file does not contain a
+        multi-animal layout.
+    :rtype: Optional[int]
+
+    :example:
+    >>> frame = find_best_multi_animal_assignment_frame(
+    ...     h5_path=r'G:\\projects\\edmayelle\\raw_data\\HCS17_..._el.h5',
+    ...     expected_animals=5,
+    ... )
+    >>> # frame == 3313 (middle of the longest 5-mice run)
+
+    :example require >= 10 body-parts per animal for higher-quality assignment frames:
+    >>> frame = find_best_multi_animal_assignment_frame(
+    ...     h5_path=..., expected_animals=5, min_bodyparts_per_animal=10)
+    """
+    check_file_exist_and_readable(file_path=h5_path)
+    check_int(name=f'{find_best_multi_animal_assignment_frame.__name__} expected_animals',
+              value=expected_animals, min_value=1)
+    check_str(name=f'{find_best_multi_animal_assignment_frame.__name__} strategy',
+              value=strategy, options=('longest_run_middle', 'first'))
+    check_int(name=f'{find_best_multi_animal_assignment_frame.__name__} min_bodyparts_per_animal',
+              value=min_bodyparts_per_animal, min_value=1)
+
+    try:
+        df = pd.read_hdf(h5_path)
+    except Exception as e:
+        raise InvalidInputError(
+            msg=f'The H5 file {h5_path} could not be read as a pandas DataFrame: {type(e).__name__}: {e}',
+            source=find_best_multi_animal_assignment_frame.__name__,
+        )
+
+    level_names = list(df.columns.names) if isinstance(df.columns, pd.MultiIndex) else []
+    if 'individuals' not in level_names:
+        NoDataFoundWarning(
+            msg=(f'H5 file {h5_path} does not contain a multi-animal "individuals" column level; '
+                 f'cannot search for a multi-animal assignment frame.'),
+            source=find_best_multi_animal_assignment_frame.__name__,
+        )
+        return None
+
+    if 'coords' in level_names and 'likelihood' in df.columns.get_level_values('coords'):
+        detection_view = df.xs('likelihood', level='coords', axis=1)
+    else:
+        detection_view = df
+
+    individuals = list(dict.fromkeys(df.columns.get_level_values('individuals')))
+    bp_counts_per_animal = pd.DataFrame(
+        {ind: detection_view.xs(ind, level='individuals', axis=1).notna().sum(axis=1) for ind in individuals},
+        index=df.index,
+    )
+    animals_meeting_threshold = (bp_counts_per_animal >= min_bodyparts_per_animal).sum(axis=1).to_numpy()
+
+    hits = np.flatnonzero(animals_meeting_threshold == expected_animals).tolist()
+    if not hits:
+        max_meeting = int(animals_meeting_threshold.max()) if len(animals_meeting_threshold) else 0
+        NoDataFoundWarning(
+            msg=(f'H5 file {h5_path} contains {len(individuals)} individuals but no frame has all '
+                 f'{expected_animals} of them with at least {min_bodyparts_per_animal} body-part(s) '
+                 f'tracked simultaneously (max animals-meeting-threshold = {max_meeting}).'),
+            source=find_best_multi_animal_assignment_frame.__name__,
+        )
+        return None
+
+    if strategy == 'first':
+        return int(hits[0])
+
+    longest_start, longest_end, longest_len = hits[0], hits[0], 1
+    for _, g in groupby(enumerate(hits), lambda ix: ix[0] - ix[1]):
+        run = list(g)
+        run_start, run_end, run_len = run[0][1], run[-1][1], len(run)
+        if run_len > longest_len:
+            longest_start, longest_end, longest_len = run_start, run_end, run_len
+    return int((longest_start + longest_end) // 2)

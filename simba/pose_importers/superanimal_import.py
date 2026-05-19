@@ -11,10 +11,13 @@ from simba.utils.checks import (check_if_dir_exists,
                                 check_if_keys_exist_in_dict, check_int,
                                 check_str, check_valid_lst)
 from simba.utils.enums import ConfigKey, Formats, TagNames
+from simba.utils.lookups import find_best_multi_animal_assignment_frame
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
+from simba.utils.errors import InvalidInputError
 from simba.utils.read_write import (clean_superanimal_topview_filename,
                                     find_all_videos_in_project,
                                     find_files_of_filetypes_in_directory,
+                                    get_h5_frame_count,
                                     get_video_meta_data,
                                     read_dlc_superanimal_h5, write_df)
 
@@ -29,6 +32,12 @@ class SuperAnimalTopViewImporter(PoseImporterMixin, ConfigReader):
 
        Trackes 27 body-parts on one or more mice recorded from zenith.
 
+       Supports both DLC H5 layouts: the legacy TensorFlow backend (``df_with_missing`` /
+       ``table``) and the modern DLC 3.0+ PyTorch backend (HRNet, RTMPose), including
+       multi-animal tracked outputs ending in ``_el.h5`` / ``_full.h5``. H5 column order is
+       assumed to follow the SuperAnimal-TopView 27 body-part schema, with animals in the
+       order supplied via ``id_lst`` (positional mapping).
+
     .. image:: _static/img/superanimal_topview.png
        :width: 150
        :align: center
@@ -38,6 +47,20 @@ class SuperAnimalTopViewImporter(PoseImporterMixin, ConfigReader):
     :param List[str] id_lst: Names of animals.
     :param Optional[Dict[str, str]] interpolation_setting: Dict defining the type and method to use to perform interpolation {'type': 'animals', 'method': 'linear'}.
     :param Optional[Dict[str, Union[str, int]]] smoothing_settings: Dictionary defining the pose estimation smoothing method {'time_window': 500, 'method': 'gaussian'}.
+    :param Optional[int] initial_frame_no: Frame index at which to open the multi-animal
+        identity-assignment UI. Only used when ``len(id_lst) > 1``.
+
+        * If an integer is passed, it is used directly (and must be ``>= 0`` and strictly
+          less than the frame count of **every** H5 file in ``data_folder``; otherwise an
+          :class:`InvalidInputError` is raised by ``__init__``).
+        * If ``None`` (default) in multi-animal mode, the importer attempts to
+          auto-detect, **per video**, a frame where all ``len(id_lst)`` animals are
+          simultaneously tracked (via
+          :func:`simba.utils.lookups.find_best_multi_animal_assignment_frame`). The UI
+          opens on that frame, so the user only needs to press "c" once. If no such
+          frame exists (or detection fails for any reason) the UI falls back to frame 0
+          as in earlier SimBA versions.
+        * Single-animal imports ignore this argument entirely.
 
     :references:
         .. [1] Ye, Shaokai, Anastasiia Filippova, Jessy Lauer, et al. “SuperAnimal Pretrained Pose Estimation Models for Behavioral Analysis.” Nature Communications 15, no. 1 (2024): 5165. https://doi.org/10.1038/s41467-024-48792-2.
@@ -46,6 +69,10 @@ class SuperAnimalTopViewImporter(PoseImporterMixin, ConfigReader):
     :example:
     >>> importer = SuperAnimalTopViewImporter(config_path=r"C:\troubleshooting\super_animal_import\project_folder\project_config.ini", data_folder=r'C:\troubleshooting\super_animal_import\data_files', id_lst=['Animal_1'])
     >>> importer.run()
+
+    :example multi-animal with a known good frame:
+    >>> importer = SuperAnimalTopViewImporter(config_path=r"...\project_config.ini", data_folder=r'...\data_files', id_lst=['mouse_1', 'mouse_2', 'mouse_3', 'mouse_4', 'mouse_5'], initial_frame_no=3313)
+    >>> importer.run()
     """
 
     def __init__(self,
@@ -53,7 +80,8 @@ class SuperAnimalTopViewImporter(PoseImporterMixin, ConfigReader):
                  data_folder: Union[str, os.PathLike],
                  id_lst: List[str],
                  interpolation_settings: Optional[Dict[str, str]] = None,
-                 smoothing_settings: Optional[Dict[str, Union[int, str]]] = None):
+                 smoothing_settings: Optional[Dict[str, Union[int, str]]] = None,
+                 initial_frame_no: Optional[int] = None):
 
 
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
@@ -68,14 +96,32 @@ class SuperAnimalTopViewImporter(PoseImporterMixin, ConfigReader):
             check_if_keys_exist_in_dict(data=smoothing_settings, key=['method', 'time_window'], name=f'{self.__class__.__name__} smoothing_settings')
             check_str(name=f'{self.__class__.__name__} smoothing_settings method', value=smoothing_settings['method'], options=('savitzky-golay', 'gaussian'))
             check_int(name=f'{self.__class__.__name__} smoothing_settings time_window', value=smoothing_settings['time_window'], min_value=1)
+        if initial_frame_no is not None:
+            check_int(name=f'{self.__class__.__name__} initial_frame_no', value=initial_frame_no, min_value=0)
 
         log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         self.interpolation_settings, self.smoothing_settings = (interpolation_settings, smoothing_settings)
+        self.initial_frame_no = initial_frame_no
         self.data_folder, self.id_lst = data_folder, id_lst
         self.import_log_path = os.path.join(self.logs_path, f"data_import_log_{self.datetime}.csv")
         self.video_paths = find_all_videos_in_project(videos_dir=self.video_dir, raise_error=True if len(id_lst) > 1 else False)
         self.input_data_paths = find_files_of_filetypes_in_directory(directory=self.data_folder, extensions=['.h5'], raise_error=True)
         self.data_and_videos_lk = self.link_video_paths_to_data_paths(data_paths=self.input_data_paths, video_paths=self.video_paths, raise_error=True if len(id_lst) > 1 else False, filename_cleaning_func=clean_superanimal_topview_filename)
+        if initial_frame_no is not None:
+            offending = []
+            for h5_path in self.input_data_paths:
+                n_frames = get_h5_frame_count(path=h5_path)
+                if n_frames is not None and initial_frame_no >= n_frames:
+                    offending.append((h5_path, n_frames))
+            if offending:
+                details = "; ".join(f'{os.path.basename(p)} has {n} frames' for p, n in offending)
+                raise InvalidInputError(
+                    msg=(f'initial_frame_no={initial_frame_no} exceeds the frame count of '
+                         f'{len(offending)} of {len(self.input_data_paths)} H5 file(s) in the data '
+                         f'folder. Valid frame indices for a given file are [0, n_frames - 1]. '
+                         f'Offending file(s): {details}.'),
+                    source=self.__class__.__name__,
+                )
         self.check_multi_animal_status()
         self.config.set(ConfigKey.GENERAL_SETTINGS.value, ConfigKey.ANIMAL_CNT.value, str(len(self.id_lst)))
         with open(self.config_path, "w") as f: self.config.write(f)
@@ -85,10 +131,7 @@ class SuperAnimalTopViewImporter(PoseImporterMixin, ConfigReader):
     def _get_expected_column_names(self):
         self.field_names, self.bp_names = [], []
         for animal_id in self.id_lst:
-            if len(self.id_lst) == 1:
-                animal_field_names = [f"{animal_id}_{s}" for s in Formats.SUPERANIMAL_TOPVIEW_BP_NAMES.value]
-            else:
-                animal_field_names = Formats.SUPERANIMAL_TOPVIEW_BP_NAMES.value
+            animal_field_names = [f"{animal_id}_{s}" for s in Formats.SUPERANIMAL_TOPVIEW_BP_NAMES.value]
             self.bp_names.extend((animal_field_names))
             animal_field_names = [f"{s}{suffix}" for s in animal_field_names for suffix in ("_x", "_y", "_p")]
             self.field_names.extend((animal_field_names))
@@ -108,7 +151,27 @@ class SuperAnimalTopViewImporter(PoseImporterMixin, ConfigReader):
             print(f"Processing {video_name} ({cnt+1}/{len(self.input_data_paths)})...")
             self.data_df = read_dlc_superanimal_h5(path=video_data['DATA'], col_names=self.field_names)
             if self.animal_cnt > 1:
-                self.initialize_multi_animal_ui(animal_bp_dict=self.animal_bp_dict, video_info=get_video_meta_data(video_data["VIDEO"]), data_df=self.data_df, video_path=video_data["VIDEO"])
+                frame_to_use = self.initial_frame_no
+                if frame_to_use is None:
+                    n_bp = len(Formats.SUPERANIMAL_TOPVIEW_BP_NAMES.value)
+                    cascade = [max(1, int(round(n_bp * f))) for f in (0.75, 0.50, 0.25)] + [1]
+                    cascade = list(dict.fromkeys(cascade))
+                    matched_threshold = None
+                    for min_bp in cascade:
+                        try:
+                            candidate = find_best_multi_animal_assignment_frame(h5_path=video_data['DATA'], expected_animals=len(self.id_lst), min_bodyparts_per_animal=min_bp)
+                        except Exception as e:
+                            print(f"Auto-detection of a starting frame for {video_name} failed at min_bodyparts_per_animal={min_bp} ({type(e).__name__}: {e}); trying a lower threshold.")
+                            continue
+                        if candidate is not None:
+                            frame_to_use = candidate
+                            matched_threshold = min_bp
+                            break
+                    if frame_to_use is not None:
+                        print(f"Auto-selected starting frame {frame_to_use} for {video_name}: all {len(self.id_lst)} animals have >= {matched_threshold}/{n_bp} body-parts tracked. Press 'c' to accept and assign identities.")
+                    else:
+                        print(f"No frame in {video_name} has all {len(self.id_lst)} animals simultaneously tracked at any threshold; opening identity-assignment UI at frame 0 (use 'x' to step forward by 50 frames).")
+                self.initialize_multi_animal_ui(animal_bp_dict=self.animal_bp_dict, video_info=get_video_meta_data(video_data["VIDEO"]), data_df=self.data_df, video_path=video_data["VIDEO"], initial_frame_no=frame_to_use)
                 self.multianimal_identification()
             else:
                 self.out_df = self.insert_multi_idx_columns(df=self.data_df.fillna(0))

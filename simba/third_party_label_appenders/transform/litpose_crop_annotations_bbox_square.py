@@ -306,8 +306,8 @@ class CropLPAnnotationsBboxSquare:
 
 
 #if __name__ == "__main__":
-cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"Z:\home\simon\LPProjects\mini_project_0504",
-                                          save_dir=r"Z:\home\simon\LPProjects\mini_project_0504_cropped_4",
-                                          bbox_pad_frac=0.15,
-                                          visualize=True)
-cropper.run()
+# cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"Z:\home\simon\LPProjects\mini_project_0513",
+#                                           save_dir=r"Z:\home\simon\LPProjects\mini_project_0513_cropped",
+#                                           bbox_pad_frac=0.25,
+#                                           visualize=True)
+# cropper.run()

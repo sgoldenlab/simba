@@ -250,7 +250,7 @@ class ProjectConfigCreator(object):
             rows = list(cr)  # create a list of rows for instance
 
         chosen_bps = rows[self.body_part_config_idx]
-        chosen_bps = list(filter(None, chosen_bps))
+        chosen_bps = list(dict.fromkeys(filter(None, chosen_bps)))
 
         project_bp_file_path = os.path.join(
             self.bp_names_folder, "project_bp_names.csv"

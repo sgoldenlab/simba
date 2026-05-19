@@ -1973,45 +1973,137 @@ def read_dlc_superanimal_h5(path: Union[str, os.PathLike], col_names: List[str])
     """
     Read and parse DeepLabCut SuperAnimal-TopView pose estimation data from H5 format.
 
-    Reads pose estimation data from a SuperAnimal-TopView DLC H5 file, validates the file structure,
-    extracts the pose data table, and returns it as a pandas DataFrame with the specified column names.
-    The function expects the H5 file to contain a 'df_with_missing' group with nested 'table' data.
+    Supports both DLC H5 layouts that the SuperAnimal-TopView workflow can produce:
+
+    1. **Legacy DLC TensorFlow backend** — H5 contains a ``df_with_missing`` group with a
+       nested PyTables ``table`` (DLC <= 2.x export written with
+       ``df.to_hdf(..., key='df_with_missing', format='table')``).
+    2. **Modern DLC 3.0+ PyTorch backend** (HRNet / RTMPose, including multi-animal
+       ``_el.h5`` / ``_full.h5`` outputs) — H5 stores a pandas DataFrame with a multi-index
+       column header (typical levels: ``scorer / [individuals] / bodyparts / coords``).
+       Readable directly with :func:`pandas.read_hdf`.
+
+    Regardless of the source format, the returned DataFrame has its columns assigned to
+    ``col_names`` **positionally**. The H5 column order is therefore assumed to follow the
+    SimBA project's body-part order (i.e. SuperAnimal-TopView 27 body parts per animal,
+    each as an ``x, y, likelihood`` triplet, animals in the order specified by ``id_lst``
+    in :class:`simba.pose_importers.superanimal_import.SuperAnimalTopViewImporter`).
 
     :parameter Union[str, os.PathLike] path: Path to the SuperAnimal DLC H5 file.
     :parameter List[str] col_names: List of column names to assign to the DataFrame. Must match the expected
         number of columns based on the SimBA project configuration (typically body-part coordinates: x, y, p).
-    :returns: DataFrame containing pose estimation data with columns named according to col_names parameter.
+    :returns: DataFrame containing pose estimation data with columns named according to ``col_names``.
     :rtype: pd.DataFrame
-    :raises InvalidInputError: If the file cannot be read as H5, if expected keys are missing, or if the
+    :raises InvalidInputError: If the file cannot be read by any supported strategy, or if the
         number of columns in the file is less than the number of expected column names.
 
     :example:
     >>> col_names = ['Animal_1_Nose_x', 'Animal_1_Nose_y', 'Animal_1_Nose_p', 'Animal_1_Ear_left_x', ...]
     >>> df = read_dlc_superanimal_h5(path='project_folder/videos/Video_1.h5', col_names=col_names)
     """
-    EXPECTED_KEYS = ['df_with_missing']
-    DF_W_MISSING = 'df_with_missing'
-    NESTED_EXPECTED_KEYS = ['_i_table', 'table']
     check_file_exist_and_readable(file_path=path)
     check_valid_lst(data=col_names, source=f'{read_dlc_superanimal_h5.__name__} col_names', valid_dtypes=(str,), min_len=1)
-    try:
-        pose_data = h5py.File(path, "r")
-    except Exception as e:
-        raise InvalidInputError(msg=f'The DLC file {path} could not be read as a valid H5 file: {e.args}', source=read_dlc_superanimal_h5.__name__)
-    pose_keys = list(pose_data.keys())
-    missing_keys = [x for x in EXPECTED_KEYS if x not in pose_keys]
-    if len(missing_keys) > 0:
-        raise InvalidInputError(msg=f'The file {path} does not contain the expected key(s) {missing_keys}. Is it a valid superanimal DLC h5 file?', source=read_dlc_superanimal_h5.__name__)
-    missing_keys = [x for x in NESTED_EXPECTED_KEYS if x not in pose_data[DF_W_MISSING]]
-    if len(missing_keys) > 0:
-        raise InvalidInputError(msg=f'The file {path} does not contain the expected key(s) {missing_keys}. Is it a valid superanimal DLC h5 file?', source=read_dlc_superanimal_h5.__name__)
-    data = pose_data[DF_W_MISSING]['table'][...]
-    data = pd.DataFrame([item[-1] for item in data])
+
+    data = None
+    read_errors = []
+
+    for read_kwargs in ({}, {'key': 'df_with_missing'}, {'key': 'tracks'}, {'key': 'data'}):
+        try:
+            candidate = pd.read_hdf(path, **read_kwargs)
+        except Exception as e:
+            read_errors.append(f'pd.read_hdf({read_kwargs}): {type(e).__name__}: {e}')
+            continue
+        if isinstance(candidate, pd.DataFrame) and len(candidate.columns) > 0:
+            data = candidate
+            break
+
+    if data is None:
+        try:
+            with h5py.File(path, 'r') as pose_data:
+                if 'df_with_missing' in pose_data and 'table' in pose_data['df_with_missing']:
+                    raw = pose_data['df_with_missing']['table'][...]
+                    data = pd.DataFrame([item[-1] for item in raw])
+                else:
+                    read_errors.append(f'h5py: top-level keys = {list(pose_data.keys())}')
+        except Exception as e:
+            read_errors.append(f'h5py: {type(e).__name__}: {e}')
+
+    if data is None:
+        raise InvalidInputError(
+            msg=(f'The DLC file {path} could not be read as a valid H5 file. SimBA tried both the '
+                 f'legacy DLC TensorFlow layout (df_with_missing/table) and the modern DLC 3.0+ '
+                 f'PyTorch / multi-animal pandas layout but neither succeeded. Read attempts: '
+                 f'{"; ".join(read_errors)}'),
+            source=read_dlc_superanimal_h5.__name__,
+        )
+
+    if isinstance(data.columns, pd.MultiIndex):
+        data.columns = list(range(len(data.columns)))
+
     if len(data.columns) < len(col_names):
-        raise InvalidInputError(msg=f'The file {path} does contains {len(data.columns)} columns. With your current project, SimBA expects this file to contain at least {len(col_names)} columns', source=read_dlc_superanimal_h5.__name__)
-    data = data.loc[:, :len(col_names)-1]
+        raise InvalidInputError(
+            msg=(f'The file {path} contains {len(data.columns)} columns. With your current '
+                 f'project, SimBA expects this file to contain at least {len(col_names)} columns.'),
+            source=read_dlc_superanimal_h5.__name__,
+        )
+
+    data = data.iloc[:, :len(col_names)].copy()
     data.columns = col_names
     return data
+
+
+def get_h5_frame_count(path: Union[str, os.PathLike]) -> Optional[int]:
+    """
+    Return the number of frames (rows) in a DLC H5 file without loading the full data.
+
+    Inspects the H5 file's structural metadata to read the row dimension cheaply,
+    handling both common pandas-on-HDF storage modes:
+
+    - ``format='table'`` (legacy DLC TF backend) → ``<key>/table`` shape[0].
+    - ``format='fixed'`` (modern DLC PyTorch backend) → ``<key>/axis1`` shape[0]
+      or ``<key>/block0_values`` shape[0].
+
+    If the structural shortcut fails for any reason, falls back to a full
+    :func:`pandas.read_hdf` read.
+
+    :param Union[str, os.PathLike] path: Path to a DLC H5 file.
+    :returns: Number of frames in the file, or ``None`` if no row count could be
+        determined.
+    :rtype: Optional[int]
+
+    :example:
+    >>> n = get_h5_frame_count(r'video_DLC_HrnetW32_..._el.h5')
+    >>> # 5400
+    """
+    check_file_exist_and_readable(file_path=path)
+    try:
+        with h5py.File(path, 'r') as f:
+            for key in f.keys():
+                grp = f[key]
+                if not hasattr(grp, 'keys'):
+                    continue
+                children = list(grp.keys())
+                if 'table' in children:
+                    try:
+                        return int(grp['table'].shape[0])
+                    except Exception:
+                        pass
+                if 'axis1' in children:
+                    try:
+                        return int(grp['axis1'].shape[0])
+                    except Exception:
+                        pass
+                if 'block0_values' in children:
+                    try:
+                        return int(grp['block0_values'].shape[0])
+                    except Exception:
+                        pass
+    except Exception:
+        pass
+    try:
+        return int(len(pd.read_hdf(path)))
+    except Exception:
+        return None
 
 
 def clean_sleap_filenames_in_directory(dir: Union[str, os.PathLike],

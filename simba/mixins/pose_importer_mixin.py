@@ -35,9 +35,28 @@ class PoseImporterMixin(object):
                                    animal_bp_dict: dict,
                                    video_info: dict,
                                    data_df: pd.DataFrame,
-                                   video_path: Union[str, os.PathLike]):
+                                   video_path: Union[str, os.PathLike],
+                                   initial_frame_no: Optional[int] = None):
+        """
+        :param Optional[int] initial_frame_no: Frame index to start the assignment UI on.
+            Useful for jumping directly to a frame where all animals are simultaneously
+            detected, so the user doesn't have to press "x" repeatedly to find one.
+            If ``None`` (default) the UI starts at frame 0, preserving previous behaviour.
+            Clamped to the valid range ``[0, len(data_df) - 1]``; out-of-range values
+            emit a :class:`FrameRangeWarning` and fall back to 0.
+        """
 
-        self.video_info, self.data_df, self.frame_no, self.add_spacer = (video_info, data_df, 0, 2)
+        start_frame = 0
+        if initial_frame_no is not None:
+            if not isinstance(initial_frame_no, int) or initial_frame_no < 0 or initial_frame_no >= len(data_df):
+                FrameRangeWarning(
+                    msg=(f"initial_frame_no={initial_frame_no} is outside the valid range "
+                         f"[0, {len(data_df) - 1}] for this video; starting at frame 0 instead."),
+                    source=self.__class__.__name__,
+                )
+            else:
+                start_frame = initial_frame_no
+        self.video_info, self.data_df, self.frame_no, self.add_spacer = (video_info, data_df, start_frame, 2)
         self.animal_bp_dict, self.cap = animal_bp_dict, cv2.VideoCapture(video_path)
         _, self.video_name, _ = get_fn_ext(video_path)
         self.get_video_scalers(video_info=video_info)
@@ -152,7 +171,7 @@ class PoseImporterMixin(object):
         for animal_cnt, (animal_name, animal_bps) in enumerate(self.animal_bp_dict.items()):
             self.img_bp_cords[animal_name] = []
             for x_name, y_name in zip(animal_bps["X_bps"], animal_bps["Y_bps"]):
-                self.img_bp_cords[animal_name].append(tuple(self.data_df.loc[self.frame_no, [x_name, y_name]].values.astype(int)))
+                self.img_bp_cords[animal_name].append(tuple(self.data_df.loc[self.frame_no, [x_name, y_name]].values.astype(np.int32)))
         self.insert_all_bodyparts_into_img(img=self.img_overlay, body_parts=self.img_bp_cords)
         side_img = np.ones((int(self.video_info["height"] / 2), self.video_info["width"], 3))
         cv2.putText(side_img, f"Current video: {self.video_name}", (10, self.scalers["space"]), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 2)
@@ -237,20 +256,25 @@ class PoseImporterMixin(object):
         self.animal_order = {}
         for animal_number, animal_click_data in self.id_cords.items():
             animal_name, animal_cord = (animal_click_data["name"], animal_click_data["cord"])
-            closest_animal = {}
-            closest_animal["animal_name"] = None
-            closest_animal["body_part_name"] = None
-            closest_animal["distance"] = np.inf
+            closest_animal = {"animal_name": None, "body_part_name": None, "distance": np.inf}
             for other_animal_name, animal_bps in self.animal_bp_dict.items():
                 animal_bp_names_x = self.animal_bp_dict[other_animal_name]["X_bps"]
                 animal_bp_names_y = self.animal_bp_dict[other_animal_name]["Y_bps"]
                 for x_col, y_col in zip(animal_bp_names_x, animal_bp_names_y):
-                    bp_location = (int(self.all_frame_data[x_col]), int(self.all_frame_data[y_col]))
-                    distance = np.sqrt((animal_cord[0] - bp_location[0]) ** 2 + (animal_cord[1] - bp_location[1]) ** 2)
+                    bp_x, bp_y = self.all_frame_data[x_col], self.all_frame_data[y_col]
+                    distance = np.sqrt((animal_cord[0] - bp_x) ** 2 + (animal_cord[1] - bp_y) ** 2)
                     if distance < closest_animal["distance"]:
                         closest_animal["animal_name"] = other_animal_name
                         closest_animal["body_part_name"] = (x_col, y_col)
                         closest_animal["distance"] = distance
+            if closest_animal["animal_name"] is None:
+                raise InvalidInputError(
+                    msg=(f'No tracked body-parts found on frame {self.frame_no} for click number '
+                         f'{animal_number} ({animal_name}): every body-part of every animal is NaN at '
+                         f'this frame. Press "x" to step to a frame where at least one body-part per '
+                         f'animal is tracked, then assign identities.'),
+                    source=self.__class__.__name__,
+                )
             self.animal_order[animal_number] = closest_animal
         self.check_intergity_of_chosen_animal_order()
         self.organize_results()
