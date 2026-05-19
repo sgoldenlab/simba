@@ -11,14 +11,13 @@ from simba.utils.checks import (check_if_dir_exists,
                                 check_if_keys_exist_in_dict, check_int,
                                 check_str, check_valid_lst)
 from simba.utils.enums import ConfigKey, Formats, TagNames
+from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import find_best_multi_animal_assignment_frame
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.errors import InvalidInputError
 from simba.utils.read_write import (clean_superanimal_topview_filename,
                                     find_all_videos_in_project,
                                     find_files_of_filetypes_in_directory,
-                                    get_h5_frame_count,
-                                    get_video_meta_data,
+                                    get_h5_frame_count, get_video_meta_data,
                                     read_dlc_superanimal_h5, write_df)
 
 
