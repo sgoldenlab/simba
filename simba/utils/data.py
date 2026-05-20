@@ -16,7 +16,12 @@ import h5py
 import numpy as np
 import pandas as pd
 from numba import jit, njit, prange, typed
-from pylab import *
+import importlib.util
+import inspect
+import sys
+
+import matplotlib
+from matplotlib import cm
 from scipy import stats
 from scipy.interpolate import interp1d
 from scipy.signal import savgol_filter
