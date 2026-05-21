@@ -3,25 +3,24 @@ __author__ = "Simon Nilsson; sronilsson@gmail.com"
 import ast
 import configparser
 import gc
+import importlib.util
+import inspect
 import io
 import os
 import platform
 import subprocess
+import sys
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import h5py
+import matplotlib
 import numpy as np
 import pandas as pd
-from numba import jit, njit, prange, typed
-import importlib.util
-import inspect
-import sys
-
-import matplotlib
 from matplotlib import cm
+from numba import jit, njit, prange, typed
 from scipy import stats
 from scipy.interpolate import interp1d
 from scipy.signal import savgol_filter
