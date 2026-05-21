@@ -1,0 +1,11 @@
+2026-05-21T08:18:05Z|tests/data/test_projects/two_c57/project_folder\csv\outlier_corrected_movement_location\Together_1.csv.InvalidInputError||error||SIMBA VALUE ERROR: The dataframe tests/data/test_projects/two_c57/project_folder\csv\outlier_corrected_movement_location\Together_1.csv are missing required columns ['Ear_left_1_y', 'Nose_1_y', 'Nose_1_x', 'Ear_right_1_y', 'Ear_left_1_x', 'Ear_right_1_x'].
+2026-05-21T10:49:49Z|ROIFeatureCreator.ROIWarning||warning||No ROIs detected for video Together_2. Skipping ROI feature calculations for video Together_2
+2026-05-21T10:49:49Z|.stdout_success||complete||ROI features analysed for 2 videos
+2026-05-21T11:28:27Z|ROIFeatureCreator.ROIWarning||warning||No ROIs detected for video Together_2. Skipping ROI feature calculations for video Together_2
+2026-05-21T11:28:27Z|.stdout_success||complete||ROI features analysed for 2 videos
+2026-05-21T11:28:27Z|ROIFeatureCreator||CLASS_INIT||append_data: False, data_path: C:\projects\simba\simba\tests\data\test_projects\two_c57\project_folder\csv\outlier_corrected_movement_location, body_parts: ['Nose_1', 'Nose_2'], config_path: C:\projects\simba\simba\tests\data\test_projects\two_c57\project_folder\project_config.ini
+2026-05-21T11:28:28Z|ROIFeatureCreator.ROIWarning||warning||No ROIs detected for video Together_2. Skipping ROI feature calculations for video Together_2
+2026-05-21T11:28:28Z|.stdout_success||complete||ROI features analysed for 2 videos
+2026-05-21T11:28:28Z|ROIFeatureCreator||CLASS_INIT||append_data: False, data_path: C:\projects\simba\simba\tests\data\test_projects\two_c57\project_folder\csv\outlier_corrected_movement_location\Together_1.csv, body_parts: ['Nose_1', 'Nose_2'], config_path: C:\projects\simba\simba\tests\data\test_projects\two_c57\project_folder\project_config.ini
+2026-05-21T11:28:28Z|.stdout_success||complete||ROI features analysed for 1 videos
+2026-05-21T11:28:28Z|ROIFeatureCreator||CLASS_INIT||append_data: False, data_path: None, body_parts: ['Nose'], config_path: C:\projects\simba\simba\tests\data\test_projects\mouse_open_field\project_folder\project_config.ini

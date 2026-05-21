@@ -93,7 +93,7 @@ class ROIFeatureCreator(ConfigReader, FeatureExtractionMixin):
             self.bp_lk[cnt] = [animal, bp, [f'{bp}_{"x"}', f'{bp}_{"y"}', f'{bp}_{"p"}']]
         if self.roi_directing_viable:
             print("Directionality calculations are VIABLE.")
-            self.directing_analyzer = DirectingROIAnalyzer(config_path=config_path, data_path=self.data_paths)
+            self.directing_analyzer = DirectingROIAnalyzer(config_path=config_path, data_path=data_path)
             self.directing_analyzer.run()
             self.dr = self.directing_analyzer.results_df
         else:

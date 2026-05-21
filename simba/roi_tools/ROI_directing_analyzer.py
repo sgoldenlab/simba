@@ -192,7 +192,6 @@ class DirectingROIAnalyzer(ConfigReader,
             video_timer = SimbaTimer(start=True)
             stdout_information(msg=f"Analyzing ROI directionality in video {self.video_name}...")
             data_df = read_df(file_path=file_path, file_type=self.file_type)
-            data_df.columns = [x.lower() for x in data_df.columns]
             video_roi_dict, shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=self.video_name)
             if len(shape_names) == 0:
                 stdout_warning(msg=f'Skipping video {self.video_name}: No ROIs drawn for video {self.video_name} detected.')
