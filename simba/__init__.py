@@ -3,6 +3,7 @@ SimBA (Simple Behavioral Analysis)
 Toolkit for computer classification and analysis of behaviors in experimental animals
 """
 import matplotlib
+
 matplotlib.use("Agg")
 
 import multiprocessing
