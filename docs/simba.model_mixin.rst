@@ -14,6 +14,13 @@ Batch random forest inference
    :members:
    :undoc-members:
 
+Batch multi-animal random forest inference
+----------------------------------------------
+
+.. autoclass:: simba.model.inference_multi_animal_batch.InferenceMultiAnimalBatch
+   :members:
+   :undoc-members:
+
 Batch multi-class random forest inference
 ----------------------------------------------
 

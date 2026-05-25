@@ -68,6 +68,7 @@ class AggregateClfCalculator(ConfigReader):
     :param bool median_interval_duration: If True, calculates median interval between bouts for each classifier. Default: True.
     :param bool frame_count: If True, includes total frame count in the output. Default: False.
     :param bool video_length: If True, includes video length in seconds in the output. Default: False.
+    :param Optional[Union[str, os.PathLike]] save_dir: Optional directory in which to save the output CSVs (``data_summary_*.csv`` and, if requested, ``detailed_bout_data_summary_*.csv``). If None, defaults to the project's ``logs_path``. Default: None.
 
     :raises NoChoosenMeasurementError: If no measurement types are selected (all measurement booleans are False).
 
@@ -87,7 +88,7 @@ class AggregateClfCalculator(ConfigReader):
                  classifiers: List[str],
                  data_dir: Optional[Union[str, os.PathLike]] = None,
                  detailed_bout_data: bool = False,
-                 transpose: bool = False,
+                 transpose: bool = True,
                  first_occurrence: bool = True,
                  event_count: bool = True,
                  total_event_duration: bool = True,
@@ -97,14 +98,16 @@ class AggregateClfCalculator(ConfigReader):
                  mean_interval_duration: bool = True,
                  median_interval_duration: bool = True,
                  frame_count: bool = False,
-                 video_length: bool = False):
+                 video_length: bool = False,
+                 save_dir: Optional[Union[str, os.PathLike]] = None):
 
         super().__init__(config_path=config_path)
         log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
-        check_valid_lst(data=classifiers, source=f'{self.__class__.__name__} classifiers', min_len=1, valid_dtypes=(str,), valid_values=self.clf_names)
         if data_dir is None:
+            check_valid_lst(data=classifiers, source=f'{self.__class__.__name__} classifiers', min_len=1, valid_dtypes=(str,), valid_values=self.clf_names)
             data_dir = self.machine_results_dir
         else:
+            check_valid_lst(data=classifiers, source=f'{self.__class__.__name__} classifiers', min_len=1, valid_dtypes=(str,))
             check_if_dir_exists(in_dir=data_dir)
         self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=[f'.{self.file_type}'], raise_error=True)
 
@@ -130,15 +133,20 @@ class AggregateClfCalculator(ConfigReader):
         self.median_interval_duration = median_interval_duration
         self.frame_count = frame_count
         self.video_length = video_length
-        self.save_path = os.path.join(self.logs_path, f"data_summary_{self.datetime}.csv")
-        self.detailed_save_path = os.path.join(self.logs_path, f"detailed_bout_data_summary_{self.datetime}.csv")
+        if save_dir is not None:
+            check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
+            self.save_dir = save_dir
+        else:
+            self.save_dir = self.logs_path
+        self.save_path = os.path.join(self.save_dir, f"data_summary_{self.datetime}.csv")
+        self.detailed_save_path = os.path.join(self.save_dir, f"detailed_bout_data_summary_{self.datetime}.csv")
 
     def run(self):
         self.results_df, self.bouts_df_lst = pd.DataFrame(), []
-        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.machine_results_paths)
+        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
         for file_cnt, file_path in enumerate(self.data_paths):
             _, file_name, _ = get_fn_ext(file_path)
-            stdout_information(msg=f"Analyzing classifier descriptive statistics for video {file_name} ({file_cnt+1}/{len(self.machine_results_paths)})...")
+            stdout_information(msg=f"Analyzing classifier descriptive statistics for video {file_name} ({file_cnt+1}/{len(self.data_paths)})...")
             _, _, fps = self.read_video_info(video_name=file_name)
             check_file_exist_and_readable(file_path)
             data_df = read_df(file_path, self.file_type)

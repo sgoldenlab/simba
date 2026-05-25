@@ -163,6 +163,16 @@ class FreezingDetector(ConfigReader):
         agg_results.to_csv(agg_results_path)
         self.timer.stop_timer(); stdout_success(msg=f'Results saved in {self.save_dir} directory.', elapsed_time=self.timer.elapsed_time_str)
 
+#
+# FreezingDetector(
+#     data_dir=r'G:\projects\jason_zhang\jason_project\project_folder\csv\outlier_corrected_movement_location',
+#     config_path=r"G:\projects\jason_zhang\jason_project\project_folder\project_config.ini",
+#     time_window=3,
+#     movement_threshold=3,
+#     shortest_bout=100
+# ).run()
+
+
 
 # FreezingDetector(
 #     data_dir=r'F:\troubleshooting\sam\sam\project_folder\csv\outlier_corrected_movement_location',

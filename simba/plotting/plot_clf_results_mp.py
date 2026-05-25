@@ -20,11 +20,13 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
-                                check_int, check_nvidea_gpu_available,
-                                check_str, check_that_column_exist,
+from simba.utils.checks import (check_float, check_if_dir_exists,
+                                check_if_valid_rgb_tuple, check_int,
+                                check_nvidea_gpu_available, check_str,
+                                check_that_column_exist,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_boolean, check_valid_dict,
+                                check_valid_lst,
                                 check_video_and_data_frm_count_align)
 from simba.utils.data import (check_if_string_value_is_valid_video_timestamp,
                               create_color_palette, detect_bouts,
@@ -212,7 +214,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file in Configparser format.
     :param bool video_setting: If True, creates compressed MP4 videos. Default True.
     :param bool frame_setting: If True, saves individual annotated frames as PNG images. Default False.
-    :param Optional[Union[List[Union[str, os.PathLike]], Union[str, os.PathLike]]] video_paths: Path(s) to video file(s) to process. If None, processes all videos found in the project's video directory. Default None.
+    :param Optional[Union[List[Union[str, os.PathLike]], Union[str, os.PathLike]]] video_paths: Path(s) to video file(s) to process. Accepts a single video file path, a list of video file paths, or a path to a directory containing videos (in which case all videos in that directory are processed). If None, processes all videos found in the project's video directory. Default None.
     :param bool rotate: If True, rotates output videos 90 degrees clockwise. Default False.
     :param bool animal_names: If True, displays animal names on the video frames. Default False.
     :param bool show_pose: If True, overlays pose-estimation keypoints on the video. Default True.
@@ -233,6 +235,9 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
     :param bool gpu: If True, uses GPU acceleration for video concatenation (requires CUDA-capable GPU). Default False.
     :param bool verbose: If True, prints progress and status messages during processing. Default True.
     :param int core_cnt: Number of CPU cores to use for parallel processing. Pass -1 to use all available cores. Default -1.
+    :param Optional[Union[str, os.PathLike]] data_dir: Directory containing the classification data files (one per video, named ``<video_name>.<file_type>``) to overlay on the videos. If None, defaults to the project's ``machine_results_dir``. Default None.
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory in which to write annotated videos/frames. Created if it does not exist. If None, defaults to the project's ``sklearn_plot_dir``. Default None.
+    :param Optional[Union[List[str], Tuple[str, ...]]] clf_names: Optional subset of classifier names to visualize. Each entry must match a classifier defined in the project config. If None, all project classifiers are plotted (current behavior). Default None.
 
     :example:
     >>> clf_plotter = PlotSklearnResultsMultiProcess(
@@ -274,7 +279,10 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                  text_bg_clr: Tuple[int, int, int] = (0, 0, 0),
                  gpu: bool = False,
                  verbose: bool = True,
-                 core_cnt: int = -1):
+                 core_cnt: int = -1,
+                 data_dir: Optional[Union[str, os.PathLike]] = None,
+                 save_dir: Optional[Union[str, os.PathLike]] = None,
+                 clf_names: Optional[Union[List[str], Tuple[str, ...]]] = None):
 
 
         ConfigReader.__init__(self, config_path=config_path)
@@ -314,23 +322,43 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         self.gpu = True if check_nvidea_gpu_available() and gpu else False
         self.pose_threshold = read_config_entry(self.config, ConfigKey.THRESHOLD_SETTINGS.value, ConfigKey.SKLEARN_BP_PROB_THRESH.value, Dtypes.FLOAT.value, 0.00)
         self.time_slice, self.overwrite, self.print_timer = time_slice, overwrite, print_timer
-        if not os.path.exists(self.sklearn_plot_dir):
-            os.makedirs(self.sklearn_plot_dir)
-        if isinstance(video_paths, str): self.video_paths = [video_paths]
+        if save_dir is not None:
+            check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir', create_if_not_exist=True, raise_error=True)
+            self.save_dir = save_dir
+        else:
+            self.save_dir = self.sklearn_plot_dir
+        if not os.path.exists(self.save_dir):
+            os.makedirs(self.save_dir)
+        if isinstance(video_paths, str):
+            if os.path.isdir(video_paths):
+                self.video_paths = find_all_videos_in_project(videos_dir=video_paths, raise_error=False)
+                if len(self.video_paths) == 0:
+                    raise NoDataError(msg=f'Cannot create classification videos. No videos exist in {video_paths} directory', source=self.__class__.__name__)
+            else:
+                self.video_paths = [video_paths]
         elif isinstance(video_paths, list): self.video_paths = video_paths
         elif video_paths is None:
             self.video_paths = find_all_videos_in_project(videos_dir=self.video_dir)
             if len(self.video_paths) == 0:
                 raise NoDataError(msg=f'Cannot create classification videos. No videos exist in {self.video_dir} directory', source=self.__class__.__name__)
         else:
-            raise InvalidInputError(msg=f'video_paths has to be a path of a list of paths. Got {type(video_paths)}', source=self.__class__.__name__)
+            raise InvalidInputError(msg=f'video_paths has to be a path, directory, or a list of paths. Got {type(video_paths)}', source=self.__class__.__name__)
 
+        if data_dir is not None:
+            check_if_dir_exists(in_dir=data_dir, source=f'{self.__class__.__name__} data_dir', raise_error=True)
+            self.data_dir = data_dir
+        else:
+            self.data_dir = self.machine_results_dir
         for video_path in self.video_paths:
             video_name = get_fn_ext(filepath=video_path)[1]
-            data_path = os.path.join(self.machine_results_dir, f'{video_name}.{self.file_type}')
+            data_path = os.path.join(self.data_dir, f'{video_name}.{self.file_type}')
             if not os.path.isfile(data_path): raise NoDataError(msg=f'Cannot create classification videos for {video_name}. Expected classification data at location {data_path} but file does not exist', source=self.__class__.__name__)
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
         self.core_cnt = find_core_cnt()[0] if int(core_cnt) == -1 or int(core_cnt) > find_core_cnt()[0] else int(core_cnt)
+        if clf_names is not None:
+            if isinstance(clf_names, tuple): clf_names = list(clf_names)
+            check_valid_lst(data=clf_names, source=f'{self.__class__.__name__} clf_names', valid_dtypes=(str,), valid_values=self.clf_names, min_len=1)
+            self.clf_names = clf_names
         self.conf_cols = [f'Probability_{x}' for x in self.clf_names]
         if platform.system() == "Darwin":
             multiprocessing.set_start_method("spawn", force=True)
@@ -338,8 +366,9 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
     def __get_print_settings(self):
         optimal_circle_size = self.get_optimal_circle_size(frame_size=(self.video_meta_data["width"], self.video_meta_data["height"]), circle_frame_ratio=100)
         longest_str = str(max(['TIMERS:', 'ENSEMBLE PREDICTION:'] + self.clf_names, key=len))
-        self.video_text_thickness = TextOptions.TEXT_THICKNESS.value if self.text_thickness is None else int(max(self.text_thickness, 1))
-        optimal_font_size, _, optimal_spacing_scale = self.get_optimal_font_scales(text=longest_str, accepted_px_width=int(self.video_meta_data["width"] / 4), accepted_px_height=int(self.video_meta_data["height"] / 8), text_thickness=self.video_text_thickness)
+        auto_thickness = max(TextOptions.TEXT_THICKNESS.value, int(round(min(self.video_meta_data["width"], self.video_meta_data["height"]) / 500)))
+        self.video_text_thickness = auto_thickness if self.text_thickness is None else int(max(self.text_thickness, 1))
+        optimal_font_size, _, optimal_spacing_scale = self.get_optimal_font_scales(text=longest_str, accepted_px_width=int(self.video_meta_data["width"] / 2.5), accepted_px_height=int(self.video_meta_data["height"] / 5), text_thickness=self.video_text_thickness)
         self.video_circle_size = optimal_circle_size if self.circle_size is None else int(max(1, self.circle_size))
         self.video_font_size = optimal_font_size if self.font_size is None else self.font_size
         self.video_space_size = optimal_spacing_scale if self.space_size is None else int(max(self.space_size, 1))
@@ -352,7 +381,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(video_path)
             if self.verbose: stdout_information(msg=f"Creating classification visualization for video {self.video_name}...")
-            self.data_path = os.path.join(self.machine_results_dir, f'{self.video_name}.{self.file_type}')
+            self.data_path = os.path.join(self.data_dir, f'{self.video_name}.{self.file_type}')
             self.data_df = read_df(self.data_path, self.file_type).reset_index(drop=True).fillna(0)
             if self.show_pose: check_that_column_exist(df=self.data_df, column_name=self.bp_col_names, file_name=self.data_path)
             if self.show_confidence: check_that_column_exist(df=self.data_df, column_name=self.conf_cols, file_name=self.data_path)
@@ -363,17 +392,17 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                 frm_ids = find_frame_numbers_from_time_stamp(start_time=self.time_slice[START_TIME], end_time=self.time_slice[END_TIME], fps=int(self.video_meta_data['fps']))
                 self.data_df = self.data_df.loc[frm_ids]
             height, width = deepcopy(self.video_meta_data["height"]), deepcopy(self.video_meta_data["width"])
-            self.save_path = os.path.join(self.sklearn_plot_dir, f"{self.video_name}.mp4")
+            self.save_path = os.path.join(self.save_dir, f"{self.video_name}.mp4")
             self.video_frame_dir, self.video_temp_dir = None, None
             if self.video_setting:
                 if os.path.isfile(self.save_path) and not self.overwrite:
                     FileExistWarning(msg=f'Skipping video {self.video_name}: The output video exist ({self.save_path}) and overwrite is FALSE', source=self.__class__.__name__)
                     continue
-                self.video_save_path = os.path.join(self.sklearn_plot_dir, f"{self.video_name}.mp4")
-                self.video_temp_dir = os.path.join(self.sklearn_plot_dir, self.video_name, "temp")
+                self.video_save_path = os.path.join(self.save_dir, f"{self.video_name}.mp4")
+                self.video_temp_dir = os.path.join(self.save_dir, self.video_name, "temp")
                 create_directory(paths=self.video_temp_dir, overwrite=True)
             if self.frame_setting:
-                self.video_frame_dir = os.path.join(self.sklearn_plot_dir, self.video_name)
+                self.video_frame_dir = os.path.join(self.save_dir, self.video_name)
                 create_directory(paths=self.video_temp_dir, overwrite=True)
             if self.rotate:
                 self.video_meta_data["height"], self.video_meta_data["width"] = (width, height)
@@ -452,10 +481,53 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         terminate_cpu_pool(pool=self.pool, force=False, source=self.__class__.__name__)
         self.timer.stop_timer()
         if self.video_setting:
-            stdout_success(msg=f"{len(self.video_paths)} video(s) saved in {self.sklearn_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+            stdout_success(msg=f"{len(self.video_paths)} video(s) saved in {self.save_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
         if self.frame_setting:
-            stdout_success(f"Frames for {len(self.video_paths)} videos saved in sub-folders within {self.sklearn_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+            stdout_success(f"Frames for {len(self.video_paths)} videos saved in sub-folders within {self.save_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
+
+
+
+# if __name__ == "__main__":
+#     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"G:\projects\jason_zhang\jason_project\project_folder\project_config.ini",
+#                                                  video_paths=r"G:\projects\jason_zhang\jason_project\project_folder\videos\2025-10-22 12-01-34_box2.mp4",
+#                                                  data_dir=r"G:\projects\jason_zhang\jason_project\project_folder\csv\REARING\REARING_DATA",
+#                                                  save_dir=r'G:\projects\jason_zhang\jason_project\project_folder\csv\REARING\REARING_VIDEOS',
+#                                                  clf_names=('REARING',),
+#                                                  video_setting=True,
+#                                                  frame_setting=False,
+#                                                  rotate=False,
+#                                                  show_confidence=True,
+#                                                  core_cnt=8,
+#                                                  show_pose=True,
+#                                                  animal_names=False,
+#                                                  print_timer=HHMMSSSSSS,
+#                                                  overwrite=True,
+#                                                  time_slice=None, #{START_TIME: '00:00:00', END_TIME: '00:01:00'}, #,{START_TIME: '00:00:00', END_TIME: '00:01:00'}
+#                                                  bbox='animal-aligned',
+#                                                  text_opacity=0.6,
+#                                                  show_gantt=None)
+#     clf_plotter.run()
+
+
+
+# if __name__ == "__main__":
+#     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"E:\troubleshooting\mitra_emergence_hour\project_folder\project_config.ini",
+#                                                  video_paths=r"E:\troubleshooting\mitra_emergence_hour\project_folder\videos\Box3_180mISOcontrol_Females.mp4", #,#,
+#                                                  video_setting=True,
+#                                                  frame_setting=False,
+#                                                  rotate=False,
+#                                                  show_confidence=False,
+#                                                  core_cnt=12,
+#                                                  show_pose=False,
+#                                                  animal_names=False,
+#                                                  print_timer=HHMMSSSSSS,
+#                                                  overwrite=False,
+#                                                  time_slice=None, #,{START_TIME: '00:00:00', END_TIME: '00:01:00'}
+#                                                  bbox=None,
+#                                                  text_opacity=0.6,
+#                                                  show_gantt=None)
+#     clf_plotter.run()
 
 
 

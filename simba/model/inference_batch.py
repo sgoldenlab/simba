@@ -8,10 +8,12 @@ from typing import Dict, List, Optional, Union
 
 import numpy as np
 
+from simba.data_processors.agg_clf_calculator import AggregateClfCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log, check_if_dir_exists,
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_float, check_if_dir_exists,
     check_if_keys_exist_in_dict, check_int, check_that_column_exist,
     check_valid_dict, check_valid_lst)
 from simba.utils.data import plug_holes_shortest_bout
@@ -41,6 +43,8 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
     :param Optional[Union[str, os.PathLike]] save_dir: Optional directory to save the data for the analyzed videos. If None, then the `project_folder/csv/machine_results` directory of the project will be used.
     :param Optional[int] minimum_bout_length: Optional minimum bout length (milliseconds) override. If None, classifier-specific minimum bout settings from project configuration are used.
     :param Optional[Dict[str, Dict[str, List[str]]]] feature_subsets_by_clf: Optional per-classifier feature subsets to use during inference. Format: ``{classifier_name: {subset_name: [feature_col_1, feature_col_2, ...]}}``. If provided, each classifier is applied once per subset and outputs are suffixed with the subset name.
+    :param Optional[Dict[str, Dict[str, Union[str, int, float]]]] model_dict: Optional override of the classifiers to run. Format: ``{model_name: {'model_path': '/path/to/clf.sav', 'minimum_bout_length': 100, 'threshold': 0.5}}``. If None, classifier definitions are read from the project config (current behavior). When provided, these models replace the project-config classifiers for this run.
+    :param Optional[Union[str, os.PathLike]] save_agg_stats: Optional directory in which to save aggregate classifier statistics. If None, no aggregate statistics are computed. If a directory is provided, :class:`simba.data_processors.agg_clf_calculator.AggregateClfCalculator` is run after inference completes, reading from this class's ``save_dir`` and writing its CSV outputs to ``save_agg_stats``.
     :param bool verbose: If True, print progress and status messages during inference. Default: True.
 
     :example I:
@@ -58,6 +62,8 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
                  save_dir: Optional[Union[str, os.PathLike]] = None,
                  minimum_bout_length: Optional[int] = None,
                  feature_subsets_by_clf: Optional[Dict[str, Dict[str, List[str]]]] = None,
+                 model_dict: Optional[Dict[str, Dict[str, Union[str, int, float]]]] = None,
+                 save_agg_stats: Optional[Union[str, os.PathLike]] = None,
                  verbose: bool = True):
 
         ConfigReader.__init__(self, config_path=config_path)
@@ -74,6 +80,20 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
         log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         if len(self.feature_file_paths) == 0:
             raise NoFilesFoundError(msg=f"Zero files found in the {self.features_dir}. Create features before running classifier.", source=self.__class__.__name__,)
+        if model_dict is not None:
+            check_valid_dict(x=model_dict, valid_key_dtypes=(str,), valid_values_dtypes=(dict,), min_len_keys=1, source=f'{self.__class__.__name__} model_dict')
+            translated_model_dict = {}
+            for cnt, (model_name, m_hyp) in enumerate(model_dict.items()):
+                check_if_keys_exist_in_dict(data=m_hyp, key=[MODEL_PATH, THRESHOLD, MINIMUM_BOUT_LENGTH], name=f'{self.__class__.__name__} model_dict[{model_name}]', raise_error=True)
+                check_file_exist_and_readable(file_path=m_hyp[MODEL_PATH])
+                check_float(name=f'{self.__class__.__name__} model_dict[{model_name}] {THRESHOLD}', value=m_hyp[THRESHOLD], min_value=0.0, max_value=1.0)
+                check_int(name=f'{self.__class__.__name__} model_dict[{model_name}] {MINIMUM_BOUT_LENGTH}', value=m_hyp[MINIMUM_BOUT_LENGTH], min_value=0)
+                translated_model_dict[cnt] = {MODEL_PATH: m_hyp[MODEL_PATH], MODEL_NAME: model_name, THRESHOLD: float(m_hyp[THRESHOLD]), MINIMUM_BOUT_LENGTH: int(m_hyp[MINIMUM_BOUT_LENGTH])}
+            self.clf_names = list(model_dict.keys())
+            self.clf_cnt = len(self.clf_names)
+            self._override_model_dict = translated_model_dict
+        else:
+            self._override_model_dict = None
         if feature_subsets_by_clf is not None:
             check_valid_dict(x=feature_subsets_by_clf, valid_key_dtypes=(str,), source=f'{self.__class__.__name__} feature_subsets_by_clf')
             for cnt, (k, v) in enumerate(feature_subsets_by_clf.items()):
@@ -83,10 +103,13 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
                 for subset_name, feature_names in v.items():
                     check_valid_lst(data=feature_names, source=f'{self.__class__.__name__} feature_subsets_by_clf {k} {subset_name}', valid_dtypes=(str,), min_len=1, raise_error=True)
         if minimum_bout_length is not None: check_int(name=f'{self.__class__.__name__} minimum_bout_length', value=minimum_bout_length, allow_zero=False, allow_negative=False, raise_error=True)
+        if save_agg_stats is not None:
+            check_if_dir_exists(in_dir=save_agg_stats, source=f'{self.__class__.__name__} save_agg_stats')
+        self.save_agg_stats = save_agg_stats
         self.verbose, self.feature_subsets_by_clf, self.minimum_bout_length = verbose, feature_subsets_by_clf, minimum_bout_length
         if verbose: stdout_information(msg=f"Analyzing {len(self.feature_file_paths)} file(s) with {self.clf_cnt} classifier(s)...")
         self.timer = SimbaTimer(start=True)
-        self.model_dict = self.get_model_info(config=self.config, model_cnt=self.clf_cnt)
+        self.model_dict = self._override_model_dict if self._override_model_dict is not None else self.get_model_info(config=self.config, model_cnt=self.clf_cnt)
 
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.feature_file_paths)
@@ -133,19 +156,27 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
             write_df(df=out_df, file_type=self.file_type, save_path=file_save_path)
             video_timer.stop_timer()
             if self.verbose: stdout_information(msg=f"Predictions created for {file_name} (frame count: {len(in_df)}, elapsed time: {video_timer.elapsed_time_str}) ...")
+        if self.save_agg_stats is not None:
+            if self.verbose: stdout_information(msg=f"Computing aggregate classifier statistics into {self.save_agg_stats}...")
+            agg = AggregateClfCalculator(config_path=self.config_path, classifiers=list(self.clf_names), data_dir=self.save_dir, save_dir=self.save_agg_stats)
+            agg.run()
+            agg.save()
         self.timer.stop_timer()
         stdout_success(msg=f"Machine predictions complete for {len(self.feature_file_paths)} file(s). Files saved in {self.save_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
-if __name__ == "__main__" and not hasattr(sys, 'ps1'):
-    parser = argparse.ArgumentParser(description="Perform classifications according to rules defined in SimBA project_config.ini.")
-    parser.add_argument('--config_path', type=str, required=True, help='Path to SimBA Project config.')
-    args = parser.parse_args()
-    runner = InferenceBatch(config_path=args.config_path)
-    runner.run()
+# if __name__ == "__main__" and not hasattr(sys, 'ps1'):
+#     parser = argparse.ArgumentParser(description="Perform classifications according to rules defined in SimBA project_config.ini.")
+#     parser.add_argument('--config_path', type=str, required=True, help='Path to SimBA Project config.')
+#     args = parser.parse_args()
+#     runner = InferenceBatch(config_path=args.config_path)
+#     runner.run()
 
 
-
-# test = InferenceBatch(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini")
+#
+# test = InferenceBatch(config_path=r"G:\projects\jason_zhang\jason_project\project_folder\project_config.ini",
+#                       save_dir=r'G:\projects\jason_zhang\jason_project\project_folder\csv\REARING\REARING_DATA',
+#                       model_dict={'REARING': {'model_path': r"G:\projects\jason_zhang\jason_project\models\REARING.sav", 'minimum_bout_length': 100, 'threshold': 0.25}},
+#                       save_agg_stats=r'G:\projects\jason_zhang\jason_project\project_folder\csv\REARING\REARING_DATA')
 # test.run()
 
 #

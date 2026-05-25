@@ -1,78 +1,77 @@
-Pillow==8.3.2; python_version=="3.6"
-Pillow==10.3.0; python_version>="3.9"
-pyyaml==5.3.1; python_version=="3.6"
-pyyaml==6.0.2; python_version>="3.9"
-shapely == 1.8.0; python_version=="3.6"
-shapely == 2.0.2; python_version>="3.9"
+cefpython3 == 66.0
+dash == 1.14.0
+dash_color_picker == 0.0.1
+dash_colorscales == 0.0.4
+dash_core_components==1.10.2
+dash_html_components == 1.0.3
 dtreeviz == 0.8.1; python_version=="3.6"
 dtreeviz == 1.3.0; python_version>="3.9"
 eli5 == 0.10.1
+ffmpeg-python==0.2.0
+geos==0.2.3
 graphviz==0.11
+h5py==2.9.0;python_version=="3.6"
+h5py==3.11.0;python_version>="3.9"
 imbalanced-learn==0.6.2; python_version=="3.6"
 imbalanced-learn==0.12.2; python_version>="3.9"
 imgaug == 0.4.0
 imutils == 0.5.2
-osfclient == 0.0.5
+joblib == 1.1.1; python_version=="3.6"
+joblib == 1.4.2; python_version>="3.9"
+kaleido == 0.1.0; python_version=="3.6"
+kaleido; python_version>="3.9"
 matplotlib==3.3.4; python_version == "3.6"
 matplotlib==3.5.0; python_version >= "3.9" and python_version <= "3.11"
 matplotlib==3.8.*; python_version >= "3.12"
-numpy==1.19.1; python_version=="3.6"
-numpy==1.26.4; python_version >= "3.9" and python_version <= "3.11"
-numpy==1.26.1; python_version >= "3.12"
-pyglet==1.5.27; python_version=="3.6"
-pyglet==2.0.10; python_version>="3.9"
-python-dotenv==0.20.0; python_version=="3.6"
-python-dotenv==1.0.1; python_version>="3.9"
-opencv-python == 3.4.5.20; python_version=="3.6"
-opencv-python == 4.8.1.78; python_version>="3.9"
-pandas==0.25.3;python_version=="3.6"
-pandas==2.2.2;python_version>="3.9"
-scikit-image == 0.17.2;python_version=="3.6"
-scikit-image == 0.23.2; python_version>="3.9"
-scipy== 1.5.4; python_version=="3.6"
-scipy== 1.13.0; python_version>="3.9"
-seaborn == 0.11.0
-scikit-learn == 0.22.2; python_version=="3.6"
-scikit-learn == 1.4.2; python_version>="3.9"
-joblib == 1.1.1; python_version=="3.6"
-joblib == 1.4.2; python_version>="3.9"
-tabulate == 0.8.3; python_version=="3.6"
-tabulate == 0.9.0; python_version>="3.9"
-tqdm == 4.30.0; python_version=="3.6"
-tqdm == 4.67.0; python_version>="3.9"
-xgboost == 0.90
-yellowbrick==0.9.1; python_version=="3.6"
-yellowbrick==1.5.0; python_version>="3.9"
-kaleido == 0.1.0; python_version=="3.6"
-kaleido; python_version>="3.9"
-psutil == 5.9.8; python_version=="3.6"
-psutil; python_version>="3.9"
-dash == 1.14.0
-dash_color_picker == 0.0.1
-dash_core_components==1.10.2
-dash_colorscales == 0.0.4
-dash_html_components == 1.0.3
-h5py==2.9.0;python_version=="3.6"
-h5py==3.11.0;python_version>="3.9"
 numba==0.53.1;python_version=="3.6"
 numba==0.63.1;python_version>="3.9"
 numexpr==2.6.9;python_version=="3.6"
 numexpr==2.10.0;python_version>="3.9"
+numpy==1.19.1; python_version=="3.6"
+numpy==1.26.4; python_version >= "3.9" and python_version <= "3.11"
+numpy==1.26.1; python_version >= "3.12"
+opencv-python == 3.4.5.20; python_version=="3.6"
+opencv-python == 4.8.1.78; python_version>="3.9"
+openpyxl==3.1.2;python_version=="3.6"
+openpyxl==3.1.5;python_version >= "3.9" and python_version <= "3.11"
+osfclient == 0.0.5
+packaging==21.3; python_version=="3.6"
+pandas==0.25.3;python_version=="3.6"
+pandas==2.2.2;python_version>="3.9"
+Pillow==8.3.2; python_version=="3.6"
+Pillow==10.3.0; python_version>="3.9"
 plotly == 4.9.0
-pyvis==0.3.2; python_version=="3.6"
-statsmodels==0.12.0;python_version=="3.6"
-statsmodels==0.14.2;python_version>="3.9"
-cefpython3 == 66.0
+psutil == 5.9.8; python_version=="3.6"
+psutil; python_version>="3.9"
 pyarrow==6.0.1; python_version < "3.12"
 pyarrow==21.0.0; sys_platform == "win32" and python_version >= "3.12"
 pyarrow>=13.0.0; sys_platform != "win32" and python_version >= "3.12"
+pyglet==1.5.27; python_version=="3.6"
+pyglet==2.0.10; python_version>="3.9"
+python-dotenv==0.20.0; python_version=="3.6"
+python-dotenv==1.0.1; python_version>="3.9"
+pyvis==0.3.2; python_version=="3.6"
+pyyaml==5.3.1; python_version=="3.6"
+pyyaml==6.0.2; python_version>="3.9"
+scikit-image == 0.17.2;python_version=="3.6"
+scikit-image == 0.23.2; python_version>="3.9"
+scikit-learn == 0.22.2; python_version=="3.6"
+scikit-learn == 1.4.2; python_version>="3.9"
+scipy== 1.5.4; python_version=="3.6"
+scipy== 1.13.0; python_version>="3.9"
+seaborn == 0.11.0
 shap == 0.35.0;python_version=="3.6"
 shap == 0.42.0;python_version>="3.9"
+shapely == 1.8.0; python_version=="3.6"
+shapely == 2.0.2; python_version>="3.9"
+statsmodels==0.12.0;python_version=="3.6"
+statsmodels==0.14.2;python_version>="3.9"
 tables==3.6.1;python_version=="3.6"
 tables==3.9.2;python_version>="3.9"
-openpyxl==3.1.2;python_version=="3.6"
-openpyxl==3.1.5;python_version >= "3.9" and python_version <= "3.11"
-xlrd==1.2.0
+tabulate == 0.8.3; python_version=="3.6"
+tabulate == 0.9.0; python_version>="3.9"
+tqdm == 4.30.0; python_version=="3.6"
+tqdm == 4.67.0; python_version>="3.9"
 trafaret==2.1.1
-geos==0.2.3
-ffmpeg-python==0.2.0
+xgboost == 0.90
+xlrd==1.2.0

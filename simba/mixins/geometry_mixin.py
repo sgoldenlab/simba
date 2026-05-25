@@ -1169,7 +1169,7 @@ class GeometryMixin(object):
             check_int(name=f'{GeometryMixin.__name__} minimum_rotated_rectangle buffer', min_value=1, value=buffer)
             shape = shape.buffer(distance=buffer)
         rotated_rectangle = shape.minimum_rotated_rectangle
-        if isinstance(rotated_rectangle, Point):
+        if isinstance(rotated_rectangle, (Point, LineString)):
             rotated_rectangle = Polygon([(0, 0), (0, 0), (0, 0)])
         if return_type == 'array':
             rotated_rectangle = np.round(np.array(rotated_rectangle.exterior.coords)).astype(np.int32)

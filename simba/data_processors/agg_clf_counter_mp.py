@@ -286,18 +286,18 @@ class AggregateClfCalculatorMultiprocess(ConfigReader):
 #     clf_calculator.run()
 #     clf_calculator.save()
 
-if __name__ == "__main__":
-    test = AggregateClfCalculatorMultiprocess(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
-                                  classifiers=['attack'],
-                                  transpose=True,
-                                  mean_event_duration = True,
-                                  median_event_duration = True,
-                                  mean_interval_duration = True,
-                                  median_interval_duration = True,
-                                  detailed_bout_data=True,
-                                  core_cnt=12)
-    test.run()
-    test.save()
+#if __name__ == "__main__":
+    # test = AggregateClfCalculatorMultiprocess(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
+    #                               classifiers=['attack'],
+    #                               transpose=True,
+    #                               mean_event_duration = True,
+    #                               median_event_duration = True,
+    #                               mean_interval_duration = True,
+    #                               median_interval_duration = True,
+    #                               detailed_bout_data=True,
+    #                               core_cnt=12)
+    # test.run()
+    # test.save()
 
 
 # test = AggregateClfCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
