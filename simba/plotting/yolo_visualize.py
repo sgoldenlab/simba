@@ -1,5 +1,6 @@
 import os
 from typing import Optional, Tuple, Union
+import multiprocessing
 
 import numpy as np
 import pandas as pd
@@ -8,7 +9,7 @@ from simba.mixins.geometry_mixin import GeometryMixin
 from simba.plotting.geometry_plotter import GeometryPlotter
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
-                                check_valid_boolean, check_valid_dataframe)
+                                check_valid_boolean, check_valid_dataframe, check_valid_cpu_pool)
 from simba.utils.data import get_cpu_pool, terminate_cpu_pool
 from simba.utils.errors import FrameRangeError
 from simba.utils.read_write import (find_core_cnt, get_fn_ext,
@@ -63,7 +64,7 @@ class YOLOVisualizer():
     :param Optional[str] palette: Matplotlib color palette name for per-class geometry colors (e.g., ``'Set1'``, ``'tab10'``). Default: ``'Set1'``.
     :param Optional[int] core_cnt: CPU core count for parallel processing. Use ``-1`` for all available cores.
     :param float threshold: Confidence threshold in ``[0.0, 1.0]``. Detections below threshold are masked before polygon conversion.
-    :param Optional[int] padding: Polygon padding offset in pixels used during multiframe bbox-to-polygon conversion for rendering. Positive values expand polygons outward, negative values shrink polygons inward. If ``None``, no padding offset is applied. This affects visualization geometry only, not the underlying YOLO detections in the input CSV.
+    :param int padding: Polygon offset in pixels used during multiframe bbox-to-polygon conversion for rendering. Defaults to 0 (draw the exact detection box). Positive values expand polygons outward, ``-1`` shrinks them inward. This affects visualization geometry only, not the underlying YOLO detections in the input CSV.
     :param Optional[int] thickness: Polygon line thickness. If ``None``, default geometry plotter thickness is used.
     :param float opacity: Polygon fill opacity in ``[0.0, 1.0]``. Default: 0.6.
     :param Optional[Tuple[int, int, int]] outline_color: BGR color for polygon outlines. If ``None``, no outlines are drawn. Default: None.
@@ -88,7 +89,8 @@ class YOLOVisualizer():
                  palette: Optional[str] = 'Set1',
                  core_cnt: Optional[int] = -1,
                  threshold: float = 0.0,
-                 padding: Optional[int] = 20,
+                 padding: int = 0,
+                 pool: Optional[multiprocessing.Pool] = None,
                  thickness: Optional[int] = None,
                  opacity: float = 0.6,
                  outline_color: Optional[Tuple[int, int, int]] = None,
@@ -99,8 +101,9 @@ class YOLOVisualizer():
         self.data_path, self.video_path = data_path, video_path
         self.video_name = get_fn_ext(filepath=data_path)[1]
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
-        if padding is not None: check_int(name=f'{self.__class__.__name__} padding', value=padding, min_value=-1, unaccepted_vals=[0])
+        check_int(name=f'{self.__class__.__name__} padding', value=padding, min_value=-1)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
+        if pool is not None: check_valid_cpu_pool(value=pool, source=self.__class__.__name__,  max_cores=find_core_cnt()[0], raise_error=True)
         self.core_cnt = core_cnt
         if core_cnt == -1 or core_cnt > find_core_cnt()[0]: self.core_cnt = find_core_cnt()[0]
         if thickness is not None:
@@ -109,13 +112,14 @@ class YOLOVisualizer():
         check_valid_boolean(value=[verbose], source=self.__class__.__name__, raise_error=True)
         check_float(name=f'{self.__class__.__name__} opacity', value=opacity, min_value=0.0, max_value=1.0)
         self.save_dir, self.verbose, self.palette, self.thickness = save_dir, verbose, palette, thickness
-        self.threshold, self.padding, self.opacity, self.outline_color = threshold, padding, opacity, outline_color
+        self.threshold, self.padding, self.opacity, self.outline_color, self.pool = threshold, padding, opacity, outline_color, pool
+        self.pool_terminate_flag = False if pool is not None else True
 
     def run(self):
         data_df = pd.read_csv(self.data_path, index_col=0)
         check_valid_dataframe(df=data_df, source=self.__class__.__name__, required_fields=EXPECTED_COLS)
         df_frm_cnt = np.unique(data_df[FRAME].values).shape[0]
-        pool = get_cpu_pool(core_cnt=self.core_cnt, source=self.__class__.__name__)
+        pool = self.pool if self.pool is not None else get_cpu_pool(core_cnt=self.core_cnt, verbose=True, source=self.__class__.__name__)
         if self.video_meta_data['frame_count'] != df_frm_cnt:
             raise FrameRangeError(
                 msg=f'The bounding boxes contain data for {df_frm_cnt} frames, while the video is {self.video_meta_data["frame_count"]} frames',
@@ -145,7 +149,7 @@ class YOLOVisualizer():
                                   outline_clr=self.outline_color,
                                   pool=pool)
         plotter.run()
-        terminate_cpu_pool(pool=pool, source=self.__class__.__name__)
+        if self.pool_terminate_flag: terminate_cpu_pool(pool=pool, force=False, source=self.__class__.__name__)
 #
 #
 # if __name__ == '__main__':

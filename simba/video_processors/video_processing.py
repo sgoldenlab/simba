@@ -4680,7 +4680,7 @@ def superimpose_freetext(video_path: Union[str, os.PathLike],
        :align: center
 
     :param Union[str, os.PathLike] video_path: Path to the input video file or directory containing video files.
-    :param str text: The text to overlay on the video
+    :param str text: The text to overlay on the video. Characters that break the ffmpeg ``drawtext`` filter (``: ' " \\ % , ; =``) are stripped or replaced before rendering. Raises if no legal characters remain.
     :param Optional[int] font_size: Font size for the text. Default 30.
     :param Optional[str] font_color:  Font color for text. Default white
     :param Optional[str] font_border_color: Font border color for the text. Default black.
@@ -4701,6 +4701,11 @@ def superimpose_freetext(video_path: Union[str, os.PathLike],
     check_int(name=f'{superimpose_freetext.__name__} font_size', value=font_size, min_value=1)
     check_int(name=f'{superimpose_freetext.__name__} font_border_width', value=font_border_width, min_value=1)
     check_str(name=f'{superimpose_freetext.__name__} text', value=text)
+    illegal_chars = {':': '-', "'": '', '"': '', '\\': '', '%': '', ',': ' ', ';': ' ', '=': '-'}
+    cleaned_text = ''.join(illegal_chars.get(c, c) for c in text).strip()
+    if len(cleaned_text) == 0:
+        raise InvalidInputError(msg=f'The text "{text}" only contains characters that are illegal in ffmpeg drawtext and cannot be superimposed.', source=superimpose_freetext.__name__)
+    text = cleaned_text
     font_dict = get_fonts()
     check_str(name='font', value=font, options=tuple(font_dict.keys()))
     font_path = font_dict[font]

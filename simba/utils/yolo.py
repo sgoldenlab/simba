@@ -591,7 +591,7 @@ def read_yolo_metadata(model: Union[str, os.PathLike, YOLO]) -> dict:
 
     META_KEYS = ('batch', 'imgsz', 'stride', 'task', 'names', 'fp16', 'dynamic')
 
-    if isinstance(model, YOLO):
+    if YOLO is not None and isinstance(model, YOLO):
         meta = {}
         if hasattr(model, 'predictor') and model.predictor is not None and hasattr(model.predictor, 'model'):
             backend = model.predictor.model
@@ -625,6 +625,8 @@ def read_yolo_metadata(model: Union[str, os.PathLike, YOLO]) -> dict:
                 return json.loads(f.read(meta_len).decode('utf-8'))
         return {}
 
+    if YOLO is None:
+        raise SimBAPAckageVersionError(msg=f'Reading metadata from a {ext} model requires the ultralytics package, which is not installed.', source=read_yolo_metadata.__name__)
     loaded = YOLO(path)
     meta = {}
     if hasattr(loaded, 'overrides'):
@@ -641,6 +643,49 @@ def read_yolo_metadata(model: Union[str, os.PathLike, YOLO]) -> dict:
             if key not in meta and hasattr(loaded.model, key):
                 meta[key] = getattr(loaded.model, key)
     return meta
+
+
+def get_yolo_imgsz_and_batch_size(model: Union[str, os.PathLike, YOLO],
+                                  raise_error: bool = True) -> Tuple[Optional[int], Optional[int]]:
+    """
+    Attempt to read the image size and batch size baked into a YOLO model.
+
+    .. note::
+       For ``.engine`` (TensorRT) files both values are read straight from the embedded header
+       and represent the fixed input bindings. For ``.pt`` and other formats the values are
+       scraped from the training arguments, so ``imgsz`` reflects the *training* size (a sensible
+       default, not a hard constraint) and ``batch`` is frequently unavailable.
+
+    .. seealso::
+       :func:`~simba.utils.yolo.read_yolo_metadata` (full metadata dictionary)
+
+    :param Union[str, os.PathLike, YOLO] model: Path to a YOLO model file, or an already-loaded :class:`ultralytics.YOLO` instance.
+    :param bool raise_error: If True (default), raise :class:`~simba.utils.errors.InvalidInputError` when ``imgsz`` or ``batch`` cannot be found in the model metadata. If False, missing values are returned as ``None``.
+    :return: Tuple of ``(imgsz, batch_size)``, each an ``int`` (or ``None`` if not found and ``raise_error`` is False).
+    :rtype: Tuple[Optional[int], Optional[int]]
+    :raises InvalidInputError: If ``raise_error`` is True and ``imgsz`` and/or ``batch`` is not present in the model metadata.
+
+    :example:
+    >>> get_yolo_imgsz_and_batch_size(r'/models/best.engine')
+    (256, 192)
+    >>> get_yolo_imgsz_and_batch_size(r'/models/best.pt', raise_error=False)
+    (640, None)
+    """
+
+    check_valid_boolean(value=raise_error, source=f'{get_yolo_imgsz_and_batch_size.__name__} raise_error', raise_error=True)
+    meta = read_yolo_metadata(model=model)
+    imgsz, batch_size = meta.get('imgsz', None), meta.get('batch', None)
+    if isinstance(imgsz, (list, tuple)) and len(imgsz) > 0:
+        imgsz = imgsz[0]
+    if imgsz is not None:
+        imgsz = int(imgsz)
+    if batch_size is not None:
+        batch_size = int(batch_size)
+    if raise_error:
+        missing = [k for k, v in (('imgsz', imgsz), ('batch', batch_size)) if v is None]
+        if missing:
+            raise InvalidInputError(msg=f'Could not read {" and ".join(missing)} from the metadata of model {model}. Pass the value(s) explicitly, or set raise_error=False.', source=get_yolo_imgsz_and_batch_size.__name__)
+    return imgsz, batch_size
 
 # export_yolo_model(model_path=r"E:\open_video\open_field_2\yolo_seg_project\mdl\train\weights\best.pt",
 #                   export_format='engine',

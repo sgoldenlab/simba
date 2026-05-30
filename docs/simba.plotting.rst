@@ -289,6 +289,13 @@ YOLO bounding-box plotter
    :members:
    :show-inheritance:
 
+YOLO model comparator
+---------------------------------------------------------------
+
+.. autoclass:: simba.plotting.compare_bbox_mdls.YoloModelComparator
+   :members:
+   :show-inheritance:
+
 
 Plotting methods
 -----------------------------------
