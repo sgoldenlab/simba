@@ -19,19 +19,23 @@ except ModuleNotFoundError:
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.model.yolo_inference import YoloInference
 from simba.plotting.yolo_visualize import YOLOVisualizer
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_float, check_if_dir_exists,
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists,
                                 check_if_string_value_is_valid_video_timestamp,
-                                check_int, check_that_hhmmss_start_is_before_end,
+                                check_int,
+                                check_that_hhmmss_start_is_before_end,
                                 check_valid_boolean, check_valid_lst)
+from simba.utils.data import get_cpu_pool, terminate_cpu_pool
 from simba.utils.enums import Options
 from simba.utils.errors import (InvalidInputError, InvalidVideoFileError,
                                 SimBAGPUError, SimBAPAckageVersionError)
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
-from simba.utils.read_write import (find_core_cnt, find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data)
-from simba.utils.data import get_cpu_pool, terminate_cpu_pool
+from simba.utils.read_write import (find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext, get_video_meta_data)
 from simba.utils.yolo import get_yolo_imgsz_and_batch_size
-from simba.video_processors.video_processing import (clip_video_in_range, horizontal_video_concatenator, superimpose_freetext)
+from simba.video_processors.video_processing import (
+    clip_video_in_range, horizontal_video_concatenator, superimpose_freetext)
 
 ENGINE = '.engine'
 
