@@ -3,7 +3,8 @@ SimBA (Simple Behavioral Analysis)
 https://github.com/sgoldenlab/simba
 Contributors.
 https://github.com/sgoldenlab/simba#contributors-
-Licensed under GNU Lesser General Public License v3.0
+Licensed under a modified BSD 3-Clause License (academic and research use only).
+For commercial licensing inquiries, contact sronilsson@gmail.com.
 """
 
 import setuptools

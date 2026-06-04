@@ -69,7 +69,6 @@ class CropLPAnnotationsBboxSquare:
             y2 = int(np.ceil(np.max(y_valid)))
             return (x1, y1, x2, y2)
 
-        # No detection, no keypoints: center crop
         cx, cy = img_w // 2, img_h // 2
         half = min(img_w, img_h) // 2
         return (cx - half, cy - half, cx + half, cy + half)
@@ -84,7 +83,6 @@ class CropLPAnnotationsBboxSquare:
         x2p = x2 + px
         y2p = y2 + py
 
-        # Make square by extending the shorter side
         pw, ph = x2p - x1p, y2p - y1p
         side = max(pw, ph)
         cx = (x1p + x2p) / 2.0
@@ -96,7 +94,6 @@ class CropLPAnnotationsBboxSquare:
         crop_x2 = crop_x1 + side
         crop_y2 = crop_y1 + side
 
-        # Clamp to image bounds
         if crop_x1 < 0:
             crop_x1, crop_x2 = 0, side
         if crop_y1 < 0:
@@ -106,7 +103,6 @@ class CropLPAnnotationsBboxSquare:
         if crop_y2 > img_h:
             crop_y2, crop_y1 = img_h, img_h - side
 
-        # If image is smaller than the square, clamp
         crop_x1 = max(0, int(crop_x1))
         crop_y1 = max(0, int(crop_y1))
         crop_x2 = min(img_w, int(crop_x2))
@@ -179,27 +175,22 @@ class CropLPAnnotationsBboxSquare:
                 continue
             h, w = img.shape[:2]
 
-            # Get bbox and make square crop
             bbox = self._get_bbox_for_image(img_rel=img_rel, img_h=h, img_w=w, xs=xs, ys=ys, valid=valid)
             crop_x1, crop_y1, crop_x2, crop_y2 = self._bbox_to_square_crop(
                 bbox[0], bbox[1], bbox[2], bbox[3], h, w
             )
 
-            # Crop the square region
             cropped = img[crop_y1:crop_y2, crop_x1:crop_x2]
             crop_h, crop_w = cropped.shape[:2]
 
-            # Resize to target crop_size
             scale_x = crop_size[0] / crop_w
             scale_y = crop_size[1] / crop_h
             resized = cv2.resize(cropped, crop_size, interpolation=cv2.INTER_LINEAR)
 
-            # Save cropped image
             out_img_path = os.path.join(save_dir, img_rel.replace("/", os.sep))
             os.makedirs(os.path.dirname(out_img_path), exist_ok=True)
             cv2.imwrite(out_img_path, resized)
 
-            # Transform coordinates: shift by crop offset, then scale
             new_coords = coords.copy()
             new_xs = np.where(np.isnan(xs), np.nan, (xs - crop_x1) * scale_x)
             new_ys = np.where(np.isnan(ys), np.nan, (ys - crop_y1) * scale_y)
@@ -222,8 +213,6 @@ class CropLPAnnotationsBboxSquare:
         out_csv_path = os.path.join(save_dir, f"{csv_fn}{csv_ext}")
         out_df.to_csv(out_csv_path)
         stdout_success(msg=f"Saved {out_csv_path} ({len(out_df)} rows).")
-
-    # --- Copied from original (unchanged) ---
 
     @staticmethod
     def _copy_project_files(lp_project_dir: str, save_dir: str):
@@ -305,9 +294,9 @@ class CropLPAnnotationsBboxSquare:
         return common
 
 
-#if __name__ == "__main__":
-# cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"Z:\home\simon\LPProjects\mini_project_0513",
-#                                           save_dir=r"Z:\home\simon\LPProjects\mini_project_0513_cropped",
-#                                           bbox_pad_frac=0.25,
-#                                           visualize=True)
-# cropper.run()
+# if __name__ == "__main__":
+#     cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"Z:\home\simon\LPProjects\project_0601",
+#                                               save_dir=r"Z:\home\simon\LPProjects\project_0601_cropped",
+#                                               bbox_pad_frac=0.25,
+#                                               visualize=50)
+#     cropper.run()

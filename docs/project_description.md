@@ -41,7 +41,7 @@ If you use the code, please cite:
 ```
 
 ### Licence
-SimBA is licensed under GNU Lesser General Public License v3.0.
+SimBA is licensed under a modified BSD 3-Clause License, permitting use for academic and research purposes only. For commercial licensing inquiries, contact sronilsson@gmail.com.
 
 ### Contributors
 Contributers on Github https://github.com/sgoldenlab/simba#contributors
