@@ -31,9 +31,9 @@ from simba.utils.enums import Formats, Options
 from simba.utils.errors import (InvalidVideoFileError, SimBAGPUError,
                                 SimBAPAckageVersionError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.warnings import InvalidValueWarning
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_video_meta_data)
+from simba.utils.warnings import InvalidValueWarning
 from simba.utils.yolo import (_get_undetected_obs, apply_fixed_bbox_size,
                               check_valid_device, load_yolo_model,
                               yolo_predict)
