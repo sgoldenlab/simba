@@ -2,16 +2,22 @@ import multiprocessing
 import os
 from typing import Optional, Tuple, Union
 
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+
 import numpy as np
 import pandas as pd
 
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.plotting.geometry_plotter import GeometryPlotter
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_int,
+                                check_if_dir_exists, check_int, check_str,
                                 check_valid_boolean, check_valid_cpu_pool,
                                 check_valid_dataframe)
-from simba.utils.data import get_cpu_pool, terminate_cpu_pool
+from simba.utils.data import (create_color_palettes, get_cpu_pool,
+                              terminate_cpu_pool)
 from simba.utils.errors import FrameRangeError
 from simba.utils.read_write import (find_core_cnt, get_fn_ext,
                                     get_video_meta_data)
@@ -22,6 +28,8 @@ CLASS_ID = 'CLASS_ID'
 CONFIDENCE = 'CONFIDENCE'
 CLASS_NAME = 'CLASS_NAME'
 CORD_FIELDS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
+INSTANCE = 'INSTANCE'
+COLOR_BY_OPTIONS = ('class', 'instance')
 
 class YOLOVisualizer():
 
@@ -59,7 +67,7 @@ class YOLOVisualizer():
        :muted:
        :align: center
 
-    :param Union[str, os.PathLike] data_path: Path to YOLO results CSV. Expected columns: ``FRAME, CLASS_ID, CLASS_NAME, CONFIDENCE, X1..Y4``.
+    :param Union[str, os.PathLike] data_path: Path to YOLO results CSV. Expected columns: ``FRAME, CLASS_ID, CLASS_NAME, CONFIDENCE, X1..Y4``. Multiple rows sharing the same ``FRAME`` and ``CLASS_NAME`` (i.e. several detections of one class per frame, as produced by ``YoloInference`` with ``max_per_class > 1``) are rendered as separate instances, each drawn as its own polygon track and color (ordered by detection confidence).
     :param Union[str, os.PathLike] video_path: Path to the video from which the data was produced.
     :param Union[str, os.PathLike] save_dir: Directory where to save visualization output.
     :param Optional[str] palette: Matplotlib color palette name for per-class geometry colors (e.g., ``'Set1'``, ``'tab10'``). Default: ``'Set1'``.
@@ -69,6 +77,7 @@ class YOLOVisualizer():
     :param Optional[int] thickness: Polygon line thickness. If ``None``, default geometry plotter thickness is used.
     :param float opacity: Polygon fill opacity in ``[0.0, 1.0]``. Default: 0.6.
     :param Optional[Tuple[int, int, int]] outline_color: BGR color for polygon outlines. If ``None``, no outlines are drawn. Default: None.
+    :param Literal['class', 'instance'] color_by: How detections are colored when multiple instances per class are present. ``'class'`` (default) gives every instance of a class the same class color (avoids color flicker, since instance slots are confidence-ranked per frame and not identity-tracked). ``'instance'`` gives each instance slot its own color (useful only when the data carries stable identities, e.g. from a tracker). For single-instance-per-class data both options are equivalent.
     :param bool verbose: If True, prints progress information. Default: True.
     :raises FrameRangeError: If YOLO result frame coverage does not match video frame count.
 
@@ -95,6 +104,7 @@ class YOLOVisualizer():
                  thickness: Optional[int] = None,
                  opacity: float = 0.6,
                  outline_color: Optional[Tuple[int, int, int]] = None,
+                 color_by: Literal['class', 'instance'] = 'class',
                  verbose: bool = True):
 
         check_file_exist_and_readable(file_path=data_path)
@@ -112,8 +122,10 @@ class YOLOVisualizer():
         check_if_dir_exists(in_dir=save_dir)
         check_valid_boolean(value=[verbose], source=self.__class__.__name__, raise_error=True)
         check_float(name=f'{self.__class__.__name__} opacity', value=opacity, min_value=0.0, max_value=1.0)
+        check_str(name=f'{self.__class__.__name__} color_by', value=color_by, options=COLOR_BY_OPTIONS)
         self.save_dir, self.verbose, self.palette, self.thickness = save_dir, verbose, palette, thickness
         self.threshold, self.padding, self.opacity, self.outline_color, self.pool = threshold, padding, opacity, outline_color, pool
+        self.color_by = color_by
         self.pool_terminate_flag = False if pool is not None else True
 
     def run(self):
@@ -126,25 +138,32 @@ class YOLOVisualizer():
                 msg=f'The bounding boxes contain data for {df_frm_cnt} frames, while the video is {self.video_meta_data["frame_count"]} frames',
                 source=self.__class__.__name__)
         classes = np.unique(data_df[CLASS_NAME].values)
-        geometries = []
-        for cls in classes:
-            cls_df = data_df[data_df[CLASS_NAME] == cls]
+        class_clrs = create_color_palettes(no_animals=1, map_size=len(classes) + 1, cmaps=[self.palette])[0]
+        geometries, track_clrs = [], []
+        for class_cnt, cls in enumerate(classes):
+            cls_df = data_df[data_df[CLASS_NAME] == cls].copy()
             class_id = cls_df[CLASS_ID].iloc[0]
-            missing_frms = [x for x in np.arange(0, df_frm_cnt) if x not in cls_df[FRAME].values]
-            missing_df = pd.DataFrame(missing_frms, columns=[FRAME])
-            missing_df[CLASS_ID], missing_df[CLASS_NAME], missing_df[CONFIDENCE] = class_id, cls, 0
-            for cord_col in CORD_FIELDS: missing_df[cord_col] = 0
-            cls_df = pd.concat([cls_df, missing_df], axis=0).sort_values(by=[FRAME])
-            cls_df.loc[cls_df[CONFIDENCE] < self.threshold, CORD_FIELDS] = -1
-            cls_arr = cls_df[CORD_FIELDS].values
-            cls_arr = cls_arr.reshape(cls_arr.shape[0], 4, 2)
-            geometries.append(GeometryMixin().multiframe_bodyparts_to_polygon(data=cls_arr, video_name=self.video_name, core_cnt=self.core_cnt, verbose=self.verbose, parallel_offset=self.padding, pool=pool))
+            cls_df[INSTANCE] = cls_df.groupby(FRAME).cumcount()
+            n_instances = int(cls_df[INSTANCE].max()) + 1
+            for instance in range(n_instances):
+                instance_df = cls_df[cls_df[INSTANCE] == instance]
+                missing_frms = [x for x in np.arange(0, df_frm_cnt) if x not in instance_df[FRAME].values]
+                missing_df = pd.DataFrame(missing_frms, columns=[FRAME])
+                missing_df[CLASS_ID], missing_df[CLASS_NAME], missing_df[CONFIDENCE] = class_id, cls, 0
+                for cord_col in CORD_FIELDS: missing_df[cord_col] = 0
+                instance_df = pd.concat([instance_df, missing_df], axis=0).sort_values(by=[FRAME])
+                instance_df.loc[instance_df[CONFIDENCE] < self.threshold, CORD_FIELDS] = -1
+                instance_arr = instance_df[CORD_FIELDS].values
+                instance_arr = instance_arr.reshape(instance_arr.shape[0], 4, 2)
+                geometries.append(GeometryMixin().multiframe_bodyparts_to_polygon(data=instance_arr, video_name=self.video_name, core_cnt=self.core_cnt, verbose=self.verbose, parallel_offset=self.padding, pool=pool))
+                track_clrs.append(tuple(int(v) for v in class_clrs[class_cnt]))
         plotter = GeometryPlotter(geometries=geometries,
                                   video_name=self.video_path,
                                   core_cnt=self.core_cnt,
                                   save_dir=self.save_dir,
                                   verbose=self.verbose,
-                                  palette=self.palette,
+                                  palette=self.palette if self.color_by == 'instance' else None,
+                                  colors=track_clrs if self.color_by == 'class' else None,
                                   thickness=self.thickness,
                                   shape_opacity=self.opacity,
                                   outline_clr=self.outline_color,

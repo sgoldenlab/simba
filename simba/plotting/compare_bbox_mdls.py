@@ -18,11 +18,11 @@ except ModuleNotFoundError:
 
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.model.yolo_inference import YoloInference
-from simba.plotting.yolo_visualize import YOLOVisualizer
+from simba.plotting.yolo_visualize import COLOR_BY_OPTIONS, YOLOVisualizer
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_string_value_is_valid_video_timestamp,
-                                check_int,
+                                check_int, check_str,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_boolean, check_valid_lst)
 from simba.utils.data import get_cpu_pool, terminate_cpu_pool
@@ -51,6 +51,13 @@ class YoloModelComparator():
        :class:`~simba.plotting.yolo_visualize.YOLOVisualizer` (per-model rendering)
        :func:`~simba.video_processors.video_processing.horizontal_video_concatenator` (side-by-side concat)
 
+    .. video:: _static/img/YoloModelComparator.webm
+       :width: 800
+       :loop:
+       :autoplay:
+       :muted:
+       :align: center
+
     :param List[Union[str, os.PathLike]] weights: List of YOLO model weight paths (length >= 2).
     :param Union[str, os.PathLike, List[Union[str, os.PathLike]]] video_path: One of: a single video file path; a directory of videos (searched non-recursively); or a list/tuple of video file paths.
     :param Union[str, os.PathLike] out_dir: Output directory. Per-model CSV/viz subdirectories and a ``compare/`` subdirectory are created underneath.
@@ -59,12 +66,14 @@ class YoloModelComparator():
     :param Union[Literal['cpu'], int] device: Inference device ('cpu' or CUDA index).
     :param Optional[int] batch_size: Frames per YOLO inference batch. If None, it is read per-model from the model metadata (required for ``.engine`` files); falls back to 400 when unavailable (e.g. ``.pt`` weights).
     :param Optional[int] imgsz: Model inference image size. If None, it is read per-model from the model metadata; falls back to 320 when unavailable. For ``.engine`` files the engine's baked-in image size always wins (a mismatching explicit value is overridden with a warning).
-    :param int max_detections: Maximum detections per frame.
+    :param int max_detections: Maximum detections per frame (total, across all classes) returned by each model.
+    :param Optional[int] max_per_class: Maximum number of detections to retain per class per frame. E.g., if one 'resident' and one 'intruder' is expected, set this to 1. Defaults to None, meaning all detected instances of each class are retained (up to ``max_detections``). Passed through to each model's ``YoloInference``.
     :param Optional[str] palette: Matplotlib palette passed to ``YOLOVisualizer``.
     :param float opacity: Polygon fill opacity in ``[0.0, 1.0]`` for the visualization.
     :param Optional[int] thickness: Polygon line thickness.
     :param int padding: Polygon offset in pixels for the visualization. Defaults to 0 (draw the exact detection box). Positive values expand polygons outward, ``-1`` shrinks them inward.
     :param Optional[Tuple[int, int, int]] outline_color: BGR outline color for polygons.
+    :param Literal['class', 'instance'] color_by: Passed to ``YOLOVisualizer``. ``'class'`` (default) colors every instance of a class the same (avoids color flicker when ``max_per_class > 1``, since instances are confidence-ranked per frame, not identity-tracked); ``'instance'`` colors each instance slot separately. Equivalent for single-instance data.
     :param Optional[int] core_cnt: CPU core count for the visualizer. If None, defaults to a quarter of the available cores to leave headroom; ``-1`` = all cores.
     :param bool gpu: Use the NVENC codec when concatenating side-by-side.
     :param bool overwrite: If True (default), always re-render comparison videos. If False, skip videos whose comparison output already exists.
@@ -95,11 +104,13 @@ class YoloModelComparator():
                  batch_size: Optional[int] = None,
                  imgsz: Optional[int] = None,
                  max_detections: int = 300,
+                 max_per_class: Optional[int] = None,
                  palette: Optional[str] = 'Set1',
                  opacity: float = 0.6,
                  thickness: Optional[int] = 2,
                  padding: int = 0,
                  outline_color: Optional[Tuple[int, int, int]] = None,
+                 color_by: Literal['class', 'instance'] = 'class',
                  core_cnt: Optional[int] = None,
                  gpu: bool = False,
                  overwrite: bool = True,
@@ -140,10 +151,13 @@ class YoloModelComparator():
         if imgsz is not None:
             check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=32)
         check_int(name=f'{self.__class__.__name__} max_detections', value=max_detections, min_value=1)
+        if max_per_class is not None:
+            check_int(name=f'{self.__class__.__name__} max_per_class', value=max_per_class, min_value=1)
         if core_cnt is None:
             core_cnt = find_core_cnt()[1]
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
         check_float(name=f'{self.__class__.__name__} opacity', value=opacity, min_value=0.0, max_value=1.0)
+        check_str(name=f'{self.__class__.__name__} color_by', value=color_by, options=COLOR_BY_OPTIONS)
         check_valid_boolean(value=[gpu, overwrite, overlay_labels, verbose], source=self.__class__.__name__)
         self.start_time, self.end_time = None, None
         if time_window is not None:
@@ -158,6 +172,7 @@ class YoloModelComparator():
         self.video_path, self.out_dir = video_path, out_dir
         self.threshold, self.device, self.batch_size, self.imgsz = threshold, device, batch_size, imgsz
         self.max_detections, self.palette, self.opacity = max_detections, palette, opacity
+        self.max_per_class, self.color_by = max_per_class, color_by
         self.thickness, self.padding, self.outline_color = thickness, padding, outline_color
         self.core_cnt, self.gpu, self.overwrite, self.verbose = core_cnt, gpu, overwrite, verbose
         self.overlay_labels = overlay_labels
@@ -223,6 +238,7 @@ class YoloModelComparator():
                           imgsz=imgsz,
                           threshold=self.threshold,
                           max_detections=self.max_detections,
+                          max_per_class=self.max_per_class,
                           verbose=self.verbose).run()
 
         pool = get_cpu_pool(core_cnt=self.core_cnt, verbose=True, source=self.__class__.__name__)
@@ -251,6 +267,7 @@ class YoloModelComparator():
                                             thickness=self.thickness,
                                             opacity=self.opacity,
                                             outline_color=self.outline_color,
+                                            color_by=self.color_by,
                                             verbose=self.verbose)
                 visualizer.run()
                 viz_path = os.path.join(self.viz_dirs[label], f'{video_name}.mp4')
@@ -277,13 +294,15 @@ class YoloModelComparator():
 #if __name__ == '__main__':
 # comparator = YoloModelComparator(weights=[r"G:\netholabs\yolo_comparator_test\mdls\yolo_0518_best.pt",
 #                                           r"G:\netholabs\yolo_comparator_test\mdls\yolo_0519_best.pt"],
-#                                  video_path=r"D:\troubleshooting\sleap_two_animals\project_folder\videos\simba_test_v11.avi",
+#                                  video_path=r"D:\troubleshooting\sleap_import_test\project_folder\videos\2016, 2017, 2015, 2014.mp4",
 #                                  out_dir=r"D:\troubleshooting\sleap_two_animals\project_folder\videos\output",
 #                                  labels=["yolo_0518_best", "train13"],
-#                                  threshold=0.01,
-#                                  max_detections=2,
+#                                  threshold=0.001,
+#                                  max_detections=10,
+#                                  max_per_class=4,
 #                                  overwrite=True,
-#                                  time_window={'start': '00:00:00', 'end': '00:00:10'},
+#                                  padding=0,
+#                                  time_window={'start': '00:01:00', 'end': '00:01:10'},
 #                                  overlay_labels=True,
 #                                  device=0)
 # comparator.run()

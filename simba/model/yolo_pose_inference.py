@@ -107,7 +107,6 @@ class YOLOPoseInference():
                  box_threshold: float = 0.5,
                  bbox_size: Optional[Tuple[int, int]] = None,
                  max_tracks: Optional[int] = None,
-                 max_per_class: Optional[int] = None,
                  interpolate: bool = False,
                  smoothing: Optional[int] = None,
                  imgsz: int = 640,

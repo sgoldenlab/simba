@@ -126,16 +126,10 @@ def read_df(file_path: Union[str, os.PathLike],
             with open(file_path, "rb") as f:
                 first_line_len = len(f.readline())
             read_options = csv.ReadOptions(encoding="utf8", block_size=max(PA_DEFAULT_BLOCK_SIZE, first_line_len * 2))
-            df = csv.read_csv(
-                file_path, parse_options=PARSE_OPTIONS, read_options=read_options
-            )
-            duplicate_headers = list(
-                set([x for x in df.column_names if df.column_names.count(x) > 1])
-            )
+            df = csv.read_csv(file_path, parse_options=PARSE_OPTIONS, read_options=read_options)
+            duplicate_headers = list(set([x for x in df.column_names if df.column_names.count(x) > 1]))
             if len(duplicate_headers) > 0:
-                new_headers = [
-                    duplicate_headers[0] + f"_{x}" for x in range(len(df.column_names))
-                ]
+                new_headers = [duplicate_headers[0] + f"_{x}" for x in range(len(df.column_names))]
                 df = df.rename_columns(new_headers)
             if anipose_data:
                 df = df.to_pandas()

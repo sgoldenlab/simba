@@ -31,6 +31,7 @@ from simba.utils.enums import Formats, Options
 from simba.utils.errors import (InvalidVideoFileError, SimBAGPUError,
                                 SimBAPAckageVersionError)
 from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.warnings import InvalidValueWarning
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_video_meta_data)
 from simba.utils.yolo import (_get_undetected_obs, apply_fixed_bbox_size,
@@ -86,7 +87,8 @@ class YoloInference():
     :param Optional[int] batch_size: Number of frames per prediction batch.
     :param int core_cnt: CPU thread count used by torch.
     :param float threshold: Detection confidence threshold in [0.0, 1.0].
-    :param int max_detections: Maximum detections per frame.
+    :param int max_detections: Maximum detections per frame (total, across all classes) returned by the model.
+    :param Optional[int] max_per_class: Maximum number of detections to retain per class per frame. E.g., if one 'resident' and one 'intruder' is expected, set this to 1. Defaults to None, meaning all detected instances of each class are retained (up to ``max_detections``).
     :param Optional[Literal['savitzky-golay', 'bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential']] smoothing_method: Optional temporal smoothing method for bbox coordinates.
     :param Optional[int] smoothing_time_window: Smoothing window in milliseconds. Used only when ``smoothing_method`` is not None.
     :param bool interpolate: If True, interpolate missing bbox coordinates (nearest, per class).
@@ -120,6 +122,7 @@ class YoloInference():
                  core_cnt: int = 8,
                  threshold: float = 0.25,
                  max_detections: int = 300,
+                 max_per_class: Optional[int] = None,
                  smoothing_method: Optional[Literal['savitzky-golay', 'bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential']] = None,
                  smoothing_time_window: Optional[int] = None,
                  interpolate: bool = False,
@@ -153,6 +156,8 @@ class YoloInference():
         check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
         check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
+        if max_per_class is not None:
+            check_int(name=f'{self.__class__.__name__} max_per_class', value=max_per_class, min_value=1)
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1)
         
         check_valid_device(device=device)
@@ -168,6 +173,7 @@ class YoloInference():
         self.interpolate, self.smoothing_method, self.smoothing_time_window = interpolate, smoothing_method, smoothing_time_window
         self.save_dir, self.verbose, self.imgsz, self.core_cnt, self.device = save_dir, verbose, imgsz, core_cnt,device
         self.threshold, self.max_detections, self.bbox_size = threshold, max_detections, bbox_size
+        self.max_per_class = max_per_class
 
     def run(self):
         class_dict = self.model.names
@@ -186,16 +192,21 @@ class YoloInference():
                     if class_id not in detected_classes:
                         video_out.append(_get_undetected_obs(frm_id=frm_cnt, class_id=class_id, class_name=class_name, value_cnt=9))
                         continue
-                    cls_data = boxes[np.argwhere(boxes[:, -1] == class_id)]
-                    cls_data = cls_data.reshape(-1, boxes.shape[1])[np.argmax(cls_data.reshape(-1, boxes.shape[1])[:, -2].flatten())]
-                    if video_prediction.obb is not None:
-                        box = yolo_obb_data_to_bounding_box(center_x=cls_data[0], center_y=cls_data[1], width=cls_data[2], height=cls_data[3], angle=cls_data[4]).flatten()
-                    else:
-                        box = np.array([cls_data[0], cls_data[1], cls_data[2], cls_data[1], cls_data[2], cls_data[3], cls_data[0], cls_data[3]]).astype(np.int32)
-                    video_out.append([frm_cnt, cls_data[-1], class_dict[cls_data[-1]], cls_data[-2]] + list(box))
+                    cls_data = boxes[boxes[:, -1] == class_id]
+                    if self.max_per_class is not None:
+                        cls_data = cls_data[:self.max_per_class, :]
+                    for det in cls_data:
+                        if video_prediction.obb is not None:
+                            box = yolo_obb_data_to_bounding_box(center_x=det[0], center_y=det[1], width=det[2], height=det[3], angle=det[4]).flatten()
+                        else:
+                            box = np.array([det[0], det[1], det[2], det[1], det[2], det[3], det[0], det[3]]).astype(np.int32)
+                        video_out.append([frm_cnt, det[-1], class_dict[det[-1]], det[-2]] + list(box))
             results[video_name] = pd.DataFrame(video_out, columns=OUT_COLS)
             results[video_name]["CLASS_ID"] = (pd.to_numeric(results[video_name]["CLASS_ID"], errors="coerce").fillna(-1).astype(np.int32))
-            if self.interpolate:
+            multi_per_class = results[video_name].duplicated(subset=['FRAME', 'CLASS_ID'], keep=False).any()
+            if multi_per_class and (self.interpolate or self.smoothing_method is not None):
+                InvalidValueWarning(msg=f'{video_name}: interpolation and smoothing skipped - more than one detection per class per frame was retained (max_per_class={self.max_per_class}). These operations are only valid with a single detection per class.', source=self.__class__.__name__)
+            if self.interpolate and not multi_per_class:
                 for class_id in class_dict.keys():
                     class_df = results[video_name][results[video_name]["CLASS_ID"] == int(class_id)].copy()
                     if class_df.empty: continue
@@ -205,7 +216,7 @@ class YoloInference():
                         class_df[cord_col] = (class_df[cord_col].interpolate(method='linear', axis=0).ffill().bfill().replace([np.inf, -np.inf], np.nan).round().fillna(-1).astype(np.int32))
                     results[video_name].update(class_df)
                 results[video_name][CONFIDENCE] = 0
-            if self.smoothing_method is not None:
+            if self.smoothing_method is not None and not multi_per_class:
                 if self.smoothing_method != SAVITZKY_GOLAY:
                     smoothened = df_smoother(data=results[video_name][COORD_COLS], fps=video_meta_data['fps'], time_window=self.smoothing_time_window, source=self.__class__.__name__, method=self.smoothing_method)
                 else:
