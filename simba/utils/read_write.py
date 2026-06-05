@@ -81,6 +81,7 @@ SIMBA_DIR = os.path.dirname(simba.__file__)
 
 PARSE_OPTIONS = csv.ParseOptions(delimiter=",")
 READ_OPTIONS = csv.ReadOptions(encoding="utf8")
+PA_DEFAULT_BLOCK_SIZE = csv.ReadOptions().block_size
 ImageFile.LOAD_TRUNCATED_IMAGES = False
 
 def read_df(file_path: Union[str, os.PathLike],
@@ -122,8 +123,11 @@ def read_df(file_path: Union[str, os.PathLike],
     timer = SimbaTimer(start=True)
     if file_type == Formats.CSV.value:
         try:
+            with open(file_path, "rb") as f:
+                first_line_len = len(f.readline())
+            read_options = csv.ReadOptions(encoding="utf8", block_size=max(PA_DEFAULT_BLOCK_SIZE, first_line_len * 2))
             df = csv.read_csv(
-                file_path, parse_options=PARSE_OPTIONS, read_options=READ_OPTIONS
+                file_path, parse_options=PARSE_OPTIONS, read_options=read_options
             )
             duplicate_headers = list(
                 set([x for x in df.column_names if df.column_names.count(x) > 1])
