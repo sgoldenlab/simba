@@ -22,7 +22,8 @@ except ImportError:
 import simba
 from simba.mixins.config_reader import ConfigReader
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
-                                        SimbaButton, SimbaCheckbox, SimBALabel, get_menu_icons, SimBAScaleBar)
+                                        SimbaButton, SimbaCheckbox, SimBALabel,
+                                        SimBAScaleBar, get_menu_icons)
 from simba.utils.checks import (check_file_exist_and_readable, check_int,
                                 check_that_column_exist, check_valid_boolean,
                                 check_valid_dataframe, check_valid_dict,
