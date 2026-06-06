@@ -26,8 +26,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         SimbaButton, SimbaCheckbox, SimBALabel)
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_int, check_str, check_that_column_exist,
-                                check_valid_boolean, check_valid_dataframe,
+                                check_int, check_str, check_valid_boolean, check_valid_dataframe,
                                 check_valid_dict)
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Options, TagNames
 from simba.utils.errors import FrameRangeError, NoDataError, NoFilesFoundError

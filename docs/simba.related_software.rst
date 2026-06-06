@@ -1,74 +1,230 @@
 Related Software
 ================
 
+A non-exhaustive map of the animal pose-estimation, tracking, and
+behavior-analysis ecosystem that SimBA is commonly used alongside, grouped by
+primary purpose. Many tools span several categories; each is listed under its
+main use.
+
+.. contents:: Categories
+   :local:
+   :depth: 1
+
+Pose estimation
+---------------
+
 .. list-table::
    :header-rows: 1
-   :widths: 20 80
+   :widths: 22 14 64
 
    * - Software
+     - Type
      - Description
    * - `DeepLabCut <https://www.deeplabcut.org/>`__
-     - Pose estimation tool
+     - Open source
+     - Markerless 2D/3D pose estimation
    * - `SLEAP <https://sleap.ai/>`__
-     - Pose estimation tool
-   * - `B-SOID <https://github.com/YttriLab/B-SOID>`__
-     - Unsupervised behavior discovery
-   * - `JAABA <https://www.janelia.org/open-science/jaaba>`__
-     - Pose / classification
-   * - `MoSeq <https://github.com/dattalab/moseq>`__
-     - Behavior modelling from pose
-   * - `TRex <https://trex.run/>`__
-     - ID-preserving tracking
-   * - `MARS <https://github.com/YttriLab/MARS>`__
-     - Classifier / Tracking
-   * - `idtracker.ai <https://idtracker.ai/>`__
-     - Markerless ID tracking
-   * - `Ethovision XT <https://www.noldus.com/ethovision>`__
-     - Commercial tracking software
-   * - `BORIS <https://www.boris.unito.it/>`__
-     - Manual video annotation
-   * - `Tracktor <https://github.com/vivekhsridhar/tracktor>`__
-     - OpenCV-based tracker
-   * - `ToxTrac <https://toxtrac.sourceforge.net/>`__
-     - Fast animal tracker
-   * - `AlphaTracker <https://github.com/MVIG-SJTU/AlphaTracker>`__
-     - Multi-animal pose
-   * - `ezTrack <https://github.com/DeniseCaiLab/ezTrack>`__
-     - Blob based tracking
-   * - `LiveMouseTracker <https://livemousetracker.org/>`__
-     - Mouse tracking through rfid/deapth cameras
-   * - `BehaviorDEPOT <https://github.com/HanLabBU/BehaviorDEPOT>`__
-     - Pose-guided annotation
-   * - `DeepFly3D <https://github.com/NeLy-EPFL/DeepFly3D>`__
-     - 3D fly poses
-   * - `Anipose <https://github.com/lambdaloop/anipose>`__
-     - 3D pose toolkit
-   * - `DLC-Analyzer <https://github.com/DeepLabCut/DLCAnalyzer>`__
-     - Analyze DLC outputs
-   * - `DeepLabStream <https://github.com/AdaptiveMotorControlLab/deeplabstream>`__
-     - Real-time analysis
+     - Open source
+     - Multi-animal pose estimation
    * - `DeepPoseKit <https://github.com/jgraving/deepposekit>`__
-     - Pose estimation library
-   * - `CatWalk XT <https://www.noldus.com/catwalk>`__
-     - Gait analysis platform
-   * - `TrackMate <https://imagej.net/plugins/trackmate/>`__
-     - ImageJ object tracker
-   * - `C-Trax <https://ctrax.sourceforge.net/>`__
-     - Fly group tracking
-   * - `A-SOID <https://github.com/YttriLab/A-SOID>`__
-     - Behavior detection from pose
-   * - `DeepEthogram <https://github.com/jbohnslav/deepethogram>`__
-     - Video-based behavior classifier
-   * - `YOLO (Ultralytics) <https://github.com/ultralytics/ultralytics>`__
-     - Object detection / pose framework
-   * - `AMBER-pipeline <https://github.com/lapphe/AMBER-pipeline>`__
-     - Automated behavior analysis
-   * - `VAME <https://github.com/LINCellularNeuroscience/VAME>`__
-     - Unsupervised analysis of pose
-   * - `LabGym <https://github.com/umyelab/LabGym>`__
-     - Tracking and behavior classification through mask-RCNNs
-   * - `SolomonCoder <https://solomon-coder.software.informer.com/17.0/#google_vignette>`__
-     - Annotation tool for animal behavior
-   * - `Noldus Observer <https://noldus.com/observer-xt-human>`__
-     - Commercial annotation tool for animal behavior
+     - Open source
+     - Pose estimation toolkit
+   * - `Lightning Pose <https://github.com/danbider/lightning-pose>`__
+     - Open source
+     - Semi-supervised, multi-view pose estimation
+   * - `Facemap <https://github.com/MouseLand/facemap>`__
+     - Open source
+     - Mouse orofacial tracking and neural prediction
 
+3D pose estimation
+------------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 14 64
+
+   * - Software
+     - Type
+     - Description
+   * - `DeepFly3D <https://github.com/NeLy-EPFL/DeepFly3D>`__
+     - Open source
+     - 3D pose estimation for tethered Drosophila
+   * - `Anipose <https://github.com/lambdaloop/anipose>`__
+     - Open source
+     - 3D pose estimation from synchronized cameras
+   * - `DANNCE <https://github.com/spoonsso/dannce>`__
+     - Open source
+     - 3D landmark detection from multi-view video
+
+Tracking and identity
+---------------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 14 64
+
+   * - Software
+     - Type
+     - Description
+   * - `TRex <https://trex.run/>`__
+     - Open source
+     - Real-time, identity-preserving tracking
+   * - `idtracker.ai <https://idtracker.ai/>`__
+     - Open source
+     - Markerless identity tracking for animal groups
+   * - `AlphaTracker <https://github.com/ZexinChen/AlphaTracker>`__
+     - Open source
+     - Multi-animal tracking, pose, and behavioral clustering
+   * - `Tracktor <https://github.com/vivekhsridhar/tracktor>`__
+     - Open source
+     - OpenCV-based single- and multi-object tracker
+   * - `ToxTrac <https://sourceforge.net/projects/toxtrac/>`__
+     - Open source
+     - Fast tracker for one or several animals
+   * - `ezTrack <https://github.com/DeniseCaiLab/ezTrack>`__
+     - Open source
+     - Blob-based location and freezing tracking
+   * - `LiveMouseTracker <https://micecraft.org/lmt>`__
+     - Open source
+     - Long-term mouse tracking via RFID and depth cameras
+   * - `TrackMate <https://imagej.net/plugins/trackmate/>`__
+     - Open source
+     - ImageJ/Fiji object-tracking plugin
+   * - `C-Trax <https://ctrax.sourceforge.net/>`__
+     - Open source
+     - Tracking of walking flies in groups
+
+Supervised behavior classification
+-----------------------------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 14 64
+
+   * - Software
+     - Type
+     - Description
+   * - `JAABA <https://www.janelia.org/open-science/jaaba>`__
+     - Open source
+     - Supervised behavior classification from trajectories
+   * - `DeepEthogram <https://github.com/jbohnslav/deepethogram>`__
+     - Open source
+     - Supervised behavior classification from raw video
+   * - `MARS <https://github.com/neuroethology/MARS>`__
+     - Open source
+     - Pose estimation and social behavior classification in mice
+   * - `BehaviorDEPOT <https://github.com/DeNardoLab/BehaviorDEPOT>`__
+     - Open source
+     - Pose-guided behavior detection and analysis
+   * - `LabGym <https://github.com/umyelab/LabGym>`__
+     - Open source
+     - Tracking and behavior classification via Mask R-CNN
+   * - `SIPEC <https://github.com/damaggu/SIPEC>`__
+     - Open source
+     - End-to-end deep-learning behavioral analysis pipeline
+
+Unsupervised behavior discovery
+-------------------------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 14 64
+
+   * - Software
+     - Type
+     - Description
+   * - `B-SOID <https://github.com/YttriLab/B-SOID>`__
+     - Open source
+     - Unsupervised behavior discovery from pose
+   * - `A-SOID <https://github.com/YttriLab/A-SOID>`__
+     - Open source
+     - Active-learning behavior classification from pose
+   * - `Keypoint-MoSeq <https://github.com/dattalab/keypoint-moseq>`__
+     - Open source
+     - Unsupervised behavioral syllable discovery from keypoints
+   * - `VAME <https://github.com/EthoML/VAME>`__
+     - Open source
+     - Unsupervised behavioral motif discovery from pose
+   * - `DeepOF <https://github.com/mlfpm/deepof>`__
+     - Open source
+     - Behavioral analysis of DeepLabCut/SLEAP tracking
+   * - `TREBA <https://github.com/neuroethology/TREBA>`__
+     - Open source
+     - Trajectory embeddings for behavior representation learning
+
+Object detection
+----------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 14 64
+
+   * - Software
+     - Type
+     - Description
+   * - `YOLO (Ultralytics) <https://github.com/ultralytics/ultralytics>`__
+     - Open source
+     - Real-time object detection, segmentation, and pose framework
+
+Analysis and real-time pipelines
+--------------------------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 14 64
+
+   * - Software
+     - Type
+     - Description
+   * - `DLC-Analyzer <https://github.com/ETHZ-INS/DLCAnalyzer>`__
+     - Open source
+     - Analysis and visualization of DeepLabCut output
+   * - `DeepLabCut-Live <https://github.com/DeepLabCut/DeepLabCut-live>`__
+     - Open source
+     - Real-time pose estimation on live video
+   * - `DeepLabStream <https://github.com/SchwarzNeuroconLab/DeepLabStream>`__
+     - Open source
+     - Real-time, closed-loop pose-based feedback
+   * - `Bonsai <https://bonsai-rx.org/>`__
+     - Open source
+     - Visual reactive programming for experiment pipelines
+   * - `AMBER-pipeline <https://github.com/lapphe/AMBER-pipeline>`__
+     - Open source
+     - Automated rodent maternal-behavior analysis
+
+Manual annotation
+-----------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 14 64
+
+   * - Software
+     - Type
+     - Description
+   * - `BORIS <https://www.boris.unito.it/>`__
+     - Open source
+     - Event-logging and manual video annotation
+   * - `Solomon Coder <https://solomon.andraspeter.com/>`__
+     - Freeware
+     - Manual behavior coding tool
+   * - `Noldus Observer XT <https://noldus.com/observer-xt-human>`__
+     - Commercial
+     - Manual behavior annotation suite
+
+Commercial platforms
+--------------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 14 64
+
+   * - Software
+     - Type
+     - Description
+   * - `Ethovision XT <https://www.noldus.com/ethovision>`__
+     - Commercial
+     - Video tracking and analysis
+   * - `CatWalk XT <https://www.noldus.com/catwalk>`__
+     - Commercial
+     - Gait analysis platform

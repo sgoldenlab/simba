@@ -22,7 +22,7 @@ except ImportError:
 import simba
 from simba.mixins.config_reader import ConfigReader
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
-                                        SimbaButton, SimbaCheckbox, SimBALabel)
+                                        SimbaButton, SimbaCheckbox, SimBALabel, get_menu_icons, SimBAScaleBar)
 from simba.utils.checks import (check_file_exist_and_readable, check_int,
                                 check_that_column_exist, check_valid_boolean,
                                 check_valid_dataframe, check_valid_dict,
@@ -44,7 +44,7 @@ PLAY_VIDEO_SCRIPT_PATH = os.path.join(os.path.dirname(simba.__file__), "labellin
 PADDING = 5
 
 DISPLAY_RESOLUTION = get_display_resolution()
-MAX_FRAME_RATI0 = (0.33, 0.33) # W * H RATIO OF IMAGE FRAME ONLY
+MAX_FRAME_RATI0 = (0.6, 0.6) # W * H RATIO OF IMAGE FRAME ONLY
 
 
 class LabellingInterface(ConfigReader):
@@ -226,8 +226,9 @@ class LabellingInterface(ConfigReader):
         self.video_player_frm.grid(row=2, column=4, sticky=NSEW, padx=10, pady=10)
         self.play_video_btn.grid(row=0, column=0, sticky=NSEW, padx=3, pady=3)
         self.update_img_from_video.grid(row=0, column=1, sticky=NSEW,  padx=3, pady=3)
+        self.menu_icons = get_menu_icons()
 
-
+        self.get_file_menu(root=self.main_window)
         self.main_window.mainloop()
 
     def get_keyboard_shortcuts_lbl(self,
@@ -403,11 +404,50 @@ class LabellingInterface(ConfigReader):
                 else:
                     print(f"{target} ABSENT in frames {frame[0]} to {frame[1]}")
 
+    def get_file_menu(self,
+                      root: Toplevel):
+
+        menu = Menu(root)
+        file_menu = Menu(menu)
+        menu.add_cascade(label="File (LABELLING)", menu=file_menu)
+        file_menu.add_command(label="Settings ...", compound="left",image=self.menu_icons["settings"]["img"], command=lambda: self.settings_pop_up())
+        root.config(menu=menu)
+
+
+    def settings_pop_up(self):
+        if hasattr(self, 'preferences_frm'):
+            self.preferences_frm.destroy()
+        self.preferences_frm = Toplevel()
+        self.preferences_frm.minsize(400, 300)
+        self.preferences_frm.wm_title("PREFERENCES")
+        self.preferences_frm.iconphoto(False, self.menu_icons['settings']["img"])
+
+        size_frm_panel = CreateLabelFrameWithIcon(parent=self.preferences_frm, header="IMAGE SIZE", icon_name='size', padx=5, pady=5)
+        size_frm_panel.grid(row=0, column=0, sticky="NW")
+        self.max_width_scaler = SimBAScaleBar(parent=size_frm_panel, label="MAX IMAGE WIDTH (%): ", orient=HORIZONTAL, length=200, value=MAX_FRAME_RATI0[0]*100, label_width=25, lbl_img='width', from_=10, to=100)
+        self.max_height_scaler = SimBAScaleBar(parent=size_frm_panel, label="MAX IMAGE HEIGHT (%): ", orient=HORIZONTAL, length=200, value=MAX_FRAME_RATI0[1]*100, label_width=25, lbl_img='height', from_=10, to=100)
+        self.max_width_scaler.grid(row=0, column=0, sticky="NW")
+        self.max_height_scaler.grid(row=1, column=0, sticky="NW")
+
+        pref_save_btn = SimbaButton(parent=self.preferences_frm, txt="SAVE", img='save_large', font=Formats.FONT_REGULAR.value, cmd=self.set_settings)
+        pref_save_btn.grid(row=1, column=0, sticky="NW")
+
+    def set_settings(self):
+        max_width, max_height = int(self.max_width_scaler.get_value()) / 100, int(self.max_height_scaler.get_value()) / 100
+        scaled_w, scaled_h, _, _ = get_img_resize_info(img_size=(self.video_meta_data['width'], self.video_meta_data['height']), display_resolution=None, max_width_ratio=max_width, max_height_ratio=max_height)
+        self.img_display_size = (scaled_w, scaled_h)
+        self.set_img(img_lbl=self.img_lbl, video_path=self.cap, img_idx=self.img_idx, display_size=self.img_display_size)
+
+        pass
 
 # test = LabellingInterface(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                               threshold_dict=None, #threshold_dict={'Attack': 0.4}
 #                               setting='from_scratch',
 #                               continuing=False)
+
+
+# test = LabellingInterface(file_path=r"D:\troubleshooting\open_field_below\project_folder\videos\raw_clip1.mp4",
+#                           config_path=r"D:\troubleshooting\open_field_below\project_folder\project_config.ini")
 
 # _ = LabellingInterface(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                        file_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0521.mp4",
