@@ -23,12 +23,12 @@ import simba
 from simba.mixins.config_reader import ConfigReader
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         SimbaButton, SimbaCheckbox, SimBALabel,
-                                        SimBAScaleBar, get_menu_icons)
+                                        SimBAScaleBar, get_menu_icons, SimBADropDown)
 from simba.utils.checks import (check_file_exist_and_readable, check_int,
                                 check_that_column_exist, check_valid_boolean,
                                 check_valid_dataframe, check_valid_dict,
-                                check_video_and_data_frm_count_align)
-from simba.utils.enums import Formats, TagNames
+                                check_video_and_data_frm_count_align, is_img_greyscale)
+from simba.utils.enums import Formats, TagNames, TextOptions
 from simba.utils.errors import (FrameRangeError, NoDataError,
                                 NoFilesFoundError, SimbaError)
 from simba.utils.lookups import (get_current_time, get_display_resolution,
@@ -38,14 +38,16 @@ from simba.utils.lookups import (get_current_time, get_display_resolution,
 from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (find_closest_readable_frame,
                                     get_video_meta_data, read_config_entry,
-                                    read_df, read_frm_of_video, write_df)
+                                    read_df, read_frm_of_video, write_df, str_2_bool, seconds_to_timestamp)
 from simba.utils.warnings import DataHeaderWarning, FrameRangeWarning
-
+from simba.mixins.plotting_mixin import PlottingMixin
 PLAY_VIDEO_SCRIPT_PATH = os.path.join(os.path.dirname(simba.__file__), "labelling/play_annotation_video.py")
 PADDING = 5
 
 DISPLAY_RESOLUTION = get_display_resolution()
 MAX_FRAME_RATI0 = (0.6, 0.6) # W * H RATIO OF IMAGE FRAME ONLY
+DEFAULT_IMG_GREYSCALE = 'FALSE'
+DEFAULT_SAVE_VERBOSITY = 'TRUE'
 
 
 class LabellingInterface(ConfigReader):
@@ -88,6 +90,8 @@ class LabellingInterface(ConfigReader):
         self.targets_inserted_file_path = os.path.join(self.targets_folder, f"{self.video_name}.{self.file_type}")
         self.machine_results_file_path = os.path.join(self.machine_results_dir, f"{self.video_name}.{self.file_type}")
         self.cap = cv2.VideoCapture(self.video_path)
+        self.img_greyscale, self.save_verbosity = str_2_bool(input_str=DEFAULT_IMG_GREYSCALE), str_2_bool(input_str=DEFAULT_SAVE_VERBOSITY)
+        self.show_video_timer = False
         self.img_kbd_bindings = get_labelling_img_kbd_bindings()
         self.video_kbd_bindings = get_labelling_video_kbd_bindings()
         self.max_frm_id = self.video_meta_data["frame_count"] - 1
@@ -158,7 +162,7 @@ class LabellingInterface(ConfigReader):
         self.img_lbl = Label(self.img_frm, name='img_lbl')
         self.img_frm.grid(row=0, column=0, sticky=NW, padx=10, pady=10, columnspan=3, rowspan=2)
         self.img_lbl.grid(row=0, column=0, sticky=NW)
-
+        self.font_size, self.space_x, self.spacing_scale = PlottingMixin().get_optimal_font_scales(text='999999', accepted_px_width=int(self.img_display_size[0] / 8), accepted_px_height=int(self.img_display_size[1] / 8))
 
         self.navigation_frm = CreateLabelFrameWithIcon(parent=self.main_window, header='FRAME NAVIGATION',  icon_name='navigation', relief='solid')
         self.current_frm_eb = Entry_Box(parent=self.navigation_frm, fileDescription='CURRENT FRAME: ', labelwidth=20, validation='numeric', entry_box_width=10, value=self.img_idx, justify='center', label_font=Formats.FONT_HEADER.value, entry_font=Formats.FONT_HEADER.value)
@@ -168,7 +172,7 @@ class LabellingInterface(ConfigReader):
         self.forward_btn = SimbaButton(parent=self.navigation_frm, txt="", img='play_large_green', tooltip_txt="+1 FRAME", cmd=self.__advance_frame, cmd_kwargs={'frm_id': lambda: self.img_idx + 1})
         self.last_frm_btn = SimbaButton(parent=self.navigation_frm, txt="", img='skip_forward_large', tooltip_txt="GO TO LAST FRAME", cmd=self.__advance_frame, cmd_kwargs={'frm_id': self.max_frm_id})
 
-        self.set_img(img_lbl=self.img_lbl, video_path=self.cap, img_idx=self.img_idx, display_size=self.img_display_size)
+        self.set_img(img_lbl=self.img_lbl, video_path=self.cap, img_idx=self.img_idx, display_size=self.img_display_size, show_timer=self.show_video_timer)
 
         self.navigation_frm.grid(row=2, column=0, sticky=NSEW, pady=10, padx=10, columnspan=1)
         self.current_frm_eb.grid(row=0, column=0, sticky=EW, columnspan=4)
@@ -286,9 +290,9 @@ class LabellingInterface(ConfigReader):
                 img_lbl: Label,
                 video_path: Union[str, os.PathLike],
                 img_idx: int,
-                display_size: Optional[Tuple[int, int]] = None):
-
-        self.img = read_frm_of_video(video_path=video_path, frame_index=img_idx, size=display_size, raise_error=False)
+                display_size: Optional[Tuple[int, int]] = None,
+                show_timer: bool = False):
+        self.img = read_frm_of_video(video_path=video_path, frame_index=img_idx, size=display_size, raise_error=False, greyscale=self.img_greyscale)
         if self.img is None:
             FrameRangeWarning(msg=f'Frame {img_idx} could not be read in video {video_path}. Attempting to find closest readable frame...')
             img, img_idx = find_closest_readable_frame(video_path=video_path, target_frame=img_idx, max_search_range=50)
@@ -299,7 +303,11 @@ class LabellingInterface(ConfigReader):
                 self.current_frm_eb.entry_set(val=str(img_idx))
             else:
                 raise FrameRangeError(msg=f'Could not find a readable frame (± frames of {img_idx}) in video {video_path}. Cannot proceed with annotations in this video.', source=self.__class__.__name__)
-        img_rgb = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)
+        if show_timer:
+            timestamp = seconds_to_timestamp(seconds=self.img_idx / self.video_meta_data['fps'], hh_mm_ss_sss=True)
+            self.img = PlottingMixin().put_text(img=self.img, text=timestamp, pos=(TextOptions.BORDER_BUFFER_X.value, int((self.img.shape[0] - self.spacing_scale * 2))), font_size=self.font_size, font_thickness=TextOptions.TEXT_THICKNESS.value + 1, text_bg_alpha=0.6, text_color=(255, 255, 255))
+        grey_img = is_img_greyscale(img=self.img, raise_error=False, source=f'{self.__class__.__name__} img_idx')
+        img_rgb = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB) if not grey_img else self.img
         self.pil_image = Image.fromarray(img_rgb)
         self.tk_image = ImageTk.PhotoImage(self.pil_image)
         img_lbl.configure(image=self.tk_image)
@@ -344,7 +352,8 @@ class LabellingInterface(ConfigReader):
             raise FrameRangeError(msg=f"TRYING TO SHOW FRAME {frm_id} WHICH CANNOT BE SHOWN. FRAME INDEX HAS TO BE 0 OR ABOVE")
         else:
             prior_frm_idx = int(self.current_frm_eb.entry_get)
-            self.__create_print_statements(frame=prior_frm_idx)
+            if self.save_verbosity:
+                self.__create_print_statements(frame=prior_frm_idx)
             self.current_frm_eb.entry_set(val=frm_id)
             for clf in self.clf_names:
                 self.save_behavior_in_frm(clf_name=clf, frame_idx=prior_frm_idx)
@@ -353,7 +362,7 @@ class LabellingInterface(ConfigReader):
                 else:
                     self.clf_cbs[clf].set(bool(self.data_df_targets[clf].loc[frm_id]))
             self.img_idx = deepcopy(frm_id)
-            self.set_img(img_lbl=self.img_lbl, video_path=self.cap, img_idx=frm_id, display_size=self.img_display_size)
+            self.set_img(img_lbl=self.img_lbl, video_path=self.cap, img_idx=frm_id, display_size=self.img_display_size, show_timer=self.show_video_timer)
 
     def __save_behavior_in_range(self,
                                  start_frm: int,
@@ -368,8 +377,9 @@ class LabellingInterface(ConfigReader):
             self.data_df_targets[target].loc[start_frm:end_frm] = int(self.clf_cbs[target].get())
         self.current_frm_eb.entry_set(end_frm)
         self.img_idx = deepcopy(end_frm)
-        self.__create_print_statements(frame=(start_frm, end_frm))
-        self.main_window.after(1, lambda: self.set_img(img_lbl=self.img_lbl, video_path=self.cap, img_idx=end_frm, display_size=self.img_display_size))
+        if self.save_verbosity:
+            self.__create_print_statements(frame=(start_frm, end_frm))
+        self.main_window.after(1, lambda: self.set_img(img_lbl=self.img_lbl, video_path=self.cap, img_idx=end_frm, display_size=self.img_display_size, show_timer=self.show_video_timer))
 
     def save_behavior_in_frm(self,
                              frame_idx: int,
@@ -422,7 +432,6 @@ class LabellingInterface(ConfigReader):
         self.preferences_frm.minsize(400, 300)
         self.preferences_frm.wm_title("PREFERENCES")
         self.preferences_frm.iconphoto(False, self.menu_icons['settings']["img"])
-
         size_frm_panel = CreateLabelFrameWithIcon(parent=self.preferences_frm, header="IMAGE SIZE", icon_name='size', padx=5, pady=5)
         size_frm_panel.grid(row=0, column=0, sticky="NW")
         self.max_width_scaler = SimBAScaleBar(parent=size_frm_panel, label="MAX IMAGE WIDTH (%): ", orient=HORIZONTAL, length=200, value=MAX_FRAME_RATI0[0]*100, label_width=25, lbl_img='width', from_=10, to=100)
@@ -430,15 +439,33 @@ class LabellingInterface(ConfigReader):
         self.max_width_scaler.grid(row=0, column=0, sticky="NW")
         self.max_height_scaler.grid(row=1, column=0, sticky="NW")
 
+        img_clr_panel = CreateLabelFrameWithIcon(parent=self.preferences_frm, header="IMAGE COLOR", icon_name='size', padx=5, pady=5)
+        img_clr_panel.grid(row=1, column=0, sticky="NW")
+        self.img_grey_dropdown = SimBADropDown(parent=img_clr_panel, dropdown_options=['TRUE', 'FALSE'], label="IMAGE GREYSCALE: ", label_width=20, value='TRUE' if self.img_greyscale else 'FALSE', dropdown_width=10, img='grey')
+        self.img_grey_dropdown.grid(row=0, column=0, sticky="NW")
+
+        verbosity_panel = CreateLabelFrameWithIcon(parent=self.preferences_frm, header="VEBOSITY", icon_name='verbose', padx=5, pady=5)
+        verbosity_panel.grid(row=2, column=0, sticky="NW")
+        self.verbosity_dropdown = SimBADropDown(parent=verbosity_panel, dropdown_options=['TRUE', 'FALSE'], label="SAVE VERBOSITY: ", label_width=20, value='TRUE' if self.save_verbosity else 'FALSE', dropdown_width=10, img='verbose')
+        self.verbosity_dropdown.grid(row=0, column=0, sticky="NW")
+
+        video_timer_panel = CreateLabelFrameWithIcon(parent=self.preferences_frm, header="VIDEO TIMER", icon_name='frame', padx=5, pady=5)
+        video_timer_panel.grid(row=3, column=0, sticky="NW")
+        self.video_timer_dropdown = SimBADropDown(parent=video_timer_panel, dropdown_options=['TRUE', 'FALSE'], label="SHOW VIDEO TIMER: ", label_width=20, value='TRUE' if self.show_video_timer else 'FALSE', dropdown_width=10, img='timer')
+        self.video_timer_dropdown.grid(row=0, column=0, sticky="NW")
+
         pref_save_btn = SimbaButton(parent=self.preferences_frm, txt="SAVE", img='save_large', font=Formats.FONT_REGULAR.value, cmd=self.set_settings)
-        pref_save_btn.grid(row=1, column=0, sticky="NW")
+        pref_save_btn.grid(row=4, column=0, sticky="NW")
 
     def set_settings(self):
         max_width, max_height = int(self.max_width_scaler.get_value()) / 100, int(self.max_height_scaler.get_value()) / 100
         scaled_w, scaled_h, _, _ = get_img_resize_info(img_size=(self.video_meta_data['width'], self.video_meta_data['height']), display_resolution=None, max_width_ratio=max_width, max_height_ratio=max_height)
         self.img_display_size = (scaled_w, scaled_h)
-        self.set_img(img_lbl=self.img_lbl, video_path=self.cap, img_idx=self.img_idx, display_size=self.img_display_size)
-
+        self.font_size, self.space_x, self.spacing_scale = PlottingMixin().get_optimal_font_scales(text='999999', accepted_px_width=int(self.img_display_size[0] / 8), accepted_px_height=int(self.img_display_size[1] / 8))
+        self.img_greyscale = str_2_bool(input_str=self.img_grey_dropdown.get_value())
+        self.save_verbosity = str_2_bool(input_str=self.verbosity_dropdown.get_value())
+        self.show_video_timer = str_2_bool(input_str=self.video_timer_dropdown.get_value())
+        self.set_img(img_lbl=self.img_lbl, video_path=self.cap, img_idx=self.img_idx, display_size=self.img_display_size, show_timer=self.show_video_timer)
         pass
 
 # test = LabellingInterface(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
