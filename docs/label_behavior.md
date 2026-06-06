@@ -203,5 +203,24 @@ If you click yes, SimBA will open each file inside your `project_folder/csv/targ
 
 > Note: Each of the videos inside the project_folder/csv/targets_inserted directory also have to be represented in the project_folder/logs/video_info.csv for this to work. This is in order for SimBA to know the FPS of the videos and accurcatly calculate the number of seconds that each behavior has been annotated as present and absent in each of the videos.
 
+### Changing the size of the displayed image
+
+When the annotation GUI opens, SimBA scales the displayed video frame so that it takes up at most 60% of your monitor's width and 60% of your monitor's height. If the image is too small (e.g., you are annotating a low-resolution video and want to see more detail), or too large (e.g., the frame covers the annotation buttons), you can change the displayed image size through the settings menu.
+
+To do this, click `File (LABELLING)` -> `Settings ...` in the menu bar at the top left of the annotation GUI window. This brings up a `PREFERENCES` pop-up window with an `IMAGE SIZE` panel containing two slider bars:
+
+* **MAX IMAGE WIDTH (%)**: The maximum width of the displayed image, as a percent of your monitor's width (between 10% and 100%).
+* **MAX IMAGE HEIGHT (%)**: The maximum height of the displayed image, as a percent of your monitor's height (between 10% and 100%).
+
+Drag the sliders to your preferred values and click the `SAVE` button. The displayed frame is immediately re-sized to fit within the chosen maximum width and height, as in the video below:
+
+<p align="center">
+  <video src="_static/img/label_change_size_img.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
+
+> If the video above does not play, you can view it [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/_static/img/label_change_size_img.webm).
+
+> Note: SimBA preserves the aspect ratio of the video when re-sizing the displayed image. This means that the displayed image will be as large as possible while fitting within **both** the chosen maximum width and the chosen maximum height of your monitor.
+
 #
 Author [Simon N](https://github.com/sronilsson)
