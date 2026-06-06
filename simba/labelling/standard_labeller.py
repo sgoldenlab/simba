@@ -21,13 +21,16 @@ except ImportError:
 
 import simba
 from simba.mixins.config_reader import ConfigReader
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
-                                        SimbaButton, SimbaCheckbox, SimBALabel,
-                                        SimBAScaleBar, get_menu_icons, SimBADropDown)
+                                        SimbaButton, SimbaCheckbox,
+                                        SimBADropDown, SimBALabel,
+                                        SimBAScaleBar, get_menu_icons)
 from simba.utils.checks import (check_file_exist_and_readable, check_int,
                                 check_that_column_exist, check_valid_boolean,
                                 check_valid_dataframe, check_valid_dict,
-                                check_video_and_data_frm_count_align, is_img_greyscale)
+                                check_video_and_data_frm_count_align,
+                                is_img_greyscale)
 from simba.utils.enums import Formats, TagNames, TextOptions
 from simba.utils.errors import (FrameRangeError, NoDataError,
                                 NoFilesFoundError, SimbaError)
@@ -38,9 +41,10 @@ from simba.utils.lookups import (get_current_time, get_display_resolution,
 from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (find_closest_readable_frame,
                                     get_video_meta_data, read_config_entry,
-                                    read_df, read_frm_of_video, write_df, str_2_bool, seconds_to_timestamp)
+                                    read_df, read_frm_of_video,
+                                    seconds_to_timestamp, str_2_bool, write_df)
 from simba.utils.warnings import DataHeaderWarning, FrameRangeWarning
-from simba.mixins.plotting_mixin import PlottingMixin
+
 PLAY_VIDEO_SCRIPT_PATH = os.path.join(os.path.dirname(simba.__file__), "labelling/play_annotation_video.py")
 PADDING = 5
 
