@@ -35,6 +35,12 @@ Pose estimation
    * - `Facemap <https://github.com/MouseLand/facemap>`__
      - Open source
      - Mouse orofacial tracking and neural prediction
+   * - `OpenPose <https://github.com/CMU-Perceptual-Computing-Lab/openpose>`__
+     - Open source
+     - Real-time multi-person 2D keypoint detection
+   * - `MMPose <https://github.com/open-mmlab/mmpose>`__
+     - Open source
+     - General-purpose pose estimation toolbox (OpenMMLab)
 
 3D pose estimation
 ------------------
@@ -151,6 +157,12 @@ Unsupervised behavior discovery
    * - `TREBA <https://github.com/neuroethology/TREBA>`__
      - Open source
      - Trajectory embeddings for behavior representation learning
+   * - `MotionMapper <https://github.com/gordonberman/MotionMapper>`__
+     - Open source
+     - Unsupervised behavioral mapping from postural dynamics
+   * - `MoSeq <https://github.com/dattalab/moseq2-app>`__
+     - Open source
+     - Depth-video behavioral syllable segmentation
 
 Object detection
 ----------------
@@ -165,6 +177,12 @@ Object detection
    * - `YOLO (Ultralytics) <https://github.com/ultralytics/ultralytics>`__
      - Open source
      - Real-time object detection, segmentation, and pose framework
+   * - `Detectron2 <https://github.com/facebookresearch/detectron2>`__
+     - Open source
+     - Object detection and instance segmentation library
+   * - `Segment Anything (SAM 2) <https://github.com/facebookresearch/sam2>`__
+     - Open source
+     - Promptable image and video segmentation
 
 Analysis and real-time pipelines
 --------------------------------
@@ -211,6 +229,18 @@ Manual annotation
    * - `Noldus Observer XT <https://noldus.com/observer-xt-human>`__
      - Commercial
      - Manual behavior annotation suite
+   * - `CVAT <https://github.com/cvat-ai/cvat>`__
+     - Open source
+     - Image and video annotation for detection, segmentation, and keypoints
+   * - `Label Studio <https://github.com/HumanSignal/label-studio>`__
+     - Open source
+     - Multi-type data labeling and annotation platform
+   * - `VIA (VGG Image Annotator) <https://www.robots.ox.ac.uk/~vgg/software/via/>`__
+     - Open source
+     - Lightweight image, audio, and video annotation tool
+   * - `ELAN <https://archive.mpi.nl/tla/elan>`__
+     - Open source
+     - Time-aligned annotation of video and audio
 
 Commercial platforms
 --------------------
