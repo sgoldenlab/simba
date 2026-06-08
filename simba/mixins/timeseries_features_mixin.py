@@ -919,16 +919,25 @@ class TimeseriesFeatureMixin(object):
     @dynamic_numba_decorator(dtypes="(float32[:], float64[:], float64, types.ListType(types.unicode_type))", cache=True, fastmath=True)
     def sliding_descriptive_statistics(data: np.ndarray, window_sizes: np.ndarray, sample_rate: float, statistics: Literal["var", "max", "min", "std", "median", "mean", "mad", "sum", "mac", "rms", "absenergy"]) -> np.ndarray:
         """
-        Jitted compute of descriptive statistics over sliding windows in 1D data array.
+        Jitted compute of descriptive statistics over trailing (causal) sliding windows in a 1D data array.
 
-        Computes various descriptive statistics (e.g., variance, maximum, minimum, standard deviation,
-        median, mean, median absolute deviation) for sliding windows of varying sizes applied to the input data array.
+        For each requested window size, the statistic is computed over the window of samples *ending* at
+        each index ``i`` - i.e. ``data[i - window_size + 1 : i + 1]`` - and stored at index ``i``. The window
+        therefore summarizes the *preceding* samples, not a centered window. Window sizes are given in seconds
+        and converted to a number of samples with ``int(window_size_seconds * sample_rate)``.
 
-        :param np.ndarray data: 1D input data array.
-        :param np.ndarray window_sizes: Array of window sizes (in seconds).
-        :param int sample_rate: Sampling rate of the data in samples per second.
-        :param types.ListType(types.unicode_type) statistics: List of statistics to compute. Options: 'var', 'max', 'min', 'std', 'median', 'mean', 'mad', 'sum', 'mac', 'rms', 'abs_energy'.
-        :return np.ndarray: Array containing the selected descriptive statistics for each window size, data point, and statistic type. The shape of the result array is (len(statistics), data.shape[0], window_sizes.shape[0).
+        .. warning::
+           The first ``window_size - 1`` output values (per window size) are left at the fill value ``-1.0``,
+           because a full trailing window is not yet available at the start of the array. ``-1.0`` is a
+           "not enough data yet" sentinel, **not** a real statistic. Callers must mask or skip it - e.g.
+           comparing ``result <= threshold`` will wrongly include the warm-up region, since ``-1.0`` is below
+           any positive threshold. (For a sum/mean of non-negative data, filter with ``result >= 0`` first.)
+
+        :param np.ndarray data: 1D input data array. Must be ``float32``.
+        :param np.ndarray window_sizes: 1D array of window sizes in seconds. Each is multiplied by ``sample_rate`` and truncated to an integer number of samples.
+        :param float sample_rate: Sampling rate of the data in samples (frames) per second.
+        :param types.ListType(types.unicode_type) statistics: List of statistics to compute. Options: 'var', 'max', 'min', 'std', 'median', 'mean', 'mad', 'sum', 'mac', 'rms', 'absenergy'.
+        :return np.ndarray: ``float32`` array of shape ``(len(statistics), data.shape[0], window_sizes.shape[0])`` - one value per statistic, per data point, per window size. The first ``window_size - 1`` entries along the data axis are ``-1.0`` (see warning).
 
         .. note::
            The `statistics` parameter should be a list containing one or more of the following statistics:

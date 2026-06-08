@@ -227,6 +227,10 @@ Heuristic freezing detector
    :members:
    :undoc-members:
 
+.. automodule:: simba.data_processors.freezing_detector_v2
+   :members:
+   :undoc-members:
+
 
 Data GPU methods
 ----------------------------------------------

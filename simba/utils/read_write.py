@@ -3716,9 +3716,6 @@ def get_recent_projects_paths(max: int = 15, sort_alphabetically: bool = True) -
         return []
 
 
-
-
-
 def write_to_recent_project_paths(config_path: Union[str, os.PathLike]):
     file_path = os.path.join(SIMBA_DIR, Paths.RECENT_PROJECTS_PATHS.value)
     existing_paths = get_recent_projects_paths()

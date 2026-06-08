@@ -489,22 +489,22 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
 
 
 # if __name__ == "__main__":
-#     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"G:\projects\jason_zhang\jason_project\project_folder\project_config.ini",
-#                                                  video_paths=r"G:\projects\jason_zhang\jason_project\project_folder\videos\2025-10-22 12-01-34_box2.mp4",
-#                                                  data_dir=r"G:\projects\jason_zhang\jason_project\project_folder\csv\REARING\REARING_DATA",
-#                                                  save_dir=r'G:\projects\jason_zhang\jason_project\project_folder\csv\REARING\REARING_VIDEOS',
-#                                                  clf_names=('REARING',),
+#     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"H:\projects\brainwide_trap\brainwide_trap\project_folder\project_config.ini",
+#                                                  video_paths=r"H:\projects\brainwide_trap\brainwide_trap\project_folder\videos",
+#                                                  data_dir=r"H:\projects\brainwide_trap\brainwide_trap\project_folder\csv\machine_results",
+#                                                  save_dir=r'H:\projects\brainwide_trap\brainwide_trap\project_folder\frames\output\freezing_immbility',
+#                                                  clf_names=('FREEZING', 'IMMOBILITY'),
 #                                                  video_setting=True,
 #                                                  frame_setting=False,
 #                                                  rotate=False,
-#                                                  show_confidence=True,
+#                                                  show_confidence=False,
 #                                                  core_cnt=8,
 #                                                  show_pose=True,
 #                                                  animal_names=False,
 #                                                  print_timer=HHMMSSSSSS,
 #                                                  overwrite=True,
-#                                                  time_slice=None, #{START_TIME: '00:00:00', END_TIME: '00:01:00'}, #,{START_TIME: '00:00:00', END_TIME: '00:01:00'}
-#                                                  bbox='animal-aligned',
+#                                                  time_slice=None, # {START_TIME: '00:00:00', END_TIME: '00:00:10'}, #{START_TIME: '00:00:00', END_TIME: '00:01:00'}, #,{START_TIME: '00:00:00', END_TIME: '00:01:00'}
+#                                                  bbox=None, #'animal-aligned'
 #                                                  text_opacity=0.6,
 #                                                  show_gantt=None)
 #     clf_plotter.run()
