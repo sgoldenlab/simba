@@ -62,7 +62,7 @@ class CircularStatisticsMixin(object):
         Jitted compute of the mean resultant vector length of a single sample. Captures the overall "pull" or "tendency" of the
         data points towards a central direction on the circle with a range between 0 and 1.
 
-        .. image:: _static/img/mean_resultant_vector.png
+        .. image:: _static/img/mean_resultant_vector.webp
            :width: 400
            :align: center
 
@@ -100,8 +100,7 @@ class CircularStatisticsMixin(object):
         data points towards a central direction on the circle with a range between 0 and 1.
 
         .. attention::
-           The returned values represents resultant vector length in the time-window ``[(current_frame-time_window)->current_frame]``.
-           `-1` is returned where ``current_frame-time_window`` is less than 0.
+           The returned values represents resultant vector length in the time-window ``[(current_frame-time_window)->current_frame]``. `-1` is returned where ``current_frame-time_window`` is less than 0.
 
         .. image:: _static/img/sliding_mean_resultant_length.png
            :width: 600
@@ -590,6 +589,9 @@ class CircularStatisticsMixin(object):
         .. note::
            Adapted from ``pingouin.circular.circ_rayleigh`` and ``pycircstat.tests.rayleigh``.
 
+        .. image:: _static/img/rayleigh.webp
+           :width: 600
+           :align: center
 
         The Rayleigh Z score is calculated as follows:
 
@@ -598,10 +600,10 @@ class CircularStatisticsMixin(object):
 
         where :math:`n` is the sample size and :math:`R` is the mean resultant length.
 
-        The associated p-value is calculated as follows:
+        The associated p-value is calculated as follows (note this uses the resultant length :math:`nR`, not the mean resultant length :math:`R`):
 
         .. math::
-           p = \\exp\\left(\\sqrt{1 + 4n + 4(n^2 - R^2)} - (1 + 2n)\\right)
+           p = \\exp\\left(\\sqrt{1 + 4n + 4(n^2 - (nR)^2)} - (1 + 2n)\\right)
 
         .. seealso::
            :func:`simba.data_processors.cuda.circular_statistics.sliding_rayleigh_z`,
@@ -613,16 +615,15 @@ class CircularStatisticsMixin(object):
 
         >>> data = np.array([350, 360, 365, 360, 100, 109, 232, 123, 42, 3,4, 145]).astype(np.float32)
         >>> CircularStatisticsMixin().rayleigh(data=data)
-        >>> (2.3845645695246467, 0.9842236169985417)
+        >>> (2.3845645695246467, 0.09027923051217743)
         """
 
         data = np.deg2rad(data)
-        R = np.sqrt(np.sum(np.cos(data)) ** 2 + np.sum(np.sin(data)) ** 2) / len(data)
-        p = np.exp(
-            np.sqrt(1 + 4 * len(data) + 4 * (len(data) ** 2 - R**2))
-            - (1 + 2 * len(data))
-        )
-        return len(data) * R**2, p
+        n = len(data)
+        R = np.sqrt(np.sum(np.cos(data)) ** 2 + np.sum(np.sin(data)) ** 2) / n
+        R_len = n * R   # resultant length (0..n); the p-value approximation requires this, not the mean resultant length
+        p = np.exp(np.sqrt(1 + 4 * n + 4 * (n ** 2 - R_len ** 2)) - (1 + 2 * n))
+        return n * R**2, p
 
     @staticmethod
     @njit("(float32[:], float64[:], float64)", parallel=True)
@@ -654,9 +655,11 @@ class CircularStatisticsMixin(object):
             win_size = int(time_windows[i] * fps)
             for j in prange(win_size, len(data) + 1):
                 data_win = data[j - win_size : j]
-                R = np.sqrt(np.sum(np.cos(data_win)) ** 2 + np.sum(np.sin(data_win)) ** 2) / len(data_win)
-                Z_results[j - 1][i] = len(data_win) * R**2
-                P_results[j - 1][i] = np.exp(np.sqrt(1 + 4 * len(data_win) + 4 * (len(data_win) ** 2 - R**2)) - (1 + 2 * len(data_win)))
+                n_win = len(data_win)
+                R = np.sqrt(np.sum(np.cos(data_win)) ** 2 + np.sum(np.sin(data_win)) ** 2) / n_win
+                R_len = n_win * R   # resultant length (0..n); required by the p-value approximation
+                Z_results[j - 1][i] = n_win * R**2
+                P_results[j - 1][i] = np.exp(np.sqrt(1 + 4 * n_win + 4 * (n_win ** 2 - R_len ** 2)) - (1 + 2 * n_win))
         return Z_results, P_results
 
     @staticmethod
@@ -866,8 +869,12 @@ class CircularStatisticsMixin(object):
         """
         Jitted compute of Rao's spacing for angular data.
 
-        Computes the uniformity of a circular dataset in degrees. Low output values represent concentrated angularity,
-        while high values represent dispersed angularity.
+        Computes the uniformity of a circular dataset in degrees. High output values represent concentrated (clustered)
+        angularity with uneven gaps between observations, while low values (near 0) represent evenly-spaced, uniform angularity.
+
+        .. image:: _static/img/rao_spacing.webp
+           :width: 600
+           :align: center
 
         The Rao's Spacing (:math:`U`) is calculated as follows:
 
@@ -895,7 +902,7 @@ class CircularStatisticsMixin(object):
 
         data = np.sort(data)
         Ti, TiL = np.full((data.shape[0]), np.nan), np.full((data.shape[0]), np.nan)
-        l = np.int8(360 / len(data))
+        l = 360 / len(data)
         Ti[-1] = np.rad2deg(np.pi - np.abs(np.pi - np.abs(np.deg2rad(data[0]) - np.deg2rad(data[-1])))
         )
         for j in range(data.shape[0] - 1, -1, -1):
@@ -952,7 +959,7 @@ class CircularStatisticsMixin(object):
             for i in range(window_size, data.shape[0]):
                 w_data = np.sort(data[i - window_size : i])
                 Ti, TiL = np.full((w_data.shape[0]), np.nan), np.full((w_data.shape[0]), np.nan)
-                l = np.int16(360 / len(w_data))
+                l = 360 / len(w_data)
                 Ti[-1] = np.rad2deg(np.pi - np.abs(np.pi - np.abs(np.deg2rad(w_data[0]) - np.deg2rad(w_data[-1]))))
                 for j in range(w_data.shape[0] - 1, -1, -1):
                     Ti[j] = np.rad2deg(np.pi - np.abs(np.pi - np.abs(np.deg2rad(w_data[j]) - np.deg2rad(w_data[j - 1]))))
@@ -970,6 +977,10 @@ class CircularStatisticsMixin(object):
         Compute the Kuiper's two-sample test statistic for circular distributions.
 
         Kuiper's two-sample test is a non-parametric test used to determine if two samples are drawn from the same circular distribution. It is particularly useful for circular data, such as angles or directions.
+
+        .. image:: _static/img/kuipers_two_sample_test.webp
+           :width: 600
+           :align: center
 
         The Kuiper test statistic is calculated as the sum of the maximum positive and negative deviations between the cumulative distribution functions of the two samples:
 
@@ -1031,11 +1042,9 @@ class CircularStatisticsMixin(object):
         for time_window_cnt in prange(time_windows.shape[0]):
             win_size = int(time_windows[time_window_cnt] * fps)
             for i in range(win_size, sample_1.shape[0]):
-                sample_1_win, sample_2_win = (
-                    sample_1[i - win_size : i],
-                    sample_2[i - win_size : i],
-                )
-                cdfv1 = np.searchsorted(sample_2, sample_1_win) / float(
+                sample_1_win = np.sort(sample_1[i - win_size : i])
+                sample_2_win = np.sort(sample_2[i - win_size : i])
+                cdfv1 = np.searchsorted(sample_2_win, sample_1_win) / float(
                     len(sample_2_win)
                 )
                 cdfv2 = np.searchsorted(sample_1_win, sample_2_win) / float(
@@ -1465,6 +1474,10 @@ class CircularStatisticsMixin(object):
     def preferred_turning_direction(x: np.ndarray) -> int:
         """
         Determines the preferred turning direction from a 1D array of circular directional data.
+
+        .. image:: _static/img/preferred_turning_direction.webp
+           :width: 600
+           :align: center
 
         .. note::
            The input ``x`` can be created using any of the following methods:

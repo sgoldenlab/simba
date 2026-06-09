@@ -3564,7 +3564,7 @@ def read_sleap_csv(file_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, li
     if all_track_missing: data_df[REQUIRED_COLUMNS[0]] = 0
     data_df[REQUIRED_COLUMNS[0]] = data_df[REQUIRED_COLUMNS[0]].astype(str).str.replace(r"[^\d.]+", "", regex=True).astype(np.int64)
     headers = list(data_df.drop(REQUIRED_COLUMNS, axis=1).columns)
-    bp_names = np.unique([x.split('.', 1)[0] for x in headers])
+    bp_names = list(dict.fromkeys([x.split('.', 1)[0] for x in headers]))
     bp_headers = [(f'{x}.x', f'{x}.y') for x in bp_names]
 
     bp_header_order = [(f'{x}.x', f'{x}.y', f'{x}.score') for x in bp_names]

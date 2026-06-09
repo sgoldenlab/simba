@@ -1185,13 +1185,9 @@ def get_mode(x: np.ndarray) -> Union[float, int]:
     :return: The mode of `x`.
     :rtype Union[float, int]:
     """
-    check_valid_array(
-        source=f"{get_mode.__name__} x",
-        data=x,
-        accepted_dtypes=Formats.NUMERIC_DTYPES.value,
-    )
+    check_valid_array(source=f"{get_mode.__name__} x", data=x, accepted_dtypes=Formats.NUMERIC_DTYPES.value)
     values, counts = np.unique(x, return_counts=True)
-    return counts.argmax()
+    return values[counts.argmax()]
 
 
 def run_user_defined_feature_extraction_class(file_path: Union[str, os.PathLike], config_path: Union[str, os.PathLike]) -> None:

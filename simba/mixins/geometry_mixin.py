@@ -302,7 +302,11 @@ class GeometryMixin(object):
         
         This is a simple method that moves each vertex along the line from the centroid,
         preserving the vertex count and shape proportions.
-        
+
+        .. image:: _static/img/parallel_offset_polygon.webp
+           :width: 450
+           :align: center
+
         :param Polygon polygon: The input polygon to offset.
         :param Union[int, float] size_mm: The offset distance in millimeters. Positive for outward, negative for inward.
         :param float pixels_per_mm: The conversion factor from millimeters to pixels.
@@ -2916,6 +2920,10 @@ class GeometryMixin(object):
         """
         Rank a list of polygon geometries based on a specified method. E.g., order the list of geometries according to sizes or distances to each other or from left to right etc.
 
+        .. image:: _static/img/rank_shapes.webp
+           :width: 600
+           :align: center
+
         :param List[Polygon] shapes: List of Shapely polygons to be ranked. List has to contain two or more shapes.
         :param Literal["area", "min_distance", "max_distance", "mean_distance", "left_to_right", "top_to_bottom"] method: The ranking method to use.
         :param Optional[bool] deviation: If True, rank based on absolute deviation from the mean. Default: False.
@@ -2947,7 +2955,7 @@ class GeometryMixin(object):
         if method == "area":
             for shp_cnt, shape in enumerate(shapes):
                 ranking_vals[shp_cnt] = int(shape.area)
-        elif method == "min_center_distance":
+        elif method == "min_distance":
             for shp_cnt_1, shape_1 in enumerate(shapes):
                 shape_1_loc, shape_min_distance = shape_1.centroid, np.inf
                 for shp_cnt_2, shape_2 in enumerate(shapes):
@@ -3865,6 +3873,10 @@ class GeometryMixin(object):
         The Fréchet Distance measures the dissimilarity between two continuous
         curves or trajectories represented as sequences of points in a 2-dimensional
         space.
+
+        .. image:: _static/img/linear_frechet_distance.webp
+           :width: 550
+           :align: center
 
         :param ndarray data: First 2D array of size len(frames) representing body-part coordinates x and y.
         :param ndarray data: Second 2D array of size len(frames) representing body-part coordinates x and y.

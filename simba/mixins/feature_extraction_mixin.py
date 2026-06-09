@@ -387,6 +387,10 @@ class FeatureExtractionMixin(object):
         the specified radius, the body part is considered inside the circle (marked as 1); otherwise,
         it is considered outside (marked as 0).
 
+        .. image:: _static/img/is_inside_circle.webp
+           :width: 400
+           :align: center
+
         .. seealso::
            For GPU acceleration, see :func:`simba.data_processors.cuda.geometry.is_inside_circle`
 
