@@ -3654,6 +3654,10 @@ class GeometryMixin(object):
         Hausdorff distance can be used to measure the similarity of the geometry in one frame relative to the geometry in the next frame.
         Larger values indicate that the animal has a different shape than in the preceding shape.
 
+        .. image:: _static/img/hausdorff_distance.webp
+           :width: 450
+           :align: center
+
         .. seealso::
            :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_hausdorff_distance`
 
@@ -4171,6 +4175,10 @@ class GeometryMixin(object):
         or a list of Polygons, and applies a B-spline smoothing operation. The degree of
         smoothing is controlled by `smooth_factor`, and the number of interpolated points
         along the new smoothed boundary is determined by `points`.
+
+        .. image:: _static/img/smooth_geometry_bspline.webp
+           :width: 650
+           :align: center
 
         :param Union[np.ndarray, Polygon, List[Polygon]] data: The input geometry to be smoothed. This can be: A NumPy array of shape (N, 2) representing a single polygon. A NumPy array of shape (M, N, 2) representing multiple polygons. A `Polygon` object from Shapely. A list of `Polygon` objects.
         :param float smooth_factor: The smoothing factor for the B-spline. Higher values  result in smoother curves. Must be >= 0.1.

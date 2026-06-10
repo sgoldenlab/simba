@@ -88,11 +88,18 @@ class TimeseriesFeatureMixin(object):
                 divided by the mobility.
         :rtype:
 
+        .. image:: _static/img/hjort_parameters.webp
+           :width: 600
+           :align: center
+
+        .. note::
+           A constant first derivative (e.g. a perfectly linear ramp) yields ``var(dx) == 0``; in that
+           degenerate case the function returns ``(0, 0, 0)`` to avoid division by zero.
 
         :example:
-        >>> data = np.array([1.0, 2.0, 3.0, 4.0, 5.0], dtype=np.float32)
+        >>> data = np.array([1.0, 3.0, 2.0, 6.0, 4.0, 5.0], dtype=np.float32)
         >>> TimeseriesFeatureMixin().hjort_parameters(data)
-        >>> (2.5, 0.5, 0.4082482904638631)
+        >>> (2.9166667, 1.2503713, 1.6617813)  # (activity, mobility, complexity)
 
         :math:`mobility = \sqrt{\\frac{dx_{var}}{x_{var}}}`
 
@@ -138,17 +145,17 @@ class TimeseriesFeatureMixin(object):
                 ddx = np.diff(np.ascontiguousarray(dx))
                 x_var, dx_var = np.var(sample), np.var(dx)
                 if (x_var <= 0) or (dx_var <= 0):
-                    results[0, r + 1, i] = 0
-                    results[1, r + 1, i] = 0
-                    results[2, r + 1, i] = 0
+                    results[0, r - 1, i] = 0
+                    results[1, r - 1, i] = 0
+                    results[2, r - 1, i] = 0
                 else:
                     ddx_var = np.var(ddx)
                     mobility = np.sqrt(dx_var / x_var)
                     complexity = np.sqrt(ddx_var / dx_var) / mobility
                     activity = np.var(sample)
-                    results[0, r + 1, i] = mobility
-                    results[1, r + 1, i] = complexity
-                    results[2, r + 1, i] = activity
+                    results[0, r - 1, i] = mobility
+                    results[1, r - 1, i] = complexity
+                    results[2, r - 1, i] = activity
 
         return results.astype(np.float32)
 
@@ -748,6 +755,10 @@ class TimeseriesFeatureMixin(object):
         where:
            :math:`PE` is the permutation entropy.
            :math:`p_i` is the probability of each unique order pattern.
+
+        .. image:: _static/img/permutation_entropy.webp
+           :width: 600
+           :align: center
 
         :param numpy.ndarray data: The time series data for which permutation entropy is calculated.
         :param int dimension: It specifies the length of the order patterns to be considered.
@@ -1443,6 +1454,10 @@ class TimeseriesFeatureMixin(object):
             - spike_vals (List[np.ndarray]): A list of 1D arrays, each containing the values of the data points within a detected spike.
             - spike_dict (Dict[int, Dict[str, float]]): A dictionary where the keys are spike indices, and the values are dictionaries containing spike characteristics including 'amplitude' (spike amplitude), 'fwhm' (FWHM), and 'half_width' (half-width).
 
+        .. image:: _static/img/spike_finder.webp
+           :width: 600
+           :align: center
+
         .. note::
            - The function uses the Numba JIT (Just-In-Time) compilation for optimized performance. Without fastmath=True there is no runtime improvement over standard numpy.
 
@@ -1465,7 +1480,7 @@ class TimeseriesFeatureMixin(object):
         for i in prange(len(spike_idx)):
             spike_data = data[spike_idx[i]]
             spike_amplitude = np.max(spike_data) - baseline
-            half_width_idx = np.argwhere(spike_data > spike_amplitude / 2).flatten()
+            half_width_idx = np.argwhere(spike_data > baseline + spike_amplitude / 2).flatten()
             spike_dict[i] = {
                 "amplitude": np.max(spike_data) - baseline,
                 "fwhm": (half_width_idx[-1] - half_width_idx[0]) / sample_rate,
@@ -1986,6 +2001,10 @@ class TimeseriesFeatureMixin(object):
         where :math:`N` is the number of points, :math:`x_i` represents the position at each point,
         and :math:`\frac{d^3 x_i}{dt^3}` is the third derivative of the position with respect to time.
 
+        .. image:: _static/img/mean_squared_jerk.webp
+           :width: 600
+           :align: center
+
         :param np.ndarray x: A 2D array where each row represents the [x, y] position at a time step.
         :param float time_step: The time difference between successive positions in seconds.
         :param float sample_rate: The rate at which the positions are sampled (samples per second).
@@ -2022,7 +2041,7 @@ class TimeseriesFeatureMixin(object):
         :param np.ndarray x: An (N, M) array representing the path of an object, where N is the number of samples (time steps) and M is the number of spatial dimensions (e.g., 2 for 2D motion). Each row represents the position at a time step.
         :param float window_size: The size of each sliding window in seconds. This defines the interval over which the mean squared jerk is calculated.
         :param float sample_rate: The sampling rate in Hz (samples per second), which is used to convert the window size from seconds to frames.
-        :return: A 1D array of length N, containing the mean squared jerk for each sliding window that ends at each time step. The first `frame_step` values will be NaN, as they do not have enough preceding data points to compute jerk over the full window.
+        :return: A 1D array of length N, containing the mean squared jerk for each sliding window that ends at each time step. The first `frame_step` values are set to ``-1.0``, as they do not have enough preceding data points to compute jerk over the full window.
         :rtype: np.ndarray
 
         :example:
@@ -2041,13 +2060,13 @@ class TimeseriesFeatureMixin(object):
         V = np.diff(x, axis=0)
         A = np.diff(V, axis=0)
         frame_step = int(max(1.0, window_size * sample_rate))
-        results = np.full(x.shape[0], fill_value=0, dtype=np.int64)
+        results = np.full(x.shape[0], fill_value=-1.0, dtype=np.float64)
         for r in range(frame_step, x.shape[0]):
             l = r - frame_step
             V_a = A[l:r, :]
             jerks = np.diff(V_a, axis=0)
             if jerks.shape[0] == 0:
-                results[r] = 0
+                results[r] = 0.0
             else:
                 results[r] = np.sum(jerks ** 2) / jerks.shape[0]
 
@@ -2541,12 +2560,16 @@ class TimeseriesFeatureMixin(object):
         :return: The average kinetic energy of the animal.
         :rtype: float
 
+        .. image:: _static/img/avg_kinetic_energy.webp
+           :width: 600
+           :align: center
+
         :example:
         >>> x = np.random.randint(0, 500, (200, 2))
         >>> TimeseriesFeatureMixin.avg_kinetic_energy(x=x, mass=35, sample_rate=30)
         """
 
-        delta_t = np.round(1 / sample_rate, 2)
+        delta_t = 1 / sample_rate
         vx, vy = np.gradient(x[:, 0], delta_t), np.gradient(x[:, 1], delta_t)
         speed = np.sqrt(vx ** 2 + vy ** 2)
         kinetic_energy = 0.5 * mass * speed ** 2
@@ -2580,7 +2603,7 @@ class TimeseriesFeatureMixin(object):
 
         time_window_frms = np.ceil(sample_rate * time_window)
         results = np.full(shape=(x.shape[0]), fill_value=-1.0, dtype=np.float32)
-        delta_t = np.round(1 / sample_rate, 2)
+        delta_t = 1 / sample_rate
         for r in range(time_window_frms, x.shape[0] + 1):
             l = r - time_window_frms
             keypoint_sample, mass_sample = x[l:r], mass[l:r]
@@ -2602,6 +2625,10 @@ class TimeseriesFeatureMixin(object):
         :param float sample_rate: Sampling rate in FPS.
         :returns: Magnitude of the momentum.
         :rtype: float
+
+        .. image:: _static/img/momentum_magnitude.webp
+           :width: 600
+           :align: center
         """
 
         check_valid_array(data=x, source=f'{TimeseriesFeatureMixin.momentum_magnitude.__name__} x', accepted_ndims=(2,), accepted_axis_1_shape=[2, ], accepted_dtypes=Formats.NUMERIC_DTYPES.value)

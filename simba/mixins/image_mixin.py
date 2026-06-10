@@ -265,6 +265,10 @@ class ImageMixin(object):
            For GPU acceleration, see :func:`simba.data_processors.cuda.image.slice_imgs`
            For single core method, see :func:`simba.mixins.image_mixin.ImageMixin.slice_shapes_in_imgs`
 
+        .. image:: _static/img/slice_shapes_in_img.webp
+           :width: 600
+           :align: center
+
         .. video:: _static/img/slice_imgs_gpu.webm
            :width: 800
            :autoplay:
