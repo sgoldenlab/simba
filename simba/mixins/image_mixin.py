@@ -216,6 +216,10 @@ class ImageMixin(object):
         """
         Calculate contour similarity between two images.
 
+        .. image:: _static/img/get_contourmatch.webp
+           :width: 700
+           :align: center
+
         :param np.ndarray img_1: First input image (numpy array).
         :param np.ndarray img_2: Second input image (numpy array).
         :param Optional[Literal['all', 'exterior']] method: Method for contour extraction. Options: 'all' (all contours) or 'exterior' (only exterior contours). Defaults to 'all'.
@@ -249,7 +253,9 @@ class ImageMixin(object):
             img_2 = ImageMixin().canny_edge_detection(img=img_2)
         img_1_contours = ImageMixin().find_contours(img=img_1, mode=mode, method=method)
         img_2_contours = ImageMixin().find_contours(img=img_2, mode=mode, method=method)
-        return cv2.matchShapes(img_1_contours[0], img_2_contours[0], cv2.CONTOURS_MATCH_I1, 0.0)
+        cnt_1 = max(img_1_contours, key=cv2.contourArea)
+        cnt_2 = max(img_2_contours, key=cv2.contourArea)
+        return cv2.matchShapes(cnt_1, cnt_2, cv2.CONTOURS_MATCH_I1, 0.0)
 
     @staticmethod
     def slice_shapes_in_img(img: Union[np.ndarray, Tuple[cv2.VideoCapture, int]], geometries: List[Union[Polygon, np.ndarray]]) -> List[np.ndarray]:
@@ -1205,6 +1211,7 @@ class ImageMixin(object):
                  threshold: int,
                  method: str = 'absolute') -> np.ndarray:
 
+
         """
         Computes the difference between two images using the specified method and applies a threshold to produce a binary image.
 
@@ -1536,6 +1543,10 @@ class ImageMixin(object):
         of channels, they are converted to greyscale before computing the SSI. If the images are multi-channel (e.g., RGB),
         the SSI is computed for each channel.
 
+        .. image:: _static/img/structural_similarity_index.webp
+           :width: 700
+           :align: center
+
         .. seealso::
            For matrix SSI of image stack, see :func:`simba.mixins.image_mixin.ImageMixin.structural_similarity_matrix`
            for time-series based comparison, see :func:`simba.mixins.image_mixin.ImageMixin.sliding_structural_similarity_index`
@@ -1550,8 +1561,8 @@ class ImageMixin(object):
         check_if_valid_img(data=img_2, source=f'{ImageMixin.structural_similarity_index.__name__} img_2')
         multichannel = False
         if img_1.ndim != img_2.ndim:
-            img_1 = cv2.cvtColor(img_1, cv2.COLOR_BGR2GRAY)
-            img_2 = cv2.cvtColor(img_2, cv2.COLOR_BGR2GRAY)
+            if img_1.ndim == 3: img_1 = cv2.cvtColor(img_1, cv2.COLOR_BGR2GRAY)
+            if img_2.ndim == 3: img_2 = cv2.cvtColor(img_2, cv2.COLOR_BGR2GRAY)
         if img_1.ndim > 2: multichannel = True
         return abs(structural_similarity(im1=img_1.astype(np.uint8), im2=img_2.astype(np.uint8), multichannel=multichannel))
 
@@ -1653,6 +1664,10 @@ class ImageMixin(object):
         Computes the Normalized Cross-Correlation (NCC) similarity between two images.
 
         The NCC measures the similarity between two images by calculating the correlation coefficient of their pixel values. The output value ranges from -1 to 1, where 1 indicates perfect positive correlation, 0 indicates no correlation, and -1 indicates perfect negative correlation.
+
+        .. image:: _static/img/cross_correlation_similarity.webp
+           :width: 700
+           :align: center
 
         .. seealso::
            For time-series based NCC comparisons, see :func:`simba.mixins.image_mixin.ImageMixin.sliding_cross_correlation_similarity`
