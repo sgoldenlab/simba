@@ -30,7 +30,7 @@ class Interpolate(ConfigReader):
     Interpolate missing body-parts in pose-estimation data. "Missing" is defined as either (i) when a single body-parts is None, or
     when all body-parts belonging to an animal are identical (i.e., the same 2D coordinate or all None).
 
-    .. image:: _static/img/interpolation_comparison.png
+    .. image:: _static/img/interpolation_comparison.webp
        :width: 500
        :align: center
 

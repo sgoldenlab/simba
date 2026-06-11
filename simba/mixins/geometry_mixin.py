@@ -1371,6 +1371,10 @@ class GeometryMixin(object):
         """
         Buffer shapes by a specified size using multiprocessing.
 
+        .. image:: _static/img/multiframe_buffer_shapes.webp
+           :width: 500
+           :align: center
+
         .. seealso::
            For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.buffer_shape`
 
@@ -4022,6 +4026,7 @@ class GeometryMixin(object):
                  - 'min_width': The minimum width found among all polygons.
         :rtype: Dict[str, Any]
         """
+
         widths, lengths, areas, centers, max_length, max_width, max_area, min_length, min_width, min_area = [], [], [], [], -np.inf, -np.inf, -np.inf, np.inf, np.inf, np.inf
         if isinstance(shapes, Polygon):
             shapes = [shapes]

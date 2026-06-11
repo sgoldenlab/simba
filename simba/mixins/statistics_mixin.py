@@ -552,6 +552,10 @@ class Statistics(FeatureExtractionMixin):
         .. math::
            \text{KL}(P || Q) = \sum{P(x) \log{\left(\frac{P(x)}{Q(x)}\right)}}
 
+        .. image:: _static/img/kullback_leibler_divergence.webp
+           :width: 700
+           :align: center
+
         .. seealso::
            For rolling comparisons in a timeseries, see :func:`simba.mixins.statistics_mixin.Statistics.rolling_kullback_leibler_divergence`
            For GPU implementation, see :func:`simba.data_processors.cuda.statistics.kullback_leibler_divergence_gpu`.
@@ -637,16 +641,9 @@ class Statistics(FeatureExtractionMixin):
                     j
                 ].astype(np.float32)
                 bin_width, bin_count = bucket_data(data=sample_1, method=bucket_method)
-                sample_1_hist = self._hist_1d(
-                    data=sample_1,
-                    bin_count=bin_count,
-                    range=np.array([0, int(bin_width * bin_count)]),
-                )
-                sample_2_hist = self._hist_1d(
-                    data=sample_2,
-                    bin_count=bin_count,
-                    range=np.array([0, int(bin_width * bin_count)]),
-                )
+                r = np.array([np.min(sample_1), np.max(sample_1)])
+                sample_1_hist = self._hist_1d(data=sample_1, bin_count=bin_count, range=r)
+                sample_2_hist = self._hist_1d(data=sample_2, bin_count=bin_count, range=r)
                 sample_1_hist[sample_1_hist == 0] = fill_value
                 sample_2_hist[sample_2_hist == 0] = fill_value
                 sample_1_hist, sample_2_hist = sample_1_hist / np.sum(
@@ -680,6 +677,10 @@ class Statistics(FeatureExtractionMixin):
         .. seealso::
            For rolling comparisons in a timeseries, see :func:`simba.mixins.statistics_mixin.Statistics.rolling_jensen_shannon_divergence`
 
+        .. image:: _static/img/jensen_shannon_divergence.webp
+           :width: 700
+           :align: center
+
         :param ndarray sample_1: First 1d array representing feature values.
         :param ndarray sample_2: Second 1d array representing feature values.
         :param Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators.
@@ -689,7 +690,7 @@ class Statistics(FeatureExtractionMixin):
         :example:
         >>> sample_1, sample_2 = np.array([1, 2, 3, 4, 5, 10, 1, 2, 3]), np.array([1, 5, 10, 9, 10, 1, 10, 6, 7])
         >>> Statistics().jensen_shannon_divergence(sample_1=sample_1, sample_2=sample_2, bucket_method='fd')
-        >>> 0.30806541358219786
+        >>> 0.3403  # 0 = identical distributions, 1 = maximally dissimilar (log base 2)
         """
 
         check_valid_array(
@@ -710,20 +711,13 @@ class Statistics(FeatureExtractionMixin):
             options=Options.BUCKET_METHODS.value,
         )
         bin_width, bin_count = bucket_data(data=sample_1, method=bucket_method)
-        sample_1_hist = self._hist_1d(
-            data=sample_1,
-            bin_count=bin_count,
-            range=np.array([0, int(bin_width * bin_count)]),
-        )
-        sample_2_hist = self._hist_1d(
-            data=sample_2,
-            bin_count=bin_count,
-            range=np.array([0, int(bin_width * bin_count)]),
-        )
-        mean_hist = np.mean([sample_1_hist, sample_2_hist], axis=0)
-        kl_sample_1, kl_sample_2 = stats.entropy(
-            pk=sample_1_hist, qk=mean_hist
-        ), stats.entropy(pk=sample_2_hist, qk=mean_hist)
+        min_val, max_val = min(np.min(sample_1), np.min(sample_2)), max(np.max(sample_1), np.max(sample_2))
+        bin_range = np.array([min_val, max_val])
+        sample_1_hist = self._hist_1d(data=sample_1, bin_count=bin_count, range=bin_range)
+        sample_2_hist = self._hist_1d(data=sample_2, bin_count=bin_count, range=bin_range)
+        p1, p2 = sample_1_hist / np.sum(sample_1_hist), sample_2_hist / np.sum(sample_2_hist)
+        mean_hist = (p1 + p2) / 2
+        kl_sample_1, kl_sample_2 = stats.entropy(pk=p1, qk=mean_hist, base=2), stats.entropy(pk=p2, qk=mean_hist, base=2)
         return (kl_sample_1 + kl_sample_2) / 2
 
     def rolling_jensen_shannon_divergence(
@@ -772,23 +766,13 @@ class Statistics(FeatureExtractionMixin):
                     j
                 ].astype(np.float32)
                 bin_width, bin_count = bucket_data(data=sample_1, method=bucket_method)
-                sample_1_hist = self._hist_1d(
-                    data=sample_1,
-                    bin_count=bin_count,
-                    range=np.array([0, int(bin_width * bin_count)]),
-                )
-                sample_2_hist = self._hist_1d(
-                    data=sample_2,
-                    bin_count=bin_count,
-                    range=np.array([0, int(bin_width * bin_count)]),
-                )
-                sample_1_hist, sample_2_hist = sample_1_hist / np.sum(
-                    sample_1_hist
-                ), sample_2_hist / np.sum(sample_2_hist)
+                min_val, max_val = min(np.min(sample_1), np.min(sample_2)), max(np.max(sample_1), np.max(sample_2))
+                bin_range = np.array([min_val, max_val])
+                sample_1_hist = self._hist_1d(data=sample_1, bin_count=bin_count, range=bin_range)
+                sample_2_hist = self._hist_1d(data=sample_2, bin_count=bin_count, range=bin_range)
+                sample_1_hist, sample_2_hist = sample_1_hist / np.sum(sample_1_hist), sample_2_hist / np.sum(sample_2_hist)
                 mean_hist = np.mean([sample_1_hist, sample_2_hist], axis=0)
-                kl_sample_1, kl_sample_2 = stats.entropy(
-                    pk=sample_1_hist, qk=mean_hist
-                ), stats.entropy(pk=sample_2_hist, qk=mean_hist)
+                kl_sample_1, kl_sample_2 = stats.entropy(pk=sample_1_hist, qk=mean_hist, base=2), stats.entropy(pk=sample_2_hist, qk=mean_hist, base=2)
                 js = (kl_sample_1 + kl_sample_2) / 2
                 results[window_start:window_end, i] = js
         return results
@@ -811,6 +795,10 @@ class Statistics(FeatureExtractionMixin):
         .. seealso::
            For time-series based comparisons, see :func:`simba.mixins.statistics_mixin.Statistics.rolling_wasserstein_distance`
 
+        .. image:: _static/img/wasserstein_distance.webp
+           :width: 700
+           :align: center
+
         :param ndarray sample_1: First 1d array representing feature values.
         :param ndarray sample_2: Second 1d array representing feature values.
         :param Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators
@@ -818,10 +806,10 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
-        >>> sample_1 = np.random.normal(loc=10, scale=2, size=10)
-        >>> sample_2 = np.random.normal(loc=10, scale=3, size=10)
+        >>> sample_1 = np.random.normal(loc=10, scale=2, size=10000)
+        >>> sample_2 = np.random.normal(loc=12, scale=2, size=10000)
         >>> Statistics().wasserstein_distance(sample_1=sample_1, sample_2=sample_2)
-        >>> 0.020833333333333332
+        >>> 2.0  # ~ the 2-unit shift between the distributions
         """
         check_valid_array(
             data=sample_1,
@@ -841,22 +829,13 @@ class Statistics(FeatureExtractionMixin):
             options=Options.BUCKET_METHODS.value,
         )
         bin_width, bin_count = bucket_data(data=sample_1, method=bucket_method)
-        sample_1_hist = self._hist_1d(
-            data=sample_1,
-            bin_count=bin_count,
-            range=np.array([0, int(bin_width * bin_count)]),
-        )
-        sample_2_hist = self._hist_1d(
-            data=sample_2,
-            bin_count=bin_count,
-            range=np.array([0, int(bin_width * bin_count)]),
-        )
-        sample_1_hist, sample_2_hist = sample_1_hist / np.sum(
-            sample_1_hist
-        ), sample_2_hist / np.sum(sample_2_hist)
-        return stats.wasserstein_distance(
-            u_values=sample_1_hist, v_values=sample_2_hist
-        )
+        min_val, max_val = min(np.min(sample_1), np.min(sample_2)), max(np.max(sample_1), np.max(sample_2))
+        bin_range = np.array([min_val, max_val])
+        sample_1_hist = self._hist_1d(data=sample_1, bin_count=bin_count, range=bin_range)
+        sample_2_hist = self._hist_1d(data=sample_2, bin_count=bin_count, range=bin_range)
+        sample_1_hist, sample_2_hist = sample_1_hist / np.sum(sample_1_hist), sample_2_hist / np.sum(sample_2_hist)
+        bin_centers = np.linspace(min_val, max_val, bin_count)
+        return stats.wasserstein_distance(u_values=bin_centers, v_values=bin_centers, u_weights=sample_1_hist, v_weights=sample_2_hist)
 
     def rolling_wasserstein_distance(
         self,
@@ -896,10 +875,13 @@ class Statistics(FeatureExtractionMixin):
                 window_end = int(window_start + window_size)
                 sample_1, sample_2 = data_split[j - 1].astype(np.float32), data_split[j].astype(np.float32)
                 bin_width, bin_count = bucket_data(data=sample_1, method=bucket_method)
-                sample_1_hist = self._hist_1d(data=sample_1, bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)]))
-                sample_2_hist = self._hist_1d(data=sample_2, bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)]))
+                min_val, max_val = min(np.min(sample_1), np.min(sample_2)), max(np.max(sample_1), np.max(sample_2))
+                bin_range = np.array([min_val, max_val])
+                sample_1_hist = self._hist_1d(data=sample_1, bin_count=bin_count, range=bin_range)
+                sample_2_hist = self._hist_1d(data=sample_2, bin_count=bin_count, range=bin_range)
                 sample_1_hist, sample_2_hist = sample_1_hist / np.sum(sample_1_hist), sample_2_hist / np.sum(sample_2_hist)
-                w = stats.wasserstein_distance(u_values=sample_1_hist, v_values=sample_2_hist)
+                bin_centers = np.linspace(min_val, max_val, bin_count)
+                w = stats.wasserstein_distance(u_values=bin_centers, v_values=bin_centers, u_weights=sample_1_hist, v_weights=sample_2_hist)
                 results[window_start:window_end, i] = w
 
         return results
@@ -928,6 +910,10 @@ class Statistics(FeatureExtractionMixin):
         where :math:`P_i` and :math:`Q_i` are the probabilities assigned by the distributions :math:`P` and :math:`Q`
         to the same event :math:`i`, respectively.
 
+        .. image:: _static/img/total_variation_distance.webp
+           :width: 500
+           :align: center
+
         :example:
         >>> total_variation_distance(x=np.array([1, 5, 10, 20, 50]), y=np.array([1, 5, 10, 100, 110]))
         >>> 0.3999999761581421
@@ -941,18 +927,9 @@ class Statistics(FeatureExtractionMixin):
             options=Options.BUCKET_METHODS.value,
         )
         bin_width, bin_count = bucket_data(data=x, method=bucket_method)
-        s1_h = Statistics._hist_1d(
-            data=x,
-            bin_count=bin_count,
-            range=np.array([0, int(bin_width * bin_count)]),
-            normalize=True,
-        )
-        s2_h = Statistics._hist_1d(
-            data=y,
-            bin_count=bin_count,
-            range=np.array([0, int(bin_width * bin_count)]),
-            normalize=True,
-        )
+        r = np.array([min(np.min(x), np.min(y)), max(np.max(x), np.max(y))])
+        s1_h = Statistics._hist_1d(data=x, bin_count=bin_count, range=r, normalize=True)
+        s2_h = Statistics._hist_1d(data=y, bin_count=bin_count, range=r, normalize=True)
         return 0.5 * np.sum(np.abs(s1_h - s2_h))
 
     def population_stability_index(
@@ -979,7 +956,7 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           PSI = \\sum \\left(\\frac{{p_2 - p_1}}{{ln(p_2 / p_1)}}\\right)
+           PSI = \\sum \\left(p_2 - p_1\\right) \\cdot \\ln\\left(\\frac{{p_2}}{{p_1}}\\right)
 
         where:
             - \( p_1 \) and \( p_2 \) are the proportions of observations in the bins for sample 1 and sample 2 respectively.
@@ -987,6 +964,10 @@ class Statistics(FeatureExtractionMixin):
 
         .. seealso::
            For time-series based rolling comparisons, see :func:`simba.mixins.statistics_mixin.Statistics.rolling_population_stability_index`
+
+        .. image:: _static/img/population_stability_index.webp
+           :width: 700
+           :align: center
 
         :param ndarray sample_1: First 1d array representing feature values.
         :param ndarray sample_2: Second 1d array representing feature values.
@@ -1014,16 +995,10 @@ class Statistics(FeatureExtractionMixin):
             options=Options.BUCKET_METHODS.value,
         )
         bin_width, bin_count = bucket_data(data=sample_1, method=bucket_method)
-        sample_1_hist = self._hist_1d(
-            data=sample_1,
-            bin_count=bin_count,
-            range=np.array([0, int(bin_width * bin_count)]),
-        )
-        sample_2_hist = self._hist_1d(
-            data=sample_2,
-            bin_count=bin_count,
-            range=np.array([0, int(bin_width * bin_count)]),
-        )
+        min_val, max_val = min(np.min(sample_1), np.min(sample_2)), max(np.max(sample_1), np.max(sample_2))
+        bin_range = np.array([min_val, max_val])
+        sample_1_hist = self._hist_1d(data=sample_1, bin_count=bin_count, range=bin_range)
+        sample_2_hist = self._hist_1d(data=sample_2, bin_count=bin_count, range=bin_range)
         sample_1_hist[sample_1_hist == 0] = fill_value
         sample_2_hist[sample_2_hist == 0] = fill_value
         sample_1_hist, sample_2_hist = sample_1_hist / np.sum(sample_1_hist), sample_2_hist / np.sum(sample_2_hist)
@@ -1070,16 +1045,10 @@ class Statistics(FeatureExtractionMixin):
                     j
                 ].astype(np.float32)
                 bin_width, bin_count = bucket_data(data=sample_1, method=bucket_method)
-                sample_1_hist = self._hist_1d(
-                    data=sample_1,
-                    bin_count=bin_count,
-                    range=np.array([0, int(bin_width * bin_count)]),
-                )
-                sample_2_hist = self._hist_1d(
-                    data=sample_2,
-                    bin_count=bin_count,
-                    range=np.array([0, int(bin_width * bin_count)]),
-                )
+                min_val, max_val = min(np.min(sample_1), np.min(sample_2)), max(np.max(sample_1), np.max(sample_2))
+                bin_range = np.array([min_val, max_val])
+                sample_1_hist = self._hist_1d(data=sample_1, bin_count=bin_count, range=bin_range)
+                sample_2_hist = self._hist_1d(data=sample_2, bin_count=bin_count, range=bin_range)
                 sample_1_hist[sample_1_hist == 0] = fill_value
                 sample_2_hist[sample_2_hist == 0] = fill_value
                 sample_1_hist, sample_2_hist = sample_1_hist / np.sum(sample_1_hist), sample_2_hist / np.sum(sample_2_hist)
@@ -3249,6 +3218,10 @@ class Statistics(FeatureExtractionMixin):
         - :math:`Q(i)` is the probability of the :math:`i`-th event in distribution :math:`Q`,
         - :math:`n` is the number of events.
 
+        .. image:: _static/img/hellinger_distance.webp
+           :width: 600
+           :align: center
+
         :param np.ndarray x: First 1D array representing a probability distribution.
         :param np.ndarray y: Second 1D array representing a probability distribution.
         :param Optional[Literal['fd', 'doane', 'auto', 'scott', 'stone', 'rice', 'sturges', 'sqrt']] bucket_method: Method for computing histogram bins. Default is 'auto'.
@@ -3265,8 +3238,9 @@ class Statistics(FeatureExtractionMixin):
         check_valid_array(data=y, source=f'{Statistics.hellinger_distance.__name__} y', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_str(name=f"{Statistics.hellinger_distance.__name__} method", value=bucket_method, options=Options.BUCKET_METHODS.value)
         bin_width, bin_count = bucket_data(data=x, method=bucket_method)
-        s1_h = self._hist_1d(data=x, bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)]))
-        s2_h = self._hist_1d(data=y, bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)]))
+        r = np.array([min(np.min(x), np.min(y)), max(np.max(x), np.max(y))])
+        s1_h = self._hist_1d(data=x, bin_count=bin_count, range=r)
+        s2_h = self._hist_1d(data=y, bin_count=bin_count, range=r)
         return self._hellinger_helper(x=s1_h.astype(np.float32), y=s2_h.astype(np.float32))
 
     @staticmethod
@@ -3891,6 +3865,10 @@ class Statistics(FeatureExtractionMixin):
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_descriptive_statistics`
            :func:`simba.mixins.statistics_mixin.Statistics.sliding_mad_median_rule`
 
+        .. image:: _static/img/mad_median_rule.webp
+           :width: 700
+           :align: center
+
         :param np.ndarray data: A 1-dimensional array of numerical values to check for outliers.
         :param int k: The multiplier for the MAD threshold. Higher values make the rule less sensitive to deviations from the median.
         :returns: A 1D binary array of the same length as `data`, where each element is `1` if the corresponding element in `data` is classified as an outlier, and `0` otherwise.
@@ -4036,6 +4014,10 @@ class Statistics(FeatureExtractionMixin):
         - :math:`\sigma_i` is the average distance between each point in cluster :math:`i` and the centroid of cluster :math:`i`,
         - :math:`d_{ij}` is the distance between the centroids of clusters :math:`i` and :math:`j`.
 
+        .. image:: _static/img/davis_bouldin.webp
+           :width: 700
+           :align: center
+
         :param np.ndarray x: 2D array representing the data points. Shape (n_samples, n_features/n_dimension).
         :param np.ndarray y: 2D array representing cluster labels for each data point. Shape (n_samples,).
         :return: Davis-Bouldin score.
@@ -4050,13 +4032,13 @@ class Statistics(FeatureExtractionMixin):
         check_valid_array(
             data=x,
             source=Statistics.davis_bouldin.__name__,
-            accepted_ndims=[(2,)],
+            accepted_ndims=(2,),
             accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
         check_valid_array(
             data=y,
             source=Statistics.davis_bouldin.__name__,
-            accepted_ndims=[(1,)],
+            accepted_ndims=(1,),
             accepted_shapes=[(x.shape[0],)],
             accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
@@ -4065,7 +4047,7 @@ class Statistics(FeatureExtractionMixin):
         intra_dists = np.full((n_labels), 0.0)
         centroids = np.full((n_labels, x.shape[1]), 0.0)
         for k in range(n_labels):
-            cluster_k = x[np.argwhere(y == labels[k])].reshape(-1, 2)
+            cluster_k = x[np.argwhere(y == labels[k])].reshape(-1, x.shape[1])
             cluster_mean = np.full((x.shape[1]), np.nan)
             for i in range(cluster_mean.shape[0]):
                 cluster_mean[i] = np.mean(cluster_k[:, i].flatten())

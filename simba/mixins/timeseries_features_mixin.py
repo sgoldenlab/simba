@@ -1801,6 +1801,10 @@ class TimeseriesFeatureMixin(object):
         .. note::
            Modified from `Selva Prabhakaran <https://www.machinelearningplus.com/time-series/granger-causality-test-in-python/>`_.
 
+        .. image:: _static/img/granger_tests.webp
+           :width: 700
+           :align: center
+
         :example:
         >>> x = np.random.randint(0, 50, (100, 2))
         >>> data = pd.DataFrame(x, columns=['r', 'k'])
@@ -2177,6 +2181,10 @@ class TimeseriesFeatureMixin(object):
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_entropy_of_directional_changes`
 
+        .. image:: _static/img/entropy_of_directional_changes.webp
+           :width: 700
+           :align: center
+
         :param np.ndarray x: A 2D array of shape (N, 2) representing the path, where N is the number of points and each point has two spatial coordinates (e.g., x and y for 2D space). The path should be in the form of an array of consecutive (x, y) points.
         :param int bins: The number of bins to discretize the directional changes. Default is 16 bins for angles between 0 and 360 degrees. A larger number of bins will increase the precision of direction change measurement.
         :return: The entropy of the directional changes in the path. A higher value indicates more unpredictable or random direction changes, while a lower value indicates more predictable or linear movement.
@@ -2263,6 +2271,10 @@ class TimeseriesFeatureMixin(object):
 
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_path_curvature`
+
+        .. image:: _static/img/path_curvature.webp
+           :width: 600
+           :align: center
 
         :param x: A 2D numpy array of shape (N, 2), where N is the number of points and each row is (x, y).
         :param Literal['mean', 'median', 'max'] agg_type: The type of summary statistic to return. Options are 'mean', 'median', or 'max'.
@@ -2508,6 +2520,10 @@ class TimeseriesFeatureMixin(object):
         Radial eccentricity quantifies the degree of elongation in the spatial distribution
         of points. The value ranges between 0 and 1, where: - 0 indicates a perfectly circular distribution. - Values approaching 1 indicate a highly elongated or linear distribution.
 
+        .. image:: _static/img/radial_eccentricity.webp
+           :width: 700
+           :align: center
+
         :param np.ndarray x: 2-dimensional numpy array representing the input data with shape (n, m), where n is the number of frames and m is the coordinates.
         :param np.ndarray data: A 1D array of shape (n_dimensions,) representing the reference point with  respect to which the radial eccentricity is calculated.
 
@@ -2533,6 +2549,10 @@ class TimeseriesFeatureMixin(object):
 
         The RDI quantifies the variability in radial distances of points from the reference point, normalized by the mean radial distance.
         For example, the radial dispersion from an ROI center.
+
+        .. image:: _static/img/radial_dispersion_index.webp
+           :width: 600
+           :align: center
 
         :param np.ndarray x: 2-dimensional numpy array representing the input data with shape (n, m), where n is the number of frames and m is the coordinates.
         :param np.ndarray reference_point: A 1D array of shape (n_dimensions,) representing the reference point with  respect to which the radial dispertion index is calculated.

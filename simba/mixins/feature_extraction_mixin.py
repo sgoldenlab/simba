@@ -990,6 +990,10 @@ class FeatureExtractionMixin(object):
            For movement between two distinct body-parts, use func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.bodypart_distance`.
            For direct per-frame distance computation between two coordinate arrays, use func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance`.
 
+        .. image:: _static/img/framewise_bodypart_movement.webp
+           :width: 500
+           :align: center
+
         :param Union[np.ndarray, pd.DataFrame] data: Body-part coordinates with shape ``(n_frames, 2)`` where columns represent ``x`` and ``y`` pixel positions. Accepted as numpy array or pandas DataFrame.
         :param float px_per_mm: Conversion factor from pixels to millimeters. Must be positive. Default: 1.
         :param bool centimeter: If True, return movement in centimeters. If False, return movement in millimeters. Default: False.
@@ -1136,15 +1140,43 @@ class FeatureExtractionMixin(object):
                                               px_per_mm: float,
                                               time_windows: np.ndarray = np.array([0.2, 0.4, 0.8, 1.6])) -> np.ndarray:
         """
-        Computes the difference between the distances of two body-parts in the current frame versus N.N seconds ago.
-        Used for computing if animal body-parts are traveling away or towards each other within defined time-windows.
+        Computes the difference between the distance of two body-parts in the current frame versus N.N seconds ago.
+        Used for computing if animal body-parts are traveling away from each other (positive values) or towards
+        each other (negative values) within defined time-windows.
+
+        .. seealso::
+           For an equivalent stand-alone implementation, see :func:`simba.mixins.feature_extraction_supplement_mixin.FeatureExtractionSupplemental.euclidean_distance_timeseries_change`.
+
+        .. image:: _static/img/change_in_bodypart_euclidean_distance.webp
+           :width: 600
+           :align: center
+
+        :param np.ndarray location_1: 2D array (n_frames, 2) with the x,y positions of the first body-part.
+        :param np.ndarray location_2: 2D array (n_frames, 2) with the x,y positions of the second body-part.
+        :param int fps: Frame-rate of the video.
+        :param float px_per_mm: Pixels per millimeter conversion factor.
+        :param np.ndarray time_windows: Reference time-windows (in seconds) to compare the current distance against.
+        :return: Array of shape (n_frames, len(time_windows)); positive = parts moved apart, negative = moved closer.
+        :rtype: np.ndarray
+
+        :example:
+        >>> loc1 = np.random.randint(0, 500, (200, 2)).astype(np.float64)
+        >>> loc2 = np.random.randint(0, 500, (200, 2)).astype(np.float64)
+        >>> FeatureExtractionMixin().change_in_bodypart_euclidean_distance(location_1=loc1, location_2=loc2, fps=25, px_per_mm=2.0)
         """
+
         distances = self.framewise_euclidean_distance(
             location_1=location_1.astype(np.float64), location_2=location_2.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False
         )
-        return self._relative_distances(
-            distances=distances, fps=fps, time_windows=time_windows
-        )
+        results = np.full((distances.shape[0], time_windows.shape[0]), np.nan)
+        for window_cnt in range(time_windows.shape[0]):
+            frms = int(time_windows[window_cnt] * fps)
+            shifted_distances = np.copy(distances)
+            shifted_distances[0:frms] = np.nan
+            shifted_distances[frms:] = distances[:-frms]
+            shifted_distances[np.isnan(shifted_distances)] = distances[np.isnan(shifted_distances)]
+            results[:, window_cnt] = distances - shifted_distances
+        return results
 
     def dataframe_gaussian_smoother(
         self, df: pd.DataFrame, fps: int, time_window: int = 100

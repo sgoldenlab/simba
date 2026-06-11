@@ -73,6 +73,10 @@ def detect_bouts(data_df: pd.DataFrame, target_lst: Union[List[str], str], fps: 
     .. seealso::
        For multi-class Boolean classifiers, see :func:`simba.utils.data.detect_bouts_multiclass`.
 
+    .. image:: _static/img/detect_bouts.webp
+       :width: 700
+       :align: center
+
     :param pd.DataFrame data_df: Dataframe with fields representing classifications in boolean type.
     :param Union[List[str], str] target_lst: Classifier names. E.g., as list or a single ['Attack', 'Sniffing', 'Grooming'] string value 'Attack'. Can be any boolean column name.
     :param Union[int, float] fps: The fps of the input video.
@@ -215,6 +219,10 @@ def plug_holes_shortest_bout(data_df: pd.DataFrame,
        These interuptions are filled with `1`s. Next, the behavioral bouts shorter than the `shortest_bout` are removed. This operations are perfomed as it helps in preserving longer sequences of the desired behavior,
        ensuring they aren't fragmented by brief interruptions.
 
+    .. image:: _static/img/plug_holes_shortest_bout.webp
+       :width: 700
+       :align: center
+
     :param pd.DataFrame data_df: Pandas Dataframe with classifier prediction data.
     :param str clf_name: Name of the classifier field of list of names of classifier fields
     :param int fps: The fps of the input video.
@@ -224,7 +232,8 @@ def plug_holes_shortest_bout(data_df: pd.DataFrame,
 
     :example:
     >>>  data_df = pd.DataFrame(data=[1, 0, 1, 1, 1], columns=['target'])
-    >>>  plug_holes_shortest_bout(data_df=data_df, clf_name='target', fps=10, shortest_bout=2000)
+    >>>  # the single 0-frame gap (0.1 s) is shorter than 300 ms, so it is bridged; the resulting 0.5 s bout survives
+    >>>  plug_holes_shortest_bout(data_df=data_df, clf_name='target', fps=10, shortest_bout=300)
     >>>         target
     >>>    0       1
     >>>    1       1
@@ -370,6 +379,10 @@ def interpolate_color_palette(start_color: Tuple[int, int, int],
                               n: Optional[int] = 10) -> List[Tuple[int, int, int]]:
     """
     Generate a list of colors interpolated between two passed RGB colors.
+
+    .. image:: _static/img/interpolate_color_palette.webp
+       :width: 500
+       :align: center
 
     :param start_color: Tuple of RGB values for the start color.
     :param end_color: Tuple of RGB values for the end color.
@@ -597,6 +610,10 @@ def get_confusion_matrix(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     .. note::
        Adapted from mucunwuxian's Stack Overflow answer: https://stackoverflow.com/a/67747070
 
+    .. image:: _static/img/get_confusion_matrix.webp
+       :width: 500
+       :align: center
+
     :param np.ndarray x: Predicted cluster labels (1D array of integers).
     :param np.ndarray y: Ground truth class labels (1D array of integers, same length as `x`).
     :returns: A 2D confusion matrix of shape (n_labels, n_labels), where entry (i, j) is the number of times label `i` in `x` coincided with label `j` in `y`.
@@ -812,7 +829,7 @@ def freedman_diaconis(data: np.ndarray) -> Tuple[float, int]:
 
     IQR = stats.iqr(data, rng=(25, 75), scale="raw", nan_policy="omit")
     bin_width = (2 * IQR) / np.power(data.shape[0], 1 / 3)
-    bin_count = int((np.max(data) - np.min(data) / bin_width) + 1)
+    bin_count = int((np.max(data) - np.min(data)) / bin_width + 1)
     return bin_width, bin_count
 
 
@@ -866,13 +883,17 @@ def bucket_data(data: np.ndarray, method: Literal["fd", "doane", "auto", "scott"
        :func:`simba.utils.data.freedman_diaconis`
        :func:`simba.utils.data.bucket_data`
 
+    .. image:: _static/img/bucket_data.webp
+       :width: 700
+       :align: center
+
     :param np.ndarray data: 1D array of numerical data.
     :param np.ndarray method: The method to compute optimal bin count and bin width. These methods differ in how they estimate the optimal bin count and width. Defaults to 'auto', which represents the maximum of the Sturges and Freedman-Diaconis estimators. Available methods are 'fd', 'doane', 'auto', 'scott', 'stone', 'rice', 'sturges', 'sqrt'.
     :returns: A tuple containing the optimal bin width and bin count.
     :rtype: Tuple[float, int]
 
     :example:
-    >>> data = np.random.randint(low=1, high=1000, size=(1, 100))
+    >>> data = np.random.randint(low=1, high=1000, size=(100,))
     >>> bucket_data(data=data, method='fd')
     >>> (190.8, 6)
     >>> bucket_data(data=data, method='doane')
@@ -1116,6 +1137,10 @@ def find_ranked_colors(data: Dict[Any, float],
     The key with the highest value in the data dictionary is assigned the most intense palette color, while
     the key with the lowest value in the data dictionary is assigned the least intense palette color.
 
+    .. image:: _static/img/find_ranked_colors.webp
+       :width: 500
+       :align: center
+
     :param data: A dictionary where keys are labels and values are numerical scores.
     :param palette: A string representing the name of the color palette to use (e.g., 'magma').
     :param as_hex: If True, return colors in hexadecimal format; if False, return as RGB tuples. Default is False.
@@ -1126,6 +1151,12 @@ def find_ranked_colors(data: Dict[Any, float],
     >>> data = {'Animal_1': 0.34786870380536705, 'Animal_2': 0.4307923198152757, 'Animal_3': 0.221338976379357}
     >>> find_ranked_colors(data=data, palette='magma', as_hex=True)
     >>> {'Animal_2': '#040000', 'Animal_1': '#7937b7', 'Animal_3': '#bffdfc'}
+    >>> find_ranked_colors(data=data, palette='viridis', as_hex=True)
+    >>> {'Animal_2': '#540144', 'Animal_1': '#8c9121', 'Animal_3': '#25e7fd'}
+    >>> find_ranked_colors(data=data, palette='jet', as_hex=True)
+    >>> {'Animal_2': '#800000', 'Animal_1': '#7bff7b', 'Animal_3': '#000080'}
+    >>> find_ranked_colors(data=data, palette='coolwarm', as_hex=True)
+    >>> {'Animal_2': '#c04c3b', 'Animal_1': '#dddddd', 'Animal_3': '#2604b4'}
     """
 
     if palette not in Options.PALETTE_OPTIONS.value:
