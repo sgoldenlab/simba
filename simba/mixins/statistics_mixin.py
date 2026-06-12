@@ -2541,7 +2541,6 @@ class Statistics(FeatureExtractionMixin):
     #@njit("(int64[:, :],)")
     #@jit(nopython=True, cache=True)
     @dynamic_numba_decorator(dtypes="(int64[:, :],)", cache=True, fastmath=False)
-
     def phi_coefficient(data: np.ndarray) -> float:
         """
         Compute the phi coefficient for a Nx2 array of binary data.
@@ -2564,6 +2563,9 @@ class Statistics(FeatureExtractionMixin):
         .. seealso::
            For time-series based sliding comparisons, see :func:`simba.mixins.statistics_mixin.Statistics.sliding_phi_coefficient`
 
+        .. image:: _static/img/phi_coefficient.webp
+           :width: 600
+           :align: center
 
         :param np.ndarray data: A NumPy array containing binary data organized in two columns. Each row represents a pair of binary values for two variables. Columns represent two features or two binary classification results.
         :returns: The calculated phi coefficient, a value between 0 and 1. A value of 0 indicates no association between the variables, while 1 indicates a perfect association.
@@ -2619,6 +2621,10 @@ class Statistics(FeatureExtractionMixin):
 
         .. seealso::
            For sliding time-windows comparisons, see :func:`simba.mixins.statistics_mixin.Statistics.sliding_eta_squared`.
+
+        .. image:: _static/img/eta_squared.webp
+           :width: 600
+           :align: center
 
         :param np.ndarray x: 1D array containing the dependent variable data.
         :param np.ndarray y: 1d array containing the grouping variable (categorical) data of same size as ``x``.
@@ -3011,6 +3017,10 @@ class Statistics(FeatureExtractionMixin):
         .. seealso::
            For GPU method, see :func:`simba.data_processors.cuda.statistics.hamming_distance_gpu`.
 
+        .. image:: _static/img/hamming_distance.webp
+           :width: 600
+           :align: center
+
         :param np.ndarray x: First binary vector.
         :param np.ndarray x: Second binary vector.
         :param Optional[np.ndarray] w: Optional weights for each element. Can be classification probabilities. If not provided, equal weights are assumed.
@@ -3155,6 +3165,10 @@ class Statistics(FeatureExtractionMixin):
         .. note::
            Adapted from `pynndescent <https://pynndescent.readthedocs.io/en/latest/>`_.
 
+        .. image:: _static/img/bray_curtis_dissimilarity.webp
+           :width: 600
+           :align: center
+
         :param np.ndarray x: 2d array with likely normalized feature values.
         :param Optional[np.ndarray] w: Optional 2d array with weights of same size as x. Default None and all observations will have the same weight.
         :returns: 2d array with same size as x representing dissimilarity values. 0 and the observations are identical and at 1 the observations are completly disimilar.
@@ -3265,6 +3279,10 @@ class Statistics(FeatureExtractionMixin):
         - :math:`J = 0` indicates the test performs no better than random
         - :math:`J < 0` indicates the test performs worse than random
 
+        .. image:: _static/img/youden_j.webp
+           :width: 600
+           :align: center
+
         :param sample_1: The first binary array (ground truth or reference).
         :param sample_2: The second binary array (predictions or test results).
         :return: Youden's J statistic. Returns NaN if either sensitivity or specificity cannot be calculated (division by zero).
@@ -3319,6 +3337,10 @@ class Statistics(FeatureExtractionMixin):
 
         The Jaccard distance is a measure of dissimilarity between two sets. It is defined as the size of the
         intersection of the sets divided by the size of the union of the sets.
+
+        .. image:: _static/img/jaccard_distance.webp
+           :width: 600
+           :align: center
 
         :param np.ndarray x: The first 1D NumPy array.
         :param np.ndarray y: The second 1D NumPy array.
@@ -3498,6 +3520,10 @@ class Statistics(FeatureExtractionMixin):
         - :math:`\\Phi^{-1}` is the inverse of the cumulative distribution function (CDF) of the normal distribution,
         - :math:`hit\\_rate` is the proportion of true positives correctly identified,
         - :math:`false\\_alarm\\_rate` is the proportion of false positives incorrectly identified.
+
+        .. image:: _static/img/d_prime.webp
+           :width: 600
+           :align: center
 
         :param np.ndarray x: Boolean 1D array of response values, where 1 represents presence, and 0 representing absence.
         :param np.ndarray y: Boolean 1D array of ground truth, where 1 represents presence, and 0 representing absence.
@@ -3705,6 +3731,10 @@ class Statistics(FeatureExtractionMixin):
         where:
         - :math:`\text{Var}(x)` is the variance of sample :math:`x`,
         - :math:`\text{Var}(y)` is the variance of sample :math:`y`.
+
+        .. image:: _static/img/hartley_fmax.webp
+           :width: 600
+           :align: center
 
         :param np.ndarray x: 1D array representing numeric data of the first group/feature.
         :param np.ndarray x: 1D array representing numeric data of the second group/feature.
@@ -3948,6 +3978,10 @@ class Statistics(FeatureExtractionMixin):
         where :math:`\delta(C_i, C_j)` is the distance between clusters :math:`C_i` and :math:`C_j`, and
         :math:`\Delta(C_k)` is the diameter of cluster :math:`C_k`.
 
+        .. image:: _static/img/dunn_index.webp
+           :width: 600
+           :align: center
+
         .. note::
            Modified from `jqmviegas <https://github.com/jqmviegas/jqm_cvi/>`_
 
@@ -4096,6 +4130,10 @@ class Statistics(FeatureExtractionMixin):
         - :math:`N` is the total number of data points,
         - :math:`k` is the number of clusters.
 
+        .. image:: _static/img/calinski_harabasz.webp
+           :width: 600
+           :align: center
+
         :param x: 2D array representing the data points. Shape (n_samples, n_features/n_dimension).
         :param y: 2D array representing cluster labels for each data point. Shape (n_samples,).
         :return: Calinski-Harabasz score.
@@ -4189,6 +4227,10 @@ class Statistics(FeatureExtractionMixin):
            \\text{XB} = \\frac{\\frac{1}{n} \\sum_{i=1}^{n} \\| x_i - c_{y_i} \\|^2}{\\min_{i \\neq j} \\| c_i - c_j \\|^2}
 
         where :math:`n` is the total number of points in the dataset, :math:`x_i` is the :math:`i`-th data point, :math:`c_{y_i}` is the centroid of the cluster to which :math:`x_i` belongs, and :math:`\\| \\cdot \\|` denotes the Euclidean norm.
+
+        .. image:: _static/img/xie_beni.webp
+           :width: 600
+           :align: center
 
         :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
         :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
@@ -4902,6 +4944,10 @@ class Statistics(FeatureExtractionMixin):
         - :math:`FP` (False Positive) is the number of pairs of elements that are in the same cluster in y but not in x,
         - :math:`FN` (False Negative) is the number of pairs of elements that are in the same cluster in x but not in y.
 
+        .. image:: _static/img/fowlkes_mallows.webp
+           :width: 600
+           :align: center
+
         .. note::
            Modified from `scikit-learn <https://github.com/scikit-learn/scikit-learn/blob/8721245511de2f225ff5f9aa5f5fadce663cd4a3/sklearn/metrics/cluster/_supervised.py#L1184>`_
 
@@ -4946,6 +4992,10 @@ class Statistics(FeatureExtractionMixin):
            - :math:`\text{MI}(x, y)` is the mutual information between :math:`x` and :math:`y`.
            - :math:`E(\text{MI}(x, y))` is the expected mutual information.
            - :math:`H(x)` and :math:`H(y)` are the entropies of :math:`x` and :math:`y`, respectively.
+
+        .. image:: _static/img/adjusted_mutual_info.webp
+           :width: 600
+           :align: center
 
         :param np.ndarray x: 1D array representing the labels of the first model.
         :param np.ndarray y: 1D array representing the labels of the second model.
@@ -5121,6 +5171,10 @@ class Statistics(FeatureExtractionMixin):
         .. note::
             Wave-Hedges distance score of 0 indicate identical arrays. There is no upper bound.
 
+        .. image:: _static/img/wave_hedges_distance.webp
+           :width: 600
+           :align: center
+
         :param np.ndarray x: 1D array representing the first feature values.
         :param np.ndarray y: 1D array representing the second feature values.
         :returns: Wave-Hedges distance
@@ -5151,6 +5205,10 @@ class Statistics(FeatureExtractionMixin):
            This function assumes x and y have the same shape and only considers numerical attributes.
             Each observation in x is compared to the corresponding observation in y based on normalized
             absolute differences across numerical columns.
+
+        .. image:: _static/img/gower_distance.webp
+           :width: 600
+           :align: center
 
         :param np.ndarray x: First numerical matrix with shape (m, n).
         :param np.ndarray y: Second numerical matrix with shape (m, n).
@@ -5201,6 +5259,10 @@ class Statistics(FeatureExtractionMixin):
 
         .. note::
            This function assumes x and y have the same shape. It computes NGD based on the sum of elements and the minimum values between corresponding elements of x and y.
+
+        .. image:: _static/img/normalized_google_distance.webp
+           :width: 600
+           :align: center
 
         :param np.ndarray x: First numerical matrix with shape (m, n).
         :param np.ndarray y: Second array or matrix with shape (m, n).
