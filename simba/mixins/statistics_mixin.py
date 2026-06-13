@@ -2574,7 +2574,7 @@ class Statistics(FeatureExtractionMixin):
         :example:
         >>> data = np.array([[0, 1], [1, 0], [1, 0], [1, 1]]).astype(np.int64)
         >>> Statistics().phi_coefficient(data=data)
-        >>> 0.8164965809277261
+        >>> 0.5773502691896258
         >>> data = np.random.randint(0, 2, (100, 2))
         >>> result = Statistics.phi_coefficient(data=data)
         """
@@ -2589,7 +2589,7 @@ class Statistics(FeatureExtractionMixin):
             (cnt_1_0 + cnt_1_1)
             * (cnt_0_0 + cnt_0_1)
             * (cnt_1_0 + cnt_0_0)
-            * (cnt_1_1 * cnt_0_1)
+            * (cnt_1_1 + cnt_0_1)
         )
         if nominator == 0 or denominator == 0:
             return 1.0
@@ -2600,7 +2600,7 @@ class Statistics(FeatureExtractionMixin):
                     (cnt_1_0 + cnt_1_1)
                     * (cnt_0_0 + cnt_0_1)
                     * (cnt_1_0 + cnt_0_0)
-                    * (cnt_1_1 * cnt_0_1)
+                    * (cnt_1_1 + cnt_0_1)
                 )
             )
 
@@ -2642,7 +2642,7 @@ class Statistics(FeatureExtractionMixin):
         if sum_square_between + sum_square_within == 0:
             return 0.0
         else:
-            return (sum_square_between / (sum_square_between + sum_square_within)) ** .5
+            return (sum_square_between / (sum_square_between + sum_square_within))
 
     @staticmethod
     @jit(nopython=True)
@@ -2681,7 +2681,7 @@ class Statistics(FeatureExtractionMixin):
                 if sum_square_between + sum_square_within == 0:
                     results[r - 1, i] = 0.0
                 else:
-                    results[r - 1, i] = (sum_square_between / (sum_square_between + sum_square_within)) ** .5
+                    results[r - 1, i] = (sum_square_between / (sum_square_between + sum_square_within))
         return results
 
 
@@ -2697,6 +2697,10 @@ class Statistics(FeatureExtractionMixin):
         Computes sliding phi coefficients for a 2x2 contingency table derived from binary data over different
         time windows. The phi coefficient is a measure of association between two binary variables, and sliding phi
         coefficients can reveal changes in association over time.
+
+        .. image:: _static/img/sliding_phi_coefficient.webp
+           :width: 600
+           :align: center
 
         .. seealso::
            For simple two distribution comparison, see :func:`simba.mixins.statistics_mixin.Statistics.phi_coefficient`.
@@ -2735,7 +2739,7 @@ class Statistics(FeatureExtractionMixin):
                     (cnt_1_0 + cnt_1_1)
                     * (cnt_0_0 + cnt_0_1)
                     * (cnt_1_0 + cnt_0_0)
-                    * (cnt_1_1 * cnt_0_1)
+                    * (cnt_1_1 + cnt_0_1)
                 )
                 if nominator == 0 or denominator == 0:
                     results[r - 1, i] = 0.0
@@ -2746,7 +2750,7 @@ class Statistics(FeatureExtractionMixin):
                             (cnt_1_0 + cnt_1_1)
                             * (cnt_0_0 + cnt_0_1)
                             * (cnt_1_0 + cnt_0_0)
-                            * (cnt_1_1 * cnt_0_1)
+                            * (cnt_1_1 + cnt_0_1)
                         )
                     )
 
@@ -2858,6 +2862,10 @@ class Statistics(FeatureExtractionMixin):
         """
         Compute the skewness of a 1D array within sliding time windows.
 
+        .. image:: _static/img/sliding_skew.webp
+           :width: 600
+           :align: center
+
         :param np.ndarray data: 1D array of input data.
         :param np.ndarray data: 1D array of time window durations in seconds.
         :param np.ndarray data: Sampling rate of the data in samples per second.
@@ -2874,7 +2882,7 @@ class Statistics(FeatureExtractionMixin):
             for j in range(window_size, data.shape[0] + 1):
                 sample = data[j - window_size : j]
                 mean, std = np.mean(sample), np.std(sample)
-                results[j - 1][i] = (1 / sample.shape[0]) * np.sum(((data - mean) / std) ** 3)
+                results[j - 1][i] = (1 / sample.shape[0]) * np.sum(((sample - mean) / std) ** 3)
         return results
 
     @staticmethod
@@ -2884,6 +2892,10 @@ class Statistics(FeatureExtractionMixin):
     def sliding_kurtosis(data: np.ndarray, time_windows: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Compute the kurtosis of a 1D array within sliding time windows.
+
+        .. image:: _static/img/sliding_kurtosis.webp
+           :width: 600
+           :align: center
 
         :param np.ndarray data: Input data array.
         :param np.ndarray time_windows: 1D array of time window durations in seconds.
@@ -2900,7 +2912,7 @@ class Statistics(FeatureExtractionMixin):
             for j in range(window_size, data.shape[0] + 1):
                 sample = data[j - window_size : j]
                 mean, std = np.mean(sample), np.std(sample)
-                results[j - 1][i] = np.mean(((data - mean) / std) ** 4) - 3
+                results[j - 1][i] = np.mean(((sample - mean) / std) ** 4) - 3
         return results
 
     @staticmethod
@@ -3369,6 +3381,10 @@ class Statistics(FeatureExtractionMixin):
         .. math::
            D_{\text{Manhattan}} = |x_2 - x_1| + |y_2 - y_1|
 
+        .. image:: _static/img/manhattan_distance_cdist.webp
+           :width: 500
+           :align: center
+
         :param data: 2D array where each row represents a featurized observation (e.g., frame)
         :return np.ndarray: Pairwise Manhattan distance matrix where element (i, j) represents the distance between points i and j.
 
@@ -3594,6 +3610,11 @@ class Statistics(FeatureExtractionMixin):
         where:
            - `b` is the number of instances misclassified by the first model but correctly classified by the second model.
            - `c` is the number of instances correctly classified by the first model but misclassified by the second model.
+
+        .. image:: _static/img/mcnemar.webp
+           :width: 400
+           :align: center
+
         .. note::
            Adapted from `mlextend <https://github.com/rasbt/mlxtend/blob/master/mlxtend/evaluate/mcnemar.py>`__.
 
@@ -4270,9 +4291,13 @@ class Statistics(FeatureExtractionMixin):
         """
         Compute the Bouguessa-Wang-Sun (BWS) index using covariance matrices and means.
 
+        .. image:: _static/img/bouguessa_wang_sun_v2.webp
+           :width: 500
+           :align: center
+
         :param np.ndarray x: A 2D array of shape (n_samples, n_features) representing the feature vectors of the data points.
         :param np.ndarray y: A 1D array of shape (n_samples,) containing the cluster labels for each data point.
-        :returns: The BWS index value. Lower values indicate better clustering.
+        :returns: The BWS index value (between-cluster scatter / total within-cluster variance). Higher values indicate better clustering.
         :rtype: float
 
         :example:
@@ -4310,6 +4335,10 @@ class Statistics(FeatureExtractionMixin):
 
         The I-Index is a metric that measures the compactness and separation of clusters.
         A higher I-Index indicates better clustering with compact and well-separated clusters.
+
+        .. image:: _static/img/i_index.webp
+           :width: 500
+           :align: center
 
         .. seealso::
            To compute I-index on GPU, use :func:`~simba.data_processors.cuda.statistics.i_index`
@@ -4360,6 +4389,10 @@ class Statistics(FeatureExtractionMixin):
         2. **Discriminant (DIS)**: Measures the separation between clusters relative to their distance from the global mean.
 
         A lower SD Index indicates better clustering quality, reflecting compact and well-separated clusters.
+
+        .. image:: _static/img/sd_index.webp
+           :width: 500
+           :align: center
 
         :param np.ndarray x: A 2D array of shape (n_samples, n_features) representing the feature vectors of the data points.
         :param np.ndarray y: A 1D array of shape (n_samples,) containing the cluster labels for each data point.
@@ -4413,6 +4446,10 @@ class Statistics(FeatureExtractionMixin):
         The C Index ranges from 0 to 1:
            - 0 indicates perfect clustering (clusters are as compact as possible).
            - 1 indicates worst clustering (clusters are highly spread out).
+
+        .. image:: _static/img/c_index.webp
+           :width: 500
+           :align: center
 
         :references:
         .. [1] Ubert, L. J., & Levin, J. R. (1976). A general statistical framework for assessing categorical clustering in free recall. Psychological Bulletin, 83(5), 1072–1080.
@@ -4619,6 +4656,10 @@ class Statistics(FeatureExtractionMixin):
 
         Higher values indicates better clustering.
 
+        .. image:: _static/img/pbm_index.webp
+           :width: 500
+           :align: center
+
         :param np.ndarray x: A 2D array of shape (n_samples, n_features) containing the data points.
         :param np.ndarray x: A 1D array of shape (n_samples,) containing cluster labels for the data points.
         :return: The PBM Index value.
@@ -4653,10 +4694,9 @@ class Statistics(FeatureExtractionMixin):
         EK = np.sum(intra_cluster_dists)
 
         cluster_dists = cdist(cluster_centers, cluster_centers)
-        cluster_dists[cluster_dists == 0] = np.inf
-        Dmin = np.min(cluster_dists)
+        Dmax = np.max(cluster_dists)
 
-        return (((1 / N_clusters) * E1) ** 2) / (EK * Dmin)
+        return ((1 / N_clusters) * (E1 / EK) * Dmax) ** 2
 
     @staticmethod
     def banfeld_raftery_index(x: np.ndarray, y: np.ndarray) -> float:
@@ -4852,6 +4892,10 @@ class Statistics(FeatureExtractionMixin):
         """
         DunnSym index output range positive real numbers 0 -> ∞ where 0 is extremely poor clustering and higher values represent better cluster separation.
 
+        .. image:: _static/img/dunn_symmetry_idx.webp
+           :width: 500
+           :align: center
+
         :param x: 2D array representing the data points. Shape (n_samples, n_features/n_dimension).
         :param y: 2D array representing cluster labels for each data point. Shape (n_samples,).
         :return float: Dynn-Symmetry index.
@@ -4873,12 +4917,12 @@ class Statistics(FeatureExtractionMixin):
         min_inter_distance, max_intra_diameter = np.inf, -np.inf
         for i in range(len(unique_clusters)):
             for j in range(i + 1, len(unique_clusters)):
-                i_points = x[y == i]
-                j_points = x[y == j]
+                i_points = x[y == unique_clusters[i]]
+                j_points = x[y == unique_clusters[j]]
                 min_inter_distance = min(min_inter_distance, np.min(cdist(i_points, j_points)))
 
         for i in range(len(unique_clusters)):
-            i_points = x[y == i]
+            i_points = x[y == unique_clusters[i]]
             max_intra_diameter = max(max_intra_diameter, np.max(cdist(i_points, i_points)))
 
         return min_inter_distance / max_intra_diameter
@@ -5033,6 +5077,10 @@ class Statistics(FeatureExtractionMixin):
            Normalize arrays sample_1 and sample_2 before passing it to ensure accurate results.
 
         The equation for the Czebyshev distance is given by :math:`D_\infty(p, q) = \max_i \left| p_i - q_i \right|`.
+
+        .. image:: _static/img/czebyshev_distance.webp
+           :width: 400
+           :align: center
 
         .. seealso:
            :func:`simba.mixins.statistics_mixin.Statistics.sliding_czebyshev_distance`
@@ -5304,6 +5352,10 @@ class Statistics(FeatureExtractionMixin):
            SI = \frac{|x_i - y_i|}{0.5 \times (x_i + y_i)} \times 100
 
         where :math:`x_i` and :math:`y_i` are the values of the two measurements at each time point.
+
+        .. image:: _static/img/symmetry_index.webp
+           :width: 500
+           :align: center
 
         :param np.ndarray x: A 1-dimensional array of measurements from one side (e.g., left side), representing a time series or sequence of measurements.
         :param np.ndarray y: A 1-dimensional array of measurements from the other side (e.g., right side), of the same length as `x`.

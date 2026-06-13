@@ -650,6 +650,10 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         For every onset of behavior C, count the proportions of behavior T onsets in the time-window preceding the onset
         of behavior C vs the proportion of behavior T onsets in the time-window proceeding the onset of behavior C.
 
+        .. image:: _static/img/sequential_lag_analysis.webp
+           :width: 600
+           :align: center
+
         .. seealso::
            For altenative method, see :func:`~simba.data_processorsfsttc_calculator.FSTTCCalculator`
 
@@ -745,6 +749,10 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
                               centimeters: Optional[bool] = True) -> Tuple[float, float]:
         """
         Calculate total movement and mean velocity from a sequence of position data.
+
+        .. image:: _static/img/distance_and_velocity.webp
+           :width: 600
+           :align: center
 
         :param x: Array containing movement data. For example, created by ``simba.mixins.FeatureExtractionMixin.framewise_euclidean_distance``. If its a 2-dimensional array, then we assume its pixel coordinates. If it's a 1d array, we assume its frame-wise euclidean distances.
         :param fps: Frames per second of the data.

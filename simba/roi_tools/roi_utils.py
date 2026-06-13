@@ -7,6 +7,11 @@ from copy import copy, deepcopy
 from tkinter import *
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
+
 if TYPE_CHECKING:
     from simba.roi_tools.interactive_roi_bufferer import InteractiveROIBufferer
 
@@ -344,6 +349,10 @@ def get_vertices_hexagon(center: Tuple[int, int],
     """
     Generates the vertices of a regular hexagon centered at a given point with a specified radius.
 
+    .. image:: _static/img/get_vertices_hexagon.webp
+       :width: 400
+       :align: center
+
     :param Tuple[int, int] center:  A tuple (x, y) representing the center coordinates of the hexagon. Must contain exactly two numeric values.
     :param int radius: The radius of the hexagon, which represents the distance from the center to any of the vertices. Must be a positive integer.
     :return: A tuple containing vertices as array and dict.
@@ -368,15 +377,19 @@ def get_vertices_hexagon(center: Tuple[int, int],
 
 def get_half_circle_vertices(center: Tuple[int, int],
                              radius: int,
-                             direction: str,
+                             direction: Literal['NORTH', 'SOUTH', 'WEST', 'EAST', 'NORTH-EAST', 'NORTH-WEST', 'SOUTH-EAST', 'SOUTH-WEST'],
                              n_points: Optional[int] = 50) -> Tuple[np.ndarray, Dict[str, Tuple[int, int]]]:
 
     """
     Generates vertices for a half-circle with a given radius and direction, centered at a specific point.
 
+    .. image:: _static/img/get_half_circle_vertices.webp
+       :width: 600
+       :align: center
+
     :param Tuple[int, int] center: A tuple (x, y) representing the center coordinates of the half-circle. Must contain exactly two numeric values.
     :param int radius: The radius of the half-circle. Must be a positive integer.
-    :param str direction: The direction in which the half-circle is oriented.
+    :param Literal['NORTH', 'SOUTH', 'WEST', 'EAST', 'NORTH-EAST', 'NORTH-WEST', 'SOUTH-EAST', 'SOUTH-WEST'] direction: The direction in which the half-circle is oriented (the side the curved arc faces).
     :param Optional[int] n_points: The number of vertices used to approximate the half-circle. Defaults to 50.
     :return: A tuple containing vertices as array and dict.
     :rtype: Tuple[np.ndarray, Dict[str, Tuple[int, int]]]
@@ -413,9 +426,15 @@ def get_half_circle_vertices(center: Tuple[int, int],
 
 
 
-def get_triangle_vertices(center: Tuple[int, int], side_length: int, direction: int) -> Tuple[np.ndarray, Dict[str, Tuple[int, int]]]:
+def get_triangle_vertices(center: Tuple[int, int],
+                          side_length: int,
+                          direction: int) -> Tuple[np.ndarray, Dict[str, Tuple[int, int]]]:
     """
     Find equilateral triangle vertices knowing the center, direction and length side.
+
+    .. image:: _static/img/get_triangle_vertices.webp
+       :width: 600
+       :align: center
 
     :param Tuple[int, int] center: A tuple (x, y) representing the center coordinates of the hexagon. Must contain exactly two numeric values.
     :param int side_length: The length of each of the three sides in pixels.
@@ -610,6 +629,22 @@ def insert_gridlines_on_roi_img(img: np.ndarray,
                                 grid: List[Polygon],
                                 color: Tuple[int, int, int],
                                 thickness: int) -> np.ndarray:
+    """
+    Draw the outlines of a set of grid polygons onto an image.
+
+    Each polygon's exterior is drawn as a closed polyline; useful for overlaying a tiling grid on an ROI frame.
+
+    .. image:: _static/img/insert_gridlines_on_roi_img.webp
+       :width: 600
+       :align: center
+
+    :param np.ndarray img: The image to draw on, as a (height, width, 3) BGR array.
+    :param List[Polygon] grid: A list of Shapely polygons whose exteriors are drawn. If ``None`` or empty, the image is returned unchanged.
+    :param Tuple[int, int, int] color: The BGR color of the gridlines.
+    :param int thickness: The line thickness in pixels.
+    :return: The image with the gridlines drawn on it.
+    :rtype: np.ndarray
+    """
 
     if grid is None or len(grid) == 0:
         return img

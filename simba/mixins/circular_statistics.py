@@ -631,6 +631,10 @@ class CircularStatisticsMixin(object):
         """
         Jitted compute of Rayleigh Z (test of non-uniformity) of circular data within sliding time-window.
 
+        .. image:: _static/img/sliding_rayleigh_z.webp
+           :width: 600
+           :align: center
+
         .. note::
            Adapted from ``pingouin.circular.circ_rayleigh`` and ``pycircstat.tests.rayleigh``.
 
@@ -1023,6 +1027,10 @@ class CircularStatisticsMixin(object):
 
         This function calculates the Kuipers two-sample test statistic for each time window, sliding through the given circular data sequences.
 
+        .. image:: _static/img/sliding_kuipers_two_sample_test.webp
+           :width: 600
+           :align: center
+
         .. seealso::
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.kuipers_two_sample_test`
 
@@ -1067,6 +1075,10 @@ class CircularStatisticsMixin(object):
         The Hodges-Ajne test is a non-parametric test used to assess whether circular data is uniformly distributed.
         The test statistic measures the concentration of data points around the circle. Lower values indicate
         more uniform distribution, while higher values suggest clustering or non-uniformity.
+
+        .. image:: _static/img/sliding_hodges_ajne.webp
+           :width: 600
+           :align: center
 
         .. attention::
            The returned values represent the Hodges-Ajne statistic in the time-window ``[(current_frame-time_window)->current_frame]``.
@@ -1517,6 +1529,10 @@ class CircularStatisticsMixin(object):
         Computes the sliding preferred turning direction over a given time window from a 1D array of circular directional data.
 
         Calculates the most frequent turning direction (mode) within a sliding window  of a specified duration.
+
+        .. image:: _static/img/sliding_preferred_turning_direction.webp
+           :width: 600
+           :align: center
 
         .. seealso::
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.rotational_direction`, :func:`~simba.data_processors.cuda.circular_statistics.rotational_direction`,

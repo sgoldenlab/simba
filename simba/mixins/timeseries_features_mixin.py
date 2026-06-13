@@ -428,6 +428,10 @@ class TimeseriesFeatureMixin(object):
         the time series using various window sizes. It returns a 2D array where each row corresponds to a position in the time series,
         and each column corresponds to a different window size. The results are given as a percentage of data points beyond the threshold.
 
+        .. image:: _static/img/sliding_percent_beyond_n_std.webp
+           :width: 600
+           :align: center
+
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.percent_beyond_n_std`
 
@@ -440,15 +444,15 @@ class TimeseriesFeatureMixin(object):
         """
 
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
-        target = (np.std(data) * n) + np.mean(data)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
             for l, r in zip(
                 prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
             ):
                 sample = data[l:r]
+                target = np.mean(sample) + (np.std(sample) * n)
                 results[r - 1, i] = (
-                    np.argwhere(np.abs(sample) > target).shape[0] / sample.shape[0]
+                    np.argwhere(sample > target).shape[0] / sample.shape[0]
                 )
 
         return results.astype(np.float32)
@@ -464,6 +468,10 @@ class TimeseriesFeatureMixin(object):
     def sliding_unique(x: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Compute the number of unique values in a sliding window over an array of feature values.
+
+        .. image:: _static/img/sliding_unique.webp
+           :width: 600
+           :align: center
 
         :param x: 1D array of feature values for which the unique values are to be counted.
         :param time_windows: Array of window sizes (in seconds) for which the unique values are counted.
@@ -1891,6 +1899,10 @@ class TimeseriesFeatureMixin(object):
         """
         Calculate sliding (lagged) cross-correlation between two signals, e.g., the movement and velocity of two animals.
 
+        .. image:: _static/img/sliding_two_signal_crosscorrelation.webp
+           :width: 600
+           :align: center
+
         .. note::
             If no lag needed, pass lag 0.0.
 
@@ -1938,6 +1950,10 @@ class TimeseriesFeatureMixin(object):
     def sliding_pct_in_top_n(x: np.ndarray, windows: np.ndarray, n: int, fps: float) -> np.ndarray:
         """
         Compute the percentage of elements in the top 'n' frequencies in sliding windows of the input array.
+
+        .. image:: _static/img/sliding_pct_in_top_n.webp
+           :width: 600
+           :align: center
 
         .. note::
           To compute percentage of elements in the top 'n' frequencies in entire array, use :func:`simba.mixins.statistics_mixin.Statistics.pct_in_top_n()`.
@@ -2126,6 +2142,10 @@ class TimeseriesFeatureMixin(object):
 
         The Linearity Index measures how straight a path is by comparing the straight-line distance between the start and end points of each window to the total distance traveled along the path.
 
+        .. image:: _static/img/sliding_linearity_index.webp
+           :width: 600
+           :align: center
+
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.linearity_index`, :func:`simba.data_processors.cuda.timeseries.sliding_linearity_index_cuda`
 
@@ -2313,6 +2333,10 @@ class TimeseriesFeatureMixin(object):
         sensitivity to bends and turns. A higher curvature value indicates a sharper or more frequent directional change within
         the window, while a lower curvature suggests a straighter or smoother path.
 
+        .. image:: _static/img/sliding_path_curvature.webp
+           :width: 600
+           :align: center
+
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.path_curvature`
 
@@ -2413,6 +2437,10 @@ class TimeseriesFeatureMixin(object):
         spatial scale in pixels per millimeter, providing a density measurement that is adjusted for the physical scale
         of the trajectory.
 
+        .. image:: _static/img/sliding_spatial_density.webp
+           :width: 600
+           :align: center
+
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.spatial_density`, :func:`simba.data_processors.cuda.timeseries.sliding_spatial_density_cuda`
 
@@ -2483,6 +2511,10 @@ class TimeseriesFeatureMixin(object):
         Computes the aspect ratio of the bounding box for a sliding window along a path.
 
         This function calculates the aspect ratio (width/height) of the smallest bounding box that encloses a sequence of points within a sliding window over a 2D path. The path is defined by consecutive (x, y) coordinates. The sliding window moves forward by one point at each step, and the aspect ratio is computed for each position of the window.
+
+        .. image:: _static/img/sliding_path_aspect_ratio.webp
+           :width: 600
+           :align: center
 
         :param np.ndarray x: A 2D array of shape (N, 2) representing the path, where N is the number of points, and each point has two spatial coordinates (x and y).
         :param float window_size: The size of the sliding window in seconds.
@@ -2605,6 +2637,10 @@ class TimeseriesFeatureMixin(object):
         This function computes the kinetic energy of an object based on its position and mass.
         The calculation is performed over a sliding time window, returning an array of average
         kinetic energy values for each valid frame.
+
+        .. image:: _static/img/sliding_avg_kinetic_energy.webp
+           :width: 600
+           :align: center
 
         :param np.ndarray x: A 2D NumPy array of shape (n, 2), where each row contains the x and y  position coordinates of the object at each time step.
         :param np.ndarray mass: A 1D NumPy array of shape (n,), representing the mass of the object at each time step. For instance, this could be derived using  :func:`~simba.feature_extractors.perimeter_jit.jitted_hull`.

@@ -549,6 +549,10 @@ def find_bins(
     """
     Helper to find bin cut-off points.
 
+    .. image:: _static/img/find_bins.webp
+       :width: 600
+       :align: center
+
     :param dict data: Dictionary with video names as keys and list of values of size len(frames).
     :param Literal[str] bracket_type: 'QUANTILE' or 'QUANTIZE'
     :param str bracket_cnt: Number of bins.
@@ -814,6 +818,10 @@ def slice_roi_dict_from_attribute(data: Dict[str, pd.DataFrame],
 def freedman_diaconis(data: np.ndarray) -> Tuple[float, int]:
     """
     Use Freedman-Diaconis rule to compute optimal count of histogram bins and their width.
+
+    .. image:: _static/img/freedman_diaconis.webp
+       :width: 450
+       :align: center
 
     .. note::
        Can also use ``simba.utils.data.bucket_data`` passing method ``fd``.

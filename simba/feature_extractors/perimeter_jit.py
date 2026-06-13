@@ -88,6 +88,10 @@ def jitted_centroid(points: np.ndarray) -> np.ndarray:
 
     For each frame: quickhull → hull vertex indices → centroid = (mean(x), mean(y)) of those vertices.
 
+    .. image:: _static/img/jitted_centroid.webp
+       :width: 600
+       :align: center
+
     :param points: (n_frames, n_body_parts, 2) [x, y] coordinates.
     :return: (n_frames, 2) int32; centroid (x, y) per frame; NaN where hull fails.
 

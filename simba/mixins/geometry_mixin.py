@@ -3341,6 +3341,10 @@ class GeometryMixin(object):
         """
         Compute the cumulative time a body-part has spent inside a grid of geometries using multiprocessing.
 
+        .. image:: _static/img/cumsum_coord_geometries.webp
+           :width: 500
+           :align: center
+
         .. seealso::
            To create grid ``geometries``, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
 
@@ -4016,14 +4020,19 @@ class GeometryMixin(object):
         """
         Calculate the lengths and widths of the minimum bounding rectangles of polygons.
 
+        .. image:: _static/img/get_shape_statistics.webp
+           :width: 400
+           :align: center
+
         :param Union[List[Polygon], Polygon] shapes: A single Polygon, a list of Polygons, or 3d array of vertices, for which the MBR dimensions are calculated.
         :return: A dictionary containing:
-                 - 'lengths': A list of the lengths of the MBR for each polygon.
-                 - 'widths': A list of the widths of the MBR for each polygon.
-                 - 'max_length': The maximum length found among all polygons.
-                 - 'min_length': The minimum length found among all polygons.
-                 - 'max_width': The maximum width found among all polygons.
-                 - 'min_width': The minimum width found among all polygons.
+                 - 'lengths': A list of the lengths (longer side of the MBR) for each polygon.
+                 - 'widths': A list of the widths (shorter side of the MBR) for each polygon.
+                 - 'areas': A list of the MBR areas (length x width) for each polygon.
+                 - 'centers': A list of the [x, y] centroid of each polygon.
+                 - 'max_length' / 'min_length': The maximum / minimum length found among all polygons.
+                 - 'max_width' / 'min_width': The maximum / minimum width found among all polygons.
+                 - 'max_area' / 'min_area': The maximum / minimum MBR area found among all polygons.
         :rtype: Dict[str, Any]
         """
 
@@ -4035,8 +4044,11 @@ class GeometryMixin(object):
             shapes = GeometryMixin().bodyparts_to_polygon(data=shapes)
         check_valid_lst(data=shapes, source=f'{GeometryMixin.get_shape_statistics.__name__} shapes', valid_dtypes=(Polygon,), min_len=1)
         for shape in shapes:
-            shape_cords = list(zip(*shape.exterior.coords.xy))
-            mbr_lengths = [LineString((shape_cords[i], shape_cords[i + 1])).length for i in range(len(shape_cords) - 1)]
+            mbr = shape.minimum_rotated_rectangle
+            if mbr.geom_type != 'Polygon':
+                continue
+            mbr_cords = list(zip(*mbr.exterior.coords.xy))
+            mbr_lengths = [LineString((mbr_cords[i], mbr_cords[i + 1])).length for i in range(len(mbr_cords) - 1)]
             if len(mbr_lengths) > 0:
                 width, length = min(mbr_lengths), max(mbr_lengths)
                 area = width * length
