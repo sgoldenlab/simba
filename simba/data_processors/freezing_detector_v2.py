@@ -77,13 +77,16 @@ class FreezingDetector(ConfigReader):
     >>> x = FreezingDetector(data_dir=r'D:\\troubleshooting\\mitra\\project_folder\\csv\\outlier_corrected_movement_location', config_path=r"D:\\troubleshooting\\mitra\\project_folder\\project_config.ini", min_freezing_ms=1500, movement_threshold=5, min_immobility_ms=2000)
     >>> x.run()
 
-    references
+    References
     ----------
-    ..
-    .. [1] Sabnis et al., Visual detection of seizures in mice using supervised machine learning, `biorxiv`, doi: https://doi.org/10.1101/2024.05.29.596520.
-    .. [2] Lopez et al., Region-specific Nucleus Accumbens Dopamine Signals Encode Distinct Aspects of Avoidance Learning, `biorxiv`, doi: https://doi.org/10.1101/2024.08.28.610149
-    .. [3] Lopez, Gabriela C., Louis D. Van Camp, Ryan F. Kovaleski, et al. "Region-Specific Nucleus Accumbens Dopamine Signals Encode Distinct Aspects of Avoidance Learning." `Cell Biology`, Volume 35, Issue 10p2433-2443.e5May 19, 2025. DOI: 10.1016/j.cub.2025.04.006
-    .. [4] Lazaro et al., Brainwide Genetic Capture for Conscious State Transitions, `biorxiv`, doi: https://doi.org/10.1101/2025.03.28.646066
+    .. [1] Sabnis, G. S., et al. (2024). Visual detection of seizures in mice using supervised machine learning.
+           `bioRxiv <https://doi.org/10.1101/2024.05.29.596520>`_.
+    .. [2] Lopez, G. C., et al. (2024). Region-specific nucleus accumbens dopamine signals encode distinct aspects of avoidance learning.
+           `bioRxiv <https://doi.org/10.1101/2024.08.28.610149>`_.
+    .. [3] Lopez, G. C., Van Camp, L. D., Kovaleski, R. F., et al. (2025). Region-specific nucleus accumbens dopamine signals encode distinct aspects of avoidance learning.
+           `Current Biology, 35(10), 2433–2443.e5 <https://doi.org/10.1016/j.cub.2025.04.006>`_.
+    .. [4] Lazaro et al. (2025). Brainwide genetic capture for conscious state transitions.
+           `bioRxiv <https://doi.org/10.1101/2025.03.28.646066>`_.
     .. [5] Sabnis, G. S., et al. (2025). Visual detection of seizures in mice using supervised machine learning.
            `Cell Reports Methods, 5(12), 101242 <https://doi.org/10.1016/j.crmeth.2025.101242>`_.
     """

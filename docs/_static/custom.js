@@ -553,7 +553,7 @@ gtag('config', 'G-PEKR9R5J47');
       v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'none';
       v.setAttribute('data-src', '_static/img/' + fn);   // lazy: real src is set only near the active slide
       slide.appendChild(v);
-      slide.addEventListener('click', function () { if (i === idx) openVid(v); else go(i); });
+      slide.addEventListener('click', function () { if (suppressClick) return; if (i === idx) openVid(v); else go(i); });
       track.appendChild(slide);
       return { slide: slide, v: v };
     });
@@ -565,7 +565,7 @@ gtag('config', 'G-PEKR9R5J47');
       }
     }
 
-    var idx = 0, timer = null, slideW = 0;
+    var idx = 0, timer = null, slideW = 0, suppressClick = false;
     function position(animate) {
       track.style.transition = (animate === false) ? 'none' : 'transform .45s ease';
       var activeCenter = idx * (slideW + GAP) + slideW / 2;
@@ -613,6 +613,21 @@ gtag('config', 'G-PEKR9R5J47');
       e.preventDefault();
       go(e.key === 'ArrowLeft' ? idx - 1 : idx + 1);
     });
+    var touchX = 0, touchY = 0, swiping = false;
+    viewport.addEventListener('touchstart', function (e) {
+      var t = e.touches[0]; touchX = t.clientX; touchY = t.clientY; swiping = true;
+      clearTimeout(timer); freezeBar();
+    }, { passive: true });
+    viewport.addEventListener('touchend', function (e) {
+      if (!swiping) return; swiping = false;
+      var t = e.changedTouches[0], dx = t.clientX - touchX, dy = t.clientY - touchY;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {     // horizontal swipe
+        suppressClick = true; setTimeout(function () { suppressClick = false; }, 350);
+        go(dx < 0 ? idx + 1 : idx - 1);
+      } else {
+        schedule();                                              // tap / vertical scroll -> resume autoplay
+      }
+    }, { passive: true });
     window.addEventListener('resize', layout);
 
     var inst = main.querySelector('#installation');
@@ -631,5 +646,49 @@ gtag('config', 'G-PEKR9R5J47');
     }
     layout(); schedule();
     setTimeout(layout, 400);          // re-center once videos report dimensions
+  });
+})();
+
+/* ------------------------------------------------------------------ *
+ * Copy LaTeX on display-math blocks.
+ * Uses the MathJax v3 math list (the raw TeX is gone from the DOM after
+ * typesetting, but MathJax keeps the source string per math item).
+ * ------------------------------------------------------------------ */
+(function () {
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {
+      try {
+        var ta = document.createElement('textarea'); ta.value = text;
+        ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        var ok = document.execCommand('copy'); document.body.removeChild(ta);
+        if (ok) resolve(); else reject(new Error('copy failed'));
+      } catch (e) { reject(e); }
+    });
+  }
+  function addButtons() {
+    if (!(window.MathJax && MathJax.startup && MathJax.startup.document)) return;
+    var list;
+    try { list = Array.from(MathJax.startup.document.math); } catch (e) { return; }
+    list.forEach(function (item) {
+      if (!item.display) return;                          // display blocks only
+      var root = item.typesetRoot;
+      var box = root && root.closest ? root.closest('div.math') : null;
+      if (!box) return;
+      var wrap = (box.parentNode && box.parentNode.classList && box.parentNode.classList.contains('simba-math-wrap')) ? box.parentNode : null;
+      if (!wrap) { wrap = document.createElement('div'); wrap.className = 'simba-math-wrap'; box.parentNode.insertBefore(wrap, box); wrap.appendChild(box); }
+      if (wrap.querySelector('.simba-tex-btn')) return;
+      var tex = (item.math || '').trim();
+      if (!tex) return;
+      var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'simba-tex-btn'; btn.textContent = 'Copy LaTeX';
+      function flash(m) { btn.textContent = m; btn.classList.add('copied'); setTimeout(function () { btn.textContent = 'Copy LaTeX'; btn.classList.remove('copied'); }, 1400); }
+      btn.addEventListener('click', function (e) { e.preventDefault(); copyText(tex).then(function () { flash('Copied!'); }).catch(function () { flash('Failed'); }); });
+      wrap.appendChild(btn);
+    });
+  }
+  window.addEventListener('load', function () {
+    if (window.MathJax && MathJax.startup && MathJax.startup.promise) MathJax.startup.promise.then(addButtons).catch(function () {});
+    else addButtons();
   });
 })();
