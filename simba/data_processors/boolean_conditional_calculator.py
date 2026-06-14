@@ -32,7 +32,7 @@ class BooleanConditionalCalculator(ConfigReader):
     :param Optional[Union[str, os.PathLike]] agg_save_path: Optional location where to save the aggregate results as CSV file. If None, then results are saved in project logs folder under the ``Detailed_conditional_aggregate_statistics_{self.datetime}.csv`` filename.
     :param Optional[Union[str, os.PathLike]] detailed_save_path: Optional location where to save the detailed results as CSV file (bout level data). If None, then results are saved in project logs folder under the ``Detailed_conditional_aggregate_statistics_{self.datetime}.csv`` filename.
 
-    .. note:
+    .. note::
        `Example expected aggregate output table <https://github.com/sgoldenlab/simba/blob/master/misc/Conditional_aggregate_statistics_20231004130314.csv>`__.
        `Example expected detailed output table <https://github.com/sgoldenlab/simba/blob/master/misc/Detailed_conditional_aggregate_statistics_20241011123409.csv>`__.
 
@@ -50,8 +50,10 @@ class BooleanConditionalCalculator(ConfigReader):
     >>> runner.save()
 
 
-    :references:
-       .. [1] Shonka, Sophia, and Michael J Hylin. “Younger Is Better But Only for Males: Social Behavioral Development Following Juvenile Traumatic Brain Injury to the Prefrontal Cortex,” n.d.
+    References
+    ----------
+    .. [1] Shonka, S., & Hylin, M. J. (2025). Younger is better but only for males: social behavioral development following juvenile traumatic brain injury to the prefrontal cortex.
+           `bioRxiv <https://doi.org/10.1101/2025.05.24.655898>`_.
 
     """
 

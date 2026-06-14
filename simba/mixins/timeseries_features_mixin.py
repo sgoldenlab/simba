@@ -74,7 +74,7 @@ class TimeseriesFeatureMixin(object):
     #@njit("(float32[:],)")
     @dynamic_numba_decorator(dtypes="(float32[:],)", cache=True, fastmath=False)
     def hjort_parameters(data: np.ndarray) -> Tuple[np.float64, np.float64, np.float64]:
-        """
+        r"""
         Jitted compute of Hjorth parameters for a given time series data. Hjorth parameters describe
         mobility, complexity, and activity of a time series.
 
@@ -101,9 +101,9 @@ class TimeseriesFeatureMixin(object):
         >>> TimeseriesFeatureMixin().hjort_parameters(data)
         >>> (2.9166667, 1.2503713, 1.6617813)  # (activity, mobility, complexity)
 
-        :math:`mobility = \sqrt{\\frac{dx_{var}}{x_{var}}}`
+        :math:`mobility = \sqrt{\frac{dx_{var}}{x_{var}}}`
 
-        :math:`complexity = \sqrt{\\frac{ddx_{var}}{dx_{var}} / mobility}`
+        :math:`complexity = \sqrt{\frac{ddx_{var}}{dx_{var}} / mobility}`
         """
         dx = np.diff(np.ascontiguousarray(data))
         ddx = np.diff(np.ascontiguousarray(dx))
@@ -315,10 +315,10 @@ class TimeseriesFeatureMixin(object):
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_percentile_difference`
 
-        :parameter np.ndarray data: 1D array of representing time-series.
-        :parameter int upper_pct: Upper-boundary percentile.
-        :parameter int lower_pct: Lower-boundary percentile.
-        :returns: The difference between the ``upper`` and ``lower`` percentiles of the data as a percentage of the median value.
+        :param np.ndarray data: 1D array of representing time-series.
+        :param int upper_pct: Upper-boundary percentile.
+        :param int lower_pct: Lower-boundary percentile.
+        :return: The difference between the ``upper`` and ``lower`` percentiles of the data as a percentage of the median value.
         :rtype: float
 
         :examples:
@@ -400,8 +400,8 @@ class TimeseriesFeatureMixin(object):
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_percent_beyond_n_std`
 
 
-        :parameter np.ndarray data: 1D array representing time-series.
-        :parameter float n: Standard deviation cut-off.
+        :param np.ndarray data: 1D array representing time-series.
+        :param float n: Standard deviation cut-off.
         :return: Ratio of values in ``data`` that fall more than ``n`` standard deviations from mean of ``data``.
         :rtype: float
 
@@ -507,10 +507,10 @@ class TimeseriesFeatureMixin(object):
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_percent_in_percentile_window`
 
-        :parameter np.ndarray data: 1D array of representing time-series.
-        :parameter int upper_pct: Upper-boundary percentile.
-        :parameter int lower_pct: Lower-boundary percentile.
-        :returns: Ratio of values in ``data`` that fall within ``upper_pct`` and ``lower_pct`` percentiles.
+        :param np.ndarray data: 1D array of representing time-series.
+        :param int upper_pct: Upper-boundary percentile.
+        :param int lower_pct: Lower-boundary percentile.
+        :return: Ratio of values in ``data`` that fall within ``upper_pct`` and ``lower_pct`` percentiles.
         :rtype: float
 
         :example:
@@ -579,7 +579,7 @@ class TimeseriesFeatureMixin(object):
     #@njit("(float32[:],)", fastmath=True, cache=True)
     @dynamic_numba_decorator(dtypes="(float32[:],)", cache=True, fastmath=True)
     def petrosian_fractal_dimension(data: np.ndarray) -> float:
-        """
+        r"""
         Calculate the Petrosian Fractal Dimension (PFD) of a given time series data. The PFD is a measure of the
         irregularity or self-similarity of a time series. Larger values indicate higher complexity. Lower values indicate lower complexity.
 
@@ -588,13 +588,13 @@ class TimeseriesFeatureMixin(object):
            Adapted from `eeglib <https://github.com/Xiul109/eeglib/>`_.
 
         .. math::
-           PFD = \\frac{\\log_{10}(N)}{\\log_{10}(N) + \\log_{10}\\left(\\frac{N}{N + 0.4 \\cdot zC}\\right)}
+           PFD = \frac{\log_{10}(N)}{\log_{10}(N) + \log_{10}\left(\frac{N}{N + 0.4 \cdot zC}\right)}
 
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_petrosian_fractal_dimension`
 
-        :parameter np.ndarray data: A 1-dimensional numpy array containing the time series data.
-        :returns: The Petrosian Fractal Dimension of the input time series.
+        :param np.ndarray data: A 1-dimensional numpy array containing the time series data.
+        :return: The Petrosian Fractal Dimension of the input time series.
         :rtype: float
 
         :examples:
@@ -693,22 +693,22 @@ class TimeseriesFeatureMixin(object):
     @dynamic_numba_decorator(dtypes="(float32[:], int64)", cache=True, fastmath=False)
 
     def higuchi_fractal_dimension(data: np.ndarray, kmax: Optional[int] = 10):
-        """
+        r"""
         Jitted compute of the Higuchi Fractal Dimension of a given time series data. The Higuchi Fractal Dimension provides a measure of the fractal
         complexity of a time series.
 
         The maximum value of k used in the calculation. Increasing kmax considers longer sequences of data, providing a more detailed analysis of fractal complexity. Default is 10.
 
-        :parameter np.ndarray data: A 1-dimensional numpy array containing the time series data.
-        :parameter int kmax: The maximum value of k used in the calculation. Increasing kmax considers longer sequences of data, providing a more detailed analysis of fractal complexity. Default is 10.
-        :returns: The Higuchi Fractal Dimension of the input time series.
+        :param np.ndarray data: A 1-dimensional numpy array containing the time series data.
+        :param int kmax: The maximum value of k used in the calculation. Increasing kmax considers longer sequences of data, providing a more detailed analysis of fractal complexity. Default is 10.
+        :return: The Higuchi Fractal Dimension of the input time series.
         :rtype: float
 
         .. note::
            - Adapted from `eeglib <https://github.com/Xiul109/eeglib/>`_.
 
         .. math::
-           HFD = \\frac{\\log(N)}{\\log(N) + \\log\\left(\\frac{N}{N + 0.4 \\cdot zC}\\right)}
+           HFD = \frac{\log(N)}{\log(N) + \log\left(\frac{N}{N + 0.4 \cdot zC}\right)}
 
         :example:
         >>> t = np.linspace(0, 50, int(44100 * 2.0), endpoint=False)
@@ -748,7 +748,7 @@ class TimeseriesFeatureMixin(object):
     #@njit("(float32[:], int64, int64,)", fastmath=True)
     @dynamic_numba_decorator(dtypes="(float32[:], int64, int64,)", cache=True, fastmath=True)
     def permutation_entropy(data: np.ndarray, dimension: int, delay: int) -> float:
-        """
+        r"""
         Calculate the permutation entropy of a time series.
 
         Permutation entropy is a measure of the complexity of a time series data by quantifying
@@ -758,7 +758,7 @@ class TimeseriesFeatureMixin(object):
         The permutation entropy (PE) is calculated using the following formula:
 
         .. math::
-            PE = - \\sum(p_i \\log(p_i))
+            PE = - \sum(p_i \log(p_i))
 
         where:
            :math:`PE` is the permutation entropy.
@@ -817,7 +817,7 @@ class TimeseriesFeatureMixin(object):
     @dynamic_numba_decorator(dtypes="(float32[:],)", cache=True, fastmath=True)
 
     def line_length(data: np.ndarray) -> float:
-        """
+        r"""
         Calculate the line length of a 1D array.
 
         Line length is a measure of signal complexity and is computed by summing the absolute
@@ -1298,7 +1298,7 @@ class TimeseriesFeatureMixin(object):
         :param float value: The specific value to search for in the data array.
         :param int sample_rate: The sampling rate which data points were collected. It is used to calculate the time duration in seconds.
         :param bool inverse: If True, the function calculates the time since the previous value that is NOT equal to the specified 'value'. If False, it calculates the time since the previous occurrence of the specified 'value'.
-        :returns: A 1D NumPy array containing the time duration (in seconds) since the previous occurrence of the specified 'value' for each data point.
+        :return: A 1D NumPy array containing the time duration (in seconds) since the previous occurrence of the specified 'value' for each data point.
         :rtype: np.ndarray
 
         :example:
@@ -1377,7 +1377,7 @@ class TimeseriesFeatureMixin(object):
     def sliding_benford_correlation(
         data: np.ndarray, time_windows: np.ndarray, sample_rate: int
     ) -> np.ndarray:
-        """
+        r"""
         Calculate the sliding Benford's Law correlation coefficient for a given dataset within
         specified time windows.
 
@@ -1395,7 +1395,7 @@ class TimeseriesFeatureMixin(object):
 
         .. math::
 
-            P(d) = \\log_{10}\\left(1 + \\frac{1}{d}\\right) \\quad \\text{for } d \\in \{1, 2, \\ldots, 9\}
+            P(d) = \log_{10}\left(1 + \frac{1}{d}\right) \quad \text{for } d \in \{1, 2, \ldots, 9\}
 
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.benford_correlation`
@@ -1530,7 +1530,7 @@ class TimeseriesFeatureMixin(object):
 
 
         :param np.ndarray data: The data from which spike trains are extracted.
-        :param types.List(types.Array(types.int64, 1, 'C')) data: A list of spike indices, typically as integer timestamps.
+        :param types.List(types.Array(types.int64, 1, 'C')) spike_idx: A list of spike indices, typically as integer timestamps.
         :param float sample_rate: The sample rate of the data.
         :param Optional[float] min_spike_train_length: The minimum length a spike train must have to be considered. Default is set to positive infinity, meaning no minimum length is enforced.
         :param Optional[float] max_spike_train_separation: The maximum allowable separation between spikes in the same train. Default is set to positive infinity, meaning no maximum separation is enforced.
@@ -1735,7 +1735,7 @@ class TimeseriesFeatureMixin(object):
                      time_window: float = 1,
                      unit: Literal["mm", "cm", "dm", "m"] = "mm") -> np.ndarray:
 
-        """
+        r"""
         Compute acceleration.
 
         Computes acceleration from a sequence of body-part coordinates over time. It calculates the difference in velocity between consecutive frames and provides an array of accelerations.
@@ -1744,9 +1744,9 @@ class TimeseriesFeatureMixin(object):
 
         .. math::
 
-           \\text{{Acceleration}}(t) = \\frac{{\\text{{Norm}}(\\text{{Shift}}(\\text{{data}}[t], t, t-1) - \\text{{data}}[t])}}{{\\text{{pixels\\_per\\_mm}}}}
+           \text{{Acceleration}}(t) = \frac{{\text{{Norm}}(\text{{Shift}}(\text{{data}}[t], t, t-1) - \text{{data}}[t])}}{{\text{{pixels\_per\_mm}}}}
 
-        where :math:`\\text{{Norm}}` calculates the Euclidean norm, :math:`\\text{{Shift}}(\\text{{array}}, t, t-1)` shifts the array by :math:`t-1` frames, and :math:`\\text{{pixels\\_per\\_mm}}` is the conversion factor from pixels to millimeters.
+        where :math:`\text{{Norm}}` calculates the Euclidean norm, :math:`\text{{Shift}}(\text{{array}}, t, t-1)` shifts the array by :math:`t-1` frames, and :math:`\text{{pixels\_per\_mm}}` is the conversion factor from pixels to millimeters.
 
         .. note::
            By default, acceleration is calculated as change in velocity at millimeters/s. To change the denomitator, modify the ``time_window`` argument. To change the nominator, modify the ``unit`` argument (accepted ``mm``, cm``, ``dm``, ``mm``)
@@ -2150,7 +2150,7 @@ class TimeseriesFeatureMixin(object):
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.linearity_index`, :func:`simba.data_processors.cuda.timeseries.sliding_linearity_index_cuda`
 
         :param np.ndarray x: An (N, M) array representing the path, where N is the number of points and M is the number of spatial dimensions (e.g., 2 for 2D or 3 for 3D). Each row represents the coordinates of a point along the path.
-        :param float x: The size of the sliding window in seconds. This defines the time window over which the linearity index is calculated. The window size should be specified in seconds.
+        :param float window_size: The size of the sliding window in seconds. This defines the time window over which the linearity index is calculated. The window size should be specified in seconds.
         :param float sample_rate: The sample rate in Hz (samples per second), which is used to convert the window size from seconds to frames.
         :return: A 1D array of length N, where each element represents the linearity index of the path within a sliding  window. The value is a ratio between the straight-line distance and the actual path length for each window. Values range from 0 to 1, with 1 indicating a perfectly straight path.
         :rtype: np.ndarray
@@ -2482,7 +2482,7 @@ class TimeseriesFeatureMixin(object):
            :align: center
 
         :param np.ndarray x: A 2D array of shape (N, 2) representing the path, where N is the number of points and each point has two spatial coordinates (e.g., x and y for 2D space). The path should be in the form of an array of consecutive (x, y) points.
-        :param float px_per_mm: Convertion factor representing the number of pixels per millimeter
+        :param float px_per_mm: Conversion factor representing the number of pixels per millimeter
         :return: The aspect ratio of the bounding box enclosing the path. If the width or height of the bounding box is zero (e.g., if all points are aligned vertically or horizontally), returns -1.
         :rtype: float
 
@@ -2518,7 +2518,7 @@ class TimeseriesFeatureMixin(object):
 
         :param np.ndarray x: A 2D array of shape (N, 2) representing the path, where N is the number of points, and each point has two spatial coordinates (x and y).
         :param float window_size: The size of the sliding window in seconds.
-        :param float px_per_mm: Convertion factor representing the number of pixels per millimeter
+        :param float px_per_mm: Conversion factor representing the number of pixels per millimeter
         :param float sample_rate: The sample rate of the path data in points per second.
 
         :return: An array of aspect ratios for each position of the sliding window. If the window contains a path segment that is aligned vertically or horizontally (leading to a zero width or height), the function returns -1.0 for that position. NaN values are used for the initial positions where the window cannot be fully applied.
@@ -2679,7 +2679,7 @@ class TimeseriesFeatureMixin(object):
         :param np.ndarray x: 2D array of shape (n_samples, 2) representing positions.
         :param float mass: Mass of the object.
         :param float sample_rate: Sampling rate in FPS.
-        :returns: Magnitude of the momentum.
+        :return: Magnitude of the momentum.
         :rtype: float
 
         .. image:: _static/img/momentum_magnitude.webp
@@ -2704,7 +2704,7 @@ class TimeseriesFeatureMixin(object):
         :param np.ndarray mass: Array of mass values for each frame.
         :param float sample_rate: Sampling rate in FPS.
         :param float time_window: Time window in seconds for sliding momentum calculation.
-        :returns: Momentum magnitudes computed for each frame, with results from frames that cannot form a complete window filled with -1.0.
+        :return: Momentum magnitudes computed for each frame, with results from frames that cannot form a complete window filled with -1.0.
         :rtype: np.ndarray
 
         """

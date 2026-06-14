@@ -791,7 +791,7 @@ def get_img_resize_info(img_size: Tuple[int ,int],
     :param Optional[Tuple[int, int]] display_resolution: Optional resolution of the display as (width, height). If none, then grabs the resolution of the main monitor.
     :param float max_height_ratio: The maximum allowed height of the image as a fraction of the display height (default is 0.5).
     :param float max_width_ratio: The maximum allowed width of the image as a fraction of the display width (default is 0.5).
-    :returns: Length 4 tuple with resized width, resized height, downscale factor, and upscale factor
+    :return: Length 4 tuple with resized width, resized height, downscale factor, and upscale factor
     :rtype: Tuple[int, int, float, float]
     """
 
@@ -1180,9 +1180,9 @@ def check_for_updates(time_out: int = 2):
     version. Prints an informational message indicating whether an update is available or if
     the installation is up-to-date. Requires an active internet connection to query PyPI.
 
-    :parameter int time_out: Timeout in seconds for the PyPI API request. Default is 2 seconds.
+    :param int time_out: Timeout in seconds for the PyPI API request. Default is 2 seconds.
         Must be at least 1 second.
-    :returns: None. Prints update information to stdout via stdout_information.
+    :return: None. Prints update information to stdout via stdout_information.
     :raises SimBAPAckageVersionError: If the latest version cannot be fetched from PyPI, or if
         the local SimBA version cannot be determined.
 
@@ -1388,7 +1388,7 @@ def find_best_multi_animal_assignment_frame(h5_path: Union[str, os.PathLike],
         identity assignment more reliable (e.g. for SuperAnimal-TopView with 27 body
         parts per animal, ``min_bodyparts_per_animal=14`` requires that more than half
         of every animal's body-parts are tracked on the returned frame).
-    :returns: Frame index recommended for the assignment UI, or ``None`` if no frame in
+    :return: Frame index recommended for the assignment UI, or ``None`` if no frame in
         the file satisfies the constraint, or if the file does not contain a
         multi-animal layout.
     :rtype: Optional[int]

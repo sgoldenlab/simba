@@ -62,3 +62,111 @@ body {
 .sphinx-contrib-video-container.align-left video {
     display: inline-block;
 }
+
+/* --- DOI paper hovercard --- */
+.doi-hovercard {
+    position: absolute;
+    z-index: 10000;
+    width: 360px;
+    max-width: 90vw;
+    background: #ffffff;
+    border: 1px solid #d0d0d0;
+    border-radius: 10px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: #2b2b2b;
+}
+.doi-hc-title    { font-weight: 600; font-size: 14px; margin-bottom: 4px; color: #1a1a1a; }
+.doi-hc-authors  { color: #444; margin-bottom: 3px; }
+.doi-hc-meta     { color: #2980b9; font-size: 12px; margin-bottom: 6px; }
+.doi-hc-abstract { color: #555; font-size: 12.5px; max-height: 140px; overflow: hidden; }
+.doi-hc-foot     { margin-top: 10px; font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: .04em;
+                   display: flex; align-items: center; justify-content: space-between; }
+.doi-hc-actions  { display: inline-flex; gap: 8px; align-items: center; }
+.doi-hc-open     { display: inline-block; padding: 3px 10px; border-radius: 6px; background: #2980b9; color: #fff !important;
+                   font-size: 11px; font-weight: 600; text-decoration: none; text-transform: none; letter-spacing: 0; }
+.doi-hc-open:hover { background: #1f6391; color: #fff !important; text-decoration: none; }
+.doi-hc-bib      { padding: 3px 10px; border-radius: 6px; border: 1px solid #2980b9; background: #fff; color: #2980b9;
+                   font-size: 11px; font-weight: 600; cursor: pointer; text-transform: none; letter-spacing: 0; line-height: 1.4; }
+.doi-hc-bib:hover { background: #eaf3fa; }
+.doi-hc-loading  { color: #888; font-style: italic; }
+
+/* --- Image lightbox (zoom / pan viewer) --- */
+.simba-zoomable { cursor: zoom-in; }
+.simba-lightbox-overlay {
+    position: fixed; inset: 0;
+    background: rgba(20, 22, 26, 0.55);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    z-index: 11000;
+    display: none; align-items: center; justify-content: center;
+    overflow: hidden;
+    opacity: 0; transition: opacity .15s ease;
+}
+.simba-lightbox-overlay.visible { opacity: 1; }
+.simba-lightbox-img {
+    max-width: 92vw; max-height: 90vh;
+    background: #fff; border-radius: 4px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.45);
+    transform-origin: center center;
+    will-change: transform;
+    user-select: none; -webkit-user-drag: none;
+    cursor: zoom-in;
+}
+.simba-lightbox-img.grabbable { cursor: grab; }
+.simba-lightbox-img.grabbable:active { cursor: grabbing; }
+.simba-lightbox-caption {
+    position: fixed; bottom: 40px; left: 0; right: 0;
+    text-align: center; color: #f0f0f0; font-size: 13px; padding: 0 20px;
+    pointer-events: none; text-shadow: 0 1px 3px rgba(0, 0, 0, .6);
+}
+.simba-lightbox-hint {
+    position: fixed; bottom: 14px; left: 0; right: 0;
+    text-align: center; color: #c4c4c4; font-size: 11px; padding: 0 20px;
+    pointer-events: none; letter-spacing: .02em;
+}
+.simba-lightbox-close {
+    position: fixed; top: 12px; right: 22px;
+    color: #fff; font-size: 32px; line-height: 1; cursor: pointer; opacity: .85; z-index: 1;
+}
+.simba-lightbox-close:hover { opacity: 1; }
+
+/* --- Video lightbox --- */
+.simba-video-wrap { position: relative; display: inline-block; }
+.simba-video-expand {
+    position: absolute; top: 8px; right: 8px;
+    width: 30px; height: 30px;
+    border: none; border-radius: 6px;
+    background: rgba(0, 0, 0, 0.55); color: #fff;
+    font-size: 16px; line-height: 1; cursor: pointer;
+    opacity: 0; transition: opacity .15s ease; z-index: 2;
+}
+.simba-video-wrap:hover .simba-video-expand { opacity: 1; }
+.simba-video-expand:hover { background: rgba(0, 0, 0, 0.85); }
+.simba-video-holder { display: flex; align-items: center; justify-content: center; }
+.simba-video-player {
+    max-width: 92vw; max-height: 88vh;
+    border-radius: 4px; background: #000;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Math: display-equation readability --- */
+.rst-content div.math {
+    overflow-x: auto;                         /* wide equations scroll horizontally only */
+    padding: 0.6em 2px;                       /* vertical breathing room so tall glyphs are not clipped */
+    text-align: center;                       /* centre display equations */
+    /* CSS-only scroll shadow: faded edge appears only when the equation overflows.
+       Edge colour matches the RTD content background (#fcfcfc). */
+    background:
+        linear-gradient(to right, #fcfcfc 30%, rgba(252, 252, 252, 0)) 0 0,
+        linear-gradient(to right, rgba(252, 252, 252, 0), #fcfcfc 70%) 100% 0,
+        radial-gradient(farthest-side at 0 50%, rgba(0, 0, 0, .12), rgba(0, 0, 0, 0)) 0 0,
+        radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, .12), rgba(0, 0, 0, 0)) 100% 0;
+    background-repeat: no-repeat;
+    background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+    background-attachment: local, local, scroll, scroll;
+}
+
+/* slightly larger inline math so symbols read at body-text weight */
+.rst-content span.math { font-size: 1.06em; }

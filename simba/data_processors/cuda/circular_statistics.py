@@ -51,8 +51,8 @@ def direction_from_two_bps(x: np.ndarray, y: np.ndarray) -> np.ndarray:
        :width: 600
        :align: center
 
-    :parameter np.ndarray x: Size len(frames) x 2 representing x and y coordinates for first body-part.
-    :parameter np.ndarray y: Size len(frames) x 2 representing x and y coordinates for second body-part.
+    :param np.ndarray x: Size len(frames) x 2 representing x and y coordinates for first body-part.
+    :param np.ndarray y: Size len(frames) x 2 representing x and y coordinates for second body-part.
     :return: Frame-wise directionality in degrees.
     :rtype: np.ndarray.
 
@@ -130,7 +130,7 @@ def sliding_circular_mean(x: np.ndarray,
                           sample_rate: int,
                           batch_size: Optional[int] = 3e+7) -> np.ndarray:
 
-    """
+    r"""
     Calculate the sliding circular mean over a time window for a series of angles.
 
     This function computes the circular mean of angles in the input array `x` over a specified sliding window.
@@ -140,13 +140,13 @@ def sliding_circular_mean(x: np.ndarray,
     The calculation is performed using a sliding window approach, where the circular mean is computed for each window
     of angles. The function leverages GPU acceleration via CuPy for efficiency when processing large datasets.
 
-    The circular mean :math:`\\mu` for a set of angles is calculated using the following formula:
+    The circular mean :math:`\mu` for a set of angles is calculated using the following formula:
 
     .. math::
 
-        \\mu = \\text{atan2}\\left(\\frac{1}{N} \\sum_{i=1}^{N} \\sin(\\theta_i), \\frac{1}{N} \\sum_{i=1}^{N} \\cos(\\theta_i)\\right)
+        \mu = \text{atan2}\left(\frac{1}{N} \sum_{i=1}^{N} \sin(\theta_i), \frac{1}{N} \sum_{i=1}^{N} \cos(\theta_i)\right)
 
-    - :math:`\\theta_i` are the angles in radians within the sliding window
+    - :math:`\theta_i` are the angles in radians within the sliding window
     - :math:`N` is the number of samples in the window
 
 
@@ -194,7 +194,7 @@ def sliding_circular_range(x: np.ndarray,
                           time_window: float,
                           sample_rate: float,
                           batch_size: Optional[int] = int(5e+7)) -> np.ndarray:
-    """
+    r"""
     Computes the sliding circular range of a time series data array using GPU.
 
     This function calculates the circular range of a time series data array using a sliding window approach.
@@ -203,11 +203,11 @@ def sliding_circular_range(x: np.ndarray,
 
     .. math::
 
-       R = \\min \\left( \\text{max}(\\Delta \\theta) - \\text{min}(\\Delta \\theta), \\, 360 - \\text{max}(\\Delta \\theta) + \\text{min}(\\Delta \\theta) \\right)
+       R = \min \left( \text{max}(\Delta \theta) - \text{min}(\Delta \theta), \, 360 - \text{max}(\Delta \theta) + \text{min}(\Delta \theta) \right)
 
     where:
 
-    - :math:`\\Delta \\theta` is the difference between angles within the window,
+    - :math:`\Delta \theta` is the difference between angles within the window,
     - :math:`360` accounts for the circular nature of the data (i.e., wrap-around at 360 degrees).
 
     .. csv-table::
@@ -390,7 +390,7 @@ def sliding_resultant_vector_length(x: np.ndarray,
                                     sample_rate: int,
                                     batch_size: Optional[int] = 3e+7) -> np.ndarray:
 
-    """
+    r"""
     Calculate the sliding resultant vector length over a time window for a series of angles.
 
     This function computes the resultant vector length (R) for each window of angles in the input array `x`.
@@ -401,11 +401,11 @@ def sliding_resultant_vector_length(x: np.ndarray,
 
     .. math::
 
-        R = \\frac{1}{N} \\sqrt{\\left(\\sum_{i=1}^{N} \\cos(\\theta_i)\\right)^2 + \\left(\\sum_{i=1}^{N} \\sin(\\theta_i)\\right)^2}
+        R = \frac{1}{N} \sqrt{\left(\sum_{i=1}^{N} \cos(\theta_i)\right)^2 + \left(\sum_{i=1}^{N} \sin(\theta_i)\right)^2}
 
     where:
 
-    - :math:`\\theta_i` are the angles in radians within the sliding window
+    - :math:`\theta_i` are the angles in radians within the sliding window
     - :math:`N` is the number of samples in the window
 
     The computation is performed in a sliding window manner over the entire array, utilizing GPU acceleration
@@ -475,7 +475,7 @@ def direction_from_three_bps(x: np.ndarray,
     :param np.ndarray z: A 2D array of shape (N, 2) containing the coordinates of the second body part (right ear).
     :param Optional[int] batch_size: The size of the batch to be processed in each iteration. Default is 15 million.
     :return: An array of shape (N,) containing the computed direction angles in degrees.
-    :rtype np.ndarray:
+    :rtype: np.ndarray
     """
 
     check_valid_array(data=x, source=direction_from_three_bps.__name__, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
@@ -533,9 +533,9 @@ def instantaneous_angular_velocity(x: np.ndarray, stride: Optional[int] = 1) -> 
        \omega = \frac{{\Delta \theta}}{{\Delta t}} = \frac{{180}}{{\pi}} \times \left( \pi - \left| \pi - \left| \theta_r - \theta_l \right| \right| \right)
 
     where:
-    - \( \theta_r \) is the current angle.
-    - \( \theta_l \) is the angle at the specified stride before the current angle.
-    - \( \Delta t \) is the time difference between the two angles.
+    - :math:`\theta_r` is the current angle.
+    - :math:`\theta_l` is the angle at the specified stride before the current angle.
+    - :math:`\Delta t` is the time difference between the two angles.
 
 
     .. seealso::
@@ -645,7 +645,7 @@ def _sliding_angular_diff(data, strides, results):
 def sliding_angular_diff(x: np.ndarray,
                          time_windows: np.ndarray,
                          fps: float) -> np.ndarray:
-    """
+    r"""
     Calculate the sliding angular differences for a given time window using GPU acceleration.
 
 

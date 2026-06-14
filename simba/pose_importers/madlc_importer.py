@@ -32,12 +32,12 @@ class MADLCImporterH5(ConfigReader, PoseImporterMixin):
     Importing multi-animal deeplabcut (maDLC) pose-estimation data (in H5 format)
     into a SimBA project in parquet or CSV format.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
-    :parameter str data_folder: Path to folder containing maDLC data in ``.h5`` format.
-    :parameter str file_type: Method used to perform pose-estimation in maDLC. OPTIONS: `skeleton`, `box`, `ellipse`.
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str data_folder: Path to folder containing maDLC data in ``.h5`` format.
+    :param str file_type: Method used to perform pose-estimation in maDLC. OPTIONS: `skeleton`, `box`, `ellipse`.
     :param List[str] id_lst: Names of animals.
-    :parameter Optional[Dict[str, str]] interpolation_setting: Dict defining the type and method to use to perform interpolation {'type': 'animals', 'method': 'linear'}.
-    :parameter Optional[Dict[str, Union[str, int]]] smoothing_settings: Dictionary defining the pose estimation smoothing method {'time_window': 500, 'method': 'gaussian'}.
+    :param Optional[Dict[str, str]] interpolation_setting: Dict defining the type and method to use to perform interpolation {'type': 'animals', 'method': 'linear'}.
+    :param Optional[Dict[str, Union[str, int]]] smoothing_settings: Dictionary defining the pose estimation smoothing method {'time_window': 500, 'method': 'gaussian'}.
 
     .. note::
        `Multi-animal import tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Multi_animal_pose.md>`__.
@@ -47,8 +47,8 @@ class MADLCImporterH5(ConfigReader, PoseImporterMixin):
 
     References
     ----------
-    .. [1] Lauer et al., Multi-animal pose estimation, identification and tracking with DeepLabCut, `Nature Methods`,
-           2022.
+    .. [1] Lauer, J., et al. (2022). Multi-animal pose estimation, identification and tracking with DeepLabCut.
+           `Nature Methods, 19, 496–504 <https://doi.org/10.1038/s41592-022-01443-0>`_.
     """
 
     def __init__(self,

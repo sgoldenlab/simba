@@ -77,7 +77,7 @@ class ImageMixin(object):
 
         :param Union[List[np.ndarray], np.ndarray] imgs: List of images as arrays or 3/4d array of images to calculate average brightness intensity within.
         :param Optional[bool] ignore_black: If True, ignores black pixels. If the images are sliced non-rectangular geometric shapes created by ``slice_shapes_in_img``, then pixels that don't belong to the shape has been masked in black.
-        :returns: List of floats of size len(imgs) with brightness intensities.
+        :return: List of floats of size len(imgs) with brightness intensities.
         :rtype: List[float]
 
         :example:
@@ -283,8 +283,8 @@ class ImageMixin(object):
            :align: center
 
         :param Union[np.ndarray, Tuple[cv2.VideoCapture, int]] img: Either an image in numpy array format OR a tuple with cv2.VideoCapture object and the frame index.
-        :param List[Union[Polygon, np.ndarray]] img: A list of shapes either as vertices in a numpy array, or as shapely Polygons.
-        :returns: List of sliced ROIs from the input image.
+        :param List[Union[Polygon, np.ndarray]] geometries: A list of shapes either as vertices in a numpy array, or as shapely Polygons.
+        :return: List of sliced ROIs from the input image.
         :rtype: List[np.ndarray]
 
         >>> img = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/img_comparisons_4/1.png')
@@ -413,7 +413,7 @@ class ImageMixin(object):
 
         :param np.ndarray img: The input image as a 2D or 3D NumPy array. If the image has multiple channels (e.g., RGB or BGR), it will be converted to grayscale.
         :param  Optional[bool] hu_moments: If set to True, the function computes and returns the 7 Hu moments.  If False, it returns the standard moments of the image. Default is False.
-        :returns: A 24x1 2D-array if `hu_moments` is False (representing standard moments), or a 7x1 2D-array if `hu_moments` is True (representing Hu moments).
+        :return: A 24x1 2D-array if `hu_moments` is False (representing standard moments), or a 7x1 2D-array if `hu_moments` is True (representing Hu moments).
         :rtype: np.ndarray
 
         :example:
@@ -441,7 +441,7 @@ class ImageMixin(object):
            For contour comparisons, see :func:`simba.mixins.image_mixin.ImageMixin.get_contourmatch`
 
         :param np.ndarray img: Input image as a NumPy array.
-        :param Optional[Literal['all', 'exterior']] img: Contour retrieval mode. E.g., which contours should be kept. Default is 'all'.
+        :param Optional[Literal['all', 'exterior']] mode: Contour retrieval mode. E.g., which contours should be kept. Default is 'all'.
         :param Optional[Literal['simple', 'none', 'l1', 'kcos']]: Contour approximation method. Default is 'simple'.
         :rtype: np.ndarray
         """
@@ -527,7 +527,7 @@ class ImageMixin(object):
         :param np.ndarray img: Template image for matching. E.g., a cropped image from ``video_path``.
         :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1 (max available cores).
         :param Optional[bool] return_img: Whether to return the annotated best match image with rectangle around matched template area. Default is False.
-        :returns: A tuple containing: (i) int: frame index of the frame with the best match.
+        :return: A tuple containing: (i) int: frame index of the frame with the best match.
                  (ii) dict: Dictionary containing results (probability and match location) for each frame.
                  (iii) Union[None, np.ndarray]: Annotated image with rectangles around matches (if return_img is True), otherwise None.
         :rtype: Tuple[ int, dict, Union[None, np.ndarray]]
@@ -868,7 +868,7 @@ class ImageMixin(object):
 
         :param Union[str, os.PathLike] dir: Diretory holding the input images.
         :param Optional[int] core_cnt: Number of CPU cores to use to read in images. Default to ``-1`` denoting all available cores.
-        :returns: Returns a dictionary with the image name as key and the images in array format as values.
+        :return: Returns a dictionary with the image name as key and the images in array format as values.
         :rtype: Dict[str, np.ndarray]
 
         :example:
@@ -913,7 +913,7 @@ class ImageMixin(object):
            For time-series comparison and multicore acceleration, see:func:`simba.mixins.image_mixin.ImageMixin.img_sliding_mse`
 
         :param np.ndarray imgs_1: First three (non-color) or four (color) dimensional stack of images in array format.
-        :param np.ndarray imgs_1: Second three (non-color) or four (color) dimensional stack of images in array format.
+        :param np.ndarray imgs_2: Second three (non-color) or four (color) dimensional stack of images in array format.
         :return: Array of size len(imgs_1) comparing ``imgs_1`` and ``imgs_2`` at each index using mean squared errors at each pixel location.
         :rtype: np.ndarray
 
@@ -1018,7 +1018,7 @@ class ImageMixin(object):
         :param Optionalint] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, indicating using all available cores.
         :param Optional[bool] greyscale: If True, reads the images as greyscale. If False, then as original color scale. Default: False.
         :param bool black_and_white: If True, returns the images in black and white. Default False.
-        :returns: A dictionary containing frame indices as keys and corresponding frame arrays as values.
+        :return: A dictionary containing frame indices as keys and corresponding frame arrays as values.
         :rtype: Dict[int, np.ndarray]
 
         :example:
@@ -1054,7 +1054,7 @@ class ImageMixin(object):
                 img_2: Optional[np.ndarray] = None,
                 lower_bound: Optional[float] = 0.5,
                 verbose: Optional[bool] = False):
-        """
+        r"""
         Compute Wasserstein distance between two images represented as numpy arrays.
 
         .. math::
@@ -1267,7 +1267,7 @@ class ImageMixin(object):
            For single image conversion, see :func:`simba.mixins.image_mixin.ImageMixin.img_to_greyscale`
 
         :param np.ndarray imgs: A 4D array representing color images. It should have the shape (num_images, height, width, 3) where the last dimension represents the color channels (R, G, B).
-        :returns: A 3D array containing the grayscale versions of the input images. The shape of the output array is (num_images, height, width).
+        :return: A 3D array containing the grayscale versions of the input images. The shape of the output array is (num_images, height, width).
         :rtype: np.ndarray
 
         :example:
@@ -1553,7 +1553,7 @@ class ImageMixin(object):
 
         :param np.ndarray img_1: The first input image represented as a NumPy array.
         :param np.ndarray img_2: The second input image represented as a NumPy array.
-        :returns: The SSI value representing the similarity between the two images.
+        :return: The SSI value representing the similarity between the two images.
         :rtype: float
         """
 
@@ -1841,7 +1841,7 @@ class ImageMixin(object):
         :param Union[str, os.PathLike, cv2.VideoCapture] video_path: The path to a video file on disk, or a cv2.VideoCapture object.
         :param Optional[int] start_idx: The first frame (where to start searching for the non-uniform color image). Default: 0 which equals the first frame. None also equals start searching at the first frame.
         :param Optional[int] end_idx: The last frame (where to end searching for the non-uniform color image). Default: None, which equals 1s into the video.
-        :returns: The first non-uniform color image in the video as np.ndarray and the index of the first frame.
+        :return: The first non-uniform color image in the video as np.ndarray and the index of the first frame.
         :rtype: np.ndarray
         """
 

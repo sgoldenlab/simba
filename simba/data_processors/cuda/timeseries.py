@@ -240,7 +240,7 @@ def sliding_linearity_index_cuda(x: np.ndarray,
 
 
     :param np.ndarray x: An (N, M) array representing the path, where N is the number of points and M is the number of spatial dimensions (e.g., 2 for 2D or 3 for 3D). Each row represents the coordinates of a point along the path.
-    :param float x: The size of the sliding window in seconds. This defines the time window over which the linearity index is calculated. The window size should be specified in seconds.
+    :param float window_size: The size of the sliding window in seconds. This defines the time window over which the linearity index is calculated. The window size should be specified in seconds.
     :param float sample_rate: The sample rate in Hz (samples per second), which is used to convert the window size from seconds to frames.
     :return: A 1D array of length N, where each element represents the linearity index of the path within a sliding  window. The value is a ratio between the straight-line distance and the actual path length for each window. Values range from 0 to 1, with 1 indicating a perfectly straight path.
     :rtype: np.ndarray
@@ -313,7 +313,7 @@ def sliding_hjort_parameters_gpu(data: np.ndarray, window_sizes: np.ndarray, sam
     :param np.ndarray data: 1D numeric array of signal data.
     :param np.ndarray window_sizes: 1D numeric array of window sizes (in seconds).
     :param int sample_rate: Sampling rate of the data (samples per second).
-    :returns: 3D array of shape (3, len(data), len(window_sizes)) containing Hjorth parameters computed for each data point and window size.
+    :return: 3D array of shape (3, len(data), len(window_sizes)) containing Hjorth parameters computed for each data point and window size.
     :rtype: np.ndarray
 
     :example:

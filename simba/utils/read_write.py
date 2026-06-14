@@ -277,7 +277,7 @@ def get_fn_ext(filepath: Union[os.PathLike, str],
 
     :param Union[os.PathLike, str] filepath: Path to file.
     :param bool raise_error: If True, raises InvalidFilepathError for invalid paths. If False, returns (None, None, None) for invalid paths. Default: True.
-    :returns: 3-part tuple with file directory name, file name (w/o extension), and file extension. Returns (None, None, None) if invalid path and raise_error=False.
+    :return: 3-part tuple with file directory name, file name (w/o extension), and file extension. Returns (None, None, None) if invalid path and raise_error=False.
     :rtype: Union[Tuple[str, str, str], Tuple[None, None, None]]
 
     :example:
@@ -367,7 +367,7 @@ def read_project_path_and_file_type(config: configparser.ConfigParser) -> Tuple[
     Helper to read the path and file type of the SimBA project from the project_config.ini.
 
     :param configparser.ConfigParser config: parsed SimBA config in configparser.ConfigParser format
-    :returns: The path of the project ``project_folder`` and  the set file type of the project (i.e., ``csv`` or ``parquet``) as two-part tuple.
+    :return: The path of the project ``project_folder`` and  the set file type of the project (i.e., ``csv`` or ``parquet``) as two-part tuple.
     :rtype: Tuple[str, str]
     """
 
@@ -444,7 +444,7 @@ def read_config_file(config_path: Union[str, os.PathLike]) -> configparser.Confi
     """
     Helper to parse SimBA project project_config.ini file
 
-    :parameter Union[str, os.PathLike] config_path: Path to project_config.ini file
+    :param Union[str, os.PathLike] config_path: Path to project_config.ini file
     :return: parsed project_config.ini file
     :rtype: configparser.ConfigParser
     :raise MissingProjectConfigEntryError: Invalid file format.
@@ -627,7 +627,6 @@ def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike, bytes],
     :param Optional[List[Union[str, os.PathLike]]] file_paths: If not None, then the files that should be joined. If None, then all files. Default None.
     :param Optional[str] video_format: The format of the video clips that should be concatenated. Default: mp4.
     :param Optional[str] substring: If a string, then only videos in in_folder with a filename that contains substring will be joined. If None, then all are joined. Default: None.
-    :param Optional[str] video_format: Format of the input video files in ``in_folder``. Default: ``mp4``.
     :param Optional[bool] remove_splits: If true, the input splits in the ``in_folder`` will be removed following concatenation. Default: True.
     :rtype: None
     """
@@ -706,7 +705,7 @@ def get_bp_headers(body_parts_lst: List[str]) -> list:
     """
     Helper to create ordered list of all column header fields from body-part names for SimBA project dataframes.
 
-    :parameter List[str] body_parts_lst: Body-part names in the SimBA prject
+    :param List[str] body_parts_lst: Body-part names in the SimBA prject
     :return: Body-part headers
     :rtype: List[str]
 
@@ -734,7 +733,7 @@ def read_video_info(video_name: str,
     :param pd.DataFrame video_info_df: Alias for ``vid_info_df``. If both are provided, the ``vid_info_df`` is used.
     :param str video_name: Name of the video as represented in the ``Video`` column of the ``project_folder/logs/video_info.csv`` file.
     :param Optional[bool] raise_error: If True, raises error if the video cannot be found in the ``vid_info_df`` file. If False, returns None if the video cannot be found.
-    :returns: 3-part tuple: One row DataFrame representing the video in the ``project_folder/logs/video_info.csv`` file, the frame rate of the video, and the the pixels per millimeter of the video
+    :return: 3-part tuple: One row DataFrame representing the video in the ``project_folder/logs/video_info.csv`` file, the frame rate of the video, and the the pixels per millimeter of the video
     :rtype: Union[Tuple[pd.DataFrame, float, float], Tuple[None, None, None]]
 
     :example:
@@ -1733,7 +1732,7 @@ def timestamp_to_seconds(timestamp: str) -> int:
     Returns the number of seconds into the video given a timestamp in HH:MM:SS format.
 
     :param str timestamp: Timestamp in HH:MM:SS format
-    :returns: The timestamps as seconds.
+    :return: The timestamps as seconds.
     :rtype: int
     :raises FrameRangeError: If timestamp is not a valid format.
 
@@ -1875,7 +1874,7 @@ def find_max_vertices_coordinates(shapes: List[Union[Polygon, LineString, MultiP
 
     :param List[Union[Polygon, LineString, MultiPolygon, Point]] shapes: A list of Shapely geometries including Polygons, LineStrings, MultiPolygons, and Points.
     :param Optional[int] buffer: If int, adds to maximum x and y.
-    :returns: A two-part tuple containing the maximum x and y coordinates found among the vertices.
+    :return: A two-part tuple containing the maximum x and y coordinates found among the vertices.
     :rtype: Tuple[int, int]
 
     :example:
@@ -1934,7 +1933,7 @@ def clean_sleap_file_name(filename: str) -> str:
        Modified from `vtsai881 <https://github.com/vtsai881>`_.
 
     :param str filename: The original filename to be cleaned to match video name.
-    :returns str: The cleaned filename.
+    :return str: The cleaned filename.
 
     :example:
     >>> clean_sleap_file_name("projectname.v00x.00x_videoname.analysis.csv")
@@ -1987,10 +1986,10 @@ def read_dlc_superanimal_h5(path: Union[str, os.PathLike], col_names: List[str])
     each as an ``x, y, likelihood`` triplet, animals in the order specified by ``id_lst``
     in :class:`simba.pose_importers.superanimal_import.SuperAnimalTopViewImporter`).
 
-    :parameter Union[str, os.PathLike] path: Path to the SuperAnimal DLC H5 file.
-    :parameter List[str] col_names: List of column names to assign to the DataFrame. Must match the expected
+    :param Union[str, os.PathLike] path: Path to the SuperAnimal DLC H5 file.
+    :param List[str] col_names: List of column names to assign to the DataFrame. Must match the expected
         number of columns based on the SimBA project configuration (typically body-part coordinates: x, y, p).
-    :returns: DataFrame containing pose estimation data with columns named according to ``col_names``.
+    :return: DataFrame containing pose estimation data with columns named according to ``col_names``.
     :rtype: pd.DataFrame
     :raises InvalidInputError: If the file cannot be read by any supported strategy, or if the
         number of columns in the file is less than the number of expected column names.
@@ -2065,7 +2064,7 @@ def get_h5_frame_count(path: Union[str, os.PathLike]) -> Optional[int]:
     :func:`pandas.read_hdf` read.
 
     :param Union[str, os.PathLike] path: Path to a DLC H5 file.
-    :returns: Number of frames in the file, or ``None`` if no row count could be
+    :return: Number of frames in the file, or ``None`` if no row count could be
         determined.
     :rtype: Optional[int]
 
@@ -2278,8 +2277,8 @@ def fetch_pip_data(pip_url: str = Links.SIMBA_PIP_URL.value,
     Used primarily for checking if newer versions of SimBA are available. Returns the full JSON
     response data and the latest version string, or (None, None) if the request fails.
 
-    :parameter str pip_url: URL to the PyPI JSON API endpoint for the package. Defaults to SimBA's PyPI URL.
-    :returns: Tuple containing (JSON data dictionary, latest version string) on success, or (None, None) on failure.
+    :param str pip_url: URL to the PyPI JSON API endpoint for the package. Defaults to SimBA's PyPI URL.
+    :return: Tuple containing (JSON data dictionary, latest version string) on success, or (None, None) on failure.
     :rtype: Union[Tuple[Dict[str, Any], str], Tuple[None, None]]
 
     :example:
@@ -2334,7 +2333,7 @@ def read_pickle(data_path: Union[str, os.PathLike], verbose: Optional[bool] = Fa
 
     :param str data_path: Pickled file path, or directory of pickled files.
     :param Optional[bool] verbose: If True, prints progress. Default False.
-    :returns: Dictionary representation of the pickle.
+    :return: Dictionary representation of the pickle.
     :rtype: Dict[Any, Any]
 
     :example:
@@ -2512,7 +2511,7 @@ def seconds_to_timestamp(seconds: Union[int, float, List[Union[int, float]]],
 
     :param Union[int, float, List[Union[int, float]]] seconds: Input seconds.
     :param bool hh_mm_ss_sss: If True, include milliseconds in output and ormat as ``HH:MM:SS:SSS``. If False, format as ``HH:MM:SS``.
-    :returns Union[str, List[str]]: Timestamp(s) as string or list of strings.
+    :return Union[str, List[str]]: Timestamp(s) as string or list of strings.
     """
     if isinstance(seconds, (int, float)):
         check_float(name=f"{seconds_to_timestamp.__name__} seconds", value=seconds, min_value=0)
@@ -2585,8 +2584,8 @@ def img_stack_to_greyscale(imgs: np.ndarray):
        :width: 600
        :align: center
 
-    :parameter np.ndarray imgs: A 4D array representing color images. It should have the shape (num_images, height, width, 3) where the last dimension represents the color channels (R, G, B).
-    :returns np.ndarray: A 3D array containing the grayscale versions of the input images. The shape of the output array is (num_images, height, width).
+    :param np.ndarray imgs: A 4D array representing color images. It should have the shape (num_images, height, width, 3) where the last dimension represents the color channels (R, G, B).
+    :return np.ndarray: A 3D array containing the grayscale versions of the input images. The shape of the output array is (num_images, height, width).
 
     :example:
     >>> imgs = ImageMixin().read_img_batch_from_video( video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=100)
@@ -2609,8 +2608,8 @@ def img_stack_to_bw(imgs: np.ndarray):
        :width: 600
        :align: center
 
-    :parameter np.ndarray imgs: A 4D array representing color images. It should have the shape (num_images, height, width, 3) where the last dimension represents the color channels (R, G, B).
-    :returns np.ndarray: A 3D array containing the black and white versions of the input images. The shape of the output array is (num_images, height, width).
+    :param np.ndarray imgs: A 4D array representing color images. It should have the shape (num_images, height, width, 3) where the last dimension represents the color channels (R, G, B).
+    :return np.ndarray: A 3D array containing the black and white versions of the input images. The shape of the output array is (num_images, height, width).
 
     :example:
     >>> imgs = ImageMixin().read_img_batch_from_video( video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=100)
@@ -2772,7 +2771,7 @@ def find_largest_blob_location(imgs: Dict[int, np.ndarray],
 
     :param Dict[int, np.ndarray] imgs: Dictionary of images where the key is the frame id and the value is an image in np.ndarray format.
     :param bool verbose: If True, prints progress. Default: False.
-    :param video_name video_name: The name of the video being processed for interpretable progress msg if ``verbose``.
+    :param Optional[str] video_name: The name of the video being processed for interpretable progress msg if ``verbose``.
     :param Optional[np.ndarray] inclusion_zones: If not None, then 2D numpy array of ROI / shape vertices. If not None, the largest blob will be searched for only in the ROI.
     :return: Dictionary where the key is the frame id and the value is a 2D array with x and y coordinates.
     :rtype: Dict[int, np.ndarray]
@@ -3316,7 +3315,7 @@ def df_to_xlsx_sheet(xlsx_path: Union[str, os.PathLike],
     :param bool create_file: If True, create a new workbook when ``xlsx_path`` is
                              missing. If False, raise :class:`NoFilesFoundError`
                              when the file does not exist.
-    :returns: None.
+    :return: None.
     :rtype: None
 
     :raises NoFilesFoundError: If ``xlsx_path`` does not exist and ``create_file`` is False.
@@ -3448,7 +3447,7 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
     :param Optional[bool] greyscale: If True, reads the images as greyscale. If False, then as original color scale. Default: False.
     :param bool black_and_white: If True, returns the images in black and white. Default False.
     :param bool clahe: If True, returns clahe enhanced images.
-    :returns: A dictionary containing frame indices as keys and corresponding frame arrays as values.
+    :return: A dictionary containing frame indices as keys and corresponding frame arrays as values.
     :rtype: Dict[int, np.ndarray]
 
     :example:
@@ -3525,7 +3524,7 @@ def read_df_array(df: pd.DataFrame, column: str):
 
     :param pd.DataFrame df: The DataFrame containing the column.
     :param str column: The name of the column with string representations of 2D arrays.
-    :returns: A list of numpy arrays, each corresponding to an entry in the specified column.
+    :return: A list of numpy arrays, each corresponding to an entry in the specified column.
     :rtype: List[np.ndarray]
     """
 
@@ -3552,7 +3551,7 @@ def read_sleap_csv(file_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, li
     Reads and validates a SLEAP-exported CSV file containing tracking data.
 
     :param  Union[str, os.PathLike] file_path: Path to the SLEAP CSV file.
-    :returns: Tuple with (i) The validated and cleaned DataFrame, (ii) A list of unique body part names, (iii) A flattened list of coordinate column names for each body part (e.g., ['nose.x', 'nose.y', ...]) excliding probability scores.
+    :return: Tuple with (i) The validated and cleaned DataFrame, (ii) A list of unique body part names, (iii) A flattened list of coordinate column names for each body part (e.g., ['nose.x', 'nose.y', ...]) excliding probability scores.
     :rtype: Tuple[pd.DataFrame, list, list]
     """
     REQUIRED_COLUMNS = ['track', 'frame_idx', 'instance.score']
@@ -3591,7 +3590,7 @@ def recursive_file_search(directory: Union[str, os.PathLike],
 
     :param directory: Directory to start the search from.
     :param substrings: A substring or list of substrings to match in filenames. If None, all files with the specified extensions will be returned.
-    :param substrings: A substring or list of substrings to match. If filename contains this substring, it will be removed. If None, all files with the specified extensions will be returned.
+    :param skip_substrings: A substring or list of substrings to exclude. If a filename contains this substring, it will be skipped. If None, no files are excluded on this basis.
     :param extensions: A file extension or list of allowed extensions (with or without dot).
     :param case_sensitive: If True, substring match is case-sensitive. Default False.
     :param raise_error: If True, raise an error if no matches are found.

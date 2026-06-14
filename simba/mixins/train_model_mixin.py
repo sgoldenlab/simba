@@ -113,7 +113,7 @@ class TrainModelMixin(object):
         :param List[str] file_paths: List of file paths representing files to be read in.
         :param str file_type: The type of files to be read in (e.g., `csv`)
         :param Optional[List[str]] classifier_names: Optional list of classifier names representing fields of human annotations. If not None, then assert that classifier names are present in each data file.
-        :returns: concatenated DataFrame if all data represented in ``file_paths``, and a aligned list of frame numbers associated with the rows in the DataFrame.
+        :return: concatenated DataFrame if all data represented in ``file_paths``, and a aligned list of frame numbers associated with the rows in the DataFrame.
         :rtype: Tuple[pd.DataFrame, List[int]]
 
         :examples:
@@ -206,7 +206,7 @@ class TrainModelMixin(object):
 
         :param pd.DataFrame df: Dataframe holding features and annotations.
         :param str clf_name: Name of target.
-        :returns: Size-2 tuple containing two dataframes - the features, and the target.
+        :return: Size-2 tuple containing two dataframes - the features, and the target.
         :rtype: Tuple[pd.DataFrame, pd.DataFrame]
 
         :examples:
@@ -224,7 +224,7 @@ class TrainModelMixin(object):
         :param np.ndarray x_train: 2-dimensional array representing the features in train set
         :param np.ndarray y_train: Array representing the target in the training set.
         :param float sample_ratio: Ratio of behavior-absent frames to keep relative to the behavior-present frames. E.g., ``1.0`` returns an equal count of behavior-absent and behavior-present frames. ``2.0`` returns twice as many behavior-absent frames as  and behavior-present frames.
-        :returns: Size-2 tuple with DataFrames representing the under-sampled feature set and under-sampled target set.
+        :return: Size-2 tuple with DataFrames representing the under-sampled feature set and under-sampled target set.
         :rtype: Tuple[pd.DataFrame, pd.DataFrame]
 
         :examples:
@@ -255,7 +255,7 @@ class TrainModelMixin(object):
         :param np.ndarray x_train: Features in train set
         :param np.ndarray y_train: Target in train set
         :param float sample_ratio: Over-sampling ratio
-        :returns: Size-2 tuple arrays representing the over-sampled feature set and over-sampled target set.
+        :return: Size-2 tuple arrays representing the over-sampled feature set and over-sampled target set.
         :rtype: Tuple[np.ndarray, np.ndarray]
 
         :examples:
@@ -276,7 +276,7 @@ class TrainModelMixin(object):
         :param np.ndarray x_train: Features in train set
         :param np.ndarray y_train: Target in train set
         :param float sample_ratio: Over-sampling ratio
-        :returns: Size-2 tuple arrays representing the over-sampled feature set and over-sampled target set.
+        :return: Size-2 tuple arrays representing the over-sampled feature set and over-sampled target set.
         :rtype: Tuple[np.ndarray, np.ndarray]
 
         :examples:
@@ -310,7 +310,7 @@ class TrainModelMixin(object):
         :param str save_dir: Directory where to save results in CSV format. If None, then returns the dataframe and the plot (if plot
         :param Optional[bool] plot: If True, creates bar plot chart and saves in same directory as the CSV file.
         :param Optional[int] save_file_no: If permutation importance calculation is part of a grid search, provide integer identifier representing the model in the grid serach sequence. This will be used as suffix in output filename.
-        :returns:  Either non or a Tuple with the dataframe and the plot. A CSV file representing the permutation importances is stored in ``save_dir`` if save_dir is passed.
+        :return:  Either non or a Tuple with the dataframe and the plot. A CSV file representing the permutation importances is stored in ``save_dir`` if save_dir is passed.
         """
 
         stdout_information(msg="Calculating feature permutation importances...")
@@ -376,7 +376,7 @@ class TrainModelMixin(object):
         :param bool multiclass: If True, then target consist of several categories [0, 1, 2 ...] and scoring becomes ``None``. If False, then scoring ``f1``.
         :param Optional[str] scoring: The score of the models to present. Default: 'f1'.
         :param Optional[bool] plot: If True, creates plot with the train fraction size on x and ``scoring`` on y.
-        :returns: None. Results are stored in ``save_dir``.
+        :return: None. Results are stored in ``save_dir``.
         """
 
         stdout_information(msg="Calculating learning curves...")
@@ -454,7 +454,7 @@ class TrainModelMixin(object):
         :param Optional[bool] plot: If True, creates and saves line plot PR curve in the same lication as the output CSV file.
         :param Dict[int, str] classifier_map: If multiclass, dictionary mapping integers to classifier names.
         :param Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search.
-        :returns: None. Results are stored in `save_dir``.
+        :return: None. Results are stored in `save_dir``.
         """
 
         if multiclass and classifier_map is None:
@@ -645,7 +645,7 @@ class TrainModelMixin(object):
         :param bool svg: If True, save as SVG format. If False (default), save as PNG format.
         :param Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. Used in filename generation. If None, the classifier is not part of a grid search.
         :param int dpi: Resolution (dots per inch) for the output image. Default: 300.
-        :returns: None. Classification report image is saved to ``save_dir``.
+        :return: None. Classification report image is saved to ``save_dir``.
         """
 
         stdout_information(msg="Creating classification report visualization...")
@@ -705,7 +705,7 @@ class TrainModelMixin(object):
         :param bool verbose: If True (default), print progress messages. If False, suppress output.
         :param Optional[str] save_dir: Directory where to save output in CSV file format. If None, then returns the DataFrame instead of saving.
         :param Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. Used in filename generation. If None, the classifier is not part of a grid search.
-        :returns Union[None, pd.DataFrame]: If ``save_dir`` is provided, returns None and saves CSV file. If ``save_dir`` is None, returns DataFrame with columns: 'FEATURE', 'FEATURE_IMPORTANCE_MEAN', 'FEATURE_IMPORTANCE_STDEV'.
+        :return Union[None, pd.DataFrame]: If ``save_dir`` is provided, returns None and saves CSV file. If ``save_dir`` is None, returns DataFrame with columns: 'FEATURE', 'FEATURE_IMPORTANCE_MEAN', 'FEATURE_IMPORTANCE_STDEV'.
         """
 
         if verbose: stdout_information(msg="Creating feature importance log...")
@@ -756,7 +756,7 @@ class TrainModelMixin(object):
         :param str save_dir: Directory where to save output in csv file format.
         :param int n_bars: Number of bars in the plot.
         :param Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search
-        :returns: None. Results are stored in `save_dir``.
+        :return: None. Results are stored in `save_dir``.
         """
 
         check_int(name="FEATURE IMPORTANCE BAR COUNT", value=n_bars, min_value=1)
@@ -791,11 +791,11 @@ class TrainModelMixin(object):
         """
         Helper to create visualization of example decision tree using dtreeviz.
 
-        :parameter np.ndarray x_train: training features
-        :parameter np.ndarray y_train: training targets
-        :parameter str clf_name: Name of classifier
-        :parameter List[str] class_names: List of class names. E.g., ['Attack absent', 'Attack present']
-        :parameter str save_dir: Directory where to save output in csv file format.
+        :param np.ndarray x_train: training features
+        :param np.ndarray y_train: training targets
+        :param str clf_name: Name of classifier
+        :param List[str] class_names: List of class names. E.g., ['Attack absent', 'Attack present']
+        :param str save_dir: Directory where to save output in csv file format.
         """
 
         stdout_information(msg='Creating example decision tree using dtreeviz ....')
@@ -852,13 +852,13 @@ class TrainModelMixin(object):
                         save_dir: Optional[Union[str, os.PathLike]] = None,
                         save_file_suffix: Optional[int] = None) -> Union[None, Tuple[pd.DataFrame, pd.DataFrame, Dict[str, pd.DataFrame], np.ndarray]]:
 
-        """
+        r"""
         Compute SHAP values for a random forest classifier.
         This method computes SHAP (SHapley Additive exPlanations) values for a given random forest classifier.
         The SHAP value for feature 'i' in the context of a prediction 'f' and input 'x' is calculated using the following formula:
 
         .. math::
-           \phi_i(f, x) = \\sum_{S \\subseteq F \\setminus {i}} \\frac{|S|!(|F| - |S| - 1)!}{|F|!} (f_{S \cup {i}}(x_{S \\cup {i}}) - f_S(x_S))
+           \phi_i(f, x) = \sum_{S \subseteq F \setminus {i}} \frac{|S|!(|F| - |S| - 1)!}{|F|!} (f_{S \cup {i}}(x_{S \cup {i}}) - f_S(x_S))
 
         .. note::
            `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#train-predictive-classifiers-settings>`_
@@ -1016,7 +1016,6 @@ class TrainModelMixin(object):
 
         :param list meta_data_lst: Meta data in list format
         :param str clf_name: Name of classifier
-        :param str clf_name: Name of classifier
         :param str save_dir: Directory where to save output in csv file format.
         """
         stdout_information(msg="Saving model meta data file...")
@@ -1048,7 +1047,7 @@ class TrainModelMixin(object):
         :param str clf_name: Classifier name
         :param str save_dir: Directory where to save output as pickle.
         :param Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search.
-        :returns: None. Results are saved in ``save_dir``.
+        :return: None. Results are saved in ``save_dir``.
 
         """
         if save_file_no != None:
@@ -1061,8 +1060,8 @@ class TrainModelMixin(object):
         """
         Helper to read in N SimBA random forest config meta files to python dict memory.
 
-        :parameter configparser.ConfigParser config: Parsed SimBA project_config.ini
-        :parameter int model_cnt: Count of models
+        :param configparser.ConfigParser config: Parsed SimBA project_config.ini
+        :param int model_cnt: Count of models
         :return dict: Dictionary with integers as keys and hyperparameter dictionaries as keys.
         """
 
@@ -1114,8 +1113,8 @@ class TrainModelMixin(object):
         """
         Helper to get all classifier names in a SimBA project.
 
-        :parameter configparser.ConfigParser config: Parsed SimBA project_config.ini
-        :parameter int.ConfigParser target_cnt: Parsed SimBA project_config.ini
+        :param configparser.ConfigParser config: Parsed SimBA project_config.ini
+        :param int.ConfigParser target_cnt: Parsed SimBA project_config.ini
         :return: All classifier names in project
         :rtype: List[str]
 
@@ -1168,7 +1167,7 @@ class TrainModelMixin(object):
         Read pickled RandomForestClassifier object.
 
         :param Union[str, os.PathLike] file_path: Path to pickle file on disk.
-        :returns: A scikitRandomForestClassifier object.
+        :return: A scikitRandomForestClassifier object.
         :rtype: RandomForestClassifier
         """
 
@@ -1198,7 +1197,7 @@ class TrainModelMixin(object):
         :param pd.DataFrame x_df: Features
         :param pd.Series y_df: Target
         :param float test_size: Size of test as ratio of all annotated bouts (e.g., ``0.2``).
-        :returns: Size-4 tuple with DataFrames of Series representing, (i) Features for training, (ii) Features for testing, (iii) Target for training, (iv) Target for testing.
+        :return: Size-4 tuple with DataFrames of Series representing, (i) Features for training, (ii) Features for testing, (iii) Target for training, (iv) Target for testing.
         :rtype: Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]
 
         :examples:
@@ -1323,8 +1322,8 @@ class TrainModelMixin(object):
         """
         Helper to check for non-numerical entries post data sampling
 
-        :parameter pd.DataFrame x_df: Features
-        :parameter pd.DataFrame y_df: Target
+        :param pd.DataFrame x_df: Features
+        :param pd.DataFrame y_df: Target
 
         :raise FaultyTrainingSetError: Training or testing data sets contain non-numerical values
         """
@@ -1367,11 +1366,11 @@ class TrainModelMixin(object):
         """
         Compute feature partial dependencies for every feature in training set.
 
-        :parameter RandomForestClassifier clf: Random forest classifier
-        :parameter pd.DataFrame x_df: Features training set
-        :parameter str clf_name: Name of classifier
-        :parameter str save_dir: Directory where to save the data
-        :parameter Optional[int] clf_cnt: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search.
+        :param RandomForestClassifier clf: Random forest classifier
+        :param pd.DataFrame x_df: Features training set
+        :param str clf_name: Name of classifier
+        :param str save_dir: Directory where to save the data
+        :param Optional[int] clf_cnt: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search.
         """
 
         timer = SimbaTimer(start=True)
@@ -1632,10 +1631,10 @@ class TrainModelMixin(object):
            For single process method, use :func:`~simba.mixins.train_model_mixin.TrainModelMixin.read_all_files_in_folder`
            For `concurrent` library, use :func:`simba.mixins.train_model_mixin.TrainModelMixin.read_all_files_in_folder_mp_futures`.
 
-        :param List[str] file_paths: List of file-paths
-        :param List[str] file_paths: The filetype of ``file_paths`` OPTIONS: csv or parquet.
+        :param List[str] annotations_file_paths: List of file-paths
+        :param List[str] file_type: The filetype of ``file_paths`` OPTIONS: csv or parquet.
         :param Optional[List[str]] classifier_names: List of classifier names representing fields of human annotations. If not None, then assert that classifier names are present in each data file.
-        :returns: concatenated DataFrame if all data represented in ``file_paths``, and an aligned list of frame numbers associated with the rows in the DataFrame.
+        :return: concatenated DataFrame if all data represented in ``file_paths``, and an aligned list of frame numbers associated with the rows in the DataFrame.
         :rtype: Tuple[pd.DataFrame, List[int]]
 
         """
@@ -1724,10 +1723,10 @@ class TrainModelMixin(object):
            For improved runtime using multiprocessing and pyarrow, use :func:`~simba.mixins.train_model_mixin.read_all_files_in_folder_mp`
 
         :param List[str] file_paths: List of file-paths
-        :param List[str] file_paths: The filetype of ``file_paths`` OPTIONS: csv or parquet.
+        :param List[str] file_type: The filetype of ``file_paths`` OPTIONS: csv or parquet.
         :param Optional[List[str]] classifier_names: List of classifier names representing fields of human annotations. If not None, then assert that classifier names are present in each data file.
         :param bool raise_bool_clf_error: If True, raises an error if a classifier column contains values outside 0 and 1.
-        :returns: concatenated DataFrame if all data represented in ``file_paths``, and an aligned list of frame numbers associated with the rows in the DataFrame.
+        :return: concatenated DataFrame if all data represented in ``file_paths``, and an aligned list of frame numbers associated with the rows in the DataFrame.
         :rtype: Tuple[pd.DataFrame, List[int]]
 
         """
@@ -1969,7 +1968,7 @@ class TrainModelMixin(object):
     def check_df_dataset_integrity(self, df: pd.DataFrame, file_name: str, logs_path: Union[str, os.PathLike]) -> None:
         """
         Helper to check for non-numerical np.inf, -np.inf, NaN, None in a single dataframe.
-        :parameter pd.DataFrame x_df: Features
+        :param pd.DataFrame x_df: Features
         :raise NoDataError: If data contains np.inf, -np.inf, None.
         """
 

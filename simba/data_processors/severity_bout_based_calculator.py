@@ -24,8 +24,8 @@ class SeverityBoutCalculator(ConfigReader, FeatureExtractionMixin):
     Computes the "severity" of classification bout events based on how much
     the animals are moving within the bout. Bouts are scored as less or more severe at lower and higher movements, respectively.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format.
-    :parameter dict settings: how to calculate the severity. E.g., {'brackets': 10, 'clf': 'Attack', 'animals': ['Simon', 'JJ'], 'normalization': 'ALL VIDEOS', 'save_bin_definitions': True, 'visualize': True, 'visualize_event_cnt': 'ALL', 'video_speed': 1.0, 'show_pose': True}
+    :param str config_path: path to SimBA project config file in Configparser format.
+    :param dict settings: how to calculate the severity. E.g., {'brackets': 10, 'clf': 'Attack', 'animals': ['Simon', 'JJ'], 'normalization': 'ALL VIDEOS', 'save_bin_definitions': True, 'visualize': True, 'visualize_event_cnt': 'ALL', 'video_speed': 1.0, 'show_pose': True}
 
     .. note::
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md>`__.

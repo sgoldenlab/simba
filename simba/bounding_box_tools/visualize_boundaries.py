@@ -64,11 +64,11 @@ class BoundaryVisualizer(ConfigReader, PlottingMixin):
     Visualisation of user-specified animal-anchored ROI boundaries. Results are stored in the
     ``project_folder/frames/output/anchored_rois`` directory of the SimBA project
 
-    :parameter str config_path: Path to SimBA project config file in Configparser format
-    :parameter str video_name: Name of the video in the SimBA project to create bounding box video for
-    :parameter bool include_key_points: If True, includes pose-estimated body-parts in the video.
-    :parameter bool greyscale:  If True, converts the video (but not the shapes/keypoints) to greyscale.
-    :parameter bool show_intersections:  If True, then produce highlight boundaries/keypoints to signify present intersections.
+    :param str config_path: Path to SimBA project config file in Configparser format
+    :param str video_name: Name of the video in the SimBA project to create bounding box video for
+    :param bool include_key_points: If True, includes pose-estimated body-parts in the video.
+    :param bool greyscale:  If True, converts the video (but not the shapes/keypoints) to greyscale.
+    :param bool show_intersections:  If True, then produce highlight boundaries/keypoints to signify present intersections.
                                          See `this example for highlighted intersections <https://github.com/sgoldenlab/simba/blob/master/images/termites_video_3.gif>`_
 
     .. note::

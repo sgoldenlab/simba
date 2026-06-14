@@ -31,12 +31,12 @@ class OutlierCorrecterLocationAdvanced(ConfigReader, FeatureExtractionMixin):
        :width: 400
        :align: center
 
-    :parameter str config_path: path to SimBA project config file in Configparser format.
-    :parameter str input_dir: Directory containing input files. E.g., `project_folder/csv/input_csv` directory.
-    :parameter Literal['animal', 'body-part'] type: If the rules are defined on animal or body-part level. E.g., If one heuristic rule per animal then `animal`. If one heurstic rule prr body-part then `body-parts`
-    :parameter Literal['mean', 'median'] agg_method: If to use the mean or median to compute criterion.
-    :parameter dict criterion_body_parts: The body-parts used to calculate the size of the animals.
-    :parameter dict settings: The heuristic multiplier rules to use for each body part or animal.
+    :param str config_path: path to SimBA project config file in Configparser format.
+    :param str input_dir: Directory containing input files. E.g., `project_folder/csv/input_csv` directory.
+    :param Literal['animal', 'body-part'] type: If the rules are defined on animal or body-part level. E.g., If one heuristic rule per animal then `animal`. If one heurstic rule prr body-part then `body-parts`
+    :param Literal['mean', 'median'] agg_method: If to use the mean or median to compute criterion.
+    :param dict criterion_body_parts: The body-parts used to calculate the size of the animals.
+    :param dict settings: The heuristic multiplier rules to use for each body part or animal.
 
     :example:
     >>> settings = {'Simon': 1.1, 'JJ': 1.2}

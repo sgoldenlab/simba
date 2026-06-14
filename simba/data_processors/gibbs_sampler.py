@@ -28,10 +28,13 @@ class GibbSampler():
      >>> sampler = GibbSampler(data=data, save_path=r'/Users/simon/Desktop/gibbs.csv', epochs=5, iterations=600)
      >>> sampler.run()
 
-     :references:
-        .. [1] Lawrence et al, Detecting Subtle Sequence Signals: a Gibbs Sampling Strategy for Multiple Alignment, Science, vol. 262, pp. 208-214, 1993.
-        .. [2] Great YouTube tutorial / explanation by Xiaole Shirley Liu - `https://www.youtube.com/watch?v=NRjhfyXWHuQ <https://www.youtube.com/watch?v=NRjhfyXWHuQ>`_.
-        .. [3] Weinreb et al. Keypoint-MoSeq: parsing behavior by linking point tracking to pose dynamics, Nature Methods, 21, 1329–1339 (2024).
+     References
+     ----------
+     .. [1] Lawrence, C. E., et al. (1993). Detecting subtle sequence signals: a Gibbs sampling strategy for multiple alignment.
+            `Science, 262(5131), 208–214 <https://doi.org/10.1126/science.8211139>`_.
+     .. [2] Great YouTube tutorial / explanation by Xiaole Shirley Liu — `https://www.youtube.com/watch?v=NRjhfyXWHuQ <https://www.youtube.com/watch?v=NRjhfyXWHuQ>`_.
+     .. [3] Weinreb, C., et al. (2024). Keypoint-MoSeq: parsing behavior by linking point tracking to pose dynamics.
+            `Nature Methods, 21, 1329–1339 <https://doi.org/10.1038/s41592-024-02318-2>`_.
      """
 
     def __init__(self,

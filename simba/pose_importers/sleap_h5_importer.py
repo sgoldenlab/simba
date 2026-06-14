@@ -40,8 +40,8 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
 
     References
     ----------
-    .. [1] Pereira et al., SLEAP: A deep learning system for multi-animal pose tracking, `Nature Methods`,
-           2022.
+    .. [1] Pereira, T. D., et al. (2022). SLEAP: A deep learning system for multi-animal pose tracking.
+           `Nature Methods, 19, 486–495 <https://doi.org/10.1038/s41592-022-01426-1>`_.
 
     >>> sleap_h5_importer = SLEAPImporterH5(config_path=r'project_folder/project_config.ini', data_folder=r'data_folder', actor_IDs=['Termite_1', 'Termite_2', 'Termite_3', 'Termite_4', 'Termite_5'], interpolation_settings="Body-parts: Nearest", smoothing_settings = {'Method': 'Savitzky Golay', 'Parameters': {'Time_window': '200'}})
     >>> sleap_h5_importer.run()

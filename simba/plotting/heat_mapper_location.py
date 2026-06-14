@@ -45,7 +45,7 @@ class HeatmapperLocationSingleCore(ConfigReader, PlottingMixin):
     :param str bodypart: The name of the body-part used to infer the location of the animal.
     :param int bin_size: The rectangular size of each heatmap location in millimeters. For example, `50` will divide the video frames into 5 centimeter rectangular spatial bins.
     :param str palette:  Heatmap pallette. Eg. 'jet', 'magma', 'inferno','plasma', 'viridis', 'gnuplot2'
-    :param int or 'auto' max_scale: The max value in the heatmap in seconds. E.g., with a value of `10`, if the classified behavior has occured >= 10s within a rectangular bins, it will be filled with the same color.
+    :param int or 'auto' max_scale: The max value in the heatmap in seconds. E.g., with a value of `10`, if the classified behavior has occurred >= 10s within a rectangular bins, it will be filled with the same color.
     :param bool final_img_setting: If True, create a single image representing the last frame of the input video
     :param bool video_setting: If True, then create a video of heatmaps.
     :param bool frame_setting: If True, then create individual heatmap frames.

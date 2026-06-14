@@ -60,7 +60,7 @@ class COCOKeypoints2Yolo:
     :param bool greyscale: If True, converts images to greyscale before saving. If False (default), keeps original color format.
     :param bool clahe: If True, applies CLAHE (Contrast Limited Adaptive Histogram Equalization) enhancement to images before saving. If False (default), no enhancement is applied.
     :param Optional[float] bbox_pad: Optional padding factor for bounding boxes (between 10e-6 and 1.0). If provided, bounding boxes are expanded by this percentage to better encompass all body-parts. If None (default), no padding is applied.
-    :returns: None. YOLO formatted data is saved to ``save_dir`` with structure: images/train, images/val, labels/train, labels/val, and map.yaml.
+    :return: None. YOLO formatted data is saved to ``save_dir`` with structure: images/train, images/val, labels/train, labels/val, and map.yaml.
 
     :example:
     >>> runner = COCOKeypoints2Yolo(coco_path=r"D:/cvat_annotations/frames/coco_keypoints_1/s1/annotations/s1.json", img_dir=r"D:/cvat_annotations/frames/simon", save_dir=r"D:/cvat_annotations/frames/yolo_keypoints", clahe=True)

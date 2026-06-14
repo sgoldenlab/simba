@@ -26,8 +26,8 @@ def import_dlc_csv(config_path: Union[str, os.PathLike], source: str) -> List[st
     Import file or folder of  DLC pose-estimation CSV files to SimBA project.
     Returns list of file paths that has been imported.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
-    :parameter str source: path to file or folder containing DLC pose-estimation CSV files
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str source: path to file or folder containing DLC pose-estimation CSV files
     :return List[str]: Paths to location of imported files.
 
     :example:

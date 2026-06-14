@@ -133,7 +133,7 @@ class DBCVCalculator(UMLMixin, ConfigReader):
         """
         :param np.ndarray X: 2D array of shape len(observations) x len(dimensionality reduced dimensions)
         :param np.ndarray labels: 1D array with cluster labels
-        :returns float: DBCV cluster validity score
+        :return float: DBCV cluster validity score
         """
 
         print("Computing mutual reach distance ... (Step  1/4)")
@@ -151,8 +151,8 @@ class DBCVCalculator(UMLMixin, ConfigReader):
         """
         :param np.ndarray X: 2D array of shape len(observations) x len(dimensionality reduced dimensions)
         :param np.ndarray labels: 1D array with cluster labels
-        :returns ListType arrays_by_cluster: 3D array in numba ListType, of shape len(number of clusters) x len(cluster_members) x len(dimensionality reduced dimensions)
-        :returns v arrays_by_cluster: numba ListType of labels in the order of arrays_by_cluster
+        :return ListType arrays_by_cluster: 3D array in numba ListType, of shape len(number of clusters) x len(cluster_members) x len(dimensionality reduced dimensions)
+        :return v arrays_by_cluster: numba ListType of labels in the order of arrays_by_cluster
         """
 
         unique_cluster_labels = np.unique(labels)
@@ -181,7 +181,7 @@ class DBCVCalculator(UMLMixin, ConfigReader):
         """
         :param np.ndarray X: 2D array of shape len(observations) x len(dimensionality reduced dimensions)
         :param numba.types.ListType[list[np.ndarray]] arrays_by_cluster: Numba typed List of list with 2d arrays.
-        :returns Tuple[np.ndarray, bool): Graph of all pair-wise mutual reachability distances between points of size X.shape[0] x X.shape[0].
+        :return Tuple[np.ndarray, bool): Graph of all pair-wise mutual reachability distances between points of size X.shape[0] x X.shape[0].
                                           Boolean representing if any issues where detected. Including: If (i) any clusters consist of a single observation.
         """
         cluster_n = len(arrays_by_cluster)
@@ -261,7 +261,7 @@ class DBCVCalculator(UMLMixin, ConfigReader):
         """
         :param np.ndarray graph: minimum spanning tree of all pair-wise mutual reachability distances between points.
         :param np.ndarray labels: 1D array with cluster labels
-        :returns validity_index: float score in range -1 to 1 indicating validity of clustering assignments
+        :return validity_index: float score in range -1 to 1 indicating validity of clustering assignments
         """
 
         n_samples = len(labels)

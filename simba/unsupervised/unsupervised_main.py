@@ -42,7 +42,7 @@ class UnsupervisedGUI(ConfigReader, PopUpMixin):
     """
     Main access to unsupervised interface.
 
-    :parameter Union[str, os.PathLike] config_path: Path to SimAb project config
+    :param Union[str, os.PathLike] config_path: Path to SimAb project config
 
     :example:
     >>> UnsupervisedGUI(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini')

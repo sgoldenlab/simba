@@ -19,10 +19,10 @@ class BoundaryStatisticsCalculator(ConfigReader):
     """
     Compute boundary intersection statistics.
 
-    :parameter str config_path: Path to SimBA project config file in Configparser format.
-    :parameter bool roi_intersections: If True, calculates intersection of animal-anchored ROIs
-    :parameter bool roi_keypoint_intersections: If True, calculates intersection of animal-anchored ROIs and pose-estimated animal key-points.
-    :parameter str save_format: Output data format. OPTIONS: CSV, PARQUET, PICKLE.
+    :param str config_path: Path to SimBA project config file in Configparser format.
+    :param bool roi_intersections: If True, calculates intersection of animal-anchored ROIs
+    :param bool roi_keypoint_intersections: If True, calculates intersection of animal-anchored ROIs and pose-estimated animal key-points.
+    :param str save_format: Output data format. OPTIONS: CSV, PARQUET, PICKLE.
 
     Notes
     ----------

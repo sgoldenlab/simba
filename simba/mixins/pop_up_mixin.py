@@ -117,7 +117,7 @@ class PopUpMixin(object):
         :param List[str] cb_titles: List of strings representing the names of the checkboxes.
         :param Optional[str] frm_title: Title of the frame.
         :param Optional[int] idx_row: The location in main_frm to create the LabelFrame. If -1, then at the bottom.
-        :param Optional[Callable[[str], Any]] frm_title: Optional function callable associated with checking/unchecking the checkboxes.
+        :param Optional[Callable[[str], Any]] command: Optional function callable associated with checking/unchecking the checkboxes.
         :return Dict[str, BooleanVar]: Dictionary holding the ``cb_titles`` as keys and the BooleanVar representing if the checkbox is ticked or not.
 
         :example:

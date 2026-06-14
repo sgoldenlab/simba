@@ -68,7 +68,7 @@ class FreezingDetector(ConfigReader):
     :param Optional[int] movement_threshold: Movement threshold in millimeters per second. Frames with mean velocity below this threshold are considered potential freezing. Defaults to 5.
     :param Optional[int] shortest_bout: Minimum duration in milliseconds for a freezing bout to be considered valid. Shorter bouts are filtered out. Defaults to 100.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory where to store the results. If None, then results are stored in a timestamped subdirectory within the ``logs`` directory of the SimBA project.
-    :returns: None. Results are saved to CSV files in the specified save directory:
+    :return: None. Results are saved to CSV files in the specified save directory:
         - Individual video results: One CSV file per video with freezing annotations added as a 'FREEZING' column (1 = freezing, 0 = not freezing)
         - Aggregate results: `aggregate_freezing_results.csv` containing summary statistics for all videos
 
@@ -83,7 +83,8 @@ class FreezingDetector(ConfigReader):
     .. [2] Lopez et al., Region-specific Nucleus Accumbens Dopamine Signals Encode Distinct Aspects of Avoidance Learning, `biorxiv`, doi: https://doi.org/10.1101/2024.08.28.610149
     .. [3] Lopez, Gabriela C., Louis D. Van Camp, Ryan F. Kovaleski, et al. "Region-Specific Nucleus Accumbens Dopamine Signals Encode Distinct Aspects of Avoidance Learning." `Cell Biology`, Volume 35, Issue 10p2433-2443.e5May 19, 2025. DOI: 10.1016/j.cub.2025.04.006
     .. [4] Lazaro et al., Brainwide Genetic Capture for Conscious State Transitions, `biorxiv`, doi: https://doi.org/10.1101/2025.03.28.646066
-    .. [5] Sabnis et al., Visual detection of seizures in mice using supervised machine learning, 2025, Cell Reports Methods 5, 101242 December 15, 2025.
+    .. [5] Sabnis, G. S., et al. (2025). Visual detection of seizures in mice using supervised machine learning.
+           `Cell Reports Methods, 5(12), 101242 <https://doi.org/10.1016/j.crmeth.2025.101242>`_.
     """
 
     def __init__(self,

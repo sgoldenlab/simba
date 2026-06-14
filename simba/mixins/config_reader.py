@@ -296,7 +296,7 @@ class ConfigReader(object):
         :param pd.DataFrame data_df:  Dataframe where headers to to-bo replaced.
         :param List[str] new_headers:  Names of new headers.
         :param str filepath:  Path to where ``data_df`` is stored on disk
-        :returns pd.DataFrame: Dataframe with new headers
+        :return pd.DataFrame: Dataframe with new headers
         :raises DataHeaderWarning: If new headers are fewer/more than columns in dataframe
 
         :example:
@@ -326,7 +326,7 @@ class ConfigReader(object):
         Helper to find the count of non-numerical rows at the top of a dataframe.
 
         :param pd.DataFrame data_df: Dataframe to find the count non-numerical header rows in.
-        :returns int
+        :return int
         :raises DataHeaderError: All rows are non-numerical.
 
         :example:
@@ -464,7 +464,7 @@ class ConfigReader(object):
 
         :param str bp_name: Name of the body-part. E.g., ``Ear_1``.
         :param dict bp_dict: Nested dict holding animal names as keys and body-part names as and coordinates as values. Created by :meth:`simba.mixins.config_reader.ConfigReader.create_body_part_dictionary`
-        :returns str
+        :return str
 
         :example:
         >>> config_reader = ConfigReader(config_path='tests/data/test_projects/two_c57/project_folder/project_config.ini')
@@ -497,7 +497,7 @@ class ConfigReader(object):
         :param List[str] y_cols: column names for body-part coordinates on y-axis. Returned by  :meth:`simba.mixins.config_reader.ConfigReader.get_body_part_names`
         :param List[str] p_cols: column names for body-part pose-estimation probability values. Returned by  :meth:`simba.mixins.config_reader.ConfigReader.get_body_part_names`
         :param Optional[List[List[Tuple[int, int, int]]]] colors: Optional bgr colors to associate with the body-parts. Returned by :meth:`simba.utils.data.create_color_palettes`.
-        :returns dict
+        :return dict
 
         :example:
         >>> ConfigReader.create_body_part_dictionary(multi_animal_status=True, animal_id_lst=['simon',])
@@ -735,7 +735,7 @@ class ConfigReader(object):
         :param Optional[bool] raise_error: If True, raise error if video info for the video name cannot be found. Default: True.
         :param Optional[Union[str, os.PathLike]] video_info_df_path: Optional path to the video_info.csv on disk. If None, uses path from self.
 
-        :returns: Tuple representing all video info, pixels per mm, and fps. If raise_error is False, returns a tuple of Nones
+        :return: Tuple representing all video info, pixels per mm, and fps. If raise_error is False, returns a tuple of Nones
         :rtype: Union[Tuple[pd.DataFrame, float, float], Tuple[None, None, None]]
         """
 

@@ -182,7 +182,7 @@ def blob_tracker(config_path: Union[str, os.PathLike]) -> None:
        For an example blob detection config file, see `https://github.com/sgoldenlab/simba/blob/master/misc/blob_definitions_ex.json <https://github.com/sgoldenlab/simba/blob/master/misc/blob_definitions_ex.json>`__.
 
     :param Union[str, os.PathLike] config_path: Path to json file holding blob detection setting
-    :returns: None. The blob detection data is saved at the location specified in the ``config_path``.
+    :return: None. The blob detection data is saved at the location specified in the ``config_path``.
     :rtype: None
 
     :example:

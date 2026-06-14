@@ -41,13 +41,13 @@ class FrameMergererFFmpeg(ConfigReader):
           :width: 600
           :align: center
 
-    :parameter str config_path: Optional path to SimBA project config file in Configparser format.
-    :parameter Literal["horizontal", "vertical", "mosaic", "mixed_mosaic"] concat_type: Type of concatenation. OPTIONS: 'horizontal', 'vertical', 'mosaic', 'mixed_mosaic'.
-    :parameter List[Union[str, os.PathLike]] video_paths: List with videos to concatenate.
+    :param str config_path: Optional path to SimBA project config file in Configparser format.
+    :param Literal["horizontal", "vertical", "mosaic", "mixed_mosaic"] concat_type: Type of concatenation. OPTIONS: 'horizontal', 'vertical', 'mosaic', 'mixed_mosaic'.
+    :param List[Union[str, os.PathLike]] video_paths: List with videos to concatenate.
     :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
-    :parameter Optional[int] video_height: Optional height of the canatenated videos. Required if concat concat_type is not mixed_mosaic.
-    :parameter int video_width: Optional wisth of the canatenated videos. Required if concat concat_type is not mixed_mosaic.
-    :parameter Optional[bool] gpu: If True, use NVIDEA FFMpeg GPU codecs. Default False.
+    :param Optional[int] video_height: Optional height of the canatenated videos. Required if concat concat_type is not mixed_mosaic.
+    :param int video_width: Optional wisth of the canatenated videos. Required if concat concat_type is not mixed_mosaic.
+    :param Optional[bool] gpu: If True, use NVIDEA FFMpeg GPU codecs. Default False.
 
     :example:
     >>> video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled.mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled.mp4']

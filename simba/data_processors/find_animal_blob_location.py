@@ -263,7 +263,7 @@ def get_blob_vertices_from_imgs(frm_idxs: Tuple[int, List[int]],
 
     :param Dict[int, np.ndarray] imgs: Dictionary of images where the key is the frame id and the value is an image in np.ndarray format.
     :param bool verbose: If True, prints progress. Default: False.
-    :param video_name video_name: The name of the video being processed for interpretable progress msg if ``verbose``.
+    :param Optional[str] video_name: The name of the video being processed for interpretable progress msg if ``verbose``.
     :param Optional[Union[Polygon, MultiPolygon]] inclusion_zone: Optional shapely polygon, or multipolygon, restricting where to search for the largest blob. Default: None.
     :param Optional[int] window_size: If not None, then integer representing the size multiplier of the animal geometry in previous frame. If not None, the animal geometry will only be searched for within this geometry.
     :return: Dictionary where the key is the frame id and the value is a 2D array with x and y coordinates.

@@ -389,7 +389,7 @@ class PlottingMixin(object):
         :param Optional[str] edge_clr: Color of bar edges. Default: 'black'.
         :param bool hhmmss: If True, displays x-axis time as HH:MM:SS. If False, displays seconds. Default: False.
         :param bool as_svg: If True, returns or saves SVG format. If False, uses PNG format. Default: False.
-        :returns Union[None, np.ndarray, str]: If ``as_svg=True`` and ``save_path=None``, returns SVG string. If ``save_path`` provided, returns None (saves file). Otherwise returns NumPy array (BGR format).
+        :return Union[None, np.ndarray, str]: If ``as_svg=True`` and ``save_path=None``, returns SVG string. If ``save_path`` provided, returns None (saves file). Otherwise returns NumPy array (BGR format).
 
 
         """
@@ -987,7 +987,7 @@ class PlottingMixin(object):
 
         :param np.ndarray img: Input image as numpy array in uint8 format.
         :param bool right: If True, flips to the right. If False, flips to the left.
-        :returns: The rotated image as a numpy array of uint8 format.
+        :return: The rotated image as a numpy array of uint8 format.
 
         :example:
         >>> img = cv2.imread('/Users/simon/Desktop/test.png')
@@ -1090,7 +1090,7 @@ class PlottingMixin(object):
         :param Optional[int] size: Size of markers in the scatterplot. Default is 10.
         :param Optional[str] title: Title for the plot. Default is None.
         :param Optional[Union[str, os.PathLike]] save_path: The path where the plot will be saved. Default is None which returns the image.
-        :returns matplotlib.axes._subplots.AxesSubplot or None: The scatterplot if 'save_path' is not provided, otherwise None.
+        :return matplotlib.axes._subplots.AxesSubplot or None: The scatterplot if 'save_path' is not provided, otherwise None.
         """
         cmaps = get_categorical_palettes()
         if palette not in cmaps:
@@ -1175,7 +1175,7 @@ class PlottingMixin(object):
         :param Optional[int] size: Size of markers for scatter plot, default is 10.
         :param Optional[str] title: Title of the plot, default is None.
         :param Optional[Union[str, os.PathLike]] save_path: Path to save the plot image, default is None.
-        :returns sns.JointGrid or None: JointGrid object if save_path is None, else None.
+        :return sns.JointGrid or None: JointGrid object if save_path is None, else None.
 
         :example:
         >>> data, lbls = make_blobs(n_samples=100000, n_features=2, centers=10, random_state=42)
@@ -1469,7 +1469,7 @@ class PlottingMixin(object):
         :param bool as_svg: If True, returns or saves SVG format. If False, uses PNG format. Default: False.
         :param Optional[Union[str, os.PathLike]] save_path: Path to save the image. If None and ``as_svg=False``, returns NumPy array.
         :param bool show_thresholds: If True, displays horizontal threshold lines at 25%, 50%, and 75%. Default: False.
-        :returns Union[None, np.ndarray, str]: If ``as_svg=True`` and ``save_path=None``, returns SVG string. If ``save_path`` provided, returns None (saves file). Otherwise returns NumPy array (BGR format).
+        :return Union[None, np.ndarray, str]: If ``as_svg=True`` and ``save_path=None``, returns SVG string. If ``save_path`` provided, returns None (saves file). Otherwise returns NumPy array (BGR format).
 
         """
 
@@ -2069,7 +2069,7 @@ class PlottingMixin(object):
         :param int accepted_px_height: The highest allowed string in pixels. E.g., 1/10th of the image size.
         :param Optional[int] text_thickness: The thickness of the font. Default: 2.
         :param Optional[int] font: The font integer representation 0-7. See ``simba.utils.enums.Options.CV2_FONTS.values
-        :returns Tuple[int, int, int]: The font size, the shift on x between successive columns, the shift in y between successive rows.
+        :return Tuple[int, int, int]: The font size, the shift on x between successive columns, the shift in y between successive rows.
 
         :example:
         >>> img = cv2.imread('/Users/simon/Desktop/Screenshot 2024-07-08 at 4.46.03 PM.png')
@@ -2110,7 +2110,7 @@ class PlottingMixin(object):
 
         :param Tuple[int, int] frame_size: A tuple representing the dimensions of the rectangular frame (width, height).
         :param Optional[int] circle_frame_ratio: An integer representing the ratio between the frame's smallest dimension and the circle's diameter.  A lower ratio results in a larger circle, and a higher ratio results in a smaller circle.
-        :returns int: The computed diameter of the circle that fits within the smallest dimension of the frame, scaled by  the `circle_frame_ratio`.
+        :return int: The computed diameter of the circle that fits within the smallest dimension of the frame, scaled by  the `circle_frame_ratio`.
         """
 
 
@@ -2211,7 +2211,7 @@ class PlottingMixin(object):
         :param Optional[float] y_max: Maximum value for y-axis (or x-axis if horizontal). If None, auto-scales. Default: None.
         :param Optional[Union[str, os.PathLike]] save_path: Path to save the image. If None, returns matplotlib figure.
         :param bool as_svg: If True, saves as SVG format. If False, saves as PNG. Default: False.
-        :returns Optional[matplotlib.figure.Figure]: Returns matplotlib figure if ``save_path`` is None, otherwise returns None.
+        :return Optional[matplotlib.figure.Figure]: Returns matplotlib figure if ``save_path`` is None, otherwise returns None.
 
         """
 
@@ -2425,7 +2425,7 @@ class PlottingMixin(object):
         :param Optional[Union[str, os.PathLike]] save_path: Path to save the image. If None, returns figure.
         :param bool svg: If True, saves as SVG format. If False, saves as PNG. Default: False.
         :param int dpi: Resolution for saved images. Default: 500.
-        :returns Optional[matplotlib.figure.Figure]: Returns matplotlib figure if save_path is None, otherwise None.
+        :return Optional[matplotlib.figure.Figure]: Returns matplotlib figure if save_path is None, otherwise None.
 
         .. seealso::
            For more complex path plots with multiprocessing and advanced features, see :class:`simba.plotting.path_plotter.PathPlotterSingleCore` and :class:`simba.plotting.path_plotter_mp.PathPlotterMulticore`.

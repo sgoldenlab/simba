@@ -21,9 +21,9 @@ class AggBoundaryStatisticsCalculator(ConfigReader):
     """
     Compute aggregate boundary statistics
 
-    :parameter str config_path: SimBA project config file in Configparser format
-    :parameter List[str] measures: Aggregate statistics measurements. OPTIONS: 'DETAILED INTERACTIONS TABLE', 'INTERACTION TIME (s)', 'INTERACTION BOUT COUNT', 'INTERACTION BOUT MEAN (s)', 'INTERACTION BOUT MEDIAN (s)'
-    :parameter int shortest_allowed_interaction: The shortest allowed animal-anchored ROI intersection in millisecond.
+    :param str config_path: SimBA project config file in Configparser format
+    :param List[str] measures: Aggregate statistics measurements. OPTIONS: 'DETAILED INTERACTIONS TABLE', 'INTERACTION TIME (s)', 'INTERACTION BOUT COUNT', 'INTERACTION BOUT MEAN (s)', 'INTERACTION BOUT MEDIAN (s)'
+    :param int shortest_allowed_interaction: The shortest allowed animal-anchored ROI intersection in millisecond.
 
     Notes
     ----------

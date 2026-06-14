@@ -484,11 +484,11 @@ class TwoOptionQuestionPopUp(object):
     """
     Helpe to create a two-option question tkinter pop up window (e.g., YES/NO).
 
-    :parameter str question: Question to present to the user. E.g., ``DO YOU WANT TO PROCEED?``.
-    :parameter str option_one: The first user option. E.g., ``YES``.
-    :parameter str option_one: The second user option. E.g., ``NO``.
-    :parameter str title: The window titel in the top banner of the pop-up. E.g., ``A QUESTION FOR YOU!``.
-    :parameter Optional[str] link: If not None, then a link to documentation presenting background info about the user choices.
+    :param str question: Question to present to the user. E.g., ``DO YOU WANT TO PROCEED?``.
+    :param str option_one: The first user option. E.g., ``YES``.
+    :param str option_one: The second user option. E.g., ``NO``.
+    :param str title: The window titel in the top banner of the pop-up. E.g., ``A QUESTION FOR YOU!``.
+    :param Optional[str] link: If not None, then a link to documentation presenting background info about the user choices.
     """
 
     def __init__(self,

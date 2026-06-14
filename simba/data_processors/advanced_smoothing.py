@@ -47,13 +47,13 @@ class AdvancedSmoother(ConfigReader):
        :muted:
        :align: center
 
-    :parameter str data_dir: path to pose-estimation data in CSV or parquet format
-    :parameter str config_path: path to SimBA project config file in Configparser format.
-    :parameter Literal type: Level of smoothing: animal or body-part.
-    :parameter Dict settings: Smoothing rules for each animal or each animal body-part.
-    :parameter bool initial_import_multi_index: If True, the incoming data is multi-index columns dataframes. Use of input data is the ``project_folder/csv/input_csv`` directory. Default: False.
-    :parameter bool overwrite: If True, overwrites the input data. If False, then saves a copy input data in datetime-stamped sub-directory.
-    :parameter Optional[verbose] bool: If True, prints the progress. Default: True.
+    :param str data_dir: path to pose-estimation data in CSV or parquet format
+    :param str config_path: path to SimBA project config file in Configparser format.
+    :param Literal type: Level of smoothing: animal or body-part.
+    :param Dict settings: Smoothing rules for each animal or each animal body-part.
+    :param bool initial_import_multi_index: If True, the incoming data is multi-index columns dataframes. Use of input data is the ``project_folder/csv/input_csv`` directory. Default: False.
+    :param bool overwrite: If True, overwrites the input data. If False, then saves a copy input data in datetime-stamped sub-directory.
+    :param Optional[verbose] bool: If True, prints the progress. Default: True.
 
     :examples:
     >>> smoother = AdvancedSmoother(data_dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv',

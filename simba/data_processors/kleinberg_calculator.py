@@ -62,14 +62,14 @@ class KleinbergCalculator(ConfigReader):
 
     References
     ----------
-    .. [1] Kleinberg, Bursty and Hierarchical Structure in Streams, `Data Mining and Knowledge Discovery`,
-           vol. 7, pp. 373–397, 2003.
-    .. [2] Lee et al., Temporal microstructure of dyadic social behavior during relationship formation in mice, `PLOS One`,
-           2019.
-    .. [3] Bordes et al., Automatically annotated motion tracking identifies a distinct social behavioral profile
-           following chronic social defeat stress, `bioRxiv`, 2022.
-    .. [4] Chanthongdee et al., Comprehensive ethological analysis of fear expression in rats using DeepLabCut and SimBA machine learning model.
-           Front. Behav. Neurosci. https://doi.org/10.3389/fnbeh.2024.1440601
+    .. [1] Kleinberg, J. (2003). Bursty and hierarchical structure in streams.
+           `Data Mining and Knowledge Discovery, 7, 373–397 <https://doi.org/10.1023/A:1024940629314>`_.
+    .. [2] Lee, W., et al. (2019). Temporal microstructure of dyadic social behavior during relationship formation in mice.
+           `PLOS One, 14(12), e0220596 <https://doi.org/10.1371/journal.pone.0220596>`_.
+    .. [3] Bordes, J., et al. (2022). Automatically annotated motion tracking identifies a distinct social behavioral profile following chronic social defeat stress.
+           `bioRxiv <https://doi.org/10.1101/2022.06.23.497350>`_.
+    .. [4] Chanthongdee, K., et al. (2024). Comprehensive ethological analysis of fear expression in rats using DeepLabCut and SimBA machine learning model.
+           `Frontiers in Behavioral Neuroscience, 18, 1440601 <https://doi.org/10.3389/fnbeh.2024.1440601>`_.
     """
 
     def __init__(self,

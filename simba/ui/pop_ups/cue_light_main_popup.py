@@ -35,7 +35,7 @@ class CueLightMainPopUp(ConfigReader, PopUpMixin):
     """
     Launch cue light analysis GUI in SimBA.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
+    :param str config_path: path to SimBA project config file in Configparser format
 
     .. note::
        `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.

@@ -28,7 +28,7 @@ class BoundaryMenus(ConfigReader, PopUpMixin):
     Launch GUI interface for extrapolating bounding boxes from pose-estimation data, and calculating
     statstics on bounding boxes and pose-estimated key-point intersections.
 
-    :parameter str config_path: str path to SimBA project config file in Configparser format
+    :param str config_path: str path to SimBA project config file in Configparser format
 
     Notes
     ----------

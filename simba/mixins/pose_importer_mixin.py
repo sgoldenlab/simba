@@ -109,7 +109,7 @@ class PoseImporterMixin(object):
         :param Optional[List[str]] str_splits: Optional list of substrings that the data_paths would need to be split at in order to find a matching video name. E.g., ['dlc_resnet50'].
         :param Optional[object] filename_cleaning_func: Optional filename cleaning function that the data_paths filenames would have to pass through in order to find a matching video name. E.g., ``simba.utils.read_write.clean_sleap_filename(filepath)``.
         :param bool raise_error: If True, raises an error if a video file representing a data file doesn't exist. If False, return None for the specific key.
-        :returns dict: Dictionary with the data/file name as keys, and the video and data paths as values.
+        :return dict: Dictionary with the data/file name as keys, and the video and data paths as values.
         """
 
         results, video_names = {}, []

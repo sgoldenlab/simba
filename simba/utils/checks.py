@@ -349,7 +349,7 @@ def get_fn_ext(filepath: Union[os.PathLike, str]) -> (str, str, str):
     """
     Split file path into three components: (i) directory, (ii) file name, and (iii) file extension.
 
-    :parameter str filepath: Path to file.
+    :param str filepath: Path to file.
     :return str: File directory name
     :return str: File name
     :return str: File extension
@@ -670,7 +670,7 @@ def check_ffmpeg_available(raise_error: Optional[bool] = False) -> Union[bool, N
        To check which encoders are available in FFMpeg installation, see :func:`simba.utils.lookups.get_ffmpeg_encoders`
 
     :param Optional[bool] raise_error: If True, raises ``FFMPEGNotFoundError`` if FFmpeg can't be found. Else return False. Default False.
-    :returns bool: True if ``ffmpeg`` returns not None and raise_error is False. Else False.
+    :return bool: True if ``ffmpeg`` returns not None and raise_error is False. Else False.
     """
 
     try:
@@ -864,9 +864,9 @@ def check_if_module_has_import(parsed_file: ast.Module, import_name: str) -> boo
 
     Used for e.g., user custom feature extraction classes in ``simba.utils.custom_feature_extractor.CustomFeatureExtractor``.
 
-    :parameter ast.Module file_path: The abstract syntax tree (AST) of the Python module.
-    :parameter str import_name: The name of the module or package to check for in the import statements.
-    :parameter bool: True if the specified import is found in the module, False otherwise.
+    :param ast.Module file_path: The abstract syntax tree (AST) of the Python module.
+    :param str import_name: The name of the module or package to check for in the import statements.
+    :param bool: True if the specified import is found in the module, False otherwise.
 
     :example:
     >>> parsed_file = ast.parse(Path('/simba/misc/piotr.py').read_text())
@@ -917,7 +917,7 @@ def check_if_valid_img(data: np.ndarray,
     :param np.ndarray data: Data variable to check if a valid image representation.
     :param bool greyscale: Checks that the image is greyscale. Default False.
     :param bool color: Checks that the image is color. Default False.
-    :parameter bool raise_error: If True, raise InvalidInputError if invalid image representation. Else, return bool.
+    :param bool raise_error: If True, raise InvalidInputError if invalid image representation. Else, return bool.
     """
 
     check_instance(source=check_if_valid_img.__name__, instance=data, accepted_types=(np.ndarray, cp.ndarray))
@@ -2202,7 +2202,7 @@ def check_same_files_exist_in_all_directories(dirs: List[Union[str, os.PathLike]
 
     :param List[Union[str, os.PathLike]] dirs: List of directory paths to check.
     :param bool raise_error: If True, raises an error when file names do not match across directories. Defaults to False.
-    :param bool raise_error: File extension (without the dot) to check for (e.g., 'csv', 'txt'). Defaults to 'csv'.
+    :param bool file_type: File extension (without the dot) to check for (e.g., 'csv', 'txt'). Defaults to 'csv'.
     """
 
     check_valid_lst( data=dirs, source=f"{check_same_files_exist_in_all_directories.__name__} dirs", valid_dtypes=(str, os.PathLike), min_len=2)

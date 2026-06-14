@@ -43,7 +43,8 @@ class MarsImporter(object):
 
     References
     ----------
-    .. [1] Segalin et al., The Mouse Action Recognition System (MARS) software pipeline for automated analysis of social behaviors in mice, `eLife`, 2021.
+    .. [1] Segalin, C., et al. (2021). The Mouse Action Recognition System (MARS) software pipeline for automated analysis of social behaviors in mice.
+           `eLife, 10, e63720 <https://doi.org/10.7554/eLife.63720>`_.
 
     """
 

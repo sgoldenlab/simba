@@ -86,10 +86,10 @@ def change_img_format(directory: Union[str, os.PathLike],
     """
     Convert the file type of all image files within a directory.
 
-    :parameter Union[str, os.PathLike] directory: Path to directory holding image files
-    :parameter str file_type_in: Input file type, e.g., 'bmp' or 'png.
-    :parameter str file_type_out: Output file type, e.g., 'bmp' or 'png.
-    :parameter Optional[bool] verbose: If True, prints progress. Default False.
+    :param Union[str, os.PathLike] directory: Path to directory holding image files
+    :param str file_type_in: Input file type, e.g., 'bmp' or 'png.
+    :param str file_type_out: Output file type, e.g., 'bmp' or 'png.
+    :param Optional[bool] verbose: If True, prints progress. Default False.
 
     :example:
     >>> _ = change_img_format(directory='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/test_img', file_type_in='png', file_type_out='bmp', verbose=True)
@@ -136,7 +136,7 @@ def convert_to_jpeg(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]]
     :param Optional[int] quality: The quality of the output images (0-100).
     :param Optional[bool] save_dir: If not None, then the directory where to store converted images. If None, then stores the images in a subdirectory within the first passed image directory.
     :param Optional[bool] verbose: If True, prints progress. Default False.
-    :returns: None. New images are saved in ``save_dir``.
+    :return: None. New images are saved in ``save_dir``.
 
     :example:
     >>> convert_to_jpeg(path='/Users/simon/Desktop/imgs', verbose=False, quality=15)
@@ -190,7 +190,7 @@ def convert_to_bmp(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]],
     :param Union[str, os.PathLike] path: path to directory containing images, or path to a single image file, or a list of paths to image files.
     :param Optional[bool] save_dir: If not None, then the directory where to store converted images. If None, then stores the images in a subdirectory within the first passed image directory.
     :param Optional[bool] verbose: If True, print conversion progress. Default is False.
-    :returns: None. New images are saved in ``save_dir``.
+    :return: None. New images are saved in ``save_dir``.
 
     :example:
     >>> convert_to_bmp(path='/Users/simon/Desktop/test_jpg_/landing_40.jpeg', save_dir='/Users/simon/Desktop/test_jpg_/test__')
@@ -244,7 +244,7 @@ def convert_to_png(path: Union[str, os.PathLike],
     :param Union[str, os.PathLike] path: path to directory containing images, or path to a single image file, or a list of paths to image files.
     :param Optional[bool] save_dir: If not None, then the directory where to store converted images. If None, then stores the images in a subdirectory within the first passed image directory.
     :param Optional[bool] verbose: If True, print conversion progress. Default is False.
-    :returns: None. New images are saved in ``save_dir``.
+    :return: None. New images are saved in ``save_dir``.
 
     :example:
     >>> convert_to_png(path=['/Users/simon/Desktop/test_jpg_/test__/landing_40.bmp', '/Users/simon/Desktop/test_jpg_/landing_30.jpeg'], save_dir='/Users/simon/Desktop/test_jpg_/test__/HELLO_3')
@@ -299,7 +299,7 @@ def convert_to_tiff(directory: Union[str, os.PathLike],
     :param Optional[bool] stack: If True, create a TIFF stack from the images. Default is False.
     :param Literal['raw', 'tiff_deflate', 'tiff_lzw'] compression: Compression method for the TIFF file. Options are 'raw' (no compression), 'tiff_deflate', and 'tiff_lzw'. Default is 'raw'.
     :param Optional[bool] verbose: If True, print conversion progress. Default is False.
-    :returns: None. New images are saved in ``save_dir``.
+    :return: None. New images are saved in ``save_dir``.
 
     :example:
     >>> convert_to_tiff('/Users/simon/Desktop/imgs', stack=True, compression='tiff_lzw')
@@ -366,7 +366,7 @@ def convert_to_webp(path: Union[str, os.PathLike],
     :param Optional[int] quality: The quality of the output images (0-100).
     :param Optional[bool] save_dir: If not None, then the directory where to store converted images. If None, then stores the images in a subdirectory within the first passed image directory.
     :param Optional[bool] verbose: If True, prints progress. Default False.
-    :returns: None. New images are saved in ``save_dir``.
+    :return: None. New images are saved in ``save_dir``.
 
     :example:
     >>> convert_to_webp('/Users/simon/Desktop/imgs', quality=80)
@@ -427,7 +427,7 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike],
     :param Optional[int] clip_limit: CLAHE amplification limit. Inccreased clip limit reduce noise in output. Default: 2.
     :param Optional[Tuple[int]] tile_grid_size: The histogram kernel size.
     :param Optional[Union[str, os.PathLike]] out_path:  The result is saved with prefix``CLAHE_`` in the same directory as in the input file if out_path is not passed. Else saved at the out_path.
-    :returns: None.
+    :return: None.
 
     :example:
     >>> _ = clahe_enhance_video(file_path: 'project_folder/videos/Video_1.mp4')
@@ -538,7 +538,7 @@ def clahe_enhance_video_mp(file_path: Union[str, os.PathLike],
     :param Optional[Union[str, os.PathLike]] out_path:  The result is saved with prefix``CLAHE_`` in the same directory as in the input file if out_path is not passed. Else saved at the out_path.
     :param Union[str, os.PathLike] gpu: If True, try using GPU for segment concatenation.
     :param int core_cnt: Number of cores to use. Pass ``-1`` for all available cores.
-    :returns: None.
+    :return: None.
 
     :example:
     >>> _ = clahe_enhance_video_mp(file_path= 'project_folder/videos/Video_1.mp4')
@@ -692,7 +692,7 @@ def change_single_video_fps(file_path: Union[str, os.PathLike],
     :param Optional[Union[str, os.PathLike]] save_path: Path where to save the converted video. If None, saves in the same directory as input file with ``_fps_{fps}`` suffix. Default None.
     :param Optional[int] quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
     :param bool verbose: If True, prints conversion progress. Default True.
-    :returns: None
+    :return: None
 
     :example:
     >>> _ = change_single_video_fps(file_path='project_folder/videos/Video_1.mp4', fps=15)
@@ -729,7 +729,7 @@ def change_single_video_fps(file_path: Union[str, os.PathLike],
             cmd = f'ffmpeg -hwaccel auto -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -preset p4 -cq {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
             result = subprocess.run(cmd, shell=True)
             if result.returncode != 0:
-                if verbose: SimBAGPUError(msg=f'FPS convertion ({video_meta_data["fps"]}->{fps}) GPU for video {file_name} failed, using CPU instead...')
+                if verbose: SimBAGPUError(msg=f'FPS conversion ({video_meta_data["fps"]}->{fps}) GPU for video {file_name} failed, using CPU instead...')
                 gpu = False
     if not gpu:
         cmd = f'ffmpeg -i "{file_path}" -filter:v fps=fps={fps} -c:v {codec} -crf {quality} -c:a aac "{save_path}" -loglevel error -stats -hide_banner -y'
@@ -754,7 +754,7 @@ def change_fps_of_multiple_videos(path: Union[str, os.PathLike, List[Union[str, 
     :param Optional[Union[str, os.PathLike]] save_dir: If not None, then the directory where to store converted videos. If None, then stores the new videos in the same directory as the input video with the ``_fps_{fps}.file_extension`` suffix.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :param bool verbose: If True, prints conversion progress. Default True.
-    :returns: None.
+    :return: None.
     
     .. note::
        Codec is automatically selected based on file extension: libvpx-vp9 for .webm, mpeg4 for .avi, libx264 for others.
@@ -806,7 +806,7 @@ def change_fps_of_multiple_videos(path: Union[str, os.PathLike, List[Union[str, 
                 cmd = f'ffmpeg -hwaccel auto -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -preset p4 -cq {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
                 result = subprocess.run(cmd, shell=True)
                 if result.returncode != 0:
-                    if verbose: SimBAGPUError(msg=f'FPS convertion ({video_meta_data["fps"]}->{fps}) GPU for video {file_name} failed, using CPU instead...')
+                    if verbose: SimBAGPUError(msg=f'FPS conversion ({video_meta_data["fps"]}->{fps}) GPU for video {file_name} failed, using CPU instead...')
                     gpu = False
         if not gpu:
             cmd = f'ffmpeg -i "{file_path}" -filter:v fps=fps={fps} -c:v {codec} -crf {quality} -c:a aac "{save_path}" -loglevel error -stats -hide_banner -y'
@@ -824,7 +824,7 @@ def convert_video_powerpoint_compatible_format(file_path: Union[str, os.PathLike
 
     :param Union[str, os.PathLike] file_path: Path to video file.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-    :returns: None. The result is stored in the same directory as the input file with the ``_powerpointready`` suffix.
+    :return: None. The result is stored in the same directory as the input file with the ``_powerpointready`` suffix.
     
     .. note::
        Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
@@ -890,7 +890,7 @@ def video_to_greyscale(file_path: Union[str, os.PathLike],
     :param bool verbose: If True, prints conversion progress. Default True.
     :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
     :param Optional[Union[str, os.PathLike]] save_path: Path where to save the converted video. If None, saves in the same directory as input file with ``_grayscale.mp4`` suffix. Default None.
-    :returns: None. The result is stored in the same directory as the input file with the ``_grayscale.mp4`` suffix if save_path is not provided.
+    :return: None. The result is stored in the same directory as the input file with the ``_grayscale.mp4`` suffix if save_path is not provided.
     :raise FFMPEGCodecGPUError: If no GPU is found and ``gpu == True``.
     :raise FileExistError: If video name with ``_grayscale`` suffix already exist and save_path is None.
 
@@ -948,7 +948,7 @@ def batch_video_to_greyscale(path: Union[str, os.PathLike, List[Union[str, os.Pa
     :param Optional[int] quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. If None, defaults to 23. Default None.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :raise FFMPEGCodecGPUError: If no GPU is found and ``gpu == True``.
-    :returns: None.
+    :return: None.
     
     .. note::
        Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
@@ -1034,7 +1034,7 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
     :param Optional[Union[str, os.PathLike]] save_path: Optional save path or save directory for the video with frame numbers. If None, then the new video is saved in the same directory as the input video with the ``_frame_no`` suffix.
     :param Optional[Literal['top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right']] loc: The location of the font number text. Options: 'top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right'. Default 'bottom_middle'.
     :param Optional[int] fontsize: The size of the font representing the current frame. Default 20.
-    :returns: None. The result is stored in the same directory as the input file with the ``_frame_no.mp4`` suffix if ``save_path`` is None.
+    :return: None. The result is stored in the same directory as the input file with the ``_frame_no.mp4`` suffix if ``save_path`` is None.
 
     :example:
     >>> _ = superimpose_frame_count(file_path='/Users/simon/Downloads/1_LH_0_3.mp4', fontsize=90)
@@ -1126,7 +1126,7 @@ def remove_beginning_of_video(file_path: Union[str, os.PathLike],
     :param int quality: Video quality percentage (1-100). Higher values = higher quality. Default 60.
     :param Optional[Union[str, os.PathLike]] save_path: Optional save location for the shortened video. If None, then the new video is saved in the same directory as the input video with the ``_shortened`` suffix.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-    :returns: None. If save_path is not passed, the result is stored in the same directory as the input file with the ``_shorten.mp4`` suffix.
+    :return: None. If save_path is not passed, the result is stored in the same directory as the input file with the ``_shorten.mp4`` suffix.
     
     .. note::
        Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
@@ -1180,7 +1180,7 @@ def remove_end_of_video(file_path: Union[str, os.PathLike],
     :param int quality: Video quality percentage (1-100). Higher values = higher quality. Default 60.
     :param Optional[Union[str, os.PathLike]] save_path: Optional save location for the shortened video. If None, then the new video is saved in the same directory as the input video with the ``_shortened`` suffix.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-    :returns: None. If save_path is not passed, the result is stored in the same directory as the input file with the ``_shorten.mp4`` suffix.
+    :return: None. If save_path is not passed, the result is stored in the same directory as the input file with the ``_shorten.mp4`` suffix.
 
     .. note::
        Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
@@ -1249,7 +1249,7 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
     :param Optional[bool] overwrite: If True, overwrite output file if path already exists. If False, then raise FileExistError. Default False.
     :param Optional[bool] include_clip_time_in_filename: If True, include the clip start and end in HH-MM-SS format as suffix in the filename. If False, then use ``_clipped`` suffix. Default False.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-    :returns: None. The clip is stored in the same directory as the input video with the ``_clipped.mp4`` suffix if save_path and out_dir are None.
+    :return: None. The clip is stored in the same directory as the input video with the ``_clipped.mp4`` suffix if save_path and out_dir are None.
 
     :example:
     >>> _ = clip_video_in_range(file_path='project_folder/videos/Video_1.avi', start_time='00:00:05', end_time='00:00:10')
@@ -1314,7 +1314,7 @@ def downsample_video(file_path: Union[str, os.PathLike],
     :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
     :param Optional[Union[str, os.PathLike]] save_path: Optional save path for the downsampled video. If None, saves in the same directory as input file with ``_downsampled.mp4`` suffix. Default None.
     :param bool verbose: If True, prints conversion progress. Default True.
-    :returns: None. The result is stored in the same directory as the input file with the ``_downsampled.mp4`` suffix if save_path is None.
+    :return: None. The result is stored in the same directory as the input file with the ``_downsampled.mp4`` suffix if save_path is None.
 
     :example:
     >>> _ = downsample_video(file_path='project_folder/videos/Video_1.avi', video_height=600, video_width=400)
@@ -1430,11 +1430,11 @@ def batch_convert_video_format(directory: Union[str, os.PathLike],
     """
     Batch convert all videos in a folder of specific format into a different video format.
 
-    :parameter Union[str, os.PathLike] directory: Path to video file directory.
-    :parameter str input_format: Format of the input files (e.g., avi).
-    :parameter str output_format: Format of the output files (e.g., mp4).
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-    :returns: None. The results are stored in the same directory as the input files.
+    :param Union[str, os.PathLike] directory: Path to video file directory.
+    :param str input_format: Format of the input files (e.g., avi).
+    :param str output_format: Format of the output files (e.g., mp4).
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :return: None. The results are stored in the same directory as the input files.
     
     .. note::
        Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
@@ -1510,8 +1510,8 @@ def batch_create_frames(directory: Union[str, os.PathLike]) -> None:
     """
     Extract all frames for all videos in a directory.
 
-    :parameter str directory: Path to directory containing video files.
-    :returns: None. Results are stored within sub-directories in the input directory named according to the video files.
+    :param str directory: Path to directory containing video files.
+    :return: None. Results are stored within sub-directories in the input directory named according to the video files.
 
     :example:
     >>> _ = batch_create_frames(directory='project_folder/videos')
@@ -1563,7 +1563,7 @@ def extract_frames_single_video(file_path: Union[str, os.PathLike],
 
     :param Union[str, os.PathLike] file_path: Path to video file.
     :param Optional[Union[str, os.PathLike]] save_dir: Optional directory where to save the frames. If ``save_dir`` is not passed, results are stored within a subdirectory in the same directory as the input file.
-    :returns: None
+    :return: None
 
     :example:
     >>> _ = extract_frames_single_video(file_path='project_folder/videos/Video_1.mp4')
@@ -1607,7 +1607,7 @@ def multi_split_video(file_path: Union[str, os.PathLike],
     :param Optional[bool] include_clip_time_in_filename: If True, include the clip start and end in HH-MM-SS format as suffix in the filename. If False, then use integer suffic representing the count.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :param Optional[str] codec: Video codec to use for CPU encoding. If None, automatically selects based on file extension (libvpx-vp9 for .webm, mpeg4 for .avi, libx264 for others). Default None. Ignored if gpu=True.
-    :returns: None.
+    :return: None.
 
     :example:
     >>> _ = multi_split_video(file_path='project_folder/videos/Video_1.mp4', start_times=['00:00:05', '00:00:20'], end_times=['00:00:10', '00:00:25'])
@@ -1699,7 +1699,7 @@ def crop_single_video(file_path: Union[str, os.PathLike],
     :param Union[str, os.PathLike] file_path: Path to video file.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :param int quality: Video quality percentage (1-100). Higher values = higher quality. Default 60.
-    :returns: None. Results is saved in the same directory as input video with the ``_cropped.mp4`` suffix.
+    :return: None. Results is saved in the same directory as input video with the ``_cropped.mp4`` suffix.
 
     :example:
     >>> _ = crop_single_video(file_path='project_folder/videos/Video_1.mp4')
@@ -1749,7 +1749,7 @@ def crop_multiple_videos(directory_path: Union[str, os.PathLike],
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :param Optional[str] codec: Video codec to use for CPU encoding. If None, automatically selects based on file extension (libvpx-vp9 for .webm, mpeg4 for .avi, libx264 for others). Default None. Ignored if gpu=True.
     :param int quality: Video quality percentage (1-100). Higher values = higher quality. Default 60.
-    :returns: None. Results are stored in passed ``output_path``.
+    :return: None. Results are stored in passed ``output_path``.
 
     :example:
     >>> _ = crop_multiple_videos(directory_path='project_folder/videos', output_path='project_folder/videos/my_new_folder')
@@ -1896,7 +1896,7 @@ def video_concatenator(video_one_path: Union[str, os.PathLike],
     :param horizontal: If true, then horizontal concatenation. Else vertical concatenation.
     :param Optional[int] quality: Integer (1-100) representing output video quality. Higher = better quality + bigger size. If None, defaults to 60. Default None.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-    :returns: None. The video is stored in the same directory as the ``video_one_path`` using the video names concatenated as filename.
+    :return: None. The video is stored in the same directory as the ``video_one_path`` using the video names concatenated as filename.
     
     .. note::
        Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
@@ -1982,7 +1982,7 @@ class VideoRotator(ConfigReader):
     :param str output_dir: Directory where to save the rotated video.
     :param Optional[bool] gpu: If True, use FFMPEG NVIDEA GPU codecs. Else CPU codecs.
     :param Optional[bool] gpu: If True, use FFPMPEG. Else, OpenCV.
-    :returns: None. Rotated video is saved with the ``_rotated_DATETIME.mp4`` suffix.
+    :return: None. Rotated video is saved with the ``_rotated_DATETIME.mp4`` suffix.
 
     :example:
     >>> VideoRotator(input_path='project_folder/videos/Video_1.mp4', output_dir='project_folder/videos')
@@ -2209,8 +2209,8 @@ def copy_img_folder(
     """
     Copy directory of png files to the SimBA project. The directory is stored in the project_folder/frames/input folder of the SimBA project
 
-    :parameter str config_path: path to SimBA project config file in Configparser format.
-    :parameter str source: path to image folder outside SimBA project.
+    :param str config_path: path to SimBA project config file in Configparser format.
+    :param str source: path to image folder outside SimBA project.
 
     :example:
     >>> copy_img_folder(config_path='MySimBAprojectConfig', source='/DirectoryWithVideos/')
@@ -4321,7 +4321,7 @@ def reencode_mp4_video(file_path: Union[str, os.PathLike],
     :param Union[str, os.PathLike] file_path: Path to the MP4 video file to re-encode.
     :param str codec: Video codec to use for encoding (e.g., 'libx264', 'libx265', 'h264_nvenc').
     :param int quality: CRF (Constant Rate Factor) value for quality control. Lower values indicate higher quality. Typical range: 18-28 (18 = high quality, 28 = lower quality/file size).
-    :returns: None. The original file is replaced with the re-encoded version.
+    :return: None. The original file is replaced with the re-encoded version.
 
     :example:
     >>> reencode_mp4_video(file_path=r'project_folder/videos/Video_1.mp4', codec='libx264', quality=23)
@@ -4483,7 +4483,7 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
     :param int closing_iterations: Number of iterations for morphological closing operation. Default: 3.
     :param Optional[Tuple[int, int]] opening_kernel_size: Size of the morphological opening kernel (width, height). If None, opening is not applied. Default: None.
     :param int opening_iterations: Number of iterations for morphological opening operation. Default: 3.
-    :returns: None.
+    :return: None.
 
     :example:
     >>> video_bg_subtraction_mp(video_path='/Users/simon/Downloads/1_LH.mp4', bg_start_time='00:00:00', bg_end_time='00:00:10', bg_color=(0, 0, 0), fg_color=(255, 255, 255))
@@ -5181,13 +5181,14 @@ def crop_video(video_path: Union[str, os.PathLike],
     Crops a video from the given file at `video_path` and saves the result to `save_path`.
     Optionally uses GPU acceleration for faster processing, falling back to CPU if GPU fails.
 
-    :param video_path Union[str, os.PathLike]: The path to the input video file to crop. Can be a string or path-like object.
-    :param save_path Union[str, os.PathLike]: The path to save the cropped video file. Can be a string or path-like object.
-    :param size Tuple[int, int]: A tuple (width, height) specifying the size of the output cropped video.
-    :param top_left Tuple[int, int]: A tuple (x, y) specifying the top-left corner of the cropping area.
-    :param gpu bool:  True, attempts to use GPU acceleration for the video cropping. Defaults to False.
-    :param verbose bool: If True, prints progress messages and the elapsed time. Defaults to True.
-    :param quality bool:  The quality of the output video, on a scale from 1 to 100. Defaults to 60 (balances encoding time vs file size).
+    :param Union[str, os.PathLike] video_path: The path to the input video file to crop. Can be a string or path-like object.
+    :param Union[str, os.PathLike] save_path: The path to save the cropped video file. Can be a string or path-like object.
+    :param Tuple[int, int] size: A tuple (width, height) specifying the size of the output cropped video.
+    :param Tuple[int, int] top_left: A tuple (x, y) specifying the top-left corner of the cropping area.
+    :param bool gpu: If True, attempts to use GPU acceleration for the video cropping. Defaults to False.
+    :param str codec: The codec used for encoding the output video. Defaults to the SimBA batch codec.
+    :param bool verbose: If True, prints progress messages and the elapsed time. Defaults to True.
+    :param int quality: The quality of the output video, on a scale from 1 to 100. Defaults to 60 (balances encoding time vs file size).
     :return: None. The result is saved at `save_path`. If `verbose` is True, prints the elapsed time and success message.
     """
 
@@ -5303,7 +5304,7 @@ def change_playback_speed(video_path: Union[str, os.PathLike],
     :param Optional[Union[str, os.PathLike]] save_path: Path where the output video will be saved. If None, saves in the same directory as input with ``_playback_speed`` suffix.
     :param int quality: Video quality as percentage (1-100). Higher values indicate better quality. Default: 60. Converted to CRF internally.
     :param str codec: Video codec to use. Default: 'libx264'.
-    :returns: None
+    :return: None
 
     :example:
     >>> change_playback_speed(video_path=r"project_folder/videos/Video_1.mp4", speed=1.5)
@@ -5367,7 +5368,7 @@ def change_playback_speed_dir(data_dir: Union[str, os.PathLike],
     :param bool gpu: If True, use NVIDIA GPU codecs for encoding. Requires NVIDIA GPU and appropriate drivers. Default: False.
     :param bool verbose: If True, prints progress messages. Default: True.
     :param str codec: Video codec to use. Default: 'libx264'.
-    :returns: None
+    :return: None
 
     :example:
     >>> change_playback_speed_dir(data_dir=r'E:/open_video/barnes_maze/test', speed=5)

@@ -154,7 +154,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
         :param np.ndarray data: A 1D array of numerical data for which the rolling peak count ratio is calculated.
         :param np.ndarray time_windows: A 1D array of time durations (in seconds) defining the size of each sliding window.
-        :param int fps: Frames per second convertion factor.
+        :param int fps: Frames per second conversion factor.
         :return:  A 2D array where each row corresponds to a timestep in `data`, and each column corresponds to a time window. Each element represents the peak count ratio for that timestep and time window.
         :rtype: np.ndarray
         """
@@ -192,7 +192,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :param np.ndarray data: 1d array of feature values
         :param np.ndarray time_windows: Rolling time-windows as floats in seconds. E.g., [0.2, 0.4, 0.6]
         :param int fps: fps of the recorded video
-        :returns: Size data.shape[0] x time_windows.shape[0] array
+        :return: Size data.shape[0] x time_windows.shape[0] array
         :rtype: np.ndarray
 
         :example:
@@ -232,7 +232,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
         :param np.ndarray data: 1d array of feature values
         :param int fps: Frame-rate of video.
-        :returns np.ndarray: Array of size data.shape[0]
+        :return np.ndarray: Array of size data.shape[0]
         :rtype: np.ndarray
 
         :example:
@@ -270,7 +270,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :param int fps: FPS of the recorded video
         :param float pixels_per_mm: Pixels per millimeter of recorded video.
         :param np.ndarray time_windows: Rolling time-windows as floats in seconds. E.g., [0.2, 0.4, 0.6]
-        :returns: Size data.shape[0] x time_windows.shape[0]. Greater values denote greater movement on x-axis relative to y-axis.
+        :return: Size data.shape[0] x time_windows.shape[0]. Greater values denote greater movement on x-axis relative to y-axis.
         :rtype: np.ndarray
 
         :example:
@@ -327,7 +327,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :param float pixels_per_mm: Pixels per millimeter of recorded video.
         :param int fps: FPS of the recorded video
         :param float time_windows: Rolling time-window as floats in seconds. E.g., ``0.2``
-        :returns np.ndarray: Size data.shape[0] x 4 array with millimeter distances from LEFT, RIGH, TOP, BOTTOM,
+        :return np.ndarray: Size data.shape[0] x 4 array with millimeter distances from LEFT, RIGH, TOP, BOTTOM,
         :rtype: np.ndarray
 
         :example:
@@ -375,7 +375,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :param float pixels_per_mm: Pixels per millimeter of recorded video.
         :param int fps: FPS of the recorded video
         :param float time_windows: Rolling time-window as floats in seconds. E.g., ``0.2``
-        :returns np.ndarray: Size data.shape[0] x 4 array with millimeter distances from TOP LEFT, TOP RIGH, BOTTOM RIGHT, BOTTOM LEFT.
+        :return np.ndarray: Size data.shape[0] x 4 array with millimeter distances from TOP LEFT, TOP RIGH, BOTTOM RIGHT, BOTTOM LEFT.
         :rtype: np.ndarray
 
         :example I:
@@ -506,7 +506,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
         :param pd.DataFrame data: DataFrame containing shape data where each row represents a frame and each column represents a shape where 0 represents not in ROI and 1 represents inside the ROI
         :param List[str] shape_names: List of column names in the DataFrame corresponding to shape names.
-        :returns Dict[Union[str, Tuple[str], Union[int, float, List[int]]]]: Dict with the following keys and values:
+        :return Dict[Union[str, Tuple[str], Union[int, float, List[int]]]]: Dict with the following keys and values:
 
         Dict with the following keys and values:
 
@@ -662,7 +662,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :param str target: Name of the field in ``data`` representing behavior T.
         :param float time_window: The time-window to scan proceeding and preceding behavior T.
         :param float fps: The sample rate of the video used as conversion factor.
-        :returns: A value between -1 and 1 representing the relationship. A value closer to 1.0 indicates that behavior T always precede behavior C. A value closer to 0.0 indicates that behavior T follows behavior C. A value of -1.0 indicates that behavior T never precede nor proceed behavior C.
+        :return: A value between -1 and 1 representing the relationship. A value closer to 1.0 indicates that behavior T always precede behavior C. A value closer to 0.0 indicates that behavior T follows behavior C. A value of -1.0 indicates that behavior T never precede nor proceed behavior C.
         :rtype: float.
 
         :example:

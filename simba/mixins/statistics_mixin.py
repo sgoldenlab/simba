@@ -66,7 +66,8 @@ class Statistics(FeatureExtractionMixin):
        :align: center
 
 
-    :references:
+    References
+    ----------
        .. [1]  Bernard Desgraupes - https://cran.r-project.org/web/packages/clusterCrit/vignettes/clusterCrit.pdf
        .. [2]  Ikotun, A. M., Habyarimana, F., & Ezugwu, A. E. (2025). Cluster validity indices for automatic clustering: A comprehensive review. Heliyon, 11(2), e41953. https://doi.org/10.1016/j.heliyon.2025.e41953
        .. [3]  Hassan, B. A., Tayfor, N. B., Hassan, A. A., Ahmed, A. M., Rashid, T. A., & Abdalla, N. N. (2024). From A-to-Z review of clustering validation indices. arXiv. https://doi.org/10.48550/arXiv.2407.20246
@@ -89,10 +90,10 @@ class Statistics(FeatureExtractionMixin):
         .. note::
            For non-heuristic rules for bin counts and bin ranges, see ``simba.data.freedman_diaconis`` or simba.data.bucket_data``.
 
-        :parameter np.ndarray data: 1d array containing feature values.
-        :parameter int bin_count: The number of bins.
-        :parameter: np.ndarray range: 1d array with two values representing minimum and maximum value to bin.
-        :parameter: Optional[bool] normalize: If True, then the counts are returned as a ratio of all values. If False, then the raw counts. Pass normalize as True if the datasets are unequal counts. Default: True.
+        :param np.ndarray data: 1d array containing feature values.
+        :param int bin_count: The number of bins.
+        :param: np.ndarray range: 1d array with two values representing minimum and maximum value to bin.
+        :param: Optional[bool] normalize: If True, then the counts are returned as a ratio of all values. If False, then the raw counts. Pass normalize as True if the datasets are unequal counts. Default: True.
         """
 
         hist = np.histogram(data, bin_count, (range[0], range[1]))[0]
@@ -184,7 +185,7 @@ class Statistics(FeatureExtractionMixin):
         :param ndarray sample_1: First 1d array representing feature values.
         :param ndarray sample_2: Second 1d array representing feature values.
         :param ndarray critical_values: 2d array where the first column represents degrees of freedom and second column represents critical values.
-        :returns t_statistic, p_value: Size-2 tuple representing t-statistic and associated probability value. p_value is ``None`` if critical_values is None. Else True or False with True representing significant.
+        :return t_statistic, p_value: Size-2 tuple representing t-statistic and associated probability value. p_value is ``None`` if critical_values is None. Else True or False with True representing significant.
         :rtype: Tuple[float, Union[None, bool]]
 
         :example:
@@ -270,7 +271,7 @@ class Statistics(FeatureExtractionMixin):
         :param ndarray data: 1D array of size len(frames) representing feature values.
         :param np.ndarray[ints] time_window: Time windows to compute ANOVAs for in seconds.
         :param int fps: Frame-rate of recorded video.
-        :returns: Array of size data.shape[0] x window_sizes.shape[1] with Cohens D.
+        :return: Array of size data.shape[0] x window_sizes.shape[1] with Cohens D.
         :rtype: np.ndarray
 
         :example:
@@ -351,7 +352,7 @@ class Statistics(FeatureExtractionMixin):
         sample_2: np.ndarray,
         critical_values: Optional[float64[:, :]] = None,
     ) -> Tuple[float, Union[bool, None]]:
-        """
+        r"""
         Jitted compute the two-sample Kolmogorov-Smirnov (KS) test statistic and, optionally, test for statistical significance.
 
         The two-sample KS test is a non-parametric test that compares the cumulative distribution functions (ECDFs) of two independent samples to assess whether they come from the same distribution.
@@ -359,17 +360,17 @@ class Statistics(FeatureExtractionMixin):
         KS statistic (D) is calculated as the maximum absolute difference between the empirical cumulative distribution functions (ECDFs) of the two samples.
 
         .. math::
-           D = \\max(| ECDF_1(x) - ECDF_2(x) |)
+           D = \max(| ECDF_1(x) - ECDF_2(x) |)
 
         If `critical_values` are provided, the function checks the significance of the KS statistic against the critical values.
 
         .. seealso::
            For rolling timeseries based comparison, see :func:`simba.mixins.statistics_mixin.Statistics.rolling_two_sample_ks`
 
-        :param np.ndarray data: The first sample array for the KS test.
-        :param np.ndarray data: The second sample array for the KS test.
+        :param np.ndarray sample_1: The first sample array for the KS test.
+        :param np.ndarray sample_2: The second sample array for the KS test.
         :param Optional[float64[:, :]] critical_values: An array of critical values for the KS test. If provided, the function will also check the significance of the KS statistic against the critical values. Default: None.
-        :returns (float Union[bool, None]): Returns a tuple containing the KS statistic and a boolean indicating whether the test is statistically significant.
+        :return (float Union[bool, None]): Returns a tuple containing the KS statistic and a boolean indicating whether the test is statistically significant.
 
         :example:
         >>> sample_1 = np.array([1, 2, 3, 1, 3, 2, 1, 10, 8, 4, 10]).astype(np.float32)
@@ -496,7 +497,7 @@ class Statistics(FeatureExtractionMixin):
         :param ndarray data: 1D array of size len(frames) representing feature values.
         :param np.ndarray[ints] time_windows: Time windows to compute ANOVAs for in seconds.
         :param int fps: Frame-rate of recorded video.
-        :returns: 2D numpy array with F values comparing the current time-window to the immedidatly preceeding time-window.
+        :return: 2D numpy array with F values comparing the current time-window to the immedidatly preceeding time-window.
         :rtype: np.ndarray
 
 
@@ -564,7 +565,7 @@ class Statistics(FeatureExtractionMixin):
         :param ndarray sample_2: Second 1d array representing feature values.
         :param Optional[int] fill_value: Optional pseudo-value to use to fill empty buckets in ``sample_2`` histogram
         :param Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators
-        :returns: Kullback-Leibler divergence between ``sample_1`` and ``sample_2``
+        :return: Kullback-Leibler divergence between ``sample_1`` and ``sample_2``
         :rtype: float
         """
         timer = SimbaTimer(start=True)
@@ -608,7 +609,7 @@ class Statistics(FeatureExtractionMixin):
         :param Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators
         :param np.ndarray[floats] time_windows: Time windows to compute JS for in seconds.
         :param int fps: Frame-rate of recorded video.
-        :returns: Size data.shape[0] x window_sizes.shape with Kullback-Leibler divergence. Columns represents different tiem windows.
+        :return: Size data.shape[0] x window_sizes.shape with Kullback-Leibler divergence. Columns represents different tiem windows.
         :rtype: np.ndarray
 
         :example:
@@ -684,7 +685,7 @@ class Statistics(FeatureExtractionMixin):
         :param ndarray sample_1: First 1d array representing feature values.
         :param ndarray sample_2: Second 1d array representing feature values.
         :param Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators.
-        :returns: Jensen-Shannon divergence between ``sample_1`` and ``sample_2``
+        :return: Jensen-Shannon divergence between ``sample_1`` and ``sample_2``
         :rtype: float
 
         :example:
@@ -739,7 +740,7 @@ class Statistics(FeatureExtractionMixin):
         :param np.ndarray[ints] time_windows: Time windows to compute JS for in seconds.
         :param int fps: Frame-rate of recorded video.
         :param Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators
-        :returns: Array of size data.shape[0] x window_sizes.shape[0] with Jensen-Shannon divergence. Columns represents different time windows.
+        :return: Array of size data.shape[0] x window_sizes.shape[0] with Jensen-Shannon divergence. Columns represents different time windows.
         :rtype: np.ndarray
         """
 
@@ -802,7 +803,7 @@ class Statistics(FeatureExtractionMixin):
         :param ndarray sample_1: First 1d array representing feature values.
         :param ndarray sample_2: Second 1d array representing feature values.
         :param Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators
-        :returns: Wasserstein distance between ``sample_1`` and ``sample_2``
+        :return: Wasserstein distance between ``sample_1`` and ``sample_2``
         :rtype: float
 
         :example:
@@ -854,7 +855,7 @@ class Statistics(FeatureExtractionMixin):
         :param np.ndarray[ints] time_windows: Time windows to compute JS for in seconds.
         :param int fps: Frame-rate of recorded video.
         :param Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators
-        :returns: Size data.shape[0] x window_sizes.shape with Wasserstein distance. Columns represent different time windows.
+        :return: Size data.shape[0] x window_sizes.shape with Wasserstein distance. Columns represent different time windows.
         :rtype: np.ndarray
 
         :example:
@@ -894,7 +895,7 @@ class Statistics(FeatureExtractionMixin):
             Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"]
         ] = "auto",
     ):
-        """
+        r"""
         Calculate the total variation distance between two probability distributions.
 
         :param np.ndarray x: A 1-D array representing the first sample.
@@ -956,10 +957,10 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           PSI = \\sum \\left(p_2 - p_1\\right) \\cdot \\ln\\left(\\frac{{p_2}}{{p_1}}\\right)
+           PSI = \sum \left(p_2 - p_1\right) \cdot \ln\left(\frac{{p_2}}{{p_1}}\right)
 
         where:
-            - \( p_1 \) and \( p_2 \) are the proportions of observations in the bins for sample 1 and sample 2 respectively.
+            - :math:`p_1` and :math:`p_2` are the proportions of observations in the bins for sample 1 and sample 2 respectively.
 
 
         .. seealso::
@@ -973,7 +974,7 @@ class Statistics(FeatureExtractionMixin):
         :param ndarray sample_2: Second 1d array representing feature values.
         :param Optional[int] fill_value: Empty bins (0 observations in bin) in is replaced with ``fill_value``. Default 1.
         :param Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators
-        :returns: PSI distance between ``sample_1`` and ``sample_2``
+        :return: PSI distance between ``sample_1`` and ``sample_2``
         :rtype: float
 
         :example:
@@ -1030,7 +1031,7 @@ class Statistics(FeatureExtractionMixin):
         :param ndarray sample_2: Second 1d array representing feature values.
         :param int fill_value: Empty bins (0 observations in bin) in is replaced with ``fill_value``.
         :param Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators
-        :returns: PSI data of size len(data) x len(time_windows).
+        :return: PSI data of size len(data) x len(time_windows).
         :rtype: np.ndarray
         """
 
@@ -1064,7 +1065,7 @@ class Statistics(FeatureExtractionMixin):
     #@jit(nopython=True, cache=True)
     @dynamic_numba_decorator(dtypes="(float64[:], float64[:])", cache=True, fastmath=False)
     def kruskal_wallis(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
-        """
+        r"""
         Compute the Kruskal-Wallis H statistic between two distributions.
 
         The Kruskal-Wallis test is a non-parametric method for testing whether samples originate from the same distribution.
@@ -1072,7 +1073,7 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           H = \\frac{{12}}{{n(n + 1)}} \\left(\\frac{{(\\sum R_{\text{sample1}})^2}}{{n_1}} + \\frac{{(\\sum R_{\text{sample2}})^2}}{{n_2}}\\right) - 3(n + 1)
+           H = \frac{{12}}{{n(n + 1)}} \left(\frac{{(\sum R_{\text{sample1}})^2}}{{n_1}} + \frac{{(\sum R_{\text{sample2}})^2}}{{n_2}}\right) - 3(n + 1)
 
         where:
         - :math:`n` is the total number of observations,
@@ -1081,7 +1082,7 @@ class Statistics(FeatureExtractionMixin):
 
         :param ndarray sample_1: First 1d array representing feature values.
         :param ndarray sample_2: Second 1d array representing feature values.
-        :returns: Kruskal-Wallis H statistic.
+        :return: Kruskal-Wallis H statistic.
         :rtype: float
 
         :example:
@@ -1135,7 +1136,7 @@ class Statistics(FeatureExtractionMixin):
     #@jit(nopython=True, cache=True)
     @dynamic_numba_decorator(dtypes="(float64[:], float64[:])", cache=True, fastmath=False)
     def mann_whitney(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
-        """
+        r"""
         Jitted compute of Mann-Whitney U between two distributions.
 
         The Mann-Whitney U test is used to assess whether the distributions of two groups
@@ -1143,7 +1144,7 @@ class Statistics(FeatureExtractionMixin):
         to the t-test when the assumptions of normality and equal variances are violated.
 
         .. math::
-           U = \\min(U_1, U_2)
+           U = \min(U_1, U_2)
 
         Where:
               - :math:`U` is the Mann-Whitney U statistic,
@@ -1152,10 +1153,11 @@ class Statistics(FeatureExtractionMixin):
 
         :param ndarray sample_1: First 1d array representing feature values.
         :param ndarray sample_2: Second 1d array representing feature values.
-        :returns : The Mann-Whitney U statistic.
+        :return : The Mann-Whitney U statistic.
         :rtype: float
 
-        :references:
+        References
+        ----------
         `Modified from James Webber gist on GitHub <https://gist.github.com/jamestwebber/38ab26d281f97feb8196b3d93edeeb7b>`__.
 
         :example:
@@ -1190,7 +1192,7 @@ class Statistics(FeatureExtractionMixin):
         :param ndarray sample_1: First 1d array representing feature values.
         :param ndarray sample_2: Second 1d array representing feature values.
         :param ndarray critical_values: 2D array with where first column represent dfn first row dfd with values represent critical values. Can be found in ``simba.assets.critical_values_05.pickle``
-        :returns: Levene's W statistic and a boolean indicating whether the test is statistically significant (if critical values is not None).
+        :return: Levene's W statistic and a boolean indicating whether the test is statistically significant (if critical values is not None).
         :rtype: Tuple[float, Union[bool, None]]
 
         :examples:
@@ -1249,7 +1251,7 @@ class Statistics(FeatureExtractionMixin):
 
         :param ndarray sample_1: First 1d array representing feature values.
         :param ndarray sample_2: Second 1d array representing feature values.
-        :returns: Levene's W data of size len(data) x len(time_windows).
+        :return: Levene's W data of size len(data) x len(time_windows).
         :rtype: np.ndarray
 
         :example:
@@ -1338,7 +1340,7 @@ class Statistics(FeatureExtractionMixin):
     @dynamic_numba_decorator(dtypes="(float32[:], float64[:], float64)", cache=True, fastmath=False)
 
     def rolling_barletts_test(data: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
-        """
+        r"""
         Compute rolling Bartlett's test statistic comparing variances between consecutive time windows.
 
         Bartlett's test is used to test the null hypothesis that the variances of two or more groups are equal.
@@ -1353,13 +1355,13 @@ class Statistics(FeatureExtractionMixin):
         The Bartlett's test statistic (:math:`u`) is calculated as:
 
         .. math::
-           u = \\frac{(N - 2) \\cdot (\\ln(\\sigma_1^2) + \\ln(\\sigma_2^2))}{\\frac{1}{n_1 - 1} + \\frac{1}{n_2 - 1}}
+           u = \frac{(N - 2) \cdot (\ln(\sigma_1^2) + \ln(\sigma_2^2))}{\frac{1}{n_1 - 1} + \frac{1}{n_2 - 1}}
 
         where:
 
         - :math:`N = n_1 + n_2` is the total number of observations
         - :math:`n_1` and :math:`n_2` are the sample sizes of the two consecutive windows
-        - :math:`\\sigma_1^2` and :math:`\\sigma_2^2` are the sample variances of the two windows
+        - :math:`\sigma_1^2` and :math:`\sigma_2^2` are the sample variances of the two windows
 
         .. seealso::
            For Levene's test (more robust to non-normality), see :func:`simba.mixins.statistics_mixin.Statistics.rolling_levenes`.
@@ -1367,7 +1369,7 @@ class Statistics(FeatureExtractionMixin):
         :param np.ndarray data: 1D array of feature values to test.
         :param np.ndarray time_windows: Array of time window sizes in seconds. E.g., np.array([1.0, 2.0]) for 1s and 2s windows.
         :param float fps: Frames per second of the recorded video.
-        :returns: 2D array of size len(data) x len(time_windows) containing Bartlett's test statistics. Contains 0.0 for the first window of each time window size.
+        :return: 2D array of size len(data) x len(time_windows) containing Bartlett's test statistics. Contains 0.0 for the first window of each time window size.
         :rtype: np.ndarray
 
         :example:
@@ -1505,10 +1507,10 @@ class Statistics(FeatureExtractionMixin):
            For simple two sample comparison, see :func:`simba.mixins.statistics_mixin.Statistics.pearsons_r`
 
         :param ndarray sample_1: First 1D array with feature values.
-        :param ndarray sample_1: Second 1D array with feature values.
+        :param ndarray sample_2: Second 1D array with feature values.
         :param float time_windows: The length of the sliding window in seconds.
         :param int fps: The fps of the recorded video.
-        :returns: 2d array of Pearsons R of size len(sample_1) x len(time_windows). Note, if sliding window is 10 frames, the first 9 entries will be filled with 0.
+        :return: 2d array of Pearsons R of size len(sample_1) x len(time_windows). Note, if sliding window is 10 frames, the first 9 entries will be filled with 0.
         :rtype: np.ndarray
 
         :example:
@@ -1565,14 +1567,14 @@ class Statistics(FeatureExtractionMixin):
            Requires sample_1 and sample_2 has to be numeric. if working with strings, convert to
            numeric category values before using chi_square.
 
-        .. warning:
+        .. warning::
            Non-overlapping values (i.e., categories exist in sample_1 that does not exist in sample2) or small values may cause inflated chi square values.
            If small contingency table small values, consider TODO Fisher's exact test
 
         :param ndarray sample_1: First 1d array representing feature values.
         :param ndarray sample_2: Second 1d array representing feature values.
         :param ndarray critical_values: 2D array with where indexes represent degrees of freedom and values represent critical values. Can be found in ``simba.assets.critical_values_05.pickle``
-        :returns: Size-2 tuple with the chi-square value and significance threshold boolean (if critical_values is not None).
+        :return: Size-2 tuple with the chi-square value and significance threshold boolean (if critical_values is not None).
         :rtype: Tuple[float, Union[bool, None]]
 
         :example:
@@ -1642,8 +1644,8 @@ class Statistics(FeatureExtractionMixin):
         :param float time_window: The sizes of the two feature value windows being compared in seconds.
         :param float slide_time: The slide size of the second window.
         :param ndarray critical_values: 2D array with where indexes represent degrees of freedom and values represent critical T values. Can be found in ``simba.assets.critical_values_05.pickle``.
-        :parameter int fps: The fps of the recorded video.
-        :returns: 1D array of size len(data) with values representing time to most recent significantly different feature distribution.
+        :param int fps: The fps of the recorded video.
+        :return: 1D array of size len(data) with values representing time to most recent significantly different feature distribution.
         :rtype: np.ndarray
 
         :example:
@@ -1704,7 +1706,7 @@ class Statistics(FeatureExtractionMixin):
 
         :param ndarray sample_1: First 1d array representing feature values.
         :param ndarray sample_2: Second 1d array representing feature values.
-        :returns: Mann-Whitney U data of size len(data) x len(time_windows).
+        :return: Mann-Whitney U data of size len(data) x len(time_windows).
         :rtype: np.ndarray
 
         :examples:
@@ -1742,14 +1744,14 @@ class Statistics(FeatureExtractionMixin):
     @dynamic_numba_decorator(dtypes="(int64[:, :]), bool_", cache=True, fastmath=False)
 
     def concordance_ratio(x: np.ndarray, invert: bool) -> float:
-        """
+        r"""
         Calculate the concordance ratio of a 2D numpy array. The concordance ratio is a measure of agreement in a dataset. It is calculated as the ratio of the number of
         rows that contain only one unique value to the total number of rows.
 
         The equation for the concordance ratio :math:`C` is given by:
 
         .. math::
-           C = \\frac{N_c}{N_t}
+           C = \frac{N_c}{N_t}
 
         where:
            - :math:`N_c` is the count of rows with only one unique value,
@@ -1758,7 +1760,7 @@ class Statistics(FeatureExtractionMixin):
         If the `invert` parameter is set to `True`, the function will return the disconcordance ratio instead, defined as:
 
         .. math::
-            D = \\frac{N_d}{N_t}
+            D = \frac{N_d}{N_t}
 
         where:
 
@@ -1801,10 +1803,10 @@ class Statistics(FeatureExtractionMixin):
            For simple two-distribution comparion, see :func:`simba.mixins.statistics_mixin.Statistics.spearman_rank_correlation`.
 
         :param ndarray sample_1: First 1D array with feature values.
-        :param ndarray sample_1: Second 1D array with feature values.
+        :param ndarray sample_2: Second 1D array with feature values.
         :param float time_windows: The length of the sliding window in seconds.
         :param int fps: The fps of the recorded video.
-        :returns: 2d array of Soearman's ranks of size len(sample_1) x len(time_windows). Note, if sliding window is 10 frames, the first 9 entries will be filled with 0. The 10th value represents the correlation in the first 10 frames.
+        :return: 2d array of Soearman's ranks of size len(sample_1) x len(time_windows). Note, if sliding window is 10 frames, the first 9 entries will be filled with 0. The 10th value represents the correlation in the first 10 frames.
         :rtype: np.ndarray
 
         :example:
@@ -1906,7 +1908,7 @@ class Statistics(FeatureExtractionMixin):
 
 
     def kendall_tau(sample_1: np.ndarray, sample_2: np.ndarray) -> Tuple[float, float]:
-        """
+        r"""
         Jitted compute of Kendall Tau (rank correlation coefficient). Non-parametric method for computing correlation
         between two time-series features. Returns tau and associated z-score.
 
@@ -1918,7 +1920,7 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           \\tau = \\frac{{\\sum C - \\sum D}}{{\\sum C + \\sum D}}
+           \tau = \frac{{\sum C - \sum D}}{{\sum C + \sum D}}
 
         where :math:`C` is the count of concordant pairs and :math:`D` is the count of discordant pairs.
 
@@ -1926,8 +1928,8 @@ class Statistics(FeatureExtractionMixin):
            For time-series based comparison, see :func:`simba.mixins.statistics_mixin.Statistics.sliding_kendall_tau`.
 
         :param ndarray sample_1: First 1D array with feature values.
-        :param ndarray sample_1: Second 1D array with feature values.
-        :returns: Size-2 tuple with Kendall Tau and associated z-score.
+        :param ndarray sample_2: Second 1D array with feature values.
+        :return: Size-2 tuple with Kendall Tau and associated z-score.
         :rtype: Tuple[float, float]
 
         :examples:
@@ -1959,7 +1961,7 @@ class Statistics(FeatureExtractionMixin):
     @dynamic_numba_decorator(dtypes="(float32[:], float32[:], float64[:], int64)", cache=True, fastmath=False)
 
     def sliding_kendall_tau(sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
-        """
+        r"""
         Compute sliding Kendall's Tau correlation coefficient.
 
         Calculates Kendall's Tau correlation coefficient between two samples over sliding time windows. Kendall's Tau is a measure of correlation between two ranked datasets.
@@ -1968,7 +1970,7 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           \\tau = \\frac{{\\text{{concordant pairs}} - \\text{{discordant pairs}}}}{{\\text{{concordant pairs}} + \\text{{discordant pairs}}}}
+           \tau = \frac{{\text{{concordant pairs}} - \text{{discordant pairs}}}}{{\text{{concordant pairs}} + \text{{discordant pairs}}}}
 
         where concordant pairs are pairs of elements with the same order in both samples, and discordant pairs are pairs with different orders.
 
@@ -2101,7 +2103,7 @@ class Statistics(FeatureExtractionMixin):
         :param Optional[float] contamination: Small pseudonumber to avoid DivisionByZero error.
         :param Optional[bool] normalize: Whether to normalize the distances between 0 and 1. Defaults to False.
         :param Optional[int] groupby_idx: If int, then the index 1 of ``data`` for which to group the data and compute LOF on each segment. E.g., can be field holding a cluster identifier.
-        :returns: Array of size data.shape[0] with local outlier scores.
+        :return: Array of size data.shape[0] with local outlier scores.
         :rtype: np.ndarray
 
         :example:
@@ -2307,7 +2309,8 @@ class Statistics(FeatureExtractionMixin):
         >>> results = pd.DataFrame(results, columns=['X', 'Y', 'ISOLATION SCORE'])
         >>> PlottingMixin.continuous_scatter(data=results, palette='seismic', bg_clr='lightgrey', columns=['X', 'Y', 'ISOLATION SCORE'],size=30)
 
-        :references:
+        References
+        ----------
         ----------
            .. [1] Liu, Fei Tony, Kai Ming Ting, and Zhi-Hua Zhou. “Isolation Forest.” In 2008 Eighth IEEE International Conference on Data Mining, 413–22. Pisa, Italy: IEEE, 2008. https://doi.org/10.1109/ICDM.2008.17.
         """
@@ -2379,9 +2382,9 @@ class Statistics(FeatureExtractionMixin):
         """
         Jitted helper to compute Histogram-based Outlier Score (HBOS) called by ``simba.mixins.statistics_mixin.Statistics.hbos``.
 
-        :parameter np.ndarray data: 2d array with frames represented by rows and columns representing feature values.
-        :parameter typed.Dict histograms: Numba typed.Dict with integer keys (representing order of feature) and 1d arrays as values representing observation bin counts.
-        :parameter: typed.Dict histogram_edges: Numba typed.Dict with integer keys (representing order of feature) and 1d arrays as values representing bin edges.
+        :param np.ndarray data: 2d array with frames represented by rows and columns representing feature values.
+        :param typed.Dict histograms: Numba typed.Dict with integer keys (representing order of feature) and 1d arrays as values representing observation bin counts.
+        :param: typed.Dict histogram_edges: Numba typed.Dict with integer keys (representing order of feature) and 1d arrays as values representing bin edges.
         :return: Array of size data.shape[0] representing outlier scores, with higher values representing greater outliers.
         :rtype: np.ndarray
         """
@@ -2517,8 +2520,8 @@ class Statistics(FeatureExtractionMixin):
 
         :param ndarray data: 1D NumPy array containing the time-series data.
         :param ndarray time_windows: 1D NumPy array specifying the time windows in seconds over which to calculate the Z-scores.
-        :param int time_windows: Frames per second, used to convert time windows from seconds to the corresponding number of data points.
-        :returns: A 2D NumPy array containing the calculated Z-scores. Each row corresponds to the Z-scores calculated for a specific time window. The time windows are represented by the columns.
+        :param int fps: Frames per second, used to convert time windows from seconds to the corresponding number of data points.
+        :return: A 2D NumPy array containing the calculated Z-scores. Each row corresponds to the Z-scores calculated for a specific time window. The time windows are represented by the columns.
         :rtype: np.ndarray
 
         :example:
@@ -2542,7 +2545,7 @@ class Statistics(FeatureExtractionMixin):
     #@jit(nopython=True, cache=True)
     @dynamic_numba_decorator(dtypes="(int64[:, :],)", cache=True, fastmath=False)
     def phi_coefficient(data: np.ndarray) -> float:
-        """
+        r"""
         Compute the phi coefficient for a Nx2 array of binary data.
 
         The phi coefficient (a.k.a Matthews Correlation Coefficient (MCC)), is a measure of association for binary data in a 2x2 contingency table. It quantifies the
@@ -2552,7 +2555,7 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           \\phi = \\frac{{(BC - AD)}}{{\sqrt{{(C\_1 + C\_2)(R\_1 + R\_2)(C\_1 + R\_1)(C\_2 + R\_2)}}}}
+           \phi = \frac{{(BC - AD)}}{{\sqrt{{(C\_1 + C\_2)(R\_1 + R\_2)(C\_1 + R\_1)(C\_2 + R\_2)}}}}
 
         where:
             - :math:`BC`: Hit rate (reponse and truth is both 1)
@@ -2568,7 +2571,7 @@ class Statistics(FeatureExtractionMixin):
            :align: center
 
         :param np.ndarray data: A NumPy array containing binary data organized in two columns. Each row represents a pair of binary values for two variables. Columns represent two features or two binary classification results.
-        :returns: The calculated phi coefficient, a value between 0 and 1. A value of 0 indicates no association between the variables, while 1 indicates a perfect association.
+        :return: The calculated phi coefficient, a value between 0 and 1. A value of 0 indicates no association between the variables, while 1 indicates a perfect association.
         :rtype: float
 
         :example:
@@ -2610,7 +2613,7 @@ class Statistics(FeatureExtractionMixin):
         r"""
         Calculate eta-squared, a measure of between-subjects effect size.
 
-        Eta-squared (\(\eta^2\)) is calculated as the ratio of the sum of squares between groups to the total sum of squares. Range from 0 to 1, where larger values indicate
+        Eta-squared (:math:`\eta^2`) is calculated as the ratio of the sum of squares between groups to the total sum of squares. Range from 0 to 1, where larger values indicate
         a stronger effect size.
 
         The equation for eta squared is defined as: :math:`\eta^2 = \frac{SS_{between}}{SS_{between} + SS_{within}}`
@@ -2708,7 +2711,7 @@ class Statistics(FeatureExtractionMixin):
         :param np.ndarray data: A 2D NumPy array containing binary data organized in two columns. Each row represents a pair of binary values for two variables.
         :param np.ndarray window_sizes: 1D NumPy array specifying the time windows (in seconds) over which to calculate the sliding phi coefficients.
         :param int sample_rate: The sampling rate or time interval (in samples per second, e.g., fps) at which data points were collected.
-        :returns: A 2D NumPy array containing the calculated sliding phi coefficients. Each row corresponds to the phi coefficients calculated for a specific time point, the columns correspond to time-windows.
+        :return: A 2D NumPy array containing the calculated sliding phi coefficients. Each row corresponds to the phi coefficients calculated for a specific time point, the columns correspond to time-windows.
         :rtype: np.ndarray
 
         :example:
@@ -2822,17 +2825,17 @@ class Statistics(FeatureExtractionMixin):
     @dynamic_numba_decorator(dtypes="int64[:], int64[:],", cache=True, fastmath=False)
 
     def cohens_h(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
-        """
+        r"""
         Jitted compute Cohen's h effect size for two samples of binary [0, 1] values. Cohen's h is a measure of effect size
         for comparing two independent samples based on the differences in proportions of the two samples.
 
-        .. note:
+        .. note::
            Modified from `DABEST <https://github.com/ACCLAB/DABEST-python/blob/fa7df50d20ab1c9cc687c66dd8bddf55d9a9dce3/dabest/_stats_tools/effsize.py#L216>`_
            `Cohen's h wiki <https://en.wikipedia.org/wiki/Cohen%27s_h>`_
 
         .. math::
 
-           \\text{Cohen's h} = 2 \\arcsin\\left(\\sqrt{\\frac{\\sum\\text{sample\_1}}{N\_1}}\\right) - 2 \\arcsin\\left(\\sqrt{\\frac{\\sum\\text{sample\_2}}{N\_2}}\\right)
+           \text{Cohen's h} = 2 \arcsin\left(\sqrt{\frac{\sum\text{sample\_1}}{N\_1}}\right) - 2 \arcsin\left(\sqrt{\frac{\sum\text{sample\_2}}{N\_2}}\right)
 
         Where :math:`N_1` and :math:`N_2` are the sample sizes of sample_1 and sample_2, respectively.
 
@@ -2867,8 +2870,8 @@ class Statistics(FeatureExtractionMixin):
            :align: center
 
         :param np.ndarray data: 1D array of input data.
-        :param np.ndarray data: 1D array of time window durations in seconds.
-        :param np.ndarray data: Sampling rate of the data in samples per second.
+        :param np.ndarray time_windows: 1D array of time window durations in seconds.
+        :param np.ndarray sample_rate: Sampling rate of the data in samples per second.
         :return np.ndarray: 2D array of skewness`1 values with rows corresponding to data points and columns corresponding to time windows.
 
         :example:
@@ -2921,7 +2924,7 @@ class Statistics(FeatureExtractionMixin):
         """
         Perform k-means clustering on a 1-dimensional dataset.
 
-        .. note:
+        .. note::
            - If calc_medians is True, the function returns cluster medians in addition to centroids and labels.
 
 
@@ -2933,7 +2936,7 @@ class Statistics(FeatureExtractionMixin):
         :param int k: Number of clusters.
         :param int max_iters: Maximum number of iterations for the k-means algorithm.
         :param bool calc_medians: Flag indicating whether to calculate cluster medians.
-        :returns: Tuple of three elements. Final centroids of the clusters. Labels assigned to each data point based on clusters. Cluster medians (if calc_medians is True), otherwise None.
+        :return: Tuple of three elements. Final centroids of the clusters. Labels assigned to each data point based on clusters. Cluster medians (if calc_medians is True), otherwise None.
         :rtype: Tuple[np.ndarray, np.ndarray, Union[None, types.DictType]]
 
         :example:
@@ -3010,7 +3013,7 @@ class Statistics(FeatureExtractionMixin):
                          y: np.ndarray,
                          sort: Optional[bool] = False,
                          w: Optional[np.ndarray] = None) -> float:
-        """
+        r"""
         Jitted compute of the Hamming similarity between two vectors.
 
         The Hamming similarity measures the similarity between two binary vectors by counting the number of positions at which the corresponding elements are different.
@@ -3020,7 +3023,7 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           \\text{Hamming distance}(x, y) = \\frac{{\\sum_{i=1}^{n} w_i}}{{n}}
+           \text{Hamming distance}(x, y) = \frac{{\sum_{i=1}^{n} w_i}}{{n}}
 
         where:
            - :math:`n` is the length of the vectors,
@@ -3034,7 +3037,7 @@ class Statistics(FeatureExtractionMixin):
            :align: center
 
         :param np.ndarray x: First binary vector.
-        :param np.ndarray x: Second binary vector.
+        :param np.ndarray y: Second binary vector.
         :param Optional[np.ndarray] w: Optional weights for each element. Can be classification probabilities. If not provided, equal weights are assumed.
         :param Optional[bool] sort: If True, sorts x and y prior to hamming distance calculation. Default, False.
         :return: Hamming similarity
@@ -3066,20 +3069,20 @@ class Statistics(FeatureExtractionMixin):
     def yule_coef(
         x: np.ndarray, y: np.ndarray, w: Optional[np.ndarray] = None
     ) -> float64:
-        """
+        r"""
         Jitted calculate of the yule coefficient between two binary vectors (e.g., to classified behaviors). 0 represent independence, 2 represents
         complete interdependence.
 
         .. math::
-           Yule Coefficient = \\frac{{2 \cdot t_f \cdot f_t}}{{t_t \cdot f_f + t_f \cdot f_t}}
+           Yule Coefficient = \frac{{2 \cdot t_f \cdot f_t}}{{t_t \cdot f_f + t_f \cdot f_t}}
 
         .. note::
            Adapted from `pynndescent <https://pynndescent.readthedocs.io/en/latest/>`_.
 
         :param np.ndarray x: First binary vector.
-        :param np.ndarray x: Second binary vector.
+        :param np.ndarray y: Second binary vector.
         :param Optional[np.ndarray] w: Optional weights for each element. Can be classification probabilities. If not provided, equal weights are assumed.
-        :returns: yule coefficient
+        :return: yule coefficient
         :rtype: float
 
         :example:
@@ -3119,11 +3122,11 @@ class Statistics(FeatureExtractionMixin):
     @dynamic_numba_decorator(dtypes=[(int8[:], int8[:], types.misc.Omitted(None)), (int8[:], int8[:], float32[:])], cache=True, fastmath=False)
 
     def sokal_sneath(x: np.ndarray, y: np.ndarray, w: Optional[np.ndarray] = None) -> float64:
-        """
+        r"""
         Jitted calculate of the sokal sneath coefficient between two binary vectors (e.g., to classified behaviors). 0 represent independence, 1 represents complete interdependence.
 
         .. math::
-           Sokal-Sneath = \\frac{{f_t + t_f}}{{2 \cdot (t_{{cnt}} + f_{{cnt}}) + f_t + t_f}}
+           Sokal-Sneath = \frac{{f_t + t_f}}{{2 \cdot (t_{{cnt}} + f_{{cnt}}) + f_t + t_f}}
 
         .. note::
            Adapted from `pynndescent <https://pynndescent.readthedocs.io/en/latest/>`_.
@@ -3132,9 +3135,9 @@ class Statistics(FeatureExtractionMixin):
            For GPU method, see :func:`simba.data_processors.cuda.statistics.sokal_sneath_gpu`
 
         :param np.ndarray x: First binary vector.
-        :param np.ndarray x: Second binary vector.
+        :param np.ndarray y: Second binary vector.
         :param Optional[np.ndarray] w: Optional weights for each element. Can be classification probabilities. If not provided, equal weights are assumed.
-        :returns: sokal sneath coefficient
+        :return: sokal sneath coefficient
         :rtype: float
 
         :example:
@@ -3183,7 +3186,7 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: 2d array with likely normalized feature values.
         :param Optional[np.ndarray] w: Optional 2d array with weights of same size as x. Default None and all observations will have the same weight.
-        :returns: 2d array with same size as x representing dissimilarity values. 0 and the observations are identical and at 1 the observations are completly disimilar.
+        :return: 2d array with same size as x representing dissimilarity values. 0 and the observations are identical and at 1 the observations are completly disimilar.
         :rtype: np.ndarray
 
         :example:
@@ -3251,7 +3254,7 @@ class Statistics(FeatureExtractionMixin):
         :param np.ndarray x: First 1D array representing a probability distribution.
         :param np.ndarray y: Second 1D array representing a probability distribution.
         :param Optional[Literal['fd', 'doane', 'auto', 'scott', 'stone', 'rice', 'sturges', 'sqrt']] bucket_method: Method for computing histogram bins. Default is 'auto'.
-        :returns: Hellinger distance between the two input probability distributions.
+        :return: Hellinger distance between the two input probability distributions.
         :rtype: float
 
         :example:
@@ -3271,7 +3274,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     def youden_j(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
-        """
+        r"""
         Calculate Youden's J statistic from two binary arrays.
 
         Youden's J statistic is a measure of the overall performance of a binary classification test, taking into account both sensitivity (true positive rate) and specificity (true negative rate).
@@ -3300,9 +3303,10 @@ class Statistics(FeatureExtractionMixin):
         :return: Youden's J statistic. Returns NaN if either sensitivity or specificity cannot be calculated (division by zero).
         :rtype: float
 
-        :references:
-            .. [1] Youden, W. J. (1950). Index for rating diagnostic tests. Cancer, 3(1), 32-35.
-                   https://acsjournals.onlinelibrary.wiley.com/doi/abs/10.1002/1097-0142(1950)3:1%3C32::AID-CNCR2820030106%3E3.0.CO;2-3
+        References
+        ----------
+        .. [1] Youden, W. J. (1950). Index for rating diagnostic tests.
+               `Cancer, 3(1), 32–35 <https://doi.org/10.1002/1097-0142(1950)3:1%3C32::AID-CNCR2820030106%3E3.0.CO;2-3>`_.
 
         :example:
         >>> y_true = np.array([1, 1, 0, 0, 1, 0, 1, 1, 0, 0])
@@ -3372,7 +3376,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     def manhattan_distance_cdist(data: np.ndarray) -> np.ndarray:
-        """
+        r"""
         Compute the pairwise Manhattan distance matrix between points in a 2D array.
 
         Can be preferred over Euclidean distance in scenarios where the movement is restricted
@@ -3411,7 +3415,7 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: Predicted cluster labels (1D array of integers).
         :param np.ndarray y: Ground truth class labels (1D array of integers, same length as `x`).
-        :returns: Purity score in the range [0, 1].
+        :return: Purity score in the range [0, 1].
         :rtype: float
 
         :example:
@@ -3419,7 +3423,8 @@ class Statistics(FeatureExtractionMixin):
         >>> y = np.random.randint(0, 4, (100000,))
         >>> p = Statistics.get_clustering_purity(x=x, y=y)
 
-        :references:
+        References
+        ----------
            .. [1] Evaluation of clustering. *Introduction to Information Retrieval*. Available at: https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-clustering-1.html
         """
 
@@ -3472,7 +3477,7 @@ class Statistics(FeatureExtractionMixin):
     @dynamic_numba_decorator(dtypes="(int64[:], int64[:])", cache=True, fastmath=False)
 
     def cohens_kappa(sample_1: np.ndarray, sample_2: np.ndarray):
-        """
+        r"""
         Jitted compute Cohen's Kappa coefficient for two binary samples.
 
         Cohen's Kappa coefficient measures the agreement between two sets of binary ratings, taking into account agreement occurring by chance.
@@ -3480,7 +3485,7 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           \\kappa = 1 - \\frac{\sum{w_{ij} \\cdot D_{ij}}}{\\sum{w_{ij} \\cdot E_{ij}}}
+           \kappa = 1 - \frac{\sum{w_{ij} \cdot D_{ij}}}{\sum{w_{ij} \cdot E_{ij}}}
 
         where:
            - :math:`\kappa` is Cohen's Kappa coefficient,
@@ -3522,7 +3527,7 @@ class Statistics(FeatureExtractionMixin):
         lower_limit: Optional[float] = 0.0001,
         upper_limit: Optional[float] = 0.9999,
     ) -> float:
-        """
+        r"""
         Computes d-prime from two Boolean 1d arrays, e.g., between classifications and ground truth.
 
         D-prime (d') is a measure of signal detection performance, indicating the ability to discriminate between signal and noise.
@@ -3530,12 +3535,12 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           d' = \\Phi^{-1}(hit\\_rate) - \\Phi^{-1}(false\\_alarm\\_rate)
+           d' = \Phi^{-1}(hit\_rate) - \Phi^{-1}(false\_alarm\_rate)
 
         where:
-        - :math:`\\Phi^{-1}` is the inverse of the cumulative distribution function (CDF) of the normal distribution,
-        - :math:`hit\\_rate` is the proportion of true positives correctly identified,
-        - :math:`false\\_alarm\\_rate` is the proportion of false positives incorrectly identified.
+        - :math:`\Phi^{-1}` is the inverse of the cumulative distribution function (CDF) of the normal distribution,
+        - :math:`hit\_rate` is the proportion of true positives correctly identified,
+        - :math:`false\_alarm\_rate` is the proportion of false positives incorrectly identified.
 
         .. image:: _static/img/d_prime.webp
            :width: 600
@@ -3598,14 +3603,14 @@ class Statistics(FeatureExtractionMixin):
         ground_truth: np.ndarray,
         continuity_corrected: Optional[bool] = True,
     ) -> Tuple[float, float]:
-        """
+        r"""
         Perform McNemar's test to compare the predictive accuracy of two models. This test is used
         to evaluate if the accuracies of two classifiers are significantly different when tested on the same data.
 
         The chi-squared statistic (with continuity correction if `continuity_corrected=True`) is calculated as:
 
         .. math::
-          X^2 = \\frac{(|b - c| - 1)^2}{b + c} \\,\\text{ if corrected, or }\\, X^2 = \\frac{(b - c)^2}{b + c}
+          X^2 = \frac{(|b - c| - 1)^2}{b + c} \,\text{ if corrected, or }\, X^2 = \frac{(b - c)^2}{b + c}
 
         where:
            - `b` is the number of instances misclassified by the first model but correctly classified by the second model.
@@ -3622,7 +3627,7 @@ class Statistics(FeatureExtractionMixin):
         :param np.ndarray y: 1-dimensional Boolean array with predictions of the second model.
         :param np.ndarray ground_truth: 1-dimensional Boolean array with ground truth labels.
         :param Optional[bool] continuity_corrected: Whether to apply continuity correction. Default is True.
-        :returns: McNemar score are significance level.
+        :return: McNemar score are significance level.
         :rtype: Tuple[float, float]
 
         :example:
@@ -3758,7 +3763,7 @@ class Statistics(FeatureExtractionMixin):
            :align: center
 
         :param np.ndarray x: 1D array representing numeric data of the first group/feature.
-        :param np.ndarray x: 1D array representing numeric data of the second group/feature.
+        :param np.ndarray y: 1D array representing numeric data of the second group/feature.
         :return: Hartley's Fmax statistic.
         :rtype: float
 
@@ -3922,7 +3927,7 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray data: A 1-dimensional array of numerical values to check for outliers.
         :param int k: The multiplier for the MAD threshold. Higher values make the rule less sensitive to deviations from the median.
-        :returns: A 1D binary array of the same length as `data`, where each element is `1` if the corresponding element in `data` is classified as an outlier, and `0` otherwise.
+        :return: A 1D binary array of the same length as `data`, where each element is `1` if the corresponding element in `data` is classified as an outlier, and `0` otherwise.
         :rtype: np.ndarray
 
         :example:
@@ -4062,7 +4067,7 @@ class Statistics(FeatureExtractionMixin):
            Modified from `scikit-learn <https://github.com/scikit-learn/scikit-learn/blob/f07e0138bfee41cd2c0a5d0251dc3fe03e6e1084/sklearn/metrics/cluster/_unsupervised.py#L390>`_
 
         .. math::
-           DB = \\frac{1}{N} \sum_{i=1}^{N} \max_{j \neq i} \left( \frac{\sigma_i + \sigma_j}{d_{ij}} \right)
+           DB = \frac{1}{N} \sum_{i=1}^{N} \max_{j \neq i} \left( \frac{\sigma_i + \sigma_j}{d_{ij}} \right)
 
         where:
         - :math:`N` is the number of clusters,
@@ -4129,7 +4134,7 @@ class Statistics(FeatureExtractionMixin):
     @dynamic_numba_decorator(dtypes="(float32[:,:], int64[:])", cache=True, fastmath=False)
 
     def calinski_harabasz(x: np.ndarray, y: np.ndarray) -> float:
-        """
+        r"""
         Compute the Calinski-Harabasz score to evaluate clustering quality.
 
         The Calinski-Harabasz score is a measure of cluster separation and compactness.
@@ -4143,7 +4148,7 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-            CH = \\frac{B}{W} \\times \\frac{N - k}{k - 1}
+            CH = \frac{B}{W} \times \frac{N - k}{k - 1}
 
         where:
         - :math:`B` is the sum of squared distances between cluster centroids,
@@ -4198,7 +4203,7 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
         :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
-        :returns: The average silhouette score for the dataset.
+        :return: The average silhouette score for the dataset.
         :rtype: float
 
         :example:
@@ -4233,7 +4238,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     def xie_beni(x: np.ndarray, y: np.ndarray) -> float:
-        """
+        r"""
         Computes the Xie-Beni index for clustering evaluation.
 
         The score is calculated as the ratio between the average intra-cluster variance and the squared minimum distance between cluster centroids. This ensures that the index penalizes both loosely packed clusters and clusters that are too close to each other.
@@ -4245,9 +4250,9 @@ class Statistics(FeatureExtractionMixin):
            Significant GPU savings detected at about 1m features, 25 clusters
 
         .. math::
-           \\text{XB} = \\frac{\\frac{1}{n} \\sum_{i=1}^{n} \\| x_i - c_{y_i} \\|^2}{\\min_{i \\neq j} \\| c_i - c_j \\|^2}
+           \text{XB} = \frac{\frac{1}{n} \sum_{i=1}^{n} \| x_i - c_{y_i} \|^2}{\min_{i \neq j} \| c_i - c_j \|^2}
 
-        where :math:`n` is the total number of points in the dataset, :math:`x_i` is the :math:`i`-th data point, :math:`c_{y_i}` is the centroid of the cluster to which :math:`x_i` belongs, and :math:`\\| \\cdot \\|` denotes the Euclidean norm.
+        where :math:`n` is the total number of points in the dataset, :math:`x_i` is the :math:`i`-th data point, :math:`c_{y_i}` is the centroid of the cluster to which :math:`x_i` belongs, and :math:`\| \cdot \|` denotes the Euclidean norm.
 
         .. image:: _static/img/xie_beni.webp
            :width: 600
@@ -4255,7 +4260,7 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
         :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
-        :returns: The Xie-Beni score for the dataset.
+        :return: The Xie-Beni score for the dataset.
         :rtype: float
 
         :example:
@@ -4263,9 +4268,10 @@ class Statistics(FeatureExtractionMixin):
         >>> X, y = make_blobs(n_samples=100000, centers=40, n_features=600, random_state=0, cluster_std=0.3)
         >>> Statistics.xie_beni(x=X, y=y)
 
-        :references:
-        .. [1] X. L. Xie, G. Beni (1991). A validity measure for fuzzy clustering.
-               In: IEEE Transactions on Pattern Analysis and Machine Intelligence 13(8), 841 - 847. DOI: 10.1109/34.85677
+        References
+        ----------
+        .. [1] Xie, X. L., & Beni, G. (1991). A validity measure for fuzzy clustering.
+               `IEEE Transactions on Pattern Analysis and Machine Intelligence, 13(8), 841–847 <https://doi.org/10.1109/34.85677>`_.
         """
         check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0], ])
@@ -4297,7 +4303,7 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: A 2D array of shape (n_samples, n_features) representing the feature vectors of the data points.
         :param np.ndarray y: A 1D array of shape (n_samples,) containing the cluster labels for each data point.
-        :returns: The BWS index value (between-cluster scatter / total within-cluster variance). Higher values indicate better clustering.
+        :return: The BWS index value (between-cluster scatter / total within-cluster variance). Higher values indicate better clustering.
         :rtype: float
 
         :example:
@@ -4305,9 +4311,10 @@ class Statistics(FeatureExtractionMixin):
         >>> X, y = make_blobs(n_samples=500, centers=3, random_state=42)
         >>> Statistics.bouguessa_wang_sun_v2(X, y)
 
-        :references:
-        .. [1] Bouguessa, Wang & Sun (2006).Bouguessa M, Wang S, Sun H. An objective approach to cluster validation.
-               Pattern Recognition Letters. 2006;27:1419–1430. doi: 10.1016/j.patrec.2006.01.015.
+        References
+        ----------
+        .. [1] Bouguessa, M., Wang, S., & Sun, H. (2006). An objective approach to cluster validation.
+               `Pattern Recognition Letters, 27(13), 1419–1430 <https://doi.org/10.1016/j.patrec.2006.01.015>`_.
         """
 
         unique_y = np.unique(y)
@@ -4345,13 +4352,14 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
         :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
-        :returns: The I-index score for the dataset.
+        :return: The I-index score for the dataset.
         :rtype: float
 
-        :references:
-            .. [1] Zhao, Q., Xu, M., Fränti, P. (2009). Sum-of-Squares Based Cluster Validity Index and Significance Analysis.
-                   In: Kolehmainen, M., Toivanen, P., Beliczynski, B. (eds) Adaptive and Natural Computing Algorithms. ICANNGA 2009.
-                    Lecture Notes in Computer Science, vol 5495. Springer, Berlin, Heidelberg. https://doi.org/10.1007/978-3-642-04921-7_32
+        References
+        ----------
+        .. [1] Zhao, Q., Xu, M., & Fränti, P. (2009). Sum-of-squares based cluster validity index and significance analysis.
+               In Adaptive and Natural Computing Algorithms (ICANNGA 2009), Lecture Notes in Computer Science, vol. 5495.
+               `Springer <https://doi.org/10.1007/978-3-642-04921-7_32>`_.
 
         :example:
         >>> X, y = make_blobs(n_samples=5000, centers=20, n_features=3, random_state=0, cluster_std=0.1)
@@ -4396,16 +4404,18 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: A 2D array of shape (n_samples, n_features) representing the feature vectors of the data points.
         :param np.ndarray y: A 1D array of shape (n_samples,) containing the cluster labels for each data point.
-        :returns: The SD Index value. Lower values indicate better clustering quality with more compact and well-separated clusters.
+        :return: The SD Index value. Lower values indicate better clustering quality with more compact and well-separated clusters.
         :rtype: float
 
         :example:
         >>> X, y = make_blobs(n_samples=800, centers=2, n_features=3, random_state=0, cluster_std=0.1)
         >>> Statistics.sd_index(x=X, y=y)
 
-        :references:
-        .. [1] Halkidi, M., Vazirgiannis, M., Batistakis, Y. (2000). Quality Scheme Assessment in the Clustering Process. In: Zighed, D.A., Komorowski, J., Żytkow, J. (eds) Principles of Data Mining and Knowledge Discovery. PKDD 2000.
-               Lecture Notes in Computer Science(), vol 1910. Springer, Berlin, Heidelberg. https://doi.org/10.1007/3-540-45372-5_26
+        References
+        ----------
+        .. [1] Halkidi, M., Vazirgiannis, M., & Batistakis, Y. (2000). Quality scheme assessment in the clustering process (PKDD 2000).
+               Principles of Data Mining and Knowledge Discovery, Lecture Notes in Computer Science, vol. 1910.
+               `Springer <https://doi.org/10.1007/3-540-45372-5_26>`_.
         """
         check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=(int,), accepted_axis_0_shape=[x.shape[0], ])
@@ -4439,7 +4449,7 @@ class Statistics(FeatureExtractionMixin):
         Calculate the C Index for clustering evaluation.
 
         :param np.ndarray x: A 2D array of shape (n_samples, n_features) containing the data points.
-        :param np.ndarray x: A 1D array of shape (n_samples,) containing cluster labels for the data points.
+        :param np.ndarray y: A 1D array of shape (n_samples,) containing cluster labels for the data points.
         :return: The C Index value, ranging from 0 to 1.
         :rtype: float
 
@@ -4451,8 +4461,10 @@ class Statistics(FeatureExtractionMixin):
            :width: 500
            :align: center
 
-        :references:
-        .. [1] Ubert, L. J., & Levin, J. R. (1976). A general statistical framework for assessing categorical clustering in free recall. Psychological Bulletin, 83(5), 1072–1080.
+        References
+        ----------
+        .. [1] Hubert, L. J., & Levin, J. R. (1976). A general statistical framework for assessing categorical clustering in free recall.
+               `Psychological Bulletin, 83(6), 1072–1080 <https://doi.org/10.1037/0033-2909.83.6.1072>`_.
 
 
         :example:
@@ -4482,7 +4494,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     def adjusted_rand(x: np.ndarray, y: np.ndarray) -> float:
-        """
+        r"""
         Calculate the Adjusted Rand Index (ARI) between two clusterings.
 
         The Adjusted Rand Index (ARI) is a measure of the similarity between two clusterings. It considers all pairs of samples and counts pairs that are assigned to the same or different clusters in both the true and predicted clusterings.
@@ -4490,7 +4502,7 @@ class Statistics(FeatureExtractionMixin):
         The ARI is defined as:
 
         .. math::
-           ARI = \\frac{TP + TN}{TP + FP + FN + TN}
+           ARI = \frac{TP + TN}{TP + FP + FN + TN}
 
         where:
             - :math:`TP` (True Positive) is the number of pairs of elements that are in the same cluster in both x and y,
@@ -4541,12 +4553,13 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: A 2D array of shape (n_samples, n_features) representing the feature vectors of the data points.
         :param np.ndarray y: A 1D array of shape (n_samples,) containing the cluster labels for each data point.
-        :returns: The RMSSTD index value. Lower values indicate better clustering.
+        :return: The RMSSTD index value. Lower values indicate better clustering.
         :rtype: float
 
-        :references:
+        References
+        ----------
         .. [1] Milligan, G. W., & Cooper, M. C. (1985). An examination of procedures for determining the number of clusters in a data set.
-               Psychometrika, 50(2), 159–179. https://doi.org/10.1007/BF02294245
+               `Psychometrika, 50(2), 159–179 <https://doi.org/10.1007/BF02294245>`_.
 
         :example:
         >>> X, y = make_blobs(n_samples=100, centers=10, n_features=3, random_state=0, cluster_std=0.1)
@@ -4577,12 +4590,13 @@ class Statistics(FeatureExtractionMixin):
         :param np.ndarray x: A 2D array of shape (n_samples, n_features) representing the feature vectors of the data points.
         :param np.ndarray y: A 1D array of shape (n_samples,) containing the cluster labels for each data point.
         :param float epsilon: Small correction factor to avoid division by zero. Default 1e-16.
-        :returns: The KL index value. Higher values indicate better clustering.
+        :return: The KL index value. Higher values indicate better clustering.
         :rtype: float
 
-        :references:
+        References
+        ----------
         .. [1] Krzanowski, W. J., & Lai, Y. T. (1988). A criterion for determining the number of groups in a data set using sum-of-squares clustering.
-               Biometrics, 44(1), 23–34. https://doi.org/10.2307/2531893
+               `Biometrics, 44(1), 23–34 <https://doi.org/10.2307/2531893>`_.
 
         :example:
         >>> X, y = make_blobs(n_samples=100, centers=10, n_features=3, random_state=0, cluster_std=100)
@@ -4614,13 +4628,14 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: A 2D array of shape (n_samples, n_features) representing the feature vectors of the data points.
         :param np.ndarray y: A 1D array of shape (n_samples,) containing the cluster labels for each data point.
-        :returns: The COP index value. Lower values indicate better clustering.
+        :return: The COP index value. Lower values indicate better clustering.
         :rtype: float
 
-        :references:
+        References
+        ----------
         .. [1] Gurrutxaga, I., Albisua, I., Arbelaitz, O., Martín, J. I., Muguerza, J., Pérez, J. M., & Perona, I. (2011).
-               SEP/COP: An efficient method to find the best partition in hierarchical clustering based on a new cluster validity index.
-               Pattern Recognition, 44(4), 810-820. https://doi.org/10.1016/j.patcog.2010.10.002
+               SEP/COP: an efficient method to find the best partition in hierarchical clustering based on a new cluster validity index.
+               `Pattern Recognition, 44(4), 810–820 <https://doi.org/10.1016/j.patcog.2010.10.002>`_.
 
         :example:
         >>> X, y = make_blobs(n_samples=50000, centers=10, n_features=3, random_state=0, cluster_std=1)
@@ -4661,14 +4676,16 @@ class Statistics(FeatureExtractionMixin):
            :align: center
 
         :param np.ndarray x: A 2D array of shape (n_samples, n_features) containing the data points.
-        :param np.ndarray x: A 1D array of shape (n_samples,) containing cluster labels for the data points.
+        :param np.ndarray y: A 1D array of shape (n_samples,) containing cluster labels for the data points.
         :return: The PBM Index value.
         :rtype: float
 
-        :references:
+        References
+        ----------
         .. [1] Pakhira, M. K., Bandyopadhyay, S., & Maulik, U. (2004). Validity index for crisp and fuzzy clusters.
-               Pattern Recognition, 37(4), 487–501. https://doi.org/10.1016/j.patcog.2003.09.021
-        .. [2] Bernard Desgraupes, University Paris Ouest Lab Modal’X, https://cran.r-project.org/web/packages/clusterCrit/vignettes/clusterCrit.pdf
+               `Pattern Recognition, 37(4), 487–501 <https://doi.org/10.1016/j.patcog.2003.09.021>`_.
+        .. [2] Desgraupes, B. clusterCrit: Clustering Indices (R package vignette).
+               `CRAN <https://cran.r-project.org/web/packages/clusterCrit/vignettes/clusterCrit.pdf>`_.
 
         :example:
         >>> X, y = make_blobs(n_samples=5, centers=2, n_features=3, random_state=0, cluster_std=5)
@@ -4710,7 +4727,8 @@ class Statistics(FeatureExtractionMixin):
         :return: The Banfeld-Raftery index.
         :rtype: float
 
-        :references:
+        References
+        ----------
            .. [1] Banfield, J. D., & Raftery, A. E. (1993). Model-based Gaussian and non-Gaussian clustering. Biometrics, 49(3), 803-821. https://doi.org/10.2307/2532201
 
         """
@@ -4738,12 +4756,14 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
         :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
-        :returns: The Scott-Symons index score.
+        :return: The Scott-Symons index score.
         :rtype: float
 
 
-        :references:
-           .. [1] . J. Scott and M. J. Symons. Clustering methods based on likelihood ratio criteria. Biometrics, 27:387–397, 1971.
+        References
+        ----------
+        .. [1] Scott, A. J., & Symons, M. J. (1971). Clustering methods based on likelihood ratio criteria.
+               `Biometrics, 27(2), 387–397 <https://doi.org/10.2307/2529003>`_.
         """
 
         check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
@@ -4769,10 +4789,11 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
         :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
-        :returns: The Wemmert-Gançarski index score.
+        :return: The Wemmert-Gançarski index score.
         :rtype: float
 
-        :references:
+        References
+        ----------
            .. [1] Bernard Desgraupes, University Paris Ouest Lab Modal’X, https://cran.r-project.org/web/packages/clusterCrit/vignettes/clusterCrit.pdf
         """
 
@@ -4811,10 +4832,11 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
         :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
-        :returns: The McClain-Rao Index score, a lower value indicates better clustering quality.
+        :return: The McClain-Rao Index score, a lower value indicates better clustering quality.
         :rtype: float
 
-        :references:
+        References
+        ----------
            .. [1] McClain, J. O., & Rao, V. R. (1975). CLUSTISZ: A program to test for the quality of clustering of a set of objects.  *Journal of Marketing Research, 12*(4), 456-460. https://doi.org/10.1177/002224377501200410
         """
 
@@ -4843,7 +4865,7 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
         :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
-        :returns: The S_Dbw index score.
+        :return: The S_Dbw index score.
         :rtype: float
 
         .. note::
@@ -4854,8 +4876,10 @@ class Statistics(FeatureExtractionMixin):
         >>> X, labels = make_blobs(n_samples=5000, centers=5, random_state=42, n_features=3, cluster_std=2)
         >>> score = Statistics.s_dbw_index(X, labels)
 
-        :references:
-           .. [1]  M. Halkidi and M. Vazirgiannis. Clustering validity assessment: Finding the optimal partitioning of a data set. Proceedings IEEE International Conference on Data Mining, pages 187–194, 2001.
+        References
+        ----------
+        .. [1] Halkidi, M., & Vazirgiannis, M. (2001). Clustering validity assessment: finding the optimal partitioning of a data set.
+               `Proceedings IEEE International Conference on Data Mining, 187–194 <https://doi.org/10.1109/ICDM.2001.989517>`_.
         """
 
         check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
@@ -4900,7 +4924,8 @@ class Statistics(FeatureExtractionMixin):
         :param y: 2D array representing cluster labels for each data point. Shape (n_samples,).
         :return float: Dynn-Symmetry index.
 
-        :references:
+        References
+        ----------
            .. [1]  Ikotun, A. M., Habyarimana, F., & Ezugwu, A. E. (2025). Cluster validity indices for automatic clustering: A comprehensive review. Heliyon, 11(2), e41953. https://doi.org/10.1016/j.heliyon.2025.e41953
            .. [2]  Hassan, B. A., Tayfor, N. B., Hassan, A. A., Ahmed, A. M., Rashid, T. A., & Abdalla, N. N. (2024). From A-to-Z review of clustering validation indices. arXiv. https://doi.org/10.48550/arXiv.2407.20246
 
@@ -4936,7 +4961,7 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
         :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
-        :returns: The Ray-Turi  index score.
+        :return: The Ray-Turi  index score.
         :rtype: float
 
         :example:
@@ -4944,8 +4969,10 @@ class Statistics(FeatureExtractionMixin):
         >>> X, labels = make_blobs(n_samples=5000, centers=5, random_state=42, n_features=3, cluster_std=2)
         >>> score = Statistics.s_dbw_index(X, labels)
 
-        :references:
-           .. [1] Ray, S., & Turi, R. H. (1999). Determination of number of clusters in k-means clustering and application in colour image segmentation. Proceedings of the 4th International Conference on Advances in Pattern Recognition and Digital Techniques, 137–143.
+        References
+        ----------
+        .. [1] Ray, S., & Turi, R. H. (1999). Determination of number of clusters in k-means clustering and application in colour image segmentation.
+               `Proceedings of the 4th International Conference on Advances in Pattern Recognition and Digital Techniques, 137–143 <https://www.semanticscholar.org/paper/0ec132fce9971d1e0e670e650b58176dc7bf36da>`_.
         """
 
         check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
@@ -4973,7 +5000,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     def fowlkes_mallows(x: np.ndarray, y: np.ndarray) -> float:
-        """
+        r"""
         Calculate the Fowlkes-Mallows Index (FMI) between two clusterings.
 
         The Fowlkes-Mallows index (FMI) is a measure of similarity between two clusterings. It compares the similarity of the clusters obtained by two different clustering algorithms or procedures.
@@ -4981,7 +5008,7 @@ class Statistics(FeatureExtractionMixin):
         The index is defined as the geometric mean of the pairwise precision and recall:
 
         .. math::
-           FMI = \\sqrt{\\frac{TP}{TP + FP} \\times \\frac{TP}{TP + FN}}
+           FMI = \sqrt{\frac{TP}{TP + FP} \times \frac{TP}{TP + FN}}
 
         where:
         - :math:`TP` (True Positive) is the number of pairs of elements that are in the same cluster in both x and y,
@@ -5082,7 +5109,7 @@ class Statistics(FeatureExtractionMixin):
            :width: 400
            :align: center
 
-        .. seealso:
+        .. seealso::
            :func:`simba.mixins.statistics_mixin.Statistics.sliding_czebyshev_distance`
 
         :param np.ndarray sample_1: The first sample, an N-dimensional NumPy array.
@@ -5116,7 +5143,7 @@ class Statistics(FeatureExtractionMixin):
         .. note::
            Normalize array x before passing it to ensure accurate results.
 
-        .. seealso:
+        .. seealso::
            For simple 2-sample comparison, use :func:`simba.mixins.statistics_mixin.Statistics.czebyshev_distance`
 
         :param np.ndarray x: Input signal, a 2D array with shape (n_samples, n_features).
@@ -5160,7 +5187,7 @@ class Statistics(FeatureExtractionMixin):
            Adapted from `umap <https://github.com/lmcinnes/umap/blob/e7f2fb9e5e772edd5c8f38612365ec6a35a54373/umap/distances.py#L468>`_.
 
         .. math::
-           D(x, y) = \\frac{2 \cdot \sum_{i} w_i \cdot \mathbb{1}(x_i \neq y_i)}{N + \sum_{i} w_i \cdot \mathbb{1}(x_i \neq y_i)}
+           D(x, y) = \frac{2 \cdot \sum_{i} w_i \cdot \mathbb{1}(x_i \neq y_i)}{N + \sum_{i} w_i \cdot \mathbb{1}(x_i \neq y_i)}
 
         where:
         - :math:`x` and :math:`y` are the binary vectors or matrices.
@@ -5225,7 +5252,7 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: 1D array representing the first feature values.
         :param np.ndarray y: 1D array representing the second feature values.
-        :returns: Wave-Hedges distance
+        :return: Wave-Hedges distance
         :rtype: float
 
         :example:
@@ -5233,7 +5260,8 @@ class Statistics(FeatureExtractionMixin):
         >>> y = np.random.randint(0, 500, (1000,))
         >>> Statistics().wave_hedges_distance(x=x, y=y)
 
-        :references:
+        References
+        ----------
            .. [1] Hedges, T. S. (1976). An empirical modification to linear wave theory. Proceedings of the Institution of Civil Engineers, Part 2, 61(3), 575–579. https://doi.org/10.1680/iicep.1976.3408
         """
 
@@ -5268,7 +5296,8 @@ class Statistics(FeatureExtractionMixin):
         >>> Statistics.gower_distance(x=x, y=y)
 
 
-        :references:
+        References
+        ----------
            .. [1] Gower, J. C. (1971). A general coefficient of similarity and some of its properties. Biometrics, 27(4), 857–874. https://doi.org/10.2307/2528823
 
 
@@ -5321,7 +5350,8 @@ class Statistics(FeatureExtractionMixin):
         >>> x, y = np.random.randint(0, 500, (1000,200)), np.random.randint(0, 500, (1000,200))
         >>> Statistics.normalized_google_distance(x=y, y=x)
 
-        :references:
+        References
+        ----------
            .. [1] Cilibrasi, R., & Vitányi, P. (2007). Clustering by compression. IEEE Transactions on Information Theory, 51(4), 1523-1545. https://doi.org/10.1109/TIT.2005.862080
         """
         check_valid_array(data=x, source=f'{Statistics.normalized_google_distance.__name__} x', accepted_ndims=(1, 2), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
@@ -5390,10 +5420,11 @@ class Statistics(FeatureExtractionMixin):
         :param ndarray x: 1D array representing the feature values for which the IQR will be calculated.
         :param float window_size: Size of the sliding window, in seconds.  This value determines how many samples are included in each window.
         :param float sample_rate: The sampling rate in samples per second, e.g., fps.
-        :returns : Sliding IQR values
+        :return : Sliding IQR values
         :rtype: np.ndarray
 
-        :references:
+        References
+        ----------
             .. [1] Hession, Leinani E., Gautam S. Sabnis, Gary A. Churchill, and Vivek Kumar. “A Machine-Vision-Based Frailty Index for Mice.” Nature Aging 2, no. 8 (August 16, 2022): 756–66. https://doi.org/10.1038/s43587-022-00266-0.
 
         :example:

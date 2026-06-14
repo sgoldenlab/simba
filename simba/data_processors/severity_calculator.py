@@ -20,8 +20,8 @@ class SeverityCalculator(ConfigReader):
     Computes the "severity" of classification frame events based on how much
     the animals are moving. Frames are scored as less or more severe at lower and higher movements, respectively.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format.
-    :parameter dict settings: how to calculate the severity. E.g., {'brackets': 10, 'clf': 'Attack', 'animals': ['Simon', 'JJ'], 'time': True, 'frames': False}.
+    :param str config_path: path to SimBA project config file in Configparser format.
+    :param dict settings: how to calculate the severity. E.g., {'brackets': 10, 'clf': 'Attack', 'animals': ['Simon', 'JJ'], 'time': True, 'frames': False}.
 
     .. note::
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md>`__.

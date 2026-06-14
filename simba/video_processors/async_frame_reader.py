@@ -132,7 +132,7 @@ def get_async_frame_batch(batch_reader: AsyncVideoFrameReader,
 
     :param AsyncVideoFrameReader batch_reader: An instance of `AsyncVideoFrameReader` that is currently running.
     :param AsyncVideoFrameReader timeout: Maximum time (in seconds) to wait for a frame batch before raising `queue.Empty`.
-    :returns: A tuple containing: start frame index of the batch of video (int), end frame index of the batch of video (int) and batch of frames (np.ndarray of shape [batch_size, H, W, C] or similar).
+    :return: A tuple containing: start frame index of the batch of video (int), end frame index of the batch of video (int) and batch of frames (np.ndarray of shape [batch_size, H, W, C] or similar).
     :rtype: Tuple[int, int, np.ndarray]
     """
 

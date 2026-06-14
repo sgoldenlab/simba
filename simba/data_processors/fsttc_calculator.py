@@ -22,12 +22,12 @@ class FSTTCCalculator(ConfigReader, PlottingMixin):
     Compute forward spike-time tiling coefficients between pairs of
     classified behaviors.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format.
-    :parameter: Optional[bool] join_bouts_within_delta: If several bouts onsets (of the same classifier) occurs within a single time-delta, then join the bouts into a single bout.
-    :parameter: Optional[bool] time_delta_at_onset: If True, time delta is initatiated at bout onset. If False, then initated at bout offset and includes bout duration. Default: False.
-    :parameter int time_window: FSTTC hyperparameter; Integer representing the time window in seconds.
-    :parameter List[str] behavior_lst: Behaviors to calculate FSTTC between. FSTTC will be computed for all combinations of behaviors.
-    :parameter bool create_graphs: If True, created violin plots (as below) representing each FSTTC. Default: False.
+    :param str config_path: path to SimBA project config file in Configparser format.
+    :param: Optional[bool] join_bouts_within_delta: If several bouts onsets (of the same classifier) occurs within a single time-delta, then join the bouts into a single bout.
+    :param: Optional[bool] time_delta_at_onset: If True, time delta is initatiated at bout onset. If False, then initated at bout offset and includes bout duration. Default: False.
+    :param int time_window: FSTTC hyperparameter; Integer representing the time window in seconds.
+    :param List[str] behavior_lst: Behaviors to calculate FSTTC between. FSTTC will be computed for all combinations of behaviors.
+    :param bool create_graphs: If True, created violin plots (as below) representing each FSTTC. Default: False.
 
     .. image:: _static/img/fsttc_violin.png
        :width: 500
@@ -43,10 +43,10 @@ class FSTTCCalculator(ConfigReader, PlottingMixin):
 
     References
     ----------
-    .. [1] Lee et al., Temporal microstructure of dyadic social behavior during relationship formation in mice, `PLOS One`,
-           2019.
-    .. [2] Cutts et al., Detecting Pairwise Correlations in Spike Trains: An Objective Comparison of Methods and
-           Application to the Study of Retinal Waves, `J Neurosci`, 2014.
+    .. [1] Lee, W., et al. (2019). Temporal microstructure of dyadic social behavior during relationship formation in mice.
+           `PLOS One, 14(12), e0220596 <https://doi.org/10.1371/journal.pone.0220596>`_.
+    .. [2] Cutts, C. S., & Eglen, S. J. (2014). Detecting pairwise correlations in spike trains: an objective comparison of methods and application to the study of retinal waves.
+           `Journal of Neuroscience, 34(43), 14288–14303 <https://doi.org/10.1523/JNEUROSCI.2767-14.2014>`_.
     """
 
     def __init__(

@@ -30,11 +30,11 @@ class Interpolate(ConfigReader):
     Interpolate missing body-parts in pose-estimation data. "Missing" is defined as either (i) when a single body-parts is None, or
     when all body-parts belonging to an animal are identical (i.e., the same 2D coordinate or all None).
 
-    :parameter str input_path: Directory or file path to pose-estimation data in CSV or parquet format
-    :parameter str config_path: path to SimBA project config file in Configparser format.
-    :parameter Literal str: Type of interpolation. OPTIONS: 'Animal(s): Nearest', 'Animal(s): Linear', 'Animal(s): Quadratic','Body-parts: Nearest', 'Body-parts: Linear', 'Body-parts: Quadratic']
+    :param str input_path: Directory or file path to pose-estimation data in CSV or parquet format
+    :param str config_path: path to SimBA project config file in Configparser format.
+    :param Literal str: Type of interpolation. OPTIONS: 'Animal(s): Nearest', 'Animal(s): Linear', 'Animal(s): Quadratic','Body-parts: Nearest', 'Body-parts: Linear', 'Body-parts: Quadratic']
                             See `tutorial for info/images of the different interpolation types <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files>`__.
-    :parameter bool initial_import_multi_index: If True, the incoming data is multi-index columns dataframes. Default: False.
+    :param bool initial_import_multi_index: If True, the incoming data is multi-index columns dataframes. Default: False.
 
     .. image:: _static/img/interpolation_comparison.webp
        :width: 400
@@ -235,11 +235,11 @@ class Smooth(ConfigReader):
     """
     Smooth pose-estimation data according to user-defined method.
 
-    :parameter str input_path: path to pose-estimation data in CSV or parquet format
-    :parameter str config_path: path to SimBA project config file in Configparser format.
-    :parameter Literal str: Type of smoothing_method. OPTIONS: ``Gaussian``, ``Savitzky-Golay``.
-    :parameter int time_window: Rolling time window in millisecond to use when smoothing. Larger time-windows and greater smoothing.
-    :parameter bool initial_import_multi_index: If True, the incoming data is multi-index columns dataframes. Default: False.
+    :param str input_path: path to pose-estimation data in CSV or parquet format
+    :param str config_path: path to SimBA project config file in Configparser format.
+    :param Literal str: Type of smoothing_method. OPTIONS: ``Gaussian``, ``Savitzky-Golay``.
+    :param int time_window: Rolling time window in millisecond to use when smoothing. Larger time-windows and greater smoothing.
+    :param bool initial_import_multi_index: If True, the incoming data is multi-index columns dataframes. Default: False.
 
     .. note::
         `Smoothing tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files>`__.
@@ -430,12 +430,12 @@ class AdvancedInterpolator(ConfigReader):
     Interpolation method that allows different interpolation parameters for different animals or body-parts.
     For example, interpolate some body-parts of animals using linear interpolation, and other body-parts of animals using nearest interpolation.
 
-    :parameter str data_dir: path to pose-estimation data in CSV or parquet format
-    :parameter str config_path: path to SimBA project config file in Configparser format.
-    :parameter Literal type: Type of interpolation: animal or body-part.
-    :parameter Dict settings: Interpolation rules for each animal or each animal body-part.
-    :parameter bool initial_import_multi_index: If True, the incoming data is multi-index columns dataframes. Use of input data is the ``project_folder/csv/input_csv`` directory. Default: False.
-    :parameter bool overwrite: If True, overwrites the input data. If False, then saves input data in datetime-stamped sub-directory.
+    :param str data_dir: path to pose-estimation data in CSV or parquet format
+    :param str config_path: path to SimBA project config file in Configparser format.
+    :param Literal type: Type of interpolation: animal or body-part.
+    :param Dict settings: Interpolation rules for each animal or each animal body-part.
+    :param bool initial_import_multi_index: If True, the incoming data is multi-index columns dataframes. Use of input data is the ``project_folder/csv/input_csv`` directory. Default: False.
+    :param bool overwrite: If True, overwrites the input data. If False, then saves input data in datetime-stamped sub-directory.
 
     :examples:
     >>> interpolator = AdvancedInterpolator(data_dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv',
@@ -570,12 +570,12 @@ class AdvancedSmoother(ConfigReader):
     Smoothing method that allows different smoothing parameters for different animals or body-parts.
     For example, smooth some body-parts of animals using Savitzky-Golay smoothing, and other body-parts of animals using Gaussian smoothing.
 
-    :parameter str data_dir: path to pose-estimation data in CSV or parquet format
-    :parameter str config_path: path to SimBA project config file in Configparser format.
-    :parameter Literal type: Level of smoothing: animal or body-part.
-    :parameter Dict settings: Smoothing rules for each animal or each animal body-part.
-    :parameter bool initial_import_multi_index: If True, the incoming data is multi-index columns dataframes. Use of input data is the ``project_folder/csv/input_csv`` directory. Default: False.
-    :parameter bool overwrite: If True, overwrites the input data. If False, then saves a copy input data in datetime-stamped sub-directory.
+    :param str data_dir: path to pose-estimation data in CSV or parquet format
+    :param str config_path: path to SimBA project config file in Configparser format.
+    :param Literal type: Level of smoothing: animal or body-part.
+    :param Dict settings: Smoothing rules for each animal or each animal body-part.
+    :param bool initial_import_multi_index: If True, the incoming data is multi-index columns dataframes. Use of input data is the ``project_folder/csv/input_csv`` directory. Default: False.
+    :param bool overwrite: If True, overwrites the input data. If False, then saves a copy input data in datetime-stamped sub-directory.
 
     :examples:
 

@@ -24,13 +24,13 @@ class CueLightMovementAnalyzer(ConfigReader):
     Compute aggregate statistics of animal movement in relation to the cue light
     ON and OFF states.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
-    :parameter int pre_window: Time period (in millisecond) before the onset of each cue light to compute aggregate classification statistics within.
-    :parameter int post_window: Time period (in millisecond) after the offset of each cue light to compute aggregate classification statistics within.
-    :parameter List[str] cue_light_names: Names of cue lights, as defined in the SimBA ROI interface.
-    :parameter float threshold: The body-part post-estimation probability threshold. SimBA omits movement calculations for frames where the body-part probability threshold is lower than the user-specified threshold.
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param int pre_window: Time period (in millisecond) before the onset of each cue light to compute aggregate classification statistics within.
+    :param int post_window: Time period (in millisecond) after the offset of each cue light to compute aggregate classification statistics within.
+    :param List[str] cue_light_names: Names of cue lights, as defined in the SimBA ROI interface.
+    :param float threshold: The body-part post-estimation probability threshold. SimBA omits movement calculations for frames where the body-part probability threshold is lower than the user-specified threshold.
 
-    .. note:
+    .. note::
        `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
 
 

@@ -142,7 +142,7 @@ def filter_yolo_keypoint_data(bbox_data: np.ndarray,
     Helper to filters YOLO bounding box and keypoint data based on class ID and/or confidence threshold.
 
     :param np.ndarray bbox_data: A 2D array of shape (N, M) representing YOLO bounding box data, where each row corresponds to one detection and contains class and confidence values.
-    :param np.ndarray bbox_data: A 3D array of shape (N, 2, 3) representing keypoints for each detection, where K is the number of keypoints per detection.
+    :param np.ndarray keypoint_data: A 3D array of shape (N, 2, 3) representing keypoints for each detection, where K is the number of keypoints per detection.
     :param Optional[int] class_id: Target class ID to filter detections. Defaults to None.
     :param Optional[float] confidence: Minimum confidence threshold to keep detections. Must be in [0, 1]. Defaults to None.
     :param int confidence_idx: Index in `bbox_data` where confidence value is stored. Defaults to 5.
@@ -199,7 +199,7 @@ def yolo_predict(model: YOLO,
     :param float threshold: Confidence threshold for filtering predictions. Only detections with confidence >= threshold are returned. Must be between 0.0 and 1.0.
     :param int max_detections: Maximum number of detections per image/frame to return.
     :param bool verbose: If True, print inference progress and summary information.
-    :returns: YOLO results or generator of YOLO results.
+    :return: YOLO results or generator of YOLO results.
     """
 
     check_valid_boolean(value=half, source=f'{yolo_predict.__name__} half', raise_error=True)

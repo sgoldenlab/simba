@@ -1206,7 +1206,7 @@ class ROI_mixin(ConfigReader):
         self.buffer_roi_frm.iconphoto(False, self.menu_icons['resize']["img"])
         buffer_roi_settings_frm = CreateLabelFrameWithIcon(parent=self.buffer_roi_frm, header="BUFFER ROI SETTINGS", icon_name='resize', padx=5, pady=5)
         self.buffer_size_eb = Entry_Box(parent=buffer_roi_settings_frm, fileDescription='BUFFER SIZE (MM):', labelwidth=35, entry_box_width=10, justify='center', value=20, img='resize', tooltip_key='ROI_BUFFER_SIZE') #validation='numeric')
-        self.px_per_mm_eb = Entry_Box(parent=buffer_roi_settings_frm, fileDescription='PIXEL PER MM CONVERTION FACTOR:', labelwidth=35, entry_box_width=10, justify='center', value=self.px_per_mm, img='calipher', tooltip_key='ROI_PIXEL_PER_MM')
+        self.px_per_mm_eb = Entry_Box(parent=buffer_roi_settings_frm, fileDescription='PIXEL PER MM CONVERSION FACTOR:', labelwidth=35, entry_box_width=10, justify='center', value=self.px_per_mm, img='calipher', tooltip_key='ROI_PIXEL_PER_MM')
         buffer_roi_settings_frm.grid(row=0, column=0, sticky=NW)
         self.buffer_size_eb.grid(row=0, column=0, sticky=NW, pady=5)
         self.px_per_mm_eb.grid(row=1, column=0, sticky=NW, pady=5)
@@ -1219,7 +1219,7 @@ class ROI_mixin(ConfigReader):
         buffer_mm = self.buffer_size_eb.entry_get
         px_per_mm = self.px_per_mm_eb.entry_get
         valid_buffer, error_msg_buffer = check_int(name='BUFFER SIZE (MM)', value=buffer_mm, allow_zero=False, allow_negative=True, raise_error=False)
-        valid_px_per_mm, error_msg_px_per_mm = check_float(name='PIXEL PER MM CONVERTION FACTOR', value=px_per_mm, allow_zero=False, allow_negative=False, raise_error=False)
+        valid_px_per_mm, error_msg_px_per_mm = check_float(name='PIXEL PER MM CONVERSION FACTOR', value=px_per_mm, allow_zero=False, allow_negative=False, raise_error=False)
         if not valid_buffer:
             self.set_status_bar_panel(text=error_msg_buffer, fg='red')
             raise InvalidInputError(error_msg_buffer, source=self.__class__.__name__)

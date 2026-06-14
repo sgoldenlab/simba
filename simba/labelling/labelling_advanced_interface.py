@@ -41,9 +41,9 @@ class AdvancedLabellingInterface(ConfigReader):
        :width: 800
        :align: center
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
-    :parameter str file_path: Path to video that is to be annotated
-    :parameter bool continuing: If True, user is continuing the annotations of a video with started but incomplete annotations.
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str file_path: Path to video that is to be annotated
+    :param bool continuing: If True, user is continuing the annotations of a video with started but incomplete annotations.
 
     Examples
     ----------

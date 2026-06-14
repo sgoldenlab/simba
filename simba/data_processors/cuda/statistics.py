@@ -388,7 +388,7 @@ def sliding_spearmans_rank(x: np.ndarray,
                            sample_rate: Union[float, int],
                            batch_size: Optional[int] = int(1.6e+7),
                            verbose: bool = False) -> np.ndarray:
-    """
+    r"""
     Computes the Spearman's rank correlation coefficient between two 1D arrays `x` and `y`
     over sliding windows of size `time_window * sample_rate`. The computation is performed
     in batches to optimize memory usage, leveraging GPU acceleration with CuPy.
@@ -397,12 +397,12 @@ def sliding_spearmans_rank(x: np.ndarray,
 
        For CPU function see :func:`~simba.mixins.statistics.StatisticsMixin.sliding_spearman_rank_correlation`.
 
-    :math:`\\rho = 1 - \\frac{6 \\sum d_i^2}{n_w(n_w^2 - 1)}`
+    :math:`\rho = 1 - \frac{6 \sum d_i^2}{n_w(n_w^2 - 1)}`
 
     Where:
-    - \( \\rho \) is the Spearman's rank correlation coefficient.
-    - \( d_i \) is the difference between the ranks of corresponding elements in the sliding window.
-    - \( n_w \) is the size of the sliding window.
+    - :math:`\rho` is the Spearman's rank correlation coefficient.
+    - :math:`d_i` is the difference between the ranks of corresponding elements in the sliding window.
+    - :math:`n_w` is the size of the sliding window.
 
     :param np.ndarray x: The first 1D array containing the values for Feature 1.
     :param np.ndarray y: The second 1D array containing the values for Feature 2.
@@ -564,7 +564,6 @@ def euclidean_distance_to_static_point(data: np.ndarray,
     :param pixels_per_millimeter: A scaling factor that indicates how many pixels correspond to one millimeter. Defaults to 1 if no scaling is necessary.
     :param centimeter:  A flag to indicate whether the output distances should be converted from millimeters to centimeters. If True, the result is divided by 10. Defaults to False (millimeters).
     :param batch_size: The number of points to process in each batch to avoid memory overflow on the GPU. The default  batch size is set to 65 million points (6.5e+7). Adjust this parameter based on GPU memory capacity.
-    :param batch_size: The number of points to process in each batch to avoid memory overflow on the GPU. The default  batch size is set to 65 million points (6.5e+7). Adjust this parameter based on GPU memory capacity.
     :return: A 1D array of distances between each point in `data` and the static `point`, either in millimeters or centimeters depending on the `centimeter` flag.
     :rtype: np.ndarray
     """
@@ -644,7 +643,7 @@ def dunn_index(x: np.ndarray, y: np.ndarray) -> float:
 
 
 def adjusted_rand_gpu(x: np.ndarray, y: np.ndarray) -> float:
-    """
+    r"""
     Calculate the Adjusted Rand Index (ARI) between two clusterings.
 
     The Adjusted Rand Index (ARI) is a measure of the similarity between two clusterings. It considers all pairs of samples and counts pairs that are assigned to the same or different clusters in both the true and predicted clusterings.
@@ -652,7 +651,7 @@ def adjusted_rand_gpu(x: np.ndarray, y: np.ndarray) -> float:
     The ARI is defined as:
 
     .. math::
-       ARI = \\frac{TP + TN}{TP + FP + FN + TN}
+       ARI = \frac{TP + TN}{TP + FP + FN + TN}
 
     where:
         - :math:`TP` (True Positive) is the number of pairs of elements that are in the same cluster in both x and y,
@@ -776,7 +775,7 @@ def xie_beni(x: np.ndarray, y: np.ndarray) -> float:
 
     :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
     :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
-    :returns: The Xie-Beni score for the dataset.
+    :return: The Xie-Beni score for the dataset.
     :rtype: float
 
     :example:
@@ -784,9 +783,10 @@ def xie_beni(x: np.ndarray, y: np.ndarray) -> float:
     >>> X, y = make_blobs(n_samples=100000, centers=40, n_features=600, random_state=0, cluster_std=0.3)
     >>> xie_beni(x=X, y=y)
 
-    :references:
-    .. [1] X. L. Xie, G. Beni (1991). A validity measure for fuzzy clustering.
-           In: IEEE Transactions on Pattern Analysis and Machine Intelligence 13(8), 841 - 847. DOI: 10.1109/34.85677
+    References
+    ----------
+    .. [1] Xie, X. L., & Beni, G. (1991). A validity measure for fuzzy clustering.
+           `IEEE Transactions on Pattern Analysis and Machine Intelligence, 13(8), 841–847 <https://doi.org/10.1109/34.85677>`_.
     """
     check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
     check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0], ])
@@ -811,7 +811,7 @@ def xie_beni(x: np.ndarray, y: np.ndarray) -> float:
 
 
 def i_index(x: np.ndarray, y: np.ndarray, verbose: bool = False) -> float:
-    """
+    r"""
     Calculate the I-Index for evaluating clustering quality.
 
     The I-Index is a metric that measures the compactness and separation of clusters.
@@ -840,12 +840,14 @@ def i_index(x: np.ndarray, y: np.ndarray, verbose: bool = False) -> float:
 
     :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
     :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
-    :returns: The I-index score for the dataset.
+    :return: The I-index score for the dataset.
     :rtype: float
 
-    :references:
-        .. [1] Zhao, Q., Xu, M., Fränti, P. (2009). Sum-of-Squares Based Cluster Validity Index and Significance Analysis.
-               In: Kolehmainen, M., Toivanen, P., Beliczynski, B. (eds) Adaptive and Natural Computing Algorithms. ICANNGA 2009. Lecture Notes in Computer Science, vol 5495. Springer, Berlin, Heidelberg. https://doi.org/10.1007/978-3-642-04921-7_32
+    References
+    ----------
+    .. [1] Zhao, Q., Xu, M., & Fränti, P. (2009). Sum-of-squares based cluster validity index and significance analysis.
+           In Adaptive and Natural Computing Algorithms (ICANNGA 2009), Lecture Notes in Computer Science, vol. 5495.
+           `Springer <https://doi.org/10.1007/978-3-642-04921-7_32>`_.
 
     :example:
     >>> X, y = make_blobs(n_samples=5000, centers=20, n_features=3, random_state=0, cluster_std=0.1)
@@ -893,7 +895,7 @@ def kullback_leibler_divergence_gpu(x: np.ndarray,
     :param ndarray y: Second 1d array representing feature values.
     :param Optional[int] fill_value: Optional pseudo-value to use to fill empty buckets in ``y`` histogram
     :param Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators
-    :returns: Kullback-Leibler divergence between ``x`` and ``y``
+    :return: Kullback-Leibler divergence between ``x`` and ``y``
     :rtype: float
 
     :example:
@@ -945,7 +947,7 @@ def hamming_distance_gpu(x: np.ndarray,
     :param ndarray x: A 1D or 2D NumPy array representing the reference data. If 2D, shape should be (n_samples, n_features). Supported dtypes are numeric.
     :param ndarray y: Array of the same shape as `x` representing the data to compare.
     :param ndarray w: A 1D array of shape (n_samples,) representing sample weights. If None, uniform weights are used.
-    :returns: The weighted average Hamming distance between corresponding rows of `x` and `y`.
+    :return: The weighted average Hamming distance between corresponding rows of `x` and `y`.
     :rtype: float
 
 
@@ -992,7 +994,7 @@ def sokal_sneath_gpu(x: np.ndarray, y: np.ndarray, w: Optional[np.ndarray] = Non
     :param ndarray x: First binary vector (1D array of 0s and 1s).
     :param ndarray y: Second binary vector of the same shape as `x`.
     :param ndarray w: A 1D array of shape (n_samples,) representing sample weights. If None, uniform weights are used.
-    :returns: The Sokal–Sneath similarity coefficient between `x` and `y`.
+    :return: The Sokal–Sneath similarity coefficient between `x` and `y`.
     :rtype: float.
     """
 

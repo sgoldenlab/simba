@@ -24,14 +24,14 @@ class ClassifierValidationClips(ConfigReader):
     """
     Create video clips with overlaid classified events for detection of false positive event bouts.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
-    :parameter int window: Number of seconds before and after the event bout that should be included in the output video.
-    :parameter str clf_name: Name of the classifier to create validation videos for.
-    :parameter bool clips: If True, creates individual video file clips for each validation bout.
-    :parameter Tuple[int, int, int] text_clr: Color of text overlay in BGR.
-    :parameter Optional[Tuple[int, int, int]] highlight_clr: Color of text when probability values are above threshold. If None, same as text_clr.
-    :parameter float video_speed:  FPS rate in relation to original video. E.g., the same as original video if 1.0. Default: 1.0.
-    :parameter bool concat_video:  If True, creates a single video including all events bouts for each video. Default: False.
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param int window: Number of seconds before and after the event bout that should be included in the output video.
+    :param str clf_name: Name of the classifier to create validation videos for.
+    :param bool clips: If True, creates individual video file clips for each validation bout.
+    :param Tuple[int, int, int] text_clr: Color of text overlay in BGR.
+    :param Optional[Tuple[int, int, int]] highlight_clr: Color of text when probability values are above threshold. If None, same as text_clr.
+    :param float video_speed:  FPS rate in relation to original video. E.g., the same as original video if 1.0. Default: 1.0.
+    :param bool concat_video:  If True, creates a single video including all events bouts for each video. Default: False.
 
     .. note::
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/classifier_validation.md#classifier-validation>`_.

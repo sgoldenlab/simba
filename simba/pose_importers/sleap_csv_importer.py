@@ -36,15 +36,16 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
       `Google Colab notebook for converting SLEAP .slp to CSV written by @Toshea111  <https://colab.research.google.com/drive/1EpyTKFHVMCqcb9Lj9vjMrriyaG9SvrPO?usp=sharing>`__.
       `Example expected SLEAP csv data file for 5 animals / 4 pose-estimated body-parts  <https://github.com/sgoldenlab/simba/blob/master/misc/sleap_csv_example.csv>`__.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
-    :parameter str data_folder: Path to folder containing SLEAP data in `csv` format.
-    :parameter List[str] id_lst: Animal names. This will be ignored in one animal projects and default to ``Animal_1``.
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str data_folder: Path to folder containing SLEAP data in `csv` format.
+    :param List[str] id_lst: Animal names. This will be ignored in one animal projects and default to ``Animal_1``.
     :param Optional[Dict[str, str]] interpolation_setting: Dict defining the type and method to use to perform interpolation {'type': 'animals', 'method': 'linear'}.
     :param Optional[Dict[str, Union[str, int]]] smoothing_settings: Dictionary defining the pose estimation smoothing method {'time_window': 500, 'method': 'gaussian'}.
 
     References
     ----------
-    .. [1] Pereira et al., SLEAP: A deep learning system for multi-animal pose tracking, `Nature Methods`, 2022.
+    .. [1] Pereira, T. D., et al. (2022). SLEAP: A deep learning system for multi-animal pose tracking.
+           `Nature Methods, 19, 486–495 <https://doi.org/10.1038/s41592-022-01426-1>`_.
 
     >>> sleap_csv_importer = SLEAPImporterCSV(config_path=r'project_folder/project_config.ini', data_folder=r'data_folder', id_lst=['Termite_1', 'Termite_2', 'Termite_3', 'Termite_4', 'Termite_5'], interpolation_settings={'type': 'animals', 'method': 'linear'}, smoothing_settings = {'time_window': 500, 'method': 'gaussian'})
     >>> sleap_csv_importer.run()

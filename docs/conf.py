@@ -20,7 +20,6 @@ release = '0.0.2'
 myst_enable_extensions = ["html_image"]
 myst_url_schemes = ["http", "https"]
 extensions = ['sphinx.ext.napoleon',
-              'sphinx.ext.imgmath',
               'sphinx.ext.mathjax',
               'sphinx-mathjax-offline',
               'sphinx.ext.autodoc',
@@ -35,8 +34,8 @@ extensions = ['sphinx.ext.napoleon',
               'sphinx.ext.autosummary',
               'sphinxcontrib.youtube']
 
-#mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
-mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+# Math is rendered by a single renderer: MathJax (served locally via sphinx-mathjax-offline).
+# Do not set mathjax_path here — it would override the offline bundle and re-introduce a CDN dependency.
 
 html_favicon = "../simba/assets/icons/readthedocs_logo.png"
 html_logo = "../simba/assets/icons/readthedocs_logo.png"

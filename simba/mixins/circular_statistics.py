@@ -58,7 +58,7 @@ class CircularStatisticsMixin(object):
     @staticmethod
     @njit("(float32[:],)")
     def mean_resultant_vector_length(data: np.ndarray) -> float:
-        """
+        r"""
         Jitted compute of the mean resultant vector length of a single sample. Captures the overall "pull" or "tendency" of the
         data points towards a central direction on the circle with a range between 0 and 1.
 
@@ -68,17 +68,17 @@ class CircularStatisticsMixin(object):
 
         .. math::
 
-            R = \\frac{{\\sqrt{{\\sum_{{i=1}}^N \\cos(\\theta_i - \\bar{\theta})^2 + \\sum_{{i=1}}^N \\sin(\theta_i - \\bar{\\theta})^2}}}}{{N}}
+            R = \frac{{\sqrt{{\sum_{{i=1}}^N \cos(\theta_i - \bar{\theta})^2 + \sum_{{i=1}}^N \sin(\theta_i - \bar{\theta})^2}}}}{{N}}
 
-        where :math:`N` is the number of data points, :math:`\\theta_i` is the angle of the ith data point, and \(\bar{\theta}\) is the mean angle.
+        where :math:`N` is the number of data points, :math:`\theta_i` is the angle of the ith data point, and :math:`\bar{\theta}` is the mean angle.
 
         .. seealso::
            :func:`simba.data_processors.cuda.circular_statistics.sliding_resultant_vector_length`,
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_mean_resultant_vector_length`
 
 
-        :parameter np.ndarray data: 1D array of size len(frames) representing angles in degrees.
-        :returns: The mean resultant vector of the angles. 1 represents tendency towards a single point. 0 represents no central point.
+        :param np.ndarray data: 1D array of size len(frames) representing angles in degrees.
+        :return: The mean resultant vector of the angles. 1 represents tendency towards a single point. 0 represents no central point.
         :rtype: float
 
         :example:
@@ -110,10 +110,10 @@ class CircularStatisticsMixin(object):
            :func:`simba.data_processors.cuda.circular_statistics.sliding_resultant_vector_length`,
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.mean_resultant_vector_length`
 
-        :parameter np.ndarray data: 1D array of size len(data) representing degrees.
-        :parameter np.ndarray time_window: Rolling time-window as float in seconds.
-        :parameter int fps: fps of the recorded video
-        :returns: Size len(data) x len(time_windows) representing resultant vector length in the prior ``time_window``.
+        :param np.ndarray data: 1D array of size len(data) representing degrees.
+        :param np.ndarray time_window: Rolling time-window as float in seconds.
+        :param int fps: fps of the recorded video
+        :return: Size len(data) x len(time_windows) representing resultant vector length in the prior ``time_window``.
         :rtype: np.ndarray
 
         :example:
@@ -156,7 +156,7 @@ class CircularStatisticsMixin(object):
 
 
         :param np.ndarray data: 1D array of size len(frames) representing angles in degrees.
-        :returns: The circular mean of the angles in degrees.
+        :return: The circular mean of the angles in degrees.
         :rtype: float
 
         .. image:: _static/img/mean_angle.png
@@ -199,10 +199,10 @@ class CircularStatisticsMixin(object):
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.circular_mean`
 
 
-        :parameter np.ndarray data: 1d array with feature values in degrees.
-        :parameter np.ndarray time_windows: Rolling time-windows as floats in seconds. E.g., [0.2, 0.4, 0.6]
-        :parameter int fps: fps of the recorded video
-        :returns: Size data.shape[0] x time_windows.shape[0] array
+        :param np.ndarray data: 1d array with feature values in degrees.
+        :param np.ndarray time_windows: Rolling time-windows as floats in seconds. E.g., [0.2, 0.4, 0.6]
+        :param int fps: fps of the recorded video
+        :return: Size data.shape[0] x time_windows.shape[0] array
         :rtype: np.ndarray
 
         :example:
@@ -224,7 +224,7 @@ class CircularStatisticsMixin(object):
     @staticmethod
     @njit("(float32[:],)")
     def circular_std(data: np.ndarray) -> float:
-        """
+        r"""
         Jitted compute of the circular standard deviation from a single distribution of angles in degrees.
 
         .. image:: _static/img/circular_std.png
@@ -237,13 +237,13 @@ class CircularStatisticsMixin(object):
 
         .. math::
 
-           \\sigma_{\\text{circular}} = \\text{rad2deg}\\left(\\sqrt{-2 \\cdot \\log\\left(|\text{mean}(\\exp(j \\cdot \\theta))|\\right)}\\right)
+           \sigma_{\text{circular}} = \text{rad2deg}\left(\sqrt{-2 \cdot \log\left(|\text{mean}(\exp(j \cdot \theta))|\right)}\right)
 
-        where :math:`\\theta` represents the angles in radians
+        where :math:`\theta` represents the angles in radians
 
 
         :param ndarray data: 1D array of size len(frames) with angles in degrees
-        :returns: The standard deviation of the data sample in degrees.
+        :return: The standard deviation of the data sample in degrees.
         :rtype: float
 
         :example:
@@ -278,7 +278,7 @@ class CircularStatisticsMixin(object):
         :param ndarray data: 1D array of size len(frames) representing degrees.
         :param np.ndarray time_window: Sliding time-window as float in seconds.
         :param int fps: fps of the recorded video
-        :returns: Size data.shape[0] x time_windows.shape[0] with angular standard deviations in rolling time windows in degrees.
+        :return: Size data.shape[0] x time_windows.shape[0] with angular standard deviations in rolling time windows in degrees.
         :rtype: np.ndarray
 
         :example:
@@ -320,9 +320,9 @@ class CircularStatisticsMixin(object):
            :func:`simba.data_processors.cuda.circular_statistics.instantaneous_angular_velocity`
 
 
-        :parameter ndarray data: 1D array of size len(frames) representing degrees.
-        :parameter int bin_size: The number of frames prior to compare the current angular velocity against.
-        :returns: 1D array with instantanous angular velocities according to bin size.
+        :param ndarray data: 1D array of size len(frames) representing degrees.
+        :param int bin_size: The number of frames prior to compare the current angular velocity against.
+        :return: 1D array with instantanous angular velocities according to bin size.
         :rtype: np.ndarray
 
         :example:
@@ -357,7 +357,7 @@ class CircularStatisticsMixin(object):
            :width: 600
            :align: center
 
-        :parameter np.ndarray degree_angles: 1d array of degrees. Note: return by ``self.head_direction``.
+        :param np.ndarray degree_angles: 1d array of degrees. Note: return by ``self.head_direction``.
         :return: List of strings representing frame-wise cardinality.
         :rtype: List[str]
 
@@ -525,8 +525,8 @@ class CircularStatisticsMixin(object):
            :func:`simba.data_processors.cuda.circular_statistics.direction_from_three_bps`
 
 
-        :parameter np.ndarray anterior_loc: Size len(frames) x 2 representing x and y coordinates for first body-part.
-        :parameter np.ndarray posterior_loc: Size len(frames) x 2 representing x and y coordinates for second body-part.
+        :param np.ndarray anterior_loc: Size len(frames) x 2 representing x and y coordinates for first body-part.
+        :param np.ndarray posterior_loc: Size len(frames) x 2 representing x and y coordinates for second body-part.
         :return np.ndarray: Frame-wise directionality in degrees.
 
         :example:
@@ -603,14 +603,14 @@ class CircularStatisticsMixin(object):
         The associated p-value is calculated as follows (note this uses the resultant length :math:`nR`, not the mean resultant length :math:`R`):
 
         .. math::
-           p = \\exp\\left(\\sqrt{1 + 4n + 4(n^2 - (nR)^2)} - (1 + 2n)\\right)
+           p = \exp\left(\sqrt{1 + 4n + 4(n^2 - (nR)^2)} - (1 + 2n)\right)
 
         .. seealso::
            :func:`simba.data_processors.cuda.circular_statistics.sliding_rayleigh_z`,
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_rayleigh_z`
 
-        :parameter ndarray data: 1D array of size len(frames) representing degrees.
-        :returns: Tuple with Rayleigh Z score and associated probability value.
+        :param ndarray data: 1D array of size len(frames) representing degrees.
+        :return: Tuple with Rayleigh Z score and associated probability value.
         :rtype: Tuple[float, float]
 
         >>> data = np.array([350, 360, 365, 360, 100, 109, 232, 123, 42, 3,4, 145]).astype(np.float32)
@@ -642,10 +642,10 @@ class CircularStatisticsMixin(object):
            :func:`simba.data_processors.cuda.circular_statistics.sliding_rayleigh_z`,
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.rayleigh`
 
-        :parameter ndarray data: 1D array of size len(frames) representing degrees.
-        :parameter np.ndarray time_window: Rolling time-window as float in seconds. Two windows of 0.5s and 1s would be represented as np.array([0.5, 1.0])
-        :parameter int fps: fps of the recorded video
-        :returns: Two 2d arrays with the first representing Rayleigh Z scores and second representing associated p values.
+        :param ndarray data: 1D array of size len(frames) representing degrees.
+        :param np.ndarray time_window: Rolling time-window as float in seconds. Two windows of 0.5s and 1s would be represented as np.array([0.5, 1.0])
+        :param int fps: fps of the recorded video
+        :return: Two 2d arrays with the first representing Rayleigh Z scores and second representing associated p values.
         :rtype: Tuple[np.ndarray, np.ndarray]
 
         :example:
@@ -678,7 +678,7 @@ class CircularStatisticsMixin(object):
         The circular correlation coefficient is calculated as:
 
         .. math::
-           R = \\frac{\\sum \\sin(\\theta_1 - \\bar{\\theta}_1) \\sin(\\theta_2 - \\bar{\\theta}_2)}{\\sqrt{\\sum \\sin^2(\\theta_1 - \\bar{\\theta}_1) \\sum \\sin^2(\\theta_2 - \\bar{\\theta}_2)}}
+           R = \frac{\sum \sin(\theta_1 - \bar{\theta}_1) \sin(\theta_2 - \bar{\theta}_2)}{\sqrt{\sum \sin^2(\theta_1 - \bar{\theta}_1) \sum \sin^2(\theta_2 - \bar{\theta}_2)}}
 
         Where:
 
@@ -693,11 +693,11 @@ class CircularStatisticsMixin(object):
            :width: 700
            :align: center
 
-        .. seealso:
+        .. seealso::
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_correlation`
 
         :param np.ndarray sample_1: Angular data for e.g., Animal 1
-        :param np.ndarray sample_1: Angular data for e.g., Animal 2
+        :param np.ndarray sample_2: Angular data for e.g., Animal 2
         :return: The correlation between the two distributions.
         :rtype: float
 
@@ -707,8 +707,10 @@ class CircularStatisticsMixin(object):
         >>> CircularStatisticsMixin().circular_correlation(sample_1=sample_1, sample_2=sample_2)
         >>> 0.7649115920066833
 
-        :references:
-           .. [1] Mardia, K. V. (1976). Linear-circular correlation coefficients and rhythmometry. Biometrika, 63(2), 403–405
+        References
+        ----------
+        .. [1] Mardia, K. V. (1976). Linear-circular correlation coefficients and rhythmometry.
+               `Biometrika, 63(2), 403–405 <https://doi.org/10.2307/2335637>`_.
         """
 
         sample_1, sample_2 = np.deg2rad(sample_1), np.deg2rad(sample_2)
@@ -740,11 +742,11 @@ class CircularStatisticsMixin(object):
         - :math:`\theta_1` and :math:`\theta_2` are the angular data points from the two samples.
         - :math:`\bar{\theta_1}` and :math:`\bar{\theta_2}` are the mean angles of the two samples.
 
-        .. seealso:
+        .. seealso::
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.circular_correlation`
 
         :param np.ndarray sample_1: Angular data for e.g., Animal 1
-        :param np.ndarray sample_1: Angular data for e.g., Animal 2
+        :param np.ndarray sample_2: Angular data for e.g., Animal 2
         :param float time_windows: Size of sliding time window in seconds. E.g., two windows of 0.5s and 1s would be represented as np.array([0.5, 1.0])
         :param int fps: Frame-rate of recorded video.
         :return: Array of size len(sample_1) x len(time_window) with correlation coefficients.
@@ -793,9 +795,9 @@ class CircularStatisticsMixin(object):
            :width: 600
            :align: center
 
-        :parameter ndarray data: 1D array of size len(frames) representing degrees. Can be computed by `CircularStatisticsMixin().direction_three_bps` or `CircularStatisticsMixin().direction_two_bps`.
-        :parameter np.ndarray time_window: Rolling time-window as float in seconds.
-        :parameter int fps: fps of the recorded video
+        :param ndarray data: 1D array of size len(frames) representing degrees. Can be computed by `CircularStatisticsMixin().direction_three_bps` or `CircularStatisticsMixin().direction_two_bps`.
+        :param np.ndarray time_window: Rolling time-window as float in seconds.
+        :param int fps: fps of the recorded video
 
         :example:
         >>> data = np.array([350, 350, 1, 1]).astype(np.float32)
@@ -832,9 +834,9 @@ class CircularStatisticsMixin(object):
            :width: 800
            :align: center
 
-        :parameter ndarray data: 1D array of size len(frames) representing degrees.
-        :parameter np.ndarray time_window: Rolling time-window as float in seconds.
-        :parameter int fps: fps of the recorded video
+        :param ndarray data: 1D array of size len(frames) representing degrees.
+        :param np.ndarray time_window: Rolling time-window as float in seconds.
+        :param int fps: fps of the recorded video
 
         :example:
         >>> data = np.random.normal(loc=45, scale=3, size=20).astype(np.float32)
@@ -870,7 +872,7 @@ class CircularStatisticsMixin(object):
     @staticmethod
     @njit("(float32[:],)", parallel=True)
     def rao_spacing(data: np.array):
-        """
+        r"""
         Jitted compute of Rao's spacing for angular data.
 
         Computes the uniformity of a circular dataset in degrees. High output values represent concentrated (clustered)
@@ -884,19 +886,20 @@ class CircularStatisticsMixin(object):
 
         .. math::
 
-           U = \\frac{1}{2} \\sum_{i=1}^{N} |l - T_i|
+           U = \frac{1}{2} \sum_{i=1}^{N} |l - T_i|
 
         where :math:`N` is the number of data points in the sliding window, :math:`T_i` is the spacing between adjacent data points, and :math:`l` is the equal angular spacing.
 
 
-        :parameter ndarray data: 1D array of size len(frames) with data in degrees.
+        :param ndarray data: 1D array of size len(frames) with data in degrees.
         :return: Rao's spacing measure, indicating the dispersion or concentration of angular data points.
         :rtype: int
 
         .. seealso::
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_rao_spacing`
 
-        :references:
+        References
+        ----------
         .. [1] `UCSB <https://jammalam.faculty.pstat.ucsb.edu/html/favorite/test.htm>`__.
 
         :example:
@@ -923,7 +926,7 @@ class CircularStatisticsMixin(object):
     @staticmethod
     @njit("(float32[:], float64[:], int64)", parallel=True)
     def sliding_rao_spacing(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
-        """
+        r"""
         Jitted compute of the uniformity of a circular dataset in sliding windows.
 
         :param ndarray data: 1D array of size len(frames) representing degrees.
@@ -939,7 +942,7 @@ class CircularStatisticsMixin(object):
 
         .. math::
 
-           U = \\frac{1}{2} \\sum_{i=1}^{N} |l - T_i|
+           U = \frac{1}{2} \sum_{i=1}^{N} |l - T_i|
 
         where :math:`N` is the number of data points in the sliding window, :math:`T_i` is the spacing between adjacent data points, and :math:`l` is the equal angular spacing.
 
@@ -949,7 +952,8 @@ class CircularStatisticsMixin(object):
         .. seealso::
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.rao_spacing`
 
-        :references:
+        References
+        ----------
         .. [1] `UCSB <https://jammalam.faculty.pstat.ucsb.edu/html/favorite/test.htm>`__.
 
         :example:
@@ -977,7 +981,7 @@ class CircularStatisticsMixin(object):
     @staticmethod
     @njit("(float32[:], float32[:])")
     def kuipers_two_sample_test(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
-        """
+        r"""
         Compute the Kuiper's two-sample test statistic for circular distributions.
 
         Kuiper's two-sample test is a non-parametric test used to determine if two samples are drawn from the same circular distribution. It is particularly useful for circular data, such as angles or directions.
@@ -995,7 +999,7 @@ class CircularStatisticsMixin(object):
         Where:
 
         - :math:`F_1(\theta)` and :math:`F_2(\theta)` are the empirical cumulative distribution functions (CDFs) of the two circular samples.
-        - :math:`\\theta` are the sorted angles in the two samples.
+        - :math:`\theta` are the sorted angles in the two samples.
 
         .. note::
            Adapted from `Kuiper <https://github.com/aarchiba/kuiper/tree/master>`__ by `Anne Archibald <https://github.com/aarchiba>`_.
@@ -1004,8 +1008,8 @@ class CircularStatisticsMixin(object):
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_kuipers_two_sample_test`
 
 
-        :param ndarray data: The first circular sample array in degrees.
-        :param ndarray data: The second circular sample array in degrees.
+        :param ndarray sample_1: The first circular sample array in degrees.
+        :param ndarray sample_2: The second circular sample array in degrees.
         :return: Kuiper's test statistic.
         :rtype: float
 
@@ -1034,11 +1038,11 @@ class CircularStatisticsMixin(object):
         .. seealso::
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.kuipers_two_sample_test`
 
-        :param np.ndarray data: The first circular sample array in degrees.
-        :param np.ndarray data: The second circular sample array in degrees.
+        :param np.ndarray sample_1: The first circular sample array in degrees.
+        :param np.ndarray sample_2: The second circular sample array in degrees.
         :param np.ndarray time_windows: An array containing the time window sizes (in seconds) for which the Kuipers two-sample test will be computed.
         :param int fps: The frames per second, representing the sampling rate of the data.
-        :returns: A 2D array containing the Kuipers two-sample test statistics for each time window and each time step.
+        :return: A 2D array containing the Kuipers two-sample test statistics for each time window and each time step.
         :rtype: np.ndarray
 
         :examples:
@@ -1069,7 +1073,7 @@ class CircularStatisticsMixin(object):
 
     @staticmethod
     def sliding_hodges_ajne(data: np.ndarray, time_window: float, fps: int) -> np.ndarray:
-        """
+        r"""
         Compute the Hodges-Ajne test statistic for uniformity of circular data within sliding time windows.
 
         The Hodges-Ajne test is a non-parametric test used to assess whether circular data is uniformly distributed.
@@ -1087,13 +1091,13 @@ class CircularStatisticsMixin(object):
         The Hodges-Ajne statistic (:math:`H`) is calculated as:
 
         .. math::
-           H = n \\cdot (1 - v)
+           H = n \cdot (1 - v)
 
         where:
 
         - :math:`n` is the number of data points in the sliding window
-        - :math:`v = 1 - |\\text{mean}(\\exp(j \\cdot \\theta))|` is a measure of dispersion
-        - :math:`\\theta` are the angles in radians within the window
+        - :math:`v = 1 - |\text{mean}(\exp(j \cdot \theta))|` is a measure of dispersion
+        - :math:`\theta` are the angles in radians within the window
 
         .. seealso::
            For computing the Hodges-Ajne statistic on a single sample, see :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.hodges_ajne`.
@@ -1101,7 +1105,7 @@ class CircularStatisticsMixin(object):
         :param np.ndarray data: 1D array of size len(frames) representing angles in degrees.
         :param float time_window: Size of the sliding time window in seconds.
         :param int fps: Frames per second of the recorded video.
-        :returns: 1D array of size len(data) containing Hodges-Ajne test statistics for each sliding window. Contains -1.0 for frames before the first complete window.
+        :return: 1D array of size len(data) containing Hodges-Ajne test statistics for each sliding window. Contains -1.0 for frames before the first complete window.
         :rtype: np.ndarray
 
         :example:
@@ -1235,7 +1239,7 @@ class CircularStatisticsMixin(object):
            :width: 700
            :align: center
 
-        .. warning:
+        .. warning::
            Make sure the ``bins`` argument do not contain overlapping bin edge definitions. E.g.,
            bins = np.array([[270, 0], [1, 90], [91, 180], [181, 269]]) is accepted but
            bins = np.array([[270, 0], [0, 90], [90, 180], [180, 270]]) is not.
@@ -1244,8 +1248,8 @@ class CircularStatisticsMixin(object):
            :func:`simba.data_processors.cuda.circular_statistics.sliding_circular_hotspots`,
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_hotspots`
 
-        :parameter ndarray data: 1D array of circular data measured in degrees.
-        :parameter ndarray bins: 2D array of shape representing circular bins defining [start_degree, end_degree] inclusive.
+        :param ndarray data: 1D array of circular data measured in degrees.
+        :param ndarray bins: 2D array of shape representing circular bins defining [start_degree, end_degree] inclusive.
         :return: 1D array containing the proportion of data points that fall within each specified circular bin.
         :rtype: np.ndarray
 
@@ -1276,10 +1280,10 @@ class CircularStatisticsMixin(object):
         Jitted compute of sliding circular hotspots in a dataset. Calculates circular hotspots in a time-series dataset by sliding a time window
         across the data and computing hotspot statistics for specified circular bins.
 
-        :parameter ndarray data: 1D array of circular data measured in degrees.
-        :parameter ndarray bins: 2D array of shape representing circular bins defining [start_degree, end_degree] inclusive.
-        :parameter float time_window: The size of the sliding window in seconds.
-        :parameter float fps: The frame-rate of the video.
+        :param ndarray data: 1D array of circular data measured in degrees.
+        :param ndarray bins: 2D array of shape representing circular bins defining [start_degree, end_degree] inclusive.
+        :param float time_window: The size of the sliding window in seconds.
+        :param float fps: The frame-rate of the video.
 
         :return np.ndarray: A 2D numpy array where each row corresponds to a time point in `data`, and each column represents a circular bin. The values in the array represent the proportion of data points within each bin at each time point.
 
@@ -1396,7 +1400,7 @@ class CircularStatisticsMixin(object):
         [(float64[:, :, :], int64), (float64[:, :, :], types.misc.Omitted(value=400))]
     )
     def fit_circle(data: np.ndarray, max_iterations: Optional[int] = 400) -> np.ndarray:
-        """
+        r"""
         Fit a circle to a dataset using the least squares method.
 
         This function fits a circle to a dataset using the least squares method. The circle is defined
@@ -1414,13 +1418,13 @@ class CircularStatisticsMixin(object):
 
         References
         ----------
-        .. [1] Kanatani, Rangarajan, Hyper least squares fitting of circles and ellipses, `Computational Statistics & Data Analysis`,
-               vol. 55, pp. 2197-2208, 2011.
-        .. [2] Lapp, Salazar, Champagne. Automated maternal behavior during early life in rodents (AMBER) pipeline, `Scientific Reports`,
-               13:18277, 2023.
+        .. [1] Kanatani, K., & Rangarajan, P. (2011). Hyper least squares fitting of circles and ellipses.
+               `Computational Statistics & Data Analysis, 55(6), 2197–2208 <https://doi.org/10.1016/j.csda.2010.12.012>`_.
+        .. [2] Lapp, H. E., Salazar, M. G., & Champagne, F. A. (2023). Automated maternal behavior during early life in rodents (AMBER) pipeline.
+               `Scientific Reports, 13, 18277 <https://doi.org/10.1038/s41598-023-45495-4>`_.
 
-        :parameter np.ndarray data: A 3D NumPy array with shape (N, M, 2). N represent frames, M represents the number of body-parts, and 2 represents x and y coordinates.
-        :parameter int max_iterations: The maximum number of iterations for fitting the circle.
+        :param np.ndarray data: A 3D NumPy array with shape (N, M, 2). N represent frames, M represents the number of body-parts, and 2 represents x and y coordinates.
+        :param int max_iterations: The maximum number of iterations for fitting the circle.
         :return: Array with shape (N, 3) with N representing frame and 3 representing (i) X-coordinate of the circle center, (ii) Y-coordinate of the circle center, and (iii) Radius of the circle
         :rtype: np.ndarray
 

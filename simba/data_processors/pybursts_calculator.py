@@ -18,7 +18,7 @@ def kleinberg_burst_detection(offsets: np.ndarray, s: float, gamma: float):
     :param float s: Base of the rate scale (``> 1``). The candidate rate at level ``j`` is ``s**j / mean_gap``, so larger ``s`` means levels grow farther apart and bursts must be more pronounced to reach higher levels. Common choice: ``s = 2``.
     :param float gamma: Cost of moving up one level (``>= 0``). Higher ``gamma`` penalizes rising into a burst, producing fewer / shorter bursts. Lower ``gamma`` makes the detector more sensitive. Common choice: ``gamma = 1``.
 
-    :returns: 2D ``np.ndarray`` of shape ``(N, 3)`` and ``dtype=object`` with one row per detected burst, columns ``[level, start_offset, end_offset]``:
+    :return: 2D ``np.ndarray`` of shape ``(N, 3)`` and ``dtype=object`` with one row per detected burst, columns ``[level, start_offset, end_offset]``:
 
         * ``level`` — integer burst level (``0`` is the baseline level, higher levels are nested faster bursts).
         * ``start_offset`` — value from ``offsets`` where this burst opens.

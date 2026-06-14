@@ -24,7 +24,7 @@ class KeypointRemover(object):
     :param str file_format: File type of pose-estimation data.
     :param str pose_tool: Tool used to perform pose-estimation. E.g., `DLC` or `maDLC`
 
-    .. note:
+    .. note::
     `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#remove-body-parts-from-tracking-data>`__.
 
     Examples

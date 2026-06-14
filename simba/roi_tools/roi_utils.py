@@ -321,7 +321,7 @@ def get_ear_tags_for_rectangle(center: Tuple[int, int], width: int, height: int)
 
     :param Tuple[int, int] center: The center x and y coordinates of the rectangle
     :param int width: The width of the rectangle in pixels.
-    :param Tuple[int, int] width: The width of the rectangle in pixels.
+    :param Tuple[int, int] height: The width of the rectangle in pixels.
     :return: Dictionary holding the name of the tag as key and coordinates as value.
     :rtype: Dict[str, Union[int, Tuple[int, int]]]
     """

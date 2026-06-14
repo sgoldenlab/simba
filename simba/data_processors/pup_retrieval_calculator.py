@@ -22,8 +22,8 @@ class PupRetrieverCalculator(ConfigReader):
     """
     Pup retreival calculator used in ``Winters et al., `Sci Reports`, 2022``
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
-    :parameter dict settings: user-defined setting for pup retrieval.
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param dict settings: user-defined setting for pup retrieval.
 
     .. note::
        `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/add_on_pup_ret.md>`_

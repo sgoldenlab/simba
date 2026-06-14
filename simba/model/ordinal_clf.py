@@ -50,7 +50,8 @@ class OrdinalClassifier():
     .. [2] Sabnis, Gautam, Leinani Hession, J. Matthew Mahoney, Arie Mobley, Marina Santos, and Vivek Kumar. “Visual Detection of Seizures in Mice Using Supervised Machine Learning,” May 31, 2024. https://doi.org/10.1101/2024.05.29.596520.
     .. [3] Another implementation / benchmarking by Lee Prevost - `https://github.com/leeprevost/OrdinalClassifier/tree/main <https://github.com/leeprevost/OrdinalClassifier/tree/main>`_.
     .. [4] https://github.com/fabianp/mord
-    .. [5] Michael J Wurm, Paul J Rathouz, and Bret M Hanlon. Regularized ordinal regression and the ordinalnet r package. Journal of Statistical Software, 99(6), 2021.
+    .. [5] Wurm, M. J., Rathouz, P. J., & Hanlon, B. M. (2021). Regularized ordinal regression and the ordinalNet R package.
+           `Journal of Statistical Software, 99(6) <https://doi.org/10.18637/jss.v099.i06>`_.
 
     :example:
     >>> X = np.random.randint(0, 500, (100, 50))

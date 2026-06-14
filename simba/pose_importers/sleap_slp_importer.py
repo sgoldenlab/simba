@@ -55,7 +55,8 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
 
     References
     ----------
-    .. [1] Pereira et al., SLEAP: A deep learning system for multi-animal pose tracking, `Nature Methods`, 2022.
+    .. [1] Pereira, T. D., et al. (2022). SLEAP: A deep learning system for multi-animal pose tracking.
+           `Nature Methods, 19, 486–495 <https://doi.org/10.1038/s41592-022-01426-1>`_.
     """
 
     def __init__(self,

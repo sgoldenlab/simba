@@ -289,7 +289,7 @@ def _cuda_diff(x, start, end, diff):
 
     :param np.ndarray x: Input array.
     :param int start: Start index (inclusive) of the slice
-    :param int start: End index (exclusive) of the slice.
+    :param int end: End index (exclusive) of the slice.
     :param np.ndarray diff: Output array to store differences of x[start:end].
 
     :example:

@@ -732,13 +732,13 @@ class AnnotatorMixin(ConfigReader):
         .. note::
            store_funcs will be executed before update_funcs.
 
-        :parameter int new_frm_id: The frame number of the new frame.
-        :parameter Optional[int] min_frm: If the minimum frame number is not the first frame of the video, pass the minimum frame number here.
-        :parameter Optional[int] max_frm: If the maximum frame number is not the last frame of the video, pass the max frame number here.
-        :parameter Optional[int] max_frm: If the maximum frame number is not the last frame of the video, pass the max frame number here.
-        :parameter Optional[List[Callable[[int], None]]] update_funcs: Optional functions that takes accepts the new frame numers that should be called. E.g., if updating the frame number should cause the display of the new frame numbers in any other Frame.
-        :parameter Optional[List[Callable[[], None]]] store_funcs: Optional functions that saves user frame selections in memory.
-        :parameter Optional[bool] keep_radio_btn_choices: If True, then any update_funcs that causes the update of radio button choices in the newly displayed frame will be supressed. Thus, the choices in the prior frame is maintained.
+        :param int new_frm_id: The frame number of the new frame.
+        :param Optional[int] min_frm: If the minimum frame number is not the first frame of the video, pass the minimum frame number here.
+        :param Optional[int] max_frm: If the maximum frame number is not the last frame of the video, pass the max frame number here.
+        :param Optional[int] max_frm: If the maximum frame number is not the last frame of the video, pass the max frame number here.
+        :param Optional[List[Callable[[int], None]]] update_funcs: Optional functions that takes accepts the new frame numers that should be called. E.g., if updating the frame number should cause the display of the new frame numbers in any other Frame.
+        :param Optional[List[Callable[[], None]]] store_funcs: Optional functions that saves user frame selections in memory.
+        :param Optional[bool] keep_radio_btn_choices: If True, then any update_funcs that causes the update of radio button choices in the newly displayed frame will be supressed. Thus, the choices in the prior frame is maintained.
         """
 
         check_int(name="FRAME NUMBER", value=new_frm_id)

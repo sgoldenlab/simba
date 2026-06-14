@@ -110,8 +110,8 @@ class CueLightAnalyzer(ConfigReader):
 
     References
     ----------
-    .. [1] López-Moraga, Alba, Laura Luyten, and Tom Beckers. “Generalization and Extinction of Platform-Mediated Avoidance in Male and Female Rats.”
-           Scientific Reports 15, no. 1 (March 21, 2025): 9730. https://doi.org/10.1038/s41598-025-94265-x.
+    .. [1] López-Moraga, A., Luyten, L., & Beckers, T. (2025). Generalization and extinction of platform-mediated avoidance in male and female rats.
+           `Scientific Reports, 15, 9730 <https://doi.org/10.1038/s41598-025-94265-x>`_.
 
     :example:
     >>> cue_light_analyzer = CueLightAnalyzer(config_path='MyProjectConfig', in_dir='project_folder/csv/outlier_corrected_movement_location', cue_light_names=['Cue_light'])

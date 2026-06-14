@@ -527,7 +527,7 @@ def add_missing_ROI_cols(shape_df: pd.DataFrame) -> pd.DataFrame:
     user-interface but analyzed using newer versions of SimBA.
 
     :param pd.DataFrame shape_df: Dataframe holding ROI definitions.
-    :returns DataFrame
+    :return DataFrame
     """
 
     if not "Color BGR" in shape_df.columns:
@@ -557,7 +557,7 @@ def find_bins(
     :param Literal[str] bracket_type: 'QUANTILE' or 'QUANTIZE'
     :param str bracket_cnt: Number of bins.
     :param str normalization_method: Create bins based on data in all videos ("ALL VIDEOS") or create different bins per video ('BY VIDEO')
-    :returns dict: The videos as keys and bin cut off points as array of size len(bracket_cnt) x 2.
+    :return dict: The videos as keys and bin cut off points as array of size len(bracket_cnt) x 2.
     """
 
     print("Finding bracket cut off points...")
@@ -620,7 +620,7 @@ def get_confusion_matrix(x: np.ndarray, y: np.ndarray) -> np.ndarray:
 
     :param np.ndarray x: Predicted cluster labels (1D array of integers).
     :param np.ndarray y: Ground truth class labels (1D array of integers, same length as `x`).
-    :returns: A 2D confusion matrix of shape (n_labels, n_labels), where entry (i, j) is the number of times label `i` in `x` coincided with label `j` in `y`.
+    :return: A 2D confusion matrix of shape (n_labels, n_labels), where entry (i, j) is the number of times label `i` in `x` coincided with label `j` in `y`.
     :rtype: np.ndarray
 
     :example:
@@ -647,7 +647,7 @@ def find_frame_numbers_from_time_stamp(start_time: str, end_time: str, fps: int)
     :param str start_time: Period start time in HH:MM:SS format.
     :param str end_time: Period end time in HH:MM:SS format.
     :param int fps: Framerate of the video.
-    :returns: Frame numbers within the period.
+    :return: Frame numbers within the period.
     :rtype: List[int]
 
     :example:
@@ -827,7 +827,7 @@ def freedman_diaconis(data: np.ndarray) -> Tuple[float, int]:
        Can also use ``simba.utils.data.bucket_data`` passing method ``fd``.
 
     :param np.ndarray data: 1d array with values to compute optimal bins for.
-    :returns: Tuple representing the optimal count of histogram bins and their width.
+    :return: Tuple representing the optimal count of histogram bins and their width.
     :rtype: Tuple[float, int]
 
     :references:
@@ -859,7 +859,7 @@ def hist_1d_mp(data: np.ndarray, bin_counts: np.ndarray, bin_widths: np.ndarray,
     :param int bin_count: The number of bins.
     :param np.ndarray range: 1d array with two values representing minimum and maximum value to bin.
     :param Optional[bool] normalize: If True, then the counts are returned as a ratio of all values. If False, then the raw counts. Pass normalize as True if the datasets are unequal counts. Default: True.
-    :returns: A numba list of list of same size as data.shape[0]
+    :return: A numba list of list of same size as data.shape[0]
     :rtype: typed.List
 
 
@@ -897,7 +897,7 @@ def bucket_data(data: np.ndarray, method: Literal["fd", "doane", "auto", "scott"
 
     :param np.ndarray data: 1D array of numerical data.
     :param np.ndarray method: The method to compute optimal bin count and bin width. These methods differ in how they estimate the optimal bin count and width. Defaults to 'auto', which represents the maximum of the Sturges and Freedman-Diaconis estimators. Available methods are 'fd', 'doane', 'auto', 'scott', 'stone', 'rice', 'sturges', 'sqrt'.
-    :returns: A tuple containing the optimal bin width and bin count.
+    :return: A tuple containing the optimal bin width and bin count.
     :rtype: Tuple[float, int]
 
     :example:
@@ -934,7 +934,7 @@ def bucket_data_mp(data: np.ndarray,
     :param data: 2D input arrays for which to calculate histogram bin edges.
     :param np.ndarray method: The method to compute optimal bin count and bin width. These methods differ in how they estimate the optimal bin count and width. Defaults to 'auto', which represents the maximum of the Sturges and Freedman-Diaconis estimators. Available methods are 'fd', 'doane', 'auto', 'scott', 'stone', 'rice', 'sturges', 'sqrt'.
     :param n_jobs: Number of CPU cores to use for parallelism (-1 uses all available cores).
-    :returns Tuple[float, int]: A tuple containing the optimal bin width and bin count.
+    :return Tuple[float, int]: A tuple containing the optimal bin width and bin count.
     """
 
     check_valid_array(data=data, source=bucket_data_mp.__name__, accepted_ndims=(2,))
@@ -1222,7 +1222,7 @@ def get_mode(x: np.ndarray) -> Union[float, int]:
 
     :param np.ndarray x: 1d array of numerics.
     :return: The mode of `x`.
-    :rtype Union[float, int]:
+    :rtype: Union[float, int]
     """
     check_valid_array(source=f"{get_mode.__name__} x", data=x, accepted_dtypes=Formats.NUMERIC_DTYPES.value)
     values, counts = np.unique(x, return_counts=True)

@@ -355,7 +355,7 @@ def find_midpoints(x: np.ndarray,
     by the specified percentile. The computation is performed in batches to handle
     large datasets efficiently.
 
-    .. seealso:
+    .. seealso::
        For CPU function see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.find_midpoints`.
 
     .. image:: _static/img/find_midpoints.webp

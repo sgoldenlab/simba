@@ -69,7 +69,7 @@ class FreezingDetector(ConfigReader):
     :param Optional[int] clean_ms: De-noising window in milliseconds. Brief sub-threshold movement interruptions shorter than this are bridged (so jitter does not split one freeze into two), and stray bouts shorter than this are dropped, before the duration tests. Keep small relative to ``min_freezing_ms``. Defaults to 100.
     :param Optional[int] min_immobility_ms: Minimum duration in milliseconds at which sustained freezing is instead scored as immobility. Bouts at least this long are flagged in an `IMMOBILITY` column (1 = immobility, 0 = not) and removed from `FREEZING` (the two are mutually exclusive), with extra aggregate statistics; bouts between ``min_freezing_ms`` and this remain freezing. Must be greater than or equal to ``min_freezing_ms`` (when equal, there is no freezing band and every sustained bout is immobility). If None, no immobility is computed and every bout at least ``min_freezing_ms`` long is freezing. Defaults to None.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory where to store the results. If None, then results are stored in a timestamped subdirectory within the ``logs`` directory of the SimBA project.
-    :returns: None. Results are saved to CSV files in the specified save directory:
+    :return: None. Results are saved to CSV files in the specified save directory:
         - Individual video results: One CSV file per video with freezing annotations added as a 'FREEZING' column (1 = freezing, 0 = not freezing)
         - Aggregate results: `aggregate_freezing_results.csv` containing summary statistics for all videos
 
@@ -84,7 +84,8 @@ class FreezingDetector(ConfigReader):
     .. [2] Lopez et al., Region-specific Nucleus Accumbens Dopamine Signals Encode Distinct Aspects of Avoidance Learning, `biorxiv`, doi: https://doi.org/10.1101/2024.08.28.610149
     .. [3] Lopez, Gabriela C., Louis D. Van Camp, Ryan F. Kovaleski, et al. "Region-Specific Nucleus Accumbens Dopamine Signals Encode Distinct Aspects of Avoidance Learning." `Cell Biology`, Volume 35, Issue 10p2433-2443.e5May 19, 2025. DOI: 10.1016/j.cub.2025.04.006
     .. [4] Lazaro et al., Brainwide Genetic Capture for Conscious State Transitions, `biorxiv`, doi: https://doi.org/10.1101/2025.03.28.646066
-    .. [5] Sabnis et al., Visual detection of seizures in mice using supervised machine learning, 2025, Cell Reports Methods 5, 101242 December 15, 2025.
+    .. [5] Sabnis, G. S., et al. (2025). Visual detection of seizures in mice using supervised machine learning.
+           `Cell Reports Methods, 5(12), 101242 <https://doi.org/10.1016/j.crmeth.2025.101242>`_.
     """
 
     def __init__(self,

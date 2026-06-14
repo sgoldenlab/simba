@@ -117,11 +117,11 @@ class FeatureExtractionMixin(object):
            :align: center
 
          :param float ax: x coordinate of the first body-part (e.g., nape).
-         :param float ax: y coordinate of the first body-part (e.g., nape).
+         :param float ay: y coordinate of the first body-part (e.g., nape).
          :param float bx: x coordinate of the second body-part (e.g., center).
-         :param float bx: y coordinate of the second body-part (e.g., center).
+         :param float by: y coordinate of the second body-part (e.g., center).
          :param float cx: x coordinate of the second body-part (e.g., tail-base).
-         :param float cx: y coordinate of the second body-part (e.g., tail-base).
+         :param float cy: y coordinate of the second body-part (e.g., tail-base).
          :return: Angle between 0-360.
          :rtype: float
 
@@ -315,7 +315,7 @@ class FeatureExtractionMixin(object):
            For numpy method (which appears faster than numba) use :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.keypoint_distances`.
 
         :param ndarray location_1: 2D numpy array of size len(frames) x 2.
-        :param ndarray location_1: 1D numpy array holding the X and Y of the static location.
+        :param ndarray location_2: 1D numpy array holding the X and Y of the static location.
         :param float px_per_mm: The pixels per millimeter in the video.
         :param bool centimeter: If true, the value in centimeters is returned. Else the value in millimeters.
         :return: 1D array of size location_1.shape[0] with distances in millimeter or centimeter.
@@ -572,7 +572,7 @@ class FeatureExtractionMixin(object):
         Jitted analogue of meth:`scipy.cdist` for 3D array. Use to calculate Euclidean distances between
         all coordinates in of one array and itself.
 
-        :parameter np.ndarray data: 3D array of body-part coordinates of size len(frames) x -1 x 2.
+        :param np.ndarray data: 3D array of body-part coordinates of size len(frames) x -1 x 2.
         :return np.ndarray: 3D array of size data.shape[0], data.shape[1], data.shape[1].
         """
 
@@ -592,7 +592,7 @@ class FeatureExtractionMixin(object):
         calculates the cosine similarity between all pairs in 2D array.
 
         :param np.ndarray data: 2D array of observations.
-        :returns: Matrix representing the cosine similarity between all observations in ``data``.
+        :return: Matrix representing the cosine similarity between all observations in ``data``.
         :rtype: np.ndarray
 
         :example:
@@ -728,7 +728,7 @@ class FeatureExtractionMixin(object):
         """
         Helper to return the headers names (body-part location columns) that should be used during feature extraction.
 
-        :parameter str pose: Pose-estimation setting, e.g., ``16``.
+        :param str pose: Pose-estimation setting, e.g., ``16``.
         :return List[str]: The names and order of the pose-estimation columns.
         """
         simba_dir = os.path.dirname(simba.__file__)
@@ -1184,9 +1184,9 @@ class FeatureExtractionMixin(object):
         """
         Column-wise Gaussian smoothing of dataframe.
 
-        :parameter pd.DataFrame df: Dataframe with un-smoothened data.
-        :parameter int fps: The frame-rate of the video representing the data.
-        :parameter int time_window: Time-window in milliseconds to use for Gaussian smoothing.
+        :param pd.DataFrame df: Dataframe with un-smoothened data.
+        :param int fps: The frame-rate of the video representing the data.
+        :param int time_window: Time-window in milliseconds to use for Gaussian smoothing.
         :return pd.DataFrame: Dataframe with smoothened data
 
         :references:
@@ -1213,9 +1213,9 @@ class FeatureExtractionMixin(object):
         """
         Column-wise Savitzky-Golay smoothing of dataframe.
 
-        :parameter pd.DataFrame df: Dataframe with un-smoothened data.
-        :parameter int fps: The frame-rate of the video representing the data.
-        :parameter int time_window: Time-window in milliseconds to use for Gaussian smoothing.
+        :param pd.DataFrame df: Dataframe with un-smoothened data.
+        :param int fps: The frame-rate of the video representing the data.
+        :param int time_window: Time-window in milliseconds to use for Gaussian smoothing.
         :return pd.DataFrame: Dataframe with smoothened data
 
         :references:
@@ -1315,7 +1315,7 @@ class FeatureExtractionMixin(object):
         """
         **Legacy** non-jitted helper to calculate if an animal is directing towards a static coordinate (e.g., ROI centroid).
 
-        .. important:
+        .. important::
            For improved runtime, use :func:`simba.mixins.feature_extraction_mixin.jitted_line_crosses_to_static_targets`
 
         :param list p: left ear coordinates of observing animal.
@@ -1363,7 +1363,7 @@ class FeatureExtractionMixin(object):
         :param np.ndarray bp_1: An array of 2D points representing the first set of points. Rows represent frames. First column represent x coordinates. Second column represent y coordinates.
         :param np.ndarray bp_2: An array of 2D points representing the second set of points. Rows represent frames. First column represent x coordinates. Second column represent y coordinates.
         :param float percentile: The percentile value to determine the distance between the points for calculating midpoints. When set to 0.5 it calculates midpoints at the midpoint of the two points.
-        :returns: An array of 2D points representing the midpoints between the points in bp_1 and bp_2 based on the specified percentile.
+        :return: An array of 2D points representing the midpoints between the points in bp_1 and bp_2 based on the specified percentile.
         :rtype: np.ndarray
 
         :example:

@@ -48,9 +48,9 @@ class BorisSourceCleaner(object):
     Helper to clean BORIS files where behavior with the same name are assigned to different
     animals through the **Subjects** field.
 
-    :parameter Union[str, os.PathLike] data_dir: Directory with BORIS annotations in CSV format.
-    :parameter Union[str, os.PathLike] save_dir: Directory to store the modified BORIS annotations in CSV format.
-    :parameter dict settings: Rules for how to change the behavior names.
+    :param Union[str, os.PathLike] data_dir: Directory with BORIS annotations in CSV format.
+    :param Union[str, os.PathLike] save_dir: Directory to store the modified BORIS annotations in CSV format.
+    :param dict settings: Rules for how to change the behavior names.
 
     :example:
     >>> boris_cleaner = BorisSourceCleaner(data_dir='/Users/simon/Downloads/boris_data', save_dir='/Users/simon/Downloads/save_dir', settings=SETTINGS)

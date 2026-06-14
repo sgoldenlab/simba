@@ -21,13 +21,13 @@ class AnimalBoundaryFinder(ConfigReader, FeatureExtractionMixin):
     Compute boundaries (animal-anchored) ROIs for animals in each frame. Result is saved
     as a pickle in the ``project_folder/logs`` directory of the SimBA project.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
-    :parameter str roi_type: shape type of ROI. OPTIONS: "ENTIRE ANIMAL", "SINGLE BODY-PART SQUARE", "SINGLE BODY-PART CIRCLE". For
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str roi_type: shape type of ROI. OPTIONS: "ENTIRE ANIMAL", "SINGLE BODY-PART SQUARE", "SINGLE BODY-PART CIRCLE". For
                              more information/examples, see `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md/>`_.
-    :parameter bool force_rectangle: If True, forces roi shape into minimum bounding rectangle. If False, then polygon.
-    :parameter Optional[dict] or None body_parts: If roi_type is 'SINGLE BODY-PART CIRCLE' or 'SINGLE BODY-PART SQUARE', then body-parts to anchor the ROI to
+    :param bool force_rectangle: If True, forces roi shape into minimum bounding rectangle. If False, then polygon.
+    :param Optional[dict] or None body_parts: If roi_type is 'SINGLE BODY-PART CIRCLE' or 'SINGLE BODY-PART SQUARE', then body-parts to anchor the ROI to
                                         with keys as animal names and values as body-parts. E.g., body_parts={'Animal_1': 'Head_1', 'Animal_2': 'Head_2'}.
-    :parameter Optional[int] parallel_offset: Offset of ROI from the animal outer bounds in millimeter. If None, then no offset.
+    :param Optional[int] parallel_offset: Offset of ROI from the animal outer bounds in millimeter. If None, then no offset.
 
     .. notes:
        `Bounding boxes tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md/>`_.

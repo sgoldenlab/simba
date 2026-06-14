@@ -146,7 +146,7 @@ class ROIClfCalculatorMultiprocess(ConfigReader):
     :param bool started_bout_cnt: If True, computes started bout counts of each classifier in each ROI. Deafult True.
     :param bool ended_bout_cnt: If True, computes ended bout counts of each classifier in each ROI. Deafult True.
 
-    .. note:
+    .. note::
        'GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results`__.
 
     :example:

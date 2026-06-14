@@ -63,7 +63,7 @@ class NetworkMixin(object):
         Create a single undirected graph with single edges from on dictionary.
 
         :param Dict[Tuple[str, str], float] data: A dictionary where keys are tuples representing node pairs and values are the corresponding edge weights.
-        :returns nx.Graph: A networkx graph with nodes and edges defined by the input data.
+        :return nx.Graph: A networkx graph with nodes and edges defined by the input data.
 
         :example:
         >>> data = {('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5}
@@ -93,7 +93,7 @@ class NetworkMixin(object):
         timepoints.
 
         :param Dict[Tuple[str, str], List[float]] data: A dictionary where keys are tuples representing node pairs, and values are lists of edge weights associated with each pair.
-        :returns nx.MultiGraph: A NetworkX multigraph with nodes and edges specified by the input data. Each edge is labeled and weighted based on the provided information.
+        :return nx.MultiGraph: A NetworkX multigraph with nodes and edges specified by the input data. Each edge is labeled and weighted based on the provided information.
 
         :example:
         >>> data = {('Animal_1', 'Animal_2'): [0, 0, 0, 6], ('Animal_1', 'Animal_3'): [0, 0, 0, 0], ('Animal_1', 'Animal_4'): [0, 0, 0, 0], ('Animal_1', 'Animal_5'): [0, 0, 0, 0], ('Animal_2', 'Animal_3'): [0, 0, 0, 0], ('Animal_2', 'Animal_4'): [5, 0, 0, 2], ('Animal_2', 'Animal_5'): [0, 0, 0, 0], ('Animal_3', 'Animal_4'): [0, 0, 0, 0], ('Animal_3', 'Animal_5'): [0, 2, 22, 0], ('Animal_4', 'Animal_5'): [0, 0, 0, 0]}
@@ -350,7 +350,7 @@ class NetworkMixin(object):
 
         .. note::
            Multi-networks created by ``simba.mixins.network_mixin.create_multigraph`` can be a little messy to look at. Instead,
-           creates seperate objects and files with single edges from each time-point.
+           creates separate objects and files with single edges from each time-point.
 
         :param Union[nx.Graph, nx.MultiGraph] graph: The input graph to be visualized.
         :param Optional[Union[str, os.PathLike]] save_path: The path to save the HTML file. If multi-graph,  pass a directory path. If None, the graph(s) are returned but not saved.
@@ -455,7 +455,7 @@ class NetworkMixin(object):
     @staticmethod
     @jit(nopython=True)
     def simpson_index(x: np.ndarray) -> float:
-        """
+        r"""
         Calculate Simpson's diversity index for a given array of values.
 
         Simpson's diversity index is a measure of diversity that takes into account the number of different categories
@@ -467,9 +467,9 @@ class NetworkMixin(object):
            D = \frac{\sum(n(n-1))}{N(N-1)}
 
         where:
-        - \( n \) is the number of individuals of a particular category,
-        - \( N \) is the total number of individuals,
-        - \( \sum \) represents the sum over all categories.
+        - :math:`n` is the number of individuals of a particular category,
+        - :math:`N` is the total number of individuals,
+        - :math:`\sum` represents the sum over all categories.
 
         :param np.ndarray x: 1-dimensional numpy array containing the values representing categories for which Simpson's index is calculated.
         :return float: Simpson's diversity index value for the input array `x`
@@ -488,7 +488,7 @@ class NetworkMixin(object):
 
     @staticmethod
     def berger_parker(x: np.ndarray) -> float:
-        """
+        r"""
         Berger-Parker index for the given one-dimensional array.
         The Berger-Parker index is a measure of category dominance, calculated as the ratio of
         the frequency of the most abundant category to the total number of observations. Answer how dominated a cluster or community is
@@ -498,11 +498,11 @@ class NetworkMixin(object):
 
         .. math::
 
-           BP = \\frac{f_{\max}}{N}
+           BP = \frac{f_{\max}}{N}
 
         where:
-        - \( f_{\max} \) is the frequency of the most abundant category,
-        - \( N \) is the total number of observations.
+        - :math:`f_{\max}` is the frequency of the most abundant category,
+        - :math:`N` is the total number of observations.
 
         :param np.ndarray x: One-dimensional numpy array containing the values for which the Berger-Parker index is calculated.
         :return float: Berger-Parker index value for the input array `x`
@@ -517,12 +517,12 @@ class NetworkMixin(object):
             data=x,
             accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, np.int8),
         )
-        return get_mode(x=x) / x.shape[0]
+        return np.max(np.unique(x, return_counts=True)[1]) / x.shape[0]
 
     @staticmethod
     @jit(nopython=True)
     def shannon_diversity_index(x: np.ndarray) -> float:
-        """
+        r"""
         Calculate the Shannon Diversity Index for a given array of categories. The Shannon Diversity Index is a measure of diversity in a
         categorical feature, taking into account both the number of different categories (richness)
         and their relative abundances (evenness). Answer how homogenous a cluster or community is
@@ -533,8 +533,8 @@ class NetworkMixin(object):
            H = -\sum_{i=1}^{n} (p_i \cdot \log(p_i))
 
         where:
-        - \( p_i \) is the proportion of individuals belonging to the i-th category,
-        - \( n \) is the total number of categories.
+        - :math:`p_i` is the proportion of individuals belonging to the i-th category,
+        - :math:`n` is the total number of categories.
 
         :param np.ndarray x: One-dimensional numpy array containing the categories for which the Shannon Diversity Index is calculated.
         :return float: Shannon Diversity Index value for the input array `x`
@@ -557,7 +557,7 @@ class NetworkMixin(object):
 
     @staticmethod
     def margalef_diversification_index(x: np.array) -> float:
-        """
+        r"""
         Calculate the Margalef Diversification Index for a given array of values.
 
         The Margalef Diversification Index is a measure of category diversity. It quantifies the richness of a community/cluster
@@ -568,11 +568,11 @@ class NetworkMixin(object):
 
         .. math::
 
-           D = \\frac{(S - 1)}{\\log(N)}
+           D = \frac{(S - 1)}{\log(N)}
 
         where:
-        - \( S \) is the number of unique categories,
-        - \( N \) is the total number of individuals.
+        - :math:`S` is the number of unique categories,
+        - :math:`N` is the total number of individuals.
 
         :param np.array x: One-dimensional numpy array containing nominal values for which the Margalef Diversification Index is calculated.
         :return float: Margalef Diversification Index value for the input array `x`
@@ -594,7 +594,7 @@ class NetworkMixin(object):
 
     @staticmethod
     def menhinicks_index(x: np.array) -> float:
-        """
+        r"""
         Calculate the Menhinick's Index for a given array of values.
 
         Menhinick's Index is a measure of category richness. It quantifies the number of categories relative to the square root of the total number of observations.
@@ -605,11 +605,11 @@ class NetworkMixin(object):
 
         .. math::
 
-           D = \\frac{S}{\\sqrt{N}}
+           D = \frac{S}{\sqrt{N}}
 
         where:
-        - \( S \) is the number of unique categories,
-        - \( N \) is the total number of observations.
+        - :math:`S` is the number of unique categories,
+        - :math:`N` is the total number of observations.
 
          :param np.array x: One-dimensional numpy array containing the integer values representing nominal values for which Menhinick's Index is calculated.
          :return float: Menhinick's Index value for the input array `x`
@@ -629,7 +629,7 @@ class NetworkMixin(object):
 
     @staticmethod
     def brillouins_index(x: np.array) -> float:
-        """
+        r"""
         Calculate Brillouin's Diversity Index for a given array of values.
 
         Brillouin's Diversity Index is a measure of cluster/community diversity that accounts for both richness
@@ -639,13 +639,13 @@ class NetworkMixin(object):
 
         .. math::
 
-           H = \\frac{1}{\\log(S)} \\sum_{i=1}^{S} \\frac{N_i(N_i - 1)}{n(n-1)}
+           H = \frac{1}{\log(S)} \sum_{i=1}^{S} \frac{N_i(N_i - 1)}{n(n-1)}
 
         where:
-        - \( H \) is Brillouin's Diversity Index,
-        - \( S \) is the total number of unique species,
-        - \( N_i \) is the count of individuals in the i-th species,
-        - \( n \) is the total number of individuals.
+        - :math:`H` is Brillouin's Diversity Index,
+        - :math:`S` is the total number of unique species,
+        - :math:`N_i` is the count of individuals in the i-th species,
+        - :math:`n` is the total number of individuals.
 
         :param np.array x: One-dimensional numpy array containing the values for which Brillouin's Index is calculated.
         :return float: Brillouin's Diversity Index value for the input array `x`
@@ -677,7 +677,7 @@ class NetworkMixin(object):
 
     @staticmethod
     def sorensen_dice_coefficient(x: np.ndarray, y: np.ndarray) -> float:
-        """
+        r"""
         Calculate Sørensen's Similarity Index between two communities/clusters.
 
         The Sørensen similarity index, also known as the overlap index, quantifies the overlap between two populations by comparing the number of shared categories to the total number of categories in both populations. It ranges from zero, indicating no overlap, to one, representing perfect overlap
@@ -686,13 +686,13 @@ class NetworkMixin(object):
 
         .. math::
 
-            S = \\frac{2 \times |X \cap Y|}{|X| + |Y|}
+            S = \frac{2 \times |X \cap Y|}{|X| + |Y|}
 
         where:
-        - \( S \) is Sørensen's Similarity Index,
-        - \( X \) and \( Y \) are the sets representing the categories in the first and second communities, respectively,
-        - \( |X \cap Y| \) is the number of shared categories between the two communities,
-        - \( |X| \) and \( |Y| \) are the total number of categories in the first and second communities, respectively.
+        - :math:`S` is Sørensen's Similarity Index,
+        - :math:`X` and :math:`Y` are the sets representing the categories in the first and second communities, respectively,
+        - :math:`|X \cap Y|` is the number of shared categories between the two communities,
+        - :math:`|X|` and :math:`|Y|` are the total number of categories in the first and second communities, respectively.
 
 
         :param x: 1D numpy array with nominal values for the first cluster/community.

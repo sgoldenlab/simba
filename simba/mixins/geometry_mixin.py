@@ -100,7 +100,7 @@ class GeometryMixin(object):
         :param float simplify_tolerance: The higher this value, the smaller the number of vertices in the resulting polygon. Default 2.
         :param bool preserve_topology: If True, operation will avoid creating invalid geometries (checking for collapses, ring-intersections, etc). Default True.
         :param bool convex_hull:  If True, creates the convex hull of the shape, which is the smallest convex polygon that encloses the shape. Default True.
-        :returns: List of polygons, with one entry for every 2D input array.
+        :return: List of polygons, with one entry for every 2D input array.
 
         :example:
         >>> data = [[[364, 308],[383, 323],[403, 335], [423, 351]]]
@@ -152,7 +152,7 @@ class GeometryMixin(object):
         """
         Convert body-parts coordinate to Point geometries.
 
-        .. note:
+        .. note::
            If buffer and px_per_mm is not None, then the points will be *buffered* and a 2D share polygon created with the specified buffered area.
            If buffer is provided, then also provide px_per_mm for accurate conversion factor between pixels and millimeters.
 
@@ -162,8 +162,8 @@ class GeometryMixin(object):
 
         :param np.ndarray data: 2D array with body-part coordinates where rows are frames and columns are x and y coordinates.
         :param Optional[int] buffer: If not None, then the area of the Point. Thus, if not None, then returns Polygons representing the Points.
-        :param Optional[int] px_per_mm: Pixels to millimeter convertion factor. Required if buffer is not None.
-        :returns: List of shapely Points (or polygons if buffer is not None).
+        :param Optional[int] px_per_mm: Pixels to millimeter conversion factor. Required if buffer is not None.
+        :return: List of shapely Points (or polygons if buffer is not None).
         :rtype: List[Union[Point, Polygon]]
 
         :example:
@@ -236,7 +236,7 @@ class GeometryMixin(object):
         :param np.ndarray data: Body-part coordinate(s) as 1D array [x, y] or 2D array [[x1, y1], [x2, y2], ...]. E.g., np.array([364, 308]) or np.array([[364, 308], [100, 200]]).
         :param float parallel_offset: The radius of the resultant circle(s). Default: 1.
         :param float pixels_per_mm: The pixels per millimeter conversion factor. If 1, radius is in pixels. Default: 1.
-        :returns: Single Shapely Polygon for 1D input, or List[Polygon] for 2D input.
+        :return: Single Shapely Polygon for 1D input, or List[Polygon] for 2D input.
         :rtype: Union[Polygon, List[Polygon]]
 
         :example:
@@ -268,7 +268,7 @@ class GeometryMixin(object):
         Create a multistring skeleton from a 3d array where each 2d array represents start and end coordinates of a linewithin the skeleton.
 
         :param np.ndarray data: A 3D numpy array where each 2D array represents the start position and end position of each LineString.
-        :returns: Shapely MultiLineString representing animal skeleton.
+        :return: Shapely MultiLineString representing animal skeleton.
         :rtype: MultiLineString
 
         .. image:: _static/img/bodyparts_to_multistring_skeleton.png
@@ -584,7 +584,7 @@ class GeometryMixin(object):
         .. note::
            If certain that the input data is a valid Polygon, consider using :func:`simba.feature_extractors.perimeter_jit.jitted_hull` or :func:`simba.data_processors.cuda.geometry.poly_area` for numba jit and CUDA acceleration, respectively.
 
-        .. seealso:
+        .. seealso::
            For multiprocessing, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_area`
 
         :param Union[MultiPolygon, Polygon] shape: The geometry (MultiPolygon or Polygon) for which to calculate the area.
@@ -625,7 +625,7 @@ class GeometryMixin(object):
         .. note::
            The distance is the minimum Euclidean distance between any point on geometry A and any point on geometry B.
 
-        .. seealso:
+        .. seealso::
            For multicore wrapper method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_shape_distance`
 
         .. image:: _static/img/shape_distance.png
@@ -675,13 +675,13 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
-        .. seealso:
+        .. seealso::
            For multicore method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodyparts_to_line`
 
         :param np.ndarray data: 2D dataframe representing the locations of the body-parts in a single image.
         :param Optional[int] buffer: Optional buffer for the linestring in millimeters. Default None.
         :param Optional[float] px_per_mm: Optional conversion factor. Pass if ``buffer`` is passed.
-        :returns:
+        :return:
         :rtype: Union[Polygon, LineString]
 
 
@@ -727,7 +727,7 @@ class GeometryMixin(object):
            :align: center
 
         :param Union[LineString, Polygon, MultiPolygon, List[Union[LineString, Polygon, MultiPolygon]]] shape: A single geometry or a list of geometries. If None, then None is returned.
-        :returns: Array sith x, y coordinates of ``shape`` centers.
+        :return: Array sith x, y coordinates of ``shape`` centers.
         :rtype: np.ndarray
 
         :example:
@@ -824,7 +824,7 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
-        .. seealso:
+        .. seealso::
            For multicore method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_difference`
 
         :param List[Union[LineString, Polygon, MultiPolygon]] shapes: A list of geometries.
@@ -873,7 +873,7 @@ class GeometryMixin(object):
            :muted:
            :align: center
 
-        .. seealso:
+        .. seealso::
            For multicore method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_union`
 
         :param List[Union[LineString, Polygon, MultiPolygon]] shapes: A list of LineString, Polygon, or MultiPolygon geometries to be unioned.
@@ -909,7 +909,7 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
-        .. seealso:
+        .. seealso::
            For multicore call, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_symmetric_difference`.
 
         :param List[Union[LineString, Polygon, MultiPolygon]] shapes: A list of LineString, Polygon, or MultiPolygon geometries to find the symmetric difference.
@@ -1061,7 +1061,7 @@ class GeometryMixin(object):
         :param Optional[bool] verbose: If True, then prints progress frmae-by-frame. Default: False.
         :param Optional[np.ndarray] bg_img: Background image to be used as the canvas for drawing shapes. Defaults to None. Could be e.g., a low opacity image of the arena.
         :param Optional[Tuple[int]] bg_clr: Background color specified as a tuple of RGB values. Defaults to white.
-        :returns: None
+        :return: None
         """
 
         timer = SimbaTimer(start=True)
@@ -1245,7 +1245,7 @@ class GeometryMixin(object):
         :param bool preserve_topology: If True, preserves topology during simplification. Default True.
         :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores. Ignored if pool is provided.
         :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
-        :returns: A list of polygons with length data.shape[0]
+        :return: A list of polygons with length data.shape[0]
         :rtype: List[Polygon]
 
         :example:
@@ -1326,9 +1326,9 @@ class GeometryMixin(object):
         :param np.ndarray data: 2D or 3D array with body-part coordinates where rows are frames and columns are x and y coordinates.
         :param Optional[int] core_cnt: The number of cores to use. If -1, then all available cores. Ignored if pool is provided.
         :param Optional[int] buffer: If not None, then the area of the Point. Thus, if not None, then returns Polygons representing the Points.
-        :param Optional[int] px_per_mm: Pixels to millimeter convertion factor. Required if buffer is not None.
+        :param Optional[int] px_per_mm: Pixels to millimeter conversion factor. Required if buffer is not None.
         :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
-        :returns Union[List[Point], List[List[Point]]]: If input is a 2D array, then list of Points. If 3D array, then list of list of Points.
+        :return Union[List[Point], List[List[Point]]]: If input is a 2D array, then list of Points. If 3D array, then list of list of Points.
 
         .. note::
            If buffer and px_per_mm is not None, then the points will be *buffered* and a 2D share polygon created with the specified buffered area.
@@ -1423,7 +1423,7 @@ class GeometryMixin(object):
         :param bool verbose: If True, prints progress messages. Default True.
         :param int pixels_per_mm: The pixels per millimeter of the video. If not passed, 1 will be used meaning revert to radius in pixels rather than millimeters.
         :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
-        :returns: List of shapely Polygons of circular shape of size data.shape[0].
+        :return: List of shapely Polygons of circular shape of size data.shape[0].
         :rtype: List[Polygon]
 
         :example:
@@ -1478,7 +1478,7 @@ class GeometryMixin(object):
            :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_delaunay_triangulate_keypoints`
 
         :param np.ndarray data: NumPy array of body part coordinates. Each subarray represents the coordinates of a body part.
-        :returns: A list of `Polygon` objects representing the triangles formed by the Delaunay triangulation.
+        :return: A list of `Polygon` objects representing the triangles formed by the Delaunay triangulation.
         :rtype: List[Polygon]
 
         :example:
@@ -1648,7 +1648,7 @@ class GeometryMixin(object):
 
            Note that shape_1 and shape_2 entries can be NoneType. If so no overlap will be in the output for that observation.
 
-        .. seealso:
+        .. seealso::
            :func:`simba.mixins.geometry_mixin.GeometryMixin.compute_shape_overlap`, :func:`simba.mixins.geometry_mixin.GeometryMixin.compute_pct_shape_overlap`, :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_compute_pct_shape_overlap`
 
         :param List[Union[Polygon, LineString, None]] shape_1: List of Polygons, LineStrings, or None.
@@ -1799,7 +1799,7 @@ class GeometryMixin(object):
         :param Optional[bool] verbose: If True, prints progress.
         :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores. Ignored if pool is provided.
         :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
-        :returns: A list of rotated rectangles of size len(shapes).
+        :return: A list of rotated rectangles of size len(shapes).
         :rtype: List[Polygon]
 
         :example:
@@ -1925,7 +1925,7 @@ class GeometryMixin(object):
 
         :param np.ndarray line_points: Coordinates of the line segment's two points. Two rows and each row represents a point (x, y).
         :param np.ndarray bounding_box: Bounding box coordinates in the format (min_x, min_y, max_x, max_y).
-        :returns: Intersection points where the extended line crosses the bounding box edges. The shape of the array is (2, 2), where each row represents a point (x, y).
+        :return: Intersection points where the extended line crosses the bounding box edges. The shape of the array is (2, 2), where each row represents a point (x, y).
         :rtype: np.ndarray
 
         :example:
@@ -1981,7 +1981,7 @@ class GeometryMixin(object):
 
         :param np.ndarray line_points: Intersection points where the extended line crosses the bounding box edges. The shape of the array is (2, 2), where each row represents a point (x, y).
         :param np.ndarray bounding_box: Bounding box coordinates in the format (min_x, min_y, max_x, max_y).
-        :returns: A collection of polygons resulting from splitting the bounding box with the extended line.
+        :return: A collection of polygons resulting from splitting the bounding box with the extended line.
         :rtype: GeometryCollection
 
         :example:
@@ -2466,7 +2466,7 @@ class GeometryMixin(object):
         :param np.ndarray img: Either an image in numpy array format OR a tuple with cv2.VideoCapture object and the frame index.
         :param List[Union[Polygon, np.ndarray]] geometries: A list of shapes either as vertices in a numpy array, or as shapely Polygons.
         :param Optional[bool] ignore_black: If non-rectangular geometries, then pixels that don't belong to the geometry are masked in black. If True, then these pixels will be ignored when computing averages.
-        :returns: List of geometry brighness values.
+        :return: List of geometry brighness values.
         :rtype: List[float]
 
         :example:
@@ -2708,7 +2708,7 @@ class GeometryMixin(object):
         :param Optional[Polygon] geometry: If Polygon, then the geometry in the two images that should be compared. If None, then entire images will be contourcompared.
         :param Literal['all', 'exterior'] method: The method used for contour comparison.
         :param Optional[bool] canny: If True, applies Canny edge detection before contour comparison. Helps reduce noise and enhance contours.  Default is True.
-        :returns: Contour matching score between the two images. Lower scores indicate higher similarity.
+        :return: Contour matching score between the two images. Lower scores indicate higher similarity.
         :rtype: float
 
 
@@ -2870,7 +2870,7 @@ class GeometryMixin(object):
         :param int pixels_per_mm: Pixels per millimeter for conversion. Default is 1.
         :param int parallel_offset: Size of the geometry ROI in millimeters. Default 1.
         :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
-        :returns: The difference between the successive geometry histograms.
+        :return: The difference between the successive geometry histograms.
         :rtype: np.ndarray
 
         :example:
@@ -3107,7 +3107,7 @@ class GeometryMixin(object):
         :param float px_per_mm: Pixels per millimeter conversion factor.
         :param Tuple[int, int] img_size: Size of the image in pixels (width, height).
         :param Optional[bool] border_sites: If True, includes points on the border of the image. Default is True.
-        :returns: Dictionary where keys are (row, column) indices of the point, and values are Shapely Point objects.
+        :return: Dictionary where keys are (row, column) indices of the point, and values are Shapely Point objects.
         :rtype: Dict[Tuple[int, int], Point]
 
         :example:
@@ -3167,7 +3167,7 @@ class GeometryMixin(object):
         :param Optional[float] px_per_mm: Pixels per millimeter conversion factor. Necessery if buckets are defined by ``bucket_size_mm`` argument.
         :param Optional[bool] add_correction: If True, performs correction by adding extra columns or rows to cover any remaining space if using ``bucket_size_mm``. Default True.
         :param Optional[bool] verbose: If True, prints progress / completion information. Default False.
-        :returns: Size-2 Tuple with (i) Dictionary where the segment index is the key and polygon is the value, and (ii) float representing aspect ratio of each bucket.
+        :return: Size-2 Tuple with (i) Dictionary where the segment index is the key and polygon is the value, and (ii) float representing aspect ratio of each bucket.
 
         :example:
         >>> img = cv2.imread('/Users/simon/Desktop/Screenshot 2024-01-21 at 10.15.55 AM.png', 1)
@@ -3354,7 +3354,7 @@ class GeometryMixin(object):
         :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1 which is all available cores. Ignored if pool is provided.
         :param Optional[bool] verbose: If True, prints progress.
         :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
-        :returns: Matrix of size (frames x horizontal bins x vertical bins) with cumulative time values.
+        :return: Matrix of size (frames x horizontal bins x vertical bins) with cumulative time values.
         :rtype: np.ndarray
 
         :example:
@@ -3436,7 +3436,7 @@ class GeometryMixin(object):
         :param bool verbose: If true, prints progress. Default: True.
         :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which means using all available cores. Ignored if pool is provided.
         :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
-        :returns: Matrix of size (frames x horizontal bins x vertical bins) with times in seconds (if fps passed) or frames (if fps not passed)
+        :return: Matrix of size (frames x horizontal bins x vertical bins) with times in seconds (if fps passed) or frames (if fps not passed)
         :rtype: np.ndarray
         :rtype: np.ndarray
 
@@ -3529,7 +3529,7 @@ class GeometryMixin(object):
         :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which means using all available cores. Ignored if pool is provided.
         :param Optional[bool] verbose: If True, then prints progress.
         :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
-        :returns: Matrix of size (frames x horizontal bins x vertical bins) with values representing time in seconds (if fps passed) or frames (if fps not passed)
+        :return: Matrix of size (frames x horizontal bins x vertical bins) with values representing time in seconds (if fps passed) or frames (if fps not passed)
         :rtype: np.ndarray
         :rtype: np.ndarray
         """
@@ -3717,7 +3717,7 @@ class GeometryMixin(object):
         :param Optional[Union[float, int]] sample_rate: The FPS of the recording. Used as conversion factor if lag is a float.
         :param Optional[int] core_cnt: The number of cores to use for parallel processing. Default is -1, which uses the maximum available cores. Ignored if pool is provided.
         :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool to reuse. If None, creates a new pool. Default None.
-        :returns: List of Hausdorff distance measures.
+        :return: List of Hausdorff distance measures.
         :rtype: List[float]
 
         :example:
@@ -3890,10 +3890,10 @@ class GeometryMixin(object):
            :width: 550
            :align: center
 
-        :param ndarray data: First 2D array of size len(frames) representing body-part coordinates x and y.
-        :param ndarray data: Second 2D array of size len(frames) representing body-part coordinates x and y.
+        :param ndarray x: First 2D array of size len(frames) representing body-part coordinates x and y.
+        :param ndarray y: Second 2D array of size len(frames) representing body-part coordinates x and y.
         :param int sample: The downsampling factor for the trajectories (default is 100If sample > 1, the trajectories are downsampled by selecting every sample-th point.
-        :returns: Linear Fréchet Distance between two trajectories
+        :return: Linear Fréchet Distance between two trajectories
         :rtype: float
 
         .. note::

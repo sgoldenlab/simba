@@ -334,7 +334,7 @@ def img_stack_brightness(x: np.ndarray,
                          ignore_black: bool = True,
                          verbose: bool = False,
                          batch_size: int = 2500) -> np.ndarray:
-    """
+    r"""
     Calculate the average brightness of a stack of images using a specified method.
 
     Useful for analyzing light cues or brightness changes over time. For example, compute brightness in images containing a light cue ROI, then perform clustering (e.g., k-means) on brightness values to identify frames when the light cue is on vs off.
@@ -775,7 +775,7 @@ def _cuda_is_inside_polygon(x, y, polygon_vertices):
     Checks if the pixel location is inside the polygon.
 
     :param int x: Pixel x location.
-    :param int y: Pixel y location.
+    :param int circle_r: Pixel y location.
     :param np.ndarray polygon_vertices: 2-dimensional array representing the x and y coordinates of the polygon vertices.
     :return: Boolean representing if the x and y are located in the polygon.
     """
@@ -804,7 +804,7 @@ def _cuda_is_inside_circle(x, y, circle_x, circle_y, circle_r):
     :param int y: Pixel y location.
     :param int circle_x: Center of circle x coordinate.
     :param int circle_y: Center of circle y coordinate.
-    :param int y: Circle radius.
+    :param int circle_r: Circle radius.
     :return: Boolean representing if the x and y are located in the circle.
     """
 
@@ -1120,7 +1120,7 @@ def rotate_img_stack_cupy(imgs: np.ndarray,
     :param np.ndarray imgs: The input stack of images to be rotated. Expected to be a NumPy array with 3 or 4 dimensions.  3D shape: (num_images, height, width) - 4D shape: (num_images, height, width, channels)
     :param Optional[float] rotation_degrees: The angle by which the images should be rotated, in degrees. Must be between 1 and 359 degrees. Defaults to 180 degrees.
     :param Optional[int] batch_size: Number of images to process on GPU in each batch. Decrease if data can't fit on GPU RAM.
-    :returns: A NumPy array containing the rotated images with the same shape as the input.
+    :return: A NumPy array containing the rotated images with the same shape as the input.
     :rtype: np.ndarray
 
     :example:
@@ -1170,7 +1170,7 @@ def rotate_video_cupy(video_path: Union[str, os.PathLike],
     :param Optional[Union[str, os.PathLike]] save_path: Path to save the rotated video. If None, saves the video in the same directory as the input with '_rotated_<rotation_degrees>' appended to the filename.
     :param nptional[float] rotation_degrees:  Degrees to rotate the video. Must be between 1 and 359 degrees. Default is 180.
     :param Optional[int] batch_size: The number of frames to process in each batch. Deafults to None meaning all images will be processed in a single batch.
-    :returns: None.
+    :return: None.
 
     :example:
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/F0_gq_Saline_0626_clipped.mp4"
