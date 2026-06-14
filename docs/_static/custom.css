@@ -170,3 +170,138 @@ body {
 
 /* slightly larger inline math so symbols read at body-text weight */
 .rst-content span.math { font-size: 1.06em; }
+
+/* --- Copy button on code blocks --- */
+.rst-content div.highlight { position: relative; }
+.simba-copy-btn {
+    position: absolute; top: 6px; right: 6px;
+    padding: 2px 9px; border: 1px solid #cfd6dc; border-radius: 5px;
+    background: rgba(255, 255, 255, 0.9); color: #404040;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    opacity: 0; transition: opacity .15s ease;
+}
+.rst-content div.highlight:hover .simba-copy-btn { opacity: 1; }
+.simba-copy-btn:hover { background: #fff; border-color: #2980b9; color: #2980b9; }
+.simba-copy-btn.copied { background: #2980b9; color: #fff; border-color: #2980b9; }
+
+/* --- Command palette (Ctrl/Cmd-K) --- */
+.simba-cmdk-trigger {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    width: 100%; margin: 0 0 1.6em; padding: 12px 16px;
+    border: 1px solid #d6dde3; border-radius: 8px; background: #f6f8fa;
+    color: #5a6b7b; font-size: 14px; cursor: pointer; text-align: left;
+}
+.simba-cmdk-trigger:hover { border-color: #2980b9; background: #eef5fb; color: #2980b9; }
+.simba-cmdk-trigger kbd {
+    font-size: 11px; background: #fff; border: 1px solid #cfd6dc; border-radius: 4px;
+    padding: 2px 6px; color: #777; white-space: nowrap;
+}
+.simba-cmdk-overlay {
+    position: fixed; inset: 0; z-index: 12000; display: none;
+    background: rgba(20, 22, 26, 0.45);
+    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+    align-items: flex-start; justify-content: center;
+}
+.simba-cmdk-overlay.visible { display: flex; }
+.simba-cmdk-box {
+    margin-top: 12vh; width: 640px; max-width: 92vw; max-height: 70vh;
+    background: #fff; border-radius: 12px; box-shadow: 0 16px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden; display: flex; flex-direction: column;
+}
+.simba-cmdk-input {
+    border: none; border-bottom: 1px solid #eee; padding: 16px 18px;
+    font-size: 16px; outline: none; width: 100%; box-sizing: border-box;
+}
+.simba-cmdk-list { overflow-y: auto; }
+.simba-cmdk-item {
+    display: block; padding: 9px 18px; font-size: 13px; color: #333 !important;
+    text-decoration: none; border-bottom: 1px solid #f4f4f4;
+}
+.simba-cmdk-item.active, .simba-cmdk-item:hover { background: #eaf3fa; color: #1f6391 !important; }
+.simba-cmdk-empty { padding: 18px; color: #999; font-size: 13px; }
+
+/* --- Landing page card-grid navigation --- */
+.simba-cardgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 14px;
+    margin: 1.4em 0 2em;
+}
+.simba-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid #e1e6ea; border-radius: 10px; background: #fff;
+    color: #2c3e50 !important; text-decoration: none !important;
+    transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+.simba-card:hover {
+    border-color: #2980b9;
+    box-shadow: 0 4px 16px rgba(41, 128, 185, 0.15);
+    transform: translateY(-2px);
+}
+.simba-card-ico { font-size: 24px; line-height: 1; flex: 0 0 auto; }
+.simba-card-txt { font-size: 14px; font-weight: 600; }
+
+/* --- Landing page demo carousel (peek / coverflow) --- */
+.simba-carousel {
+    position: relative; margin: 1.8em 0; padding: 24px 0;
+    border-top: 1px solid #dfe4e9; border-bottom: 1px solid #dfe4e9;   /* demarcation lines */
+}
+.simba-carousel-viewport {
+    overflow: hidden; width: 100%; height: 580px;                      /* fixed height -> nav buttons stay put */
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%);  /* fade peeking edges */
+}
+.simba-carousel-track { display: flex; gap: 16px; align-items: center; height: 100%; will-change: transform; }
+.simba-carousel-slide {
+    flex: 0 0 auto; height: 100%; border-radius: 12px; overflow: hidden; background: #000;
+    opacity: .4; transform: scale(.86); cursor: pointer;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .3);
+    transition: opacity .45s ease, transform .45s ease;
+}
+.simba-carousel-slide.active {
+    opacity: 1; transform: scale(1); cursor: zoom-in;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, .5);
+}
+.simba-carousel-slide video { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.simba-carousel-cap {
+    position: absolute; left: 50%; transform: translateX(-50%); bottom: 42px;
+    max-width: 84%; text-align: center;
+    color: #fff; font-size: 17px; font-weight: 700; letter-spacing: .01em;
+    background: rgba(0, 0, 0, .62); padding: 7px 18px; border-radius: 22px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .6); pointer-events: none;
+}
+.simba-carousel-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    display: flex; align-items: center; justify-content: center;
+    width: 54px; height: 54px; padding-bottom: 4px;
+    border: 2px solid rgba(255, 255, 255, .9); border-radius: 50%;
+    background: rgba(41, 128, 185, .9); color: #fff; font-size: 34px; font-weight: 700; line-height: 1;
+    cursor: pointer; box-shadow: 0 2px 14px rgba(0, 0, 0, .45);
+    transition: background .15s ease, transform .15s ease;
+}
+.simba-carousel-nav:hover { background: #2980b9; transform: translateY(-50%) scale(1.08); }
+.simba-carousel-nav.prev { left: 14px; }
+.simba-carousel-nav.next { right: 14px; }
+.simba-carousel-counter {
+    position: absolute; right: 14px; bottom: 12px;
+    background: rgba(0, 0, 0, .6); color: #fff; font-size: 12px; font-weight: 600;
+    padding: 3px 10px; border-radius: 12px; pointer-events: none; letter-spacing: .03em;
+}
+.simba-carousel-hint {
+    position: absolute; left: 14px; bottom: 12px;
+    display: flex; align-items: center; gap: 5px;
+    background: rgba(0, 0, 0, .6); color: #fff; font-size: 12px; font-weight: 600;
+    padding: 3px 10px; border-radius: 12px; pointer-events: none; letter-spacing: .02em;
+}
+.simba-carousel-hint kbd {
+    background: #fff; color: #333; border: none; border-radius: 3px;
+    padding: 0 6px; font-size: 12px; line-height: 1.5; box-shadow: none;
+    /* Poppins lacks arrow glyphs -> use a system font that has them */
+    font-family: "Segoe UI Symbol", Arial, "Apple Symbols", sans-serif;
+}
+.simba-carousel-progress {
+    position: absolute; top: 8px; left: 0; right: 0; height: 7px;
+    background: rgba(0, 0, 0, .25); z-index: 3; pointer-events: none;
+}
+.simba-carousel-progress > i { display: block; height: 100%; width: 0; background: #4aa3df; }
