@@ -1,10 +1,7 @@
 📖 Welcome to SimBA's documentation!
 =================================
 
-.. image:: tutorials_rst/img/index/landing_1.gif
-   :alt: Landing 1
-   :width: 1000
-   :align: center
+.. The landing animation now plays as a lightweight WebM in the hero banner (see docs/_static/custom.js).
 
 Note
 ----

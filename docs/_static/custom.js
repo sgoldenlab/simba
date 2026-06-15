@@ -916,3 +916,65 @@ gtag('config', 'G-PEKR9R5J47');
     spy();
   });
 })();
+
+/* ------------------------------------------------------------------ *
+ * Landing-page hero banner: animated navy gradient, logo, rotating
+ * tagline, and CTA buttons.
+ * ------------------------------------------------------------------ */
+(function () {
+  window.addEventListener('load', function () {
+    var base = location.pathname.split('/').pop();
+    if (!(base === '' || base === 'index.html')) return;
+    var main = document.querySelector('[role="main"]');
+    if (!main || main.querySelector('.simba-hero-banner')) return;
+    var ROOT = (function () {
+      var el = document.getElementById('documentation_options');
+      return (el && el.getAttribute('data-url_root')) || '';
+    })();
+
+    var hero = document.createElement('div');
+    hero.className = 'simba-hero-banner';
+    hero.innerHTML =
+      '<video class="simba-hero-vid" autoplay loop muted playsinline preload="auto">' +
+        '<source src="' + ROOT + '_static/img/landing_1.webm" type="video/webm">' +
+      '</video>' +
+      '<div class="simba-hero-cta"></div>';
+    // lift the hero up to the content wrapper so it can span the full width
+    var wrap = document.querySelector('.wy-nav-content-wrap') || main;
+    wrap.insertBefore(hero, wrap.firstChild);
+
+    // hide the now-duplicate in-content landing gif
+    var dup = main.querySelector('img[src*="landing_1"]');
+    if (dup) { var w = dup.closest('a') || dup; if (!w.closest('.simba-hero-banner')) w.style.display = 'none'; }
+
+    // hide the redundant page title (the hero banner is the splash)
+    var pageH1 = main.querySelector('h1');
+    if (pageH1 && !pageH1.closest('.simba-hero-banner')) pageH1.style.display = 'none';
+
+    // hero already shows the section buttons -> hide the duplicate card grid below
+    var grid = main.querySelector('.simba-cardgrid');
+    if (grid) grid.style.display = 'none';
+
+    // CTA buttons mirror the section links shown below (the toctree),
+    // minus the stale RST tutorials/docs (those stay in the sidebar, not featured here).
+    var SKIP = /tutorial|walkthrough|labell?ing/i;
+    var cta = hero.querySelector('.simba-hero-cta'), seen = {};
+    Array.prototype.forEach.call(document.querySelectorAll('.toctree-wrapper li.toctree-l1 > a'), function (a) {
+      var href = a.getAttribute('href');
+      if (!href || seen[href]) return;
+      if (SKIP.test(href) || SKIP.test(a.textContent)) return;
+      seen[href] = 1;
+      var b = document.createElement('a');
+      b.className = 'simba-hero-btn';
+      b.href = href;
+      b.textContent = a.textContent.trim();
+      cta.appendChild(b);
+    });
+    var gh = document.createElement('a');
+    gh.className = 'simba-hero-btn'; gh.href = 'https://github.com/sgoldenlab/simba';
+    gh.target = '_blank'; gh.rel = 'noopener'; gh.textContent = '★ GitHub';
+    cta.appendChild(gh);
+
+    requestAnimationFrame(function () { hero.classList.add('in'); });
+  });
+})();
