@@ -217,6 +217,7 @@ class ImageMixin(object):
         Calculate contour similarity between two images.
 
         .. image:: _static/img/get_contourmatch.webp
+           :alt: Get contourmatch
            :width: 700
            :align: center
 
@@ -272,6 +273,7 @@ class ImageMixin(object):
            For single core method, see :func:`simba.mixins.image_mixin.ImageMixin.slice_shapes_in_imgs`
 
         .. image:: _static/img/slice_shapes_in_img.webp
+           :alt: Slice shapes in img
            :width: 600
            :align: center
 
@@ -603,6 +605,7 @@ class ImageMixin(object):
         Convert an image to black and white (binary).
 
         .. image:: _static/img/img_to_bw.png
+           :alt: Img to bw
            :width: 600
            :align: center
 
@@ -691,6 +694,7 @@ class ImageMixin(object):
         This function segments either the lower, upper, or both lower and upper part of the input image based on the specified percentage.
 
         .. image:: _static/img/segment_img_horizontal.png
+           :alt: Segment img horizontal
            :width: 800
            :align: center
 
@@ -773,6 +777,7 @@ class ImageMixin(object):
         This function segments either the left, right or both the left and right part of  input image based on the specified percentage.
 
         .. image:: _static/img/segment_img_vertical.png
+           :alt: Segment img vertical
            :width: 800
            :align: center
 
@@ -814,6 +819,7 @@ class ImageMixin(object):
         if noise is defined as being connected to the edges of the image.
 
         .. image:: _static/img/add_img_border_and_flood_fill.png
+           :alt: Add img border and flood fill
            :width: 400
            :align: center
 
@@ -953,6 +959,7 @@ class ImageMixin(object):
            To compare images in two stacks, see :func:`simba.mixins.image_mixin.ImageMixin.img_stack_mse`
 
         .. image:: _static/img/img_sliding_mse.webp
+           :alt: Img sliding mse
            :width: 600
            :align: center
 
@@ -1067,6 +1074,7 @@ class ImageMixin(object):
            Long runtime for larger images. Consider down-sampling videos / images before caluclating wasserstein / earth mover distances.
 
         .. image:: _static/img/img_emd.webp
+           :alt: Img emd
            :width: 600
            :align: center
 
@@ -1118,6 +1126,7 @@ class ImageMixin(object):
         Creates an image of specified size and color, and optionally saves it to a file.
 
         .. image:: _static/img/create_uniform_img.webp
+           :alt: Create uniform img
            :width: 600
            :align: center
 
@@ -1156,6 +1165,7 @@ class ImageMixin(object):
         between the i-th and j-th images. Useful for image similarities and anomalities.
 
         .. image:: _static/img/img_matrix_mse.webp
+           :alt: Img matrix mse
            :width: 600
            :align: center
 
@@ -1258,6 +1268,7 @@ class ImageMixin(object):
         Jitted conversion of a 4D stack of color images (RGB format) to grayscale.
 
         .. image:: _static/img/img_stack_to_greyscale.png
+           :alt: Img stack to greyscale
            :width: 600
            :align: center
 
@@ -1316,6 +1327,7 @@ class ImageMixin(object):
         Pad images in a dictionary stack to have the same dimensions (the same dimension is represented by the largest image in the stack)
 
         .. image:: _static/img/pad_img_stack.webp
+           :alt: Pad img stack
            :width: 400
            :align: center
 
@@ -1452,14 +1464,17 @@ class ImageMixin(object):
            For single core process, use :func:`simba.mixins.image_mixin.ImageMixin.slice_shapes_in_img`
 
         .. image:: _static/img/slice_shapes_in_imgs_4.gif
+           :alt: Slice shapes in imgs 4
            :width: 400
            :align: center
 
         .. image:: _static/img/bodyparts_to_circle_1.gif
+           :alt: Bodyparts to circle 1
            :width: 400
            :align: center
 
         .. image:: _static/img/bodyparts_to_circle_2.gif
+           :alt: Bodyparts to circle 2
            :width: 400
            :align: center
 
@@ -1544,6 +1559,7 @@ class ImageMixin(object):
         the SSI is computed for each channel.
 
         .. image:: _static/img/structural_similarity_index.webp
+           :alt: Structural similarity index
            :width: 700
            :align: center
 
@@ -1666,6 +1682,7 @@ class ImageMixin(object):
         The NCC measures the similarity between two images by calculating the correlation coefficient of their pixel values. The output value ranges from -1 to 1, where 1 indicates perfect positive correlation, 0 indicates no correlation, and -1 indicates perfect negative correlation.
 
         .. image:: _static/img/cross_correlation_similarity.webp
+           :alt: Cross correlation similarity
            :width: 700
            :align: center
 
@@ -2015,6 +2032,7 @@ class ImageMixin(object):
            Pretty slow.
 
         .. image:: _static/img/non_local_mean_denoising.webp
+           :alt: Non local mean denoising
            :width: 400
            :align: center
 
@@ -2051,6 +2069,7 @@ class ImageMixin(object):
            Pretty slow.
 
         .. image:: _static/img/non_local_mean_denoising.webp
+           :alt: Non local mean denoising
            :width: 400
            :align: center
 
@@ -2092,6 +2111,7 @@ class ImageMixin(object):
         Creates timelapse image from video.
 
         .. image:: _static/img/get_timelapse_img.png
+           :alt: Get timelapse img
            :width: 600
            :align: center
 
@@ -2137,6 +2157,7 @@ class ImageMixin(object):
         Create a horizontal ruler/scale bar with tick marks and labels.
 
         .. image:: _static/img/create_time_ruler.png
+           :alt: Create time ruler
            :width: 600
            :align: center
 

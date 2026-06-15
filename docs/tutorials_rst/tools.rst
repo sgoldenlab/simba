@@ -8,6 +8,7 @@ accessible, the tools have been incorporated into their own space within
 the GUI, and are described below.
 
 .. image:: img/tools/menu_1.png
+  :alt: Menu 1
   :width: 1000
   :align: center
 
@@ -82,6 +83,7 @@ first 10 seconds, and the last 5 seconds. We would start our video on at
    *00:01:55*. The settings should look like the image below.
 
 .. image:: img/tools/shorten_videos_1.png
+  :alt: Shorten videos 1
   :width: 1000
   :align: center
 
@@ -91,6 +93,7 @@ first 10 seconds, and the last 5 seconds. We would start our video on at
    as the original video.
 
 .. image:: img/tools/shorten_videos_2.png
+  :alt: Shorten videos 2
   :width: 1000
   :align: center
 
@@ -106,6 +109,7 @@ first 20 seconds from the start of the video.
    the video in ``Seconds:``, in this case it will be *20*
 
 .. image:: img/tools/shorten_videos_3.png
+  :alt: Shorten videos 3
   :width: 1000
   :align: center
 
@@ -123,6 +127,7 @@ This tool can help users to cut the videos into multiple clips/section.
    section.
 
 .. image:: img/tools/multi_clip_1.png
+  :alt: Multi clip 1
   :width: 1000
   :align: center
 
@@ -130,6 +135,7 @@ This tool can help users to cut the videos into multiple clips/section.
    ``Browse File``
 
 .. image:: img/tools/multi_clip_2.png
+  :alt: Multi clip 2
   :width: 1000
   :align: center
 
@@ -139,6 +145,7 @@ This tool can help users to cut the videos into multiple clips/section.
    click ``Confirm`` to change the table.
 
 .. image:: img/tools/multi_clip_3.png
+  :alt: Multi clip 3
   :width: 1000
   :align: center
 
@@ -175,6 +182,7 @@ This tool allows the user to crop once and apply the same dimension to
 the rest of the videos in the folder.
 
 .. image:: img/tools/crop_1.png
+  :alt: Crop 1
   :width: 1000
   :align: center
 
@@ -206,6 +214,7 @@ videos in the specified folder.
 1. First, click on Multi-crop and the following menu will pop-open:
 
 .. image:: img/tools/multi_crop_1.jpg
+  :alt: Multi crop 1
   :width: 1000
   :align: center
 
@@ -427,6 +436,7 @@ Use this tool to create a path plot videos from raw pose-estimation data
 files.
 
 .. image:: img/third_party_annotations/line_plot_1.png
+  :alt: Line plot 1
   :width: 1000
   :align: center
 
@@ -460,6 +470,7 @@ files.
    name suffix.
 
 .. image:: img/third_party_annotations/line_plot_2.png
+  :alt: Line plot 2
   :width: 1000
   :align: center
 
@@ -611,6 +622,7 @@ body-parts.
    compared to the image on the left, representing the Animal name.
 
 .. image:: img/third_party_annotations/reorganize_keypoints_1.png
+  :alt: Reorganize keypoints 1
   :width: 1000
   :align: center
 
@@ -647,6 +659,7 @@ want to get rid of the data for 2 body-parts and keep the other 14.
    would like to remove, and click ``Run Removal``.
 
 .. image:: img/third_party_annotations/remove_keypoints.png
+  :alt: Remove keypoints
   :width: 1000
   :align: center
 
@@ -685,6 +698,7 @@ results of that interpolation and smoothing.
    SimBA terminal window.
 
 .. image:: img/third_party_annotations/visualize_pose.png
+  :alt: Visualize pose
   :width: 1000
   :align: center
 
@@ -731,6 +745,7 @@ Concatenate two videos
 Use this tool to concatenate two videos into a single video.
 
 .. image:: img/third_party_annotations/concatenate_videos_1.png
+  :alt: Concatenate videos 1
   :width: 1000
   :align: center
 
@@ -761,6 +776,7 @@ Use this tool to concatenate a user-defined number of videos into a
 single video mosaic of videos.
 
 .. image:: img/third_party_annotations/menu_2.png
+  :alt: Menu 2
   :width: 1000
   :align: center
 
@@ -804,6 +820,7 @@ number of trees used to create a model) from a model ``.sav`` file in
 SimBA.
 
 .. image:: img/third_party_annotations/print_model_info_1.png
+  :alt: Print model info 1
   :width: 600
   :align: center
 
@@ -815,6 +832,7 @@ SimBA.
    information printed in the main SimBA terminal.
 
 .. image:: img/third_party_annotations/print_model_info_2.png
+  :alt: Print model info 2
   :width: 1000
   :align: center
 

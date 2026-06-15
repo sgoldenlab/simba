@@ -7,6 +7,7 @@ that is compatible with SimBA. The screenshot below shows the format of
 the tabular BORIS CSV format that SimBA expects:
 
 .. image:: img/boris/boris_1.png
+  :alt: Boris 1
   :width: 1000
   :align: center
 
@@ -14,12 +15,14 @@ To generate BORIS data in this file format, begin by creating a new
 project with **seconds** time format:
 
 .. image:: img/boris/boris_2.png
+  :alt: Boris 2
   :width: 1000
   :align: center
 
 Next, create a new observation in BORIS:
 
 .. image:: img/boris/boris_3.png
+  :alt: Boris 3
   :width: 1000
   :align: center
 
@@ -30,12 +33,14 @@ in the BORIS annotations. We need a way of knowing what behaviors in
 SimBA matches the behaviors in Boris.
 
 .. image:: img/boris/boris_4.png
+  :alt: Boris 4
   :width: 1000
   :align: center
 
 Once done, export your annotations as **Tabular events**:
 
 .. image:: img/boris/boris_5.png
+  :alt: Boris 5
   :width: 1000
   :align: center
 

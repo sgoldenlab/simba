@@ -149,14 +149,17 @@ class ROIPlotMultiprocess(ConfigReader):
        `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
 
     .. image:: _static/img/roi_visualize.png
+        :alt: Roi visualize
         :width: 400
         :align: center
 
     .. image:: _static/img/ROIPlot_1.png
+       :alt: ROIPlot 1
        :width: 1000
        :align: center
 
     .. image:: _static/img/ROIPlot_2.gif
+       :alt: ROIPlot 2
        :width: 1000
        :align: center
 

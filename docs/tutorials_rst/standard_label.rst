@@ -62,6 +62,7 @@ a Mac, if you’re running SimBA on a PC or Linux, the aestetics might be
 slightly different):
 
 .. image:: img/standard_label/menu_1.png
+  :alt: Menu 1
   :width: 1000
   :align: center
 
@@ -130,6 +131,7 @@ want to annotate. In this tutorial, I am selecting ``BtWGANP.mp4`` and
 click ``Open``:
 
 .. image:: img/standard_label/annotator_1.png
+  :alt: Annotator 1
   :width: 1000
   :align: center
 
@@ -140,6 +142,7 @@ Once I’ve selected my video file, the annotation interface will pop
 open, looking something like this:
 
 .. image:: img/standard_label/annotator_2.gif
+  :alt: Annotator 2
   :width: 1000
   :align: center
 
@@ -168,6 +171,7 @@ for the previously-viewed frame into SimBA memory (more information
 below).**
 
 .. image:: img/standard_label/annotator_3.gif
+  :alt: Annotator 3
   :width: 1000
   :align: center
 
@@ -181,6 +185,7 @@ buttons next to the ``Jump size`` bar to jump the selected number of
 frames in the video:
 
 .. image:: img/standard_label/annotator_4.gif
+  :alt: Annotator 4
   :width: 1000
   :align: center
 
@@ -209,6 +214,7 @@ held in SimBA memory.
    `HERE <https://github.com/sgoldenlab/simba/blob/master/docs/advanced_labelling.md>`__.
 
 .. image:: img/standard_label/annotator_5.gif
+  :alt: Annotator 5
   :width: 1000
   :align: center
 
@@ -224,6 +230,7 @@ The viewed frame will jump to the last frame in the selected range when
 I click ``Save Range``.
 
 .. image:: img/standard_label/annotator_5.gif
+  :alt: Annotator 5
   :width: 1000
   :align: center
 
@@ -237,6 +244,7 @@ right of the new video window that pops open, the current time and
 current frame number is printed in yellow font.
 
 .. image:: img/standard_label/annotator_6.gif
+  :alt: Annotator 6
   :width: 1000
   :align: center
 
@@ -250,6 +258,7 @@ also close the video by clicking the window close button at the top
 left.
 
 .. image:: img/standard_label/annotator_8.png
+  :alt: Annotator 8
   :width: 1000
   :align: center
 
@@ -263,6 +272,7 @@ This will diplay whatever frame is shown in the video player in the main
 SimBA annotator GUI frame-viewer.
 
 .. image:: img/standard_label/annotator_7.gif
+  :alt: Annotator 7
   :width: 1000
   :align: center
 
@@ -276,6 +286,7 @@ which you are **required to do** in order to use your annotations for
 creating machine learning models.
 
 .. image:: img/standard_label/annotator_shortcuts.png
+  :alt: Annotator shortcuts
   :width: 1000
   :align: center
 
@@ -291,6 +302,7 @@ Two of these shortcuts needs further description:
    and how you have anntated them, as in the image below.
 
 .. image:: img/standard_label/annotator_9.png
+  :alt: Annotator 9
   :width: 1000
   :align: center
 
@@ -321,6 +333,7 @@ every frame where I note the behavior to be absent.
    frame viewer.
 
 .. image:: img/standard_label/annotator_10.png
+  :alt: Annotator 10
   :width: 1000
   :align: center
 
@@ -334,6 +347,7 @@ To do this, click the
 
 
 .. image:: img/standard_label/annotator_11.png
+  :alt: Annotator 11
   :width: 1000
   :align: center
 
@@ -431,6 +445,7 @@ MISCELLANEOUS LABELLING TOOLS IN SIMBA
    should see the follwoing pop-up:
 
 .. image:: img/standard_label/annotator_12.png
+  :alt: Annotator 12
   :width: 1000
   :align: center
 

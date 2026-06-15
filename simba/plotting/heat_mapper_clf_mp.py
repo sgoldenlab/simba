@@ -115,10 +115,12 @@ class HeatMapperClfMultiprocess(ConfigReader, PlottingMixin):
        `GitHub visualizations tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
     .. image:: _static/img/heatmap.png
+       :alt: Heatmap
        :width: 500
        :align: center
 
     .. image:: _static/img/Box1_180mISOcontrol_Females_GROOMING_final_frm.webp
+       :alt: Box1 180m ISOcontrol Females GROOMING final frm
        :width: 600
        :align: center
 

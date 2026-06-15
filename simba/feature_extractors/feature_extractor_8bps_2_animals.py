@@ -27,6 +27,7 @@ class ExtractFeaturesFrom8bps2Animals(ConfigReader, FeatureExtractionMixin):
        * `Expected pose configuration <https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/5.png>`_
 
     .. image:: _static/img/pose_configurations/5.png
+       :alt: 5
        :width: 300
        :align: center
 

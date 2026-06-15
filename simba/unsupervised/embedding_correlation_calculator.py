@@ -30,6 +30,7 @@ class EmbeddingCorrelationCalculator(UMLMixin, ConfigReader):
     Class for correlating dimensionality reduction features with original features for explainability purposes.
 
     .. image:: _static/img/EmbeddingCorrelationCalculator.png
+       :alt: Embedding Correlation Calculator
        :width: 800
        :align: center
 

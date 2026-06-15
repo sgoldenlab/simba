@@ -121,6 +121,7 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
        `Visualization tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
     .. image:: _static/img/prob_plot.png
+       :alt: Prob plot
        :width: 300
        :align: center
 

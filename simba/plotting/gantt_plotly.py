@@ -37,6 +37,7 @@ def gantt_plotly(bouts_df: pd.DataFrame,
     Creates a horizontal bar chart where each row represents an event (e.g., animal behavior) over time, with estensive customization options.
 
     .. image:: _static/img/gantt_plotly.webp
+       :alt: Gantt plotly
        :width: 600
        :align: center
 

@@ -45,6 +45,7 @@ class RiptortusFeaturizer(ConfigReader, FeatureExtractionMixin, AbstractFeatureE
 
 
     .. image:: frames/input/Merge_sym_1/6212.png
+       :alt: 6212
        :width: 1022
        :align: center
 

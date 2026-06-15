@@ -26,7 +26,7 @@ class PoseConfigCreator(PlottingMixin):
 
     Class for creating user-defined pose-estimation pipeline in SimBA through a GUI interface.
 
-    ..seealso::
+    .. seealso::
        `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Pose_config.md>`__.
 
     :param str pose_name: Name of the user-defined pose-estimation setting.

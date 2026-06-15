@@ -25,6 +25,7 @@ class OutlierCorrecterMovement(ConfigReader, FeatureExtractionMixin):
     under the [Outlier settings] header.
 
     .. image:: _static/img/movement_outlier.png
+       :alt: Movement outlier
        :width: 500
        :align: center
 

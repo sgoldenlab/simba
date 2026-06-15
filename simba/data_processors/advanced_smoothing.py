@@ -37,6 +37,7 @@ class AdvancedSmoother(ConfigReader):
     For example, smooth some body-parts of animals using Savitzky-Golay smoothing, and other body-parts of animals using Gaussian smoothing.
 
     .. image:: _static/img/AdvancedSmoother.webp
+       :alt: Advanced Smoother
        :width: 600
        :align: center
 

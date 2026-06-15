@@ -350,6 +350,7 @@ def get_vertices_hexagon(center: Tuple[int, int],
     Generates the vertices of a regular hexagon centered at a given point with a specified radius.
 
     .. image:: _static/img/get_vertices_hexagon.webp
+       :alt: Get vertices hexagon
        :width: 400
        :align: center
 
@@ -384,6 +385,7 @@ def get_half_circle_vertices(center: Tuple[int, int],
     Generates vertices for a half-circle with a given radius and direction, centered at a specific point.
 
     .. image:: _static/img/get_half_circle_vertices.webp
+       :alt: Get half circle vertices
        :width: 600
        :align: center
 
@@ -433,6 +435,7 @@ def get_triangle_vertices(center: Tuple[int, int],
     Find equilateral triangle vertices knowing the center, direction and length side.
 
     .. image:: _static/img/get_triangle_vertices.webp
+       :alt: Get triangle vertices
        :width: 600
        :align: center
 
@@ -635,6 +638,7 @@ def insert_gridlines_on_roi_img(img: np.ndarray,
     Each polygon's exterior is drawn as a closed polyline; useful for overlaying a tiling grid on an ROI frame.
 
     .. image:: _static/img/insert_gridlines_on_roi_img.webp
+       :alt: Insert gridlines on roi img
        :width: 600
        :align: center
 

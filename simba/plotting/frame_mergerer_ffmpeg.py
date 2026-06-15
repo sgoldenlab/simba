@@ -38,6 +38,7 @@ class FrameMergererFFmpeg(ConfigReader):
        `GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-12-merge-frames>`_.
 
         .. image:: _static/img/mosaic_videos.gif
+          :alt: Mosaic videos
           :width: 600
           :align: center
 

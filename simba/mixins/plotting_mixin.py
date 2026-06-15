@@ -362,6 +362,7 @@ class PlottingMixin(object):
         when behaviors occurred. Supports SVG output for scalable figures or PNG/NumPy array for video overlays.
 
         .. image:: _static/img/gantt_mosaic.webp
+           :alt: Gantt mosaic
            :width: 1000
            :align: center
 
@@ -982,6 +983,7 @@ class PlottingMixin(object):
         Flip a color image 90 degrees to the left or right
 
         .. image:: _static/img/rotate_img.png
+           :alt: Rotate img
            :width: 600
            :align: center
 
@@ -1080,6 +1082,7 @@ class PlottingMixin(object):
         Create a 2D scatterplot with a categorical legend.
 
         .. image:: _static/img/categorical_scatter.png
+           :alt: Categorical scatter
            :width: 400
            :align: center
 
@@ -1165,6 +1168,7 @@ class PlottingMixin(object):
         Useful when visualizing embedded behavior data latent spaces with dense and overlapping scatters.
 
         .. image:: _static/img/joint_plot.png
+           :alt: Joint plot
            :width: 700
            :align: center
 
@@ -1445,6 +1449,7 @@ class PlottingMixin(object):
         Supports SVG output for scalable figures or PNG/NumPy array for video overlays.
 
         .. image:: _static/img/line_plot_mosaic.webp
+           :alt: Line plot mosaic
            :width: 1000
            :align: center
 
@@ -1578,6 +1583,7 @@ class PlottingMixin(object):
            Uses ``kaleido`` for transform image to numpy array or save to disk.
 
         .. image:: _static/img/make_line_plot_plotly.png
+           :alt: Make line plot plotly
            :width: 500
            :align: center
 
@@ -1702,6 +1708,7 @@ class PlottingMixin(object):
         Creates a path plot visualization from the given data.
 
         .. image:: _static/img/make_path_plot.png
+           :alt: Make path plot
            :width: 500
            :align: center
 
@@ -2191,6 +2198,7 @@ class PlottingMixin(object):
         Uses seaborn for styling with customizable colors, transparency, and axis limits.
 
         .. image:: _static/img/bar_chart_mosaic.webp
+           :alt: Bar chart mosaic
            :width: 1000
            :align: center
 
@@ -2315,6 +2323,7 @@ class PlottingMixin(object):
         Generates and saves a cumulative count plot of a specified classifier's occurrences over video frames or time.
 
         .. image:: _static/img/plot_clf_cumcount.webp
+           :alt: Plot clf cumcount
            :width: 500
            :align: center
 
@@ -2410,6 +2419,7 @@ class PlottingMixin(object):
         Generates a path visualization with optional time or velocity-based coloring, background images, smoothing, and SVG/PNG output.
 
         .. image:: _static/img/get_path_img.webp
+           :alt: Get path img
            :width: 1000
            :align: center
 

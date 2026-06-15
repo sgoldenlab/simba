@@ -141,14 +141,17 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
        `Visualization tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
     .. image:: _static/img/path_plot.png
+       :alt: Path plot
        :width: 300
        :align: center
 
     .. image:: _static/img/path_plot_mp.gif
+       :alt: Path plot mp
        :width: 500
        :align: center
 
     .. image:: _static/img/path_plot_1.png
+       :alt: Path plot 1
        :width: 500
        :align: center
 

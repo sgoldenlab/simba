@@ -28,6 +28,7 @@ class OutlierCorrecterLocationAdvanced(ConfigReader, FeatureExtractionMixin):
        See `notebook <https://simba-uw-tf-dev.readthedocs.io/en/latest/nb/advanced_outlier_correction.html>`__. for example use-case.
 
     .. image:: _static/img/location_outlier.png
+       :alt: Location outlier
        :width: 400
        :align: center
 

@@ -14,6 +14,7 @@ class GetMLSettingsFrame():
 
 
     .. image:: _static/img/GetMLSettingsFrame.png
+       :alt: Get MLSettings Frame
        :width: 500
        :align: center
 

@@ -34,6 +34,7 @@ def create_shap_log(rf_clf: Union[str, os.PathLike, RandomForestClassifier],
     based on specified counts of positive and negative samples, and optionally saves the results.
 
     .. image:: _static/img/create_shap_log_cuda.png
+       :alt: Create shap log cuda
        :width: 500
        :align: center
 

@@ -39,6 +39,7 @@ class CaveFishFeaturizer(ConfigReader, FeatureExtractionMixin):
        This class has previously been named as ``fish_feature_extractor_2023_version_5.FishFeatureExtractor``
 
     .. image:: _static/img/CaveFishFeaturizer.webp
+       :alt: Cave Fish Featurizer
        :width: 400
        :align: center
 

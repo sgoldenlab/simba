@@ -34,6 +34,7 @@ def is_inside_rectangle(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     |:heart_eyes:|
 
     .. image:: _static/img/simba.data_processors.cuda.geometry.is_inside_rectangle.webp
+       :alt: Simba.data processors.cuda.geometry.is inside rectangle
        :width: 450
        :align: center
 
@@ -140,6 +141,7 @@ def is_inside_polygon(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     the corresponding point is inside the polygon.
 
     .. image:: _static/img/simba.data_processors.cuda.geometry.is_inside_polygon.webp
+       :alt: Simba.data processors.cuda.geometry.is inside polygon
        :width: 450
        :align: center
 
@@ -311,6 +313,7 @@ def poly_area(data: np.ndarray,
 
 
     .. image:: _static/img/simba.data_processors.cuda.geometry.poly_area_cuda.webp
+       :alt: Simba.data processors.cuda.geometry.poly area cuda
        :width: 450
        :align: center
 
@@ -359,6 +362,7 @@ def find_midpoints(x: np.ndarray,
        For CPU function see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.find_midpoints`.
 
     .. image:: _static/img/find_midpoints.webp
+       :alt: Find midpoints
        :width: 600
        :align: center
 
@@ -455,6 +459,7 @@ def directionality_to_static_targets(left_ear: np.ndarray,
         If the target is moving, consider :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.jitted_line_crosses_to_nonstatic_targets`.
 
     .. image:: _static/img/directing_static_targets.png
+       :alt: Directing static targets
        :width: 400
        :align: center
 
@@ -570,6 +575,7 @@ def directionality_to_nonstatic_target(left_ear: np.ndarray,
        :header-rows: 1
 
     .. image:: _static/img/directing_moving_targets.png
+       :alt: Directing moving targets
        :width: 400
        :align: center
 

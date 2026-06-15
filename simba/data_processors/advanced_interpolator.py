@@ -41,6 +41,7 @@ class AdvancedInterpolator(ConfigReader):
     For example, interpolate some body-parts of animals using linear interpolation, and other body-parts of animals using nearest interpolation.
 
     .. image:: _static/img/AdvancedInterpolator.webp
+       :alt: Advanced Interpolator
        :width: 600
        :align: center
 

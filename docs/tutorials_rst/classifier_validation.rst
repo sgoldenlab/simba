@@ -14,6 +14,7 @@ results.
    you should see the following sub-menu:
 
 .. image:: img/classifier_validation/menu_1.png
+  :alt: Menu 1
   :width: 800
   :align: center
 
@@ -76,6 +77,7 @@ How to use it
    .mp4
 
 .. image:: img/classifier_validation/clf_validation_example.gif
+  :alt: Clf validation example
   :width: 800
   :align: center
 

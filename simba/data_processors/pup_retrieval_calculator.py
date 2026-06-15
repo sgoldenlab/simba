@@ -29,6 +29,7 @@ class PupRetrieverCalculator(ConfigReader):
        `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/add_on_pup_ret.md>`_
 
     .. image:: _static/img/pup_retrieval.webp
+       :alt: Pup retrieval
        :width: 400
        :align: center
 

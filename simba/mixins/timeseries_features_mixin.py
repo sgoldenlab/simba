@@ -49,6 +49,7 @@ class TimeseriesFeatureMixin(object):
     I've found so far has not been fast enough for rolling windows in large datasets.
 
     .. image:: _static/img/ts_runtimes.png
+       :alt: Ts runtimes
        :width: 1200
        :align: center
 
@@ -89,6 +90,7 @@ class TimeseriesFeatureMixin(object):
         :rtype:
 
         .. image:: _static/img/hjort_parameters.webp
+           :alt: Hjort parameters
            :width: 600
            :align: center
 
@@ -168,6 +170,7 @@ class TimeseriesFeatureMixin(object):
         Returns 2D np.ndarray with columns representing idx and values of local maxima.
 
         .. image:: _static/img/local_maxima_minima.png
+           :alt: Local maxima minima
            :width: 600
            :align: center
 
@@ -213,6 +216,7 @@ class TimeseriesFeatureMixin(object):
         Jitted compute of the count in time-series where sequential values crosses a defined value.
 
         .. image:: _static/img/crossings.png
+           :alt: Crossings
            :width: 600
            :align: center
 
@@ -258,6 +262,7 @@ class TimeseriesFeatureMixin(object):
            For frames occurring before a complete time window, -1.0 is returned.
 
         .. image:: _static/img/sliding_crossings.png
+           :alt: Sliding crossings
            :width: 1500
            :align: center
 
@@ -309,6 +314,7 @@ class TimeseriesFeatureMixin(object):
            Adapted from `cesium <https://github.com/cesium-ml/cesium>`_.
 
         .. image:: _static/img/percentile_difference.png
+           :alt: Percentile difference
            :width: 600
            :align: center
 
@@ -393,6 +399,7 @@ class TimeseriesFeatureMixin(object):
            Oddetity: mean calculation is incorrect if passing float32 data but correct if passing float64.
 
         .. image:: _static/img/percent_beyond_n_std.png
+           :alt: Percent beyond n std
            :width: 600
            :align: center
 
@@ -429,6 +436,7 @@ class TimeseriesFeatureMixin(object):
         and each column corresponds to a different window size. The results are given as a percentage of data points beyond the threshold.
 
         .. image:: _static/img/sliding_percent_beyond_n_std.webp
+           :alt: Sliding percent beyond n std
            :width: 600
            :align: center
 
@@ -470,6 +478,7 @@ class TimeseriesFeatureMixin(object):
         Compute the number of unique values in a sliding window over an array of feature values.
 
         .. image:: _static/img/sliding_unique.webp
+           :alt: Sliding unique
            :width: 600
            :align: center
 
@@ -501,6 +510,7 @@ class TimeseriesFeatureMixin(object):
            Adapted from `cesium <https://github.com/cesium-ml/cesium>`_.
 
         .. image:: _static/img/percent_in_percentile_window.png
+           :alt: Percent in percentile window
            :width: 600
            :align: center
 
@@ -765,6 +775,7 @@ class TimeseriesFeatureMixin(object):
            :math:`p_i` is the probability of each unique order pattern.
 
         .. image:: _static/img/permutation_entropy.webp
+           :alt: Permutation entropy
            :width: 600
            :align: center
 
@@ -834,6 +845,7 @@ class TimeseriesFeatureMixin(object):
 
 
         .. image:: _static/img/line_length.png
+           :alt: Line length
            :width: 600
            :align: center
 
@@ -866,6 +878,7 @@ class TimeseriesFeatureMixin(object):
         is calculated for each window, and the results are returned as a 2D array of float32 values.
 
         .. image:: _static/img/sliding_line_length.png
+           :alt: Sliding line length
            :width: 600
            :align: center
 
@@ -904,6 +917,7 @@ class TimeseriesFeatureMixin(object):
         the input data array. Variance is a measure of data dispersion or spread.
 
         .. image:: _static/img/sliding_variance.png
+           :alt: Sliding variance
            :width: 600
            :align: center
 
@@ -1095,6 +1109,7 @@ class TimeseriesFeatureMixin(object):
         or fall below a specified threshold.
 
         .. image:: _static/img/longest_strike.png
+           :alt: Longest strike
            :width: 700
            :align: center
 
@@ -1160,6 +1175,7 @@ class TimeseriesFeatureMixin(object):
         you can choose whether to look for values above or below the threshold.
 
         .. image:: _static/img/sliding_longest_strike.png
+           :alt: Sliding longest strike
            :width: 700
            :align: center
 
@@ -1232,6 +1248,7 @@ class TimeseriesFeatureMixin(object):
         a specified threshold in a time series. The time series is assumed to have a constant sample rate.
 
         .. image:: _static/img/time_since_previous_threshold.png
+           :alt: Time since previous threshold
            :width: 600
            :align: center
 
@@ -1288,6 +1305,7 @@ class TimeseriesFeatureMixin(object):
         of a specific value within the data array.
 
         .. image:: _static/img/time_since_previous_target_value.png
+           :alt: Time since previous target value
            :width: 700
            :align: center
 
@@ -1339,6 +1357,7 @@ class TimeseriesFeatureMixin(object):
         first digits in the provided data.
 
         .. image:: _static/img/benford_correlation.png
+           :alt: Benford correlation
            :width: 600
            :align: center
 
@@ -1463,6 +1482,7 @@ class TimeseriesFeatureMixin(object):
             - spike_dict (Dict[int, Dict[str, float]]): A dictionary where the keys are spike indices, and the values are dictionaries containing spike characteristics including 'amplitude' (spike amplitude), 'fwhm' (FWHM), and 'half_width' (half-width).
 
         .. image:: _static/img/spike_finder.webp
+           :alt: Spike finder
            :width: 600
            :align: center
 
@@ -1752,6 +1772,7 @@ class TimeseriesFeatureMixin(object):
            By default, acceleration is calculated as change in velocity at millimeters/s. To change the denomitator, modify the ``time_window`` argument. To change the nominator, modify the ``unit`` argument (accepted ``mm``, cm``, ``dm``, ``mm``)
 
         .. image:: _static/img/acceleration.png
+           :alt: Acceleration
            :width: 700
            :align: center
 
@@ -1810,6 +1831,7 @@ class TimeseriesFeatureMixin(object):
            Modified from `Selva Prabhakaran <https://www.machinelearningplus.com/time-series/granger-causality-test-in-python/>`_.
 
         .. image:: _static/img/granger_tests.webp
+           :alt: Granger tests
            :width: 700
            :align: center
 
@@ -1860,6 +1882,7 @@ class TimeseriesFeatureMixin(object):
         Calculate sliding Euclidean displacement of a body-part point over time windows.
 
         .. image:: _static/img/sliding_displacement.png
+           :alt: Sliding displacement
            :width: 600
            :align: center
 
@@ -1900,6 +1923,7 @@ class TimeseriesFeatureMixin(object):
         Calculate sliding (lagged) cross-correlation between two signals, e.g., the movement and velocity of two animals.
 
         .. image:: _static/img/sliding_two_signal_crosscorrelation.webp
+           :alt: Sliding two signal crosscorrelation
            :width: 600
            :align: center
 
@@ -1952,6 +1976,7 @@ class TimeseriesFeatureMixin(object):
         Compute the percentage of elements in the top 'n' frequencies in sliding windows of the input array.
 
         .. image:: _static/img/sliding_pct_in_top_n.webp
+           :alt: Sliding pct in top n
            :width: 600
            :align: center
 
@@ -2022,6 +2047,7 @@ class TimeseriesFeatureMixin(object):
         and :math:`\frac{d^3 x_i}{dt^3}` is the third derivative of the position with respect to time.
 
         .. image:: _static/img/mean_squared_jerk.webp
+           :alt: Mean squared jerk
            :width: 600
            :align: center
 
@@ -2099,6 +2125,7 @@ class TimeseriesFeatureMixin(object):
         Calculates the straightness (linearity) index of a path.
 
         .. image:: _static/img/linearity_index.webp
+           :alt: Linearity index
            :width: 400
            :align: center
 
@@ -2143,6 +2170,7 @@ class TimeseriesFeatureMixin(object):
         The Linearity Index measures how straight a path is by comparing the straight-line distance between the start and end points of each window to the total distance traveled along the path.
 
         .. image:: _static/img/sliding_linearity_index.webp
+           :alt: Sliding linearity index
            :width: 600
            :align: center
 
@@ -2202,6 +2230,7 @@ class TimeseriesFeatureMixin(object):
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_entropy_of_directional_changes`
 
         .. image:: _static/img/entropy_of_directional_changes.webp
+           :alt: Entropy of directional changes
            :width: 700
            :align: center
 
@@ -2293,6 +2322,7 @@ class TimeseriesFeatureMixin(object):
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_path_curvature`
 
         .. image:: _static/img/path_curvature.webp
+           :alt: Path curvature
            :width: 600
            :align: center
 
@@ -2334,6 +2364,7 @@ class TimeseriesFeatureMixin(object):
         the window, while a lower curvature suggests a straighter or smoother path.
 
         .. image:: _static/img/sliding_path_curvature.webp
+           :alt: Sliding path curvature
            :width: 600
            :align: center
 
@@ -2390,6 +2421,7 @@ class TimeseriesFeatureMixin(object):
 
 
         .. image:: _static/img/spatial_density.webp
+           :alt: Spatial density
            :width: 400
            :align: center
 
@@ -2438,6 +2470,7 @@ class TimeseriesFeatureMixin(object):
         of the trajectory.
 
         .. image:: _static/img/sliding_spatial_density.webp
+           :alt: Sliding spatial density
            :width: 600
            :align: center
 
@@ -2478,6 +2511,7 @@ class TimeseriesFeatureMixin(object):
         Calculates the aspect ratio of the bounding box that encloses a given path.
 
         .. image:: _static/img/path_aspect_ratio.webp
+           :alt: Path aspect ratio
            :width: 400
            :align: center
 
@@ -2513,6 +2547,7 @@ class TimeseriesFeatureMixin(object):
         This function calculates the aspect ratio (width/height) of the smallest bounding box that encloses a sequence of points within a sliding window over a 2D path. The path is defined by consecutive (x, y) coordinates. The sliding window moves forward by one point at each step, and the aspect ratio is computed for each position of the window.
 
         .. image:: _static/img/sliding_path_aspect_ratio.webp
+           :alt: Sliding path aspect ratio
            :width: 600
            :align: center
 
@@ -2553,6 +2588,7 @@ class TimeseriesFeatureMixin(object):
         of points. The value ranges between 0 and 1, where: - 0 indicates a perfectly circular distribution. - Values approaching 1 indicate a highly elongated or linear distribution.
 
         .. image:: _static/img/radial_eccentricity.webp
+           :alt: Radial eccentricity
            :width: 700
            :align: center
 
@@ -2583,6 +2619,7 @@ class TimeseriesFeatureMixin(object):
         For example, the radial dispersion from an ROI center.
 
         .. image:: _static/img/radial_dispersion_index.webp
+           :alt: Radial dispersion index
            :width: 600
            :align: center
 
@@ -2613,6 +2650,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: float
 
         .. image:: _static/img/avg_kinetic_energy.webp
+           :alt: Avg kinetic energy
            :width: 600
            :align: center
 
@@ -2639,6 +2677,7 @@ class TimeseriesFeatureMixin(object):
         kinetic energy values for each valid frame.
 
         .. image:: _static/img/sliding_avg_kinetic_energy.webp
+           :alt: Sliding avg kinetic energy
            :width: 600
            :align: center
 
@@ -2683,6 +2722,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: float
 
         .. image:: _static/img/momentum_magnitude.webp
+           :alt: Momentum magnitude
            :width: 600
            :align: center
         """

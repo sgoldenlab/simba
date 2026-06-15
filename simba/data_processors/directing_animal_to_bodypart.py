@@ -29,6 +29,7 @@ class DirectingAnimalsToBodyPartAnalyzer(ConfigReader, FeatureExtractionMixin):
        `Expected output <https://github.com/sgoldenlab/simba/blob/master/misc/Direction_data_example.csv>`__.
 
     .. image:: _static/img/DirectingOtherAnimalsAnalyzer.webp
+       :alt: Directing Other Animals Analyzer
        :width: 400
        :align: center
 

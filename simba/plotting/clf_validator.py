@@ -37,6 +37,7 @@ class ClassifierValidationClips(ConfigReader):
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/classifier_validation.md#classifier-validation>`_.
 
     .. image:: _static/img/ClassifierValidationClips_1.png
+       :alt: Classifier Validation Clips 1
        :width: 600
        :align: center
 

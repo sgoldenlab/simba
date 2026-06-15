@@ -36,7 +36,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
     :param Union[str, os.PathLike] video_dir: Optional path to directory with video files. If None, then read from the SimBA project as dictated by project config. Default None.
     :param Optional[Union[str, os.PathLike]] video_info_path: Optional path to vide_info.csv file. If None, then read from the SimBA project as dictated by project config. Default None.
 
-    ..seealso::
+    .. seealso::
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters>`__.
 
     :example:

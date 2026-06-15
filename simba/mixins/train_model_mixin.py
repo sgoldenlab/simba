@@ -362,6 +362,7 @@ class TrainModelMixin(object):
         Helper to compute random forest learning curves with cross-validation.
 
         .. image:: _static/img/learning_curves.png
+           :alt: Learning curves
            :width: 600
            :align: center
 
@@ -442,6 +443,7 @@ class TrainModelMixin(object):
         Compute random forest precision-recall curve.
 
         .. image:: _static/img/pr_curves.png
+           :alt: Pr curves
            :width: 800
            :align: center
 
@@ -527,6 +529,7 @@ class TrainModelMixin(object):
         Helper to produce visualization of random forest decision tree using graphviz.
 
         .. image:: _static/img/create_example_dt.png
+           :alt: Create example dt
            :width: 700
            :align: center
 
@@ -621,14 +624,17 @@ class TrainModelMixin(object):
            `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#train-predictive-classifiers-settings>`_
 
         .. image:: _static/img/clf_report.png
+           :alt: Clf report
            :width: 500
            :align: center
 
         .. image:: _static/img/clf_report.webp
+           :alt: Clf report
            :width: 500
            :align: center
 
         .. image:: _static/img/clf_report_mosaic.webp
+           :alt: Clf report mosaic
            :width: 1000
            :align: center
 
@@ -747,6 +753,7 @@ class TrainModelMixin(object):
            `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#train-predictive-classifiers-settings>`_
 
         .. image:: _static/img/gini_bar_chart.png
+           :alt: Gini bar chart
            :width: 600
            :align: center
 
@@ -865,6 +872,7 @@ class TrainModelMixin(object):
            Uses TreeSHAP `Documentation <https://shap.readthedocs.io/en/latest/index.html>`_
 
         .. image:: _static/img/shap.png
+           :alt: Shap
            :width: 600
            :align: center
 
@@ -1191,6 +1199,7 @@ class TrainModelMixin(object):
         Helper to split train and test based on annotated `bouts`.
 
         .. image:: _static/img/bout_vs_frames_split.png
+           :alt: Bout vs frames split
            :width: 600
            :align: center
 
@@ -1851,6 +1860,7 @@ class TrainModelMixin(object):
             For multiprocassing concurrent futures method (should be more reliable on Linux distros), see :func:`~simba.mixins.train_model_mixin.TrainModelMixin.create_shap_log_concurrent_mp`
 
         .. image:: _static/img/shap.png
+           :alt: Shap
            :width: 400
            :align: center
 
@@ -2661,6 +2671,7 @@ class TrainModelMixin(object):
 
 
         .. image:: _static/img/shap.png
+           :alt: Shap
            :width: 400
            :align: center
 

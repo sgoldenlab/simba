@@ -30,6 +30,7 @@ class FSTTCCalculator(ConfigReader, PlottingMixin):
     :param bool create_graphs: If True, created violin plots (as below) representing each FSTTC. Default: False.
 
     .. image:: _static/img/fsttc_violin.png
+       :alt: Fsttc violin
        :width: 500
        :align: center
 

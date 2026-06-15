@@ -2,6 +2,7 @@
 =================================
 
 .. image:: tutorials_rst/img/index/landing_1.gif
+   :alt: Landing 1
    :width: 1000
    :align: center
 

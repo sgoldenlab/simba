@@ -50,6 +50,7 @@ class FreezingDetector(ConfigReader):
        :align: center
 
     .. image:: _static/img/FreezingDetector_pipeline.png
+       :alt: Freezing Detector pipeline
        :width: 1000
        :align: center
 

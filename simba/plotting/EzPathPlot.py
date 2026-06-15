@@ -37,6 +37,7 @@ class EzPathPlot(object):
     Draws the trajectory of one body part over time as a line on a solid or video-frame background.
 
     .. image:: _static/img/get_path_img.webp
+       :alt: Get path img
        :width: 1000
        :align: center
 

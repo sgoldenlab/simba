@@ -32,6 +32,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
        `Validation tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data>`__.
 
     .. image:: _static/img/interactive_probability_plot.png
+       :alt: Interactive probability plot
        :width: 450
        :align: center
 

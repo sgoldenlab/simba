@@ -31,6 +31,7 @@ class Smoothing(ConfigReader):
     Smooth pose-estimation data according to user-defined method.
 
     .. image:: _static/img/smoothing.gif
+       :alt: Smoothing
        :width: 600
        :align: center
 

@@ -36,6 +36,7 @@ class BorisAppender(ConfigReader):
        `Example II BORIS input file <https://github.com/sgoldenlab/simba/blob/master/misc/boris_new_example.csv>`_.
 
     .. image:: _static/img/boris.png
+       :alt: Boris
        :width: 200
        :align: center
 

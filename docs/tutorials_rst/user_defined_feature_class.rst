@@ -85,6 +85,7 @@ Step 1: Use a user-defined feature extraction script in SimBA
    marked in red in the image.
 
 .. image:: img/user_defined_feature_extraction_script/1.png
+  :alt: 1
   :width: 800
   :align: center
 

@@ -103,6 +103,7 @@ class PosePlotterMultiProcess():
     :param bool verbose: If True, print progress messages during video creation. Default True.
 
     .. image:: _static/img/pose_plotter.png
+       :alt: Pose plotter
        :width: 600
        :align: center
 

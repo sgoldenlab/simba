@@ -89,6 +89,7 @@ def jitted_centroid(points: np.ndarray) -> np.ndarray:
     For each frame: quickhull → hull vertex indices → centroid = (mean(x), mean(y)) of those vertices.
 
     .. image:: _static/img/jitted_centroid.webp
+       :alt: Jitted centroid
        :width: 600
        :align: center
 

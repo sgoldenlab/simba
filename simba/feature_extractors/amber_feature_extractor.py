@@ -101,6 +101,7 @@ class AmberFeatureExtractor(ConfigReader, FeatureExtractionMixin):
        For more info, contact Hannah E. Lapp `Hannah.Lapp@austin.utexas.edu <Hannah.Lapp@austin.utexas.edu/>`_.
 
     .. image:: _static/img/pose_configurations/amber.png
+       :alt: Amber
        :width: 400
        :align: center
 

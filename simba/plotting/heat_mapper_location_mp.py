@@ -116,6 +116,7 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
        `GitHub visualizations tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
     .. image:: _static/img/heatmap_location.gif
+       :alt: Heatmap location
        :width: 500
        :align: center
 
@@ -125,6 +126,7 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
        :align: center
 
     .. image:: _static/img/HeatMapperLocationMultiprocess.webp
+       :alt: Heat Mapper Location Multiprocess
        :width: 600
        :align: center
 

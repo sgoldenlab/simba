@@ -123,6 +123,7 @@ class ShapAggregateStatisticsCalculator():
        `Example output <https://github.com/sgoldenlab/simba/blob/master/images/example_shap_graph.png>`__.
 
     .. image:: _static/img/shap.png
+       :alt: Shap
        :width: 600
        :align: center
 

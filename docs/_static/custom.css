@@ -1,15 +1,35 @@
-/* Load the font */
+/* --- Poppins web font (self-hosted, all weights) --- */
 @font-face {
-    font-family: 'Poppins';
+    font-family: 'Poppins'; font-weight: 400; font-style: normal; font-display: swap;
     src: url('./fonts/Poppins-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+}
+@font-face {
+    font-family: 'Poppins'; font-weight: 500; font-style: normal; font-display: swap;
+    src: url('./fonts/Poppins-Medium.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Poppins'; font-weight: 600; font-style: normal; font-display: swap;
+    src: url('./fonts/Poppins-Bold.ttf') format('truetype');   /* Bold reused for 600 (semibold) */
+}
+@font-face {
+    font-family: 'Poppins'; font-weight: 700; font-style: normal; font-display: swap;
+    src: url('./fonts/Poppins-Bold.ttf') format('truetype');
 }
 
-/* Apply globally */
-body {
-    font-family: 'Poppins', sans-serif;
+/* Apply Poppins across the theme (code / monospace deliberately left untouched) */
+body,
+.rst-content,
+.wy-nav-content,
+.wy-nav-side, .wy-menu-vertical,
+.wy-side-nav-search, .wy-side-nav-search > div.version, .wy-side-nav-search input[type="text"],
+.wy-nav-top,
+h1, h2, h3, h4, h5, h6,
+.rst-content .toctree-wrapper > p.caption,
+.btn, button, input, optgroup, select, textarea {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
+h1, h2, h3, h4, h5, h6, .rst-content .toctree-wrapper > p.caption { font-weight: 600; }
+.rst-content { line-height: 1.62; }
 
 
 
@@ -80,15 +100,15 @@ body {
 }
 .doi-hc-title    { font-weight: 600; font-size: 14px; margin-bottom: 4px; color: #1a1a1a; }
 .doi-hc-authors  { color: #444; margin-bottom: 3px; }
-.doi-hc-meta     { color: #2980b9; font-size: 12px; margin-bottom: 6px; }
+.doi-hc-meta     { color: #21567a; font-size: 12px; margin-bottom: 6px; }
 .doi-hc-abstract { color: #555; font-size: 12.5px; max-height: 140px; overflow: hidden; }
 .doi-hc-foot     { margin-top: 10px; font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: .04em;
                    display: flex; align-items: center; justify-content: space-between; }
 .doi-hc-actions  { display: inline-flex; gap: 8px; align-items: center; }
-.doi-hc-open     { display: inline-block; padding: 3px 10px; border-radius: 6px; background: #2980b9; color: #fff !important;
+.doi-hc-open     { display: inline-block; padding: 3px 10px; border-radius: 6px; background: #21567a; color: #fff !important;
                    font-size: 11px; font-weight: 600; text-decoration: none; text-transform: none; letter-spacing: 0; }
-.doi-hc-open:hover { background: #1f6391; color: #fff !important; text-decoration: none; }
-.doi-hc-bib      { padding: 3px 10px; border-radius: 6px; border: 1px solid #2980b9; background: #fff; color: #2980b9;
+.doi-hc-open:hover { background: #19465f; color: #fff !important; text-decoration: none; }
+.doi-hc-bib      { padding: 3px 10px; border-radius: 6px; border: 1px solid #21567a; background: #fff; color: #21567a;
                    font-size: 11px; font-weight: 600; cursor: pointer; text-transform: none; letter-spacing: 0; line-height: 1.4; }
 .doi-hc-bib:hover { background: #eaf3fa; }
 .doi-hc-loading  { color: #888; font-style: italic; }
@@ -181,8 +201,8 @@ body {
     opacity: 0; transition: opacity .15s ease;
 }
 .simba-math-wrap:hover .simba-tex-btn { opacity: 1; }
-.simba-tex-btn:hover { background: #fff; border-color: #2980b9; color: #2980b9; }
-.simba-tex-btn.copied { background: #2980b9; color: #fff; border-color: #2980b9; }
+.simba-tex-btn:hover { background: #fff; border-color: #21567a; color: #21567a; }
+.simba-tex-btn.copied { background: #21567a; color: #fff; border-color: #21567a; }
 
 /* --- Copy button on code blocks --- */
 .rst-content div.highlight { position: relative; }
@@ -194,8 +214,8 @@ body {
     opacity: 0; transition: opacity .15s ease;
 }
 .rst-content div.highlight:hover .simba-copy-btn { opacity: 1; }
-.simba-copy-btn:hover { background: #fff; border-color: #2980b9; color: #2980b9; }
-.simba-copy-btn.copied { background: #2980b9; color: #fff; border-color: #2980b9; }
+.simba-copy-btn:hover { background: #fff; border-color: #21567a; color: #21567a; }
+.simba-copy-btn.copied { background: #21567a; color: #fff; border-color: #21567a; }
 
 /* --- Command palette (Ctrl/Cmd-K) --- */
 .simba-cmdk-trigger {
@@ -204,7 +224,7 @@ body {
     border: 1px solid #d6dde3; border-radius: 8px; background: #f6f8fa;
     color: #5a6b7b; font-size: 14px; cursor: pointer; text-align: left;
 }
-.simba-cmdk-trigger:hover { border-color: #2980b9; background: #eef5fb; color: #2980b9; }
+.simba-cmdk-trigger:hover { border-color: #21567a; background: #e8eef4; color: #21567a; }
 .simba-cmdk-trigger kbd {
     font-size: 11px; background: #fff; border: 1px solid #cfd6dc; border-radius: 4px;
     padding: 2px 6px; color: #777; white-space: nowrap;
@@ -230,7 +250,7 @@ body {
     display: block; padding: 9px 18px; font-size: 13px; color: #333 !important;
     text-decoration: none; border-bottom: 1px solid #f4f4f4;
 }
-.simba-cmdk-item.active, .simba-cmdk-item:hover { background: #eaf3fa; color: #1f6391 !important; }
+.simba-cmdk-item.active, .simba-cmdk-item:hover { background: #eaf3fa; color: #19465f !important; }
 .simba-cmdk-empty { padding: 18px; color: #999; font-size: 13px; }
 
 /* --- Landing page card-grid navigation --- */
@@ -248,8 +268,8 @@ body {
     transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
 }
 .simba-card:hover {
-    border-color: #2980b9;
-    box-shadow: 0 4px 16px rgba(41, 128, 185, 0.15);
+    border-color: #21567a;
+    box-shadow: 0 4px 16px rgba(33, 86, 122, 0.15);
     transform: translateY(-2px);
 }
 .simba-card-ico { font-size: 24px; line-height: 1; flex: 0 0 auto; }
@@ -289,11 +309,11 @@ body {
     display: flex; align-items: center; justify-content: center;
     width: 54px; height: 54px; padding-bottom: 4px;
     border: 2px solid rgba(255, 255, 255, .9); border-radius: 50%;
-    background: rgba(41, 128, 185, .9); color: #fff; font-size: 34px; font-weight: 700; line-height: 1;
+    background: rgba(33, 86, 122, .9); color: #fff; font-size: 34px; font-weight: 700; line-height: 1;
     cursor: pointer; box-shadow: 0 2px 14px rgba(0, 0, 0, .45);
     transition: background .15s ease, transform .15s ease;
 }
-.simba-carousel-nav:hover { background: #2980b9; transform: translateY(-50%) scale(1.08); }
+.simba-carousel-nav:hover { background: #21567a; transform: translateY(-50%) scale(1.08); }
 .simba-carousel-nav.prev { left: 14px; }
 .simba-carousel-nav.next { right: 14px; }
 .simba-carousel-counter {
@@ -317,4 +337,206 @@ body {
     position: absolute; top: 8px; left: 0; right: 0; height: 7px;
     background: rgba(0, 0, 0, .25); z-index: 3; pointer-events: none;
 }
-.simba-carousel-progress > i { display: block; height: 100%; width: 0; background: #4aa3df; }
+.simba-carousel-progress > i { display: block; height: 100%; width: 0; background: #4f8fb5; }
+
+/* --- Content tables: zebra striping, rounded corners, lighter borders --- */
+.rst-content table.docutils {
+    border: 1px solid #e3e8ec;
+    border-radius: 8px;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.rst-content table.docutils thead th {
+    background: #eef2f6; font-weight: 600; color: #2c3e50;
+    border: none; border-bottom: 2px solid #e3e8ec;
+}
+.rst-content table.docutils td,
+.rst-content table.docutils th {
+    border: none;
+    border-bottom: 1px solid #eef1f4;       /* horizontal separators only -> lighter */
+}
+.rst-content table.docutils tr:last-child td { border-bottom: none; }
+/* soften / re-key RTD's built-in zebra to a light blue-grey on even rows */
+.rst-content table.docutils:not(.field-list) tr:nth-child(2n-1) td { background-color: #fff; }
+.rst-content table.docutils:not(.field-list) tr:nth-child(2n) td { background-color: #f7f9fb; }
+
+/* --- Parameter / return field-list labels: subtle accent --- */
+.rst-content dl.field-list > dt {
+    color: #19465f; font-weight: 600;
+}
+
+/* --- Inline code: soft pill (leaves :func: cross-ref links untouched) --- */
+.rst-content code.literal:not(.xref),
+.rst-content tt.literal:not(.xref) {
+    background: #f3f4f6;
+    border: 1px solid #e7e9ee;
+    border-radius: 6px;
+    padding: 0.10em 0.42em;
+    font-size: 0.86em;
+    color: #2d333b;                       /* soft slate instead of the loud default red */
+}
+/* cross-reference code (:func:/:class:) stays a clean link, no pill */
+.rst-content code.xref, .rst-content a code {
+    background: transparent; border: none; padding: 0; font-weight: 600;
+}
+/* inline math: keep it sitting at body-text size consistently */
+.rst-content span.math { font-size: 1.05em; line-height: 1; }
+
+/* --- Content figures: subtle rounded corners + soft shadow (pairs with the lightbox) --- */
+.rst-content img.align-center,
+.rst-content img.align-left,
+.rst-content img.align-right,
+.rst-content a.image-reference > img,
+.rst-content .figure img,
+.rst-content figure img {
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.24);   /* clearer shadow */
+    margin-top: 1.6em;                            /* space before */
+    margin-bottom: 1.6em;                         /* space after */
+}
+.rst-content img.align-center,
+.rst-content img.align-left,
+.rst-content img.align-right,
+.rst-content a.image-reference > img,
+.rst-content .figure img,
+.rst-content figure img { transition: box-shadow .18s ease; }
+/* bigger shadow on hover (lift = "click to enlarge" hint) */
+.rst-content img.align-center:hover,
+.rst-content img.align-left:hover,
+.rst-content img.align-right:hover,
+.rst-content a.image-reference:hover > img,
+.rst-content .figure img:hover,
+.rst-content figure img:hover { box-shadow: 0 16px 46px rgba(0, 0, 0, 0.45); }
+
+/* --- Sidebar: tighter spacing + clearer active item --- */
+.wy-menu-vertical a { padding-top: 0.32em; padding-bottom: 0.32em; line-height: 1.35; }  /* tighter (left/right untouched -> indent preserved) */
+.wy-menu-vertical li.toctree-l1 > a { font-weight: 600; }
+.wy-menu-vertical p.caption { margin: 1.1em 0 0.35em; font-size: 0.78em; letter-spacing: 0.06em; }
+.wy-menu-vertical li.current > a,
+.wy-menu-vertical li.current > a:hover {
+    background: #e6edf2;
+    box-shadow: inset 3px 0 0 #21567a;     /* accent bar without shifting text */
+    color: #19465f;
+    font-weight: 600;
+}
+
+/* --- Modern admonitions: tinted box + accent left-border + coloured title --- */
+.rst-content .admonition, .rst-content .admonition.admonition {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+    background: #f4f6f8;
+    border-left: 4px solid #7f8c9a;        /* generic fallback accent */
+}
+.rst-content .admonition > .admonition-title {
+    background: transparent;               /* remove RTD's solid colour bar */
+    font-weight: 600;
+    color: #5a6b7b;
+}
+/* note / seealso -> blue */
+.rst-content .admonition.note, .rst-content .admonition.seealso { background: #e8eef4; border-left-color: #21567a; }
+.rst-content .note > .admonition-title, .rst-content .seealso > .admonition-title { background: transparent; color: #19465f; }
+/* tip / hint -> green */
+.rst-content .admonition.tip, .rst-content .admonition.hint { background: #eafaf1; border-left-color: #27ae60; }
+.rst-content .tip > .admonition-title, .rst-content .hint > .admonition-title { background: transparent; color: #1e8449; }
+/* important -> purple */
+.rst-content .admonition.important { background: #f5eef9; border-left-color: #8e44ad; }
+.rst-content .important > .admonition-title { background: transparent; color: #6c3483; }
+/* warning / attention / caution -> amber */
+.rst-content .admonition.warning, .rst-content .admonition.attention, .rst-content .admonition.caution { background: #fef6e7; border-left-color: #e67e22; }
+.rst-content .warning > .admonition-title, .rst-content .attention > .admonition-title, .rst-content .caution > .admonition-title { background: transparent; color: #b9770e; }
+/* danger / error -> red */
+.rst-content .admonition.danger, .rst-content .admonition.error { background: #fdeded; border-left-color: #e74c3c; }
+.rst-content .danger > .admonition-title, .rst-content .error > .admonition-title { background: transparent; color: #c0392b; }
+
+/* --- Anchor-jump breathing room (smooth animation handled in custom.js, fast & fixed-duration) --- */
+.rst-content section,
+.rst-content dl.py > dt,
+.rst-content h1, .rst-content h2, .rst-content h3,
+.rst-content h4, .rst-content h5, .rst-content h6 {
+    scroll-margin-top: 1.2em;
+}
+
+/* --- Custom scrollbars --- */
+* { scrollbar-width: thin; scrollbar-color: #c2cbd3 transparent; }   /* Firefox */
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+    background: #c2cbd3; border-radius: 7px;
+    border: 3px solid transparent; background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: #9aa7b2; background-clip: content-box; }
+
+/* --- Function / class signature cards: each entry is one elevated card --- */
+.rst-content dl.py {
+    border: 1px solid #cfd9e3;
+    border-left: 5px solid #21567a;          /* bold accent bar */
+    border-radius: 8px;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.13);
+    background: #fff;
+    margin: 0 0 3.6em 0;                     /* clear gap between cards */
+    /* NOTE: no overflow:hidden -> nested method cards keep their shadow */
+}
+.rst-content dl.py > dt {
+    background: #e6edf2;                      /* header tint */
+    border: none;
+    border-bottom: 1px solid #cfd9e3;
+    border-radius: 7px 7px 0 0;               /* round header corners directly */
+    padding: 13px 18px;
+    box-shadow: none;
+}
+.rst-content dl.py > dt .sig-name.descname,
+.rst-content dl.py > dt .descname,
+.rst-content dl.py > dt code.descname { color: #19465f; font-weight: 700; }
+.rst-content dl.py > dt .property,
+.rst-content dl.py > dt em.property { color: #8e6fb3; font-style: normal; font-weight: 600; }   /* "class"/"static" labels */
+.rst-content dl.py > dd {
+    border: none;
+    border-radius: 0 0 7px 7px;
+    margin: 0;
+    padding: 1.1em 18px 0.6em 18px;
+    background: #fff;
+}
+.rst-content dl.py > dd > *:last-child { margin-bottom: 0; }
+/* nested method cards inside a class: keep them clearly separated too */
+.rst-content dl.py dl.py {
+    box-shadow: 0 3px 13px rgba(0, 0, 0, 0.11);
+    margin: 2.8em 0 2.8em 0;
+}
+/* hover lifts the card you're on, so it's obvious which one you're reading */
+.rst-content dl.py:hover { box-shadow: 0 8px 26px rgba(0, 0, 0, 0.18); }
+
+/* type-coded accents so a class (container) is distinct from its nested method cards */
+.rst-content dl.py.class { border-left-color: #8e6fb3; }                 /* class = purple */
+.rst-content dl.py.class > dt { background: #f3edfa; border-bottom-color: #e1d5ef; }
+.rst-content dl.py.class > dt .sig-name.descname,
+.rst-content dl.py.class > dt .descname { color: #6c3483; }
+
+.rst-content dl.py.exception { border-left-color: #e67e22; }             /* exception = amber */
+.rst-content dl.py.exception > dt { background: #fdf3e7; border-bottom-color: #f3ddc2; }
+.rst-content dl.py.exception > dt .sig-name.descname { color: #b9770e; }
+
+.rst-content dl.py.attribute, .rst-content dl.py.property, .rst-content dl.py.data { border-left-color: #16a085; }  /* attribute = teal */
+.rst-content dl.py.attribute > dt, .rst-content dl.py.property > dt, .rst-content dl.py.data > dt { background: #e7f6f2; border-bottom-color: #cdeee6; }
+.rst-content dl.py.attribute > dt .sig-name.descname,
+.rst-content dl.py.property > dt .sig-name.descname,
+.rst-content dl.py.data > dt .sig-name.descname { color: #117a65; }
+/* method / function keep the blue from the base rule */
+
+
+/* ================================================================== *
+ * SimBA accent pass: retheme RTD's default blue -> logo navy (#21567a)
+ * ================================================================== */
+a, .rst-content a { color: #21567a; }
+a:visited, .rst-content a:visited { color: #4a6b82; }
+a:hover, .rst-content a:hover { color: #143d56; }
+.wy-side-nav-search { background-color: #21567a; }
+.wy-side-nav-search input[type="text"] { border-color: #21567a; }
+.wy-nav-top { background: #21567a; }
+.wy-menu-vertical a:hover { background-color: #eef2f6; color: #19465f; }
+.rst-content .headerlink { color: #21567a; }
+.rst-content a code, .rst-content code.xref { color: #21567a; }
+.rst-content a:hover code, .rst-content code.xref:hover { color: #143d56; }
+.wy-nav-content a.icon-home { color: #fff; }

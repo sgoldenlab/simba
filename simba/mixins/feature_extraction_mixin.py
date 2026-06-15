@@ -113,6 +113,7 @@ class FeatureExtractionMixin(object):
 
 
         .. image:: _static/img/get_3pt_angle.webp
+           :alt: Get 3pt angle
            :width: 300
            :align: center
 
@@ -139,6 +140,7 @@ class FeatureExtractionMixin(object):
         Numba accelerated compute of frame-wise 3-point angles.
 
         .. image:: _static/img/get_3pt_angle.webp
+           :alt: Get 3pt angle
            :width: 300
            :align: center
 
@@ -174,6 +176,7 @@ class FeatureExtractionMixin(object):
         Calculate single frame convex hull perimeter length in millimeters.
 
         .. image:: _static/img/framewise_perim_length.png
+           :alt: Framewise perim length
            :width: 300
            :align: center
 
@@ -266,10 +269,12 @@ class FeatureExtractionMixin(object):
         body-parts that fall within defined bracket of probabilities per frame.
 
         .. image:: _static/img/count_ranges.png
+           :alt: Count ranges
            :width: 300
            :align: center
 
         .. image:: _static/img/count_ranges_2.png
+           :alt: Count ranges 2
            :width: 600
            :align: center
 
@@ -306,6 +311,7 @@ class FeatureExtractionMixin(object):
         static location (location_2) in millimeter or centimeter.
 
         .. image:: _static/img/distance_to_static.png
+           :alt: Distance to static
            :width: 600
            :align: center
 
@@ -344,6 +350,7 @@ class FeatureExtractionMixin(object):
         Frame-wise analysis if animal is inside static rectangular ROI.
 
         .. image:: _static/img/inside_rectangle.png
+           :alt: Inside rectangle
            :width: 300
            :align: center
 
@@ -388,6 +395,7 @@ class FeatureExtractionMixin(object):
         it is considered outside (marked as 0).
 
         .. image:: _static/img/is_inside_circle.webp
+           :alt: Is inside circle
            :width: 400
            :align: center
 
@@ -420,6 +428,7 @@ class FeatureExtractionMixin(object):
            Modified from `epifanio <https://stackoverflow.com/a/48760556>`_
 
         .. image:: _static/img/inside_polygon.png
+           :alt: Inside polygon
            :width: 300
            :align: center
 
@@ -540,6 +549,7 @@ class FeatureExtractionMixin(object):
         all body-parts of one animal and all body-parts of a second animal. Acceleration though numba.
 
         .. image:: _static/img/cdist.png
+           :alt: Cdist
            :width: 600
            :align: center
 
@@ -755,6 +765,7 @@ class FeatureExtractionMixin(object):
            If the target is static, consider :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.jitted_line_crosses_to_static_targets`
 
         .. image:: _static/img/directing_moving_targets.png
+           :alt: Directing moving targets
            :width: 400
            :align: center
 
@@ -812,6 +823,7 @@ class FeatureExtractionMixin(object):
         given the target location and the left ear, right ear, and nose coordinates of the observer.
 
         .. image:: _static/img/directing_static_targets.png
+           :alt: Directing static targets
            :width: 400
            :align: center
 
@@ -873,6 +885,7 @@ class FeatureExtractionMixin(object):
         Finds the minimum bounding rectangle from convex hull vertices.
 
         .. image:: _static/img/minimum_bounding_rectangle.png
+           :alt: Minimum bounding rectangle
            :width: 400
            :align: center
 
@@ -934,10 +947,12 @@ class FeatureExtractionMixin(object):
         Uses the standard Euclidean distance formula: √((x₁-x₂)² + (y₁-y₂)²) / px_per_mm
 
         .. image:: _static/img/framewise_euclid_dist.png
+           :alt: Framewise euclid dist
            :width: 300
            :align: center
 
         .. image:: _static/img/framewise_euclid_dist.webp
+           :alt: Framewise euclid dist
            :width: 300
            :align: center
 
@@ -991,6 +1006,7 @@ class FeatureExtractionMixin(object):
            For direct per-frame distance computation between two coordinate arrays, use func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance`.
 
         .. image:: _static/img/framewise_bodypart_movement.webp
+           :alt: Framewise bodypart movement
            :width: 500
            :align: center
 
@@ -1034,10 +1050,12 @@ class FeatureExtractionMixin(object):
            For Euclidean distance between one moving and one static target, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance_roi`.
 
         .. image:: _static/img/framewise_euclid_dist.png
+           :alt: Framewise euclid dist
            :width: 300
            :align: center
 
         .. image:: _static/img/framewise_euclid_dist.webp
+           :alt: Framewise euclid dist
            :width: 300
            :align: center
 
@@ -1097,6 +1115,7 @@ class FeatureExtractionMixin(object):
            Appears faster than numba deocrated method, and slower than GPU methods.
 
         .. image:: _static/img/framewise_euclid_dist.webp
+           :alt: Framewise euclid dist
            :width: 300
            :align: center
 
@@ -1148,6 +1167,7 @@ class FeatureExtractionMixin(object):
            For an equivalent stand-alone implementation, see :func:`simba.mixins.feature_extraction_supplement_mixin.FeatureExtractionSupplemental.euclidean_distance_timeseries_change`.
 
         .. image:: _static/img/change_in_bodypart_euclidean_distance.webp
+           :alt: Change in bodypart euclidean distance
            :width: 600
            :align: center
 
@@ -1354,6 +1374,7 @@ class FeatureExtractionMixin(object):
         Compute the midpoints between two sets of 2D points based on a given percentile.
 
         .. image:: _static/img/find_midpoints.png
+           :alt: Find midpoints
            :width: 600
            :align: center
 

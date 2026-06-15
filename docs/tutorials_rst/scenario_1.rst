@@ -52,6 +52,7 @@ These sections are listed below along with their corresponding
 functions:
 
 .. image:: img/scenario_1/pipeline_1.jpg
+  :alt: Pipeline 1
   :width: 1200
   :align: center
 
@@ -102,6 +103,7 @@ This section describes how to create a new project for behavioral
 classifier predictions.
 
 .. image:: img/scenario_1/create_project.png
+  :alt: Create project
   :width: 1200
   :align: center
 
@@ -115,6 +117,7 @@ auto-populate with all the required sub-directories.
    ``Create a new project``. The following windows will pop up.
 
 .. image:: img/scenario_1/create_project_1.png
+  :alt: Create project 1
   :width: 600
   :align: center
 
@@ -144,6 +147,7 @@ auto-populate with all the required sub-directories.
    create any classifiers, enter any name in the the single entry box.*
 
 .. image:: img/scenario_1/create_project_2.png
+  :alt: Create project 2
   :width: 600
   :align: center
 
@@ -231,6 +235,7 @@ that we will use to train the classifier for Behavior BtWGaNP.
    built into SimBA.
 
 .. image:: img/scenario_1/import_videos.png
+  :alt: Import videos
   :width: 600
   :align: center
 
@@ -265,6 +270,7 @@ individual videos.
    will still be present in its original folder.
 
 .. image:: img/scenario_1/import_data_1.png
+  :alt: Import data 1
   :width: 600
   :align: center
 
@@ -305,6 +311,7 @@ or
 `HERE <https://gist.github.com/gyassine/b47b90e8de935cc06ef856401f7582b0>`__.
 
 .. image:: img/scenario_1/interpolation_1.png
+  :alt: Interpolation 1
   :width: 600
   :align: center
 
@@ -357,6 +364,7 @@ drop-down menu.
    menu in the main SimBA terminal.
 
 .. image:: img/scenario_1/smoothing_1.png
+  :alt: Smoothing 1
   :width: 600
   :align: center
 
@@ -389,6 +397,7 @@ before any other process.
    following windows will pop up.
 
 .. image:: img/scenario_1/load_project_1.png
+  :alt: Load project 1
   :width: 800
   :align: center
 
@@ -399,6 +408,7 @@ before any other process.
    following, and you should no longer see the text *No file selected*:
 
 .. image:: img/scenario_1/load_project_2.png
+  :alt: Load project 2
   :width: 800
   :align: center
 
@@ -422,6 +432,7 @@ However, this is not relevant for the current Scenario 1, so please skip
 to Step 3 (but remain aware you can do this if needed later).
 
 .. image:: img/scenario_1/create_project_3.png
+  :alt: Create project 3
   :width: 1000
   :align: center
 
@@ -497,6 +508,7 @@ video recording sessions.
    up.
 
 .. image:: img/scenario_1/video_info_1.png
+  :alt: Video info 1
   :width: 1000
   :align: center
 
@@ -526,6 +538,7 @@ video recording sessions.
    correct aspect ratio.
 
 .. image:: img/scenario_1/get_coordinates_1.png
+  :alt: Get coordinates 1
   :width: 800
   :align: center
 
@@ -535,6 +548,7 @@ video recording sessions.
    real life.
 
 .. image:: img/scenario_1/get_coordinates_2.png
+  :alt: Get coordinates 2
   :width: 800
   :align: center
 
@@ -543,6 +557,7 @@ video recording sessions.
    you are done, hit ``Esc``.
 
 .. image:: img/scenario_1/get_coordinates_3.gif
+  :alt: Get coordinates 3
   :width: 800
   :align: center
 
@@ -551,6 +566,7 @@ video recording sessions.
     millimeter,
 
 .. image:: img/scenario_1/video_info_2.png
+  :alt: Video info 2
   :width: 800
   :align: center
 
@@ -570,6 +586,7 @@ video recording sessions.
    button.
 
 .. image:: img/scenario_1/video_info_3.png
+  :alt: Video info 3
   :width: 800
   :align: center
 
@@ -593,6 +610,7 @@ entered in the Settings menu are the *Location Criterion* and the
 1. Click on ``Settings`` and the following window will pop up.
 
 .. image:: img/scenario_1/outlier_correction_2.png
+  :alt: Outlier correction 2
   :width: 800
   :align: center
 
@@ -715,6 +733,7 @@ configuration.
    ``Extract Features``.
 
 .. image:: img/scenario_1/extract_features_1.png
+  :alt: Extract features 1
   :width: 800
   :align: center
 
@@ -791,6 +810,7 @@ community!
    and you should see the following menu:
 
 .. image:: img/scenario_1/labelling_1.png
+  :alt: Labelling 1
   :width: 1000
   :align: center
 
@@ -810,6 +830,7 @@ append annotations created in third-party applications, click
    wish to annotate.
 
 .. image:: img/scenario_1/labelling_2.png
+  :alt: Labelling 2
   :width: 1000
   :align: center
 
@@ -881,6 +902,7 @@ will pop up. We will go over the meaning of each of the settings in
 turn.
 
 .. image:: img/scenario_1/model_settings_1.png
+  :alt: Model settings 1
   :width: 1000
   :align: center
 
@@ -950,6 +972,7 @@ for an illustration of using **FRAMES** vs **BOUTS** Train-Test Split
 Types:
 
 .. image:: img/scenario_1/bout_vs_frames_split.png
+  :alt: Bout vs frames split
   :width: 1000
   :align: center
 
@@ -1025,6 +1048,7 @@ will lead the classifier to attribute twice the importance to behavior
 present annotatons over behavior absent annotations.
 
 .. image:: img/scenario_1/class_weights.png
+  :alt: Class weights
   :width: 1000
   :align: center
 
@@ -1271,6 +1295,7 @@ video. For this, navigate to the [Run machine model] tab and \`VALIDATE
 MODEL ON SINGLE VIDEO menu:
 
 .. image:: img/scenario_1/validate_single_video_1.png
+  :alt: Validate single video 1
   :width: 1000
   :align: center
 
@@ -1351,6 +1376,7 @@ shown which gives user controls how the video is created. If you want to
 use the deafult parameters, just go ahead and click ``RUN``.
 
 .. image:: img/scenario_1/validate_single_video_2.png
+  :alt: Validate single video 2
   :width: 1000
   :align: center
 

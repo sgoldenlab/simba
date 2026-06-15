@@ -79,6 +79,7 @@ def get_3pt_angle(x: np.ndarray, y: np.ndarray, z: np.ndarray) -> np.ndarray:
        :header-rows: 1
 
     .. image:: _static/img/get_3pt_angle.webp
+       :alt: Get 3pt angle
        :width: 300
        :align: center
 
@@ -146,6 +147,7 @@ def count_values_in_ranges(x: np.ndarray, r: np.ndarray) -> np.ndarray:
        :header-rows: 1
 
     .. image:: _static/img/count_ranges_2.png
+       :alt: Count ranges 2
        :width: 600
        :align: center
 

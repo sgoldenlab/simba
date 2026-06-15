@@ -173,10 +173,12 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
        See :meth:`simba.ROI_feature_visualizer.ROIfeatureVisualizer` for single process class. Would be slower but potentially more reliable.
 
     .. image:: _static/img/ROIfeatureVisualizer_1.png
+       :alt: ROIfeature Visualizer 1
        :width: 700
        :align: center
 
     .. image:: _static/img/ROIfeatureVisualizer_2.png
+       :alt: ROIfeature Visualizer 2
        :width: 700
        :align: center
 

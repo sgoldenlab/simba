@@ -31,6 +31,7 @@ class Interpolate(ConfigReader):
     when all body-parts belonging to an animal are identical (i.e., the same 2D coordinate or all None).
 
     .. image:: _static/img/interpolation_comparison.webp
+       :alt: Interpolation comparison
        :width: 500
        :align: center
 

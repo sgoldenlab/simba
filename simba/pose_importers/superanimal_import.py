@@ -38,6 +38,7 @@ class SuperAnimalTopViewImporter(PoseImporterMixin, ConfigReader):
        order supplied via ``id_lst`` (positional mapping).
 
     .. image:: _static/img/superanimal_topview.png
+       :alt: Superanimal topview
        :width: 150
        :align: center
 

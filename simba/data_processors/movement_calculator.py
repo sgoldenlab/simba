@@ -46,6 +46,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results>`__.
 
     .. image:: _static/img/MovementCalculator.webp
+       :alt: Movement Calculator
        :width: 400
        :align: center
 

@@ -41,6 +41,7 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
        For multiprocessing alternative, see :class:`simba.plotting.gantt_creator_mp.GanttCreatorMultiprocess`.
 
     .. image:: _static/img/gantt_plot.png
+       :alt: Gantt plot
        :width: 300
        :align: center
 

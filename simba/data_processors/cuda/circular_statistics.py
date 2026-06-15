@@ -48,6 +48,7 @@ def direction_from_two_bps(x: np.ndarray, y: np.ndarray) -> np.ndarray:
        For CPU function see :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_two_bps`.
 
     .. image:: _static/img/angle_from_2_bps.png
+       :alt: Angle from 2 bps
        :width: 600
        :align: center
 
@@ -88,6 +89,7 @@ def sliding_circular_hotspots(x: np.ndarray,
        :header-rows: 1
 
     .. image:: _static/img/sliding_circular_hotspot.png
+       :alt: Sliding circular hotspot
        :width: 300
        :align: center
 
@@ -467,6 +469,7 @@ def direction_from_three_bps(x: np.ndarray,
        * More CPU function, see :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_three_bps`
 
     .. image:: _static/img/angle_from_3_bps.png
+       :alt: Angle from 3 bps
        :width: 300
        :align: center
 
@@ -519,6 +522,7 @@ def instantaneous_angular_velocity(x: np.ndarray, stride: Optional[int] = 1) -> 
     The result is returned in degrees per unit time.
 
     .. image:: _static/img/instantaneous_angular_velocity.png
+       :alt: Instantaneous angular velocity
        :width: 400
        :align: center
 
@@ -593,6 +597,7 @@ def sliding_bearing(x: np.ndarray,
        :header-rows: 1
 
     .. image:: _static/img/sliding_bearing.png
+       :alt: Sliding bearing
        :width: 300
        :align: center
 
@@ -730,6 +735,7 @@ def rotational_direction(data: np.ndarray, stride: Optional[int] = 1) -> np.ndar
        :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.rotational_direction` for jitted CPU method.
 
     .. image:: _static/img/rotational_direction.png
+       :alt: Rotational direction
        :width: 400
        :align: center
 

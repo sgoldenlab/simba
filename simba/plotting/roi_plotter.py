@@ -44,10 +44,12 @@ class ROIPlotter(ConfigReader):
        Use :func:`simba.plotting.ROI_plotter_mp.ROIPlotMultiprocess` for improved run-time.
 
     .. image:: _static/img/ROIPlot_1.png
+       :alt: ROIPlot 1
        :width: 800
        :align: center
 
     .. image:: _static/img/ROIPlot_1.gif
+       :alt: ROIPlot 1
        :width: 800
        :align: center
 

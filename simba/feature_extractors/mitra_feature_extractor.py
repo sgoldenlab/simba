@@ -42,6 +42,7 @@ class MitraFeatureExtractor(ConfigReader,
 
 
     .. image:: _static/GerbilFeaturizer.webp
+       :alt: Gerbil Featurizer
        :width: 500
        :align: center
 

@@ -2,6 +2,7 @@ Feature family sub-sets in SimBA
 ==========================================================
 
 .. image:: img/feature_subsets/1.png
+  :alt: 1
   :width: 800
   :align: center
 
@@ -31,6 +32,7 @@ INSTRUCTIONS
 ``CALCULATE FEATURE SUBSETS`` button.
 
 .. image:: img/feature_subsets/2.png
+  :alt: 2
   :width: 700
   :align: center
 
@@ -38,6 +40,7 @@ INSTRUCTIONS
    you want to calculate.
 
 .. image:: img/feature_subsets/3.png
+  :alt: 3
   :width: 700
   :align: center
 

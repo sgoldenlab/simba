@@ -26,6 +26,7 @@ class GridSearchVisualizer(UMLMixin):
     Visualize grid-searched latent spaces in .png format.
 
     .. image:: _static/img/GridSearchVisualizer.png
+       :alt: Grid Search Visualizer
        :width: 800
        :align: center
 

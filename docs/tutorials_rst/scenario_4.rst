@@ -96,6 +96,7 @@ analyzed again.
    box and button, under the title *Archive processed files*:
 
 .. image:: img/scenario_2/archive_1.jpg
+  :alt: Archive 1
   :width: 1200
   :align: center
 
@@ -114,6 +115,7 @@ analyzed again.
    on the left, if you have previosly processed 20 videos.
 
 .. image:: img/scenario_4/archive_2.jpg
+  :alt: Archive 2
   :width: 1200
   :align: center
 
@@ -157,6 +159,7 @@ Part 2: Load the project and import your new data.
    project using the following menu:
 
 .. image:: img/scenario_4/import.jpg
+  :alt: Import
   :width: 1200
   :align: center
 
@@ -165,6 +168,7 @@ Once the data is imported, you should see the new imported data for Day
 2 in the ``project_folder/csv/input`` directory:
 
 .. image:: img/scenario_4/archive_2.jpg
+  :alt: Archive 2
   :width: 1200
   :align: center
 
@@ -204,6 +208,7 @@ Once the data is imported, you should see the new imported data for Day
 2 in the ``project_folder/csv/input`` directory:
 
 .. image:: img/scenario_4/menu_1.jpg
+  :alt: Menu 1
   :width: 1200
   :align: center
 
@@ -254,6 +259,7 @@ each .CSV in the project that contains the concatenated clips of all the
 events of the target behavior that the predictive classifier identifies.
 
 .. image:: img/scenario_4/menu_1.jpg
+  :alt: Menu 1
   :width: 1200
   :align: center
 
@@ -278,6 +284,7 @@ How to use *post-classification Validation*
    **target behavior** + **number of bouts** + .mp4
 
 .. image:: img/classifier_validation/classifiervalidation.gif
+  :alt: Classifiervalidation
   :width: 1200
   :align: center
 

@@ -413,6 +413,7 @@ Show solutions!
    </summary>
 
 .. image:: https://github.com/sgoldenlab/simba/blob/master/images/Dependencies.png
+   :alt: Dependencies
 
 These errors are related to an update in the pypi package manager
 version 20.3.3, `where they introduced stricter version

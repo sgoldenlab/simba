@@ -47,6 +47,7 @@ class DataPlotter(ConfigReader):
         `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-data-tables`>_.
 
     .. image:: _static/img/data_plot.png
+       :alt: Data plot
        :width: 300
        :align: center
 

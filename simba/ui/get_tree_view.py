@@ -19,6 +19,7 @@ class GetTreeView(PopUpMixin):
        The TreeView automatically calculates its height based on the window size to maximize screen usage. Parent nodes can be expanded/collapsed by double-clicking.
 
     .. image:: _static/img/tree_view.png
+       :alt: Tree view
        :width: 700
        :align: center
 

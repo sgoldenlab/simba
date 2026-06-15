@@ -29,6 +29,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
 
     """
     .. image:: _static/img/VisualizePoseInFolderPopUp.webp
+       :alt: Visualize Pose In Folder Pop Up
        :width: 500
        :align: center
 

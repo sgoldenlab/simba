@@ -21,6 +21,7 @@ class ROISelectorPolygon(object):
     The selected region vertices are stored in self: polygon_vertices.
 
     .. image:: _static/img/roi_selector_polygon.gif
+       :alt: Roi selector polygon
        :width: 700
        :align: center
 

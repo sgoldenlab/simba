@@ -62,6 +62,7 @@ class Statistics(FeatureExtractionMixin):
        This class contains a few probability distribution comparison methods. These are being moved to ``simba.sandbox.distances`` (05.24).
 
     .. image:: _static/img/statistics_runtimes.png
+       :alt: Statistics runtimes
        :width: 1200
        :align: center
 
@@ -120,6 +121,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: int
 
         .. image:: _static/img/independent_t_tests.png
+           :alt: Independent t tests
            :width: 700
            :align: center
 
@@ -488,6 +490,7 @@ class Statistics(FeatureExtractionMixin):
         size N to the preceding window of size N.
 
         .. image:: _static/img/rolling_anova.png
+           :alt: Rolling anova
            :width: 600
            :align: center
 
@@ -554,6 +557,7 @@ class Statistics(FeatureExtractionMixin):
            \text{KL}(P || Q) = \sum{P(x) \log{\left(\frac{P(x)}{Q(x)}\right)}}
 
         .. image:: _static/img/kullback_leibler_divergence.webp
+           :alt: Kullback leibler divergence
            :width: 700
            :align: center
 
@@ -679,6 +683,7 @@ class Statistics(FeatureExtractionMixin):
            For rolling comparisons in a timeseries, see :func:`simba.mixins.statistics_mixin.Statistics.rolling_jensen_shannon_divergence`
 
         .. image:: _static/img/jensen_shannon_divergence.webp
+           :alt: Jensen shannon divergence
            :width: 700
            :align: center
 
@@ -797,6 +802,7 @@ class Statistics(FeatureExtractionMixin):
            For time-series based comparisons, see :func:`simba.mixins.statistics_mixin.Statistics.rolling_wasserstein_distance`
 
         .. image:: _static/img/wasserstein_distance.webp
+           :alt: Wasserstein distance
            :width: 700
            :align: center
 
@@ -912,6 +918,7 @@ class Statistics(FeatureExtractionMixin):
         to the same event :math:`i`, respectively.
 
         .. image:: _static/img/total_variation_distance.webp
+           :alt: Total variation distance
            :width: 500
            :align: center
 
@@ -967,6 +974,7 @@ class Statistics(FeatureExtractionMixin):
            For time-series based rolling comparisons, see :func:`simba.mixins.statistics_mixin.Statistics.rolling_population_stability_index`
 
         .. image:: _static/img/population_stability_index.webp
+           :alt: Population stability index
            :width: 700
            :align: center
 
@@ -1500,6 +1508,7 @@ class Statistics(FeatureExtractionMixin):
         Feature 2 in the current X.X seconds of the video".
 
         .. image:: _static/img/sliding_pearsons.png
+           :alt: Sliding pearsons
            :width: 600
            :align: center
 
@@ -1634,6 +1643,7 @@ class Statistics(FeatureExtractionMixin):
         feature value distribution is detected.
 
         .. image:: _static/img/sliding_statistics.png
+           :alt: Sliding statistics
            :width: 1500
            :align: center
 
@@ -1796,6 +1806,7 @@ class Statistics(FeatureExtractionMixin):
         Feature 2 in the current X.X seconds of the video.
 
         .. image:: _static/img/sliding_spearman.png
+           :alt: Sliding spearman
            :width: 600
            :align: center
 
@@ -2095,6 +2106,7 @@ class Statistics(FeatureExtractionMixin):
            If groupby_idx is provided, then all observations with cluster/segment variable ``-1`` will be treated as unclustered and assigned the max outlier score found withiin the clustered observations.
 
         .. image:: _static/img/local_outlier_factor.png
+           :alt: Local outlier factor
            :width: 800
            :align: center
 
@@ -2193,10 +2205,12 @@ class Statistics(FeatureExtractionMixin):
         Compute the Mahalanobis distances of each observation in the input array using Elliptic Envelope method.
 
         .. image:: _static/img/EllipticEnvelope.png
+           :alt: Elliptic Envelope
            :width: 700
            :align: center
 
         .. image:: _static/img/elliptic_envelope.png
+           :alt: Elliptic envelope
            :width: 700
            :align: center
 
@@ -2288,6 +2302,7 @@ class Statistics(FeatureExtractionMixin):
         An implementation of the Isolation Forest algorithm for outlier detection.
 
         .. image:: _static/img/isolation_forest.png
+           :alt: Isolation forest
            :width: 700
            :align: center
 
@@ -2418,6 +2433,7 @@ class Statistics(FeatureExtractionMixin):
         within their respective buckets over all feature values.
 
         .. image:: _static/img/hbos.png
+           :alt: Hbos
            :width: 1200
            :align: center
 
@@ -2567,6 +2583,7 @@ class Statistics(FeatureExtractionMixin):
            For time-series based sliding comparisons, see :func:`simba.mixins.statistics_mixin.Statistics.sliding_phi_coefficient`
 
         .. image:: _static/img/phi_coefficient.webp
+           :alt: Phi coefficient
            :width: 600
            :align: center
 
@@ -2626,6 +2643,7 @@ class Statistics(FeatureExtractionMixin):
            For sliding time-windows comparisons, see :func:`simba.mixins.statistics_mixin.Statistics.sliding_eta_squared`.
 
         .. image:: _static/img/eta_squared.webp
+           :alt: Eta squared
            :width: 600
            :align: center
 
@@ -2702,6 +2720,7 @@ class Statistics(FeatureExtractionMixin):
         coefficients can reveal changes in association over time.
 
         .. image:: _static/img/sliding_phi_coefficient.webp
+           :alt: Sliding phi coefficient
            :width: 600
            :align: center
 
@@ -2866,6 +2885,7 @@ class Statistics(FeatureExtractionMixin):
         Compute the skewness of a 1D array within sliding time windows.
 
         .. image:: _static/img/sliding_skew.webp
+           :alt: Sliding skew
            :width: 600
            :align: center
 
@@ -2897,6 +2917,7 @@ class Statistics(FeatureExtractionMixin):
         Compute the kurtosis of a 1D array within sliding time windows.
 
         .. image:: _static/img/sliding_kurtosis.webp
+           :alt: Sliding kurtosis
            :width: 600
            :align: center
 
@@ -3033,6 +3054,7 @@ class Statistics(FeatureExtractionMixin):
            For GPU method, see :func:`simba.data_processors.cuda.statistics.hamming_distance_gpu`.
 
         .. image:: _static/img/hamming_distance.webp
+           :alt: Hamming distance
            :width: 600
            :align: center
 
@@ -3181,6 +3203,7 @@ class Statistics(FeatureExtractionMixin):
            Adapted from `pynndescent <https://pynndescent.readthedocs.io/en/latest/>`_.
 
         .. image:: _static/img/bray_curtis_dissimilarity.webp
+           :alt: Bray curtis dissimilarity
            :width: 600
            :align: center
 
@@ -3248,6 +3271,7 @@ class Statistics(FeatureExtractionMixin):
         - :math:`n` is the number of events.
 
         .. image:: _static/img/hellinger_distance.webp
+           :alt: Hellinger distance
            :width: 600
            :align: center
 
@@ -3295,6 +3319,7 @@ class Statistics(FeatureExtractionMixin):
         - :math:`J < 0` indicates the test performs worse than random
 
         .. image:: _static/img/youden_j.webp
+           :alt: Youden j
            :width: 600
            :align: center
 
@@ -3355,6 +3380,7 @@ class Statistics(FeatureExtractionMixin):
         intersection of the sets divided by the size of the union of the sets.
 
         .. image:: _static/img/jaccard_distance.webp
+           :alt: Jaccard distance
            :width: 600
            :align: center
 
@@ -3386,6 +3412,7 @@ class Statistics(FeatureExtractionMixin):
            D_{\text{Manhattan}} = |x_2 - x_1| + |y_2 - y_1|
 
         .. image:: _static/img/manhattan_distance_cdist.webp
+           :alt: Manhattan distance cdist
            :width: 500
            :align: center
 
@@ -3543,6 +3570,7 @@ class Statistics(FeatureExtractionMixin):
         - :math:`false\_alarm\_rate` is the proportion of false positives incorrectly identified.
 
         .. image:: _static/img/d_prime.webp
+           :alt: D prime
            :width: 600
            :align: center
 
@@ -3617,6 +3645,7 @@ class Statistics(FeatureExtractionMixin):
            - `c` is the number of instances correctly classified by the first model but misclassified by the second model.
 
         .. image:: _static/img/mcnemar.webp
+           :alt: Mcnemar
            :width: 400
            :align: center
 
@@ -3759,6 +3788,7 @@ class Statistics(FeatureExtractionMixin):
         - :math:`\text{Var}(y)` is the variance of sample :math:`y`.
 
         .. image:: _static/img/hartley_fmax.webp
+           :alt: Hartley fmax
            :width: 600
            :align: center
 
@@ -3922,6 +3952,7 @@ class Statistics(FeatureExtractionMixin):
            :func:`simba.mixins.statistics_mixin.Statistics.sliding_mad_median_rule`
 
         .. image:: _static/img/mad_median_rule.webp
+           :alt: Mad median rule
            :width: 700
            :align: center
 
@@ -4005,6 +4036,7 @@ class Statistics(FeatureExtractionMixin):
         :math:`\Delta(C_k)` is the diameter of cluster :math:`C_k`.
 
         .. image:: _static/img/dunn_index.webp
+           :alt: Dunn index
            :width: 600
            :align: center
 
@@ -4075,6 +4107,7 @@ class Statistics(FeatureExtractionMixin):
         - :math:`d_{ij}` is the distance between the centroids of clusters :math:`i` and :math:`j`.
 
         .. image:: _static/img/davis_bouldin.webp
+           :alt: Davis bouldin
            :width: 700
            :align: center
 
@@ -4157,6 +4190,7 @@ class Statistics(FeatureExtractionMixin):
         - :math:`k` is the number of clusters.
 
         .. image:: _static/img/calinski_harabasz.webp
+           :alt: Calinski harabasz
            :width: 600
            :align: center
 
@@ -4255,6 +4289,7 @@ class Statistics(FeatureExtractionMixin):
         where :math:`n` is the total number of points in the dataset, :math:`x_i` is the :math:`i`-th data point, :math:`c_{y_i}` is the centroid of the cluster to which :math:`x_i` belongs, and :math:`\| \cdot \|` denotes the Euclidean norm.
 
         .. image:: _static/img/xie_beni.webp
+           :alt: Xie beni
            :width: 600
            :align: center
 
@@ -4298,6 +4333,7 @@ class Statistics(FeatureExtractionMixin):
         Compute the Bouguessa-Wang-Sun (BWS) index using covariance matrices and means.
 
         .. image:: _static/img/bouguessa_wang_sun_v2.webp
+           :alt: Bouguessa wang sun v2
            :width: 500
            :align: center
 
@@ -4344,6 +4380,7 @@ class Statistics(FeatureExtractionMixin):
         A higher I-Index indicates better clustering with compact and well-separated clusters.
 
         .. image:: _static/img/i_index.webp
+           :alt: I index
            :width: 500
            :align: center
 
@@ -4399,6 +4436,7 @@ class Statistics(FeatureExtractionMixin):
         A lower SD Index indicates better clustering quality, reflecting compact and well-separated clusters.
 
         .. image:: _static/img/sd_index.webp
+           :alt: Sd index
            :width: 500
            :align: center
 
@@ -4458,6 +4496,7 @@ class Statistics(FeatureExtractionMixin):
            - 1 indicates worst clustering (clusters are highly spread out).
 
         .. image:: _static/img/c_index.webp
+           :alt: C index
            :width: 500
            :align: center
 
@@ -4672,6 +4711,7 @@ class Statistics(FeatureExtractionMixin):
         Higher values indicates better clustering.
 
         .. image:: _static/img/pbm_index.webp
+           :alt: Pbm index
            :width: 500
            :align: center
 
@@ -4917,6 +4957,7 @@ class Statistics(FeatureExtractionMixin):
         DunnSym index output range positive real numbers 0 -> ∞ where 0 is extremely poor clustering and higher values represent better cluster separation.
 
         .. image:: _static/img/dunn_symmetry_idx.webp
+           :alt: Dunn symmetry idx
            :width: 500
            :align: center
 
@@ -5016,6 +5057,7 @@ class Statistics(FeatureExtractionMixin):
         - :math:`FN` (False Negative) is the number of pairs of elements that are in the same cluster in x but not in y.
 
         .. image:: _static/img/fowlkes_mallows.webp
+           :alt: Fowlkes mallows
            :width: 600
            :align: center
 
@@ -5065,6 +5107,7 @@ class Statistics(FeatureExtractionMixin):
            - :math:`H(x)` and :math:`H(y)` are the entropies of :math:`x` and :math:`y`, respectively.
 
         .. image:: _static/img/adjusted_mutual_info.webp
+           :alt: Adjusted mutual info
            :width: 600
            :align: center
 
@@ -5106,6 +5149,7 @@ class Statistics(FeatureExtractionMixin):
         The equation for the Czebyshev distance is given by :math:`D_\infty(p, q) = \max_i \left| p_i - q_i \right|`.
 
         .. image:: _static/img/czebyshev_distance.webp
+           :alt: Czebyshev distance
            :width: 400
            :align: center
 
@@ -5247,6 +5291,7 @@ class Statistics(FeatureExtractionMixin):
             Wave-Hedges distance score of 0 indicate identical arrays. There is no upper bound.
 
         .. image:: _static/img/wave_hedges_distance.webp
+           :alt: Wave hedges distance
            :width: 600
            :align: center
 
@@ -5283,6 +5328,7 @@ class Statistics(FeatureExtractionMixin):
             absolute differences across numerical columns.
 
         .. image:: _static/img/gower_distance.webp
+           :alt: Gower distance
            :width: 600
            :align: center
 
@@ -5338,6 +5384,7 @@ class Statistics(FeatureExtractionMixin):
            This function assumes x and y have the same shape. It computes NGD based on the sum of elements and the minimum values between corresponding elements of x and y.
 
         .. image:: _static/img/normalized_google_distance.webp
+           :alt: Normalized google distance
            :width: 600
            :align: center
 
@@ -5384,6 +5431,7 @@ class Statistics(FeatureExtractionMixin):
         where :math:`x_i` and :math:`y_i` are the values of the two measurements at each time point.
 
         .. image:: _static/img/symmetry_index.webp
+           :alt: Symmetry index
            :width: 500
            :align: center
 

@@ -4,6 +4,7 @@ Regions of Interest (ROIs) in SimBA
 ==========================================================
 
 .. image:: img/roi/landing.png
+  :alt: Landing
   :width: 800
   :align: center
 
@@ -80,6 +81,7 @@ Part 1. Defining ROIs in SimBA
 
 
 .. image:: img/roi/table.png
+  :alt: Table
   :width: 800
   :align: center
 
@@ -117,6 +119,7 @@ is described in detail below. In brief:
    that look like this:
 
 .. image:: img/roi/ROI_img_1.png
+  :alt: ROI img 1
   :width: 800
   :align: center
 
@@ -166,6 +169,7 @@ buttons in the *Change image* menu (see gif below):
    ``Reset first frame`` button.
 
 .. image:: img/roi/change_frame.gif
+  :alt: Change frame
   :width: 1500
   :align: center
 
@@ -212,6 +216,7 @@ below):
    dropdown, select the color that your ROI should have.
 
 .. image:: img/roi/roi_attributes.png
+  :alt: Roi attributes
   :width: 800
   :align: center
 
@@ -247,6 +252,7 @@ will be automatically discarded. When you are happy with your rectangle,
    *Shape color attribute* dropdown menu above.
 
 .. image:: img/roi/draw_rectangle.gif
+  :alt: Draw rectangle
   :width: 1000
   :align: center
 
@@ -262,6 +268,7 @@ circle. Next, left click on the image where you would like the outer
 bound of the circle to be. You should now see your entire circle ROI.
 
 .. image:: img/roi/draw_circle.gif
+  :alt: Draw circle
   :width: 1000
   :align: center
 
@@ -277,6 +284,7 @@ press keyboard ``ESC`` button, the polygon with its connecting lines
 should appear.
 
 .. image:: img/roi/draw_polygon.gif
+  :alt: Draw polygon
   :width: 1000
   :align: center
 
@@ -320,6 +328,7 @@ Deleting ROIs
    sub-menu.
 
 .. image:: img/roi/delete_all_shapes.gif
+  :alt: Delete all shapes
   :width: 1000
   :align: center
 
@@ -328,6 +337,7 @@ Deleting ROIs
    click on the ``Delete ROI`` button.
 
 .. image:: img/roi/delete_specific_shape.gif
+  :alt: Delete specific shape
   :width: 1000
   :align: center
 
@@ -342,6 +352,7 @@ Duplicating ROIs
    original ROI.
 
 .. image:: img/roi/duplicate_shape.gif
+  :alt: Duplicate shape
   :width: 1000
   :align: center
 
@@ -356,6 +367,7 @@ Duplicating ROIs
    below.
 
 .. image:: img/roi/duplicate_dropdown.png
+  :alt: Duplicate dropdown
   :width: 1000
   :align: center
 
@@ -380,6 +392,7 @@ Changing ROI locations
    the center tag of the second ROI shape.
 
 .. image:: img/roi/move_shapes.gif
+  :alt: Move shapes
   :width: 1000
   :align: center
 
@@ -427,6 +440,7 @@ Changing the shape of the ROI
    clicked on the new location, the new ROI shape should be displayed.
 
 .. image:: img/roi/change_shapes.gif
+  :alt: Change shapes
   :width: 1000
   :align: center
 
@@ -462,6 +476,7 @@ Aligning ROIs
    those additional edges.
 
 .. image:: img/roi/align_shapes.gif
+  :alt: Align shapes
   :width: 1000
   :align: center
 
@@ -480,6 +495,7 @@ Change ROI attributes
    ``Change ROI`` attributes menu is closed.
 
 .. image:: img/roi/change_shape_attr.gif
+  :alt: Change shape attr
   :width: 1000
   :align: center
 
@@ -501,6 +517,7 @@ we can do this with the ``Apply shapes from another video`` sub-menu.
    in the ``Select video`` dropdown menu will appear on the frame.
 
 .. image:: img/roi/apply_shapes_other_video.gif
+  :alt: Apply shapes other video
   :width: 1000
   :align: center
 
@@ -534,6 +551,7 @@ representing the length, width and area of the rectangle**
    larger or smaller, as in the last half of the gif below.
 
 .. image:: img/roi/shape_info.gif
+  :alt: Shape info
   :width: 1000
   :align: center
 
@@ -548,6 +566,7 @@ and start from scratch.
    project menu, and the following menu should pop open:
 
 .. image:: img/roi/delete.png
+  :alt: Delete
   :width: 1000
   :align: center
 

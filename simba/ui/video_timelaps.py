@@ -26,6 +26,7 @@ class TimelapseSlider():
     visual highlighting of the selected segment and frame previews.
 
     .. image:: _static/img/TimelapseSlider.png
+       :alt: Timelapse Slider
        :width: 600
        :align: center
 

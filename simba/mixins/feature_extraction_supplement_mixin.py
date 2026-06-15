@@ -73,6 +73,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         (negative output values) relative to reference time-point(s)
 
         .. image:: _static/img/euclid_distance_change.png
+           :alt: Euclid distance change
            :width: 700
            :align: center
 
@@ -103,6 +104,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         in the prior observation (i.e., no future data is involved in comparison).
 
         .. image:: _static/img/peak_cnt.png
+           :alt: Peak cnt
            :width: 700
            :align: center
 
@@ -186,6 +188,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
            Output for initial frames where [current_frm - window_size] < 0, are populated with ``0``.
 
         .. image:: _static/img/feature_switches.png
+           :alt: Feature switches
            :width: 700
            :align: center
 
@@ -227,6 +230,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         within an ROI.
 
         .. image:: _static/img/categorical_consecitive_time.png
+           :alt: Categorical consecitive time
            :width: 700
            :align: center
 
@@ -263,6 +267,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
            Output for initial frames where [current_frm - window_size] < 0, are populated with ``0``.
 
         .. image:: _static/img/x_vs_y_movement.png
+           :alt: X vs y movement
            :width: 700
            :align: center
 
@@ -316,6 +321,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         rolling time-windows. Uses a straight line.
 
         .. image:: _static/img/border_distance.png
+           :alt: Border distance
            :width: 700
            :align: center
 
@@ -367,6 +373,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         based on the pixel-to-mm conversion.
 
         .. image:: _static/img/img_edge_distances.webp
+           :alt: Img edge distances
            :width: 400
            :align: center
 
@@ -501,6 +508,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         Detects spontaneous alternations between a set of user-defined ROIs.
 
             .. image:: _static/img/spontaneous_alternations.png
+               :alt: Spontaneous alternations
                :width: 500
                :align: center
 
@@ -610,6 +618,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         Compute the loops detected within a 2-dimensional path.
 
         .. image:: _static/img/find_path_loops.png
+           :alt: Find path loops
            :width: 700
            :align: center
 
@@ -651,6 +660,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         of behavior C vs the proportion of behavior T onsets in the time-window proceeding the onset of behavior C.
 
         .. image:: _static/img/sequential_lag_analysis.webp
+           :alt: Sequential lag analysis
            :width: 600
            :align: center
 
@@ -751,6 +761,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         Calculate total movement and mean velocity from a sequence of position data.
 
         .. image:: _static/img/distance_and_velocity.webp
+           :alt: Distance and velocity
            :width: 600
            :align: center
 

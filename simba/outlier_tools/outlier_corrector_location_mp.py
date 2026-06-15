@@ -87,6 +87,7 @@ class OutlierCorrecterLocationMultiprocess(ConfigReader, FeatureExtractionMixin)
        `Documentation <https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf>`_.
 
     .. image:: _static/img/location_outlier.png
+       :alt: Location outlier
        :width: 500
        :align: center
 

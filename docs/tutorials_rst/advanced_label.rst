@@ -61,6 +61,7 @@ a Mac, if you’re running SimBA on a PC or Linux, the aestetics might be
 slightly different):
 
 .. image:: img/standard_label/menu_1.png
+  :alt: Menu 1
   :width: 1000
   :align: center
 
@@ -76,6 +77,7 @@ selecting ``Together_1.mp4`` and click ``Open``:
 
 
 .. image:: img/advanced_label/menu_1.png
+  :alt: Menu 1
   :width: 1000
   :align: center
 
@@ -90,6 +92,7 @@ or ``PSEUDO-LABELLING``. For detailed instructions of their functions,
 tutorial <https://github.com/sgoldenlab/simba/edit/master/docs/label_behavior.md>`__.
 
 .. image:: img/advanced_label/annotator_1.png
+  :alt: Annotator 1
   :width: 1000
   :align: center
 
@@ -100,6 +103,7 @@ which is populated with two rows for the two classifiers (``Attack`` and
 or not happening, in the frame (``PRESENT`` and ``ABSENT``).
 
 .. image:: img/advanced_label/annotator_2.png
+  :alt: Annotator 2
   :width: 1000
   :align: center
 
@@ -111,6 +115,7 @@ being absent. My annotations are saved into SimBA working memory when I
 click to navigate to a different frame.
 
 .. image:: img/advanced_label/annotator_3.gif
+  :alt: Annotator 3
   :width: 1000
   :align: center
 
@@ -130,6 +135,7 @@ learning predictive classifiers. In the gif below, I use the label
 being present or absent.
 
 .. image:: img/advanced_label/annotator_4.gif
+  :alt: Annotator 4
   :width: 1000
   :align: center
 
@@ -150,6 +156,7 @@ being present or absent.
    as absent.
 
 .. image:: img/advanced_label/annotator_5.gif
+  :alt: Annotator 5
   :width: 1000
   :align: center
 
@@ -183,6 +190,7 @@ using the advanced SimBA annotation GUI. To do this, click the
 **ADVANCED LABEL BEHAVIOR** sub-menu:
 
 .. image:: img/advanced_label/annotator_6.png
+  :alt: Annotator 6
   :width: 1000
   :align: center
 

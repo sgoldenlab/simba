@@ -43,6 +43,7 @@ auto-populate with all the required sub-directories.
    ``Create a new project``. The following windows will pop up.
 
 .. image:: img/multi_animal_import/menu_1.png
+  :alt: Menu 1
   :width: 1000
   :align: center
 
@@ -68,6 +69,7 @@ auto-populate with all the required sub-directories.
    you leave the extra boxes empty, all is well.
 
 .. image:: img/multi_animal_import/menu_2.png
+  :alt: Menu 2
   :width: 1000
   :align: center
 
@@ -79,6 +81,7 @@ Step 2: Define your Type of Tracking
    sub-menu and chose ``Multi tracking``.
 
 .. image:: img/multi_animal_import/menu_3.png
+  :alt: Menu 3
   :width: 1000
   :align: center
 
@@ -91,6 +94,7 @@ Step 2: Define your Type of Tracking
    for intructions on how to import your data into SimBA.
 
 .. image:: img/multi_animal_import/menu_4.png
+  :alt: Menu 4
   :width: 1000
   :align: center
 
@@ -144,6 +148,7 @@ Step 4: Import your tracking data
    data file type.
 
 .. image:: img/multi_animal_import/menu_5.png
+  :alt: Menu 5
   :width: 1000
   :align: center
 
@@ -215,6 +220,7 @@ or OpenOffice Calc.
    *Resident* and Animal 2 *Intruder*.
 
 .. image:: img/multi_animal_import/menu_6.png
+  :alt: Menu 6
   :width: 1000
   :align: center
 
@@ -261,6 +267,7 @@ files** and SimBA does this through an interactive interface.
    pop open.
 
 .. image:: img/multi_animal_import/interface_1.png
+  :alt: Interface 1
   :width: 1000
   :align: center
 
@@ -283,6 +290,7 @@ left mouse click on the Resident (Animal 1), SimBA will ask you to
 double left mouse click on the Intruder (Animal 2).
 
 .. image:: img/multi_animal_import/interface_2.png
+  :alt: Interface 2
   :width: 1000
   :align: center
 
@@ -296,12 +304,14 @@ all the videos and H5 files in your project asking you to assign the
 identities of the animals in each file.
 
 .. image:: img/multi_animal_import/interface_3.png
+  :alt: Interface 3
   :width: 1000
   :align: center
 
 The process for each video should look like in the following gif:
 
 .. image:: img/multi_animal_import/interface_4.png
+  :alt: Interface 4
   :width: 1000
   :align: center
 

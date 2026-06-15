@@ -46,7 +46,7 @@ class BlobVisualizer():
        :muted:
        :align: center
 
-    ..seealso::
+    .. seealso::
        To create blob data, see :func:`simba.video_processors.blob_tracking_executor.BlobTrackingExecutor`
        To import blob data into SimBA project, see :func:`simba.pose_importers.simba_blob_importer.SimBABlobImporter`
 

@@ -692,3 +692,39 @@ gtag('config', 'G-PEKR9R5J47');
     else addButtons();
   });
 })();
+
+/* ------------------------------------------------------------------ *
+ * Fast smooth-scroll for same-page anchor jumps (fixed ~300ms,
+ * distance-independent — avoids the slow native scroll-behavior).
+ * ------------------------------------------------------------------ */
+(function () {
+  var DURATION = 300, OFFSET = 20;
+  function ease(t) { return 1 - Math.pow(1 - t, 3); }   // easeOutCubic
+  function scrollToEl(el) {
+    var startY = window.pageYOffset;
+    var targetY = el.getBoundingClientRect().top + startY - OFFSET;
+    var diff = targetY - startY;
+    if (Math.abs(diff) < 2) return;
+    var start = null;
+    function step(ts) {
+      if (start === null) start = ts;
+      var p = Math.min((ts - start) / DURATION, 1);
+      window.scrollTo(0, startY + diff * ease(p));
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href || href.charAt(0) !== '#' || href.length < 2) return;
+    var id = decodeURIComponent(href.slice(1));
+    var el = document.getElementById(id);
+    if (!el) { try { el = document.querySelector('a[name="' + (window.CSS ? CSS.escape(id) : id) + '"]'); } catch (x) {} }
+    if (!el) return;
+    e.preventDefault();
+    scrollToEl(el);
+    if (history.pushState) history.pushState(null, '', href);
+  });
+})();

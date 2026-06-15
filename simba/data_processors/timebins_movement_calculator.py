@@ -34,6 +34,7 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
         `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results>`__.
 
     .. image:: _static/img/TimeBinsMovementCalculator.png
+       :alt: Time Bins Movement Calculator
        :width: 500
        :align: center
 

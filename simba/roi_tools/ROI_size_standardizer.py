@@ -25,7 +25,7 @@ class ROISizeStandardizer(ConfigReader, FeatureExtractionMixin):
        Say there are a further two videos in the project with ROIs, and these videos has pixels per millimeter of `9` and `11`.
        At runtime, the area of the rectangles, circles and polygons in the two additional videos get their ROI areas increased/decreased with 10% while the baseline video ROIs are unchanged.
 
-    ..note::
+    .. note::
       See ROI tutorial on `GitHub <https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md>`_ or `ReadTheDocs https://simba-uw-tf-dev.readthedocs.io/en/latest/tutorials_rst/roi_tutorial_new_2025.html>`_
 
     :param str Union[str, os.PathLike]: path to SimBA project config file in Configparser format.

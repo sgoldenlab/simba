@@ -79,6 +79,7 @@ Part 1. Defining ROIs in SimBA
    arrow):
 
 .. image:: img/roi/roi_tutorial_1.webp
+  :alt: Roi tutorial 1
   :width: 800
   :align: center
 
@@ -94,6 +95,7 @@ Part 1. Defining ROIs in SimBA
    will pop open.
 
 .. image:: img/roi/roi_tutorial_2.webp
+  :alt: Roi tutorial 2
   :width: 600
   :align: center
 
@@ -124,6 +126,7 @@ is described in detail below. But in brief:
    up that look like this:
 
 .. image:: img/roi/roi_tutorial_3.webp
+  :alt: Roi tutorial 3
   :width: 600
   :align: center
 
@@ -226,6 +229,7 @@ to set three different *shape attributes*:
    completing your drawing, you can - more info below):
 
 .. image:: img/roi/roi_new_2.png
+  :alt: Roi new 2
   :width: 800
   :align: center
 
@@ -378,6 +382,7 @@ DUPLICATE ROIs
    section below.
 
 .. image:: img/roi/roi_tutorial_5.webp
+  :alt: Roi tutorial 5
   :width: 800
   :align: center
 
@@ -483,6 +488,7 @@ CHANGE ROI ATTRIBUTES
    the ROI that you want to change.
 
 .. image:: img/roi/change_roi_popup.webp
+  :alt: Change roi popup
   :width: 800
   :align: center
 
@@ -544,6 +550,7 @@ of the **REGION OF INTEREST (ROI) SETTINGS** menu and click the
 ``Draw ROIs of pre-defined sizes`` option:
 
 .. image:: img/roi/show_shape_size.webm
+  :alt: Show shape size
   :width: 800
   :align: center
 
@@ -570,6 +577,7 @@ To draw a RECTANGLE of set size, fill in its metric width and height in
 millimeter and click ``ADD RECTANGLE`` as in the video below:
 
 .. image:: img/roi/predefined_sizes_rectangle.webm
+  :alt: Predefined sizes rectangle
   :width: 800
   :align: center
 
@@ -580,6 +588,7 @@ To draw a CIRCLE with a specific radius, fill in its metric radius in
 millimeter and click ``ADD CIRCLE`` as in the video below:
 
 .. image:: img/roi/predefined_sizes_circle.webm
+  :alt: Predefined sizes circle
   :width: 800
   :align: center
 
@@ -590,6 +599,7 @@ To draw a HEXAGON with a specific radius, fill in its metric radius in
 millimeter and click ``ADD HEXAGON`` as in the video below:
 
 .. image:: img/roi/predefined_sizes_hexagon.webm
+  :alt: Predefined sizes hexagon
   :width: 800
   :align: center
 
@@ -602,6 +612,7 @@ in the ``direction drop-down menu``, and click ``ADD HALF CIRCLE`` as in
 the video below:
 
 .. image:: img/roi/predefined_sizes_half_circle_west.webm
+  :alt: Predefined sizes half circle west
   :width: 800
   :align: center
 
@@ -614,6 +625,7 @@ in the ``direction drop-down menu``, and click ``ADD HALF CIRCLE`` as in
 the video below:
 
 .. image:: img/roi/predefined_sizes_half_circle_north.webm
+  :alt: Predefined sizes half circle north
   :width: 800
   :align: center
 
@@ -626,6 +638,7 @@ bring-up a pop-up window that allows you to control some aspects of how
 the SimBA ROI interface behaves.
 
 .. image:: img/roi/preferences_toolbar.webp
+  :alt: Preferences toolbar
   :width: 800
   :align: center
 
@@ -643,6 +656,7 @@ the SimBA ROI interface behaves.
    library. In most cases its safe to keep this at ``-1``.
 
 .. image:: img/roi/change_highlight_clr.webm
+  :alt: Change highlight clr
   :width: 800
   :align: center
 
@@ -665,6 +679,7 @@ we can do this with the ``Apply shapes from another video`` sub-menu.
    in the ``Select video`` dropdown menu will appear on the frame.
 
 .. image:: img/roi/apply_video_from_different.webm
+  :alt: Apply video from different
   :width: 800
   :align: center
 
@@ -679,6 +694,7 @@ and start from scratch.
    project menu, and the following menu should pop open:
 
 .. image:: img/roi/ROI_delete.png
+  :alt: ROI delete
   :width: 800
   :align: center
 
@@ -711,6 +727,7 @@ below:
 
 
 .. image:: img/roi/roi_tutorial_metric.webp
+  :alt: Roi tutorial metric
   :width: 800
   :align: center
 

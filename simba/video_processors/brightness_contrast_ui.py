@@ -17,6 +17,7 @@ class BrightnessContrastUI:
         Adapted from `geeksforgeeks <https://www.geeksforgeeks.org/changing-the-contrast-and-brightness-of-an-image-using-python-opencv/>`_.
 
      .. image:: _static/img/brightness_contrast_ui.gif
+        :alt: Brightness contrast ui
         :width: 700
         :align: center
 

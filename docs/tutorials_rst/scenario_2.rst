@@ -61,6 +61,7 @@ tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4_new.md#
 and shown in the image below.
 
 .. image:: img/scenario_2/menu_1.jpg
+  :alt: Menu 1
   :width: 1200
   :align: center
 
@@ -135,6 +136,7 @@ BtWGaNP in these videos.
    and you should see the following window.
 
 .. image:: img/scenario_2/menu_2.png
+  :alt: Menu 2
   :width: 600
   :align: center
 
@@ -145,6 +147,7 @@ BtWGaNP in these videos.
    show Behavior BtWGaNP.
 
 .. image:: img/scenario_2/menu_3.png
+  :alt: Menu 3
   :width: 600
   :align: center
 
@@ -263,6 +266,7 @@ sub-menu ``Analyze machine results``, you should see the following
 buttons:
 
 .. image:: img/scenario_2/data_analysis_1.png
+  :alt: Data analysis 1
   :width: 800
   :align: center
 
@@ -276,6 +280,7 @@ buttons:
    contain. The pop up window should look like this:
 
 .. image:: img/scenario_2/data_analysis_2.png
+  :alt: Data analysis 2
   :width: 800
   :align: center
 
@@ -293,6 +298,7 @@ the exact output filename and file path.
    this:
 
 .. image:: img/scenario_2/data_analysis_3.png
+  :alt: Data analysis 3
   :width: 800
   :align: center
 
@@ -318,6 +324,7 @@ date-time stamped output csv file with the data is saved in the
    your time-bins in **seconds**.
 
 .. image:: img/scenario_2/data_analysis_4.png
+  :alt: Data analysis 4
   :width: 800
   :align: center
 
@@ -340,6 +347,7 @@ date-time stamped output csv file with the data is saved in the
    the movement of your animals in the defined time-bins.
 
 .. image:: img/scenario_2/data_analysis_5.png
+  :alt: Data analysis 5
   :width: 800
   :align: center
 
@@ -351,6 +359,7 @@ date-time stamped output csv file with the data is saved in the
    ``Classifications by ROI`` brings up the following pop-up:
 
 .. image:: img/scenario_2/data_analysis_6.png
+  :alt: Data analysis 6
   :width: 800
   :align: center
 
@@ -375,6 +384,7 @@ saved in the ``project_folder/logs`` directory of your SimBA project.
    scale. Clicking the severity button brings up the following menu:
 
 .. image:: img/scenario_2/data_analysis_7.png
+  :alt: Data analysis 7
   :width: 800
   :align: center
 
@@ -430,6 +440,7 @@ are created. We will go through each of the settings in the
 visualization options in turn:
 
 .. image:: img/scenario_2/visualization_1.png
+  :alt: Visualization 1
   :width: 800
   :align: center
 
@@ -497,10 +508,12 @@ charts allowing us to insepct when and for how long each of our
 classified behaviors occur as in the gif below.
 
 .. image:: img/scenario_2/visualization_2.png
+  :alt: Visualization 2
   :width: 800
   :align: center
 
 .. image:: img/scenario_2/gantt_example_1.gif
+  :alt: Gantt example 1
   :width: 800
   :align: center
 
@@ -567,11 +580,13 @@ sub-menu allowing users to customize the videos and how they are
 created.
 
 .. image:: img/scenario_2/visualization_3.png
+  :alt: Visualization 3
   :width: 800
   :align: center
 
 
 .. image:: img/scenario_2/probability_example.gif
+  :alt: Probability example
   :width: 800
   :align: center
 
@@ -643,10 +658,12 @@ their paths, as well the locations of the classified behaviors. In the
 up the below pop-up menu.
 
 .. image:: img/scenario_2/visualization_4.png
+  :alt: Visualization 4
   :width: 800
   :align: center
 
 .. image:: img/scenario_2/path_plot_example.gif
+  :alt: Path plot example
   :width: 800
   :align: center
 
@@ -731,19 +748,23 @@ tab, click the [VISUALIZE DISTANCES] button, which brings up the below
 pop-up menu.
 
 .. image:: img/scenario_2/visualization_5.png
+  :alt: Visualization 5
   :width: 800
   :align: center
 
 .. image:: img/scenario_2/visualization_5.png
+  :alt: Visualization 5
   :width: 800
   :align: center
 
 .. image:: img/scenario_2/distance_plot_example.gif
+  :alt: Distance plot example
   :width: 800
   :align: center
    </p>
 
 .. image:: img/scenario_2/visualization_8.png
+  :alt: Visualization 8
   :width: 800
   :align: center
 
@@ -806,11 +827,13 @@ of classified events. For an idea of how classification heatmaps works,
 see `THIS VIDEO <https://youtu.be/O41x96kXUHE>`__.
 
 .. image:: img/scenario_2/visualization_6.png
+  :alt: Visualization 6
   :width: 800
   :align: center
 
 
 .. image:: img/scenario_2/visualization_7.png
+  :alt: Visualization 7
   :width: 800
   :align: center
 
@@ -878,10 +901,12 @@ In the ``Visualization`` sub-menu, use the second button named
 and movements of animals:
 
 .. image:: img/scenario_2/data_table_example_1.gif
+  :alt: Data table example 1
   :width: 800
   :align: center
 
 .. image:: img/scenario_2/data_table_example_2.gif
+  :alt: Data table example 2
   :width: 800
   :align: center
 
@@ -933,6 +958,7 @@ the ``MERGE FRAMES`` button in the [VISUALIZATIONS] tab, and you should
 see this pop up to the left:
 
 .. image:: img/scenario_2/merge_frames.png
+  :alt: Merge frames
   :width: 800
   :align: center
 

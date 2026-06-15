@@ -20,6 +20,7 @@ class ROISelector(object):
     The selected region variables are stored in self: top_left, bottom_right, width, height etc.
 
     .. image:: _static/img/roi_selector.gif
+       :alt: Roi selector
        :width: 600
        :align: center
 

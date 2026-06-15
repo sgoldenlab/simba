@@ -37,6 +37,7 @@ class Interpolate(ConfigReader):
     :param bool initial_import_multi_index: If True, the incoming data is multi-index columns dataframes. Default: False.
 
     .. image:: _static/img/interpolation_comparison.webp
+       :alt: Interpolation comparison
        :width: 400
        :align: center
 
@@ -245,6 +246,7 @@ class Smooth(ConfigReader):
         `Smoothing tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files>`__.
 
     .. image:: _static/img/smoothing.gif
+       :alt: Smoothing
        :width: 600
        :align: center
 

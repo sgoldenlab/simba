@@ -44,6 +44,7 @@ Create a new user-defined pose-configuration
    menu pop open:
 
 .. image:: img/create_user_defined_pose_configuration/menu_1.png
+  :alt: Menu 1
   :width: 800
   :align: center
 
@@ -54,6 +55,7 @@ pose configuration.
    open:
 
 .. image:: img/create_user_defined_pose_configuration/menu_2.png
+  :alt: Menu 2
   :width: 800
   :align: center
 
@@ -101,6 +103,7 @@ proceed.
    body parts, like the gif below:
 
 .. image:: img/create_user_defined_pose_configuration/interface_1.gif
+  :alt: Interface 1
   :width: 1000
   :align: center
 
@@ -116,6 +119,7 @@ to the next body-part after a body-part as been assigned.
    though the ``Animal Settings`` menu next to the text ``# config``:
 
 .. image:: img/create_user_defined_pose_configuration/menu_3.png
+  :alt: Menu 3
   :width: 800
   :align: center
 
@@ -137,6 +141,7 @@ the ``# config`` list. To do this, locate the
 ``Project configuration`` tab:
 
 .. image:: img/create_user_defined_pose_configuration/menu_4.png
+  :alt: Menu 4
   :width: 800
   :align: center
 
@@ -145,6 +150,7 @@ the ``# config`` list. To do this, locate the
    to proceed.
 
 .. image:: img/create_user_defined_pose_configuration/warning.png
+  :alt: Warning
   :width: 800
   :align: center
 
@@ -173,6 +179,7 @@ naming convention in your DeepLabCut projects created through SimBA.
    `HERE <https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/Tutorial_DLC.md>`__.
 
 .. image:: img/create_user_defined_pose_configuration/menu_5.png
+  :alt: Menu 5
   :width: 800
   :align: center
 

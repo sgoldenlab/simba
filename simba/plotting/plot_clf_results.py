@@ -46,6 +46,7 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
        Scikit visualization documentation <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-sklearn-visualization__.
 
     .. image:: _static/img/sklearn_visualization.gif
+       :alt: Sklearn visualization
        :width: 600
        :align: center
 

@@ -26,6 +26,7 @@ class CircularPlotting(PlottingMixin):
         Create polar plot representing the within a video.
 
         .. image:: _static/img/circular_plotter.png
+          :alt: Circular plotter
           :width: 450
           :align: center
 
@@ -84,6 +85,7 @@ class CircularPlotting(PlottingMixin):
         Create polar plots representing angular diffusion within each N second time-bin of the video.
 
         .. image:: _static/img/cicular_time_bins.png
+          :alt: Cicular time bins
           :width: 600
           :align: center
 

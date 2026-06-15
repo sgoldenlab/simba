@@ -214,6 +214,7 @@ the ``project_folder\csv\targets_inserted`` directory. The content of
 the file may look similar to this:
 
 .. image:: img/scenario_3/video_info.jpg
+  :alt: Video info
   :width: 1000
   :align: center
 

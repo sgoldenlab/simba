@@ -2,6 +2,7 @@ Cue Light Analysis in SimBA
 ==================================================
 
 .. image:: img/feature_subsets/landing.png
+  :alt: Landing
   :width: 1000
   :align: center
 
@@ -65,6 +66,7 @@ Part 1. Defining cue light ROIs in SimBA.
    video. I click on ``Draw`` next to the video to define my ROIs:
 
 .. image:: img/feature_subsets/menu_1.png
+  :alt: Menu 1
   :width: 1000
   :align: center
 
@@ -88,6 +90,7 @@ Part 1. Defining cue light ROIs in SimBA.
     Define an ROI for each cue light of interest.
 
 .. image:: img/feature_subsets/interface_1.png
+  :alt: Interface 1
   :width: 1000
   :align: center
 
@@ -101,6 +104,7 @@ the SimBA interface called [Add-ons] and click on
 To begin analysing
 
 .. image:: img/feature_subsets/menu_2.png
+  :alt: Menu 2
   :width: 1000
   :align: center
 
@@ -118,6 +122,7 @@ the name of the single cue light. I use this dropdown menu to say that
 the cue light is names ``Cue light``.
 
 .. image:: img/feature_subsets/menu_3.gif
+  :alt: Menu 3
   :width: 1000
   :align: center
 
@@ -155,6 +160,7 @@ images. I choose to generate a compressed video, and click
 in the main SimBA terminal.
 
 .. image:: img/feature_subsets/menu_4.gif
+  :alt: Menu 4
   :width: 1000
   :align: center
 
@@ -173,6 +179,7 @@ the onset count, (iii) the total ON time in seconds, and the total OFF
 time in seconds, as in the gif example below:
 
 .. image:: img/feature_subsets/example_1.gif
+  :alt: Example 1
   :width: 1000
   :align: center
 
@@ -187,6 +194,7 @@ looking like the window to the right (indicated with a red rectangle)
 accepting different user-defined settings:
 
 .. image:: img/feature_subsets/menu_5.png
+  :alt: Menu 5
   :width: 1000
   :align: center
 
@@ -239,6 +247,7 @@ animals within the different cue lights periods, e.g., somthing akin to
 this:
 
 .. image:: img/feature_subsets/output_1.png
+  :alt: Output 1
   :width: 1000
   :align: center
 
@@ -249,6 +258,7 @@ file contains statistics on where in relation to the non-cue light ROIs
 the animals spent time during the different cue lights period:
 
 .. image:: img/feature_subsets/output_2.png
+  :alt: Output 2
   :width: 1000
   :align: center
 
@@ -271,6 +281,7 @@ rectangle) accepting different user-defined settings:
    classifiers.
 
 .. image:: img/feature_subsets/menu_6.png
+  :alt: Menu 6
   :width: 1000
   :align: center
 
@@ -306,6 +317,7 @@ much the animals engaged in the classified behavior outside the cue
 light time periods.
 
 .. image:: img/feature_subsets/output_3.png
+  :alt: Output 3
   :width: 1000
   :align: center
 

@@ -105,10 +105,12 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
        `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
     .. image:: _static/img/DistancePlotterMultiCore.png
+       :alt: Distance Plotter Multi Core
        :width: 600
        :align: center
 
     .. image:: _static/img/DistancePlotterMultiCore_1.gif
+       :alt: Distance Plotter Multi Core 1
        :width: 600
        :align: center
 

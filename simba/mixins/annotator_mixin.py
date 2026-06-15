@@ -81,6 +81,7 @@ class AnnotatorMixin(ConfigReader):
         Inserts a video frame as a tkinter label at a specified maximum size at specified grid location.
 
         .. image:: _static/img/video_frm_label.png
+           :alt: Video frm label
            :width: 500
            :align: center
 
@@ -118,6 +119,7 @@ class AnnotatorMixin(ConfigReader):
         Creates a horizontal frame navigation bar where the buttons are tied to callbacks for changing and displaying video frames.
 
         .. image:: _static/img/h_nav_bar.png
+           :alt: H nav bar
            :width: 500
            :align: center
 
@@ -268,6 +270,7 @@ class AnnotatorMixin(ConfigReader):
         Create a vertical navigation pane for playing a video and displaying and activating keyboard shortcuts when annotating bouts.
 
         .. image:: _static/img/h_nav_bar.png
+           :alt: H nav bar
            :width: 500
            :align: center
 
@@ -455,6 +458,7 @@ class AnnotatorMixin(ConfigReader):
         Creates a vertical pane that includes tkinter frames for selecting bouts and annotating behaviours in those bouts frame-wise.
 
         .. image:: _static/img/targeted_frames_selection_pane.png
+           :alt: Targeted frames selection pane
            :width: 500
            :align: center
 

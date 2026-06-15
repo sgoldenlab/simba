@@ -62,6 +62,7 @@ class LabellingInterface(ConfigReader):
        See the `tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md>`__.
 
     .. image:: _static/img/annotator.png
+       :alt: Annotator
        :width: 500
        :align: center
 

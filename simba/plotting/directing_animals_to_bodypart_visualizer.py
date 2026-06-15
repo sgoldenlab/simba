@@ -33,6 +33,7 @@ class DirectingAnimalsToBodyPartVisualizer(ConfigReader, PlottingMixin):
         `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-data-tables`>_.
 
         .. image:: _static/img/directing_other_animals.png
+           :alt: Directing other animals
            :width: 450
            :align: center
 

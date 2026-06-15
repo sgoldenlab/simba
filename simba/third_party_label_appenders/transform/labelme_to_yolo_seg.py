@@ -46,6 +46,7 @@ class LabelmeKeypoints2YoloSeg:
            Only works with one animal (as of 07/25).
 
         .. image:: _static/img/cocokp_to_yolo_seg.webp
+           :alt: Cocokp to yolo seg
            :width: 600
            :align: center
 

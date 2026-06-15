@@ -125,6 +125,7 @@ def convert_to_jpeg(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]]
        Quality above 95 should be avoided; 100 disables portions of the JPEG compression algorithm, and results in large files with hardly any gain in image quality
 
     .. image:: _static/img/convert_to_jpeg.jpeg
+       :alt: Convert to jpeg
        :width: 200
        :align: center
 
@@ -355,6 +356,7 @@ def convert_to_webp(path: Union[str, os.PathLike],
     Convert the file type of all image files within a directory to WEBP format of passed quality.
 
     .. image:: _static/img/convert_to_webp.webp
+       :alt: Convert to webp
        :width: 300
        :align: center
 
@@ -415,6 +417,7 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike],
        For multicore method, see :func:`simba.video_processors.video_processing.clahe_enhance_video_mp`.
 
     .. image:: _static/img/clahe_enhance_video.gif
+       :alt: Clahe enhance video
        :width: 800
        :align: center
 
@@ -522,6 +525,7 @@ def clahe_enhance_video_mp(file_path: Union[str, os.PathLike],
        For single core method, see :func:`simba.video_processors.video_processing.clahe_enhance_video`.
 
     .. image:: _static/img/clahe_enhance_video.gif
+       :alt: Clahe enhance video
        :width: 800
        :align: center
 
@@ -875,6 +879,7 @@ def video_to_greyscale(file_path: Union[str, os.PathLike],
     Convert a video file to greyscale mp4 format.
 
     .. image:: _static/img/to_greyscale.gif
+       :alt: To greyscale
        :width: 700
        :align: center
 
@@ -934,6 +939,7 @@ def batch_video_to_greyscale(path: Union[str, os.PathLike, List[Union[str, os.Pa
     Convert a directory of video file to greyscale mp4 format.
 
     .. image:: _static/img/to_greyscale.gif
+       :alt: To greyscale
        :width: 700
        :align: center
 
@@ -1010,10 +1016,12 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
     Superimpose frame count on a video file.
 
     .. image:: _static/img/superimpose_frame_count.png
+       :alt: Superimpose frame count
        :width: 700
        :align: center
 
     .. image:: _static/img/superimpose_frame_count.gif
+       :alt: Superimpose frame count
        :width: 500
        :align: center
 
@@ -1690,6 +1698,7 @@ def crop_single_video(file_path: Union[str, os.PathLike],
     Results is saved in the same directory as input video with the ``_cropped.mp4`` suffix.
 
     .. image:: _static/img/crop_single_video.gif
+       :alt: Crop single video
        :width: 700
        :align: center
 
@@ -1880,6 +1889,7 @@ def video_concatenator(video_one_path: Union[str, os.PathLike],
     Concatenate two videos to a single video either horizontally or vertically
 
     .. image:: _static/img/horizontal_video_concatenator.gif
+       :alt: Horizontal video concatenator
        :width: 1000
        :align: center
 
@@ -1975,6 +1985,7 @@ class VideoRotator(ConfigReader):
 
 
     .. image:: _static/img/VideoRotator.gif
+       :alt: Video Rotator
        :width: 700
        :align: center
 
@@ -2329,6 +2340,7 @@ def crop_single_video_circle(file_path: Union[str, os.PathLike]) -> None:
     Crop a video based on circular regions of interest (ROIs) selected by the user.
 
     .. image:: _static/img/crop_single_video_circle.gif
+       :alt: Crop single video circle
        :width: 600
        :align: center
     .. note::
@@ -2369,6 +2381,7 @@ def crop_multiple_videos_circles(in_dir: Union[str, os.PathLike], out_dir: Union
 
 
     .. image:: _static/img/crop_single_video_circle.gif
+       :alt: Crop single video circle
        :width: 600
        :align: center
 
@@ -2436,6 +2449,7 @@ def crop_single_video_polygon(file_path: Union[str, os.PathLike]) -> None:
     Crop a video based on polygonal regions of interest (ROIs) selected by the user.
 
     .. image:: _static/img/roi_selector_polygon.gif
+       :alt: Roi selector polygon
        :width: 400
        :align: center
 
@@ -2758,6 +2772,7 @@ def horizontal_video_concatenator(video_paths: List[Union[str, os.PathLike]],
     Concatenates multiple videos horizontally.
 
     .. image:: _static/img/horizontal_video_concatenator.gif
+       :alt: Horizontal video concatenator
        :width: 1000
        :align: center
 
@@ -2820,6 +2835,7 @@ def vertical_video_concatenator(video_paths: List[Union[str, os.PathLike]],
     Concatenates multiple videos vertically.
 
     .. image:: _static/img/vertical_video_concatenator.png
+       :alt: Vertical video concatenator
        :width: 300
        :align: center
 
@@ -2911,6 +2927,7 @@ def mosaic_concatenator(
     Concatenates multiple videos into a mosaic layout.
 
     .. image:: _static/img/mosaic_concatenator.png
+       :alt: Mosaic concatenator
        :width: 600
        :align: center
 
@@ -3006,6 +3023,7 @@ def mixed_mosaic_concatenator(
     Create a mixed mosaic video by concatenating multiple input videos in a mosaic layout of various sizes.
 
     .. image:: _static/img/mixed_mosaic_concatenator.png
+       :alt: Mixed mosaic concatenator
        :width: 600
        :align: center
 
@@ -3199,10 +3217,12 @@ def convert_to_mp4(path: Union[str, os.PathLike],
     Convert a directory containing videos, or a single video, to MP4 format using passed quality and codec.
 
     .. image:: _static/img/convert_to_mp4_1.webp
+       :alt: Convert to mp4 1
        :width: 800
        :align: center
 
     .. image:: _static/img/convert_to_mp4_2.webp
+       :alt: Convert to mp4 2
        :width: 800
        :align: center
 
@@ -3276,6 +3296,7 @@ def convert_to_avi(path: Union[str, os.PathLike],
     Convert a directory containing videos, or a single video, to AVI format using passed quality and codec.
 
     .. image:: _static/img/convert_to_avi.webp
+       :alt: Convert to avi
        :width: 800
        :align: center
 
@@ -3342,6 +3363,7 @@ def convert_to_webm(path: Union[str, os.PathLike],
     Convert a directory containing videos, or a single video, to WEBM format using passed quality and codec.
 
     .. image:: _static/img/convert_to_webm.webp
+       :alt: Convert to webm
        :width: 800
        :align: center
 

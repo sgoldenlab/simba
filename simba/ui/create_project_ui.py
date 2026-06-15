@@ -34,6 +34,7 @@ class ProjectCreatorPopUp():
     Mixin for GUI pop-up windows that accept user-inputs for creating a SimBA project.
 
     .. image:: _static/img/ProjectCreatorPopUp.webp
+       :alt: Project Creator Pop Up
        :width: 800
        :align: center
 

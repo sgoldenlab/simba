@@ -2,6 +2,7 @@ Third-part annotations in SimBA
 ==================================================
 
 .. image:: img/third_party_annotations/landing.png
+  :alt: Landing
   :width: 1000
   :align: center
 
@@ -61,6 +62,7 @@ tab, and the ``Append third-party annotations`` button inside the
 ``LABELLING TOOLS`` sub-frame and you should see the following pop-up:
 
 .. image:: img/third_party_annotations/menu_1.png
+  :alt: Menu 1
   :width: 1000
   :align: center
 
@@ -68,6 +70,7 @@ tab, and the ``Append third-party annotations`` button inside the
 select the application which your annotations were created in:
 
 .. image:: img/third_party_annotations/menu_2.png
+  :alt: Menu 2
   :width: 1000
   :align: center
 
@@ -88,6 +91,7 @@ Each of the ``WARNINGS AND ERRORS`` dropdowns have two options:
 ``WARNING``, and ``ERROR``:
 
 .. image:: img/third_party_annotations/menu_3.png
+  :alt: Menu 3
   :width: 1000
   :align: center
 

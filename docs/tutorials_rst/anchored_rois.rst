@@ -47,6 +47,7 @@ Finding animal-anchored ROIs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: img/anchored_roi/menu_1.png
+  :alt: Menu 1
   :width: 800
   :align: center
 
@@ -73,6 +74,7 @@ option follows below, but in brief:
    body-part will be placed inside a circular animal-anchored ROI.
 
 .. image:: img/anchored_roi/menu_2.png
+  :alt: Menu 2
   :width: 800
   :align: center
 
@@ -88,6 +90,7 @@ Entire animal based bounding boxes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: img/anchored_roi/bbox_example_termite.png
+  :alt: Bbox example termite
   :width: 800
   :align: center
 
@@ -174,6 +177,7 @@ button which should bring up the following pop-up window allowing a few
 user-defined video settings:
 
 .. image:: img/anchored_roi/menu_3.png
+  :alt: Menu 3
   :width: 800
   :align: center
 
@@ -226,14 +230,17 @@ project. You should expect the videos to look something like these
 examples, dependning in your chosen shape-type:
 
 .. image:: img/anchored_roi/bbox_example_termite.gif
+  :alt: Bbox example termite
   :width: 800
   :align: center
 
 .. image:: img/anchored_roi/bbox_example_termite_head.gif
+  :alt: Bbox example termite head
   :width: 800
   :align: center
 
 .. image:: img/anchored_roi/bbox_example_termite_overlap.gif
+  :alt: Bbox example termite overlap
   :width: 800
   :align: center
 
@@ -252,6 +259,7 @@ animal-anchored ROIs, and (ii) other animal body-part key-points, as in
 the example image below.
 
 .. image:: img/anchored_roi/termite_intersecting_examples.png
+  :alt: Termite intersecting examples
   :width: 800
   :align: center
 
@@ -259,6 +267,7 @@ To calculate these data, click on ``CALCULATE BOUNDARY STATISTICS``
 button which brings up the following pop-up settings window:
 
 .. image:: img/anchored_roi/menu_4.png
+  :alt: Menu 4
   :width: 800
   :align: center
 
@@ -294,6 +303,7 @@ user-defined custom metrics, we will go through the structure of the
 file in a little more details.
 
 .. image:: img/anchored_roi/data_format_example.png
+  :alt: Data format example
   :width: 1000
   :align: center
 
@@ -313,6 +323,7 @@ spreadsheet viewer, you might see something like this when viewing the
 first two columns and first 30 frames:
 
 .. image:: img/anchored_roi/data_format_example_1.png
+  :alt: Data format example 1
   :width: 1000
   :align: center
 
@@ -342,6 +353,7 @@ each video. To compute aggregate statistics, we click the
 following pop-up window:
 
 .. image:: img/anchored_roi/menu_5.png
+  :alt: Menu 5
   :width: 1000
   :align: center
 
@@ -384,6 +396,7 @@ ticking all available metrics. When opening this file in a spreadsheet
 viewer, the top few cells look something like this:
 
 .. image:: img/anchored_roi/data_format_example_2.png
+  :alt: Data format example 2
   :width: 1000
   :align: center
 

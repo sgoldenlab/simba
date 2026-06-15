@@ -2,6 +2,7 @@ Model explainability and calculating feature SHAP values in SimBA
 =================================================================
 
 .. image:: img/SHAP/landing.png
+  :alt: Landing
   :width: 1000
   :align: center
 
@@ -63,6 +64,7 @@ after exhaustive permutations within the order of feature-introductions
 into the classification scenario:
 
 .. image:: img/SHAP/shap_example_1.png
+  :alt: Shap example 1
   :width: 800
   :align: center
 
@@ -87,6 +89,7 @@ discriminating attack events from non-attack events (with some notable
 exceptions!).
 
 .. image:: img/SHAP/shap_example_2.png
+  :alt: Shap example 2
   :width: 800
   :align: center
 
@@ -128,6 +131,7 @@ At the bottom of the ``Settings`` pop-up window, you will see these
 entry boxes. Begin by ticking the ``Calculate SHAP values`` entry box.
 
 .. image:: img/SHAP/menu_1.png
+  :alt: Menu 1
   :width: 800
   :align: center
 
@@ -172,6 +176,7 @@ beginning of the calculations to look something like this in the main
 SimBA terminal:
 
 .. image:: img/SHAP/printing.png
+  :alt: Printing
   :width: 1000
   :align: center
 
@@ -227,6 +232,7 @@ actual feature values (represented in the
 ``RAW_SHAP_feature_values_copulation_prediction.csv``).
 
 .. image:: img/SHAP/output_1.png
+  :alt: Output 1
   :width: 1000
   :align: center
 
@@ -247,6 +253,7 @@ the data, and give a sanity check that the calculations were done as
 expected:
 
 .. image:: img/SHAP/output_2.png
+  :alt: Output 2
   :width: 1000
   :align: center
 
@@ -287,6 +294,7 @@ different frame sampling frequencies (133ms, 166ms, 200ms, 500ms, 66ms,
 something like this:
 
 .. image:: img/SHAP/output_3.png
+  :alt: Output 3
   :width: 1000
   :align: center
 
@@ -309,6 +317,7 @@ the summed SHAP values seen in the
 something like this:
 
 .. image:: img/SHAP/output_4.png
+  :alt: Output 4
   :width: 1000
   :align: center
 

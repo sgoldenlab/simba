@@ -22,6 +22,7 @@ class ImportVideosFrame(PopUpMixin, ConfigReader):
 
     """
     .. image:: _static/img/ImportVideosFrame.webp
+       :alt: Import Videos Frame
        :width: 500
        :align: center
 

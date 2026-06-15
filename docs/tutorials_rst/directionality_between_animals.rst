@@ -50,6 +50,7 @@ the created CSV files and dataframes are accurate.
 |Video example: SimBA YouTube playlist|
 
 .. image:: img/directionality_between_animals/example.png
+  :alt: Example
   :width: 1000
   :align: center
 
@@ -93,6 +94,7 @@ Calculate what other body-parts and what other animals, are in the line of sight
    ``Visualize directionality between animals``.
 
 .. image:: img/directionality_between_animals/menu_1.png
+  :alt: Menu 1
   :width: 1000
   :align: center
 
@@ -152,6 +154,7 @@ within the line of sight, then the specific row for these columns will
 also read ``0``.
 
 .. image:: img/directionality_between_animals/output_1.png
+  :alt: Output 1
   :width: 1000
   :align: center
 

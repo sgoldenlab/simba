@@ -38,6 +38,7 @@ class AdvancedLabellingInterface(ConfigReader):
        `Advanced annotation tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/advanced_labelling.md>`__.
 
     .. image:: _static/img/adv_annotator.png
+       :alt: Adv annotator
        :width: 800
        :align: center
 

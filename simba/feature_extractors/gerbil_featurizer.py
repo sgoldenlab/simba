@@ -22,6 +22,7 @@ class GerbilFeaturizer(object):
     Compute features from SLEAP pose-estimation data in NPY format with two animals and a single body-part tracked per animal.
 
     .. image:: _static/GerbilFeaturizer.webp
+       :alt: Gerbil Featurizer
        :width: 400
        :align: center
 

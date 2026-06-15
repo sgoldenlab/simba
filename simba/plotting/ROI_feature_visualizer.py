@@ -50,14 +50,17 @@ class ROIfeatureVisualizer(ConfigReader):
        `Tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-5-visualizing-roi-features>`__.
 
     .. image:: _static/img/roi_visualize.png
+       :alt: Roi visualize
        :width: 400
        :align: center
 
     .. image:: _static/img/ROIfeatureVisualizer_1.png
+       :alt: ROIfeature Visualizer 1
        :width: 700
        :align: center
 
     .. image:: _static/img/ROIfeatureVisualizer_2.png
+       :alt: ROIfeature Visualizer 2
        :width: 700
        :align: center
 

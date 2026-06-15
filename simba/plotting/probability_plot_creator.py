@@ -36,6 +36,7 @@ class TresholdPlotCreatorSingleProcess(ConfigReader, PlottingMixin):
        For improved run-time, use :meth:`simba.plotting.probability_plot_creator_mp.TresholdPlotCreatorMultiprocess`
 
     .. image:: _static/img/prob_plot.png
+       :alt: Prob plot
        :width: 300
        :align: center
 

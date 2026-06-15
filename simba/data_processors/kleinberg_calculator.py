@@ -32,6 +32,7 @@ class KleinbergCalculator(ConfigReader):
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/kleinberg_filter.md>`__.
 
     .. image:: _static/img/kleinberg.png
+       :alt: Kleinberg
        :width: 400
        :align: center
 

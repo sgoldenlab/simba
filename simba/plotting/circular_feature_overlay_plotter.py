@@ -28,6 +28,7 @@ class CircularFeaturePlotter(ConfigReader, PlottingMixin, FeatureExtractionMixin
     accurate cardinality and angle degree computation.
 
     .. image:: _static/img/circular_visualiation.gif
+       :alt: Circular visualiation
        :width: 600
        :align: center
 

@@ -137,6 +137,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
        and :func:`simba.mixins.geometry_mixin.GeometryMixin.geometry_video`
 
     .. image:: _static/img/GeometryPlotter.gif
+       :alt: Geometry Plotter
        :width: 600
        :align: center
 

@@ -1979,6 +1979,7 @@ class InitiateClipMultipleVideosByTimestampsPopUp(PopUpMixin):
 class BrightnessContrastPopUp(PopUpMixin):
     """
     .. image:: _static/img/brightness_contrast_ui.gif
+       :alt: Brightness contrast ui
        :width: 700
        :align: center
     """
@@ -2050,6 +2051,7 @@ class BrightnessContrastPopUp(PopUpMixin):
 class InteractiveClahePopUp(PopUpMixin):
     """
     .. image:: _static/img/interactive_clahe_ui.gif
+       :alt: Interactive clahe ui
        :width: 500
        :align: center
     """

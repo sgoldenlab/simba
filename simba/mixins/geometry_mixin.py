@@ -90,6 +90,7 @@ class GeometryMixin(object):
            For GPU method, see :func:`simba.data_processors.cuda.geometry.get_convex_hull`
 
         .. image:: _static/img/bodyparts_to_polygon.png
+           :alt: Bodyparts to polygon
            :width: 400
            :align: center
 
@@ -226,10 +227,12 @@ class GeometryMixin(object):
            For multicore method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodyparts_to_circle`
 
         .. image:: _static/img/bodyparts_to_circle.png
+           :alt: Bodyparts to circle
            :width: 400
            :align: center
 
         .. image:: _static/img/bodyparts_to_circle.gif
+           :alt: Bodyparts to circle
            :width: 450
            :align: center
 
@@ -272,10 +275,12 @@ class GeometryMixin(object):
         :rtype: MultiLineString
 
         .. image:: _static/img/bodyparts_to_multistring_skeleton.png
+           :alt: Bodyparts to multistring skeleton
            :width: 400
            :align: center
 
         .. image:: _static/img/bodyparts_to_multistring_skeleton.gif
+           :alt: Bodyparts to multistring skeleton
            :width: 450
            :align: center
 
@@ -304,6 +309,7 @@ class GeometryMixin(object):
         preserving the vertex count and shape proportions.
 
         .. image:: _static/img/parallel_offset_polygon.webp
+           :alt: Parallel offset polygon
            :width: 450
            :align: center
 
@@ -383,6 +389,7 @@ class GeometryMixin(object):
         Create a buffered shape by applying a buffer operation to the input polygon or linestring.
 
         .. image:: _static/img/buffer_shape.png
+           :alt: Buffer shape
            :width: 400
            :align: center
 
@@ -426,6 +433,7 @@ class GeometryMixin(object):
         Compute the percentage of overlap between two shapes.
 
         .. image:: _static/img/compute_pct_shape_overlap.png
+           :alt: Compute pct shape overlap
            :width: 400
            :align: center
 
@@ -492,6 +500,7 @@ class GeometryMixin(object):
            Only returns if two shapes are overlapping or not overlapping. If the amount of overlap is required, use ``GeometryMixin().compute_shape_overlap()``.
 
         .. image:: _static/img/compute_overlap.png
+           :alt: Compute overlap
            :width: 400
            :align: center
 
@@ -522,6 +531,7 @@ class GeometryMixin(object):
         Check if two LineString objects cross each other.
 
         .. image:: _static/img/are_lines_crossing.png
+           :alt: Are lines crossing
            :width: 400
            :align: center
 
@@ -555,6 +565,7 @@ class GeometryMixin(object):
         Check if one geometry fully covers another.
 
         .. image:: _static/img/is_line_covered.png
+           :alt: Is line covered
            :width: 400
            :align: center
 
@@ -629,10 +640,12 @@ class GeometryMixin(object):
            For multicore wrapper method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_shape_distance`
 
         .. image:: _static/img/shape_distance.png
+           :alt: Shape distance
            :width: 400
            :align: center
 
         .. image:: _static/img/multiframe_shape_distance.webp
+           :alt: Multiframe shape distance
            :width: 400
            :align: center
 
@@ -672,6 +685,7 @@ class GeometryMixin(object):
           with specificed area.
 
         .. image:: _static/img/bodyparts_to_line.png
+           :alt: Bodyparts to line
            :width: 400
            :align: center
 
@@ -723,6 +737,7 @@ class GeometryMixin(object):
         Get the center coordinate of a shape or a list of shapes.
 
         .. image:: _static/img/get_center.png
+           :alt: Get center
            :width: 500
            :align: center
 
@@ -761,6 +776,7 @@ class GeometryMixin(object):
         Check if two geometries touch each other.
 
         .. image:: _static/img/touches.png
+           :alt: Touches
            :width: 500
            :align: center
 
@@ -797,6 +813,7 @@ class GeometryMixin(object):
         Check if the first shape in a list contains a second shape in the same list.
 
         .. image:: _static/img/is_containing.png
+           :alt: Is containing
            :width: 500
            :align: center
 
@@ -817,10 +834,12 @@ class GeometryMixin(object):
         Calculate the difference between a shape and one or more potentially overlapping shapes.
 
         .. image:: _static/img/difference.png
+           :alt: Difference
            :width: 400
            :align: center
 
         .. image:: _static/img/difference_1.png
+           :alt: Difference 1
            :width: 400
            :align: center
 
@@ -863,6 +882,7 @@ class GeometryMixin(object):
         Compute the union of multiple geometries.
 
         .. image:: _static/img/union.png
+           :alt: Union
            :width: 400
            :align: center
 
@@ -906,6 +926,7 @@ class GeometryMixin(object):
         In other words, it includes the parts that are unique to each geometry while excluding the parts that are common to both.
 
         .. image:: _static/img/symmetric_difference.png
+           :alt: Symmetric difference
            :width: 400
            :align: center
 
@@ -1051,6 +1072,7 @@ class GeometryMixin(object):
            * If single images of geometries are needed, then use :func:`simba.mixins.geometry_mixin.view_shapes()`
 
         .. image:: _static/img/geometry_video.gif
+           :alt: Geometry video
            :width: 500
            :align: center
 
@@ -1147,6 +1169,7 @@ class GeometryMixin(object):
         The minimum rotated rectangle, also known as the minimum bounding rectangle (MBR) or oriented bounding box (OBB), is the smallest rectangle that can fully contain a given polygon or set of points while allowing rotation. It is defined by its center, dimensions (length and width), and rotation angle.
 
         .. image:: _static/img/minimum_rotated_rectangle.png
+           :alt: Minimum rotated rectangle
            :width: 500
            :align: center
 
@@ -1187,6 +1210,7 @@ class GeometryMixin(object):
         Calculate the length of a LineString geometry.
 
         .. image:: _static/img/length.png
+           :alt: Length
            :width: 400
            :align: center
 
@@ -1372,6 +1396,7 @@ class GeometryMixin(object):
         Buffer shapes by a specified size using multiprocessing.
 
         .. image:: _static/img/multiframe_buffer_shapes.webp
+           :alt: Multiframe buffer shapes
            :width: 500
            :align: center
 
@@ -1463,14 +1488,17 @@ class GeometryMixin(object):
         the keypoints.
 
         .. image:: _static/img/delaunay_triangulate_keypoints.png
+           :alt: Delaunay triangulate keypoints
            :width: 400
            :align: center
 
         .. image:: _static/img/delaunay_triangulate_keypoints.gif
+           :alt: Delaunay triangulate keypoints
            :width: 450
            :align: center
 
         .. image:: _static/img/delaunay_triangulate_keypoints_2.png
+           :alt: Delaunay triangulate keypoints 2
            :width: 450
            :align: center
 
@@ -1572,6 +1600,7 @@ class GeometryMixin(object):
         Compute the percentage overlap between corresponding Polygons in two lists.
 
         .. image:: _static/img/multiframe_compute_pct_shape_overlap.png
+           :alt: Multiframe compute pct shape overlap
            :width: 600
            :align: center
 
@@ -1715,6 +1744,7 @@ class GeometryMixin(object):
            For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.shape_distance`
 
         .. image:: _static/img/multiframe_shape_distance.webp
+           :alt: Multiframe shape distance
            :width: 600
            :align: center
 
@@ -1847,6 +1877,7 @@ class GeometryMixin(object):
         Determine the relative position (left vs right) of a static point with respect to multiple lines.
 
         .. image:: _static/img/static_point_lineside.png
+           :alt: Static point lineside
            :width: 400
            :align: center
 
@@ -1885,6 +1916,7 @@ class GeometryMixin(object):
         Determine the relative position of a point (left vs right) with respect to a lines in each frame.
 
         .. image:: _static/img/point_lineside.png
+           :alt: Point lineside
            :width: 400
            :align: center
 
@@ -1920,6 +1952,7 @@ class GeometryMixin(object):
         Jitted extend a line segment defined by two points to fit within a bounding box.
 
         .. image:: _static/img/extend_line_to_bounding_box_edges.png
+           :alt: Extend line to bounding box edges
            :width: 400
            :align: center
 
@@ -1972,10 +2005,12 @@ class GeometryMixin(object):
           Extended line can be found by body-parts using :func:`simba.mixins.geometry_mixin.GeometryMixin.extend_line_to_bounding_box_edges`.
 
         .. image:: _static/img/line_split_bounding_box.png
+           :alt: Line split bounding box
            :width: 400
            :align: center
 
         .. image:: _static/img/extend_line_to_bounding_box_edge.gif
+           :alt: Extend line to bounding box edge
            :width: 450
            :align: center
 
@@ -2448,6 +2483,7 @@ class GeometryMixin(object):
         E.g., can be used with hardcoded thresholds or model kmeans in `simba.mixins.statistics_mixin.Statistics.kmeans_1d` to detect if a light source is ON or OFF state.
 
         .. image:: _static/img/get_geometry_brightness_intensity.png
+           :alt: Get geometry brightness intensity
            :width: 500
            :align: center
 
@@ -2529,6 +2565,7 @@ class GeometryMixin(object):
            If there is non-pose related noise in the environment (e.g., there are non-experiment related light sources that goes on and off, or waving window curtains causing changes in histgram values w/o affecting pose) this will negatively affect the realiability of histogram comparisons.
 
         .. image:: _static/img/geometry_histocomparison.png
+           :alt: Geometry histocomparison
            :width: 700
            :align: center
 
@@ -2627,6 +2664,7 @@ class GeometryMixin(object):
         first shape.
 
         .. image:: _static/img/multiframe_is_shape_covered.png
+           :alt: Multiframe is shape covered
            :width: 600
            :align: center
 
@@ -2696,6 +2734,7 @@ class GeometryMixin(object):
         Compare contours between a geometry in two images using shape matching.
 
         .. image:: _static/img/geometry_contourcomparison.png
+           :alt: Geometry contourcomparison
            :width: 700
            :align: center
 
@@ -2925,6 +2964,7 @@ class GeometryMixin(object):
         Rank a list of polygon geometries based on a specified method. E.g., order the list of geometries according to sizes or distances to each other or from left to right etc.
 
         .. image:: _static/img/rank_shapes.webp
+           :alt: Rank shapes
            :width: 600
            :align: center
 
@@ -3050,6 +3090,7 @@ class GeometryMixin(object):
         Shift a set of geometries specified distance in the x and/or y-axis.
 
         .. image:: _static/img/adjust_geometry_locations.png
+           :alt: Adjust geometry locations
            :width: 600
            :align: center
 
@@ -3096,6 +3137,7 @@ class GeometryMixin(object):
         Create a grid of evenly spaced points within an image. Use for creating spatial markers within an arena.
 
         .. image:: _static/img/bucket_img_into_grid_points.png
+           :alt: Bucket img into grid points
            :width: 800
            :align: center
 
@@ -3147,6 +3189,7 @@ class GeometryMixin(object):
         Segment an image into squares and return a dictionary of polygons representing the bucket locations.
 
         .. image:: _static/img/bucket_img_into_grid_square_3.png
+           :alt: Bucket img into grid square 3
            :width: 500
            :align: center
 
@@ -3254,6 +3297,7 @@ class GeometryMixin(object):
         Bucketize an image into hexagons and return a dictionary of polygons representing the hexagon locations.
 
         .. image:: _static/img/bucket_img_into_grid_hexagon.png
+           :alt: Bucket img into grid hexagon
            :width: 500
            :align: center
 
@@ -3342,6 +3386,7 @@ class GeometryMixin(object):
         Compute the cumulative time a body-part has spent inside a grid of geometries using multiprocessing.
 
         .. image:: _static/img/cumsum_coord_geometries.webp
+           :alt: Cumsum coord geometries
            :width: 500
            :align: center
 
@@ -3421,6 +3466,7 @@ class GeometryMixin(object):
 
 
         .. image:: _static/img/cumsum_bool_geometries.webp
+           :alt: Cumsum bool geometries
            :width: 500
            :align: center
 
@@ -3520,6 +3566,7 @@ class GeometryMixin(object):
            To calculate the cumulative time the animal has spent in each geometry using a single key-point, see :func:`simba.mixins.geometry_mixin.GeometryMixin.cumsum_coord_geometries`.
 
         .. image:: _static/img/cumsum_animal_geometries_grid.webp
+           :alt: Cumsum animal geometries grid
            :width: 400
            :align: center
 
@@ -3590,6 +3637,7 @@ class GeometryMixin(object):
         Computes transition probabilities between pairs of spatial grid cells, represented as polygons. For each cell, it calculates the likelihood of transitioning to other cells.
 
         .. image:: _static/img/geometry_transition_probabilities.webp
+           :alt: Geometry transition probabilities
            :width: 500
            :align: center
 
@@ -3663,6 +3711,7 @@ class GeometryMixin(object):
         Larger values indicate that the animal has a different shape than in the preceding shape.
 
         .. image:: _static/img/hausdorff_distance.webp
+           :alt: Hausdorff distance
            :width: 450
            :align: center
 
@@ -3783,6 +3832,7 @@ class GeometryMixin(object):
            (ii) To compute the time and distance travelled along a path **after** reaching the most distal or proximal point to a second geometry, pass ``time_prior = False``.
 
         .. image:: _static/img/locate_line_point.png
+           :alt: Locate line point
            :width: 600
            :align: center
 
@@ -3887,6 +3937,7 @@ class GeometryMixin(object):
         space.
 
         .. image:: _static/img/linear_frechet_distance.webp
+           :alt: Linear frechet distance
            :width: 550
            :align: center
 
@@ -4021,6 +4072,7 @@ class GeometryMixin(object):
         Calculate the lengths and widths of the minimum bounding rectangles of polygons.
 
         .. image:: _static/img/get_shape_statistics.webp
+           :alt: Get shape statistics
            :width: 400
            :align: center
 
@@ -4081,6 +4133,7 @@ class GeometryMixin(object):
         Extract exterior keypoints from a list of Polygon geometries in parallel, with optional core count specification for multiprocessing.
 
         .. image:: _static/img/geometries_to_exterior_keypoints.webp
+           :alt: Geometries to exterior keypoints
            :width: 400
            :align: center
 
@@ -4121,6 +4174,7 @@ class GeometryMixin(object):
         the x and y axes.
 
         .. image:: _static/img/keypoints_to_axis_aligned_bounding_box.webp
+           :alt: Keypoints to axis aligned bounding box
            :width: 400
            :align: center
 
@@ -4150,6 +4204,7 @@ class GeometryMixin(object):
         Finds the points that fall inside the respective polygons.
 
         .. image:: _static/img/simba.mixins.geometry_mixin.GeometryMixin.points_in_polygon.webp
+           :alt: Simba.mixins.geometry mixin.Geometry Mixin.points in polygon
            :width: 400
            :align: center
 
@@ -4194,6 +4249,7 @@ class GeometryMixin(object):
         along the new smoothed boundary is determined by `points`.
 
         .. image:: _static/img/smooth_geometry_bspline.webp
+           :alt: Smooth geometry bspline
            :width: 650
            :align: center
 

@@ -104,6 +104,7 @@ class TimeBinsMovementCalculatorMultiprocess(ConfigReader, FeatureExtractionMixi
         On macOS (Darwin), multiprocessing start method is automatically set to 'spawn' for compatibility.
 
     .. image:: _static/img/TimeBinsMovementCalculator.png
+       :alt: Time Bins Movement Calculator
        :width: 500
        :align: center
 

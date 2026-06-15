@@ -32,6 +32,7 @@ class OutlierCorrecterMovementAdvanced(ConfigReader, FeatureExtractionMixin):
        See `notebook <https://simba-uw-tf-dev.readthedocs.io/en/latest/nb/advanced_outlier_correction.html>`__. for example use-case.
 
     .. image:: _static/img/movement_outlier.png
+       :alt: Movement outlier
        :width: 400
        :align: center
 

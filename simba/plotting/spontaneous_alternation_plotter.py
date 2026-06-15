@@ -132,6 +132,7 @@ class SpontaneousAlternationsPlotter(ConfigReader):
     Create plots representing delayed-alternation computations overlayed on video.
 
     .. image:: _static/img/SpontaneousAlternationsPlotter.gif
+       :alt: Spontaneous Alternations Plotter
        :width: 700
        :align: center
 

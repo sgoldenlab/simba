@@ -49,6 +49,7 @@ class BlobTrackingUI(PopUpMixin):
     GUI interface for configuring and executing blob tracking on videos using background subtraction.
 
     .. image:: _static/img/BlobTrackingUI.webp
+       :alt: Blob Tracking UI
        :width: 800
        :align: center
 

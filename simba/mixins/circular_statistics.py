@@ -33,10 +33,12 @@ class CircularStatisticsMixin(object):
         See references below for mature packages computing more extensive circular measurements.
 
     .. image:: _static/img/circular_statistics.png
+       :alt: Circular statistics
        :width: 800
        :align: center
 
     .. image:: _static/img/circular_stats_runtimes.png
+       :alt: Circular stats runtimes
        :width: 1200
        :align: center
 
@@ -63,6 +65,7 @@ class CircularStatisticsMixin(object):
         data points towards a central direction on the circle with a range between 0 and 1.
 
         .. image:: _static/img/mean_resultant_vector.webp
+           :alt: Mean resultant vector
            :width: 400
            :align: center
 
@@ -103,6 +106,7 @@ class CircularStatisticsMixin(object):
            The returned values represents resultant vector length in the time-window ``[(current_frame-time_window)->current_frame]``. `-1` is returned where ``current_frame-time_window`` is less than 0.
 
         .. image:: _static/img/sliding_mean_resultant_length.png
+           :alt: Sliding mean resultant length
            :width: 600
            :align: center
 
@@ -160,6 +164,7 @@ class CircularStatisticsMixin(object):
         :rtype: float
 
         .. image:: _static/img/mean_angle.png
+           :alt: Mean angle
            :width: 400
            :align: center
 
@@ -187,6 +192,7 @@ class CircularStatisticsMixin(object):
         Compute the circular mean in degrees within sliding temporal windows.
 
         .. image:: _static/img/mean_rolling_timeseries_angle.png
+           :alt: Mean rolling timeseries angle
            :width: 600
            :align: center
 
@@ -228,6 +234,7 @@ class CircularStatisticsMixin(object):
         Jitted compute of the circular standard deviation from a single distribution of angles in degrees.
 
         .. image:: _static/img/circular_std.png
+           :alt: Circular std
            :width: 600
            :align: center
 
@@ -267,6 +274,7 @@ class CircularStatisticsMixin(object):
         Compute standard deviation of angular data in sliding time windows.
 
         .. image:: _static/img/angle_stdev.png
+           :alt: Angle stdev
            :width: 600
            :align: center
 
@@ -313,6 +321,7 @@ class CircularStatisticsMixin(object):
             When current frame minus bin_size results in a negative index, -1 is returned.
 
         .. image:: _static/img/instantaneous_angular_velocity.png
+           :alt: Instantaneous angular velocity
            :width: 600
            :align: center
 
@@ -354,6 +363,7 @@ class CircularStatisticsMixin(object):
            To convert integers to cardinal literals, map using :func:`simba.utils.enums.lookups.integer_to_cardinality_lookup`.
 
         .. image:: _static/img/degrees_to_cardinal.png
+           :alt: Degrees to cardinal
            :width: 600
            :align: center
 
@@ -385,6 +395,7 @@ class CircularStatisticsMixin(object):
            To calculate frame-by-frame bearing, pass fps == 1 and lag == 1.
 
         .. image:: _static/img/sliding_bearing.png
+           :alt: Sliding bearing
            :width: 600
            :align: center
 
@@ -420,6 +431,7 @@ class CircularStatisticsMixin(object):
         and right_ear_nose and returns the midpoint.
 
         .. image:: _static/img/angle_from_3_bps.png
+          :alt: Angle from 3 bps
           :width: 600
           :align: center
 
@@ -474,6 +486,7 @@ class CircularStatisticsMixin(object):
            For two-point direction calculation, see :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_two_bps`.
 
         .. image:: _static/img/angle_from_3_bps.png
+           :alt: Angle from 3 bps
            :width: 600
            :align: center
 
@@ -516,6 +529,7 @@ class CircularStatisticsMixin(object):
         or swim bladder to tail. Uses arctangent to determine the heading direction in degrees.
 
         .. image:: _static/img/angle_from_2_bps.png
+           :alt: Angle from 2 bps
            :width: 1200
            :align: center
 
@@ -552,6 +566,7 @@ class CircularStatisticsMixin(object):
         It is a validated wrapper around the optimized numba implementation.
 
         .. image:: _static/img/angle_from_2_bps.png
+           :alt: Angle from 2 bps
            :width: 1200
            :align: center
 
@@ -590,6 +605,7 @@ class CircularStatisticsMixin(object):
            Adapted from ``pingouin.circular.circ_rayleigh`` and ``pycircstat.tests.rayleigh``.
 
         .. image:: _static/img/rayleigh.webp
+           :alt: Rayleigh
            :width: 600
            :align: center
 
@@ -632,6 +648,7 @@ class CircularStatisticsMixin(object):
         Jitted compute of Rayleigh Z (test of non-uniformity) of circular data within sliding time-window.
 
         .. image:: _static/img/sliding_rayleigh_z.webp
+           :alt: Sliding rayleigh z
            :width: 600
            :align: center
 
@@ -690,6 +707,7 @@ class CircularStatisticsMixin(object):
            Adapted from ``astropy.stats.circstats.circcorrcoef``.
 
         .. image:: _static/img/circular_correlation.png
+           :alt: Circular correlation
            :width: 700
            :align: center
 
@@ -728,6 +746,7 @@ class CircularStatisticsMixin(object):
         using the cross-correlation coefficient.
 
         .. image:: _static/img/cicle_correlation.png
+           :alt: Cicle correlation
            :width: 800
            :align: center
 
@@ -792,6 +811,7 @@ class CircularStatisticsMixin(object):
            Results are returned in rounded nearest integer.
 
         .. image:: _static/img/sliding_angular_difference.png
+           :alt: Sliding angular difference
            :width: 600
            :align: center
 
@@ -831,6 +851,7 @@ class CircularStatisticsMixin(object):
            The first time-bin of the video cannot be compared against the prior time-bin and is populated with `0`.
 
         .. image:: _static/img/circular_difference_time_bins.png
+           :alt: Circular difference time bins
            :width: 800
            :align: center
 
@@ -879,6 +900,7 @@ class CircularStatisticsMixin(object):
         angularity with uneven gaps between observations, while low values (near 0) represent evenly-spaced, uniform angularity.
 
         .. image:: _static/img/rao_spacing.webp
+           :alt: Rao spacing
            :width: 600
            :align: center
 
@@ -935,6 +957,7 @@ class CircularStatisticsMixin(object):
         :return np.ndarray: representing rao-spacing U in every sliding windows [-window:n]
 
         .. image:: _static/img/raospacing.png
+           :alt: Raospacing
            :width: 800
            :align: center
 
@@ -987,6 +1010,7 @@ class CircularStatisticsMixin(object):
         Kuiper's two-sample test is a non-parametric test used to determine if two samples are drawn from the same circular distribution. It is particularly useful for circular data, such as angles or directions.
 
         .. image:: _static/img/kuipers_two_sample_test.webp
+           :alt: Kuipers two sample test
            :width: 600
            :align: center
 
@@ -1032,6 +1056,7 @@ class CircularStatisticsMixin(object):
         This function calculates the Kuipers two-sample test statistic for each time window, sliding through the given circular data sequences.
 
         .. image:: _static/img/sliding_kuipers_two_sample_test.webp
+           :alt: Sliding kuipers two sample test
            :width: 600
            :align: center
 
@@ -1081,6 +1106,7 @@ class CircularStatisticsMixin(object):
         more uniform distribution, while higher values suggest clustering or non-uniformity.
 
         .. image:: _static/img/sliding_hodges_ajne.webp
+           :alt: Sliding hodges ajne
            :width: 600
            :align: center
 
@@ -1165,6 +1191,7 @@ class CircularStatisticsMixin(object):
 
 
         .. image:: _static/img/circular_range.png
+           :alt: Circular range
            :width: 400
            :align: center
 
@@ -1196,6 +1223,7 @@ class CircularStatisticsMixin(object):
         shortest arc that can contain all the data points. Measures the circular spread of data within sliding time windows of specified duration.
 
         .. image:: _static/img/sliding_circular_range.png
+           :alt: Sliding circular range
            :width: 600
            :align: center
 
@@ -1236,6 +1264,7 @@ class CircularStatisticsMixin(object):
         Calculate the proportion of data points falling within circular bins.
 
         .. image:: _static/img/circular_hotspots.png
+           :alt: Circular hotspots
            :width: 700
            :align: center
 
@@ -1305,6 +1334,7 @@ class CircularStatisticsMixin(object):
           Note that ``0`` is noted as a bin-edge, ``360`` should not be a bin-edge. Instead, use ``0`` and ``359`` or ``1`` and ``360``.
 
         .. image:: _static/img/sliding_circular_hotspot.png
+           :alt: Sliding circular hotspot
            :width: 600
            :align: center
 
@@ -1354,6 +1384,7 @@ class CircularStatisticsMixin(object):
            See :func:`~simba.data_processors.cuda.circular_statistics.rotational_direction` for GPU acceleration.
 
         .. image:: _static/img/rotational_direction.png
+           :alt: Rotational direction
            :width: 600
            :align: center
 
@@ -1413,6 +1444,7 @@ class CircularStatisticsMixin(object):
            Adapted to numba JIT from `circle-fit <https://github.com/AlliedToasters/circle-fit>`_ ``hyperLSQ`` method.
 
         .. image:: _static/img/fit_circle.png
+           :alt: Fit circle
            :width: 600
            :align: center
 
@@ -1492,6 +1524,7 @@ class CircularStatisticsMixin(object):
         Determines the preferred turning direction from a 1D array of circular directional data.
 
         .. image:: _static/img/preferred_turning_direction.webp
+           :alt: Preferred turning direction
            :width: 600
            :align: center
 
@@ -1535,6 +1568,7 @@ class CircularStatisticsMixin(object):
         Calculates the most frequent turning direction (mode) within a sliding window  of a specified duration.
 
         .. image:: _static/img/sliding_preferred_turning_direction.webp
+           :alt: Sliding preferred turning direction
            :width: 600
            :align: center
 

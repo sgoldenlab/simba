@@ -89,6 +89,7 @@ class OutlierCorrecterMovementMultiProcess(ConfigReader, FeatureExtractionMixin)
     :param Optional[float] criterion: The criterion multiplier. If None, grabs the info from the SimBA project config.
 
     .. image:: _static/img/movement_outlier.png
+       :alt: Movement outlier
        :width: 500
        :align: center
 

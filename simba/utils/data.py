@@ -74,6 +74,7 @@ def detect_bouts(data_df: pd.DataFrame, target_lst: Union[List[str], str], fps: 
        For multi-class Boolean classifiers, see :func:`simba.utils.data.detect_bouts_multiclass`.
 
     .. image:: _static/img/detect_bouts.webp
+       :alt: Detect bouts
        :width: 700
        :align: center
 
@@ -220,6 +221,7 @@ def plug_holes_shortest_bout(data_df: pd.DataFrame,
        ensuring they aren't fragmented by brief interruptions.
 
     .. image:: _static/img/plug_holes_shortest_bout.webp
+       :alt: Plug holes shortest bout
        :width: 700
        :align: center
 
@@ -381,6 +383,7 @@ def interpolate_color_palette(start_color: Tuple[int, int, int],
     Generate a list of colors interpolated between two passed RGB colors.
 
     .. image:: _static/img/interpolate_color_palette.webp
+       :alt: Interpolate color palette
        :width: 500
        :align: center
 
@@ -550,6 +553,7 @@ def find_bins(
     Helper to find bin cut-off points.
 
     .. image:: _static/img/find_bins.webp
+       :alt: Find bins
        :width: 600
        :align: center
 
@@ -615,6 +619,7 @@ def get_confusion_matrix(x: np.ndarray, y: np.ndarray) -> np.ndarray:
        Adapted from mucunwuxian's Stack Overflow answer: https://stackoverflow.com/a/67747070
 
     .. image:: _static/img/get_confusion_matrix.webp
+       :alt: Get confusion matrix
        :width: 500
        :align: center
 
@@ -820,6 +825,7 @@ def freedman_diaconis(data: np.ndarray) -> Tuple[float, int]:
     Use Freedman-Diaconis rule to compute optimal count of histogram bins and their width.
 
     .. image:: _static/img/freedman_diaconis.webp
+       :alt: Freedman diaconis
        :width: 450
        :align: center
 
@@ -892,6 +898,7 @@ def bucket_data(data: np.ndarray, method: Literal["fd", "doane", "auto", "scott"
        :func:`simba.utils.data.bucket_data`
 
     .. image:: _static/img/bucket_data.webp
+       :alt: Bucket data
        :width: 700
        :align: center
 
@@ -1146,6 +1153,7 @@ def find_ranked_colors(data: Dict[Any, float],
     the key with the lowest value in the data dictionary is assigned the least intense palette color.
 
     .. image:: _static/img/find_ranked_colors.webp
+       :alt: Find ranked colors
        :width: 500
        :align: center
 

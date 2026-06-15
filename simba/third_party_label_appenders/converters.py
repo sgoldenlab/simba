@@ -587,6 +587,7 @@ def scale_pose_img_sizes(pose_data: np.ndarray,
     Resizes images and scales corresponding pose-estimation data to match the new image sizes.
 
     .. image:: _static/img/scale_pose_img_sizes.webp
+       :alt: Scale pose img sizes
        :width: 400
        :align: center
 

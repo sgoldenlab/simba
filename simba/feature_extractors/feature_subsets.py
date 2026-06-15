@@ -79,6 +79,7 @@ class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/feature_subsets.md>_`
 
     .. image:: _static/img/feature_subsets.png
+       :alt: Feature subsets
        :width: 400
        :align: center
 

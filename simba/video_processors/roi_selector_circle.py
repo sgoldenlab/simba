@@ -27,6 +27,7 @@ class ROISelectorCircle(object):
     :raises CropWarning: If the selected ROI extends beyond the image boundaries or if the ROI radius equals zero.
 
     .. image:: _static/img/circle_crop_2.gif
+       :alt: Circle crop 2
        :width: 700
        :align: center
 

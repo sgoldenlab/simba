@@ -31,6 +31,7 @@ class DistancePlotterSingleCore(ConfigReader):
        `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
     .. image:: _static/img/distance_plot.png
+       :alt: Distance plot
        :width: 300
        :align: center
 

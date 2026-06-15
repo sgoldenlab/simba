@@ -35,6 +35,7 @@ class COCOKeypoints2YoloSeg:
         Convert COCO keypoint annotations to YOLO segmentation format.
 
         .. image:: _static/img/cocokp_to_yolo_seg.webp
+           :alt: Cocokp to yolo seg
            :width: 600
            :align: center
 

@@ -44,6 +44,7 @@ sequence. If the user leaves certain parameters unchanged, then they are
 ignored in the pipeline.
 
 .. image:: img/video_process/flow_diagram.png
+  :alt: Flow diagram
   :width: 800
   :align: center
 
@@ -51,6 +52,7 @@ Step 1: Folder Selection
 ------------------------
 
 .. image:: img/video_process/menu_1.png
+  :alt: Menu 1
   :width: 1000
   :align: center
 
@@ -59,6 +61,7 @@ Step 1: Folder Selection
    below will display.
 
 .. image:: img/video_process/menu_2.png
+  :alt: Menu 2
   :width: 1000
   :align: center
 
@@ -69,6 +72,7 @@ Step 1: Folder Selection
    directory.
 
 .. image:: img/video_process/menu_3.png
+  :alt: Menu 3
   :width: 1000
   :align: center
 
@@ -83,6 +87,7 @@ Step 1: Folder Selection
    video names. Instead use underscores if needed.
 
 .. image:: img/video_process/menu_4.png
+  :alt: Menu 4
   :width: 1000
   :align: center
 
@@ -97,6 +102,7 @@ Step 2: The batch processing interface.
    We will go through the functions of each one in turn.
 
 .. image:: img/video_process/menu_5.png
+  :alt: Menu 5
   :width: 1000
   :align: center
 
@@ -118,6 +124,7 @@ that the ``Start Time`` of all videos listed in the VIDEOS table are
 updated:
 
 .. image:: img/video_process/quick_clip.gif
+  :alt: Quick clip
   :width: 1000
   :align: center
 
@@ -127,6 +134,7 @@ resolution. I then update the ``Width`` and ``Height`` values in the
 ``Downsample Videos`` sub-menu, and click ``Apply``:
 
 .. image:: img/video_process/quick_downsample.gif
+  :alt: Quick downsample
   :width: 1000
   :align: center
 
@@ -148,6 +156,7 @@ from downsampling. The same applies for the FPS, greyscale, CLAHE and
 Frame count radio buttons:
 
 .. image:: img/video_process/header_radiobtn.gif
+  :alt: Header radiobtn
   :width: 1000
   :align: center
 
@@ -166,6 +175,7 @@ or ESC button to save your rectangle. Notice that the ``Crop`` button
 associated with Video 1 turns red after I’ve defined the cropped region.
 
 .. image:: img/video_process/crop.gif
+  :alt: Crop
   :width: 1000
   :align: center
 
@@ -185,6 +195,7 @@ CROP, and (iii) EXECUTE.
 they were when opening the batch processing interface:
 
 .. image:: img/video_process/reset.gif
+  :alt: Reset
   :width: 1000
   :align: center
 

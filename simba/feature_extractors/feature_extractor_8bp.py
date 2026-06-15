@@ -27,6 +27,7 @@ class ExtractFeaturesFrom8bps(ConfigReader, FeatureExtractionMixin):
        * `Expected pose configuration <https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/3.png>`_
 
     .. image:: _static/img/pose_configurations/3.png
+       :alt: 3
        :width: 300
        :align: center
 

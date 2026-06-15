@@ -47,10 +47,12 @@ class DirectingOtherAnimalsVisualizer(ConfigReader, PlottingMixin):
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-data-tables>`__.
 
     .. image:: _static/img/directing_other_animals.png
+       :alt: Directing other animals
        :width: 500
        :align: center
 
     .. image:: _static/img/DirectingOtherAnimalsVisualizer.png
+       :alt: Directing Other Animals Visualizer
        :width: 500
        :align: center
 

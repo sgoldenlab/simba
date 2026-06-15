@@ -196,6 +196,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
        For single-core processing, see :meth:`simba.plotting.plot_clf_results.PlotSklearnResultsSingleCore`.
 
     .. image:: _static/img/sklearn_visualization.gif
+       :alt: Sklearn visualization
        :width: 600
        :align: center
 

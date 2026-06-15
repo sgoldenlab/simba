@@ -2581,6 +2581,7 @@ def img_stack_to_greyscale(imgs: np.ndarray):
     Jitted conversion of a 4D stack of color images (RGB format) to grayscale.
 
     .. image:: _static/img/img_stack_to_greyscale.png
+       :alt: Img stack to greyscale
        :width: 600
        :align: center
 
@@ -2605,6 +2606,7 @@ def img_stack_to_bw(imgs: np.ndarray):
     Jitted conversion of a 4D stack of color images (RGB format) to black and white.
 
     .. image:: _static/img/img_stack_to_greyscale.png
+       :alt: Img stack to greyscale
        :width: 600
        :align: center
 
