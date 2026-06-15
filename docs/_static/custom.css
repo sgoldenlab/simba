@@ -194,10 +194,10 @@ h1, h2, h3, h4, h5, h6, .rst-content .toctree-wrapper > p.caption { font-weight:
 /* --- Copy LaTeX button on display-math blocks --- */
 .simba-math-wrap { position: relative; }
 .simba-tex-btn {
-    position: absolute; top: 4px; right: 4px; z-index: 4;
-    padding: 2px 9px; border: 1px solid #cfd6dc; border-radius: 5px;
-    background: rgba(255, 255, 255, 0.9); color: #404040;
-    font-size: 11px; font-weight: 600; cursor: pointer;
+    position: absolute; top: 6px; right: 6px; z-index: 4;
+    padding: 5px 13px; border: 1px solid #cfd6dc; border-radius: 6px;
+    background: rgba(255, 255, 255, 0.92); color: #404040;
+    font-size: 13px; font-weight: 600; cursor: pointer;
     opacity: 0; transition: opacity .15s ease;
 }
 .simba-math-wrap:hover .simba-tex-btn { opacity: 1; }
@@ -207,10 +207,10 @@ h1, h2, h3, h4, h5, h6, .rst-content .toctree-wrapper > p.caption { font-weight:
 /* --- Copy button on code blocks --- */
 .rst-content div.highlight { position: relative; }
 .simba-copy-btn {
-    position: absolute; top: 6px; right: 6px;
-    padding: 2px 9px; border: 1px solid #cfd6dc; border-radius: 5px;
-    background: rgba(255, 255, 255, 0.9); color: #404040;
-    font-size: 11px; font-weight: 600; cursor: pointer;
+    position: absolute; top: 8px; right: 8px;
+    padding: 5px 13px; border: 1px solid #cfd6dc; border-radius: 6px;
+    background: rgba(255, 255, 255, 0.92); color: #404040;
+    font-size: 13px; font-weight: 600; cursor: pointer;
     opacity: 0; transition: opacity .15s ease;
 }
 .rst-content div.highlight:hover .simba-copy-btn { opacity: 1; }
@@ -540,3 +540,78 @@ a:hover, .rst-content a:hover { color: #143d56; }
 .rst-content a code, .rst-content code.xref { color: #21567a; }
 .rst-content a:hover code, .rst-content code.xref:hover { color: #143d56; }
 .wy-nav-content a.icon-home { color: #fff; }
+
+/* --- Permalink "copy link" toast --- */
+.rst-content a.headerlink { position: relative; }
+.simba-permalink-toast {
+    position: absolute; left: 100%; top: 50%;
+    transform: translateY(-50%) translateX(7px);
+    white-space: nowrap;
+    background: #21567a; color: #fff !important;
+    font-size: 11px; font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    padding: 2px 9px; border-radius: 5px;
+    opacity: 0; transition: opacity .15s ease; pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .2); z-index: 20;
+}
+.simba-permalink-toast.show { opacity: 1; }
+
+/* --- "Copy link" button in function/class signature header (next to [source]) --- */
+.rst-content dl.py > dt .simba-copylink {
+    float: right;
+    margin: 0 0 0 8px;
+    border: 1px solid #cdd8e2; border-radius: 5px;
+    background: rgba(255, 255, 255, 0.7); color: #21567a;
+    font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; line-height: 1.5;
+    padding: 0 9px; cursor: pointer;
+}
+.rst-content dl.py > dt .simba-copylink:hover { background: #fff; border-color: #21567a; }
+.rst-content dl.py > dt .simba-copylink.copied { background: #21567a; color: #fff; border-color: #21567a; }
+
+/* --- Back-to-top button --- */
+.simba-top-btn {
+    position: fixed; right: 26px; bottom: 26px; z-index: 9000;
+    width: 44px; height: 44px; border: none; border-radius: 50%;
+    background: #21567a; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transform: translateY(10px); pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease, background .15s ease;
+}
+.simba-top-btn.show { opacity: .92; transform: translateY(0); pointer-events: auto; }
+.simba-top-btn:hover { background: #143d56; opacity: 1; }
+.simba-top-btn::before {                       /* CSS-drawn up chevron (no glyph -> no font issues) */
+    content: ''; width: 11px; height: 11px;
+    border-left: 3px solid #fff; border-top: 3px solid #fff;
+    transform: rotate(45deg); margin-top: 3px;
+}
+
+/* --- "On this page" right-rail TOC + scroll-spy --- */
+.simba-toc {
+    position: fixed; top: 72px; bottom: 84px; right: 16px; width: 218px;
+    overflow-y: auto; z-index: 500;
+    padding: 4px 4px 4px 14px;
+    border-left: 2px solid #e3e8ec;
+    font-family: 'Poppins', sans-serif; font-size: 12.5px;
+}
+.simba-toc-title {
+    font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+    color: #7a8a99; margin: 0 0 8px 2px;
+}
+.simba-toc-filter {
+    width: 100%; box-sizing: border-box; margin: 0 0 8px 0;
+    padding: 4px 9px; border: 1px solid #d4dee7; border-radius: 6px;
+    font-family: 'Poppins', sans-serif; font-size: 12px; color: #2d333b; outline: none;
+}
+.simba-toc-filter:focus { border-color: #21567a; }
+.simba-toc a {
+    display: block; padding: 3px 9px; margin: 1px 0;
+    color: #5a6b7b !important; text-decoration: none !important; border-radius: 5px;
+    line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.simba-toc a:hover { background: #eef2f6; color: #21567a !important; }
+.simba-toc a.active {
+    background: #e6edf2; color: #143d56 !important; font-weight: 600;
+    box-shadow: inset 3px 0 0 #21567a;
+}
+@media (max-width: 1300px) { .simba-toc { display: none; } }   /* hide when there's no room */

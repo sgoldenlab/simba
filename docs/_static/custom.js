@@ -728,3 +728,191 @@ gtag('config', 'G-PEKR9R5J47');
     if (history.pushState) history.pushState(null, '', href);
   });
 })();
+
+/* ------------------------------------------------------------------ *
+ * Permalink "copy link": click the ¶ on a heading or function/class
+ * signature to copy its full URL to the clipboard.
+ * ------------------------------------------------------------------ */
+(function () {
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {
+      try {
+        var ta = document.createElement('textarea'); ta.value = text;
+        ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        var ok = document.execCommand('copy'); document.body.removeChild(ta);
+        if (ok) resolve(); else reject(new Error('copy failed'));
+      } catch (e) { reject(e); }
+    });
+  }
+  function flash(el, msg) {
+    var t = document.createElement('span');
+    t.className = 'simba-permalink-toast';
+    t.textContent = msg;
+    el.appendChild(t);
+    requestAnimationFrame(function () { t.classList.add('show'); });
+    setTimeout(function () {
+      t.classList.remove('show');
+      setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 220);
+    }, 1100);
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a.headerlink');
+    if (!a) return;
+    var href = a.getAttribute('href') || '';
+    var url = location.origin + location.pathname + href;   // absolute, shareable
+    copyText(url).then(function () { flash(a, 'Link copied!'); }).catch(function () {});
+    // (the smooth-scroll handler already updates the hash / scrolls)
+  });
+  function flashBtn(btn) {
+    var o = btn.getAttribute('data-icon') || btn.innerHTML;
+    btn.setAttribute('data-icon', o);
+    btn.innerHTML = 'Copied!'; btn.classList.add('copied');
+    setTimeout(function () { btn.innerHTML = o; btn.classList.remove('copied'); }, 1200);
+  }
+  window.addEventListener('load', function () {
+    Array.prototype.forEach.call(document.querySelectorAll('a.headerlink'), function (a) {
+      a.title = 'Copy link to clipboard';
+    });
+    // visible "copy link" button next to [source] on function/class signatures
+    Array.prototype.forEach.call(document.querySelectorAll('.rst-content dl.py > dt[id]'), function (dt) {
+      if (dt.querySelector('.simba-copylink')) return;
+      var hl = dt.querySelector('a.headerlink');
+      var href = hl ? hl.getAttribute('href') : '#' + dt.id;
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'simba-copylink'; btn.title = 'Copy link to this entry';
+      btn.innerHTML = '🔗 link';
+      btn.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        copyText(location.origin + location.pathname + href).then(function () { flashBtn(btn); }).catch(function () {});
+        if (history.pushState) history.pushState(null, '', href);
+      });
+      dt.appendChild(btn);
+    });
+  });
+})();
+
+/* ------------------------------------------------------------------ *
+ * Back-to-top button (appears after scrolling; fast smooth scroll up)
+ * ------------------------------------------------------------------ */
+(function () {
+  var btn = null;
+  function toTop() {
+    var startY = window.pageYOffset, start = null, D = 340;
+    function ease(t) { return 1 - Math.pow(1 - t, 3); }
+    function step(ts) {
+      if (start === null) start = ts;
+      var p = Math.min((ts - start) / D, 1);
+      window.scrollTo(0, startY * (1 - ease(p)));
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  function ensure() {
+    if (btn) return btn;
+    btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'simba-top-btn';
+    btn.title = 'Back to top';
+    btn.setAttribute('aria-label', 'Back to top');
+    btn.addEventListener('click', toTop);
+    document.body.appendChild(btn);
+    return btn;
+  }
+  function onScroll() {
+    ensure();
+    if (window.pageYOffset > 450) btn.classList.add('show');
+    else btn.classList.remove('show');
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('load', onScroll);
+})();
+
+/* ------------------------------------------------------------------ *
+ * "On this page" right-rail TOC + scroll-spy (API pages only).
+ * Lists the page's function/class/method anchors, highlights the one
+ * currently in view, hides on narrow screens.
+ * ------------------------------------------------------------------ */
+(function () {
+  var MIN_ENTRIES = 3;
+  window.addEventListener('load', function () {
+    var dts = document.querySelectorAll('.rst-content dl.py > dt[id]');
+    var targets = [];
+    Array.prototype.forEach.call(dts, function (dt) { if (dt.id) targets.push(dt); });
+    if (targets.length < MIN_ENTRIES) return;
+
+    var nav = document.createElement('nav');
+    nav.className = 'simba-toc';
+    nav.setAttribute('aria-label', 'On this page');
+    var title = document.createElement('div');
+    title.className = 'simba-toc-title';
+    title.textContent = 'On this page';
+    nav.appendChild(title);
+
+    var filter = document.createElement('input');
+    filter.className = 'simba-toc-filter';
+    filter.type = 'text';
+    filter.placeholder = 'Filter methods…';
+    filter.setAttribute('aria-label', 'Filter methods on this page');
+    nav.appendChild(filter);
+
+    var links = {};
+    targets.forEach(function (dt) {
+      var nameEl = dt.querySelector('.sig-name, .descname, code.descname');
+      var name = nameEl ? nameEl.textContent.trim() : dt.id.split('.').pop();
+      var a = document.createElement('a');
+      a.href = '#' + dt.id;
+      a.textContent = name;
+      a.title = name;
+      nav.appendChild(a);
+      links[dt.id] = a;
+    });
+    document.body.appendChild(nav);
+
+    function applyFilter() {
+      var q = filter.value.trim().toLowerCase();
+      targets.forEach(function (dt) {
+        var a = links[dt.id];
+        a.style.display = (!q || a.textContent.toLowerCase().indexOf(q) !== -1) ? '' : 'none';
+      });
+    }
+    filter.addEventListener('input', applyFilter);
+    filter.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { filter.value = ''; applyFilter(); filter.blur(); }
+      else if (e.key === 'Enter') {                       // jump to first visible match
+        for (var i = 0; i < targets.length; i++) {
+          var a = links[targets[i].id];
+          if (a.style.display !== 'none') { a.click(); break; }
+        }
+      }
+    });
+
+    var current = null;
+    function setActive(id) {
+      if (id === current) return;
+      if (current && links[current]) links[current].classList.remove('active');
+      current = id;
+      var a = links[id];
+      if (!a) return;
+      a.classList.add('active');
+      // keep the active item visible within the rail (without scrolling the page)
+      var lt = a.offsetTop, lb = lt + a.offsetHeight;
+      if (lt < nav.scrollTop) nav.scrollTop = lt - 8;
+      else if (lb > nav.scrollTop + nav.clientHeight) nav.scrollTop = lb - nav.clientHeight + 8;
+    }
+    function spy() {
+      var active = targets[0].id;
+      for (var i = 0; i < targets.length; i++) {
+        if (targets[i].getBoundingClientRect().top <= 130) active = targets[i].id;
+        else break;
+      }
+      setActive(active);
+    }
+    var ticking = false;
+    window.addEventListener('scroll', function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(function () { spy(); ticking = false; }); }
+    }, { passive: true });
+    spy();
+  });
+})();
