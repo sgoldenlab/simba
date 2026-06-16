@@ -219,15 +219,20 @@ h1, h2, h3, h4, h5, h6, .rst-content .toctree-wrapper > p.caption { font-weight:
 
 /* --- Command palette (Ctrl/Cmd-K) --- */
 .simba-cmdk-trigger {
-    display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    width: 100%; margin: 0 0 1.6em; padding: 12px 16px;
-    border: 1px solid #d6dde3; border-radius: 8px; background: #f6f8fa;
-    color: #5a6b7b; font-size: 14px; cursor: pointer; text-align: left;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    width: 100%; margin: 0 0 1.8em; padding: 18px 22px;
+    border: 1px solid #cdd6dd; border-radius: 12px; background: #f6f8fa;
+    color: #5a6b7b; font-size: 17px; cursor: pointer; text-align: left;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: border-color .15s ease, background .15s ease, box-shadow .15s ease, transform .15s ease;
 }
-.simba-cmdk-trigger:hover { border-color: #21567a; background: #e8eef4; color: #21567a; }
+.simba-cmdk-trigger:hover {
+    border-color: #21567a; background: #e8eef4; color: #21567a;
+    box-shadow: 0 6px 20px rgba(33, 86, 122, 0.16); transform: translateY(-1px);
+}
 .simba-cmdk-trigger kbd {
-    font-size: 11px; background: #fff; border: 1px solid #cfd6dc; border-radius: 4px;
-    padding: 2px 6px; color: #777; white-space: nowrap;
+    font-size: 13px; background: #fff; border: 1px solid #cfd6dc; border-radius: 5px;
+    padding: 4px 9px; color: #777; white-space: nowrap;
 }
 .simba-cmdk-overlay {
     position: fixed; inset: 0; z-index: 12000; display: none;
@@ -247,10 +252,18 @@ h1, h2, h3, h4, h5, h6, .rst-content .toctree-wrapper > p.caption { font-weight:
 }
 .simba-cmdk-list { overflow-y: auto; }
 .simba-cmdk-item {
-    display: block; padding: 9px 18px; font-size: 13px; color: #333 !important;
+    display: flex; align-items: center; gap: 10px; padding: 9px 18px; font-size: 13px; color: #333 !important;
     text-decoration: none; border-bottom: 1px solid #f4f4f4;
 }
 .simba-cmdk-item.active, .simba-cmdk-item:hover { background: #eaf3fa; color: #19465f !important; }
+.simba-cmdk-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.simba-cmdk-kind {
+    flex: none; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 20px; color: #fff;
+}
+.simba-cmdk-kind-API { background: #21567a; }
+.simba-cmdk-kind-page { background: #27ae60; }
+.simba-cmdk-kind-section { background: #9098a0; }
 .simba-cmdk-empty { padding: 18px; color: #999; font-size: 13px; }
 
 /* --- Landing page card-grid navigation --- */
@@ -716,3 +729,81 @@ a:hover, .rst-content a:hover { color: #143d56; }
     font-size: 1.65em;
     color: #19465f;
 }
+
+/* --- Landing page: hide the redundant page title (hero banner is the splash) --- */
+html.simba-landing .rst-content h1 { display: none !important; }
+
+/* --- Search box: larger, rounded, with a clear focus ring --- */
+.wy-side-nav-search input[type="text"] {
+    border-radius: 24px;
+    padding: 10px 15px;
+    font-size: 12.5px;
+    transition: box-shadow .15s ease, background .15s ease, border-color .15s ease;
+}
+.wy-side-nav-search input[type="text"]::placeholder { font-size: 12.5px; }
+.wy-side-nav-search { padding-top: 1em; padding-bottom: 1em; }
+.wy-side-nav-search input[type="text"]:focus {
+    background: #fff;
+    border-color: #38a8d4;
+    box-shadow: 0 0 0 3px rgba(56, 168, 212, 0.55);
+    outline: none;
+}
+
+/* --- Search results page: card-style hits --- */
+.rst-content ul.search { margin-left: 0; }
+.rst-content ul.search > li {
+    list-style: none;
+    border: 1px solid #e1e4e8;
+    border-radius: 10px;
+    padding: 13px 17px;
+    margin: 0 0 13px 0;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: box-shadow .15s ease, transform .15s ease;
+}
+.rst-content ul.search > li:hover { box-shadow: 0 6px 18px rgba(33, 86, 122, 0.16); transform: translateY(-2px); }
+.rst-content ul.search > li > a { font-weight: 600; font-size: 15px; color: #21567a !important; }
+.rst-content ul.search > li .context { color: #5a6b78; font-size: 13px; }
+
+/* --- Sidebar: prominent Install CTA --- */
+.simba-install-cta {
+    display: block; margin: 12px 14px 4px; padding: 11px 14px;
+    background: #38a8d4; color: #fff !important; text-align: center;
+    font-weight: 700; font-size: 14px; border-radius: 8px; text-decoration: none !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+    transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+.simba-install-cta:hover { background: #2f93bd; transform: translateY(-1px); box-shadow: 0 5px 16px rgba(0, 0, 0, 0.38); }
+
+/* --- Sidebar: pinned quick-links footer --- */
+.simba-side-links {
+    position: sticky; bottom: 0; z-index: 5;
+    display: flex; flex-wrap: wrap; gap: 5px 16px; justify-content: center;
+    padding: 12px 14px; background: #2c2c2c;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+.simba-side-links a {
+    color: #b9c4cc !important; font-size: 12.5px; font-weight: 600;
+    text-decoration: none !important; transition: color .15s ease;
+}
+.simba-side-links a:hover { color: #38a8d4 !important; }
+
+/* --- Citation panel (How to cite) --- */
+.simba-cite {
+    border-left: 4px solid #21567a;
+    background: #f4f8fb;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 12px 0 16px;
+}
+.simba-cite-ref { margin: 0; font-size: 14.5px; line-height: 1.6; color: #2c3e50; }
+
+/* --- Resource pill-row (lighter, secondary links) --- */
+.simba-pill-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 16px 0 6px; }
+.simba-pill-row a {
+    display: inline-flex; align-items: center; text-decoration: none !important;
+    background: #f3f8fb; color: #21567a !important; font-weight: 600; font-size: 13.5px;
+    padding: 7px 15px; border-radius: 22px; border: 1px solid #cfe0ea;
+    transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+.simba-pill-row a:hover { background: #e2eef5; border-color: #9fc1d8; transform: translateY(-2px); }

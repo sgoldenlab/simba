@@ -2,8 +2,11 @@ import datetime
 import glob
 import os
 import shutil
-from typing import Dict, List, Literal, Tuple, Union
-
+from typing import Dict, List, Tuple, Union
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 import cv2
 import pandas as pd
 import yaml
@@ -339,10 +342,8 @@ class LitPoseMergeProjects:
 
 
 
-# merger = LitPoseMergeProjects(master_dir=r'Z:\home\simon\LPProjects\cropped_0408',
-#                               other_dirs=[r"Z:\home\simon\LPProjects\lp_300126_cropped",
-#                                           r'Z:\home\simon\LPProjects\mini_project_0410_cropped',
-#                                           r'Z:\home\simon\LPProjects\projects_lp_compressed_13.4.2028_cropped'],
+# merger = LitPoseMergeProjects(master_dir=r'Z:\home\simon\LPProjects\project_0609_5cam_simon',
+#                               other_dirs=[r"Z:\home\simon\LPProjects\project_0609_5cam"],
 #                               duplicate_method='skip',
 #                               verbose=True,
 #                               skip_videos=True)

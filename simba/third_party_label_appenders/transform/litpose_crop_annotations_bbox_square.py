@@ -294,9 +294,9 @@ class CropLPAnnotationsBboxSquare:
         return common
 
 
-#if __name__ == "__main__":
-cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"Z:\home\simon\LPProjects\project_0609_5cam",
-                                              save_dir=r"Z:\home\simon\LPProjects\project_0609_5cam_cropped",
-                                              bbox_pad_frac=0.25,
-                                              visualize=50)
-cropper.run()
+# #if __name__ == "__main__":
+# cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"Z:\home\simon\LPProjects\project_0609_5cam_simon",
+#                                               save_dir=r"Z:\home\simon\LPProjects\project_0609_5cam_cropped",
+#                                               bbox_pad_frac=0.25,
+#                                               visualize=100)
+# cropper.run()

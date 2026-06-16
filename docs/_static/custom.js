@@ -3,6 +3,13 @@ function gtag() { dataLayer.push(arguments); }
 gtag('js', new Date());
 gtag('config', 'G-PEKR9R5J47');
 
+/* Tag the landing page early (runs in <head>) so CSS can hide the
+ * redundant page H1 immediately — the hero banner is the splash. */
+(function () {
+  var base = location.pathname.split('/').pop();
+  if (base === '' || base === 'index.html') document.documentElement.classList.add('simba-landing');
+})();
+
 /* ------------------------------------------------------------------ *
  * DOI paper hovercard — hover a doi.org link to preview the paper.
  * Metadata fetched live from the CrossRef API (free, CORS-enabled).
@@ -363,27 +370,54 @@ gtag('config', 'G-PEKR9R5J47');
   })();
   var entries = null, overlay = null, input = null, list = null, sel = -1, loading = false;
 
+  function parseSearchIndex(text) {
+    var i = text.indexOf('{'), j = text.lastIndexOf('}');
+    if (i === -1 || j === -1) return null;
+    try { return JSON.parse(text.slice(i, j + 1)); } catch (e) { return null; }
+  }
+  function entriesFromGenindex(html) {
+    var doc = new DOMParser().parseFromString(html, 'text/html'), out = [];
+    Array.prototype.forEach.call(doc.querySelectorAll('a[href]'), function (a) {
+      var href = a.getAttribute('href');
+      if (!href || href.indexOf('#') === -1) return;            // only object deep-links
+      var label = a.textContent.replace(/\s+/g, ' ').trim();
+      if (!label) return;
+      out.push({ label: label, href: ROOT + href, kind: 'API' });
+    });
+    return out;
+  }
+  function entriesFromSearchIndex(idx) {
+    var out = [], docs = idx.docnames || [], titles = idx.titles || [], at = idx.alltitles;
+    if (at && Object.keys(at).length) {                         // Sphinx >=5: page titles + section headings
+      Object.keys(at).forEach(function (title) {
+        (at[title] || []).forEach(function (pair) {
+          var di = pair[0], anchor = pair[1];
+          if (typeof di !== 'number' || !docs[di]) return;
+          var href = ROOT + docs[di] + '.html' + (anchor ? ('#' + String(anchor).replace(/^#/, '')) : '');
+          out.push({ label: title, href: href, kind: anchor ? 'section' : 'page' });
+        });
+      });
+    } else {                                                    // fallback: page titles only
+      for (var d = 0; d < docs.length; d++) out.push({ label: titles[d] || docs[d], href: ROOT + docs[d] + '.html', kind: 'page' });
+    }
+    return out;
+  }
   function loadEntries(cb) {
     if (entries) return cb(entries);
     if (loading) return;
     loading = true;
-    fetch(ROOT + 'genindex.html')
-      .then(function (r) { return r.text(); })
-      .then(function (html) {
-        var doc = new DOMParser().parseFromString(html, 'text/html');
-        var seen = {}, out = [];
-        Array.prototype.forEach.call(doc.querySelectorAll('a[href]'), function (a) {
-          var href = a.getAttribute('href');
-          if (!href || href.indexOf('#') === -1) return;        // only object deep-links
-          var label = a.textContent.replace(/\s+/g, ' ').trim();
-          if (!label) return;
-          var key = label + '|' + href;
-          if (seen[key]) return; seen[key] = 1;
-          out.push({ label: label, href: ROOT + href });
-        });
-        entries = out; cb(entries);
-      })
-      .catch(function () { entries = []; cb(entries); });
+    Promise.all([
+      fetch(ROOT + 'genindex.html').then(function (r) { return r.text(); }).catch(function () { return ''; }),
+      fetch(ROOT + 'searchindex.js').then(function (r) { return r.text(); }).catch(function () { return ''; })
+    ]).then(function (res) {
+      var out = [];
+      if (res[0]) out = out.concat(entriesFromGenindex(res[0]));
+      var idx = res[1] ? parseSearchIndex(res[1]) : null;
+      if (idx) out = out.concat(entriesFromSearchIndex(idx));
+      var seen = {}, dedup = [];
+      out.forEach(function (e) { var k = e.label + '|' + e.href; if (seen[k]) return; seen[k] = 1; dedup.push(e); });
+      entries = dedup; cb(entries);
+    }).catch(function () { entries = []; cb(entries); });
   }
   function escapeHtml(s) { return s.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function score(label, q) {
@@ -395,7 +429,7 @@ gtag('config', 'G-PEKR9R5J47');
     overlay = document.createElement('div'); overlay.className = 'simba-cmdk-overlay';
     var box = document.createElement('div'); box.className = 'simba-cmdk-box';
     input = document.createElement('input'); input.className = 'simba-cmdk-input';
-    input.type = 'text'; input.placeholder = 'Jump to a function, class or method…';
+    input.type = 'text'; input.placeholder = 'Jump to a page, section, function or class…';
     list = document.createElement('div'); list.className = 'simba-cmdk-list';
     box.appendChild(input); box.appendChild(list); overlay.appendChild(box);
     document.body.appendChild(overlay);
@@ -421,7 +455,8 @@ gtag('config', 'G-PEKR9R5J47');
       .slice(0, 40).map(function (x) { return x.e; });
     sel = items.length ? 0 : -1;
     list.innerHTML = items.map(function (e, i) {
-      return '<a class="simba-cmdk-item' + (i === 0 ? ' active' : '') + '" href="' + e.href + '">' + escapeHtml(e.label) + '</a>';
+      var kind = e.kind ? '<span class="simba-cmdk-kind simba-cmdk-kind-' + e.kind + '">' + e.kind + '</span>' : '';
+      return '<a class="simba-cmdk-item' + (i === 0 ? ' active' : '') + '" href="' + e.href + '"><span class="simba-cmdk-label">' + escapeHtml(e.label) + '</span>' + kind + '</a>';
     }).join('') || '<div class="simba-cmdk-empty">No matches</div>';
   }
   function itemEls() { return list.querySelectorAll('.simba-cmdk-item'); }
@@ -450,7 +485,7 @@ gtag('config', 'G-PEKR9R5J47');
     if (!main || main.querySelector('.simba-cmdk-trigger')) return;
     var btn = document.createElement('button');
     btn.type = 'button'; btn.className = 'simba-cmdk-trigger';
-    btn.innerHTML = '<span>🔍&nbsp;&nbsp;Search the API — functions, classes, methods…</span><kbd>Ctrl K</kbd>';
+    btn.innerHTML = '<span>🔍&nbsp;&nbsp;Search the docs — pages, sections, functions…</span><kbd>Ctrl K</kbd>';
     btn.addEventListener('click', open);
     main.insertBefore(btn, main.firstChild);
   });
@@ -976,5 +1011,46 @@ gtag('config', 'G-PEKR9R5J47');
     cta.appendChild(gh);
 
     requestAnimationFrame(function () { hero.classList.add('in'); });
+  });
+})();
+
+/* ------------------------------------------------------------------ *
+ * Sidebar search box: clearer placeholder + Ctrl-K hint.
+ * ------------------------------------------------------------------ */
+(function () {
+  window.addEventListener('load', function () {
+    var inp = document.querySelector('.wy-side-nav-search input[type="text"]');
+    if (inp) inp.setAttribute('placeholder', 'Search docs…  (Ctrl K)');
+  });
+})();
+
+/* ------------------------------------------------------------------ *
+ * Sidebar extras: prominent "Install SimBA" CTA + pinned quick-links footer.
+ * ------------------------------------------------------------------ */
+(function () {
+  var ROOT = (function () {
+    var el = document.getElementById('documentation_options');
+    return (el && el.getAttribute('data-url_root')) || './';
+  })();
+  window.addEventListener('load', function () {
+    var search = document.querySelector('.wy-side-nav-search');
+    if (search && !document.querySelector('.simba-install-cta')) {
+      var cta = document.createElement('a');
+      cta.className = 'simba-install-cta';
+      cta.href = ROOT + 'installation.html';
+      cta.innerHTML = '⚙️&nbsp;&nbsp;Install SimBA';
+      search.insertAdjacentElement('afterend', cta);
+    }
+    var scroll = document.querySelector('.wy-side-scroll');
+    if (scroll && !document.querySelector('.simba-side-links')) {
+      var f = document.createElement('div');
+      f.className = 'simba-side-links';
+      f.innerHTML =
+        '<a href="https://github.com/sgoldenlab/simba" target="_blank" rel="noopener">GitHub</a>' +
+        '<a href="https://pypi.org/project/Simba-UW-tf-dev/" target="_blank" rel="noopener">PyPI</a>' +
+        '<a href="https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im" target="_blank" rel="noopener">Gitter</a>' +
+        '<a href="https://www.nature.com/articles/s41593-024-01649-9" target="_blank" rel="noopener">Paper</a>';
+      scroll.appendChild(f);
+    }
   });
 })();
