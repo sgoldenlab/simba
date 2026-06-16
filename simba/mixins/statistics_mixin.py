@@ -4723,7 +4723,7 @@ class Statistics(FeatureExtractionMixin):
         References
         ----------
         .. [1] Pakhira, M. K., Bandyopadhyay, S., & Maulik, U. (2004). Validity index for crisp and fuzzy clusters.
-               `Pattern Recognition, 37(4), 487–501 <https://doi.org/10.1016/j.patcog.2003.09.021>`_.
+               `Pattern Recognition, 37(3), 487–501 <https://doi.org/10.1016/j.patcog.2003.06.005>`_.
         .. [2] Desgraupes, B. clusterCrit: Clustering Indices (R package vignette).
                `CRAN <https://cran.r-project.org/web/packages/clusterCrit/vignettes/clusterCrit.pdf>`_.
 

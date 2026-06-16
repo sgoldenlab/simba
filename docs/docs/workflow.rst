@@ -128,12 +128,21 @@ Spreadsheet collection of real-world independent SimBA applications and validati
 .. warning::
    This list is not actively maintained and may be outdated.
 
-.. image:: ../_static/img/simba_usecases_header.webp
-   :alt: Simba usecases header
-   :width: 1000
-   :align: center
-   :target: https://docs.google.com/spreadsheets/d/169enc3Am2KQKifxj1F9KEKKLbftpMhBlw49zjl-egsY/edit?usp=sharing
+.. The table below is the live Google Sheet embedded read-only (auto-reflects edits to the sheet).
+   To upgrade to the sortable/searchable widget: open the sheet → File → Share → Publish to web →
+   Embed, then replace the iframe src below with the published ``…/d/e/2PACX-…/pubhtml?widget=true`` URL.
 
-🔗 `View Use Cases Spreadsheet (Google Sheets) <https://docs.google.com/spreadsheets/d/169enc3Am2KQKifxj1F9KEKKLbftpMhBlw49zjl-egsY/edit?usp=sharing>`__
+.. raw:: html
+
+   <div style="margin:14px 0 6px 0;height:650px;overflow:hidden;border:1px solid #e1e4e8;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.12);">
+     <iframe
+       src="https://docs.google.com/spreadsheets/d/169enc3Am2KQKifxj1F9KEKKLbftpMhBlw49zjl-egsY/htmlembed?gid=0"
+       width="100%" height="694" frameborder="0"
+       style="display:block;margin-top:-44px;border:0;"
+       title="SimBA Published Use Cases (Google Sheet)"
+       loading="lazy"></iframe>
+   </div>
+
+🔗 `Open full-screen in Google Sheets <https://docs.google.com/spreadsheets/d/169enc3Am2KQKifxj1F9KEKKLbftpMhBlw49zjl-egsY/edit?usp=sharing>`__
 
 
