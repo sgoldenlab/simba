@@ -16,20 +16,22 @@ from simba.mixins.statistics_mixin import Statistics
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
-    check_if_filepath_list_is_empty)
+    check_if_filepath_list_is_empty, check_that_column_exist)
 from simba.utils.read_write import (SimbaTimer, get_fn_ext, read_df,
                                     stdout_information, stdout_success,
                                     write_df)
 
 NOSE = 'nose'
-LEFT_SIDE = 'left_side'
-RIGHT_SIDE = 'right_side'
+LEFT_SIDE = 'lat_left'
+RIGHT_SIDE = 'lat_right'
 LEFT_EAR = 'left_ear'
 RIGHT_EAR = 'right_ear'
 CENTER = 'center'
 TAIL_BASE = 'tail_base'
 TAIL_CENTER = 'tail_center'
-TAIL_TIP = 'tail_tip'
+TAIL_TIP = 'tail_end'
+
+REQUIRED_BODYPARTS = (NOSE, LEFT_SIDE, RIGHT_SIDE, LEFT_EAR, RIGHT_EAR, CENTER, TAIL_BASE, TAIL_CENTER, TAIL_TIP)
 
 TIME_WINDOWS = np.array([0.25, 0.5, 1.0, 2.0])
 
@@ -94,6 +96,8 @@ class MitraFeatureExtractor(ConfigReader,
     def run(self):
         for file_cnt, file_path in enumerate(self.outlier_corrected_paths):
             df = read_df(file_path=file_path, file_type=self.file_type)
+            required_cols = [f'{bp}_{axis}' for bp in REQUIRED_BODYPARTS for axis in ('x', 'y')]
+            check_that_column_exist(df=df, column_name=required_cols, file_name=file_path)
             results = pd.DataFrame()
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(filepath=file_path)
@@ -236,7 +240,7 @@ class MitraFeatureExtractor(ConfigReader,
 # feature_extractor.run()
 
 
-# feature_extractor = MitraFeatureExtractor(config_path=r"E:\troubleshooting\mitra_pbn\mitra_pbn\project_folder\project_config.ini")
+# feature_extractor = MitraFeatureExtractor(config_path=r"H:\projects\jason_zhang\jason_project\project_folder\project_config.ini")
 # feature_extractor.run()
 
 
