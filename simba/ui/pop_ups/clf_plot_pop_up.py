@@ -19,7 +19,7 @@ from simba.utils.checks import (check_float,
                                 check_that_hhmmss_start_is_before_end)
 from simba.utils.enums import Formats, Links, Options
 from simba.utils.errors import NoFilesFoundError, NoSpecifiedOutputError
-from simba.utils.lookups import get_color_dict
+from simba.utils.lookups import get_color_dict, get_named_simba_fonts
 from simba.utils.read_write import (find_all_videos_in_directory,
                                     find_video_of_file, str_2_bool)
 
@@ -52,6 +52,8 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         gpu_available = check_nvidea_gpu_available()
         self.clr_dict = get_color_dict()
         pose_palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
+        self.font_options = sorted(get_named_simba_fonts().keys())
+        self.default_font = 'Poppins Regular' if 'Poppins Regular' in self.font_options else self.font_options[0]
         PopUpMixin.__init__(self, title="VISUALIZE CLASSIFICATION (SKLEARN) RESULTS", icon='photos', size=(700, 850))
         bp_threshold_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BODY-PART VISUALIZATION THRESHOLD", icon_name='threshold', icon_link=Links.SKLEARN_PLOTS.value, padx=5, pady=5, relief='solid')
         self.bp_threshold_lbl = SimBALabel(parent=bp_threshold_frm, txt="Body-parts detected below the set threshold won't be shown in the output videos (use 0.0 to see all body-part predictions)", font=Formats.FONT_REGULAR_ITALICS.value)
@@ -63,6 +65,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.bp_threshold_entry.grid(row=1, column=0, sticky=NW)
 
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="TEXT SETTINGS", icon_name='style', icon_link=Links.SKLEARN_PLOTS.value, padx=5, pady=5, relief='solid')
+        self.font_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.font_options, label='FONT: ', label_width=40, dropdown_width=15, value=self.default_font, img='text')
         self.text_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='TEXT SIZE: ', label_width=40, dropdown_width=15, value='AUTO', img='text', tooltip_key='CLF_PLOT_TEXT_SIZE')
         self.text_spacing_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='TEXT SPACING: ', label_width=40, dropdown_width=15, value='AUTO', img='text_spacing', tooltip_key='CLF_PLOT_TEXT_SPACING')
         self.text_thickness_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='TEXT THICKNESS: ', label_width=40, dropdown_width=15, value='AUTO', img='bold', tooltip_key='CLF_PLOT_TEXT_THICKNESS')
@@ -73,14 +76,15 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.tracking_clr_palette_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=pose_palettes, label='TRACKING COLOR PALETTE: ', label_width=40, dropdown_width=15, value='Set1', img='color_wheel', tooltip_key='CLF_PLOT_TRACKING_PALETTE')
 
         self.style_settings_frm.grid(row=1, column=0, sticky=NW)
-        self.text_size_dropdown.grid(row=0, column=0, sticky=NW)
-        self.text_spacing_dropdown.grid(row=1, column=0, sticky=NW)
-        self.text_thickness_dropdown.grid(row=2, column=0, sticky=NW)
-        self.circle_size_dropdown.grid(row=3, column=0, sticky=NW)
-        self.text_opacity_dropdown.grid(row=4, column=0, sticky=NW)
-        self.text_clr_dropdown.grid(row=5, column=0, sticky=NW)
-        self.bg_clr_dropdown.grid(row=6, column=0, sticky=NW)
-        self.tracking_clr_palette_dropdown.grid(row=7, column=0, sticky=NW)
+        self.font_dropdown.grid(row=0, column=0, sticky=NW)
+        self.text_size_dropdown.grid(row=1, column=0, sticky=NW)
+        self.text_spacing_dropdown.grid(row=2, column=0, sticky=NW)
+        self.text_thickness_dropdown.grid(row=3, column=0, sticky=NW)
+        self.circle_size_dropdown.grid(row=4, column=0, sticky=NW)
+        self.text_opacity_dropdown.grid(row=5, column=0, sticky=NW)
+        self.text_clr_dropdown.grid(row=6, column=0, sticky=NW)
+        self.bg_clr_dropdown.grid(row=7, column=0, sticky=NW)
+        self.tracking_clr_palette_dropdown.grid(row=8, column=0, sticky=NW)
 
         self.time_segment_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="TIME SEGMENT", icon_name='timer', icon_link=Links.SKLEARN_PLOTS.value, padx=5, pady=5, relief='solid', tooltip_key='CLF_PLOT_TIME_SEGMENT')
         self.time_cb, self.time_var = SimbaCheckbox(parent=self.time_segment_frm, txt='PLOT SPECIFIC TIME SEGMENT', txt_img='timer', cmd=self._set_timeslice_state, val=False, tooltip_key='CLF_PLOT_PLOT_SPECIFIC_TIME_SEGMENT')
@@ -167,6 +171,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         circle_size = float(self.circle_size_dropdown.get_value())  if self.circle_size_dropdown.get_value() != AUTO else None
         space_size = float(self.text_spacing_dropdown.get_value()) if self.text_spacing_dropdown.get_value() != AUTO else None
         text_thickness = float(self.text_thickness_dropdown.get_value()) if self.text_thickness_dropdown.get_value() != AUTO else None
+        font = self.font_dropdown.get_value()
         text_opacity = float(self.text_opacity_dropdown.get_value())
         text_clr = self.clr_dict[self.text_clr_dropdown.get_value()]
         text_bg_clr = self.clr_dict[self.bg_clr_dropdown.get_value()]
@@ -225,6 +230,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
                                                      print_timer=timer,
                                                      core_cnt=core_cnt,
                                                      font_size=font_size,
+                                                     font=font,
                                                      space_size=space_size,
                                                      text_thickness=text_thickness,
                                                      circle_size=circle_size,

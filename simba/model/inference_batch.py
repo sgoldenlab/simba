@@ -173,11 +173,11 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
 
 
 #
-# test = InferenceBatch(config_path=r"G:\projects\jason_zhang\jason_project\project_folder\project_config.ini",
-#                       save_dir=r'G:\projects\jason_zhang\jason_project\project_folder\csv\REARING\REARING_DATA',
-#                       model_dict={'REARING': {'model_path': r"G:\projects\jason_zhang\jason_project\models\REARING.sav", 'minimum_bout_length': 100, 'threshold': 0.25}},
-#                       save_agg_stats=r'G:\projects\jason_zhang\jason_project\project_folder\csv\REARING\REARING_DATA')
-# test.run()
+test = InferenceBatch(config_path=r"H:\projects\jason_zhang\jason_project\project_folder\project_config.ini",
+                      save_dir=r'H:\projects\jason_zhang\jason_project\project_folder\csv\REARING',
+                      model_dict={'GROOMING': {'model_path': r"H:\projects\jason_zhang\jason_project\models\GROOMING.sav", 'minimum_bout_length': 100, 'threshold': 0.33}},
+                      save_agg_stats=r'H:\projects\jason_zhang\jason_project\project_folder\csv\REARING')
+test.run()
 
 #
 # test = InferenceBatch(config_path=r"E:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")

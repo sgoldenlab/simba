@@ -185,6 +185,25 @@ def load_simba_fonts():
     for k, v in font_enum.items():
         pyglet.font.add_file(os.path.join(simba_dir, v))
 
+def get_named_simba_fonts() -> Dict[str, str]:
+    """
+    Return a dictionary mapping the name (filename without extension) of each font bundled with SimBA
+    (in ``simba/assets/fonts``) to its absolute file path.
+
+    .. seealso::
+       For all fonts installed on the host OS (rather than only those bundled with SimBA), see :func:`~simba.utils.lookups.get_fonts`.
+
+    :example:
+    >>> get_named_simba_fonts()
+    >>> {'Poppins Regular': '.../simba/assets/fonts/Poppins Regular.ttf', ...}
+    """
+    simba_dir = os.path.dirname(simba.__file__)
+    check_if_dir_exists(in_dir=simba_dir, source=get_named_simba_fonts.__name__)
+    fonts_dir = os.path.join(simba_dir, 'assets', 'fonts')
+    check_if_dir_exists(in_dir=fonts_dir, source=get_named_simba_fonts.__name__)
+    font_paths = glob.glob(os.path.join(fonts_dir, '*.ttf')) + glob.glob(os.path.join(fonts_dir, '*.otf'))
+    return {os.path.splitext(os.path.basename(p))[0]: p for p in font_paths}
+
 def get_third_party_appender_file_formats() -> Dict[str, str]:
     """
     Helper to get dictionary that maps different third-party annotation tools with different file formats.
@@ -695,7 +714,20 @@ def get_labelling_video_kbd_bindings() -> dict:
 
 
 def get_fonts(sort_alphabetically: bool = False):
-    """ Returns a dictionary with all fonts available in OS, with the font name as key and font path as value"""
+    """
+    Returns a dictionary with all fonts available in OS, with the font name as key and font path as value.
+
+    .. seealso::
+       For only the fonts bundled with SimBA (in ``simba/assets/fonts``), see :func:`~simba.utils.lookups.get_named_simba_fonts`.
+
+    :param bool sort_alphabetically: If True, the returned dictionary is sorted by font name using natural (numeric-aware) ordering. If False, fonts are returned in the order reported by matplotlib's font manager. Default False.
+    :return: Dictionary mapping font name (key) to font file path (value). On Windows the ``C:`` drive prefix is stripped and paths are returned as POSIX-style strings.
+    :rtype: Dict[str, str]
+
+    :example:
+    >>> get_fonts(sort_alphabetically=True)
+    >>> {'Arial': '/Windows/Fonts/arial.ttf', ...}
+    """
     font_dict = {f.name: f.fname for f in matplotlib.font_manager.fontManager.ttflist if not f.name.startswith('.')}
     if len(font_dict) == 0:
         NoDataFoundWarning(msg='No fonts found on disk using matplotlib.font_manager', source=get_fonts.__name__)

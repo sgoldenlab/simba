@@ -4,7 +4,8 @@ import os
 import shutil
 from copy import copy
 from typing import Any, Dict, List, Optional, Tuple, Union
-
+from PIL import Image, ImageDraw, ImageFont
+from functools import lru_cache
 import cv2
 import imutils
 import matplotlib
@@ -21,7 +22,6 @@ from matplotlib.collections import LineCollection
 from matplotlib.figure import Figure
 from matplotlib.ticker import FuncFormatter, MaxNLocator
 from numba import bool_, njit, uint8
-from PIL import Image
 
 try:
     from typing import Literal
@@ -41,9 +41,10 @@ from simba.utils.checks import (
 from simba.utils.data import (create_color_palette, detect_bouts,
                               savgol_smoother)
 from simba.utils.enums import Formats, Keys, Options
-from simba.utils.errors import InvalidInputError
+from simba.utils.errors import InvalidFileTypeError, InvalidInputError
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
-                                 get_fonts, get_named_colors)
+                                 get_fonts, get_named_colors,
+                                 get_named_simba_fonts)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data, read_df,
@@ -146,6 +147,17 @@ class PlottingMixin(object):
     def remove_a_folder(self, folder_dir: str) -> None:
         """Helper to remove a directory, use for cleaning up smaller multiprocessed videos following concat"""
         shutil.rmtree(folder_dir, ignore_errors=True)
+
+    @staticmethod
+    @lru_cache(maxsize=64)
+    def _load_ttf(font_path: str, size: int):
+
+        check_file_exist_and_readable(file_path=font_path)
+        check_int(name=f'{PlottingMixin._load_ttf.__name__} size', value=size, min_value=1)
+        try:
+            return ImageFont.truetype(font_path, size=size)
+        except OSError as e:
+            raise InvalidFileTypeError(msg=f'The file {font_path} is not a valid font file (.ttf/.otf) and could not be loaded: {e}', source=PlottingMixin._load_ttf.__name__)
 
     def split_and_group_df(self,
                            df: pd.DataFrame,
@@ -401,12 +413,17 @@ class PlottingMixin(object):
         original_font_family = copy(plt.rcParams['font.family']) if isinstance(plt.rcParams['font.family'], list) else plt.rcParams['font.family']
         
         if font is not None:
+            simba_fonts = get_named_simba_fonts()
             available_fonts = get_fonts()
-            if font in available_fonts:
-                matplotlib.font_manager._get_font.cache_clear()
+            matplotlib.font_manager._get_font.cache_clear()
+            if font in simba_fonts:
+                #  A SimBA-bundled font (e.g. 'Poppins Regular'): register the .ttf with matplotlib and resolve its internal family name - the filename-stem name used elsewhere in SimBA is not the matplotlib family name.
+                matplotlib.font_manager.fontManager.addfont(simba_fonts[font])
+                family_name = matplotlib.font_manager.FontProperties(fname=simba_fonts[font]).get_name()
+                plt.rcParams['font.family'] = [family_name, 'sans-serif']
+            elif font in available_fonts:
                 plt.rcParams['font.family'] = font
             else:
-                matplotlib.font_manager._get_font.cache_clear()
                 plt.rcParams['font.family'] = [font, 'sans-serif']
         
         fig, ax = plt.subplots()
@@ -2105,6 +2122,84 @@ class PlottingMixin(object):
                 return (font_scale, x_shift, y_shift)
         return (1, 1, 1)
 
+    @staticmethod
+    def get_optimal_font_size_ttf(text: Union[str, List[str]],
+                                  font_path: str,
+                                  accepted_px_width: int,
+                                  accepted_px_height: int,
+                                  max_px: int = 400) -> Tuple[int, int, int]:
+
+        """
+        Get the optimal font PIXEL size, column-wise and row-wise text distance for printing text on images using a
+        TrueType/OpenType (.ttf/.otf) font rendered with PIL.
+
+        This is the TTF counterpart of :meth:`get_optimal_font_scales`. Note that the returned value is a font PIXEL
+        size (to be passed as ``font_size`` to :meth:`put_text` together with ``font_path``), NOT the cv2 scale factor
+        returned by :meth:`get_optimal_font_scales`. The two are not interchangeable.
+
+        :param Union[str, List[str]] text: The text to be printed. Either a string or a list of strings. If a list, then the longest string will be used to evaluate spacings/font.
+        :param str font_path: Path to the .ttf/.otf font file to measure with.
+        :param int accepted_px_width: The widest allowed string in pixels. E.g., 1/4th of the image width.
+        :param int accepted_px_height: The highest allowed string in pixels. E.g., 1/10th of the image size.
+        :param int max_px: The largest font pixel size to consider. The search counts down from this value. Default: 400.
+        :return Tuple[int, int, int]: The font pixel size, the shift on x between successive columns, the shift in y between successive rows.
+
+        :example:
+        >>> size_px, x_shift, y_shift = PlottingMixin.get_optimal_font_size_ttf(text='HELLO MY FELLOW', font_path='Poppins-Regular.ttf', accepted_px_width=480, accepted_px_height=108)
+        """
+
+        check_file_exist_and_readable(file_path=font_path)
+        check_int(name='accepted_px_width', value=accepted_px_width, min_value=1)
+        check_int(name='accepted_px_height', value=accepted_px_height, min_value=1)
+        check_int(name='max_px', value=max_px, min_value=1)
+        if isinstance(text, list):
+            check_valid_lst(data=text, valid_dtypes=(str,), min_len=1)
+            text = max(text, key=len)
+        else:
+            check_str(name='text', value=text)
+        for size in reversed(range(1, max_px + 1)):
+            font = PlottingMixin._load_ttf(font_path, size)
+            l, t, r, b = font.getbbox(text)
+            new_width, new_height = r - l, b - t
+            if (new_width <= accepted_px_width) and (new_height <= accepted_px_height):
+                x_shift = new_width + (b - new_height)
+                y_shift = new_height + (b - new_height)
+                return (size, x_shift, y_shift)
+        return (1, 1, 1)
+
+    @staticmethod
+    def get_optimal_font_spacing_ttf(font_path: str, size_px: int, text: Union[str, List[str]], gap: int = 1) -> int:
+        """
+        Return the optimal vertical pixel pitch (distance between consecutive baselines) for stacking lines of
+        TTF text rendered by :meth:`put_text`, so the per-line background boxes sit snugly without overlapping.
+
+        The pitch equals the tallest rendered box height of the actual ``text`` being drawn (i.e. the tight
+        ascender-to-descender bbox of the supplied strings at ``size_px``, plus the same padding that :meth:`put_text`
+        adds to its background box), plus a small ``gap``. Measuring the real text - rather than a worst-case probe -
+        keeps caps-only stacks tight (no wasted descender room) while still accommodating descenders when present.
+        This is the row-spacing counterpart to the font PIXEL size returned by :meth:`get_optimal_font_size_ttf`; do
+        not use the cv2 spacing from :meth:`get_optimal_font_scales` for TTF text, as the metrics differ.
+
+        :param str font_path: Path to the .ttf/.otf font file.
+        :param int size_px: Font pixel height (as passed to :meth:`put_text` when ``font_path`` is set).
+        :param Union[str, List[str]] text: The string(s) that will be stacked. The tallest rendered box across them sets the pitch.
+        :param int gap: Extra pixels inserted between consecutive line boxes. Default 1.
+        :return int: The recommended vertical pitch in pixels.
+
+        :example:
+        >>> PlottingMixin.get_optimal_font_spacing_ttf(font_path='Poppins Regular.ttf', size_px=13, text=['TIMERS:', 'grooming'])
+        """
+        check_int(name='size_px', value=size_px, min_value=1)
+        check_int(name='gap', value=gap, min_value=0)
+        if isinstance(text, str):
+            text = [text]
+        check_valid_lst(data=text, valid_dtypes=(str,), min_len=1)
+        pil_font = PlottingMixin._load_ttf(font_path, size_px)
+        pad = max(1, int(size_px * 0.1))  # mirror the padding used in put_text's TTF branch
+        measure = ImageDraw.Draw(Image.new("RGB", (1, 1)))
+        max_box_h = max((measure.textbbox((0, 0), s, font=pil_font, anchor="ls")[3] - measure.textbbox((0, 0), s, font=pil_font, anchor="ls")[1]) for s in text)
+        return max_box_h + (2 * pad) + gap
+
     def get_optimal_circle_size(self,
                                 frame_size: Tuple[int, int],
                                 circle_frame_ratio: Optional[int] = 100) -> int:
@@ -2135,6 +2230,7 @@ class PlottingMixin(object):
                   font_size: Union[int, float],
                   font_thickness: Optional[int] = 2,
                   font: Optional[int] = cv2.FONT_HERSHEY_DUPLEX,
+                  font_path: Optional[str] = None,
                   text_color: Optional[Tuple[int, int, int]] = (255, 255, 255),
                   text_color_bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
                   text_bg_alpha: float = 0.8) -> np.ndarray:
@@ -2149,9 +2245,10 @@ class PlottingMixin(object):
         :param img: The image on which the text is to be drawn. This is a NumPy array representing the image data.
         :param text: The text string to be drawn on the image.
         :param pos: The position (x, y) where the text will be placed on the image. The coordinates correspond to the  bottom-left corner of the text.
-        :param font_size: The size of the font. It determines the scale factor that is multiplied by the font-specific base size.
-        :param font_thickness: The thickness of the text strokes. It is an integer specifying the number of pixels for the thickness.
-        :param font: The font type used to render the text. It corresponds to one of the predefined OpenCV font types.
+        :param font_size: The size of the font. When ``font_path`` is None, this is the cv2 scale factor multiplied by the font-specific base size. When ``font_path`` is passed, this is interpreted as the font PIXEL height.
+        :param font_thickness: The thickness of the text strokes. It is an integer specifying the number of pixels for the thickness. Used only by the cv2 path (ignored when ``font_path`` is passed).
+        :param font: The font type used to render the text. It corresponds to one of the predefined OpenCV Hershey font types (0-7). Ignored when ``font_path`` is passed.
+        :param font_path: Optional path to a TrueType/OpenType (.ttf/.otf) font file. If passed, it takes precedence over ``font`` and the text is rendered with PIL using this font (e.g. for custom fonts such as Poppins). If None, the cv2 Hershey ``font`` is used.
         :param text_color: The color of the text in RGB format. By default, the text color is white.
         :param text_color_bg: The background color for the text in RGB format. By default, the background color is black.
         :param text_bg_alpha: The transparency level of the background rectangle. A value between 0 and 1, where 0 is fully transparent  and 1 is fully opaque.
@@ -2159,11 +2256,30 @@ class PlottingMixin(object):
         """
 
         check_valid_tuple(x=pos, accepted_lengths=(2,), valid_dtypes=(int,))
-        check_int(name='font_thickness', value=font_thickness, min_value=1)
-        check_int(name='font', value=font, min_value=0, max_value=7)
         check_if_valid_rgb_tuple(data=text_color)
         check_if_valid_rgb_tuple(data=text_color_bg)
         check_float(name='text_bg_alpha', value=text_bg_alpha, min_value=0, max_value=1.0)
+        if font_path is not None:
+            #  When a TTF/OTF font_path is passed it takes precedence over the cv2 Hershey `font`, and `font_size` is interpreted as a PIXEL height (not the cv2 scale factor). Only the small region under the text is converted to/from PIL, so the cost scales with text size, not frame size.
+            pil_font = PlottingMixin._load_ttf(font_path, int(font_size))
+            x, y = pos
+            output = img.copy()
+            measure = ImageDraw.Draw(Image.new("RGB", (1, 1)))
+            x0, y0, x1, y1 = measure.textbbox(pos, text, font=pil_font, anchor="ls")
+            pad = max(1, int(font_size * 0.1))
+            X0, Y0 = max(0, x0 - pad), max(0, y0 - pad)
+            X1, Y1 = min(output.shape[1], x1 + pad), min(output.shape[0], y1 + pad)
+            if X1 <= X0 or Y1 <= Y0:
+                return output
+            roi = output[Y0:Y1, X0:X1]
+            bg = roi.copy(); bg[:] = text_color_bg
+            cv2.addWeighted(bg, text_bg_alpha, roi, 1 - text_bg_alpha, 0, roi)
+            pil = Image.fromarray(cv2.cvtColor(roi, cv2.COLOR_BGR2RGB))
+            ImageDraw.Draw(pil).text((x - X0, y - Y0), text, font=pil_font, fill=text_color[::-1], anchor="ls")
+            output[Y0:Y1, X0:X1] = cv2.cvtColor(np.array(pil), cv2.COLOR_RGB2BGR)
+            return output
+        check_int(name='font_thickness', value=font_thickness, min_value=1)
+        check_int(name='font', value=font, min_value=0, max_value=7)
         x, y = pos
         text_size, px_buffer = cv2.getTextSize(text, font, font_size, font_thickness)
         w, h = text_size
@@ -2499,7 +2615,7 @@ class PlottingMixin(object):
             if bg_clr.shape[2] == 3:
                 bg_clr_rgb = cv2.cvtColor(bg_clr, cv2.COLOR_BGR2RGB)
             else:
-                bg_clr_rgb = bg_img
+                bg_clr_rgb = bg_clr
             ax.imshow(bg_clr_rgb, extent=[0, size[1], size[0], 0], origin='upper')
         else:
             bg_clr_normalized = (bg_clr[0] / 255.0, bg_clr[1] / 255.0, bg_clr[2] / 255.0)
