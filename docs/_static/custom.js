@@ -1054,3 +1054,66 @@ gtag('config', 'G-PEKR9R5J47');
     }
   });
 })();
+
+/* ------------------------------------------------------------------ *
+ * Notebooks page: give each tile a short subtitle under its title.
+ * Keyed by notebook filename so the toctree (and sidebar nav) stay intact.
+ * ------------------------------------------------------------------ */
+(function () {
+  var SUB = {
+    'CLI Example 1': 'Import pose data and run a classifier end-to-end.',
+    'shap_example_1': 'Compute SHAP explainability scores on a single core.',
+    'shap_example_2': 'Compute SHAP scores in parallel across cores.',
+    'shap_log_3': 'GPU-accelerated SHAP score computation.',
+    'outlier_correction': 'Correct movement & location pose outliers.',
+    'third_party_append': 'Append annotations from BORIS, Solomon, etc.',
+    'advanced_smoothing_interpolation': 'Fine-grained smoothing & interpolation control.',
+    'advanced_outlier_correction': 'Custom, parameterized outlier correction.',
+    'kleinberg_gridsearch': 'Grid-search Kleinberg bout-smoothing settings.',
+    'train_models': 'Train a random-forest classifier from code.',
+    'path_plots': 'Draw animal movement paths.',
+    'classifier_validation_videos': 'Render clips to validate classifier hits.',
+    'gantt_plots': 'Gantt charts of classified bouts over time.',
+    'distance_plotter': 'Plot distances between body-parts.',
+    'clf_results_plotting': 'Overlay classification results on video.',
+    'Visualize pose-estimation': 'Plot tracked body-part locations.',
+    'roi_feature_visualizer': 'Visualize ROI-based features.',
+    'probability_plots': 'Plot classifier probability over time.',
+    'hatmap_location_plotter': 'Heatmaps of where animals spend time.',
+    'heatmap_clf': 'Heatmaps of where behaviors occur.',
+    'pose_plotter_gpu': 'GPU-accelerated pose-estimation plotting.',
+    'geometry_example_1': 'Key-point movement statistics in a grid.',
+    'geometry_example_2': 'Hull movement statistics in a grid.',
+    'geometry_ex_3': 'Build & analyze animal paths as geometries.',
+    'geometry_example_3': 'Slice animal videos by location (CPU).',
+    'geometry_example_5': 'Slice animal shapes from frames.',
+    'geometry_example_6': 'ROI and path statistics from geometries.',
+    'geometry_example_7': 'Further geometry computation examples.',
+    'yolo_ex_1': 'Detect animals with YOLO bounding boxes.',
+    'yolo_ex_2': 'YOLO detection — further example.',
+    'bg_remove': 'Remove static background from videos.',
+    'egocentric_align': 'Egocentrically align data and video.',
+    'blob_tracking': 'Track animals as blobs (no pose model).',
+    'blob_tracking_vis': 'Visualize blob-tracking results.',
+    'import_sleap_h5': 'Import SLEAP .h5 tracking files.',
+    'multiclass': 'Build multi-class behavior classifiers.',
+    'define_rois': 'Define ROIs programmatically.'
+  };
+  window.addEventListener('load', function () {
+    var root = document.querySelector('.simba-nb');
+    if (!root) return;
+    Array.prototype.forEach.call(root.querySelectorAll('.toctree-l1 > a.reference.internal'), function (a) {
+      if (a.querySelector('.simba-nb-txt')) return;                 // already processed
+      var base = (a.getAttribute('href') || '').split('/').pop().replace(/\.html.*$/, '');
+      try { base = decodeURIComponent(base); } catch (e) {}
+      var title = a.textContent.trim();
+      var sub = SUB[base];
+      a.textContent = '';
+      var wrap = document.createElement('span'); wrap.className = 'simba-nb-txt';
+      var t = document.createElement('span'); t.className = 'simba-nb-title'; t.textContent = title;
+      wrap.appendChild(t);
+      if (sub) { var s = document.createElement('span'); s.className = 'simba-nb-sub-card'; s.textContent = sub; wrap.appendChild(s); }
+      a.appendChild(wrap);
+    });
+  });
+})();

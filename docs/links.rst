@@ -6,18 +6,19 @@ Key SimBA links — code, community, publications, and data resources.
 .. raw:: html
 
    <style>
-     .simba-link-grid { display:flex; flex-wrap:wrap; gap:22px; margin:26px 0 6px; }
-     .simba-link-card { flex:1 1 300px; border:1px solid #e1e4e8; border-radius:12px; padding:20px 22px 16px;
-        background:#fff; box-shadow:0 4px 14px rgba(0,0,0,.07); transition:transform .15s ease, box-shadow .15s ease; }
-     .simba-link-card:hover { transform:translateY(-3px); box-shadow:0 10px 26px rgba(33,86,122,.16); }
-     .simba-link-card h3 { margin:0 0 11px !important; font-size:16.5px; color:#21567a !important;
-        padding-bottom:9px; border-bottom:2px solid #eef2f5; }
-     a.simba-link { display:block; text-decoration:none !important; padding:8px 10px; border-radius:8px;
-        margin:2px -10px; transition:background .13s ease; }
+     .simba-link-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:26px; margin:28px 0 6px; }
+     @media (max-width:640px){ .simba-link-grid { grid-template-columns:1fr; } }
+     .simba-link-card { border:1px solid #e1e4e8; border-radius:14px; padding:26px 28px 22px;
+        background:#fff; box-shadow:0 4px 16px rgba(0,0,0,.08); transition:transform .15s ease, box-shadow .15s ease; }
+     .simba-link-card:hover { transform:translateY(-4px); box-shadow:0 12px 30px rgba(33,86,122,.18); }
+     .simba-link-card h3 { margin:0 0 14px !important; font-size:19px; color:#21567a !important;
+        padding-bottom:11px; border-bottom:2px solid #eef2f5; }
+     a.simba-link { display:block; text-decoration:none !important; padding:11px 12px; border-radius:9px;
+        margin:3px -12px; transition:background .13s ease; }
      a.simba-link:hover { background:#f3f8fb; }
-     a.simba-link b { color:#21567a !important; font-weight:600; font-size:14px; }
-     a.simba-link::after { content:"→"; float:right; color:#a7bccc; font-weight:600; }
-     a.simba-link span { display:block; color:#6a7884; font-size:12.5px; margin-top:1px; }
+     a.simba-link b { color:#21567a !important; font-weight:600; font-size:15.5px; }
+     a.simba-link::after { content:"→"; float:right; color:#a7bccc; font-weight:600; font-size:15px; }
+     a.simba-link span { display:block; color:#6a7884; font-size:13.5px; margin-top:2px; }
    </style>
    <div class="simba-link-grid">
 

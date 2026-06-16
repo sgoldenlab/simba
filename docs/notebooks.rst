@@ -1,12 +1,17 @@
 📚 Notebooks
 =============
 
-Assortment of examples to execute SimBA commands through custom code outside the code aimed at speeding up processing
-and surface additional functionalities.
+A collection of examples for running SimBA through custom code — useful for batch/scripted processing
+and for unlocking functionality beyond the GUI.
 
+.. raw:: html
+
+   <div class="simba-nb">
 
 ⚙️ General processing
--------------------
+--------------------------------------------------
+Run core SimBA steps from code — outlier correction, smoothing, model training, and SHAP explainability.
+
 .. toctree::
    :maxdepth: 1
 
@@ -22,7 +27,9 @@ and surface additional functionalities.
    nb/train_models
 
 📊 Visualizations
--------------------
+--------------------------------------------------
+Generate plots, Gantt charts, heatmaps, paths, and annotated videos from your project data.
+
 .. toctree::
    :maxdepth: 1
 
@@ -39,8 +46,8 @@ and surface additional functionalities.
    nb/pose_plotter_gpu
 
 📐 Geometry- and image-related calculators
--------------------
-Some example operations pertaining to working with animals and environments as geometries.
+--------------------------------------------------
+Treat animals and environments as geometries, plus image/video helpers (YOLO, background removal, egocentric alignment).
 
 .. toctree::
    :maxdepth: 1
@@ -60,13 +67,19 @@ Some example operations pertaining to working with animals and environments as g
    nb/blob_tracking_vis
 
 🧰 Miscellaneous
--------------------
+--------------------------------------------------
+Data import, multi-class classifiers, and ROI-definition helpers.
+
 .. toctree::
    :maxdepth: 1
 
    nb/import_sleap_h5
    nb/multiclass
    nb/define_rois
+
+.. raw:: html
+
+   </div>
 
 
 
