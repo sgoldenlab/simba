@@ -537,7 +537,11 @@ h1, h2, h3, h4, h5, h6, .rst-content .toctree-wrapper > p.caption { font-weight:
 a, .rst-content a { color: #21567a; }
 a:visited, .rst-content a:visited { color: #4a6b82; }
 a:hover, .rst-content a:hover { color: #143d56; }
-.wy-side-nav-search { background-color: #21567a; }
+.wy-side-nav-search {
+    background: linear-gradient(135deg, #07273a, #11597e, #1f7aa6, #38a8d4, #176993, #0c3b56, #0a2c44);
+    background-size: 320% 320%;
+    animation: simbaGradient 13s ease-in-out infinite;
+}
 .wy-side-nav-search input[type="text"] { border-color: #21567a; }
 .wy-nav-top { background: #21567a; }
 .wy-menu-vertical a:hover { background-color: rgba(255, 255, 255, 0.08); color: #fff; }
@@ -656,3 +660,59 @@ a:hover, .rst-content a:hover { color: #143d56; }
     box-shadow: inset 3px 0 0 #21567a;
 }
 @media (max-width: 1300px) { .simba-toc { display: none; } }   /* hide when there's no room */
+
+/* --- :download: links styled as accent pill buttons (global) --- */
+.rst-content a.reference.download {
+    display: inline-block;
+    margin: 5px 9px 5px 0;
+    padding: 8px 17px;
+    background: #21567a;
+    color: #fff !important;
+    border-radius: 22px;
+    font-weight: 600;
+    font-size: 13.5px;
+    text-decoration: none !important;
+    box-shadow: 0 2px 8px rgba(33, 86, 122, 0.25);
+    transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+.rst-content a.reference.download:hover {
+    background: #19465f;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(33, 86, 122, 0.35);
+}
+.rst-content a.reference.download code,
+.rst-content a.reference.download .pre {
+    color: #fff !important; background: transparent; border: none; padding: 0; font-weight: 600;
+}
+
+/* --- Workflow/resources page: heading accents, section separators, hero panel --- */
+.simba-workflow h2 {
+    border-left: 4px solid #21567a;
+    padding-left: 13px;
+    border-top: 1px solid #e9edf0;
+    padding-top: 1.25em;
+    margin-top: 1.7em;
+}
+.simba-workflow section:first-of-type {
+    position: relative;
+    background: linear-gradient(135deg, #eaf3fa 0%, #d3e6f4 100%);
+    border: 1px solid #c5dcef;
+    border-radius: 14px;
+    padding: 16px 30px 28px;
+    margin-bottom: 1.9em;
+    box-shadow: 0 10px 34px rgba(33, 86, 122, 0.22);
+}
+.simba-workflow section:first-of-type::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0; height: 6px;
+    border-radius: 14px 14px 0 0;
+    background: linear-gradient(90deg, #21567a, #38a8d4);
+}
+.simba-workflow section:first-of-type > h2 {
+    border-top: none;
+    border-left: none;
+    padding: 0.3em 0 0;
+    margin-top: 0.3em;
+    font-size: 1.65em;
+    color: #19465f;
+}

@@ -1,6 +1,10 @@
 SimBA Presentations, Workflow, Documents
 ==========================================
 
+.. raw:: html
+
+   <div class="simba-workflow">
+
 .. contents::
    :local:
    :depth: 1
@@ -30,7 +34,7 @@ Poster presented at the Gordon Research Conference summarizing SimBA’s capabil
 
 
 🔍 SimBA Explainability Slides – Winter Brain
---------------------------
+----------------------------------------------------
 Slides introducing explainability features within SimBA, presented at Winter Brain Workshop.
 
 
@@ -57,7 +61,7 @@ Presentation from Society for Neuroscience (SfN) showcasing SimBA’s behavior c
 
 
 📄 SimBA Preprint – bioRxiv
---------------------------
+----------------------------------------------------
 Original preprint detailing SimBA’s architecture, methods, and early validation examples.
 
 .. image:: ../_static/img/simba_biorxiv_header.webp
@@ -71,7 +75,7 @@ Original preprint detailing SimBA’s architecture, methods, and early validatio
 
 📰 SimBA Paper – Nature Neuroscience
 ----------------------------------------------------
-Peer-reviewed publication in *Nature Neuroscience* Describing SimBA.
+Peer-reviewed publication in *Nature Neuroscience* describing SimBA.
 
 .. image:: ../_static/img/simba_paper_nn_header.webp
    :alt: Simba paper nn header
@@ -84,6 +88,7 @@ Peer-reviewed publication in *Nature Neuroscience* Describing SimBA.
 
 📓 SimBA API example notebook and ML concepts
 ----------------------------------------------------
+A hands-on Google Colab notebook walking through the SimBA API and core machine-learning concepts.
 
 .. image:: ../_static/img/simba_api_example_nb.webp
    :alt: Simba api example nb
@@ -96,6 +101,7 @@ Peer-reviewed publication in *Nature Neuroscience* Describing SimBA.
 
 𝄃𝄃𝄂𝄂𝄀𝄁𝄃𝄂𝄂𝄃 SimBA QR codes
 ----------------------------------------------------
+Printable QR codes linking to key SimBA resources — handy for posters and presentations.
 
 .. image:: ../_static/img/simba_qr_codes.webp
    :alt: Simba qr codes
@@ -108,6 +114,7 @@ Peer-reviewed publication in *Nature Neuroscience* Describing SimBA.
 
 🎥 SimBA overview 2025/10
 ----------------------------------------------------
+A high-level video overview of SimBA’s purpose, use cases, and key features (October 2025).
 
 .. image:: ../_static/img/overview_video.webp
    :alt: Overview video
@@ -144,5 +151,9 @@ Spreadsheet collection of real-world independent SimBA applications and validati
    </div>
 
 🔗 `Open full-screen in Google Sheets <https://docs.google.com/spreadsheets/d/169enc3Am2KQKifxj1F9KEKKLbftpMhBlw49zjl-egsY/edit?usp=sharing>`__
+
+.. raw:: html
+
+   </div>
 
 
