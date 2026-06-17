@@ -397,7 +397,7 @@ class PlottingMixin(object):
         :param float bar_opacity: Opacity of behavior bars (0.0-1.0). Default: 0.85.
         :param int font_rotation: Rotation angle in degrees for y-axis labels. Default: 45.
         :param int x_tick_lbl_rotation: Rotation angle in degrees for x-axis tick labels. Default: 0.
-        :param Optional[str] font: Font family name. If None, uses matplotlib default.
+        :param Optional[str] font: Font to render the chart text in. Accepts a bundled SimBA font name (the .ttf filename stem returned by :func:`~simba.utils.lookups.get_named_simba_fonts`, e.g. 'Poppins Regular'), an OS-installed font name (from :func:`~simba.utils.lookups.get_fonts`), or any matplotlib family name. Bundled fonts are auto-registered with matplotlib and resolved to their internal family name. If None, uses the matplotlib default.
         :param Optional[str] save_path: Path to save the image. If None and ``as_svg=False``, returns NumPy array.
         :param Optional[str] edge_clr: Color of bar edges. Default: 'black'.
         :param bool hhmmss: If True, displays x-axis time as HH:MM:SS. If False, displays seconds. Default: False.

@@ -18,10 +18,12 @@ from simba.utils.checks import (check_float,
                                 check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end)
 from simba.utils.enums import Formats, Links, Options
-from simba.utils.errors import NoFilesFoundError, NoSpecifiedOutputError
+from simba.utils.errors import (NoDataError, NoFilesFoundError,
+                                NoSpecifiedOutputError)
 from simba.utils.lookups import get_color_dict, get_named_simba_fonts
 from simba.utils.read_write import (find_all_videos_in_directory,
-                                    find_video_of_file, str_2_bool)
+                                    find_video_of_file, get_fn_ext,
+                                    str_2_bool)
 
 AUTO = 'AUTO'
 TEXT_SIZE_OPTIONS = list(range(1, 101))
@@ -48,6 +50,11 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
             raise NoFilesFoundError(msg=f'Cannot create classification videos: No video files found in {self.video_dir} directory', source=self.__class__.__name__)
         if len(self.machine_results_paths) == 0:
             raise NoFilesFoundError(msg=f'Cannot create classification videos: No data files found in {self.machine_results_dir} directory', source=self.__class__.__name__)
+        #  Only list videos that have corresponding classification results in the machine_results directory.
+        results_names = set(get_fn_ext(filepath=p)[1] for p in self.machine_results_paths)
+        self.video_lst = [v for v in self.video_lst if v in results_names]
+        if len(self.video_lst) == 0:
+            raise NoDataError(msg=f'Cannot create classification videos: none of the videos in {self.video_dir} have corresponding classification results in {self.machine_results_dir}. Run the classifier(s) first.', source=self.__class__.__name__)
         self.max_len = max(len(s) for s in self.video_lst)
         gpu_available = check_nvidea_gpu_available()
         self.clr_dict = get_color_dict()
@@ -248,7 +255,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
 
         plotter.run()
 
-#_ = SklearnVisualizationPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
+#_ = SklearnVisualizationPopUp(config_path=r"H:\projects\jason_zhang\jason_project\project_folder\project_config.ini")
 #_ = SklearnVisualizationPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 
 #_ = SklearnVisualizationPopUp(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini")

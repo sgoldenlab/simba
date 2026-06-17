@@ -34,7 +34,7 @@ it is not object-oriented and has no tests or checks — but if needed, it can b
 prior to ``0.77.0`` from PyPI.
 
 .. note::
-   **Maintained solo.** Simon Nilsson left the Golden lab in 2020 and has maintained SimBA in his spare time from North Carolina ever
+   Simon Nilsson left the Golden lab in 2020 and has maintained SimBA in his spare time from North Carolina ever
    since. As of October 2020, the SimBA codebase, GitHub repository, pip package, API, documentation, and support channels are
    developed exclusively by Simon — without grants, hardware, or other support. This is only possible thanks to the collaborative,
    friendly open-source community and their expert feedback and suggestions!

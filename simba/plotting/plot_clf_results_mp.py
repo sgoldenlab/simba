@@ -44,7 +44,8 @@ from simba.utils.read_write import (concatenate_videos_in_folder,
                                     get_fn_ext, get_video_meta_data,
                                     read_config_entry, read_df,
                                     seconds_to_timestamp)
-from simba.utils.warnings import FileExistWarning, FrameRangeWarning
+from simba.utils.warnings import (FileExistWarning, FrameRangeWarning,
+                                  NoDataFoundWarning)
 
 START_TIME, END_TIME = 'start_time', 'end_time'
 SECONDS, HHMMSSSSSS = ['seconds', 'hh:mm:ss.ssss']
@@ -85,6 +86,8 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
     fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_DUPLEX
     #  When a TTF font_path is passed, put_text needs a PIXEL size (font_size_px); otherwise it uses the cv2 scale (font_size).
     overlay_font_size = font_size_px if font_path is not None else font_size
+    #  make_gantt_plot (matplotlib) takes the bundled font NAME, which is the .ttf filename stem (e.g. 'Poppins Regular').
+    gantt_font = os.path.splitext(os.path.basename(font_path))[0] if font_path is not None else None
     video_meta_data = get_video_meta_data(video_path=video_path)
     if rotate:
         video_meta_data["height"], video_meta_data["width"] = (video_meta_data['width'], video_meta_data['height'])
@@ -144,6 +147,7 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                                                        width=video_meta_data['width'],
                                                        height=video_meta_data['height'],
                                                        font_size=12,
+                                                       font=gantt_font,
                                                        font_rotation=45,
                                                        x_tick_lbl_rotation=45,
                                                        hhmmss=True,
@@ -370,10 +374,20 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             self.data_dir = data_dir
         else:
             self.data_dir = self.machine_results_dir
+        #  Keep only videos that have corresponding classification data in data_dir; warn about (and skip) the rest, and error only if none have data.
+        videos_with_data, videos_missing_data = [], []
         for video_path in self.video_paths:
             video_name = get_fn_ext(filepath=video_path)[1]
             data_path = os.path.join(self.data_dir, f'{video_name}.{self.file_type}')
-            if not os.path.isfile(data_path): raise NoDataError(msg=f'Cannot create classification videos for {video_name}. Expected classification data at location {data_path} but file does not exist', source=self.__class__.__name__)
+            if os.path.isfile(data_path):
+                videos_with_data.append(video_path)
+            else:
+                videos_missing_data.append(video_name)
+        if len(videos_with_data) == 0:
+            raise NoDataError(msg=f'Cannot create classification videos: none of the {len(self.video_paths)} video(s) have corresponding classification data in {self.data_dir} (expected files named <video_name>.{self.file_type}).', source=self.__class__.__name__)
+        if len(videos_missing_data) > 0:
+            NoDataFoundWarning(msg=f'Skipping {len(videos_missing_data)} video(s) with no classification data in {self.data_dir}: {videos_missing_data}', source=self.__class__.__name__)
+        self.video_paths = videos_with_data
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
         self.core_cnt = find_core_cnt()[0] if int(core_cnt) == -1 or int(core_cnt) > find_core_cnt()[0] else int(core_cnt)
         if clf_names is not None:
@@ -519,10 +533,9 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             stdout_success(f"Frames for {len(self.video_paths)} videos saved in sub-folders within {self.save_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
-
 if __name__ == "__main__":
     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"H:\projects\jason_zhang\jason_project\project_folder\project_config.ini",
-                                                 video_paths=r"H:\projects\jason_zhang\jason_project\project_folder\videos\2025-10-22 12-01-34_box4.mp4",
+                                                 video_paths=r"H:\projects\jason_zhang\jason_project\project_folder\videos",
                                                  data_dir=r"H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING",
                                                  save_dir=r'H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING\videos',
                                                  clf_names=('GROOMING',),
@@ -530,16 +543,16 @@ if __name__ == "__main__":
                                                  frame_setting=False,
                                                  rotate=False,
                                                  show_confidence=True,
-                                                 core_cnt=8,
+                                                 core_cnt=14,
                                                  show_pose=True,
                                                  animal_names=False,
                                                  font='DynaPuff',
                                                  print_timer=HHMMSSSSSS,
-                                                 overwrite=True,
-                                                 time_slice={START_TIME: '00:00:00', END_TIME: '00:00:10'}, # {START_TIME: '00:00:00', END_TIME: '00:00:10'}, #{START_TIME: '00:00:00', END_TIME: '00:01:00'}, #,{START_TIME: '00:00:00', END_TIME: '00:01:00'}
-                                                 bbox='animal-aligned', #'animal-aligned'
+                                                 overwrite=False,
+                                                 time_slice=None, # {START_TIME: '00:00:00', END_TIME: '00:00:10'}, #{START_TIME: '00:00:00', END_TIME: '00:01:00'}, #,{START_TIME: '00:00:00', END_TIME: '00:01:00'}
+                                                 bbox=None, #'animal-aligned'
                                                  text_opacity=0.6,
-                                                 show_gantt=None)
+                                                 show_gantt=2)
     clf_plotter.run()
 
 
