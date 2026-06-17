@@ -22,8 +22,7 @@ from simba.utils.errors import (NoDataError, NoFilesFoundError,
                                 NoSpecifiedOutputError)
 from simba.utils.lookups import get_color_dict, get_named_simba_fonts
 from simba.utils.read_write import (find_all_videos_in_directory,
-                                    find_video_of_file, get_fn_ext,
-                                    str_2_bool)
+                                    find_video_of_file, get_fn_ext, str_2_bool)
 
 AUTO = 'AUTO'
 TEXT_SIZE_OPTIONS = list(range(1, 101))
