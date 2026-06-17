@@ -204,6 +204,33 @@ def get_named_simba_fonts() -> Dict[str, str]:
     font_paths = glob.glob(os.path.join(fonts_dir, '*.ttf')) + glob.glob(os.path.join(fonts_dir, '*.otf'))
     return {os.path.splitext(os.path.basename(p))[0]: p for p in font_paths}
 
+def get_simba_font_name_and_path(font: str) -> Tuple[str, str]:
+    """
+    Resolve a (case-insensitive) bundled SimBA font name to its canonical name and absolute font-file path.
+
+    The returned canonical name (correct casing) is suitable for matplotlib / :meth:`~simba.mixins.plotting_mixin.PlottingMixin.make_gantt_plot`,
+    and the returned path is the ``.ttf`` to pass to :meth:`~simba.mixins.plotting_mixin.PlottingMixin.put_text`.
+
+    .. seealso::
+       For the full name-to-path dictionary, see :func:`~simba.utils.lookups.get_named_simba_fonts`.
+
+    :param str font: The font name to resolve (case-insensitive), as listed by :func:`get_named_simba_fonts`.
+    :return: Tuple of (canonical font name, absolute font-file path).
+    :rtype: Tuple[str, str]
+    :raises StringError: If ``font`` is not a valid SimBA font name.
+
+    :example:
+    >>> get_simba_font_name_and_path(font='poppins regular')
+    >>> ('Poppins Regular', '.../simba/assets/fonts/Poppins Regular.ttf')
+    """
+    check_str(name=f'{get_simba_font_name_and_path.__name__} font', value=font)
+    simba_fonts = get_named_simba_fonts()
+    fonts_lower = {k.lower(): k for k in simba_fonts.keys()}  # lower-case -> canonical name
+    if font.lower() not in fonts_lower:
+        check_str(name=f'{get_simba_font_name_and_path.__name__} font', value=font, options=tuple(simba_fonts.keys()))
+    canonical_name = fonts_lower[font.lower()]
+    return canonical_name, simba_fonts[canonical_name]
+
 def get_third_party_appender_file_formats() -> Dict[str, str]:
     """
     Helper to get dictionary that maps different third-party annotation tools with different file formats.

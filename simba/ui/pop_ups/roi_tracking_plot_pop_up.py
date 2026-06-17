@@ -18,7 +18,8 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
 from simba.utils.checks import check_file_exist_and_readable, check_float
 from simba.utils.enums import ROI_SETTINGS, Formats, Keys, Links, Options
 from simba.utils.errors import NoDataError, ROICoordinatesNotFoundError
-from simba.utils.lookups import get_color_dict, get_tooltips
+from simba.utils.lookups import (get_color_dict, get_named_simba_fonts,
+                                  get_tooltips)
 from simba.utils.read_write import (find_all_videos_in_directory,
                                     find_core_cnt,
                                     find_files_of_filetypes_in_directory,
@@ -26,6 +27,8 @@ from simba.utils.read_write import (find_all_videos_in_directory,
 
 BP_SIZE_OPTIONS = list(range(1, 101, 1))
 BP_SIZE_OPTIONS.insert(0, 'AUTO')
+FONT_OPTIONS = sorted(get_named_simba_fonts().keys())
+DEFAULT_FONT = 'Poppins Regular'
 
 class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
 
@@ -70,6 +73,8 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         self.show_animal_name_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL NAMES:', label_width=40, value='FALSE', img='label', tooltip_key='ROI_TRACKING_SHOW_ANIMAL_NAMES')
         self.show_bbox_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['FALSE', Options.AXIS_ALIGNED.value, Options.ANIMAL_ALIGNED.value], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL BOUNDING BOXES:', label_width=40, value='FALSE', tooltip_key='SHOW_ANIMAL_BBOX', img='rectangle_2')
         self.timer_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=[Options.SECONDS.value, Options.HHMMSSSSSS.value], label='CLASSIFICATION TIMERS FORMAT:', label_width=40, dropdown_width=self.longest_animal_name_len, value=Options.SECONDS.value, img='timer', tooltip_key='ROI_TRACKING_INCLUDE_TIMERS')
+        font_value = DEFAULT_FONT if DEFAULT_FONT in FONT_OPTIONS else FONT_OPTIONS[0]
+        self.font_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=FONT_OPTIONS, dropdown_width=self.longest_animal_name_len, label='TEXT FONT:', label_width=40, value=font_value, img='label', tooltip_key='ROI_TRACKING_FONT')
         self.border_bg_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(self.bg_clr_options.keys()), dropdown_width=self.longest_animal_name_len, label='BORDER BACKGROUND COLOR:', label_width=40, value='Black', tooltip_key='BORDER_BG_COLOR', img='fill')
         self.outside_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='OUTSIDE ROI ZONES DATA:', label_width=40, value='FALSE', tooltip_key='ROI_TRACKING_OUTSIDE_ROI', img='outside')
         self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(2, self.cpu_cnt)), dropdown_width=self.longest_animal_name_len, label='NUMBER OF CPU CORES:', label_width=40, value=find_core_cnt()[1], img='cpu_small', tooltip_key='ROI_TRACKING_CPU_CORES')
@@ -81,9 +86,10 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         self.show_animal_name_dropdown.grid(row=3, column=0, sticky=NW)
         self.show_bbox_dropdown.grid(row=4, column=0, sticky=NW)
         self.timer_dropdown.grid(row=5, column=0, sticky=NW)
-        self.border_bg_dropdown.grid(row=6, column=0, sticky=NW)
-        self.outside_dropdown.grid(row=7, column=0, sticky=NW)
-        self.core_cnt_dropdown.grid(row=8, column=0, sticky=NW)
+        self.font_dropdown.grid(row=6, column=0, sticky=NW)
+        self.border_bg_dropdown.grid(row=7, column=0, sticky=NW)
+        self.outside_dropdown.grid(row=8, column=0, sticky=NW)
+        self.core_cnt_dropdown.grid(row=9, column=0, sticky=NW)
         #self.gpu_dropdown.grid(row=5, column=0, sticky=NW)
 
         self.body_parts_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMAL(S)", icon_name='pose', icon_link=Links.ROI_DATA_PLOT.value)
@@ -178,6 +184,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         gpu = str_2_bool(self.gpu_dropdown.get_value())
         core_cnt = int(self.core_cnt_dropdown.get_value())
         outside_roi = str_2_bool(self.outside_dropdown.get_value())
+        font = self.font_dropdown.get_value()
         border_bg_clr = self.bg_clr_options[self.border_bg_dropdown.get_value()]
         body_parts = [v.get_value() for k, v in self.bp_dropdown_dict.items()]
         bp_clrs, bp_sizes = None, None
@@ -210,6 +217,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
                                                   bp_colors=bp_clrs,
                                                   bp_sizes=bp_sizes,
                                                   print_timer=timer,
+                                                  font=font,
                                                   core_cnt=core_cnt,
                                                   bbox=show_bbox,
                                                   gpu=gpu,

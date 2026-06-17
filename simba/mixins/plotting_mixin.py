@@ -2261,27 +2261,30 @@ class PlottingMixin(object):
         check_if_valid_rgb_tuple(data=text_color_bg)
         check_float(name='text_bg_alpha', value=text_bg_alpha, min_value=0, max_value=1.0)
         if font_path is not None:
-            #  When a TTF/OTF font_path is passed it takes precedence over the cv2 Hershey `font`, and `font_size` is interpreted as a PIXEL height (not the cv2 scale factor). Only the small region under the text is converted to/from PIL, so the cost scales with text size, not frame size.
             pil_font = PlottingMixin._load_ttf(font_path, int(font_size))
             x, y = pos
-            output = img.copy()
             measure = ImageDraw.Draw(Image.new("RGB", (1, 1)))
             x0, y0, x1, y1 = measure.textbbox(pos, text, font=pil_font, anchor="ls")
             pad = max(1, int(font_size * 0.1))
             X0, Y0 = max(0, x0 - pad), max(0, y0 - pad)
-            X1, Y1 = min(output.shape[1], x1 + pad), min(output.shape[0], y1 + pad)
+            X1, Y1 = min(img.shape[1], x1 + pad), min(img.shape[0], y1 + pad)
             if X1 <= X0 or Y1 <= Y0:
-                return output
-            roi = output[Y0:Y1, X0:X1]
-            bg = roi.copy(); bg[:] = text_color_bg
-            cv2.addWeighted(bg, text_bg_alpha, roi, 1 - text_bg_alpha, 0, roi)
+                return img
+            roi = img[Y0:Y1, X0:X1]
+            if text_bg_alpha > 0:
+                bg = roi.copy(); bg[:] = text_color_bg
+                cv2.addWeighted(bg, text_bg_alpha, roi, 1 - text_bg_alpha, 0, roi)
             pil = Image.fromarray(cv2.cvtColor(roi, cv2.COLOR_BGR2RGB))
             ImageDraw.Draw(pil).text((x - X0, y - Y0), text, font=pil_font, fill=text_color[::-1], anchor="ls")
-            output[Y0:Y1, X0:X1] = cv2.cvtColor(np.array(pil), cv2.COLOR_RGB2BGR)
-            return output
+            img[Y0:Y1, X0:X1] = cv2.cvtColor(np.array(pil), cv2.COLOR_RGB2BGR)
+            return img
+
         check_int(name='font_thickness', value=font_thickness, min_value=1)
         check_int(name='font', value=font, min_value=0, max_value=7)
         x, y = pos
+        if text_bg_alpha <= 0:
+            cv2.putText(img, text, (x, y), font, font_size, text_color, font_thickness)
+            return img
         text_size, px_buffer = cv2.getTextSize(text, font, font_size, font_thickness)
         w, h = text_size
         overlay, output = img.copy(), img.copy()

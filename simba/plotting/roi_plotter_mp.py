@@ -39,11 +39,11 @@ from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError,
                                 ROICoordinatesNotFoundError)
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    find_core_cnt, get_current_time,
-                                    get_video_meta_data, read_df,
+                                    find_core_cnt, get_video_meta_data, read_df,
                                     seconds_to_timestamp)
 from simba.utils.warnings import (DuplicateNamesWarning, FrameRangeWarning,
                                   GPUToolsWarning)
+from simba.utils.lookups import get_simba_font_name_and_path
 
 pd.options.mode.chained_assignment = None
 SECONDS, HHMMSSSSSS = ['seconds', 'hh:mm:ss.ssss']
@@ -62,6 +62,8 @@ def _roi_plotter_mp(data: Tuple[int, pd.DataFrame],
                     roi_dict: dict,
                     bp_colors: list,
                     show_animal_name: bool,
+                    font_path: Optional[str],
+                    font_size_px: Optional[int],
                     show_pose: bool,
                     animal_ids: list,
                     threshold: float,
@@ -75,11 +77,11 @@ def _roi_plotter_mp(data: Tuple[int, pd.DataFrame],
     def __insert_texts(roi_dict, img):
         for animal_name in animal_ids:
             for shape_name, shape_data in roi_dict.items():
-                img = cv2.putText(img, loc_dict[animal_name][shape_name]["timer_text"], loc_dict[animal_name][shape_name]["timer_text_loc"], TextOptions.FONT.value, font_size, shape_data['Color BGR'], TextOptions.TEXT_THICKNESS.value)
-                img = cv2.putText(img, loc_dict[animal_name][shape_name]["entries_text"], loc_dict[animal_name][shape_name]["entries_text_loc"], TextOptions.FONT.value, font_size, shape_data['Color BGR'], TextOptions.TEXT_THICKNESS.value)
+                img = PlottingMixin().put_text(img=img, text=loc_dict[animal_name][shape_name]["timer_text"], pos=loc_dict[animal_name][shape_name]["timer_text_loc"], font_size=font_size, font=TextOptions.FONT.value, font_thickness=TextOptions.TEXT_THICKNESS.value, font_path=font_path, text_color=tuple(int(v) for v in shape_data['Color BGR']), text_bg_alpha=0.0)
+                img = PlottingMixin().put_text(img=img, text=loc_dict[animal_name][shape_name]["entries_text"], pos=loc_dict[animal_name][shape_name]["entries_text_loc"], font_size=font_size, font=TextOptions.FONT.value, font_thickness=TextOptions.TEXT_THICKNESS.value, font_path=font_path, text_color=tuple(int(v) for v in shape_data['Color BGR']), text_bg_alpha=0.0)
             if outside_roi:
-                img = cv2.putText(img, loc_dict[animal_name][ROI_SETTINGS.OUTSIDE_ROI.value]["timer_text"], loc_dict[animal_name][ROI_SETTINGS.OUTSIDE_ROI.value]["timer_text_loc"], TextOptions.FONT.value, font_size, TextOptions.WHITE.value, TextOptions.TEXT_THICKNESS.value)
-                img = cv2.putText(img, loc_dict[animal_name][ROI_SETTINGS.OUTSIDE_ROI.value]["entries_text"], loc_dict[animal_name][ROI_SETTINGS.OUTSIDE_ROI.value]["entries_text_loc"], TextOptions.FONT.value, font_size, TextOptions.WHITE.value, TextOptions.TEXT_THICKNESS.value)
+                img = PlottingMixin().put_text(img=img, text=loc_dict[animal_name][ROI_SETTINGS.OUTSIDE_ROI.value]["timer_text"], pos=loc_dict[animal_name][ROI_SETTINGS.OUTSIDE_ROI.value]["timer_text_loc"], font_size=font_size, font=TextOptions.FONT.value, font_thickness=TextOptions.TEXT_THICKNESS.value, font_path=font_path, text_color=TextOptions.WHITE.value, text_bg_alpha=0.0)
+                img = PlottingMixin().put_text(img=img, text=loc_dict[animal_name][ROI_SETTINGS.OUTSIDE_ROI.value]["entries_text"], pos=loc_dict[animal_name][ROI_SETTINGS.OUTSIDE_ROI.value]["entries_text_loc"], font_size=font_size, font=TextOptions.FONT.value, font_thickness=TextOptions.TEXT_THICKNESS.value, font_path=font_path, text_color=TextOptions.WHITE.value, text_bg_alpha=0.0)
             return img
 
 
@@ -90,6 +92,7 @@ def _roi_plotter_mp(data: Tuple[int, pd.DataFrame],
     df_frm_range = data_df.index.tolist()
     start_frm, current_frm, end_frm = df_frm_range[0], df_frm_range[0], df_frm_range[-1]
     save_path = os.path.join(save_temp_directory, f"{group_cnt}.mp4")
+    font_size = font_size_px if font_path is not None else font_size
     video_meta_data = get_video_meta_data(video_path=input_video_path)
     writer = cv2.VideoWriter(save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"] * 2, video_meta_data["height"]))
     cap = cv2.VideoCapture(input_video_path)
@@ -108,7 +111,7 @@ def _roi_plotter_mp(data: Tuple[int, pd.DataFrame],
                         if show_pose:
                             img = cv2.circle(img, (x, y), circle_sizes[animal_cnt], bp_colors[animal_cnt], -1)
                         if show_animal_name:
-                            img = cv2.putText(img, animal_name, (x, y), TextOptions.FONT.value, font_size, bp_colors[animal_cnt], TextOptions.TEXT_THICKNESS.value)
+                            img = PlottingMixin().put_text(img=img, text=animal_name, pos=(x, y), font_size=font_size, font=TextOptions.FONT.value, font_thickness=TextOptions.TEXT_THICKNESS.value, font_path=font_path, text_color=tuple(int(v) for v in bp_colors[animal_cnt]), text_bg_alpha=0.0)
                         if bbox is not None:
                             x_cols, y_cols = animal_bp_dict[animal_name]['X_bps'], animal_bp_dict[animal_name]['Y_bps']
                             animal_cols = [x for pair in zip(x_cols, y_cols) for x in pair]
@@ -126,8 +129,10 @@ def _roi_plotter_mp(data: Tuple[int, pd.DataFrame],
                     timer = round(data_df.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_time"], 2)
                     if print_timer == HHMMSSSSSS: timer = seconds_to_timestamp(seconds=timer, hh_mm_ss_sss=True)
                     entries = data_df.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_entries"]
-                    img = cv2.putText(img, str(timer), loc_dict[animal_name][shape_name]["timer_data_loc"], TextOptions.FONT.value, font_size, shape_color, TextOptions.TEXT_THICKNESS.value)
-                    img = cv2.putText(img, str(entries), loc_dict[animal_name][shape_name]["entries_data_loc"], TextOptions.FONT.value, font_size, shape_color, TextOptions.TEXT_THICKNESS.value)
+                    img = PlottingMixin().put_text(img=img, text=str(timer), pos=loc_dict[animal_name][shape_name]["timer_data_loc"], font_size=font_size, font=TextOptions.FONT.value, font_thickness=TextOptions.TEXT_THICKNESS.value, font_path=font_path, text_color=tuple(int(v) for v in shape_color), text_bg_alpha=0.0)
+                    img = PlottingMixin().put_text(img=img, text=str(entries), pos=loc_dict[animal_name][shape_name]["entries_data_loc"], font_size=font_size, font=TextOptions.FONT.value, font_thickness=TextOptions.TEXT_THICKNESS.value, font_path=font_path, text_color=tuple(int(v) for v in shape_color), text_bg_alpha=0.0)
+                    #img = cv2.putText(img, str(timer), loc_dict[animal_name][shape_name]["timer_data_loc"], TextOptions.FONT.value, font_size, shape_color, TextOptions.TEXT_THICKNESS.value)
+                    #img = cv2.putText(img, str(entries), loc_dict[animal_name][shape_name]["entries_data_loc"], TextOptions.FONT.value, font_size, shape_color, TextOptions.TEXT_THICKNESS.value)
 
             writer.write(img)
             current_frm += 1
@@ -141,7 +146,7 @@ def _roi_plotter_mp(data: Tuple[int, pd.DataFrame],
     writer.release()
     return group_cnt
 
-class ROIPlotMultiprocess(ConfigReader):
+class ROIPlotMultiprocess(ConfigReader, PlottingMixin):
     """
     Visualize the ROI data (number of entries/exits, time-spent in ROIs) using multiprocessing for improved performance.
 
@@ -207,6 +212,7 @@ class ROIPlotMultiprocess(ConfigReader):
                  verbose: bool = True,
                  outside_roi: bool = False,
                  show_body_part: bool = True,
+                 font: Optional[str] = None,
                  show_animal_name: bool = False,
                  bbox: Optional[Literal['axis-aligned', 'animal-aligned']] = None,
                  print_timer: Literal['seconds', 'hh:mm:ss.ssss'] = 'seconds',
@@ -230,6 +236,8 @@ class ROIPlotMultiprocess(ConfigReader):
         check_valid_boolean(value=show_body_part, source=f'{self.__class__.__name__} show_body_part', raise_error=True)
         check_valid_boolean(value=show_animal_name, source=f'{self.__class__.__name__} show_animal_name', raise_error=True)
         check_str(name=f'{self.__class__.__name__} timer', value=print_timer, options=(SECONDS, HHMMSSSSSS,))
+        self.font_path, self.font = None, None
+        if font is not None: self.font, self.font_path = get_simba_font_name_and_path(font=font)
         if bbox is not None:
             check_str(name=f'{self.__class__.__name__} bbox', value=bbox, options=Options.BBOX_OPTIONS.value, allow_blank=False, raise_error=True)
         if gpu and not check_nvidea_gpu_available():
@@ -314,12 +322,15 @@ class ROIPlotMultiprocess(ConfigReader):
                 self.data_df[col_name][self.data_df.index.isin(entry_dict["frame_range"])] = 1
 
     def __get_text_locs(self) -> dict:
-         loc_dict, txt_strs = {}, []
-         for animal_cnt, animal_name in enumerate(self.animal_names):
-             for shape in self.shape_names:
-                 txt_strs.append(animal_name + ' ' + shape + ' entries')
-         longest_text_str = max(txt_strs, key=len)
+         loc_dict = {}
+         label_strs = [f'{shape} {animal_name} timer:' for animal_name in self.animal_names for shape in self.shape_names] + [f'{shape} {animal_name} entries:' for animal_name in self.animal_names for shape in self.shape_names]
+         longest_text_str = max(label_strs, key=len)
          self.font_size, x_spacer, y_spacer = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=int(self.video_meta_data["width"] / 1.5), accepted_px_height=int(self.video_meta_data["height"] / 10), text_thickness=TextOptions.TEXT_THICKNESS.value)
+         if self.font_path is not None:
+             self.video_font_size_px, x_spacer, _ = PlottingMixin().get_optimal_font_size_ttf(text=label_strs, font_path=self.font_path, accepted_px_width=int(self.video_meta_data["width"] / 1.5), accepted_px_height=int(self.video_meta_data["height"] / 10))
+             self.default_space_size = self.get_optimal_font_spacing_ttf(font_path=self.font_path, size_px=self.video_font_size_px, text=label_strs, gap=0)
+         else:
+             self.video_font_size_px, default_space_size = None, y_spacer
          row_counter = TextOptions.FIRST_LINE_SPACING.value
          for animal_cnt, animal_name in enumerate(self.animal_names):
              loc_dict[animal_name] = {}
@@ -398,6 +409,8 @@ class ROIPlotMultiprocess(ConfigReader):
                                       input_video_path=self.video_path,
                                       roi_dfs_dict=self.sliced_roi_dict,
                                       roi_dict = self.roi_dict_,
+                                      font_path=self.font_path,
+                                      font_size_px=self.video_font_size_px,
                                       video_shape_names=self.shape_names,
                                       bp_colors=self.color_lst,
                                       print_timer=self.print_timer,
@@ -423,13 +436,15 @@ class ROIPlotMultiprocess(ConfigReader):
 
 
 # if __name__ == "__main__":
-#     test = ROIPlotMultiprocess(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
-#                                video_path=r"D:\troubleshooting\maplight_ri\project_folder\videos\Trial_10_C24_D1_1.mp4",
-#                                body_parts=['resident_NOSE'],
+#     test = ROIPlotMultiprocess(config_path=r"G:\projects\sleap_bp_order\by_order\project_folder\project_config.ini",
+#                                video_path=r"G:\projects\sleap_bp_order\by_order\project_folder\videos\rat_pilot.mp4",
+#                                body_parts=['nose'],
 #                                outside_roi=True,
 #                                gpu=True,
-#                                border_bg_clr=(255, 0, 0),
-#                                show_bbox=False)
+#                                font='poppins regular',
+#                                core_cnt=8,
+#                                border_bg_clr=(0, 0, 0),
+#                                bbox=None)
 #     test.run()
 
 # if __name__ == "__main__":

@@ -35,7 +35,7 @@ from simba.utils.data import (check_if_string_value_is_valid_video_timestamp,
 from simba.utils.enums import ConfigKey, Dtypes, Options, TagNames, TextOptions
 from simba.utils.errors import (InvalidInputError, NoDataError,
                                 NoSpecifiedOutputError)
-from simba.utils.lookups import get_named_simba_fonts
+from simba.utils.lookups import get_simba_font_name_and_path
 from simba.utils.printing import (SimbaTimer, log_event, stdout_information,
                                   stdout_success)
 from simba.utils.read_write import (concatenate_videos_in_folder,
@@ -84,9 +84,7 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                                 verbose:bool):
 
     fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_DUPLEX
-    #  When a TTF font_path is passed, put_text needs a PIXEL size (font_size_px); otherwise it uses the cv2 scale (font_size).
-    overlay_font_size = font_size_px if font_path is not None else font_size
-    #  make_gantt_plot (matplotlib) takes the bundled font NAME, which is the .ttf filename stem (e.g. 'Poppins Regular').
+    font_size = font_size_px if font_path is not None else font_size
     gantt_font = os.path.splitext(os.path.basename(font_path))[0] if font_path is not None else None
     video_meta_data = get_video_meta_data(video_path=video_path)
     if rotate:
@@ -116,12 +114,7 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                 if show_animal_names:
                     x_bp, y_bp, p_bp = (animal_data["X_bps"][0], animal_data["Y_bps"][0], animal_data["P_bps"][0])
                     bp_cords = data.loc[current_frm, [x_bp, y_bp, p_bp]]
-                    if font_path is not None:
-                        #  Render animal names in the custom TTF font too. text_bg_alpha=0 keeps the original box-free look (just the glyphs). pose_clr_lst entries are float lists, so coerce to an int RGB tuple for put_text's validation.
-                        name_clr = tuple(int(v) for v in pose_clr_lst[0])
-                        img = PlottingMixin().put_text(img=img, text=animal_name, pos=(int(bp_cords[x_bp]), int(bp_cords[y_bp])), font_size=overlay_font_size, font_path=font_path, text_color=name_clr, text_bg_alpha=0.0)
-                    else:
-                        img = cv2.putText(img, animal_name, (int(bp_cords[x_bp]), int(bp_cords[y_bp])), font, font_size, pose_clr_lst[0],  text_thickness)
+                    img = PlottingMixin().put_text(img=img, text=animal_name, pos=(int(bp_cords[x_bp]), int(bp_cords[y_bp])), font_size=font_size, font=font, font_thickness=text_thickness, font_path=font_path, text_color=tuple(int(v) for v in pose_clr_lst[0]), text_bg_alpha=0.0)
                 if bbox is not None:
                     animal_headers = [val for pair in zip(animal_data["X_bps"], animal_data["Y_bps"]) for val in pair]
                     animal_cords = data.loc[current_frm, animal_headers].values.reshape(-1, 2).astype(np.int32)
@@ -156,7 +149,7 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                                                        palette=gantt_clrs)
                 img = np.concatenate((img, gantt_plot), axis=1)
             if timer is not None:
-                img = PlottingMixin().put_text(img=img, text="TIMERS:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((video_meta_data["height"] - video_meta_data["height"]) + space_size)), font_size=overlay_font_size, font_path=font_path, font_thickness=text_thickness, font=font, text_bg_alpha=text_opacity, text_color_bg=text_bg_clr, text_color=text_color)
+                img = PlottingMixin().put_text(img=img, text="TIMERS:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((video_meta_data["height"] - video_meta_data["height"]) + space_size)), font_size=font_size, font_path=font_path, font_thickness=text_thickness, font=font, text_bg_alpha=text_opacity, text_color_bg=text_bg_clr, text_color=text_color)
             add_spacer = 2
             for clf_name, clf_time_df in clf_cumsum.items():
                 frame_results = clf_time_df.loc[current_frm]
@@ -164,19 +157,19 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                 if timer is not None:
                     if timer == HHMMSSSSSS:
                         clf_time = seconds_to_timestamp(seconds=clf_time, hh_mm_ss_sss=True)
-                    img = PlottingMixin().put_text(img=img, text=f"{clf_name} {clf_time}",pos=(TextOptions.BORDER_BUFFER_Y.value, ((video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer)), font_size=overlay_font_size, font_path=font_path, font_thickness=text_thickness, font=font, text_bg_alpha=text_opacity, text_color_bg=text_bg_clr, text_color=text_color)
+                    img = PlottingMixin().put_text(img=img, text=f"{clf_name} {clf_time}",pos=(TextOptions.BORDER_BUFFER_Y.value, ((video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer)), font_size=font_size, font_path=font_path, font_thickness=text_thickness, font=font, text_bg_alpha=text_opacity, text_color_bg=text_bg_clr, text_color=text_color)
                     add_spacer += 1
                 if clf_confidence is not None:
                     conf = round(clf_confidence[clf_name][current_frm], 4)
                     frm_clf_conf_txt = f'{clf_name} CONFIDENCE: {conf:.4f}'
-                    img = PlottingMixin().put_text(img=img, text=frm_clf_conf_txt,pos=(TextOptions.BORDER_BUFFER_Y.value, ((video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer)), font_size=overlay_font_size, font_path=font_path, font_thickness=text_thickness, font=font, text_bg_alpha=text_opacity, text_color_bg=text_bg_clr, text_color=text_color)
+                    img = PlottingMixin().put_text(img=img, text=frm_clf_conf_txt,pos=(TextOptions.BORDER_BUFFER_Y.value, ((video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer)), font_size=font_size, font_path=font_path, font_thickness=text_thickness, font=font, text_bg_alpha=text_opacity, text_color_bg=text_bg_clr, text_color=text_color)
                     add_spacer += 1
 
-            img = PlottingMixin().put_text(img=img, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer)), font_size=overlay_font_size, font_path=font_path, font_thickness=text_thickness, font=font, text_bg_alpha=text_opacity, text_color_bg=text_bg_clr, text_color=text_color)
+            img = PlottingMixin().put_text(img=img, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer)), font_size=font_size, font_path=font_path, font_thickness=text_thickness, font=font, text_bg_alpha=text_opacity, text_color_bg=text_bg_clr, text_color=text_color)
             add_spacer += 1
             for clf_name in clf_cumsum.keys():
                 if data.loc[current_frm, clf_name] == 1:
-                    img = PlottingMixin().put_text(img=img, text=clf_name, pos=(TextOptions.BORDER_BUFFER_Y.value, (video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer), font_size=overlay_font_size, font_path=font_path, font_thickness=text_thickness, font=font, text_color=TextOptions.FLAMINGO.value, text_bg_alpha=text_opacity)
+                    img = PlottingMixin().put_text(img=img, text=clf_name, pos=(TextOptions.BORDER_BUFFER_Y.value, (video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer), font_size=font_size, font_path=font_path, font_thickness=text_thickness, font=font, text_color=TextOptions.FLAMINGO.value, text_bg_alpha=text_opacity)
                     add_spacer += 1
             if video_setting:
                 video_writer.write(img.astype(np.uint8))
@@ -312,13 +305,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         if font_size is not None: check_float(name=f'{self.__class__.__name__} font_size', value=font_size, min_value=0.1)
         self.font_path, self.font = None, None
         if font is not None:
-            check_str(name=f'{self.__class__.__name__} font', value=font)
-            simba_fonts = get_named_simba_fonts()
-            fonts_lower = {k.lower(): k for k in simba_fonts.keys()}  # lower-case -> canonical name
-            if font.lower() not in fonts_lower:
-                check_str(name=f'{self.__class__.__name__} font', value=font, options=tuple(simba_fonts.keys()))
-            self.font = fonts_lower[font.lower()]      # canonical font name (correct case) for matplotlib/make_gantt_plot
-            self.font_path = simba_fonts[self.font]    # absolute .ttf path for put_text
+            self.font, self.font_path = get_simba_font_name_and_path(font=font)
         if space_size is not None: check_float(name=f'{self.__class__.__name__} space_size', value=space_size, min_value=0.1)
         if text_thickness is not None: check_float(name=f'{self.__class__.__name__} text_thickness', value=text_thickness, min_value=0.1)
         if circle_size is not None: check_float(name=f'{self.__class__.__name__} text_thickness', value=circle_size, min_value=0.1)
@@ -406,15 +393,11 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         optimal_font_size, _, optimal_spacing_scale = self.get_optimal_font_scales(text=longest_str, accepted_px_width=int(self.video_meta_data["width"] / 2.5), accepted_px_height=int(self.video_meta_data["height"] / 5), text_thickness=self.video_text_thickness)
         self.video_circle_size = optimal_circle_size if self.circle_size is None else int(max(1, self.circle_size))
         self.video_font_size = optimal_font_size if self.font_size is None else self.font_size
-        #  When a TTF font is set, the timer/prediction overlays are rendered with PIL and need a PIXEL size (computed from the same resolution budget as the cv2 scale above). self.font_size still controls the cv2 scale (animal names).
         if self.font_path is not None:
             self.video_font_size_px, _, _ = self.get_optimal_font_size_ttf(text=longest_str, font_path=self.font_path, accepted_px_width=int(self.video_meta_data["width"] / 2.5), accepted_px_height=int(self.video_meta_data["height"] / 5))
-            #  Line spacing must follow the TTF rendered box height of the ACTUAL stacked strings, NOT the cv2 metric and NOT a worst-case probe. Measuring the real labels keeps caps-only stacks tight while accommodating descenders when a label has them.
-            stacked_strings = ['TIMERS:', 'ENSEMBLE PREDICTION:'] + list(self.clf_names) + [f'{c} CONFIDENCE: 0.0000' for c in self.clf_names]
-            default_space_size = self.get_optimal_font_spacing_ttf(font_path=self.font_path, size_px=self.video_font_size_px, text=stacked_strings, gap=0)
+            default_space_size = self.get_optimal_font_spacing_ttf(font_path=self.font_path, size_px=self.video_font_size_px, text=['TIMERS:', 'ENSEMBLE PREDICTION:'] + list(self.clf_names) + [f'{c} CONFIDENCE: 0.0000' for c in self.clf_names], gap=0)
         else:
-            self.video_font_size_px = None
-            default_space_size = optimal_spacing_scale
+            self.video_font_size_px, default_space_size = None, optimal_spacing_scale
         self.video_space_size = default_space_size if self.space_size is None else int(max(self.space_size, 1))
         self.video_text_opacity = 0.8 if self.text_opacity is None else float(self.text_opacity)
 
@@ -533,27 +516,27 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             stdout_success(f"Frames for {len(self.video_paths)} videos saved in sub-folders within {self.save_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
-if __name__ == "__main__":
-    clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"H:\projects\jason_zhang\jason_project\project_folder\project_config.ini",
-                                                 video_paths=r"H:\projects\jason_zhang\jason_project\project_folder\videos",
-                                                 data_dir=r"H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING",
-                                                 save_dir=r'H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING\videos',
-                                                 clf_names=('GROOMING',),
-                                                 video_setting=True,
-                                                 frame_setting=False,
-                                                 rotate=False,
-                                                 show_confidence=True,
-                                                 core_cnt=14,
-                                                 show_pose=True,
-                                                 animal_names=False,
-                                                 font='DynaPuff',
-                                                 print_timer=HHMMSSSSSS,
-                                                 overwrite=False,
-                                                 time_slice=None, # {START_TIME: '00:00:00', END_TIME: '00:00:10'}, #{START_TIME: '00:00:00', END_TIME: '00:01:00'}, #,{START_TIME: '00:00:00', END_TIME: '00:01:00'}
-                                                 bbox=None, #'animal-aligned'
-                                                 text_opacity=0.6,
-                                                 show_gantt=2)
-    clf_plotter.run()
+# if __name__ == "__main__":
+#     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"H:\projects\jason_zhang\jason_project\project_folder\project_config.ini",
+#                                                  video_paths=r"H:\projects\jason_zhang\jason_project\project_folder\videos",
+#                                                  data_dir=r"H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING",
+#                                                  save_dir=r'H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING\videos',
+#                                                  clf_names=('GROOMING',),
+#                                                  video_setting=True,
+#                                                  frame_setting=False,
+#                                                  rotate=False,
+#                                                  show_confidence=True,
+#                                                  core_cnt=14,
+#                                                  show_pose=True,
+#                                                  animal_names=False,
+#                                                  font='DynaPuff',
+#                                                  print_timer=HHMMSSSSSS,
+#                                                  overwrite=False,
+#                                                  time_slice=None, # {START_TIME: '00:00:00', END_TIME: '00:00:10'}, #{START_TIME: '00:00:00', END_TIME: '00:01:00'}, #,{START_TIME: '00:00:00', END_TIME: '00:01:00'}
+#                                                  bbox=None, #'animal-aligned'
+#                                                  text_opacity=0.6,
+#                                                  show_gantt=2)
+#     clf_plotter.run()
 
 
 # if __name__ == "__main__":
