@@ -33,9 +33,9 @@ from simba.utils.data import (check_if_string_value_is_valid_video_timestamp,
                               find_frame_numbers_from_time_stamp, get_cpu_pool,
                               terminate_cpu_pool)
 from simba.utils.enums import ConfigKey, Dtypes, Options, TagNames, TextOptions
-from simba.utils.lookups import get_named_simba_fonts
 from simba.utils.errors import (InvalidInputError, NoDataError,
                                 NoSpecifiedOutputError)
+from simba.utils.lookups import get_named_simba_fonts
 from simba.utils.printing import (SimbaTimer, log_event, stdout_information,
                                   stdout_success)
 from simba.utils.read_write import (concatenate_videos_in_folder,

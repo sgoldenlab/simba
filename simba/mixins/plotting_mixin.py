@@ -3,9 +3,9 @@ import io
 import os
 import shutil
 from copy import copy
-from typing import Any, Dict, List, Optional, Tuple, Union
-from PIL import Image, ImageDraw, ImageFont
 from functools import lru_cache
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 import cv2
 import imutils
 import matplotlib
@@ -22,6 +22,7 @@ from matplotlib.collections import LineCollection
 from matplotlib.figure import Figure
 from matplotlib.ticker import FuncFormatter, MaxNLocator
 from numba import bool_, njit, uint8
+from PIL import Image, ImageDraw, ImageFont
 
 try:
     from typing import Literal
