@@ -120,14 +120,45 @@ autodoc_mock_imports = ['torch', 'ultralytics', 'cupy']
 autodoc_typehints = 'none'
 
 
-def setup(app):
-    """Copy the docs/images/ tree verbatim into <outdir>/images/ after an HTML build.
+# GitHub-style alerts (> [!NOTE], > [!WARNING], ...) are used throughout the
+# Markdown tutorials. MyST 0.16.1 is too old to understand them (support landed in
+# myst-parser 4.x, which needs a newer Python than the docs build pins), so it
+# renders them as plain blockquotes with a literal "[!NOTE]" leaking through. This
+# transform rewrites those blockquotes into proper admonition nodes at parse time,
+# keeping the .md GitHub-native while rendering styled admonitions in Sphinx.
+import re as _re
+_GH_ALERT_RE = _re.compile(r'^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*', _re.I)
 
-    Markdown tutorials embed media as raw ``<img>`` / ``<video src="images/...">``
-    tags, which Sphinx does not track or copy. ``html_extra_path`` can't be used here
-    because it copies a directory's *contents* to the output root (flattening the
-    ``images/`` prefix the tags rely on). Copying explicitly preserves the structure
-    and works identically on Read the Docs.
+
+def _convert_github_alerts(app, doctree):
+    from docutils import nodes
+    kinds = {'note': nodes.note, 'tip': nodes.tip, 'important': nodes.important,
+             'warning': nodes.warning, 'caution': nodes.caution}
+    for bq in list(doctree.findall(nodes.block_quote)):
+        if not bq.children or not isinstance(bq.children[0], nodes.paragraph):
+            continue
+        para = bq.children[0]
+        m = _GH_ALERT_RE.match(para.astext())
+        if not m:
+            continue
+        # strip the leading "[!TYPE]" marker from the first text node of the paragraph
+        if para.children and isinstance(para.children[0], nodes.Text):
+            stripped = _GH_ALERT_RE.sub('', para.children[0].astext(), count=1)
+            para.replace(para.children[0], nodes.Text(stripped))
+        admonition = kinds[m.group(1).lower()]()
+        admonition += bq.children
+        bq.replace_self(admonition)
+
+
+def setup(app):
+    """Build-time hooks for the Markdown tutorials.
+
+    1. Copy the docs/images/ tree verbatim into <outdir>/images/ after an HTML build.
+       Markdown tutorials embed media as raw ``<img>`` / ``<video src="images/...">``
+       tags, which Sphinx does not track. ``html_extra_path`` can't be used because it
+       copies a directory's *contents* to the output root (flattening the ``images/``
+       prefix the tags rely on). Copying explicitly preserves the structure.
+    2. Convert GitHub-style alerts to admonitions (see ``_convert_github_alerts``).
     """
     from sphinx.util.fileutil import copy_asset
 
@@ -138,3 +169,4 @@ def setup(app):
                 copy_asset(src, os.path.join(app.outdir, 'images'))
 
     app.connect('build-finished', _copy_images)
+    app.connect('doctree-read', _convert_github_alerts)
