@@ -1,7 +1,5 @@
 # 🎯 Scenario 4: Adding New Experimental Data to a Previously Started Project
 
----
-
 > **Tooltips:** Many menu items and dialog options in SimBA have **tooltips**. Hover over a label or control to see a short description.
 
 ---
@@ -164,11 +162,11 @@ When you have many predictions, you may want to review them in short clips that 
 
 
 <p align="center">
-  <video src="images/scenario4/classifiervalidation.mp4" width="600" controls>Your browser does not support the video tag.</video>
+  <video src="images/scenario4/classifiervalidation.webm" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
 <p align="center">
-  <video src="images/scenario4/ClassifierValidationClips_1.mp4" width="600" controls>Your browser does not support the video tag.</video>
+  <video src="images/scenario4/ClassifierValidationClips_1.webm" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
 ---

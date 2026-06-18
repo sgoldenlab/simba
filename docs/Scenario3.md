@@ -1,7 +1,5 @@
 # 🎯 Scenario 3: Updating a Classifier with Further Annotated Data
 
----
-
 > **Tooltips:** Many menu items and dialog options in SimBA have **tooltips**. Hover over a label or control to see a short description.
 
 ---

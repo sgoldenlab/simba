@@ -56,7 +56,7 @@ pygments_style = 'sphinx'
 # every other root-level .md stays excluded. Add to this set as each tutorial is
 # migrated from tutorials_rst/*.rst.
 import glob as _glob
-MIGRATED_MD = {'Scenario1.md'}
+MIGRATED_MD = {'Scenario1.md', 'Scenario2.md', 'Scenario3.md', 'Scenario4.md'}
 _unmigrated_md = [f for f in _glob.glob('*.md') if f not in MIGRATED_MD]
 
 exclude_patterns = [
@@ -77,6 +77,9 @@ html_static_path = ['_static']
 # links (and search-engine results) keep working.  Target is relative to the old page.
 redirects = {
     "tutorials_rst/scenario_1": "../Scenario1.html",
+    "tutorials_rst/scenario_2": "../Scenario2.html",
+    "tutorials_rst/scenario_3": "../Scenario3.html",
+    "tutorials_rst/scenario_4": "../Scenario4.html",
 }
 html_css_files = ['css/simba_theme.css',  # Include your existing CSS file
                   'custom.css']  # Include your additional CSS file

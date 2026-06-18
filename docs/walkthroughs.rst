@@ -7,6 +7,6 @@ For up-to-date and additional walkthroughs, see markdown content on the `SimBA G
    :maxdepth: 3
 
    Scenario1
-   tutorials_rst/scenario_2
-   tutorials_rst/scenario_3
-   tutorials_rst/scenario_4
+   Scenario2
+   Scenario3
+   Scenario4

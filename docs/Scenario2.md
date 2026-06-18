@@ -1,7 +1,5 @@
 # 🎯 Scenario 2: Run a Classifier on New Experimental Data
 
----
-
 > **Tooltips:** Many menu items and dialog options in SimBA have **tooltips**. Hover over a label or control to see a short description.
 
 ---
@@ -473,9 +471,13 @@ The **Visualize classifications** dialog offers the following options:
 
 **Where output is saved:** Videos and frames are saved to the `project_folder/frames/output/sklearn_results/` directory.
 
-[sklearn_visualization.webm](https://github.com/user-attachments/assets/50094bd3-051a-432c-8f97-06aad53d18f0)
+<p align="center">
+  <video src="images/scenario2/sklearn_visualization.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[sklearn_visualization_2.webm](https://github.com/user-attachments/assets/63acd686-7c56-4552-8850-3051f10d530b)
+<p align="center">
+  <video src="images/scenario2/sklearn_visualization_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ![animal_vs_axis_aligned](https://github.com/user-attachments/assets/e961484f-1da4-4c50-bc67-87079e339553)
 
@@ -660,7 +662,9 @@ Path plots show where each animal moved over time (trajectory lines) and, option
   <img src="images/scenario2/path_plot_5.webp" width="600" alt="Path plot example 5">
 </p>
 
-[path_plot_2.webm](https://github.com/user-attachments/assets/0aee884a-8548-450e-a6b1-e41502eb8ca6)
+<p align="center">
+  <video src="images/scenario2/path_plot_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 
