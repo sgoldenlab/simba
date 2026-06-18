@@ -1,9 +1,10 @@
 # Friendly Asked Questions (FAQ)
 
-## Please search the [SimBA issues tracker](https://github.com/sgoldenlab/simba/issues), or search the [Gitter chat channel](https://gitter.im/SimBA-Resource/community) for more questions and answers. If that does not help, reach out to us by posting a new issue or write to us on Gitter.  
+> [!TIP]
+> Please search the [SimBA issues tracker](https://github.com/sgoldenlab/simba/issues), or search the [Gitter chat channel](https://gitter.im/SimBA-Resource/community) for more questions and answers. If that does not help, reach out to us by posting a new issue or write to us on Gitter.
 
 
-###  1. I get 'TypeError: cannot convert the series to <class 'int'>' or 'TypeError: cannot convert the series to <class 'float'>' when trying to extract features, generate movies/frames, or when extracting outliers
+##  1. I get 'TypeError: cannot convert the series to <class 'int'>' or 'TypeError: cannot convert the series to <class 'float'>' when trying to extract features, generate movies/frames, or when extracting outliers
 <details>
   <summary>Show solutions!</summary>
 <br/><br/>
@@ -11,7 +12,7 @@ This error typilcally comes up when SimBA can't find the resolution and/or pixel
   
 </details>
 
-### 2. When I click on a video to set its parameters (i.e., "pixel per millimeter"), or try to open a video to dray ROI regions I get an OpenCV, I get an error report with something like "cv2.Error. The function is not implemented. Rebuild the library with Windows..."
+## 2. When I click on a video to set its parameters (i.e., "pixel per millimeter"), or try to open a video to dray ROI regions I get an OpenCV, I get an error report with something like "cv2.Error. The function is not implemented. Rebuild the library with Windows..."
 
 <details>
   <summary>Show solutions!</summary>
@@ -30,7 +31,7 @@ Then launch SimBA by typing `SimBA`, and see if that fixes the issue.
   
 </details>
 
-### 3. I get a `QHull` (e..g., QH6154 or 6013) error when extracting the features
+## 3. I get a `QHull` (e..g., QH6154 or 6013) error when extracting the features
 
 <details>
   <summary>Show solutions!</summary>
@@ -47,7 +48,7 @@ However, in some use-cases, it is not possible to keep the animal(s) in the fram
 
 </details>
 
-### 4. The frames folder is empty after clicking to extract frames, or my videos have not been generated appropriately
+## 4. The frames folder is empty after clicking to extract frames, or my videos have not been generated appropriately
 
 <details>
   <summary>Show solutions!</summary>
@@ -59,7 +60,7 @@ However, in some use-cases, it is not possible to keep the animal(s) in the fram
   
 </details>
 
-### 5. SimBA won't launch - there's an error with some complaint about Shapely
+## 5. SimBA won't launch - there's an error with some complaint about Shapely
 
 <details>
   <summary>Show solutions!</summary>
@@ -76,7 +77,7 @@ https://github.com/sgoldenlab/simba/issues/70#issuecomment-703180294
 </details>
 
 
-### 6. SimBA won't start, and there is GPU related errors, such as "ImportError: Could not find 'cudart64_100.dll'.
+## 6. SimBA won't start, and there is GPU related errors, such as "ImportError: Could not find 'cudart64_100.dll'.
 
 <details>
   <summary>Show solutions!</summary>
@@ -96,7 +97,7 @@ If you are running SimBA on a computer fitted with a never RTX 3080TI/ 3070 GPU,
 </details>
 
 
-### 7. I get an error when launching the ROI interface - it is complaining about `ValueError: cannot set WRITEABLE flag to True of this array`. It may also have seen `Missing optional dependency 'tables`. 
+## 7. I get an error when launching the ROI interface - it is complaining about `ValueError: cannot set WRITEABLE flag to True of this array`. It may also have seen `Missing optional dependency 'tables`.
 
 <details>
   <summary>Show solutions!</summary>
@@ -112,7 +113,7 @@ Make sure you are running a later version of pytables(>= version 3.51). Also mak
   
 </details>
 
-### 8. My videos are very long and can be a pain to annotate in the SimBA annotation GUI, can I skip annotating some frames and still build an accurate classification model based on annotated/not-annotated frames?
+## 8. My videos are very long and can be a pain to annotate in the SimBA annotation GUI, can I skip annotating some frames and still build an accurate classification model based on annotated/not-annotated frames?
 
 <details>
   <summary>Show solutions!</summary>
@@ -126,7 +127,7 @@ However, if the second part of your video **does** contain examples of your beha
 
 </details>
   
-### 9. When I try to execute some process in SimBA (e.g., feature extraction, or generate frames or videos etc), I get a TypeError that may look somthing like this:
+## 9. When I try to execute some process in SimBA (e.g., feature extraction, or generate frames or videos etc), I get a TypeError that may look somthing like this:
 ```
 TypeError("cannot convert the series to " "{0}".format(str(converter)))
 TypeError: cannot convert the series to <class 'float'>
@@ -146,7 +147,7 @@ When you execute your process (e.g., Feature extraction), SimBA looks in the fol
 </details>
   
   
-### 10. When I install or update SimBA, I see a bunch or messages in the console, in red text, telling me some error has happened, similar or the same as this:
+## 10. When I install or update SimBA, I see a bunch or messages in the console, in red text, telling me some error has happened, similar or the same as this:
 ```diff
 - ERROR: imbalanced-learn 0.7.0 has requirement scikit-learn>=0.23, but you'll have scikit-learn 0.22.2 which is incompatible.
 - ERROR: deeplabcut 2.0.9 has requirement numpy~=1.14.5, but you'll have numpy 1.18.1 which is incompatible.
@@ -160,7 +161,7 @@ These are warnings, and are not fatal. You should be able to ignore them - go ah
 </details>
 
 
-### 11. When I install or update SimBA, I see a bunch or messages in the console, telling there me about some `dependency conflicts`. The messages may look a little like this:
+## 11. When I install or update SimBA, I see a bunch or messages in the console, telling there me about some `dependency conflicts`. The messages may look a little like this:
 
 <details>
   <summary>Show solutions!</summary>
@@ -184,7 +185,7 @@ here: https://github.com/sgoldenlab/simba/blob/master/docs/installation.md#pytho
   
 </details>
 
-### 12. When run my [classifier on new videos](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data), or trying to to [validate my classifier on a single video](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#optional-step-before-running-machine-model-on-new-data) my predictions seem to be generated, but then I get either an IndexError: `Index 1 is out of bounds for axis 1 of size 1`, or an error msg telling me that my classifier hasn't been generated properly:
+## 12. When run my [classifier on new videos](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data), or trying to to [validate my classifier on a single video](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#optional-step-before-running-machine-model-on-new-data) my predictions seem to be generated, but then I get either an IndexError: `Index 1 is out of bounds for axis 1 of size 1`, or an error msg telling me that my classifier hasn't been generated properly:
 
 <details>
   <summary>Show solutions!</summary>
@@ -196,7 +197,7 @@ This could happen if you did not provide the classifier with examples for **both
 
 </details>
 
-### 13. When I try to correct outliers, I get an error about the wrong number of columns, for example: `Value error: Length mismatch: Expected axis has 16 elements, new values have 24`. 
+## 13. When I try to correct outliers, I get an error about the wrong number of columns, for example: `Value error: Length mismatch: Expected axis has 16 elements, new values have 24`.
 
 <details>
   <summary>Show solutions!</summary>
@@ -208,7 +209,7 @@ If the files you are importing has a name akin to `CollectedData_MyName.csv` you
   
 </details>
 
-### 14. When I try to to run my classifier on new videos, I get an error message telling me about a *mismatch* error - something along the lines of: `Mismatch in the number of features in input file and what is expected from the model in file...`
+## 14. When I try to to run my classifier on new videos, I get an error message telling me about a *mismatch* error - something along the lines of: `Mismatch in the number of features in input file and what is expected from the model in file...`
 
 <details>
   <summary>Show solutions!</summary>
@@ -224,7 +225,7 @@ For example, when you created the model, SimBA grabbed the files inside your `pr
 
 </details>
   
-### 15. After a Microsoft Windows 10 update, I get a GPU CUDA/cudnn error - it was working before the update and now it is complaining about about `.cv2 DLL`
+## 15. After a Microsoft Windows 10 update, I get a GPU CUDA/cudnn error - it was working before the update and now it is complaining about about `.cv2 DLL`
 
 <details>
   <summary>Show solutions!</summary>
@@ -234,7 +235,7 @@ In Windows, try an go to Settings > Apps > Manage Optional Features > Add a Feat
   
 </details>
 
-### 16. I get en error message, complaining that something like `Could not find a version that satisfies the requirement tensorflow-gpu==1.14.0. No Matching distribution found for tensorflow==1.14.0.`
+## 16. I get en error message, complaining that something like `Could not find a version that satisfies the requirement tensorflow-gpu==1.14.0. No Matching distribution found for tensorflow==1.14.0.`
 
 <details>
   <summary>Show solutions!</summary>
@@ -245,7 +246,7 @@ You may be running the wrong version of python. You want to be running Python 64
   
 </details>
 
-### 17. I get an error when I try to import multi-animal data (H5 files) from DeepLabCut into SimBA - the error says that SimBA cannot locate my video files. 
+## 17. I get an error when I try to import multi-animal data (H5 files) from DeepLabCut into SimBA - the error says that SimBA cannot locate my video files.
 
 <details>
   <summary>Show solutions!</summary>
@@ -269,7 +270,7 @@ To find the correct video name, SimBA tries to split each filename into two at a
 
 </details>
 
-### 18. I'm trying to lunch SimBA on a Mac, and I get an `ImportError` reading `ImportError: Python is not installed as a framework. The Mac OS X backend will not be able to function correctly if Python is not installed as a framework...`. Or, while trying to launch SimBA on my Mac, I get an error reading `_tkinter.TclError: expected boolean value but got ""`. 
+## 18. I'm trying to lunch SimBA on a Mac, and I get an `ImportError` reading `ImportError: Python is not installed as a framework. The Mac OS X backend will not be able to function correctly if Python is not installed as a framework...`. Or, while trying to launch SimBA on my Mac, I get an error reading `_tkinter.TclError: expected boolean value but got ""`.
 
 <details>
   <summary>Show solutions!</summary>
@@ -279,7 +280,7 @@ This error is caused by running the wrong version of Python. You want to make su
   
 </details>
 
-### 19. I have installed SimBA on MacOS. When I try to launch SimBA by typing `simba`, I get an error saying:  ```ImportError: Python is not installed as a framework. The Mac OS X backend will not be able to function correctly if Python is not installed as a framework. See the Python documentation for more information on installing Python as a framework on Mac OS X. Please either reinstall Python as a framework, or try one of the other backends. If you are using (Ana)Conda please install python.app and replace the use of 'python' with 'pythonw'. See 'Working with Matplotlib on OSX' in the Matplotlib FAQ for more information.```
+## 19. I have installed SimBA on MacOS. When I try to launch SimBA by typing `simba`, I get an error saying:  ```ImportError: Python is not installed as a framework. The Mac OS X backend will not be able to function correctly if Python is not installed as a framework. See the Python documentation for more information on installing Python as a framework on Mac OS X. Please either reinstall Python as a framework, or try one of the other backends. If you are using (Ana)Conda please install python.app and replace the use of 'python' with 'pythonw'. See 'Working with Matplotlib on OSX' in the Matplotlib FAQ for more information.```
 
 
 <details>
@@ -297,7 +298,7 @@ In your conda environment:
 </details>
 
 
-### 20. I have installed SimBA on MacOS. When I try to launch SimBA by typing `simba`, I get a long error message, which ends with: ```libc++abi.dylib: terminating with uncaught exception of type NSException Abort trap: 6```
+## 20. I have installed SimBA on MacOS. When I try to launch SimBA by typing `simba`, I get a long error message, which ends with: ```libc++abi.dylib: terminating with uncaught exception of type NSException Abort trap: 6```
 
 
 <details>
@@ -318,7 +319,7 @@ For more information, see this [GitHub issue](https://github.com/sgoldenlab/simb
 
 </details>
 
-### 21. I am trying to install SimBA on a machine with Linux, and I get an error ```OSError: Could not find library geos_c or load any of its variants ['libgeos_c.so.1', 'libgeos_c.so’]```. I may also get an additional error complaining about `opencv-python` 
+## 21. I am trying to install SimBA on a machine with Linux, and I get an error ```OSError: Could not find library geos_c or load any of its variants ['libgeos_c.so.1', 'libgeos_c.so’]```. I may also get an additional error complaining about `opencv-python`
 
 <details>
   <summary>Show solutions!</summary>
@@ -332,7 +333,7 @@ This error is produced when SimBA is trying to install the packages `shapeley` a
 
 </details>
 
-### 22. I am trying to launch SimBA by typing `simba`, and I get a long error message that ends with `ImportError: cannot import name 'available_if'`
+## 22. I am trying to launch SimBA by typing `simba`, and I get a long error message that ends with `ImportError: cannot import name 'available_if'`
 <details>
   <summary>Show solutions!</summary>
 <br/><br/>
@@ -348,7 +349,7 @@ This error is produced when SimBA is installed with the wrong version of `pip`. 
 </details>
 
 
-### 23. When installing shapely with "conda install -c conda-forge shapely" I see the error msg "CondaSSLError: OpenSSL appears to be unavailable on this machine. OpenSSL is required to download and install packages." 
+## 23. When installing shapely with "conda install -c conda-forge shapely" I see the error msg "CondaSSLError: OpenSSL appears to be unavailable on this machine. OpenSSL is required to download and install packages."
 
 <details>
   <summary>Show solutions!</summary>
@@ -358,7 +359,7 @@ Try to install `shapely` with "pip install shapely` or `conda install shapely` r
   
 </details>
 
-### 24. When building and evaluating a behavior classification model, I had no issues! However, now, when I am analyzing new data I hit an error complaining about feature number mismatch: e.g., `FEATURE NUMBER ERROR: Mismatch in the number of features in input file and what is expected from the model in file MyVideo and model 0 ('Number of features of the model must match the input. Model n_features is 750 and input n_features is 621 ',)
+## 24. When building and evaluating a behavior classification model, I had no issues! However, now, when I am analyzing new data I hit an error complaining about feature number mismatch: e.g., `FEATURE NUMBER ERROR: Mismatch in the number of features in input file and what is expected from the model in file MyVideo and model 0 ('Number of features of the model must match the input. Model n_features is 750 and input n_features is 621 ',)
 
 <details>
   <summary>Show solutions!</summary>
@@ -372,7 +373,7 @@ If your classifiers performs well, and you don't want to update them, I would st
   
 </details>
 
-### 25. My pose-estimation tracking looks good when I visualize it in the pose-estimation tool. However, after I import it into SimBA, it doesn’t look good anymore, why??
+## 25. My pose-estimation tracking looks good when I visualize it in the pose-estimation tool. However, after I import it into SimBA, it doesn’t look good anymore, why??
 
 <details>
   <summary>Show solutions!</summary>
@@ -394,7 +395,7 @@ Some pose-estimation tools, like DeepLabCut also has a filtering method, which c
 
 </details>
 
-### 26. When I try to install SimBA I get an error about scikit learn missing '_OneToOneFeatureMixin' e.g., end of error message may read: ``from sklearn.base import _OneToOneFeatureMixin as OneToOneFeatureMixin ImportError: cannot import name '_OneToOneFeatureMixin'``
+## 26. When I try to install SimBA I get an error about scikit learn missing '_OneToOneFeatureMixin' e.g., end of error message may read: ``from sklearn.base import _OneToOneFeatureMixin as OneToOneFeatureMixin ImportError: cannot import name '_OneToOneFeatureMixin'``
 
 <details>
   <summary>Show solutions!</summary>
@@ -411,7 +412,7 @@ Then try to relaunch simba by typing `simba`.
 
 </details>
 
-### 27. I'm on Linux, and when I install SimBA I get a complaint error while installing the SHAP library, complaining about ``gcc`` and exit code 1
+## 27. I'm on Linux, and when I install SimBA I get a complaint error while installing the SHAP library, complaining about ``gcc`` and exit code 1
 
 <details>
   <summary>Show solutions!</summary>
@@ -427,7 +428,7 @@ Then try to relaunch simba by typing `simba`.
 
 </details>
 
-### 28. I'm on a mac M2 computer and SimBA won't install properly!
+## 28. I'm on a mac M2 computer and SimBA won't install properly!
 
 <details>
   <summary>Show solutions!</summary>
