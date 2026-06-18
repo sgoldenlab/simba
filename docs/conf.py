@@ -76,6 +76,14 @@ exclude_patterns = [
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'sphinx_rtd_theme'
+# The long Markdown tutorials have many emoji-prefixed Step headings; with the RTD
+# defaults the sidebar expanded every one into a deep, hard-to-read wall. Constrain
+# it: show the page + its top-level sections only, with [+] expanders for the rest.
+html_theme_options = {
+    'navigation_depth': 3,         # page + top-level sections (Parts), not every Step
+    'collapse_navigation': True,   # RTD default: only the current path expands
+    'sticky_navigation': True,
+}
 html_static_path = ['_static']
 
 # Markdown tutorials are published at the repo-root depth their relative paths assume
