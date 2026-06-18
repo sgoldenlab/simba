@@ -21,4 +21,6 @@ dependencies:
       - umap-learn==0.5.2
       - pyvis==0.3.2
       - sphinxcontrib-youtube==1.3.0
+      - myst-parser==0.16.1
+      - sphinx-reredirects==0.1.4
 prefix: /Users/simon/.conda/envs/simba_dev

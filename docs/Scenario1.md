@@ -1,7 +1,5 @@
 # 🎯 Scenario 1: From Scratch — Train a Behavioral Classifier
 
----
-
 > **Tooltips:** Many menu items and dialog options in SimBA have **tooltips**. Hover over a label or control to see a short description.
 
 ---
@@ -151,9 +149,13 @@ SimBA needs the pose-estimation data (x,y coordinates of body parts) produced by
   <img src="images/scenario1/smoothing.png" width="600">
 </p>
 
-[smoothing.webm](https://github.com/user-attachments/assets/17afddde-2869-4dbe-99b5-dd3880d8387b)
+<p align="center">
+  <video src="images/scenario1/smoothing.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[wmoothing_2.webm](https://github.com/user-attachments/assets/3f54ddc8-cf3f-4b44-82b6-0b20c178ae55)
+<p align="center">
+  <video src="images/scenario1/wmoothing_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 > [!TIP]
@@ -242,7 +244,9 @@ You can skip the Further imports step for Scenario 1, since you will not add new
 
 4. For each video, click **CALCULATE DISTANCE**; a window shows the first frame. Double-**left**-click two points that define the known distance. If a point is misplaced, double-click the dot to replace the misplaced point. Press **Esc** when done.
 
-[getcoord.webm](https://github.com/user-attachments/assets/4da58c75-f9b9-4d26-bafe-a65fc1ce5d17)
+<p align="center">
+  <video src="images/scenario1/getcoord.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 5. When finished, click **SAVE PIXEL PER MILLIMETER DATA** (or <kbd>SAVE</kbd> in the table) to write the values to `video_info.csv` in `project_folder/logs`. You must save before closing the window or the calibration will not be applied to later steps.
 
@@ -486,7 +490,9 @@ Before running your classifier on real experimental data, you should check how w
 9. **RUN** — SimBA creates a video with the classifier's predictions overlaid on each frame (e.g. behavior-present frames highlighted, probability text, Gantt chart if selected). The output video is saved to the `project_folder/frames/output/validation/` directory.
 
 
-[validation_example.webm](https://github.com/user-attachments/assets/7d8cc685-1e84-4ae1-9634-71f9fecbcefe)
+<p align="center">
+  <video src="images/scenario1/validation_example.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 > [!NOTE]

@@ -6,7 +6,7 @@ For up-to-date and additional walkthroughs, see markdown content on the `SimBA G
 .. toctree::
    :maxdepth: 3
 
-   tutorials_rst/scenario_1
+   Scenario1
    tutorials_rst/scenario_2
    tutorials_rst/scenario_3
    tutorials_rst/scenario_4
