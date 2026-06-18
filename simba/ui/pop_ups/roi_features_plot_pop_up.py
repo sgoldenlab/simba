@@ -14,9 +14,13 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         SimbaButton, SimbaCheckbox,
                                         SimBADropDown, SimBALabel)
 from simba.utils.checks import check_float, check_nvidea_gpu_available
-from simba.utils.enums import Formats, Links, Options
+from simba.utils.enums import Formats, Links, Options, TextOptions
 from simba.utils.errors import NoFilesFoundError, NoROIDataError
+from simba.utils.lookups import get_named_simba_fonts
 from simba.utils.read_write import find_all_videos_in_directory, str_2_bool
+
+FONT_OPTIONS = sorted(get_named_simba_fonts().keys())
+DEFAULT_FONT = TextOptions.DEFAULT_FONT.value
 
 
 class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin):
@@ -58,6 +62,8 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', icon_link=Links.ROI_FEATURES_PLOT.value)
         self.show_directionality_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['FALSE', 'LINES', 'FUNNEL'],  label='SHOW DIRECTIONALITY:', label_width=25, dropdown_width=15, value='FALSE', state=self.directing_viable, img='direction_3', tooltip_key='ROI_FEATURES_SHOW_DIRECTIONALITY')
         self.border_clr_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(self.colors_dict.keys()), label='BORDER COLOR:', label_width=25, dropdown_width=15, value='Black', img='fill', tooltip_key='BORDER_BG_COLOR')
+        font_value = DEFAULT_FONT if DEFAULT_FONT in FONT_OPTIONS else FONT_OPTIONS[0]
+        self.font_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=FONT_OPTIONS, label='TEXT FONT:', label_width=25, dropdown_width=15, value=font_value, img='label', tooltip_key='ROI_TRACKING_FONT')
         self.show_pose_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW POSE:', label_width=25, dropdown_width=15, value='TRUE', img='pose', tooltip_key='ROI_TRACKING_SHOW_POSE')
         self.show_roi_centers_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ROI CENTERS:', label_width=25, dropdown_width=15, value='TRUE', img='bullseye', tooltip_key='ROI_FEATURES_SHOW_ROI_CENTERS')
         self.show_roi_eartags_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ROI EAR TAGS:', label_width=25, dropdown_width=15, value='TRUE', img='ear_small', tooltip_key='ROI_FEATURES_SHOW_ROI_EARTAGS')
@@ -68,12 +74,13 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
         self.settings_frm.grid(row=1, column=0, sticky=NW)
         self.show_directionality_dropdown.grid(row=0, column=0, sticky=NW)
         self.border_clr_dropdown.grid(row=1, column=0, sticky=NW)
-        self.show_pose_dropdown.grid(row=2, column=0, sticky=NW)
-        self.show_roi_centers_dropdown.grid(row=3, column=0, sticky=NW)
-        self.show_roi_eartags_dropdown.grid(row=4, column=0, sticky=NW)
-        self.show_animal_names_dropdown.grid(row=5, column=0, sticky=NW)
-        self.bbox_dropdown.grid(row=6, column=0, sticky=NW)
-        self.cpu_cnt_dropdown.grid(row=7, column=0, sticky=NW)
+        self.font_dropdown.grid(row=2, column=0, sticky=NW)
+        self.show_pose_dropdown.grid(row=3, column=0, sticky=NW)
+        self.show_roi_centers_dropdown.grid(row=4, column=0, sticky=NW)
+        self.show_roi_eartags_dropdown.grid(row=5, column=0, sticky=NW)
+        self.show_animal_names_dropdown.grid(row=6, column=0, sticky=NW)
+        self.bbox_dropdown.grid(row=7, column=0, sticky=NW)
+        self.cpu_cnt_dropdown.grid(row=8, column=0, sticky=NW)
 
         self.body_parts_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PARTS", icon_name='pose', icon_link=Links.ROI_FEATURES_PLOT.value)
         self.animal_cnt_dropdown = SimBADropDown(parent=self.body_parts_frm, dropdown_options=list(range(1, self.animal_cnt + 1)), label='NUMBER OF ANIMALS:', label_width=25, dropdown_width=15, value=1, command=self.__populate_bp_dropdown, img='abacus', tooltip_key='ROI_TRACKING_NUMBER_OF_ANIMALS')
@@ -118,6 +125,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
         border_clr = self.colors_dict[self.border_clr_dropdown.getChoices()]
         show_animal_names = str_2_bool(self.show_animal_names_dropdown.get_value())
         show_pose = str_2_bool(self.show_pose_dropdown.get_value())
+        font = self.font_dropdown.get_value()
         bbox = None if self.bbox_dropdown.get_value() == 'FALSE' else self.bbox_dropdown.get_value()
 
         if multiple:
@@ -136,6 +144,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
                                                                           show_roi_eartags=show_ear_tags,
                                                                           show_pose=show_pose,
                                                                           bbox=bbox,
+                                                                          font=font,
                                                                           border_bg_clr=border_clr,
                                                                           direction=direction)
 

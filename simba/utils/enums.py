@@ -500,6 +500,7 @@ class TextOptions(Enum):
 
     FONT = cv2.FONT_HERSHEY_SIMPLEX
     WHITE = (255, 255, 255)
+    DEFAULT_FONT = 'Poppins Regular'  # DEFAULT SIMBA-BUNDLED TTF FONT NAME (RESOLVED VIA get_simba_font_name_and_path). USED AS THE DEFAULT SELECTION IN FONT DROPDOWNS.
 
 
 class Defaults(Enum):

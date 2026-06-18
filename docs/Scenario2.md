@@ -438,6 +438,7 @@ The **Visualize classifications** dialog offers the following options:
 | Option | Description |
 |--------|-------------|
 | **BODY-PART PROBABILITY THRESHOLD** | Minimum pose-estimation confidence (0.0–1.0) for body parts to be drawn. Use 0.0 to show all; use 1.0 to show only 100% certain detections. Body parts below this threshold are hidden. |
+| **FONT** | Font used for the behavior labels, timers, and probability text drawn on the video. Options are the fonts bundled with SimBA (in `simba/assets/fonts`). Pick a clean, legible font (e.g. **Poppins Regular**) for small overlay text. |
 | **TEXT SIZE** | Size of behavior labels on the video. AUTO = SimBA picks based on video resolution; or choose 1–100. |
 | **TEXT SPACING** | Space between label text and other drawn elements. AUTO = SimBA picks; or 1–100. |
 | **TEXT THICKNESS** | How bold the behavior labels are. AUTO or 1–100; higher = thicker text. |
@@ -463,6 +464,12 @@ The **Visualize classifications** dialog offers the following options:
 | **VIDEO** (Single Video) | Dropdown to select which video to create when using <kbd>Create single video</kbd>. You can also browse to pick a video file directly. |
 
 **SINGLE VIDEO** — Select one video from the dropdown (or use the file browser) and click <kbd>Create single video</kbd>. **MULTIPLE VIDEOS** — Click <kbd>Create multiple videos</kbd> to process all videos that have classification results.
+
+<p align="center">
+  <img src="images/visualizations/simba_fonts_preview.webp" width="700" alt="Preview of SimBA bundled fonts">
+</p>
+
+*Preview of the fonts bundled with SimBA (the **FONT** option) — each row renders the same sample so you can compare legibility before choosing.*
 
 **Where output is saved:** Videos and frames are saved to the `project_folder/frames/output/sklearn_results/` directory.
 

@@ -207,6 +207,7 @@ Create videos that overlay your ROI shapes and **counters** (time spent in each 
 | **SHOW ANIMAL NAMES** | **TRUE** — Display animal labels (e.g. Animal_1) on the video; **FALSE** — Do not show names. |
 | **SHOW ANIMAL BOUNDING BOXES** | **FALSE** = no bounding box. **axis-aligned** = axis-aligned bounding box (aligned with video axes). **animal-aligned** = minimum rotated rectangle that aligns with the animal's orientation. |
 | **SHOW CLASSIFICATION TIMERS** | Timer format for classifier/ROI counters shown in the overlay. **SECONDS** = numeric seconds. **HH:MM:SS.SSSS** = clock-style timestamp with fractional seconds. |
+| **TEXT FONT** | Font used for the ROI timer/entry counters and labels drawn in the side panel. Options are the fonts bundled with SimBA (in `simba/assets/fonts`). Pick a clean, legible font (e.g. **Poppins Regular**) for small overlay text. |
 | **BORDER BACKGROUND COLOR** | Color of the border/frame around the video (e.g. Black, White). Affects the appearance of the output video frame. |
 | **OUTSIDE ROI ZONES DATA** | **TRUE** — Treat all area not covered by any ROI as one combined zone and show time/entry counters for it; **FALSE** — Only show counters for user-drawn ROIs. |
 | **NUMBER OF CPU CORES** | Dropdown from 1 to your machine’s core count. Higher values speed up rendering when creating multiple videos but may use more RAM. |
@@ -215,6 +216,12 @@ Create videos that overlay your ROI shapes and **counters** (time spent in each 
 | **SELECT BODY-PARTS** | One row per animal with: **ANIMAL NAME** (label), **BODY-PART NAME** (dropdown — which body-part represents that animal’s location), **COLOR** (dropdown — color of the pose circle for that animal; only used if SHOW POSE-ESTIMATED LOCATIONS is TRUE), **KEY-POINT SIZE** (dropdown — size of the pose circle, 1–100 or **AUTO** to scale from video resolution; only used if pose is shown). |
 | **SINGLE VIDEO** | **SELECT VIDEO** — Dropdown (or file picker) of videos that have both ROI definitions and pose data. **CREATE SINGLE ROI VIDEO** — Generate the ROI tracking video for the selected video only. |
 | **ALL VIDEOS** | **CREATE ALL ROI VIDEOS (N VIDEO(S) WITH DATA FOUND)** — Generate ROI tracking videos for every project video that has ROIs and pose data. |
+
+<p align="center">
+  <img src="images/visualizations/simba_fonts_preview.webp" width="700" alt="Preview of SimBA bundled fonts">
+</p>
+
+*Preview of the fonts bundled with SimBA (the **TEXT FONT** option) — each row renders the same sample so you can compare legibility before choosing.*
 
 Use **CREATE SINGLE ROI VIDEO** for one video or **CREATE ALL ROI VIDEOS** to process the full project.
 
@@ -246,6 +253,7 @@ Visualize **continuous and boolean ROI features** (distances to ROIs, inside/out
 | **SETTINGS** | |
 | **SHOW DIRECTIONALITY** | **FALSE** — Do not show directionality; **LINES** — Draw lines from animal to ROIs when directing; **FUNNEL** — Draw funnel-shaped directionality. Requires nose and left/right ear body-parts; option is disabled if directionality cannot be computed. |
 | **BORDER COLOR** | Color of the border/shape outlines (e.g. Black, White). Affects ROI and overlay appearance. |
+| **TEXT FONT** | Font used for the ROI feature text (in-zone status, distances, directionality) drawn in the side panel. Options are the fonts bundled with SimBA (in `simba/assets/fonts`). Pick a clean, legible font (e.g. **Poppins Regular**) for small overlay text. |
 | **SHOW POSE** | **TRUE** — Draw pose-estimated body-parts on the video; **FALSE** — Do not draw. |
 | **SHOW ROI CENTERS** | **TRUE** — Mark the center of each ROI with a circle; **FALSE** — Do not show centers. |
 | **SHOW ROI EAR TAGS** | **TRUE** — Show [ear tags](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#shape-attributes) (orientation markers) for each ROI shape; **FALSE** — Do not show. |
@@ -256,6 +264,12 @@ Visualize **continuous and boolean ROI features** (distances to ROIs, inside/out
 | **SELECT BODY-PARTS** | **NUMBER OF ANIMALS** dropdown — How many animals to visualize. Below it, one dropdown per animal (e.g. Animal_1, Animal_2) to choose which body-part represents that animal’s location for ROI feature drawing. |
 | **VISUALIZE SINGLE VIDEO** | **SELECT VIDEO** — Dropdown of all project videos that have ROI data. **VISUALIZE ROI FEATURES: SINGLE VIDEO** — Create the ROI-features visualization for the selected video only. |
 | **VISUALIZE ALL VIDEOS** | **VISUALIZE ROI FEATURES: ALL N VIDEO(S)** — Create ROI-features videos for every video in the project. |
+
+<p align="center">
+  <img src="images/visualizations/simba_fonts_preview.webp" width="700" alt="Preview of SimBA bundled fonts">
+</p>
+
+*Preview of the fonts bundled with SimBA (the **TEXT FONT** option) — each row renders the same sample so you can compare legibility before choosing.*
 
 Directionality can be shown as **Funnels** or **Lines** (see example GIFs below).
 

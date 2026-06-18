@@ -16,6 +16,14 @@ On the left of the `Visualization` tab menu, there is a sub-menu with the headin
 
 * **STYLE SETTINGS**: By default, SimBA will **auto-compute** suitable visualization (i) font sizes, (ii) spacing between text rows, (iii) font thickness, and (iv) pose-estimation body-part location circles which depend on the resolution of your videos. If you do **not** want SimBA to auto-compute these attributes, go ahead and and **un-tick** the `Auto-compute font/key-point sizes checkbox, and fill in these values manually in each entry box. 
 
+  - **FONT**: Use the `FONT` drop-down to choose the typeface used for the behavior labels, timers, and probability text drawn on the video. The options are the fonts bundled with SimBA (in `simba/assets/fonts`). For small overlay text, pick a clean, legible font (e.g. `Poppins Regular`).
+
+<p align="center">
+  <img src="images/visualizations/simba_fonts_preview.webp" width="700" alt="Preview of SimBA bundled fonts">
+</p>
+
+*Preview of the fonts bundled with SimBA (the `FONT` options) — each row renders the same sample so you can compare legibility before choosing.* 
+
 * **VISUALIZATION SETTINGS**:
   - **Create video**: Tick the `Create video` checkbox to generate `.mp4` videos with classification result overlays.
   - **Create frames**: Tick the `Create frames` checkbox to generate `.png` files with classification result overlays (NOTE: this will create one png file for each frame in each video. If you are concerned about storage, leave this checkbox unchecked. 

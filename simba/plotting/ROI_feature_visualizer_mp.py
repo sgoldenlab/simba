@@ -31,6 +31,7 @@ from simba.utils.checks import (check_file_exist_and_readable,
 from simba.utils.data import (find_frame_numbers_from_time_stamp, get_cpu_pool,
                               slice_roi_dict_for_video, terminate_cpu_pool)
 from simba.utils.enums import Formats, Options, TextOptions
+from simba.utils.lookups import get_simba_font_name_and_path
 from simba.utils.errors import BodypartColumnNotFoundError, NoFilesFoundError
 from simba.utils.printing import stdout_information, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
@@ -52,6 +53,8 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
                                shape_names: list,
                                video_path: str,
                                animal_names: list,
+                               font_path: Optional[str],
+                               font_size_px: Optional[int],
                                roi_dict: dict,
                                bp_lk: dict,
                                bbox: Optional[str],
@@ -71,10 +74,13 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
             for cnt, animal_data in bp_lk.items():
                 animal, animal_bp, _ = animal_data
                 animal_name = f"{animal} {animal_bp}"
-                cv2.putText(img, text_locations[animal_name][shape_name]["in_zone_text"], text_locations[animal_name][shape_name]["in_zone_text_loc"], font, font_size, shape_color, 1)
-                cv2.putText(img, text_locations[animal_name][shape_name]["distance_text"], text_locations[animal_name][shape_name]["distance_text_loc"], font, font_size, shape_color, 1)
+                img = PlottingMixin().put_text(img=img, text=text_locations[animal_name][shape_name]["in_zone_text"], pos=text_locations[animal_name][shape_name]["in_zone_text_loc"], font_size=font_size, font=font, font_thickness=TextOptions.TEXT_THICKNESS.value, font_path=font_path, text_color=tuple(int(v) for v in shape_color), text_bg_alpha=0.0)
+                img = PlottingMixin().put_text(img=img, text=text_locations[animal_name][shape_name]["distance_text"], pos=text_locations[animal_name][shape_name]["distance_text_loc"], font_size=font_size, font=font, font_thickness=TextOptions.TEXT_THICKNESS.value, font_path=font_path, text_color=tuple(int(v) for v in shape_color), text_bg_alpha=0.0)
+                #cv2.putText(img, text_locations[animal_name][shape_name]["in_zone_text"], text_locations[animal_name][shape_name]["in_zone_text_loc"], font, font_size, shape_color, 1)
+                #cv2.putText(img, text_locations[animal_name][shape_name]["distance_text"], text_locations[animal_name][shape_name]["distance_text_loc"], font, font_size, shape_color, 1)
                 if directing_data is not None and direction is not None:
-                    cv2.putText(img, text_locations[animal][shape_name]["directing_text"], text_locations[animal][shape_name]["directing_text_loc"], font, font_size, shape_color, 1)
+                    img = PlottingMixin().put_text(img=img, text=text_locations[animal][shape_name]["directing_text"], pos=text_locations[animal][shape_name]["directing_text_loc"], font_size=font_size, font=font, font_thickness=TextOptions.TEXT_THICKNESS.value, font_path=font_path, text_color=tuple(int(v) for v in shape_color), text_bg_alpha=0.0)
+                    #cv2.putText(img, text_locations[animal][shape_name]["directing_text"], text_locations[animal][shape_name]["directing_text_loc"], font, font_size, shape_color, 1)
         return img
 
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
@@ -82,6 +88,7 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
     group_cnt, frm_range = frm_range[0], frm_range[1]
     start_frm, current_frm, end_frm = frm_range[0], frm_range[0], frm_range[-1]
     save_path = os.path.join(save_temp_dir, f"{group_cnt}.mp4")
+    font_size = font_size_px if font_path is not None else font_size
     writer = cv2.VideoWriter(save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"] * 2, video_meta_data["height"]))
     cap = cv2.VideoCapture(video_path)
     cap.set(1, current_frm)
@@ -99,7 +106,8 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
                 for animal_name, bp_data in animal_bp_dict.items():
                     headers = [bp_data["X_bps"][-1], bp_data["Y_bps"][-1]]
                     bp_cords = data_df.loc[current_frm, headers].values.astype(np.int64)
-                    cv2.putText(img, animal_name, (bp_cords[0], bp_cords[1]), font, font_size, animal_bp_dict[animal_name]["colors"][0], 1)
+                    img = PlottingMixin().put_text(img=img, text=animal_name, pos=(bp_cords[0], bp_cords[1]), font_size=font_size, font=font, font_thickness=TextOptions.TEXT_THICKNESS.value, font_path=font_path, text_color=tuple(int(v) for v in animal_bp_dict[animal_name]["colors"][0]), text_bg_alpha=0.0)
+                    #cv2.putText(img, animal_name, (bp_cords[0], bp_cords[1]), font, font_size, animal_bp_dict[animal_name]["colors"][0], 1)
             if bbox is not None:
                 for animal_name, bp_data in animal_bp_dict.items():
                     x_cols, y_cols = animal_bp_dict[animal_name]['X_bps'], animal_bp_dict[animal_name]['Y_bps']
@@ -116,19 +124,21 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
                         pass
 
             img = PlottingMixin.roi_dict_onto_img(img=img, roi_dict=roi_dict, circle_size=circle_size, show_tags=show_roi_ear_tags, show_center=show_roi_centers)
-
             for animal_name, shape_name in itertools.product(animal_bp_names, shape_names):
                 in_zone_col_name = f"{shape_name} {animal_name} in zone"
                 distance_col_name = f"{shape_name} {animal_name} distance"
                 in_zone_value = str(bool(roi_features_df.loc[current_frm, in_zone_col_name]))
                 distance_value = round(roi_features_df.loc[current_frm, distance_col_name], 2)
-                cv2.putText(img, in_zone_value, text_locations[animal_name][shape_name]["in_zone_data_loc"], font, font_size, shape_info[shape_name]["Color BGR"], 1)
-                cv2.putText(img, str(distance_value), text_locations[animal_name][shape_name]["distance_data_loc"], font, font_size, shape_info[shape_name]["Color BGR"], 1)
+                img = PlottingMixin().put_text(img=img, text=in_zone_value, pos=text_locations[animal_name][shape_name]["in_zone_data_loc"], font_size=font_size, font=font, font_thickness=TextOptions.TEXT_THICKNESS.value, font_path=font_path, text_color=tuple(int(v) for v in shape_info[shape_name]["Color BGR"]), text_bg_alpha=0.0)
+                img = PlottingMixin().put_text(img=img, text=str(distance_value), pos=text_locations[animal_name][shape_name]["distance_data_loc"], font_size=font_size, font=font, font_thickness=TextOptions.TEXT_THICKNESS.value, font_path=font_path, text_color=tuple(int(v) for v in shape_info[shape_name]["Color BGR"]), text_bg_alpha=0.0)
+                #cv2.putText(img, in_zone_value, text_locations[animal_name][shape_name]["in_zone_data_loc"], font, font_size, shape_info[shape_name]["Color BGR"], 1)
+                #cv2.putText(img, str(distance_value), text_locations[animal_name][shape_name]["distance_data_loc"], font, font_size, shape_info[shape_name]["Color BGR"], 1)
             if (directing_data is not None) and direction is not None:
                 for animal_name, shape_name in itertools.product(animal_names, shape_names):
                     facing_col_name = f"{shape_name} {animal_name} facing"
                     facing_value = roi_features_df.loc[current_frm, facing_col_name]
-                    cv2.putText(img, str(bool(facing_value)), text_locations[animal_name][shape_name]["directing_data_loc"], font, font_size, shape_info[shape_name]["Color BGR"], 1)
+                    img = PlottingMixin().put_text(img=img, text=str(bool(facing_value)), pos=text_locations[animal_name][shape_name]["directing_data_loc"], font_size=font_size, font=font, font_thickness=TextOptions.TEXT_THICKNESS.value, font_path=font_path, text_color=tuple(     int(v) for v in shape_info[shape_name]["Color BGR"]), text_bg_alpha=0.0)
+                    #cv2.putText(img, str(bool(facing_value)), text_locations[animal_name][shape_name]["directing_data_loc"], font, font_size, shape_info[shape_name]["Color BGR"], 1)
                     if facing_value:
                         img = PlottingMixin.insert_directing_line(directing_df=directing_data,
                                                                   img=img,
@@ -160,8 +170,10 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
     :param bool show_roi_centers: If True, draw the center point of each ROI on the video. Default True.
     :param bool show_roi_eartags: If True, draw ear-tag labels on ROI shapes. Default False.
     :param bool show_animal_names: If True, display animal names on the video. Default False.
+    :param Optional[str] font: Name of a SimBA-bundled font (in ``simba/assets/fonts``, e.g. ``'Poppins Regular'``) used for the ROI feature text drawn in the border panel. If None, a default cv2 font is used. Default None.
     :param Tuple[int, int, int] border_bg_clr: RGB tuple for the background color of the border panel where ROI stats are shown. Default (0, 0, 0).
     :param Optional[Literal['funnel', 'lines']] direction: If not None, draw directionality (animal directing towards ROI). ``'funnel'`` or ``'lines'`` style. Default None (no directionality).
+    :param Optional[Dict[str, str]] time_slice: Optional time window to render, given as ``{'start_time': 'HH:MM:SS', 'end_time': 'HH:MM:SS'}``. If None, the full video is rendered. Default None.
     :param Optional[Literal['axis-aligned', 'animal-aligned']] bbox: If not None, draw bounding boxes around each animal. ``'axis-aligned'`` = rectangle aligned with video axes; ``'animal-aligned'`` = minimum rotated rectangle. Default None (no bounding boxes).
     :param Optional[Union[str, os.PathLike]] roi_coordinates_path: Optional path to ROI definitions file. If None, uses project default from config. Default None.
     :param bool show_pose: If True, draw pose-estimation keypoints (circles) on the video. Default True.
@@ -191,6 +203,7 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
     ...     direction='funnel',
     ...     show_pose=True,
     ...     show_animal_names=True,
+    ...     font='Poppins Regular',
     ...     core_cnt=-1)
     >>> test.run()
     """
@@ -202,6 +215,7 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
                  show_roi_centers: bool = True,
                  show_roi_eartags: bool = False,
                  show_animal_names: bool = False,
+                 font: Optional[str] = None,
                  border_bg_clr: Tuple[int, int, int] = (0, 0, 0),
                  direction: Optional[Literal['funnel', 'lines']] = None,
                  time_slice: Optional[Dict[str, str]] = None,
@@ -231,8 +245,8 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
             check_if_string_value_is_valid_video_timestamp(value=time_slice[START_TIME], name='START TIME', raise_error=True)
             check_if_string_value_is_valid_video_timestamp(value=time_slice[END_TIME], name='END TIME', raise_error=True)
             check_that_hhmmss_start_is_before_end(start_time=time_slice[START_TIME], end_time=time_slice[END_TIME], name=f'TIME SLICE', raise_error=True)
-
-
+        self.font_path, self.font = None, None
+        if font is not None: self.font, self.font_path = get_simba_font_name_and_path(font=font)
         self.gpu, self.show_roi_centers, self.show_roi_eartags, self.show_animal_names = gpu, show_roi_centers, show_roi_eartags, show_animal_names
         self.show_pose, self.border_bg_clr, self.direction, self.bbox, self.time_slice = show_pose, border_bg_clr, direction, bbox, time_slice
         if roi_coordinates_path is not None:
@@ -284,13 +298,21 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
     def __calc_text_locs(self):
         add_spacer = TextOptions.FIRST_LINE_SPACING.value
         self.loc_dict = {}
-        txt_strs = []
-        for animal_cnt, animal_bp_name in enumerate(self.animal_bp_names):
+        label_strs = []
+        for animal_cnt, animal_data in self.bp_lk.items():
+            animal, animal_bp, _ = animal_data
+            animal_name = f"{animal} {animal_bp}"
             for shape in self.shape_names:
-                txt_strs.append(animal_bp_name + ' ' + shape + ' center distance')
-        longest_text_str = str(max(txt_strs, key=len))
+                label_strs.append(f"{shape} {animal_name} in zone")
+                label_strs.append(f"{shape} {animal_name} distance")
+                if self.direct_viable and self.direction is not None:
+                    label_strs.append(f"{shape} {animal} facing")
+        longest_text_str, self.video_font_size_px = str(max(label_strs, key=len)), None
         self.font_size, x_spacer, y_spacer = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=int(self.video_meta_data["width"] / 2), accepted_px_height=int(self.video_meta_data["height"] / 15), text_thickness=3)
         self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_meta_data["height"]), int(self.video_meta_data["height"])), circle_frame_ratio=100)
+        if self.font_path is not None:
+            self.video_font_size_px, x_spacer, _ = PlottingMixin().get_optimal_font_size_ttf(text=label_strs, font_path=self.font_path, accepted_px_width=int(self.video_meta_data["width"] / 2), accepted_px_height=int(self.video_meta_data["height"] / 15))
+            y_spacer = PlottingMixin().get_optimal_font_spacing_ttf(font_path=self.font_path, size_px=self.video_font_size_px, text=label_strs, gap=0)
         for animal_cnt, animal_data in self.bp_lk.items():
             animal, animal_bp, _ = animal_data
             animal_name = f"{animal} {animal_bp}"
@@ -348,6 +370,8 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
                                       shape_names=self.shape_names,
                                       animal_bp_names=self.animal_bp_names,
                                       video_path=self.video_path,
+                                      font_path=self.font_path,
+                                      font_size_px=self.video_font_size_px,
                                       animal_names=self.animal_names,
                                       animal_bp_dict=self.animal_bp_dict,
                                       bp_lk=self.bp_lk,
@@ -369,6 +393,22 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
         stdout_success(msg=f"Video {self.video_name} complete. Video saved in directory {self.roi_features_save_dir}.", elapsed_time=self.timer.elapsed_time_str)
 
 
+# if __name__ == "__main__":
+#     test = ROIfeatureVisualizerMultiprocess(config_path=r"G:\projects\sleap_bp_order\by_order\project_folder\project_config.ini",
+#                                             video_path=r"G:\projects\sleap_bp_order\by_order\project_folder\videos\rat_pilot.mp4",
+#                                             body_parts=['nose'],
+#                                             show_roi_centers=True,
+#                                             show_roi_eartags=False,
+#                                             show_animal_names=False,
+#                                             show_pose=True,
+#                                             direction='funnel',
+#                                             font='Poppins Regular',
+#                                             border_bg_clr=(0, 0, 0),
+#                                             bbox=None,
+#                                             gpu=True,
+#                                             core_cnt=8)
+#     test.run()
+#
 
 
 
@@ -397,7 +437,7 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
 #                                                 body_parts=['nose'],
 #                                                 core_cnt=-1)
 #     test.run()
-
+#
 
 
 

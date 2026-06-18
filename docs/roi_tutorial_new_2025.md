@@ -592,6 +592,8 @@ Once your ROI definitions are all defined, close the `ROI table`, `Regions of In
 
 * If you want to create machine learning features using your ROI definitions, use the `Append ROI data to features` in the `Extract features` tab as detailed in [THIS TUTORIAL](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data)
 
+* If you want to create videos that overlay your ROI shapes and counters (time spent in each ROI, number of entries) on the source video, use the `Visualize ROI tracking` button as detailed in [THIS TUTORIAL](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-5-visualizing-roi-tracking). The pop-up includes a `TEXT FONT` drop-down for the counters/labels drawn in the side panel — the options are the fonts bundled with SimBA (in `simba/assets/fonts`); pick a clean, legible font (e.g. `Poppins Regular`) for small overlay text.
+
 If you have any questions, bug reports or feature requests, please let us know by opening a new [github issue](https://github.com/sgoldenlab/simba/issues) or contact us through [gitter](https://gitter.im/SimBA-Resource/community)! 
 
 > [!IMPORTANT]

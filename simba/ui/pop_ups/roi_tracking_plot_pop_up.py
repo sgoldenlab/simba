@@ -16,7 +16,8 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         FileSelect, SimbaButton, SimbaCheckbox,
                                         SimBADropDown, SimBALabel)
 from simba.utils.checks import check_file_exist_and_readable, check_float
-from simba.utils.enums import ROI_SETTINGS, Formats, Keys, Links, Options
+from simba.utils.enums import (ROI_SETTINGS, Formats, Keys, Links, Options,
+                               TextOptions)
 from simba.utils.errors import NoDataError, ROICoordinatesNotFoundError
 from simba.utils.lookups import (get_color_dict, get_named_simba_fonts,
                                   get_tooltips)
@@ -28,7 +29,7 @@ from simba.utils.read_write import (find_all_videos_in_directory,
 BP_SIZE_OPTIONS = list(range(1, 101, 1))
 BP_SIZE_OPTIONS.insert(0, 'AUTO')
 FONT_OPTIONS = sorted(get_named_simba_fonts().keys())
-DEFAULT_FONT = 'Poppins Regular'
+DEFAULT_FONT = TextOptions.DEFAULT_FONT.value
 
 class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
 

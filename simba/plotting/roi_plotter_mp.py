@@ -328,9 +328,9 @@ class ROIPlotMultiprocess(ConfigReader, PlottingMixin):
          self.font_size, x_spacer, y_spacer = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=int(self.video_meta_data["width"] / 1.5), accepted_px_height=int(self.video_meta_data["height"] / 10), text_thickness=TextOptions.TEXT_THICKNESS.value)
          if self.font_path is not None:
              self.video_font_size_px, x_spacer, _ = PlottingMixin().get_optimal_font_size_ttf(text=label_strs, font_path=self.font_path, accepted_px_width=int(self.video_meta_data["width"] / 1.5), accepted_px_height=int(self.video_meta_data["height"] / 10))
-             self.default_space_size = self.get_optimal_font_spacing_ttf(font_path=self.font_path, size_px=self.video_font_size_px, text=label_strs, gap=0)
+             y_spacer = self.get_optimal_font_spacing_ttf(font_path=self.font_path, size_px=self.video_font_size_px, text=label_strs, gap=0)
          else:
-             self.video_font_size_px, default_space_size = None, y_spacer
+             self.video_font_size_px = None
          row_counter = TextOptions.FIRST_LINE_SPACING.value
          for animal_cnt, animal_name in enumerate(self.animal_names):
              loc_dict[animal_name] = {}

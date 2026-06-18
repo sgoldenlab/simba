@@ -281,7 +281,7 @@
   "ROI_TRACKING_BODY_PART_COLOR": "Color for this animal's body-part markers (circles). Choose a color that contrasts well with the video background and ROI colors.",
   "ROI_TRACKING_KEYPOINT_SIZE": "Size of the body-part marker circles in pixels. AUTO lets SimBA choose based on video size. Or set 1-100 pixels. Larger values are more visible but may obscure details.",
   "ROI_TRACKING_OUTSIDE_ROI": "If TRUE, treats all areas NOT covered by drawn ROIs as a single additional ROI named 'OUTSIDE REGIONS OF INTEREST'. Shows statistics for time spent outside all ROIs.",
-  "ROI_TRACKING_FONT": "Font used for the ROI timer and entry counters drawn in the border panel. Choose a clean, legible font (e.g. Poppins Regular) for small overlay text; heavy or decorative fonts can be harder to read at small sizes.",
+  "ROI_TRACKING_FONT": "Font used for the ROI timer and entry counters drawn in the border panel. Choose a clean, legible font (e.g. Poppins Regular) for small overlay text.",
   "ROI_TRACKING_CPU_CORES": "Number of CPU cores to use for processing. Higher values speed up processing for multiple videos but use more memory. Recommended: half of available cores.",
   "ROI_TRACKING_SINGLE_VIDEO": "Select which video to create ROI tracking visualization for. Only videos that have both ROI definitions and pose data are shown.",
   "ROI_TRACKING_PROBABILITY_THRESHOLD": "Minimum pose-estimation confidence threshold (0.0-1.0). Only frames where body-part detection confidence exceeds this value are used for ROI tracking. Lower values include more frames but may add noise. Higher values are stricter and filter out low-confidence detections.",
