@@ -20,7 +20,7 @@ from simba.utils.enums import (ROI_SETTINGS, Formats, Keys, Links, Options,
                                TextOptions)
 from simba.utils.errors import NoDataError, ROICoordinatesNotFoundError
 from simba.utils.lookups import (get_color_dict, get_named_simba_fonts,
-                                  get_tooltips)
+                                 get_tooltips)
 from simba.utils.read_write import (find_all_videos_in_directory,
                                     find_core_cnt,
                                     find_files_of_filetypes_in_directory,
