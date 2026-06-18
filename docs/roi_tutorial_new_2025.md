@@ -1,7 +1,7 @@
 # <p align="center"> Regions of Interest (ROIs) in SimBA </p>
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_new_1.png" />
+<img src="images/roi_new_1.png" />
 </p>
 
 The SimBA region of interest (ROI) interface allows users to draw ROIs on videos. ROI data can be used to calculate basic descriptive 
@@ -91,7 +91,7 @@ and lastly (iv) [Correct outliers](https://github.com/sgoldenlab/simba/blob/mast
 2. Navigate to the **ROI** tab, which should look like the image below (we will be using the menu highted by the red rectangle and red arrow):
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/roi_tutorial_1.webp" />
+<img src="images/roi_tutorial/roi_tutorial_1.webp" />
 </p>
 
 > [!NOTE]
@@ -101,7 +101,7 @@ and lastly (iv) [Correct outliers](https://github.com/sgoldenlab/simba/blob/mast
 3. Next, we click on the `Define ROIs` button, and the following table will pop open.
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/roi_tutorial_2.webp" height="600"/>
+<img src="images/roi_tutorial/roi_tutorial_2.webp" height="600"/>
 </p>
 
 This table contain one row for each of the videos in the project (each video inside the `project_folder/videos directory in the SImBA procet). Each video in the project has three buttons associated with it: **Draw, Reset,** and **Apply to all**. 
@@ -116,7 +116,7 @@ The functions associated with each button is described in detail below. But in b
 4. To begin to draw your ROI shapes, click on the <kbd>**Draw**</kbd> button for the first video in the table. Once clicked, two windows will pop up that look like this:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/roi_tutorial_3.webp"/>
+<img src="images/roi_tutorial/roi_tutorial_3.webp"/>
 </p>
 
 The right window (titled **Define shape**) will display the first frame of the video. The left window (titled **REGION OF INTEREST (ROI) SETTINGS**) will contain information, buttons and entry-boxes for creating and manpulating your ROI shapes, and we will go through each of their function in detail below.  
@@ -142,7 +142,9 @@ Occationally, the very first frame of the video isn't suitable for defining your
  
 * If you want to display the first frame of the video, click on the <kbd>FIRST FRAME</kbd>. If you want to display the last frame of the video, click on the <kbd>LAST FRAME</kbd>.
 
-[roi_tutorial_4.webm](https://github.com/user-attachments/assets/e448bb20-95ec-4504-a52d-9ec588b040bd)
+<p align="center">
+  <video src="images/roi_tutorial/roi_tutorial_4.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ## SET NEW SHAPE
 
@@ -161,7 +163,7 @@ Next, once you have selected the `Shape type`, you can pick a few of its attribu
 > If you want to change these shape attributes later, after completing your drawing, you can - more info below):
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_new_2.png" />
+<img src="images/roi_new_2.png" />
 </p>
 
 ## SHAPE NAME
@@ -173,7 +175,9 @@ Once you have defined your shape, it is time to draw it. The methods for drawing
 ### DRAW RECTANGLE
 To draw a rectangle, click and hold the left mouse button at the top left corner of your rectangle and drag the mouse to the bottom right corner of the rectangle. If you're unhappy with your rectangle, you can start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your rectangle, **press the keyboard `ESCAPE` key**  OR **click the left mouse button anywhere in the ROI SETTINGS window** to save your rectangle to memory. 
 
-[draw_rectangle.webm](https://github.com/user-attachments/assets/a2dbec23-e652-4e1e-809d-fe070dd24d02)
+<p align="center">
+  <video src="images/roi_tutorial/draw_rectangle.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 > [!NOTE]
 > If you want to modify the appearance, location, or size, width, height of your rectangle, you can do this later - see the `CHANGE ROI SIZES` or `CHANGE ROI ATTRIBUTES` sections below. 
@@ -181,7 +185,9 @@ To draw a rectangle, click and hold the left mouse button at the top left corner
 ### DRAW CIRCLE
 Begin by **clicking and holding down** the left mouse button at the center of the circle. Next, drag the mouse, **while holding down the left mouse button**, towards the outer bounds of the circle. Once the circle looks good, **let go of the left mouse button**. If you're unhappy with your circle, begin again by **clicking and holding down** the left mouse button at the center of the circle and start dragging the cursor to the outer bounds of the rectangle. Once the circle looks good, hit the **keyboard `ESCAPE` key** OR **click the left mouse button anywhere in the ROI SETTINGS window** and the circle will be saved to memory.
 
-[draw_circle.webm](https://github.com/user-attachments/assets/962783ea-8923-414f-8b53-3d462fe1c08b)
+<p align="center">
+  <video src="images/roi_tutorial/draw_circle.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 > [!NOTE]
 > If you want to modify the appearance, location, or radius of your circle, you can do this later - see the `CHANGE ROI SIZES` or `CHANGE ROI ATTRIBUTES` sections below. 
@@ -190,7 +196,9 @@ Begin by **clicking and holding down** the left mouse button at the center of th
 Left mouse click on **at least three different locations** in the image that defines the outer bounds of your polygon. You should see filled circles, representing the polygon vertices, and and lines connecting the vertices, appear where you click. Once you are happy with your polygon, hit the **keyboard `ESCAPE` key** OR 
 **click the left mouse button anywhere in the ROI SETTINGS window** and the polygon will appear in full and the polygon will be saved to memory.
 
-[draw_polygon.webm](https://github.com/user-attachments/assets/586d08bb-bf9c-4e8c-86b0-c7e46a133237)
+<p align="center">
+  <video src="images/roi_tutorial/draw_polygon.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 > [!NOTE]
 > If you want to modify the appearance, location, or size, or positions of the polygon edges, you can do this later - see the `CHANGE ROI SIZES` or `CHANGE ROI ATTRIBUTES` sections below. 
@@ -215,23 +223,29 @@ SimBA allows several forms of shape manipulations that are described in detail b
 
 * To delete all drawn ROIs, click the <kbd>DELETE ALL</kbd> button in the `DRAW` sub-menu:
 * 
-[delete_all.webm](https://github.com/user-attachments/assets/f7cddd4a-2009-4fa5-9b4b-a54dc0bd1783)
+<p align="center">
+  <video src="images/roi_tutorial/delete_all.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 * To delete a specific ROI, first use the `ROI` drop-down menu in the `DRAW` sub-menu to select the ROI you wish to delete. Next, click on the <kbd>DELETE SELECTED ROI</kbd> button:
 
-[delete_selected.webm](https://github.com/user-attachments/assets/8bfe62a0-0361-4481-894e-0f2b422f883f)
+<p align="center">
+  <video src="images/roi_tutorial/delete_selected.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ### DUPLICATE ROIs
 
 1) To duplicate an already-draw ROI, first use the `ROI` drop-down menu in the `DRAW` sub-menu to select the ROI you wish to duplicate. Next, click on the <kbd>DUPLICATE SELECTED ROI</kbd> button. A new ROI, with the same dimensions and attributes as the ROI selected in the `ROI` drop-down menu, should appear in the frame near the original ROI:
 
-[duplicate_rectangle.webm](https://github.com/user-attachments/assets/3e5af366-ec63-434d-a53e-900d8800b4bf)
+<p align="center">
+  <video src="images/roi_tutorial/duplicate_rectangle.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 2. The duplicated ROI will inherit the name of the original ROI with the `_duplicated` suffix appended to the name. Thus, if you look in the `ROI` dropdown menu, you should see a new ROI with a name in this format: `MY_ROI_NAME_duplicated`. To change this name, and/or any other attribute belonging to this ROI, see the [Change ROI attributes](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#change-roi-attributes) section below. 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/roi_tutorial_5.webp"/>
+<img src="images/roi_tutorial/roi_tutorial_5.webp"/>
 </p>
 
 
@@ -245,7 +259,9 @@ SimBA allows several forms of shape manipulations that are described in detail b
 
 4. Once the ROIs have been moved into their correct location. We need to exit the **MOVE MODE**. Select the `DEFINE SHAPE` window (e.g., by clicking the top bar), and hit the **keyboard `ESCAPE` key**.
 
-[move_shapes.webm](https://github.com/user-attachments/assets/7e120954-1ca4-4cf4-af97-36a0393b609c)
+<p align="center">
+  <video src="images/roi_tutorial/move_shapes.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ### CHANGING ROI SHAPES
   
@@ -270,13 +286,17 @@ SimBA allows several forms of shape manipulations that are described in detail b
 
 4. Finally, once the ROIs have been moved into their correct location. We need to exit the **MOVE MODE**. Select the `DEFINE SHAPE` window (e.g., by clicking the top bar), and hit the **keyboard `ESCAPE` key**.
 
-[change_shapes.webm](https://github.com/user-attachments/assets/3f4ebcf6-b343-4c52-9779-42d84e11bee5)
+<p align="center">
+  <video src="images/roi_tutorial/change_shapes.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ### BUFFERING ROI SHAPES
 
 The buffer tool allows you to expand or shrink ROI shapes by a specified distance in millimeters by clicking on their center tags. This is useful for creating buffer zones around existing ROIs or adjusting ROI sizes while maintaining their general shape.
 
-[buffering_roi_shapes.webm](https://github.com/user-attachments/assets/11e93b0f-aed1-4451-b54c-123533dff69b)
+<p align="center">
+  <video src="images/roi_tutorial/buffering_roi_shapes.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 1. To activate the buffer tool, navigate to the `File (ROI)` dropdown menu at the top of the **REGION OF INTEREST (ROI) SETTINGS** window and click on `Buffer ROIs...`. A pop-up window will appear:
 
@@ -302,12 +322,14 @@ The buffer tool allows you to expand or shrink ROI shapes by a specified distanc
 1. To change the attributes of an already-created ROI, click on the <kbd>CHANGE ROI</kbd> button and a pop-up menu will appear. This pop-up menu has a drop-down menu, titled `CHANGE ROI`, which allows you to select the ROI that you want to change.
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/change_roi_popup.webp"/>
+<img src="images/roi_tutorial/change_roi_popup.webp"/>
 </p>
 
 2. To change the name of the ROI, enter a new name in the `NEW SHAPE NAME` entry box. TO change the color, thickness, or ear-tag size of the shape, use the respective dropdown windows. Once complete, hit the <kbd>SAVE ATTRIBUTES</kbd> button.
 
-[change_attributes.webm](https://github.com/user-attachments/assets/0af65571-8c72-4125-aa04-8d9524567dd5)
+<p align="center">
+  <video src="images/roi_tutorial/change_attributes.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ## SHOW SHAPE SIZE INFORMATION. 
@@ -324,13 +346,17 @@ Sometimes we need some metrics representing the sizes of the ROIs we have drawn.
   
 2. When the <kbd>SHOW SHAPE INFO</kbd> button is clicked, the text of the button toggles to <kbd>HIDE SHAPE INFO</kbd>. Click the button again to hide the shape size information. 
 
-[show_shape_size.webm](https://github.com/user-attachments/assets/6fdb61c1-7110-46dc-8845-cd6c47c10cef)
+<p align="center">
+  <video src="images/roi_tutorial/show_shape_size.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ## MEASURE DISTANCES WITH THE RULER TOOL
 
 SimBA includes a ruler tool that allows you to measure distances between two points on the video frame. This is useful for verifying pixel-to-millimeter conversion factors, measuring distances between ROIs, or checking the dimensions of objects in your video.
 
-[ROI_ruler_2.webm](https://github.com/user-attachments/assets/edff3c5e-2894-43b7-b44d-7559b4bdb5ed)
+<p align="center">
+  <video src="images/roi_tutorial/ROI_ruler_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 1. To activate the ruler tool, click the <kbd>RULER</kbd> button in the `SHAPE INTERACTION` submenu. The button is located alongside the `MOVE SHAPE` and `SHOW SHAPE INFO` buttons.
 
@@ -352,7 +378,7 @@ https://github.com/user-attachments/assets/2838106a-3452-4ed0-bce6-0140a539d5da
 To draw shapes of specific metric sizes (i.e., specified size in millimeters), first open the `File (ROI)` drop-down menu at the head of the **REGION OF INTEREST (ROI) SETTINGS** menu and click the `Draw ROIs of pre-defined sizes` option:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/fix_metric_size.webp"/>
+<img src="images/roi_tutorial/fix_metric_size.webp"/>
 </p>
 
 Once clicked, you should see the following pop-up opening allowing you to draw a range of different shapes with specified sizes. If you need a shape-type that is missing, consider letting us know through [Gitter](https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im) or by opening en issue on [GithHub](https://github.com/sgoldenlab/simba/issues/new?assignees=&labels=&projects=&template=feature_request.md&title=).
@@ -365,31 +391,41 @@ In the `SETTINGS` frame, fill in the name of your ROI, and choose its color, thi
 
 To draw a RECTANGLE of set size, fill in its metric width and height in millimeter and click ``ADD RECTANGLE`` as in the video below:
 
-[predefined_sizes_rectangle.webm](https://github.com/user-attachments/assets/f669e54a-c8d7-4e2c-b2a9-bb39dd483b3f)
+<p align="center">
+  <video src="images/roi_tutorial/predefined_sizes_rectangle.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 #### DRAW A CIRCLE OF METRIC RADIUS
 
 To draw a CIRCLE with a specific radius, fill in its metric radius in millimeter and click ``ADD CIRCLE`` as in the video below:
 
-[predefined_sizes_circle.webm](https://github.com/user-attachments/assets/9c745aa3-20bf-49fb-8e65-90144ac7e3c7)
+<p align="center">
+  <video src="images/roi_tutorial/predefined_sizes_circle.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 #### DRAW A HEXAGON METRIC RADIUS
 
 To draw a HEXAGON with a specific radius, fill in its metric radius in millimeter and click ``ADD HEXAGON`` as in the video below:
 
-[predefined_sizes_hexagon.webm](https://github.com/user-attachments/assets/eda60da0-693f-414e-95c5-51a7fc5a033c)
+<p align="center">
+  <video src="images/roi_tutorial/predefined_sizes_hexagon.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 #### DRAW A HALF CIRCLE OF METRIC RADIUS POINTING NORTH
 
 To draw a HALF CIRCLE with a specific radius with its chunky part pointing UP, fill in its metric radius in millimeter, choose `NORTH` in the `direction drop-down menu`, and click ``ADD HALF CIRCLE`` as in the video below:
 
-[predefined_sizes_half_circle_north.webm](https://github.com/user-attachments/assets/d0323574-f163-4038-bfcd-b8f2e4595d0c)
+<p align="center">
+  <video src="images/roi_tutorial/predefined_sizes_half_circle_north.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 #### DRAW A HALF CIRCLE OF METRIC RADIUS POINTING WEST
 
 To draw a HALF CIRCLE with a specific radius with its chunky part pointing LEFT, fill in its metric radius in millimeter, choose `WEST` in the `direction drop-down menu`, and click ``ADD HALF CIRCLE`` as in the video below:
 
-[predefined_sizes_half_circle_west.webm](https://github.com/user-attachments/assets/3127e41f-ca83-4617-8ed8-7d9b6ece4079)
+<p align="center">
+  <video src="images/roi_tutorial/predefined_sizes_half_circle_west.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ## PREFRENCES
@@ -397,7 +433,7 @@ To draw a HALF CIRCLE with a specific radius with its chunky part pointing LEFT,
 The `File` drop-down in the  **REGION OF INTEREST (ROI) SETTINGS** header also contains a *Preferences* option. Clicking this, will bring-up a pop-up window that allows you to control some aspects of how the SimBA ROI interface behaves. 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/preferences_toolbar.webp"/>
+<img src="images/roi_tutorial/preferences_toolbar.webp"/>
 </p>
 
 1) **ROI SELECT COLOR**: This controls the color of teh selected edges while in **MOVE MODE** as in the video below. 
@@ -406,7 +442,9 @@ The `File` drop-down in the  **REGION OF INTEREST (ROI) SETTINGS** header also c
 
 3) **LINE TYPE**: Most often you wouldn't need to worry about this. It controls how lines are visualized on the frame through the [OpenCV](https://hawk-tech-blog.com/python-opencv-line-type/) library. In most cases its safe to keep this at `-1`.  
 
-[change_highlight_clr.webm](https://github.com/user-attachments/assets/bef08c2f-155e-4ff3-a9b0-395bfcffd535)
+<p align="center">
+  <video src="images/roi_tutorial/change_highlight_clr.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ## APPLY SHAPES FROM ANOTHER VIDEO
@@ -417,7 +455,9 @@ Sometimes we have created ROIs in one video, saved them, and opened up a second 
 
 2. In this dropdown menu, select the video which has the ROIs you wish to replicate. Once selected, click `Apply`. The ROIs from the video in the `Select video` dropdown menu will appear on the frame.
 
-[apply_video_from_different.webm](https://github.com/user-attachments/assets/de87053e-8ad9-4f66-8d20-6de6927ae5fd)
+<p align="center">
+  <video src="images/roi_tutorial/apply_video_from_different.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ## DELETE ALL ROI DEFINITIONS IN SIMBA PROJECT
 
@@ -426,7 +466,7 @@ Somtimes we may want to delete all ROI definitions in a SimBA project and start 
 1. To delete all the ROI definitions in the SimBA projects, click on the `Delete all ROI definitions` under the [ROI] tab in the load project menu, and the following menu should pop open:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_delete.png" />
+<img src="images/ROI_delete.png" />
 </p>
 
 2. Click `Yes` to delete all ROI definitions in a SimBA project.
@@ -439,7 +479,7 @@ Somtimes we may want to delete all ROI definitions in a SimBA project and start 
 Once all the ROI drawings on the video looks good. remember to hit the `SAVE` button shown to save your video's ROIs to disk as in the image below. After clicking the save button, you are good to close the ROI **REGION OF INTEREST (ROI) SETTINGS** window and **DEFINE SHAPES** window. 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/save_btn.webp"/>
+<img src="images/roi_tutorial/save_btn.webp"/>
 </p>
 
 ## STANDARDIZE ROI SIZE ACROSS VIDEOS
@@ -467,12 +507,16 @@ To show the tracking (pose) data in the ROI drawing window, click the `File (ROI
 
 Alternatively, to romove the tracking data from the drawing window, toggle the `SHOW TRACKING DATA:` drop-down menu to `False`.
 
-[roi_show_pose_fps_15.webm](https://github.com/user-attachments/assets/3e4c04a6-d20b-440b-9606-2f82a328ff8b)
+<p align="center">
+  <video src="images/roi_tutorial/roi_show_pose_fps_15.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 Similarly, to view bounding boxes derived from the pose estimation, or to view both pose-estimation and bounding boxes, select the appropriate option in the dropdown and hit SAVE:
 
-[show_roi_bbox_fps_15.webm](https://github.com/user-attachments/assets/59d9a751-6b98-425e-8650-22b1a1e9363a)
+<p align="center">
+  <video src="images/roi_tutorial/show_roi_bbox_fps_15.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ## OVERLAY GRID LINES ON DRAWING IMAGES
@@ -481,11 +525,15 @@ To see grid-lines, click the `File (ROI')` menu button followed bt `Preferences`
 
 Alternatively, to romove the grid lines data from the drawing window, toggle the `SHOW SHOE GRID LINES` drop-down menu to `False`.
 
-[roi_show_gridline.webm](https://github.com/user-attachments/assets/afaf5d56-665c-440d-8de7-03552e940846)
+<p align="center">
+  <video src="images/roi_tutorial/roi_show_gridline.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 Similarly, to overlay hexagonal grid lines, which may help you draw straight, toggle the `SHOW HEXAGONAL GRID LINES:` drop-down menu to to the size (in millimeters) which you want your hexagon radii, as in the video below. You can also change their colors if it helps you see better:
 
-[roi_show_gridline_hexagon_fps_15.webm](https://github.com/user-attachments/assets/1bbd93a9-42df-47f0-867c-706de5efa3c7)
+<p align="center">
+  <video src="images/roi_tutorial/roi_show_gridline_hexagon_fps_15.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ## CHANGE DRAWING WINDOW SIZE
 If the drawing window is too big (or too small) for your monitor resolution, you can change the maximum and/or minimum percent the drawing window should take up. To make the drawing window larger, increase the values. To make the drawing window smaller, decrease the values:

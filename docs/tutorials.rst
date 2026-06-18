@@ -7,7 +7,7 @@ For up-to-date and additional tutorials, see markdown content on the `SimBA GitH
    :maxdepth: 1
 
    tutorials_rst/roi
-   tutorials_rst/roi_tutorial_new_2025
+   roi_tutorial_new_2025
    FSTTC
    feature_subsets
    tutorials_rst/user_defined_feature_class
