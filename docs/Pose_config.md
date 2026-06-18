@@ -10,13 +10,13 @@ However, SimBA can handle *any* combination of tracked body-parts, as long as us
 
 1. In the main SimBA console window, click on `File`, and `Create a new project`. The window that pops open is descibed in-depth the [Scenario 1 - Create Project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-1-generate-project-config) tutorial. If you are creating a new user-defined pose-configuration setting, **do not** begin by specifying a project path, project name, or any SML settings. Instead, skip these menus, leave these entry boxes blank, and click on the button in the `Animal Settings` menu next to the text `# config`. You should see the following default menu pop open:
 
-![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/Project_config_99.PNG "Pose config menu 1")
+![alt-text-1](images/Project_config_99.PNG "Pose config menu 1")
 
 Click on `Create pose config` to begin to define a new user-defined pose configuration. 
 
 2.  After clicking on `Create pose config`, the following menu pops open:
 
-![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/Pose_config_2.PNG "Pose config menu 2")
+![alt-text-1](images/Pose_config_2.PNG "Pose config menu 2")
 
 In the *first* entry box, give your pose-configuration a name. In this tutorial we will call our user-defined pose configuration *BtWGaNP_pose*. Please avoid spaces in the pose config name. In the *second* entry box, enter the number of animals you wish to track. This could be 1 or 2 or mote. In the *third* entry box, enter the number of body-parts your tracking data will contain. For example, if the dataset contains 8 tracked body-parts on two different animals, I will enter the integer **16**. 
 
@@ -25,7 +25,7 @@ Next, select an image that is representative of your tracking environment and co
 3. After clicking confirm a table should pop open. The table contains one row for each body-part specified in the `# of Bodyparts` entry box. If the user has entered `1` in the `# of Animals` entry box, this table will contain a single columns (as in the left image below). If the user has entered a number greater than 1 in the `# of Animals` entry box, then this table will contain two columns (as in the right image below). 
 
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/UD_1.png" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/UD_2.png" width="425"/>
+<img src="images/UD_1.png" width="425"/> <img src="images/UD_2.png" width="425"/>
 
 Please name the bodyparts in the left-most column (titled *Bodyparts' name*) by filling in their names. **Do not use spaces in the bodypart names**.
 
@@ -35,13 +35,13 @@ If you have two or more animals, you will need to fill in the second column (tit
 
 **NOTE: DOUBLE LEFT MOUSE CLICK TO PLACE BODY PART. PRESS ESC TO ADVANCE TO THE NEXT BODY PART**
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/New_pose_config_image.PNG" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/New_pose_config.gif" width="425"/>
+<img src="images/New_pose_config_image.PNG" width="425"/> <img src="images/New_pose_config.gif" width="425"/>
 
 The window will close once all the body-parts have been marked. Double left mouse-click to assign a body-part location. Press `Esc` to move to the next body-part after a body-part as been assigned. 
 
 4. Your newly created body part configuration should now be accessable though the `Animal Settings` menu next to the text `# config`:
 
-![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/Pose_config_image_5.PNG "Pose config menu 5")
+![alt-text-1](images/Pose_config_image_5.PNG "Pose config menu 5")
 
 >*Note:* When a project has been created in SimBA, the pose-configuration selected when creating the project is stored within a CSV file within the project folder, and this file is referenced to at various stages of the workflow. You can check this file out by navigating to the `project_folder\logs\measures\pose_configs\bp_names\project_bp_names.csv` file.
 
@@ -49,11 +49,11 @@ The window will close once all the body-parts have been marked. Double left mous
 
 The user may want to remove user-defined body-part configurations from the `# config` list. To do this, locate the `Reset user-defined pose configs` button in the `Project configuration` tab:
 
-![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/Project_config_100.PNG "Pose config menu 1")
+![alt-text-1](images/Project_config_100.PNG "Pose config menu 1")
 
 1. When clicked on, a warning message will pop open, asking if you are sure if you want to reset your pose-configurations. Click on `Yes` to proceed. 
 
-![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/warning11.PNG "Pose config menu 1")
+![alt-text-1](images/warning11.PNG "Pose config menu 1")
 
 2. The next time you open the `Project configuration` tab, your user-defined pose-configurations will no longer be visable in the `# config` list. 
 
@@ -65,7 +65,7 @@ Once a project with a specific pose-configuration has been created in SimBA, you
 
 1. You newly created pose-configuration setting in a new DeepLabCut project through SimBA, click the following box next to the text `Bp config file` in the `Create DLC model` menu. For more information on how to use DeepLabCut in SimBA, click [HERE](https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/Tutorial_DLC.md).
 
-![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/DLC_menu_pose.png "Pose config menu 6")
+![alt-text-1](images/DLC_menu_pose.png "Pose config menu 6")
 
 Once clicked on, first navigate to your SimBA project. Your SimBA body-part configuration is saved in a csv file within your SimBA project. Go ahead and navigate to `project_folder/logs/measures/pose_configs/bp_names\project_bp_names.csv` and select this file. 
 

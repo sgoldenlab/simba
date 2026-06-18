@@ -17,19 +17,19 @@ We suggest pre-processing videos in the following scenarios:
 
 The video parameters that you specify will be processed in the following sequence. If the user leaves certain parameters unchanged, then they are ignored in the pipeline.  
 
-![alt-text-1](/images/processvideo_flowdiagram.png "processvideo_flowdiagram")
+![alt-text-1](images/processvideo_flowdiagram.png "processvideo_flowdiagram")
 
 ## Step 1: Folder Selection
 
-![alt-text-1](/images/processvideo.PNG "processvideo")
+![alt-text-1](images/processvideo.PNG "processvideo")
 
 1. To begin batch pre-processing, in the main SimBA window click on `Process Videos` --> `Batch pre-process videos`. The window shown below will display. 
 
-![](/images/batchprocessvideo1.PNG)
+![](images/batchprocessvideo1.PNG)
 
 2. Under **Folder Selection** heading and next to `Video directory`, click on `Browse Folder` and navigate to a folder that contains the videos that should be batch processed and click on 'Select Folder`. All vidoes that you would like to process must be present in this directory.
 
-![](/images/selectfolderwithvideos.PNG)
+![](images/selectfolderwithvideos.PNG)
 
 3. Next to `Output Directory`, click on `Browse Folder` and navigate to a folder *(usually a new, empty, folder)* that should store the processed videos and click on 'Select Folder`.
 
@@ -37,14 +37,14 @@ The video parameters that you specify will be processed in the following sequenc
 
 >**Note**: Please make sure there is no spaces in your folder names or video names. Instead use underscores if needed.
 
-![](/images/processvideo2.PNG)
+![](images/processvideo2.PNG)
 
 ## Step 2: The batch processing interface.
 
 1. Once you select `Confirm`, an interface will be displayed which will allow us to manipulate the attributes of each video, or batch change attributes of all videos in the directory. Below is a screengrab of this interface, which I have labelled into three different parts: **(1) QUICK SETTINGS, (2) VIDEOS, and (3) EXECUTE**. We will go through the functions of each one in turn. 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/batch_preprocess_2.png" />
+<img src="images/batch_preprocess_2.png" />
 </p>
 
 ### QUICK SETTINGS
@@ -54,13 +54,13 @@ The quick setting menu allows us to batch specify new resolutions, new frames ra
 Let's say I want to remove the first 5s from each of the videos, and to do this I can use the `Clip Videos Settings` sub-menu in QUICK SETTINGS. To do this, I set the `Start Time` to 00:00:05, and the `End Time` to 00:00:10 and click `Apply`, as in the gif below. Note that the `Start Time` of all videos listed in the VIDEOS table are updated:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/quick_clip.gif" />
+<img src="images/quick_clip.gif" />
 </p>
 
 Similarly, let say I want to downsample all my videos to a 1200x800 resolution. I then update the `Width` and `Height` values in the `Downsample Videos` sub-menu, and click `Apply`:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/quick_downsample.gif" />
+<img src="images/quick_downsample.gif" />
 </p>
 
 As of 12/2025, the `QUICK SETTINGS` menu includes a dropdown named `USE GPU`. If this is selected as TRUE, then SimBA will run the video editing using FFMpeg *GPU* codecs instead of FFMpeg *CPU* codecs. Using the GPU potentially means a lot faster processing. For an indication of the potential time-savings when this checkbox is checked, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/gpu_vs_cpu_video_processing_runtimes.md) table. This function requires an NVIDEA GPU, and this dropdown will be grayed out if SimBA does not detect a GPU on your computer. 
@@ -77,13 +77,13 @@ As of 12/2025, SimBA includes a `OUTPUT VIDEO QUALITY` frame inside the `QUICK S
 The middle VIDEOS table list all the video files found inside your input directory defined in Step 1, with one video per row. Each video has a `Crop` button, and several entry boxes and radio buttons that allows us to specify which pre-processing functions we should apply to each video. In the header of the VIDEOS table, there are also radio buttons that allows us to tick all of the videos in the table. For example, if I want to apply the 00:00:05 to 00:00:10 clip trimming to all videos, I go ahead and click the `Clip all videos` radio button. If I want downsample all videos, I go ahead and click the `Downsample All Videos` radiobutton. If I want to `Clip all videos` *except* few videos. I go ahead and de-select the videos I want to omit from downsampling. The same applies for the FPS, greyscale, CLAHE and Frame count radio buttons:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/header_radiobtn.gif" />
+<img src="images/header_radiobtn.gif" />
 </p>
 
 Next, it might be that you want to crop some of the videos listes in the VIDEOS table. To do this, click on the `Crop` button associated with the video. In this scenario I want to crop Video 1, and click the `Crop` button. Once clicked, the first frame of `Video 1` pops open. To draw the region of the video to keep, click and hold the left mouse button at the top left corner of your rectangular region and drag the mouse to the bottom right corner of the rectanglar region. If you're unhappy with your rectangle, start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your region, press the keyboard SPACE or ESC button to save your rectangle. Notice that the `Crop` button associated with Video 1 turns red after I've defined the cropped region.
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/crop_fast.gif" />
+<img src="images/crop_fast.gif" />
 </p>
 
 The final column in the `VIDEO TABLE` is named `Quality %` and allows you to control balance of quality versus file-size of each of the videos individually (to quick set all of the videos to a particular quality, see the quick settings menu above). I recommend using a video quality setting of about 60-70%. It can feel tempting to say 100% - however a very high setting (90-100%) is typically associated with files that are **very large** with limited or no discernable quality improvements from a lower quality setting.  
@@ -103,7 +103,7 @@ The Ecexute section contains three buttons: (i) RESET ALL, (ii) RESET CROP, and 
 **RESET ALL**: The RESET ALL button puts all the choices back to how they were when opening the batch processing interface:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/reset_settings.gif" />
+<img src="images/reset_settings.gif" />
 </p>
 
 **RESET CROP**: The RESET CROP button removes all crop settings only (once clicking the `RESET CROP` button, you should see any red `Crop` button associated the videos go bck to their original color). 

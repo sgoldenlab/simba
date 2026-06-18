@@ -22,7 +22,7 @@ In some scenarios, however, employing these built-in feature-extraction scripts 
 2. Navigate to the `Extract features` tab in SimBA. and you should see the following window with the "User-defined feature extraction" menu marked in red in the image. 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_extraction_user_defined_2023.png" />
+<img src="images/feature_extraction_user_defined_2023.png" />
 </p>
 
 3. Tick the `Apply user defined feature extraction script` box, and click the `Browse File` button next to the `Script path` entry-box. Go ahead and select the path to your feature extraction script.
