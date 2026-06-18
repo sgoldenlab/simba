@@ -194,7 +194,9 @@ Re-encodes **one video** to a new frame rate. You choose the input file and the 
 
 **Where output is saved:** Same directory as the input video. Filename suffix: `fps_{value}` (e.g. `MyVideo_fps_15.mp4`).
 
-[change_single_video_fps.webm](https://github.com/user-attachments/assets/a1b067ce-1bac-46b5-b810-f70d5701774f)
+<p align="center">
+  <video src="images/tools/change_single_video_fps.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 
@@ -432,7 +434,9 @@ Crops **one video** to a **rectangular** region. The first frame opens; you clic
 
 **Where output is saved:** Same folder as the input video. Filename: original name + `_cropped` (e.g. `MyVideo_cropped.mp4`).
 
-[crop_rectangle.webm](https://github.com/user-attachments/assets/33d9b792-6aa1-4436-8302-1fcf69d875aa)
+<p align="center">
+  <video src="images/tools/crop_rectangle.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 
@@ -458,13 +462,21 @@ Crops to a **circular** region. Single-video mode: draw one circle per video. **
 
 **Where output is saved:** Same folder as input (single), or the **output directory** you chose (batch). Filenames typically add `_cropped` or similar.
 
-[crop_circle_0.webm](https://github.com/user-attachments/assets/51b85a98-8ba8-45da-8d0a-8f8030878341)
+<p align="center">
+  <video src="images/tools/crop_circle_0.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[crop_circle_1.webm](https://github.com/user-attachments/assets/5a48355e-34a3-4836-8e03-52b369cbe6d4)
+<p align="center">
+  <video src="images/tools/crop_circle_1.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[circle_crop_2.webm](https://github.com/user-attachments/assets/247b684e-33ab-4dfb-a8fb-2c6f36f4f2cb)
+<p align="center">
+  <video src="images/tools/circle_crop_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[circle_crop_3.webm](https://github.com/user-attachments/assets/66a5bf36-ea93-4023-9609-3c07fdf26e28)
+<p align="center">
+  <video src="images/tools/circle_crop_3.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 
@@ -486,7 +498,9 @@ Crops to a **user-defined polygon** (shape with multiple corners). You click poi
 
 **Where output is saved:** As specified in the dialog (often same directory as input with `_cropped` or similar).
 
-[roi_selector_polygon.webm](https://github.com/user-attachments/assets/79a5e725-b4da-40fa-bfa4-9efea37b0712)
+<p align="center">
+  <video src="images/tools/roi_selector_polygon.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 
@@ -516,7 +530,9 @@ Splits **each video** into **several cropped videos** by drawing multiple rectan
 **Fixed rectangle for many videos:** To apply the same rectangle to all videos in a folder, use a Fixed Crop Videos option if present in your build, or **Multi-crop** with **# of crop** = 1 and draw the same rectangle for each file.
 
 
-[multicrop.webm](https://github.com/user-attachments/assets/f548d9d7-eee0-4c38-8a46-414e48dc3805)
+<p align="center">
+  <video src="images/tools/multicrop.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 
@@ -602,7 +618,9 @@ Converts one or more videos to a target **container format** (e.g. MP4, AVI, WEB
 
 **Where output is saved:** Same folder as the input video(s). Filename: original name + `_grayscale` (e.g. `MyVideo_grayscale.mp4`).
 
-[geyscale_0.webm](https://github.com/user-attachments/assets/998d5470-882f-4361-83d1-d1f1cb60469a)
+<p align="center">
+  <video src="images/tools/geyscale_0.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ![greyscale_1](https://github.com/user-attachments/assets/bdd35048-e3ef-445a-804f-36add8cfb6d7)
 
@@ -626,7 +644,8 @@ Converts one or more videos to a target **container format** (e.g. MP4, AVI, WEB
 **Related:** [Extract frames](#extract-frames) (black and white option when extracting), [Change video brightness / contrast](#change-video-brightness--contrast).
 
 <p align="center">
-  <video src="images/tools/bw_gui.webp" width="600" controls>Convert to grayscale</video>
+  <img src="images/tools/bw_gui.webp" width="600" alt="Convert to grayscale">
+
 </p>
 
 | Option | Description |
@@ -640,7 +659,9 @@ Converts one or more videos to a target **container format** (e.g. MP4, AVI, WEB
 
 ![black_and_white_1](https://github.com/user-attachments/assets/76b3d634-b1b8-4ee9-af57-7bd14c0c1393)
 
-[black_and_white_0.webm](https://github.com/user-attachments/assets/921cbdc9-b672-44ec-bc05-17194678b59f)
+<p align="center">
+  <video src="images/tools/black_and_white_0.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 
@@ -674,7 +695,9 @@ Converts one or more videos to a target **container format** (e.g. MP4, AVI, WEB
 
 **Where output is saved:** Same folder as the input video. Filename: `CLAHE_` + original name. Output is often **.avi** format.
 
-[clahe.webm](https://github.com/user-attachments/assets/df2b9f30-29bc-4e60-9359-14c745d48a33)
+<p align="center">
+  <video src="images/tools/clahe.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ---
@@ -886,7 +909,9 @@ Place **two videos** in one output: either **horizontally** (side by side) or **
 
 **Where output is saved:** Next to input or in chosen folder. Full description: [Visualizations.md — Create path plots](Visualizations.md#create-path-plots-roi-tab) (same tool under **ROI** tab).
 
-[EzPathPlot_2.webm](https://github.com/user-attachments/assets/dd9e4b22-278a-41c7-b05a-315c6dda25b0)
+<p align="center">
+  <video src="images/tools/EzPathPlot_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 
@@ -1094,7 +1119,9 @@ Extract all frames from a `.seq` file. Output: folder of images (e.g. PNGs).
 | **GET PIXELS PER MILLIMETER** | Click to open the frame. **Double-click** at one end of the known distance, then **double-click** at the other end. Press **Esc** when done. |
 | **Output** | The conversion factor is printed in the main SimBA terminal. Use this value for calibration when not using the project's **Video parameters** tab. |
 
-[pixel_per_mm.webm](https://github.com/user-attachments/assets/85ce851d-bf88-4443-bead-f83b7cd08845)
+<p align="center">
+  <video src="images/tools/pixel_per_mm.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ---
@@ -1123,7 +1150,9 @@ Extract all frames from a `.seq` file. Output: folder of images (e.g. PNGs).
 
 
 
-[brightness_contrast_ui.webm](https://github.com/user-attachments/assets/0c02a1d2-5739-4b97-811c-0fdeacf0fab0)
+<p align="center">
+  <video src="images/tools/brightness_contrast_ui.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ---
@@ -1182,7 +1211,9 @@ Extract all frames from a `.seq` file. Output: folder of images (e.g. PNGs).
 **Where output is saved:** The save directory you chose (or same folder as input if not specified).
 
 
-[playback_speed.webm](https://github.com/user-attachments/assets/e99a9cee-03de-4414-9628-ed694913dfc0)
+<p align="center">
+  <video src="images/tools/playback_speed.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 
@@ -1296,7 +1327,9 @@ Rotates **every frame** by a **fixed angle** (e.g. 90° or 180°). Use when the 
 
 * **Tools** → **Rotate / flip / reverse videos...** → **Interactively rotate videos**
 
-[rotate_demo.webm](https://github.com/user-attachments/assets/a464705c-65e8-4d90-842e-10bf799f51ac)
+<p align="center">
+  <video src="images/tools/rotate_demo.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 Lets you **rotate by keypress** while viewing the video: use **left/right arrow keys** to rotate stepwise until the orientation looks correct, then press **Esc** to save and close. Useful when you don't know the exact angle and want to tune by eye.
@@ -1310,7 +1343,9 @@ Lets you **rotate by keypress** while viewing the video: use **left/right arrow 
 | **Run** (if in dialog) | Start the interactive window. |
 
 
-[rotate_video.webm](https://github.com/user-attachments/assets/32c77c76-3b0a-4df8-931a-991834c21213)
+<p align="center">
+  <video src="images/tools/rotate_video.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 
@@ -1331,7 +1366,9 @@ Lets you **rotate by keypress** while viewing the video: use **left/right arrow 
 | **Direction** | **Horizontal** — mirror left–right. **Vertical** — mirror top–bottom. |
 | **Run** | Apply flip and save. |
 
-[flip_videos.webm](https://github.com/user-attachments/assets/3cb887af-ea94-4a72-95e5-a20534070753)
+<p align="center">
+  <video src="images/tools/flip_videos.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 
@@ -1355,7 +1392,9 @@ Lets you **rotate by keypress** while viewing the video: use **left/right arrow 
 | **USE GPU** | **TRUE** = use NVIDIA GPU for encoding. **FALSE** = CPU only. |
 | **Run** | Start processing. |
 
-[reverse_videos.webm](https://github.com/user-attachments/assets/55ddde05-c880-4850-b5cd-afabaef8bbf4)
+<p align="center">
+  <video src="images/tools/reverse_videos.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 
@@ -1396,7 +1435,9 @@ Draws the **frame index** (frame number) on each frame. Useful for annotation, d
 | **Use GPU** | **TRUE** = use NVIDIA GPU for encoding. **FALSE** = CPU only. |
 | **Run** | Process. Single: use **Run – single video**. Batch: use **Run – multiple videos**. |
 
-[superimpose_frame_count.webm](https://github.com/user-attachments/assets/a497b075-a5f7-429c-835e-ad84829a0de0)
+<p align="center">
+  <video src="images/tools/superimpose_frame_count.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ---
@@ -1426,7 +1467,9 @@ Overlays a **watermark image** (e.g. logo) on every frame. You choose the image,
 
 
 
-[watermark_video.webm](https://github.com/user-attachments/assets/c3cbca9e-8667-43dc-ba10-f14fcc0247ac)
+<p align="center">
+  <video src="images/tools/watermark_video.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 
@@ -1459,7 +1502,9 @@ Draws a **running timer** (elapsed time from the start of the video) on each fra
 | **Video path** (single) / **Video directory path** (batch) | The video(s) to process. |
 | **Run** | **Run – single video** or **Run – multiple videos**. |
 
-[superimpose_elapsed_time.webm](https://github.com/user-attachments/assets/bc055f3a-dc13-4c1b-8aac-61c0013b5b70)
+<p align="center">
+  <video src="images/tools/superimpose_elapsed_time.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ---
@@ -1510,7 +1555,9 @@ Overlays **one video on top of another** (e.g. picture-in-picture). You choose a
 | **Use GPU** | **TRUE** = use NVIDIA GPU for encoding. **FALSE** = CPU only. |
 | **Run** | Apply and save. |
 
-[superimpose_video.webm](https://github.com/user-attachments/assets/6543306d-1b4b-4ab7-a567-c5b3a4c69f60)
+<p align="center">
+  <video src="images/tools/superimpose_video.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 
@@ -1540,7 +1587,9 @@ Writes the **video filename** as text on each frame. Use when you need to identi
 | **Run** | **Run – single video** or **Run – multiple videos**. |
 
 
-[superimpose_video_names.webm](https://github.com/user-attachments/assets/f76350db-764e-4539-91bf-2ebc4d34e6d9)
+<p align="center">
+  <video src="images/tools/superimpose_video_names.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 
@@ -1570,7 +1619,9 @@ Draws **custom text** you type on every frame. You set position, font, size, col
 
 **Where output is saved:** As set in each pop-up (often same folder with a suffix such as `_frame_no`, `_watermark`, or similar).
 
-[superimpose_freetext.webm](https://github.com/user-attachments/assets/c555a600-1b17-4e62-8885-3ee94cde7ef7)
+<p align="center">
+  <video src="images/tools/superimpose_freetext.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ---
@@ -1614,9 +1665,13 @@ Process **one video**: compute or supply a background, then replace matching pix
 **Where output is saved:** Same directory as input. Filename: original name + `_bg_subtracted`.
 
 
-[bg_remover_example_4.webm](https://github.com/user-attachments/assets/80abb7bb-bb19-4e34-8d98-b20dc27d263f)
+<p align="center">
+  <video src="images/tools/bg_remover_example_4.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[bg_remover_example_3.webm](https://github.com/user-attachments/assets/439b0eac-e6f3-479e-be4f-7ddcb106d14b)
+<p align="center">
+  <video src="images/tools/bg_remover_example_3.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 
@@ -1645,11 +1700,17 @@ Process **all videos in a folder**. Optionally supply a folder of reference vide
 **Where output is saved:** Same directory as each input video. Filename: original name + `_bg_subtracted`.
 
 
-[bg_removed_ex_2_clipped.webm](https://github.com/user-attachments/assets/cfb8d6e4-8739-441b-b5fe-02cfe3126b34)
+<p align="center">
+  <video src="images/tools/bg_removed_ex_2_clipped.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[bg_removed_ex_4_clipped.webm](https://github.com/user-attachments/assets/c88889e8-75ce-4bbe-b1bf-0ad58c0279ff)
+<p align="center">
+  <video src="images/tools/bg_removed_ex_4_clipped.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[bg_removed_ex_6_clipped.webm](https://github.com/user-attachments/assets/fef45850-6bb7-415f-ac5b-1c13ce42f3df)
+<p align="center">
+  <video src="images/tools/bg_removed_ex_6_clipped.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ---
@@ -1725,7 +1786,9 @@ Joins **only the videos you choose**, in the **order you set** (VIDEO PATH 1, th
 **Where output is saved:** Same directory as the input video.
 
 
-[roi_blurbox.webm](https://github.com/user-attachments/assets/60f07106-2335-440b-9e9c-557b9bb76263)
+<p align="center">
+  <video src="images/tools/roi_blurbox.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ---
@@ -1761,7 +1824,9 @@ Joins **only the videos you choose**, in the **order you set** (VIDEO PATH 1, th
 **Where output is saved:** Same directory as the input (or as specified in the dialog).
 
 
-[crossfade_two_videos.webm](https://github.com/user-attachments/assets/7fcd7e40-97eb-4794-abe2-06298d0cc1d5)
+<p align="center">
+  <video src="images/tools/crossfade_two_videos.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ---
@@ -1794,13 +1859,21 @@ Joins **only the videos you choose**, in the **order you set** (VIDEO PATH 1, th
 
 **Where output is saved:** In the **Average frame save directory** you chose. Filename: `{video_name}_avg_frm.png` per video.
 
-[create_average_frm_1.webm](https://github.com/user-attachments/assets/d493f30e-1c5d-4583-ab59-61a03cd4d227)
+<p align="center">
+  <video src="images/tools/create_average_frm_1.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[create_average_frm_2.webm](https://github.com/user-attachments/assets/c498340e-09da-445f-b0cf-67e6102c0242)
+<p align="center">
+  <video src="images/tools/create_average_frm_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[create_average_frm_3.webm](https://github.com/user-attachments/assets/d0f11225-dd09-4fad-9117-35f7910bd7fa)
+<p align="center">
+  <video src="images/tools/create_average_frm_3.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[create_average_frm_4.webm](https://github.com/user-attachments/assets/6f805a43-b59d-4e55-8390-a8177d7ce471)
+<p align="center">
+  <video src="images/tools/create_average_frm_4.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ### ✅ Validate video seekability
@@ -1878,9 +1951,13 @@ Joins **only the videos you choose**, in the **order you set** (VIDEO PATH 1, th
 
 → Full description: [Visualizations.md — Egocentrically align pose and video](Visualizations.md#egocentrically-align-pose-and-video-tools-menu).
 
-[egocentric_1.webm](https://github.com/user-attachments/assets/ad42c335-4147-4e54-b2cc-2ec6439f194f)
+<p align="center">
+  <video src="images/tools/egocentric_1.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[egocentric_2.webm](https://github.com/user-attachments/assets/39aa532b-c812-4e04-aa4c-d15fdc66ae42)
+<p align="center">
+  <video src="images/tools/egocentric_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 

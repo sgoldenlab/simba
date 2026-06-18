@@ -61,7 +61,7 @@ MIGRATED_MD = {
     'FSTTC.md', 'SHAP.md', 'anchored_rois.md', 'classifier_validation.md',
     'cue_light_tutorial.md', 'directionality_between_animals.md', 'feature_subsets.md',
     'kleinberg_filter.md', 'Multi_animal_pose.md', 'FAQ.md',
-    'roi_tutorial_new_2025.md',
+    'roi_tutorial_new_2025.md', 'Tools.md',
 }
 _unmigrated_md = [f for f in _glob.glob('*.md') if f not in MIGRATED_MD]
 
@@ -105,6 +105,7 @@ redirects = {
     "tutorials_rst/multi_animal_pose": "../Multi_animal_pose.html",
     "tutorials_rst/FAQ": "../FAQ.html",
     "tutorials_rst/roi_tutorial_new_2025": "../roi_tutorial_new_2025.html",
+    "tutorials_rst/tools": "../Tools.html",
 }
 html_css_files = ['css/simba_theme.css',  # Include your existing CSS file
                   'custom.css']  # Include your additional CSS file
