@@ -1,7 +1,7 @@
 # Model explainability and calculating feature SHAP values in SimBA
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP0.png" />
+<img src="images/SHAP0.png" />
 </p>
 
 An understanding of how machine learning models reach their  decisions is important not only for the scientific method but can also help you gain insight into how your classifier works and what makes it different or similar to other classifiers. Machine learning explainability metrics, such as SHAP, can help you answer questions like:
@@ -25,7 +25,7 @@ Here we  look at how we can use [SHAP (SHapley Additive exPlanations)](https://g
 In brief, when using SHAP, each feature is evaluated independently, and the final classification probability is distributed among the individual features according to their contribution to it. This value is calculated after exhaustive permutations within the order of feature-introductions into the classification scenario:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP1.png" />
+<img src="images/SHAP1.png" />
 </p>
 
 The *base probability* in the figure above is the probability of picking a frame that contains your behavior by pure chance (e.g., if half of your video frames contain you behavior of interest, then the base probability will be 50%; more info below!). The values associated with each feature describe the features effect on the classification probability. To read more about SHAP values, also see the [SHAP GitHub repository](https://github.com/slundberg/shap) which SimBA wraps, or read [SHAP paper in Nature Machine Learning Intelligence](https://www.nature.com/articles/s42256-019-0138-9). 
@@ -33,7 +33,7 @@ The *base probability* in the figure above is the probability of picking a frame
 The goal if this analysis may be to produce data and visualisations similar to the image below, which compares classifiers for the same target behavior (attack behaviour, in this example) but built using annotations from different recording environment, annotators and institutes. With this type of data at hand, we would be able to conclude that most attack classifiers primarily depend on features of intruder movement, animal distances, and resident and intruder movements, for discriminating attack events from non-attack events (with some notable exceptions!). 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP_05_10.png" />
+<img src="images/SHAP_05_10.png" />
 </p>
 
 ## Part 1: Generate a dataset
@@ -49,7 +49,7 @@ Navigate to the `Train machine model` tab and click on `Settings`. In the pop-up
 (https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model. At the bottom of the `Settings` pop-up window, you will see these entry boxes. Begin by ticking the `Calculate SHAP values` entry box.
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP2.png" />
+<img src="images/SHAP2.png" />
 </p>
 
 When this box is ticked, and the entry boxes are filled in, SiMBA will also calculate SHAP values while generating your behavioral classifier. SimBA will use your annotations in the `project_folder/csv/targets_inserted` folder when doing so. SHAP calculations are an computationally expensive process, so you most likely can't use **all** of your annotations to calculate them. The time it takes to calculate SHAP scores for a single frame will depend on how many features you have the the specs of your computer, but in all likelihood it will take **several seconds, and possibly tens of seconds**, for a single frame. We therefore have to select a random sub-set of frames to calculate SHAP scores for. 
@@ -66,7 +66,7 @@ Click to close the `Settings` pop-up window.
 Start the classifier training  by clicking on `Train single model from global environment` or `Train multiple models, one for each saved settings`. You will be able to follow the progress in the Terminal window. A new message will be printed in the main SimBA terminal for every SHAP score computed. If you are calculating the shap scores for 200 frames, you can expect the beginning of the calculations to look something like this in the main SimBA terminal:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP3.png" />
+<img src="images/SHAP3.png" />
 </p>
 
 >**Note**: As noted above, calculating SHAP scores is computationally expensive and depending on the number of frames you entered in the `# target present` and `# target absent`, this could take a while. If you are calculating SHAP scores for a lot of frames, it's best to make it an overnighter. 
@@ -88,7 +88,7 @@ Below we will go through how the data in these two files can be interpreted.
 The first two SHAP value output files (`RAW_SHAP_feature_values_copulation_prediction.csv` & `SHAP_values_copulation_prediction.csv`) have an equal number of rows, where every row represent one of the frames that we calculated SHAP scores for. If you chose to generate SHAP values for 200 frames, each of the two files will contain 200 rows, where row *N* within both files represent the data for the **same frame**. The first file (`SHAP_values_copulation_prediction.csv`) contains the SHAP probability values. The second file (`RAW_SHAP_feature_values_copulation_prediction.csv`) contain the **raw** feature values for the same frames. The reason for generating two files is that it is sometimes necessery to match the SHAP values (represented in the `SHAP_values_copulation_prediction.csv`) with an actual feature values (represented in the `RAW_SHAP_feature_values_copulation_prediction.csv`).  
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP5.png" />
+<img src="images/SHAP5.png" />
 </p>
 
 To help understand this, I've placed the two CSV files next to each other in the image above, with the `RAW feature values` file shown on the left, and the `SHAP values` file on the right. The red rectangle in the RAW values, on the left, shows that raw feature distance between the nose and the tail of animal number 1 (the feature name is in the header) was 70.23404 millimeters in frame number 1. Conversely, the SHAP values, shown on the right, shows that the distance between the nose and the tail of animal number 1 **increased** the copulation probability in frame number 1 with 0.317%.
@@ -96,7 +96,7 @@ To help understand this, I've placed the two CSV files next to each other in the
 The last four columns of the `SHAP_values_copulation_prediction.csv` file contain some information that might be helpful for interpretating the data, and give a sanity check that the calculations were done as expected:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP6.png" />
+<img src="images/SHAP6.png" />
 </p>
 
 The first of these 4  columns (`Expected_value`), contains the baseline probability value. That is - in this toy example - if you picked a frame at random, there is a 7.693% chance that the frame contains the target behavior `copulation`. 
@@ -109,7 +109,7 @@ Three further SHAP output files are generated **if** you are using the SimBA pre
 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/shap_05_2.png" />
+<img src="images/shap_05_2.png" />
 </p>
 
 The top screengrab tells you that the most important feature category for detecting copulation events was features measuring the combined movement of both the animals, and the most important feature time-sampling window within this category was 200ms. The bottom screengrab tells you that the most important features for detecting non-copulation events. To see which features form part of each of the sub-categories, check out [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/shap_feature_categories.csv) CSV file. 
@@ -118,7 +118,7 @@ The final file (`SHAP_summary_line_graph_copulation_20210507160801.png`) is an i
 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/shap_05_3.png" />
+<img src="images/shap_05_3.png" />
 </p>
 
 

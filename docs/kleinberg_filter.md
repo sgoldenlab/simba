@@ -1,7 +1,7 @@
 # Kleinberg behavior classification smoothing in SimBA
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Kleinberg_1.png" />
+<img src="images/Kleinberg_1.png" />
 </p>
 
 Classifiers generated in SimBA provide a classification for the presence vs. absence of a behavior of interest in every frame of the analysed videos. This mean that, according to the classifier, a behavioural bout can be a short as one frame of the video (e.g., 20ms in a 50 fps video). Similarly, according to the classifier, two behavioral bouts can also be separated by a single frame where the classifier judges the behavioral event to be absent. Often we want to smooth these classified events, so that the (i) behaviours expressed for very short periods are removed, and (ii) behavioral bouts seperated by very short time are concatenated. We can do this by setting [heuristic rules in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data) when we run the classifiers (i.e., a behavioural bout cannot be shorter than N milliseconds). 
@@ -12,7 +12,7 @@ After applying the Kleinberg smoother, you can expect the output to look like be
 
 
 <p align="center">
-  <img src="https://github.com/sgoldenlab/simba/blob/master/images/klenberg.gif" width="850"/>
+  <img src="images/klenberg.gif" width="850"/>
 </p>
 
 >Note: If you are smoothing your data using the Kleinberg smoother, I recommend refraining from setting [heuristic rules in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data) when we run the classifiers (i.e., a behavioural bout cannot be shorter than N milliseconds) and instead let the Kleinberg algorithm take care of **all** of the smoothing. Thus, when you first run the classifier, set the **min bout duration** for the classifiers you want to smooth (as descibed [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data)) to `0`. 
@@ -21,17 +21,17 @@ After applying the Kleinberg smoother, you can expect the output to look like be
  
 1. After running the machine model (i.e., after clicking on `Run RF Model` as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model)), go ahead and click on the `Kleinberg Smoothing` button.
 
- ![](/images/kleinberg1.PNG)
+ ![](images/kleinberg1.PNG)
  
 2. You should see the below `settings menu` pop up. Check the classifier(s) that you wished to apply the Kleinberg smoothing for and set the "hyperparameters". See the section below for more information about the hyperparameters and the default settings. Click on the `Apply Kleinberg Smoother` button to apply the filter.
 
-![](/images/kleinberg_2023.png)
+![](images/kleinberg_2023.png)
 
 3. The files in the `project_folder/csv/machine_results` will be overwritten with new files, with the same file names as the original files, but now containing the kleinberg smoothened classifications for the selected classifiers. The original files will be saved inside a subdirectory within the `project_folder/csv/machine_results` folder named `Pre_Kleinberg_DATETIMESTAMP`.
 
 4. For troubleshooting purposes - for each classifier you smooth - SimBA will save a log file in the `project_folder/csv/logs` directory that is named after the classifier name and the current date and time, for example *Kleinberg_log_Attack_20210204202223.csv*. This file contains information on **all** the classified bouts found by the Kleinberg smoother, their hierarchy, and start and end frame. It may look like this:
 
-![](/images/Kleinberg_10.png)
+![](images/Kleinberg_10.png)
 
 Here, every row is a classified behavioral bout. The *Hierarchy* columns denotes which level in the hierarchy the bout belongs to. The *Start* columns denotes the frame when the behavioral bout started within this part of the hierarchy. The *End* columns denotes the frame when the behavioral bout ended within this part of the hierarchy. If you look carefully you see that the lower hierarchies encompass the same boural events further up the hierarchy.  
 
@@ -55,7 +55,7 @@ In short,
  *(iv) Hierarchical search* - If **not** ticked,  then bouts are split or combined at different Kleinberg hierarchy levels. For example, setting Hierachy to **3** will preserve only behaviour bouts at hierarchy level **3** which may exclude longer behavioral bouts **only** present at hierarch levels 1 and 2.  For example, when Hierarchical search is **ticked** and hierarchy is set to 3, SimBA will preserve all behaviour bouts at level 3, as well as behaviour bouts at level 2 that is not encompassed by the behavior bouts at level 3. 
  
 #### Hierarchical search example
- ![](/images/nastacias_fine_draw_kleinberg.png)
+ ![](images/nastacias_fine_draw_kleinberg.png)
 
  
  

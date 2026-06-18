@@ -1,6 +1,6 @@
 # Calculating forward-spike time tiling coefficents in SimBA
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_1.png" />
+<img src="images/FSTTC_1.png" />
 
 
 When classifying mutiple behaviors in SimBA, we may be interested in causal sequences. For example, does behavior A cause the expression of behavior B, or does behavior B cause the expression of behavior A (... and so one for all the different pairwise behavior combinations of interest).
@@ -24,7 +24,7 @@ Note that SimBA will calculate the FSTTC for all the behaviors selected by the u
 The FSTTC is calculated as:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_2.png" />
+<img src="images/FSTTC_2.png" />
 </p>
 
 Where the Δt hyper-parameter is a time-window (e.g 2000ms - Lee et al. 2019). P is the proportion of behavior B onsets that fall inside Δt following the onset of behavior A. T<sub>A</sub> is the proportion of the total session time that falls inside Δt following behavior A onset. T<sub>B</sub>  is the proportion of the total session time that falls inside Δt following behavior B onset.
@@ -44,13 +44,13 @@ First, SimBA needs classified data to calculate the FSTTC. SimBA will look in th
 [Load you SimBA project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config), and click on the `[Run machine model]` tab. In the *Run Machine Model* submenu, you should see a button named `FSTTC`. 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_11.png" />
+<img src="images/FSTTC_11.png" />
 </p>
 
 Go ahead and click on it, and you should see the following menu pop up:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_12.png" />
+<img src="images/FSTTC_12.png" />
 </p>
 
 
@@ -59,7 +59,7 @@ In this menu, we need to insert some settings telling SimBA how to perform the F
 * `Create graph`: If you tick this box, SimBA will create and save a violin plot of the FSTTC representating all the videos in you project. This can be helpful to get a quick overview of the data. The graph will be saved as a time-stamped `.png` file in the `project_folder/logs` directory, and be named something like `FSTTC_20210307071243.png`. It will look something like this image below (click on the image to enlarge), with the FSTTC is on the y-axis, and the dyadic pairwise behaviors on the x-axis. On the x-axis, the first behavior name is behavior A, and the second behavior name is behavior B. Thus, in the image below, the first violin represents the FSTTC for **Lateral threat** behavior followed by **Attack** behavior. 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_violin.png" />
+<img src="images/FSTTC_violin.png" />
 </p>
 
 * Time Delta: The FSTTC needs a single hyperparameter - time delta - which should be expressed in milliseconds. This represents the length of the time-window following behavior A onset. If the expression of behavior B happens within time-delta, then we will consider behavior B as produced by behavior A. If unsure, start with a time-delta of 2000ms [Lee et al, 2019](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220596). 
@@ -73,7 +73,7 @@ Once done, go ahead and click on `Caluclate FSTTC`. You can follow the progress 
 Once done, inside your `project_folder/logs` directory, you will have a time-stamped CSV file - which is named something like `FSTTC_20210307071243.csv` - and contains the results for each of the videos in your project. If you open it up, it will look like this (click on the image to enlarge):
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_13.png" />
+<img src="images/FSTTC_13.png" />
 </p>
 
 This file contains one row for every video in your project, and one column for every pairwise behavior combination of the behaviors you selected in **Step 2** above. So, for example, if you want the FSTTC for video `CSDS01110` and `Lateral threat -> Attack`, look in cell C2. 

@@ -56,7 +56,12 @@ pygments_style = 'sphinx'
 # every other root-level .md stays excluded. Add to this set as each tutorial is
 # migrated from tutorials_rst/*.rst.
 import glob as _glob
-MIGRATED_MD = {'Scenario1.md', 'Scenario2.md', 'Scenario3.md', 'Scenario4.md'}
+MIGRATED_MD = {
+    'Scenario1.md', 'Scenario2.md', 'Scenario3.md', 'Scenario4.md',
+    'FSTTC.md', 'SHAP.md', 'anchored_rois.md', 'classifier_validation.md',
+    'cue_light_tutorial.md', 'directionality_between_animals.md', 'feature_subsets.md',
+    'kleinberg_filter.md', 'Multi_animal_pose.md', 'FAQ.md',
+}
 _unmigrated_md = [f for f in _glob.glob('*.md') if f not in MIGRATED_MD]
 
 exclude_patterns = [
@@ -80,6 +85,16 @@ redirects = {
     "tutorials_rst/scenario_2": "../Scenario2.html",
     "tutorials_rst/scenario_3": "../Scenario3.html",
     "tutorials_rst/scenario_4": "../Scenario4.html",
+    "tutorials_rst/FSTTC": "../FSTTC.html",
+    "tutorials_rst/SHAP": "../SHAP.html",
+    "tutorials_rst/anchored_rois": "../anchored_rois.html",
+    "tutorials_rst/classifier_validation": "../classifier_validation.html",
+    "tutorials_rst/cue_lights": "../cue_light_tutorial.html",
+    "tutorials_rst/directionality_between_animals": "../directionality_between_animals.html",
+    "tutorials_rst/feature_subsets": "../feature_subsets.html",
+    "tutorials_rst/kleinberg_filter": "../kleinberg_filter.html",
+    "tutorials_rst/multi_animal_pose": "../Multi_animal_pose.html",
+    "tutorials_rst/FAQ": "../FAQ.html",
 }
 html_css_files = ['css/simba_theme.css',  # Include your existing CSS file
                   'custom.css']  # Include your additional CSS file

@@ -167,7 +167,7 @@ These are warnings, and are not fatal. You should be able to ignore them - go ah
 <br/><br/>
 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/Dependencies.png)
+![](images/Dependencies.png)
 
 These errors are related to an update in the pypi package manager version 20.3.3, [where they introduced stricter version control](https://pip.pypa.io/en/stable/news/). I suggest trying either:
 

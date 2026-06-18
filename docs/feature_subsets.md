@@ -1,7 +1,7 @@
 # <p align="center"> Feature sub-sets in SimBA </p>
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_subsets_0.png" />
+<img src="images/feature_subsets_0.png" />
 </p>
 
 ### INTRODUCTION
@@ -16,7 +16,7 @@ SimBA extracts features for builing and [running downstream machine learning mod
 2). Navigate to the [Extract features] tab, and click on the `CALCULATE FEATURE SUBSETS` button.
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_subset_menu_1.png" />
+<img src="images/feature_subset_menu_1.png" />
 </p>
 
 3) In the **SETTINGS** frame, begin by selecting a directory where you want to store the output data. In the chosen directory, SimBA will store one CSV file per file in the `project_folder/csv/outlier_corrected_movement_location` directory. In these files, there will be one column per new feature and one row per video frame. It's a good idea to select an empty directory. 
@@ -35,7 +35,7 @@ SimBA extracts features for builing and [running downstream machine learning mod
 8) Next, we need to select the features that we want to compute:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_subset_menu_2.png" />
+<img src="images/feature_subset_menu_2.png" />
 </p>
 
 
@@ -50,9 +50,3 @@ For smaller examples of expected output features, see:
 * [Within-animal three-point convex hull (mm2).csv](https://github.com/sgoldenlab/simba/blob/master/misc/Within-animal%20three-point%20convex%20hull%20(mm2).csv)
 * [Within-animal four-point convex hull (mm2).csv](https://github.com/sgoldenlab/simba/blob/master/misc/Within-animal%20four-point%20convex%20hull%20(mm2).csv)
 * [Frame-by-frame body-part movement (mm).csv](https://github.com/sgoldenlab/simba/blob/master/misc/Frame-by-frame%20body-part%20movement%20(mm).csv)
-
-
-
-
-
-

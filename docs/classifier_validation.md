@@ -4,7 +4,7 @@ This tool can help us visualize any potential false-positives within the classif
 
 1. Load your SimBA project and click on the `CLASSIFIER VALIDATION CLIPS` button in [Visualizations] tab and you should see the following sub-menu:
 
-![](/images/clf_validation_1223.png)
+![](images/clf_validation_1223.png)
 
 * The `SECONDS` entry-box: Sometimes it can be difficult to understand the context if we only see the classified behavior bout, and we want to introduce a little temporal "padding" pre- and post-behavioral bout to get a better understand of what is going on. In this entry-box, enter the **number of seconds** pre- and post-behavioral bout that should be included in the output video clips. 
 
@@ -26,6 +26,6 @@ SINGLE VIDEO: To create post-classification validation visualizations for a sing
 
 MULTIPLE VIDEO: To create post-classification validation visualizations for all videos in your project, click the <kbd>Create multiple videos button</kbd>. Videos will be created for all of the files found within the `project_folder/csv/machine_results` directory. You can follow the progress in the main SimBA terminal. The results will be stored in the project_folder/frames/output/classifier_validation directory of your SimBA project.
 
-![](/images/classifiervalidation.gif)
+![](images/classifiervalidation.gif)
 
 Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)

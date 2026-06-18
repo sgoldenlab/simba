@@ -139,7 +139,7 @@ ________________________________________________
    :maxdepth: 1
    :caption: FAQ:
 
-   tutorials_rst/FAQ
+   FAQ
 
 .. toctree::
    :maxdepth: 1

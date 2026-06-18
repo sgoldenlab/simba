@@ -20,15 +20,15 @@ We can also use SimBA to generate visualizations of these metrics, so that we ca
 
 </div>
 
-[![Video example: SimBA YouTube playlist](https://github.com/sgoldenlab/simba/blob/master/images/Direct_10.JPG)](https://youtu.be/d6pAatreb1E "Video example: SimBA YouTube playlist")
+[![Video example: SimBA YouTube playlist](images/Direct_10.JPG)](https://youtu.be/d6pAatreb1E "Video example: SimBA YouTube playlist")
 
 
 <p align="center">
-  <img src="https://github.com/sgoldenlab/simba/blob/master/images/Testing_Video_3_short.gif" width="425"/>
+  <img src="images/Testing_Video_3_short.gif" width="425"/>
 </p>
 
 <p align="center">
-  <img src="https://github.com/sgoldenlab/simba/blob/master/images/Directionality_ROI.PNG" width="425"/>
+  <img src="images/Directionality_ROI.PNG" width="425"/>
 </p>
 
 
@@ -46,7 +46,7 @@ Specifically, for working with directionality between animal in SimBA, begin by 
 2. Navigate to the ROI tab. On the right hand side, within the `Analyze distances/velocity` sub-menu, there are two buttons (circled in red in the image below) - (i) `Analyze directionality between animals` and (ii) `Visualize directionality between animals`.
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/directionality_tutorial_1.png" />
+<img src="images/directionality_tutorial_1.png" />
 </p>
 
 3. We will begin clicking on the `ANALYZE DIRECTIONALITY BETWEEN ANIMALS` button. This will bring up a pop-up menu with three ouput options. Select which data output format you would like.
@@ -56,7 +56,7 @@ Specifically, for working with directionality between animal in SimBA, begin by 
 * **CREATE DETAILED SUMMARY TABLES**: Creates one CSV file per video in your project, with one row for every "line of sight" observation detected in the video, as in the screengrab below. The `Video` columns denotes the video the data was computed from. The `Frame_#` columns denotes the frame number the "line of sight" observation. The `Animal_1` columns represents the observing animal. The `Animal_2` column represents the animal beeing observed. The `Animal_2_body_part` represents the body-part of `Animal_2` that is beeing observed. The `Eye_x` and	`Eye_y` columns denotes the approximate pixel location of the `Animal_1` eye that observed the `Animal_2_body_part`. The `Animal_2_bodypart_x` and `Animal_2_bodypart_y` columns represents the location of the `Animal_2_body_part` that is observed by `Animal_1`.  For a full example of expected output of the detailed summary tables, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/detailed_summary_directionality_example.csv) CSV file. 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/directionality_tutorial_2.png" />
+<img src="images/directionality_tutorial_2.png" />
 </p>
 
 * **CREATE AGGREGATE STATISTICS TABLES**: Creates one CSV file with aggregate statistics, with each row representing a relationship between two animals within a video and the aggregate seconds that one animal was within the "line of sight" of another animal. The aggregate seconds is computed by summing all the frames that where one or more body-part of the observed animals was in the "line of sight" of the observing animal. For an example of expected output of the aggregate summary table, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/direction_data_aggregates_example.csv) CSV file. 
@@ -75,7 +75,7 @@ Once you filled in your selected output formats, click `RUN`. You can follow the
 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/directionality_tutorial_3.png" />
+<img src="images/directionality_tutorial_3.png" />
 </p>
 
 * `Shows pose-estimated body-parts`. If checked, the ouput video will include circles denoting the predicted location of the animal body-parts. If not checked, no pose-estimated body-part locations are shown.
@@ -97,11 +97,11 @@ Once complete, you can find your final rendered videos in your `project_folder\f
 
 
 [Example 1 - 5 mice](https://www.youtube.com/watch?v=d6pAatreb1E&list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl&index=20&t=0s)
-![](https://github.com/sgoldenlab/simba/blob/master/images/Testing_Video_3_short.gif)
+![](images/Testing_Video_3_short.gif)
 
 
 [Example 2 - 2 mice on YouTube](https://www.youtube.com/watch?v=tsOJCOYZRAA&list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl&index=19&t=0s)
-![](https://github.com/sgoldenlab/simba/blob/master/images/Together_2.gif)
+![](images/Together_2.gif)
 
 
 Author [Simon N](https://github.com/sronilsson)
