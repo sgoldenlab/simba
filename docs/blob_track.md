@@ -1,6 +1,8 @@
 # BLOB TRACKING 
 
-[header.webm](https://github.com/user-attachments/assets/f8a18ba8-76b4-473b-b001-2331192b72c1)
+<p align="center">
+  <video src="images/blob_track/header.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 https://github.com/user-attachments/assets/1838035d-e4c4-40e3-b98f-09e3b4cb9bc7
 
@@ -47,7 +49,7 @@ After starting SimBA click on `Process Videos` in the main toolbar, and go to `B
 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/docs/tutorials_rst/img/blob_tracking/blob_tracking_0.webp" />
+<img src="images/blob_track/blob_tracking_0.webp" />
 </p>
 
 
@@ -55,7 +57,7 @@ Next, you should see the following pop-up menu. Next to the `INPUT VIDEO DIRECTO
 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/docs/tutorials_rst/img/blob_tracking/blob_tracking_1.webp" />
+<img src="images/blob_track/blob_tracking_1.webp" />
 </p>
 
 
@@ -66,7 +68,7 @@ Next, hit the <kbd>RUN</kbd> button, and the below pop-up should show, which lis
 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/docs/tutorials_rst/img/blob_tracking/blob_tracking_2.webp" />
+<img src="images/blob_track/blob_tracking_2.webp" />
 </p>
 
 
@@ -89,7 +91,9 @@ Generally, a value between 20-70 should do the trick.
 
 In the video below, I toggle the between different threshold, clicking apply, and you can see the `THRESHOLD` column updated for all the videos in the table below.
 
-[quick_set_threshold.webm](https://github.com/user-attachments/assets/b04b8f13-f0c7-489a-a3cd-a07b8a39dc68)
+<p align="center">
+  <video src="images/blob_track/quick_set_threshold.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 **SMOOTHING TIME (S)**: If this dropdown is set to None, **no** temporal smooth of the animal tracking points is performed. 
 
@@ -97,7 +101,9 @@ If set to, for example, 0.5, then SimBA performs Savitzky-Golay smoothing across
 
 In the video below, I toggle the between different smoothing times, clicking apply, and you can see the `SMOOTHING TIME` column updated for all the videos in the below table.
 
-[quicK-set_smoothing_time.webm](https://github.com/user-attachments/assets/3418e032-9dcc-4b81-8c56-d0daaae36c99)
+<p align="center">
+  <video src="images/blob_track/quicK-set_smoothing_time.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 **BUFFER SIZE (PIXELS)**: If set to None, then animals detected key-points will be placed right along the hull perimeter. 
 
@@ -138,7 +144,9 @@ SimBA will automatically pair each background video with the videos in the table
 
 In the video below, I choose a background directory and hit <kbd>APPLY</kbd>. You should see all the background reference video paths updating in the below video table.
 
-[bg_directory.webm](https://github.com/user-attachments/assets/2fcb2aae-0c27-472e-8d29-b80e7306a6ad)
+<p align="center">
+  <video src="images/blob_track/bg_directory.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 > [!NOTE]
 > As discussed above, the larger the background videos are (higher resolution, higher FPS, longer time), the longer the detection processing will be. 
@@ -185,7 +193,9 @@ This is typically a faster way to get inclusion zones drawn, than manually drawi
 
 Note: to date, I havent found much use for `INCLUSION ZONES`, and have been able to find the animals reliably without it. 
 
-[duplicate_interaction_zones.webm](https://github.com/user-attachments/assets/bfcd54f8-c610-4ad1-970c-1176873950b5)
+<p align="center">
+  <video src="images/blob_track/duplicate_interaction_zones.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 #### VIDEO TABLE
@@ -215,7 +225,9 @@ To do this, click the <kbd>SET INCLUSION ZONES</kbd> button for a video, and use
 
 For a full tutorial for how to use this interface, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md) documentation. As an example, in the video below, I define a polygon called `MAZE` for the first video, and save it, making sure that the animal will only be detected inside the `MAZE` region of interest.
 
-[inclusion_zones_define_downsampled.webm](https://github.com/user-attachments/assets/9e498c6d-cf2c-4084-ba42-2582305421bd)
+<p align="center">
+  <video src="images/blob_track/inclusion_zones_define_downsampled.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 > [!NOTE]
 > 1) To save time, consider specifying the inclusion zones on only one video, and duplicating these inclusion zones on the rest of the videos using the `DUPLICATE INCLUSION ZONES` dropdown menu in the `RUN-TIME SETTING` menu above.
@@ -225,14 +237,18 @@ For a full tutorial for how to use this interface, see [THIS](https://github.com
 
 **BUFFER SIZE**: If set to None, the animals detected key-points will be placed right along the hull perimeter. We may want to "buffer the animals shape a little, to capture a larger area as the animal. Set how many pixels that you wish to buffer the animals geometry with. For a visual example about what "buffering" means, see below video. 
 
-[buffer_ex.webm](https://github.com/user-attachments/assets/62cca260-5ab9-41ca-9cae-5369b3dc194c)
+<p align="center">
+  <video src="images/blob_track/buffer_ex.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 **GAP FILL SIZE (%)**: Controls animal shape refinement. Larger values will merge separate parts if the images detected as the foreground together into a single entity. 
 
 The larger the value, the further apart the separate parts of the foreground is allowed to be and still be merged into a single entity. See below video of an animal when increasingly larger kernel sizes are choosen. 
 
-[close_kernal_example.webm](https://github.com/user-attachments/assets/a86a0d7b-35c6-4da7-b44c-4856d71fd861)
+<p align="center">
+  <video src="images/blob_track/close_kernal_example.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 > [!NOTE]
 > In the example above, from a elevated plus maze, the borders of the open arms are black (same color as the animal) causing the tracking to fail and split the animal into two parts of the animal gets mistaken for the background as the animal performs a head dip. This is solved by smoothing (or "closing") the animals geometry.
@@ -241,7 +257,9 @@ The larger the value, the further apart the separate parts of the foreground is 
 
 This can be helpful to get rid of small noise related to the movement of bedding or light across the video like the below video.
 
-[open_kernal.webm](https://github.com/user-attachments/assets/91b8b70a-a442-454c-b957-31ba5253d042)
+<p align="center">
+  <video src="images/blob_track/open_kernal.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 > [!NOTE]
 > Only relevant if the light and or background changes slightly across videos. If there isn't any background noise, or the background noise is small enough not to be confused with the larger animal, set the NOISE FILL SIZE to `None. 
@@ -253,7 +271,9 @@ Hitting the <kbd>QUICK CHECK</kbd> button will remove the background, and show a
 
 If you can reliably see the animal in white, and teh background in black, you are good to go!
 
-[quick_check.webm](https://github.com/user-attachments/assets/b83dfef6-746e-4fb7-ab50-fec64ad803be)
+<p align="center">
+  <video src="images/blob_track/quick_check.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 #### EXECUTE
 

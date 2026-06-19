@@ -23,5 +23,5 @@ For up-to-date and additional tutorials, see markdown content on the `SimBA GitH
    tutorials_rst/installation
    Pose_config
    Tools
-   tutorials_rst/blob_tracking
+   blob_track
    simba.env
