@@ -1,4 +1,4 @@
-# Post-classification Validation (detecting false-positives)
+# ✅ Post-classification validation (detecting false-positives)
 
 This tool can help us visualize any potential false-positives within the classifaction results. Post-classification validation process creates video clips of each detected (classified) behavioral bout in user-defined videos in your SimBA project. This method can be applied to any video within your SimBA project that is represented by (i) a file inside the `project_folder/csv/machine_results` directory, and (ii) a video file inside the `project_folder/videos` directory. See below for instructions on how to use this tool.
 

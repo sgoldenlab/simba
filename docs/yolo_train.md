@@ -1,4 +1,4 @@
-# YOLO Pose Estimation Training in SimBA
+# 🟢 YOLO pose estimation: training in SimBA
 
 SimBA has a graphical user interface (GUI) for training YOLO-based pose estimation models. This GUI allows users to train custom YOLO pose estimation models on their own annotated datasets, which can then be used for pose estimation inference on videos.
 

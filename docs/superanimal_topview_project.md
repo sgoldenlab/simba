@@ -1,4 +1,4 @@
-# SuperAnimal-Topview data in SimBA
+# 🔝 SuperAnimal-Topview data in SimBA
 
 ## CREATE A SuperAnimal-Topview PROJECT IN SIMBA
 

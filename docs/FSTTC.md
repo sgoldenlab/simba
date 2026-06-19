@@ -1,4 +1,4 @@
-# Calculating forward-spike time tiling coefficents in SimBA
+# ⏱️ Calculating forward-spike time tiling coefficients in SimBA
 
 <img src="images/FSTTC_1.png" />
 

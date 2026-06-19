@@ -1,4 +1,4 @@
-# Model explainability and calculating feature SHAP values in SimBA
+# 🧠 Model explainability and feature SHAP values in SimBA
 
 <p align="center">
 <img src="images/SHAP0.png" />

@@ -1,4 +1,4 @@
-# FaceMap data in SimBA
+# 🎭 FaceMap data in SimBA
 
 ## CREATE A FACEMAP PROJECT IN SIMBA
 

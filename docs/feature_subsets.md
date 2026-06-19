@@ -1,4 +1,4 @@
-# Feature sub-sets in SimBA
+# 🧩 Feature sub-sets in SimBA
 
 <p align="center">
 <img src="images/feature_subsets_0.png" />

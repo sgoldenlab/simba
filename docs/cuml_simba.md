@@ -1,7 +1,7 @@
 
 
 
-# TRAIN RANDOM FOREST MODELS ON GPU IN SIMBA
+# ⚡ Train random forest models on GPU in SimBA
 
 
 **1)** In Linux, be in a python **3.10** environment with SimBA installed. you can create a SimBA python 3.10 environment as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md).

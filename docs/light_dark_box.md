@@ -1,4 +1,4 @@
-# Light dark box analysis in SimBA
+# 🌓 Light dark box analysis in SimBA
 
 
 ## GENERAL REQUIREMENTS

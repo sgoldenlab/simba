@@ -1,4 +1,4 @@
-# User-defined pose-configurations in SimBA
+# 🦴 User-defined pose-configurations in SimBA
 
 SimBA comes pre-packaged with the ability to import tracking data based on [8 different body-part pose-estimation tracking combinations](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling). Where possible, we strongly recommend using SimBA and pose-estimation packages (like DeepLabCut or DeepPoseKit) with a [16-body-part, 2 animal, pose-configuration setting](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling).
 

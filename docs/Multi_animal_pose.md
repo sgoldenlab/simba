@@ -1,4 +1,4 @@
-# Using multi-animal pose-estimation data in SimBA
+# 🐭 Using multi-animal pose-estimation data in SimBA
 
 New developments in pose-estimation packages such as [maDeepLabCut (version >=2.2b5)](https://github.com/DeepLabCut/DeepLabCut/releases/tag/v2.2b5) and [SLEAP](https://sleap.ai/) allow users to track similar looking animals, for example multiple littermates of the same coat-color. In prior versions of these pose-estimation tools, tracking several similar looking animals could be difficult as a single body-part (i.e., the "Snout" or the "Tail-base") was intermittently attributed to either animal. 
 

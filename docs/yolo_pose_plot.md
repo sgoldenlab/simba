@@ -1,4 +1,4 @@
-# YOLO Pose Estimation Visualization in SimBA
+# 🟢 YOLO pose estimation: visualization in SimBA
 
 SimBA has a graphical user interface (GUI) for visualizing YOLO-based pose estimation results on videos. This GUI allows users to overlay detected keypoints, bounding boxes, and tracking information onto videos, creating annotated output videos that show the pose estimation results.
 

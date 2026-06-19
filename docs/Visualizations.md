@@ -1,4 +1,4 @@
-# 🎬 SimBA Visualization Methods
+# 🎬 SimBA visualization methods
 
 > This document consolidates all SimBA visualization methods from the scenario-based tutorials. Use it as a single reference for creating videos, plots, heatmaps, and other outputs.
 

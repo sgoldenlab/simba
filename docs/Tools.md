@@ -1,4 +1,4 @@
-# 🔧 SimBA Tools Reference
+# 🔧 SimBA tools reference
 
 > This is a consolidated reference for the **Tools** menu in SimBA. It is based on [Tutorial_tools.md](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the current SimBA GUI. For visualization-specific tools (e.g. create path plot, visualize pose in folder, concatenate two videos), see [Visualizations.md](Visualizations.md).
 

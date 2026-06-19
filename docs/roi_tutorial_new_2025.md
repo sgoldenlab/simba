@@ -1,4 +1,4 @@
-# Regions of Interest (ROIs) in SimBA
+# 📍 Regions of interest (ROIs) in SimBA
 
 <p align="center">
 <img src="images/roi_new_1.png" />

@@ -1,4 +1,4 @@
-# BLOB TRACKING 
+# 🫧 Blob tracking in SimBA
 
 <p align="center">
   <video src="images/blob_track/header.webm" width="600" controls>Your browser does not support the video tag.</video>

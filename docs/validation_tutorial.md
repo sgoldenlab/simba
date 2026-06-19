@@ -1,4 +1,4 @@
-# Validate model on single video
+# 🎯 Validate model on single video
 
 1. Click on `File` --> `Load project`, and the following window will pop up.
 

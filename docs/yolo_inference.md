@@ -1,4 +1,4 @@
-# YOLO Pose Estimation Inference in SimBA
+# 🟢 YOLO pose estimation: inference in SimBA
 
 SimBA has graphical user interface (GUI) for running YOLO-based pose estimation inference on videos. This GUI allows users to apply pre-trained YOLO pose estimation models to analyze videos and extract keypoint tracking data.
 

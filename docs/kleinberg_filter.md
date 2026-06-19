@@ -1,4 +1,4 @@
-# Kleinberg behavior classification smoothing in SimBA
+# 🌀 Kleinberg behavior classification smoothing in SimBA
 
 <p align="center">
 <img src="images/Kleinberg_1.png" />

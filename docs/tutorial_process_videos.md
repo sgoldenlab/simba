@@ -1,4 +1,4 @@
-# Tutorial for processing videos in batch
+# 🎞️ Tutorial for processing videos in batch
 
 It is often helpful, and sometimes necessary, to pre-process experimental videos prior to analysis. This is generally accomplished through the use of open-source approaches like **FFmpeg** or commercial software, but can be a time consuming and cumbersome when applying to numerous similar videos. To streamline this process, SimBA incorporates **FFmpeg** into a a batch-process GUI. 
 

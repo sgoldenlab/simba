@@ -1,4 +1,4 @@
-# Spontaneous Alternation in SimBA
+# 🔄 Spontaneous alternation in SimBA
 
 <p align="center">
   <img src="images/spontaneous_alternation/spontaneous_alternations.png" />
