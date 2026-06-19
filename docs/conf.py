@@ -81,8 +81,11 @@ html_theme = 'sphinx_rtd_theme'
 # defaults the sidebar expanded every one into a deep, hard-to-read wall. Constrain
 # it: show the page + its top-level sections only, with [+] expanders for the rest.
 html_theme_options = {
-    'navigation_depth': 3,         # page + top-level sections (Parts), not every Step
-    'collapse_navigation': True,   # RTD default: only the current path expands
+    # depth 2 = sidebar shows page TITLES only, never their internal sections. Higher
+    # values flood the sidebar (and the tutorials landing page) with every heading,
+    # producing an unreadable jumble. Sections are reachable via each page's own TOC.
+    'navigation_depth': 2,
+    'collapse_navigation': True,   # only the current path expands
     'sticky_navigation': True,
 }
 html_static_path = ['_static']

@@ -5,6 +5,7 @@ For up-to-date and additional tutorials, see markdown content on the `SimBA GitH
 
 .. toctree::
    :maxdepth: 1
+   :titlesonly:
 
    tutorials_rst/roi
    roi_tutorial_new_2025
