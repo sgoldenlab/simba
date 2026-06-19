@@ -29,7 +29,7 @@ cross-referenced from anywhere in the docs with the ``:term:`` role
       count, duration and timing of these episodes.
 
    behavior
-   target
+      target
       The action a SimBA :term:`classifier` is trained to detect (e.g. attack, grooming,
       freezing). Also referred to as the *target*.
 
@@ -47,7 +47,7 @@ cross-referenced from anywhere in the docs with the ``:term:`` role
       area, shape and overlap metrics.
 
    DeepLabCut
-   DLC
+      DLC
       A popular open-source :term:`pose estimation` toolbox. SimBA imports DLC tracking
       data (single- and multi-animal).
 
@@ -60,7 +60,7 @@ cross-referenced from anywhere in the docs with the ``:term:`` role
       orientation, removing the animal's global location/heading from the analysis.
 
    feature
-   feature extraction
+      feature extraction
       A numeric quantity computed per frame from :term:`pose estimation` data (distances,
       velocities, angles, areas, etc.). Feature extraction turns raw tracking into the
       inputs a :term:`classifier` learns from.
@@ -87,7 +87,7 @@ cross-referenced from anywhere in the docs with the ``:term:`` role
       values from neighbouring frames.
 
    Kleinberg smoothing
-   burst detection
+      burst detection
       A burst-detection algorithm (Kleinberg, 2003) applied to classifier output to merge
       fragmented detections into coherent :term:`bouts <bout>` and remove noise.
 
@@ -111,7 +111,7 @@ cross-referenced from anywhere in the docs with the ``:term:`` role
       settings (paths, body-parts, classifiers, thresholds).
 
    px/mm
-   pixels per millimeter
+      pixels per millimeter
       The conversion factor between image pixels and real-world millimetres, used to report
       distances/speeds in physical units. Set per video via a known reference length.
 
@@ -150,8 +150,8 @@ cross-referenced from anywhere in the docs with the ``:term:`` role
       decisions (e.g. Gini importance, permutation importance, or :term:`SHAP`).
 
    precision
-   recall
-   F1
+      recall
+      F1
       Standard classification metrics. Precision = fraction of predicted-positive frames
       that are correct; recall = fraction of true behavior frames detected; F1 = their
       harmonic mean.
@@ -161,7 +161,7 @@ cross-referenced from anywhere in the docs with the ``:term:`` role
       evaluate a :term:`classifier`.
 
    discrimination threshold
-   probability threshold
+      probability threshold
       The probability cut-off above which a frame is scored as the :term:`behavior`.
       Raising it makes detection stricter (higher :term:`precision`), lowering it more
       permissive (higher :term:`recall`).
@@ -178,7 +178,7 @@ cross-referenced from anywhere in the docs with the ``:term:`` role
       Synonym for :term:`body-part` — a tracked point produced by :term:`pose estimation`.
 
    p
-   pose confidence
+      pose confidence
       The probability/likelihood score (0–1) that :term:`pose estimation` assigns to each
       tracked :term:`body-part`, indicating tracking reliability.
 
@@ -187,7 +187,7 @@ cross-referenced from anywhere in the docs with the ``:term:`` role
       poorly tracked or missing — often handled by :term:`interpolation`.
 
    multi-animal tracking
-   identity
+      identity
       Tracking several animals at once while maintaining each individual's identity across
       frames (and recovering it after :term:`occlusion`), e.g. via :term:`maDLC` or
       :term:`SLEAP`.
@@ -211,7 +211,7 @@ cross-referenced from anywhere in the docs with the ``:term:`` role
       :term:`px/mm`-scaled units.
 
    sliding window
-   rolling window
+      rolling window
       A fixed-length time window slid across the data to compute time-resolved
       :term:`features <feature>` (e.g. mean velocity over the last 0.5 s).
 
@@ -239,7 +239,7 @@ cross-referenced from anywhere in the docs with the ``:term:`` role
       counts, mean bout duration, latency, etc.) saved to the project ``logs``.
 
    clustering
-   embedding
+      embedding
       Unsupervised grouping of behavioral data without labels — e.g. projecting
       :term:`features <feature>` with UMAP/t-SNE and clustering the result to discover
       behavioral motifs.
