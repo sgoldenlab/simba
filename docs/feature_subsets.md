@@ -4,12 +4,12 @@
 <img src="images/feature_subsets_0.png" />
 </p>
 
-### INTRODUCTION
+## INTRODUCTION
 
 SimBA extracts features for builing and [running downstream machine learning models](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features). However, at times, we may want to take advantage of some SimBA [feature calculators](https://github.com/sgoldenlab/simba/blob/master/simba/mixins/feature_extraction_mixin.py) and generate a subset of measurements, either for use in our own downstream applications, or as additional potentially informative features when building classifiers in SimBA. For some of the feature sub-sets available, see the image above. 
 
 
-### INSTRUCTIONS
+## INSTRUCTIONS
 
 1) To create feature sub-sets, first import your pose-esimation data into SimBA and follow the instruction up-to and **including** outlier correction as documented in the [Scenario 1 tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md). Before calculating feature sub-sets in SimBA, ensure that the `project_folder/csv/outlier_corrected_movement_location` directory of your SimBA project is populated with files. 
 

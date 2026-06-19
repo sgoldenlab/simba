@@ -6,7 +6,7 @@ In this tutorial we will import multi-animal tracking data from DeepLabCut into 
 
 **IMPORTANT NOTE:** Both maDLC and SLEAP present significant advances in pose-estimation. However, behaviors that contain elements where experimental subjects are fully occluded, by either environmental factors (such as enrichment igloos) or by other experimental subjects (such as during aggression or mating behaviors), may present tracking difficulties. The accuracy of predictive classifiers depends on tracking, so it is critical to troubleshoot any similar multiple animal pose-estimation issues prior to importing tracking data into SimBA.
 
-### Step 1: Generate Project Config
+## Step 1: Generate Project Config
 
 If you are coming along from [Scenario 1 - Creating a classifier from scratch](https://github.com/sgoldenlab/simba/edit/SimBA_no_TF/docs/Scenario_1_new.md), then you have already completed *Step 1* of the current tutorial and you can skip this part and continue to Step 2. 
 
@@ -29,7 +29,7 @@ In this Step we will create the main project folder, which will then auto-popula
   <img width="385" height="106" src="images/classifier1.PNG">
 </p>
 
-### Step 2: Define your Type of Tracking
+## Step 2: Define your Type of Tracking
 
 1. In this current Scenario we are using multi-animal tracking. Click on the `Type of Tracking` drop-down menu in the `Animal Settings` sub-menu and chose `Multi tracking`.  
 
@@ -43,13 +43,13 @@ In this Step we will create the main project folder, which will then auto-popula
 
 In this current scenario we will import the tracking data for 8 body-parts on each of the two black-coated mice (16 body-parts in total). In the `# config` drop-down menu we select `Multi-animals, 8bps`. Once selected, we click on `Generate Project Config`. 
 
-### Step 3: Import your videos
+## Step 3: Import your videos
 
 1. Next, click on the `[Import videos into project folder]` tab in the `Project configuration` window. If you have multiple videos, use the `Import multiple videos` sub-menu to select a folder containing the *raw* MP4 or AVI video files you have analyzed in DeepLabCut. If you have a single video, use the `Import single video` sub-menu to select a single MP4 or AVI file to import into the project. For more details on importing video files into SimBA projects, see the following tutorial documentation: [1](https://github.com/sgoldenlab/simba/blob/SimBA_no_TF/docs/Scenario1.md#step-2-import-videos-into-project-folder)[2](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-2-import-videos-into-project-folder).
 
 >*Note*: When importing multi-animal pose-estimation data into SimBA you **must** import your videos prior to importing your tracking data. The videos will be used to interactively re-organise your pose-estimation data to ensure  that the pose-estimation data for each specific individual falls in the same column, and same column order, in all your tracked files (more information on this follows below). 
 
-### Step 4: Import your tracking data
+## Step 4: Import your tracking data
 
 1. After importing your video files, click on the `[Import tracking data]` tab in the `Project configuration` window. In the `Import tracking data` sub-menu, click on the `File type` drop-down menu to select your pose-estimation tracking data file type. 
 
@@ -75,7 +75,7 @@ In this tutorial we have multi-animal tracking data in .H5 file format from Deep
 
 5. Next to `Path to h5 files`, click on `Browse` to select the folder that contain you H5 files. The selected folder should contain one H5 file for all the videos imported into the project during [Step 3 of the current tutorial](https://github.com/sgoldenlab/simba/blob/SimBA_no_TF/docs/Multi_animal_pose.md#step-3-import-your-videos). Once you have selected a folder containing your H5 files, click on `Import h5`.
 
-### Step 5: Assigning tracks the correct identities. 
+## Step 5: Assigning tracks the correct identities. 
 
 When SLEAP and multi-animal DLC predicts the location of body-parts for multiple animals, the animals are assigned *tracks* or *tracklets* (for more information, see the SLEAP and maDLC documentation), with one track for each animal. In the current scenario, this means that DeepLabCut may have assigned *track 1* to be the Resident, and *track 2* to be the Intruder. It could also be the reverse, and *track 1* is the Intruder and *track 2* is the Resident. Further - if you have multiple videos, then the identity of the animal representing *track 1* and *track 2* will most likely shift across the different videos in your project. We need to organise the pose-estimation data such as *track 1* is Animal 1 (Resident) and *track 2*  is Animal 2 (Intruder) **in all of our tracking files** and SimBA does this through an interactive interface. 
 

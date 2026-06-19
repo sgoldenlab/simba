@@ -387,7 +387,7 @@ Once clicked, you should see the following pop-up opening allowing you to draw a
 
 In the `SETTINGS` frame, fill in the name of your ROI, and choose its color, thickness, and ear tag size. 
 
-##### DRAW A RECTANGLE OF METRIC WIDTH & HEIGHT
+#### DRAW A RECTANGLE OF METRIC WIDTH & HEIGHT
 
 To draw a RECTANGLE of set size, fill in its metric width and height in millimeter and click ``ADD RECTANGLE`` as in the video below:
 
@@ -395,7 +395,7 @@ To draw a RECTANGLE of set size, fill in its metric width and height in millimet
   <video src="images/roi_tutorial/predefined_sizes_rectangle.webm" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
-##### DRAW A CIRCLE OF METRIC RADIUS
+#### DRAW A CIRCLE OF METRIC RADIUS
 
 To draw a CIRCLE with a specific radius, fill in its metric radius in millimeter and click ``ADD CIRCLE`` as in the video below:
 
@@ -403,7 +403,7 @@ To draw a CIRCLE with a specific radius, fill in its metric radius in millimeter
   <video src="images/roi_tutorial/predefined_sizes_circle.webm" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
-##### DRAW A HEXAGON METRIC RADIUS
+#### DRAW A HEXAGON METRIC RADIUS
 
 To draw a HEXAGON with a specific radius, fill in its metric radius in millimeter and click ``ADD HEXAGON`` as in the video below:
 
@@ -411,7 +411,7 @@ To draw a HEXAGON with a specific radius, fill in its metric radius in millimete
   <video src="images/roi_tutorial/predefined_sizes_hexagon.webm" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
-##### DRAW A HALF CIRCLE OF METRIC RADIUS POINTING NORTH
+#### DRAW A HALF CIRCLE OF METRIC RADIUS POINTING NORTH
 
 To draw a HALF CIRCLE with a specific radius with its chunky part pointing UP, fill in its metric radius in millimeter, choose `NORTH` in the `direction drop-down menu`, and click ``ADD HALF CIRCLE`` as in the video below:
 
@@ -419,7 +419,7 @@ To draw a HALF CIRCLE with a specific radius with its chunky part pointing UP, f
   <video src="images/roi_tutorial/predefined_sizes_half_circle_north.webm" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
-##### DRAW A HALF CIRCLE OF METRIC RADIUS POINTING WEST
+#### DRAW A HALF CIRCLE OF METRIC RADIUS POINTING WEST
 
 To draw a HALF CIRCLE with a specific radius with its chunky part pointing LEFT, fill in its metric radius in millimeter, choose `WEST` in the `direction drop-down menu`, and click ``ADD HALF CIRCLE`` as in the video below:
 
@@ -495,7 +495,7 @@ To do this, click the `File` heading in the `PROJECT VIDEOS: ROI TABLE` window. 
 below:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/docs/tutorials_rst/img/roi/roi_tutorial_metric.webp"/>
+<img src="images/roi_tutorial/roi_tutorial_metric.webp"/>
 </p>
 
 Select the video that you want to act as the "baseline" reference video which the ROI sizes should be corrected against. Once selected, click the 

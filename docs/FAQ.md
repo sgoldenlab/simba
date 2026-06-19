@@ -4,7 +4,7 @@
 > Please search the [SimBA issues tracker](https://github.com/sgoldenlab/simba/issues), or search the [Gitter chat channel](https://gitter.im/SimBA-Resource/community) for more questions and answers. If that does not help, reach out to us by posting a new issue or write to us on Gitter.
 
 
-##  1. I get 'TypeError: cannot convert the series to <class 'int'>' or 'TypeError: cannot convert the series to <class 'float'>' when trying to extract features, generate movies/frames, or when extracting outliers
+##  1. I get 'TypeError: cannot convert the series to &lt;class 'int'&gt;' or 'TypeError: cannot convert the series to &lt;class 'float'&gt;' when trying to extract features, generate movies/frames, or when extracting outliers
 <details>
   <summary>Show solutions!</summary>
 <br/><br/>
