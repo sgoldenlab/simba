@@ -4,7 +4,7 @@ The animal-anchored region-of-interest (ROI) interface allows users to define bo
 
 The code can be found in [simba.bounding_box_tools](https://github.com/sgoldenlab/simba/tree/master/simba/bounding_box_tools).
 
-# BEFORE ANALYZING ANIMAL-ANCHORED ROIs in SIMBA
+## BEFORE ANALYZING ANIMAL-ANCHORED ROIs in SIMBA
 
 To analyze anchored-roi data in SimBA (for descriptive statistics, machine learning features, or both descriptive statistics and 
 machine learning features), the pose-estimated tracking data **first** has to be processed **up-to and including the 
@@ -18,9 +18,9 @@ Specifically, for working with anchored-ROIs in SimBA, begin by
 and lastly (iv) [Correctting outliers](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction) (or click to indicate that you want to *Skip outlier correction* as detailed in the Correct outliers tutorial)
 
 
-# ANALYZING ANIMAL-ANCHORED ROIs IN SIMBA
+## ANALYZING ANIMAL-ANCHORED ROIs IN SIMBA
 
-## FINDING THE ANIMAL-ANCHORED ROIs
+### FINDING THE ANIMAL-ANCHORED ROIs
 
 <p align="center">
 <img src="images/anchored_roi_1.png" />
@@ -41,7 +41,7 @@ This brings up a further pop-up window named `FIND ANIMAL BOUNDARIES` with a sin
 
 If choosing **Entire animal** in the `SELECT SHAPE TYPE` dropdown, the settings menu on the **left** in the screen-grab below will be show up. If choosing **Single body-part circle** or **Single body-part square**  in the `SELECT SHAPE TYPE` dropdown, the settings menu on the **right** in the screen-grab below will be show up. We will first go through the settings for **Entire animal** based bounding boxes, followed by body-part anchored bounding boxes. 
 
-### ANCHORED-ROI SHAPE TYPES - ENTIRE ANIMAL BASED BOUNDING BOXES
+#### ANCHORED-ROI SHAPE TYPES - ENTIRE ANIMAL BASED BOUNDING BOXES
 
 <p align="center">
 <img src="images/bounding_boxes_example_2.png" />
@@ -55,7 +55,7 @@ If selecting `Entire animal` based bounding boxes, then users have two user-defi
 
 * 2. PARALLEL OFFSET: Sometimes we may **not** want to draw our animal-anchored ROIs exacactly by the outer-bounds of the animal hull body-part key-points. Instead, we may want to introduce a little extra wriggle room that defines the animals personal space. If you want to introduce a little extra room inside the animal-anchored ROIs, then enter the size of that space in the `PARALLEL OFFSET` entry box in millimeter. 
 
-### SINGLE BODY-PART BASED BOUNDING BOXES.
+#### SINGLE BODY-PART BASED BOUNDING BOXES.
 
 Single body-part based bounding also has two user-defined parameters:
 
@@ -69,7 +69,7 @@ Once you have filled in the parameters for your animal-anchored ROIs, click the 
 
 Once complete, SimBA saves the information of all the anchored ROIs for all the animals in all frames and videos in a *pickled dictionary of shapely shapes values* with the `project_folder/log` directory. You should see a file named `project_folder/logs/anchored_rois.pickle`. I know - a *pickled dictionary with shapely shapes* will be nonsense to many and difficult to work with. However, this file containes all the information we need to compute all the statistics we need. The reason for saving the data in this nonsense format as we need to **compress** it as much as we possibly can, because it contains a potentially very large about of data (depending on the number of videos, individuals, and frame rate of your videos). 
 
-## VISUALIZING ANIMAL-ANCHORED ROIs
+### VISUALIZING ANIMAL-ANCHORED ROIs
 
 Next, when the animal anchored-ROIs have been computed and we have the `anchored_rois.pickle` file, we may want to visualize the information in this file to confirm the ROIs look as expected. To visualize the animal-anchored ROI boundaries, click on the `VISUALIZE BOUNDARIES` button which should bring up the following pop-up window allowing a few user-defined video settings:
 
@@ -102,7 +102,7 @@ Next, to create the animal-anchored boundary videos, click the `RUN` button. You
 <img src="images/termites_video_3.gif" />
 </p>
 
-## CALCULATING BOUNDARY STATISTICS
+### CALCULATING BOUNDARY STATISTICS
 
 Next, we want to calculate statistics based on on each animal-anchored ROI. For each frame and each animal-anchored ROI, we may want to know:
 
@@ -146,7 +146,7 @@ The first column (in blue) is named `Animal_1:Animal_2:ROI_ONLY`. This column co
 
 The second column (in yellow) is named `Animal 1:Animal 5:Head`. This column contains data for the intersections of the **Animal 1 anchored ROI** and the **Animal 2 head body-part**. The `1` in rows 14-30 shows that the Animal 1 anchored ROI and Animal 5 head body-part where **overlapping** in those frames. The value `0` in the cells representing frames 0-13 shows that the Animal 1 anchored ROI and Animal 5 head body-part where **not overlapping** in those frames.
 
-## CALCULATING SUMMARY AGGREGATE BOUNDARY STATISTICS
+### CALCULATING SUMMARY AGGREGATE BOUNDARY STATISTICS
 
 Next, with this information at hand, we can now compute aggregate statistics proxying how much each animal interact with each other in each video. To compute aggregate statistics, we click the `CALCULATE AGGREGATE BOUNDARY STATISTICS` button which brings up the following pop-up window:
 

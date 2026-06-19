@@ -15,7 +15,7 @@ In some scenarios, however, employing these built-in feature-extraction scripts 
 *5. SimBA has a large battery of feature caluclators only accessable through the API (as of 12/23). These feature calculators tap into [frequentist](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.mixins.html#module-simba.mixins.statistics_mixin), [circular](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.mixins.html#module-simba.mixins.circular_statistics), and [time-series](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.mixins.html#module-simba.mixins.timeseries_features_mixin) statistics. They also compute [geometric](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.mixins.html#module-simba.mixins.geometry_mixin) manipulations and time-dependent [network (graph)](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.mixins.html#module-simba.mixins.network_mixin) based measures and other ML related distribution measures. To take advantage of these, users will currently have to write standalone classes calling these methods.*
 
 
-### Use a user-defined feature extraction script in SimBA
+## Use a user-defined feature extraction script in SimBA
 
 1. Before using a user-defined a feature extraction script in SimBA, load your project, import the pose-estimation tracking files and correct outliers. For instructions on how to load your project, importing pose-estimation tracking files, and correcting outliers, read the walk-through tutorial for [Scenario 1](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md) and/or [Part I](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config%5D) or the generic SimBA tutorial.  
 
@@ -31,7 +31,7 @@ In some scenarios, however, employing these built-in feature-extraction scripts 
 
 4. After selecting the feature extraction script you would like to use in you project, click on `Extract Features` in the `Extract Features` sub-menu. You can follow the progress in the SimBA GUI main window and/or the operating system terminal which you used to boot up the SimBA GUI.
 
-### Writing a custom feature extraction script and running it in SimBA: Design, expected layout and gotcha's. 
+## Writing a custom feature extraction script and running it in SimBA: Design, expected layout and gotcha's. 
 
 >Note: For example outlines of SimBA feature extraction files, for either designing your own feature extraction script within SimBA, or modifying existing feature extraction scripts, please see the [hard-coded feature extraction scripts in SimBA](https://github.com/sgoldenlab/simba/tree/master/simba/feature_extractors) or the SimBA [OSF repository](https://osf.io/emxyw/). For an example user-defined feature extraction script used to score behavior in zebrafish, see [THIS FILE](https://github.com/sgoldenlab/simba/blob/master/simba/feature_extractors/misc/fish_feature_extractor_2023_version_5.py). For an example classifyin pup/dam behavior, see [THIS FILE](https://github.com/lapphe/AMBER-pipeline/blob/main/SimBA_AMBER_project/AMBER_2_0__feature_extraction/amber_feature_extraction_20230815.py). For an example feature extraction script that calculates geometric features and bounding boxes from pose-estimation data, see [THIS FILE](https://github.com/sgoldenlab/simba/blob/master/misc/geometry_feature_extraction.py).
 
@@ -50,5 +50,4 @@ might still be quick and reliable (it often is). However, I have noted that some
 
 (5) If you are intrested in the code that SimBA uses to parse and exexute your custom feature extraction code, you can find it [HERE](https://github.com/sgoldenlab/simba/blob/master/simba/utils/custom_feature_extractor.py). If you have suggested improvements, bug reports, or ideas, please consider reaching out to us on [Gitter](https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im) or by opening an [issue](https://github.com/sgoldenlab/simba/issues) here on GitHub. 
 
-#
 Author [Simon N](https://github.com/sronilsson))

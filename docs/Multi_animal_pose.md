@@ -115,7 +115,6 @@ Go to [Scenario 3 - Updating a classifier with further annotated data](https://g
 
 
 
-##
 Author [Simon N](https://github.com/sronilsson)
 
 

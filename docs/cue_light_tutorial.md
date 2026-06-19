@@ -4,7 +4,6 @@
 <img src="images/cue_lights_89.png" />
 </p>
 
-# <p align="center">  </p>
 
 
 Behavioral experiments can involve conditioned stimuli (such as cue lights) where experimenters assess behaviors around the time periods of such conditioned stimuli.
@@ -19,13 +18,13 @@ For example, we may want to know:
 
 In this tutorial we will use SimBA to infer when the cue light is on, and analyze movement, velocities, and behavioral classifications in relationship with the cue light status. This tutorial involves a scenario with a single video, single classifier, single animal and single cue light. However, note that SimBA methods supports several cue lights, multiple animals and classifiers, and different cue lights in different locations across multiple videos. 
 
-# Before analyzing cue light data in SimBA
+## Before analyzing cue light data in SimBA
 
 To analyze cue light data in SimBA, the tracking data **first** has to be processed the **up-to and including the *Outlier correction* step described in [Part 2 - Step 4 - Correcting outliers](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction)**. Thus, before proceeding to analyze cue light based measures, you should have one file for each of the videos in your project located within the `project_folder\csv\outlier_corrected_movement_location` sub-directory of your SimBA project. 
 
 Specifically, when working cue lights in SimBA, begin by (i) [Importing your videos to your project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-2-import-videos-into-project-folder), (ii) [Import the tracking data and relevant videos to your project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-import-dlc-tracking-data), (iii) [Set the video parameters](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters), and lastly (iv) [Correct outliers](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction).
 
-# Part 1. Defining cue light ROIs in SimBA.
+## Part 1. Defining cue light ROIs in SimBA.
 
 1) SimBA uses ROIs to locate your cue light(s) in the image and to compute their states. To define the locations of the cue lights, [load your project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-2-load-project-1) and head to the [ROI] tab. Next, click on `Define ROIs`. A pop up will be displayed listing all the videos in your project. In this tutorial, I am working with a SimBA project which contains a single video. As in the video below, I click on `Draw` next to the video to define my ROI cue lights, I draw a single rectangular ROI called `MY_CUE_LIGHT` in coral color, and click to save my ROI data.  
 
@@ -38,7 +37,7 @@ https://github.com/user-attachments/assets/8ac1d59a-910e-4126-a6c6-655ff885aa79
 >
 >For a detailed tutorial for how to use the ROI interface, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md) documentation. 
 
-# Part 2. Analyzing cue light(s) states. 
+## Part 2. Analyzing cue light(s) states. 
 
 1. To begin analyzing your cue light data, head to the right-most tab in the SimBA interface called [Add-ons] and click on `CUE LIGHT ANALYSIS`, button, which brings up the following pop-up:
 
@@ -68,7 +67,7 @@ Each of these files will have two additional columns for each of your cue lights
 
 Finally, if you selected `COMPUTE DETAILED CUE LIGHT BOUT DATA`, there will be a CSV file inside the `porject/folder/logs` directory that list each episode that each cue light was on in each video. In my case (a single short video with one cue light), it can be expected to look like [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/cue_light_details_20250525112722.csv)
 
-# Part 3. Visualizing cue light states.
+## Part 3. Visualizing cue light states.
 
 **Once Part 2 is completed**, we'd want to visualize the results of the preceding step to confirm that SimBA has accurately captured the onsets and offsets of the cue lights. We go ahead and click on <kbd>VISUALIZE CUE LIGHT DATA</kbd> and the following pop-up - showing options for how to generate the visualizations - pop up: 
 
@@ -92,7 +91,7 @@ https://github.com/user-attachments/assets/441989a3-300c-407d-9582-cf5900e04cdd
 >To visualize the ROI data, SimBA uses the ROI analysis data computet in Part 1. If your cue light ROIs changes, please re-do Part 1 before visualizing the cue-light data. 
 
 
-# Part 4. Analyzing movement at cue light states. 
+## Part 4. Analyzing movement at cue light states. 
 
 Next, we may want to analyze movements (distances moved and velocities) in and around the times the cue light(s) are on. To do this we click on <kbd>ANALYZE CUE LIGHT MOVEMENT</kbd> which will bring up a pop-up menu looking like below:
 
@@ -109,7 +108,7 @@ Once selected, click the <kbd>RUN</kbd> button. You can follow the progress in t
 >[!NOTE]
 >If the cue-light post- or pre-period in the video is shorter than the specified pre- and post period in seconds (e.g., the light comes on five seconds into the video and I have specified a 10s `PRE CUE LIGHT WINDOW (S)` time), then SimBA will use a pre-period of 5s for that episode).
 
-# Part 5. Analyzing classifications at cue light states. 
+## Part 5. Analyzing classifications at cue light states. 
 
 Next, we want to analyze behavioral classifications in and around the times the cue light(s) are on. To do this we click on <kbd>ANALYZE CUE LIGHT CLASSIFICATIONS</kbd>. This will bring up a up pop-up menu looking like the window below accepting some user-defined settings:
 

@@ -6,7 +6,7 @@ However, SimBA can handle *any* combination of tracked body-parts, as long as us
 
  **CAUTION**: When users create projects with user-defined body part configurations, SimBA calculates fewer and less precise features for the machine models and this may negatively affect the prediction performance. Thus - *if users have the option* - we strongly encourage  that the [16-body-part, 2 animal, pose-configuration setting](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling) is used. Click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/features_user_defined_pose_config.csv) for a rough list of the features that SimBA calculates based on user-defined pose configurations. For comparison, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv) for the list of features that SimBA calculates based on the 16-body-part, 2 animal, pose-configuration setting.
 
-# Create a new user-defined pose-configuration
+## Create a new user-defined pose-configuration
 
 1. In the main SimBA console window, click on `File`, and `Create a new project`. The window that pops open is descibed in-depth the [Scenario 1 - Create Project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-1-generate-project-config) tutorial. If you are creating a new user-defined pose-configuration setting, **do not** begin by specifying a project path, project name, or any SML settings. Instead, skip these menus, leave these entry boxes blank, and click on the button in the `Animal Settings` menu next to the text `# config`. You should see the following default menu pop open:
 
@@ -45,7 +45,7 @@ The window will close once all the body-parts have been marked. Double left mous
 
 >*Note:* When a project has been created in SimBA, the pose-configuration selected when creating the project is stored within a CSV file within the project folder, and this file is referenced to at various stages of the workflow. You can check this file out by navigating to the `project_folder\logs\measures\pose_configs\bp_names\project_bp_names.csv` file.
 
-# Removing / archiving user-defined pose-configurations in SimBA
+## Removing / archiving user-defined pose-configurations in SimBA
 
 The user may want to remove user-defined body-part configurations from the `# config` list. To do this, locate the `Reset user-defined pose configs` button in the `Project configuration` tab:
 
@@ -59,7 +59,7 @@ The user may want to remove user-defined body-part configurations from the `# co
 
 >*Note:* The user defined configs are never deleted even though they are removed from the `# config` list. The user-defined pose-configurations are archived in the they can be retrieved. Once removed , they are stored in the `SimBA\pose_configurations_archive` folder.  
 
-# Optional: Creating DeepLabCut projects using user-defined pose-configurations in SimBA
+## Optional: Creating DeepLabCut projects using user-defined pose-configurations in SimBA
 
 Once a project with a specific pose-configuration has been created in SimBA, you may also want to use this pose-configuration and body part naming convention in your DeepLabCut projects created through SimBA. 
 
@@ -72,7 +72,6 @@ Once clicked on, first navigate to your SimBA project. Your SimBA body-part conf
 When you click on `Create project` in the  DeepLabCut `Create Project` menu, your DeepLabCut project and DeepLabCut project *yaml* file will now be based on your SimBA-configured body-parts.  
 
 
-##
 Author [Simon N](https://github.com/sronilsson)
 
 

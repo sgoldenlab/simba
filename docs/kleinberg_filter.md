@@ -40,7 +40,7 @@ If you are unhappy with the results, I suggest you tinker with the hierarchy val
 If satisfied with the results, go ahead and compute new descriptive stastistics as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-9-analyze-machine-results).
 
 
-### Hyperparameters
+## Hyperparameters
 
 Through the SimBA menues the user can access three hyperparameters. For more information of what the hyperparameters mean, check out the [R 'bursts' package documentation](https://cran.r-project.org/web/packages/bursts/bursts.pdf), the [Lee et al. 2019](https://journals.plos.org/plosone/article/comments?id=10.1371/journal.pone.0220596) paper, the [original paper](https://link.springer.com/article/10.1023/A:1024940629314), or [THIS](https://nikkimarinsek.com/blog/kleinberg-burst-detection-algorithm) excellent blog post walk-through. 
 
@@ -54,10 +54,9 @@ In short,
  
  *(iv) Hierarchical search* - If **not** ticked,  then bouts are split or combined at different Kleinberg hierarchy levels. For example, setting Hierachy to **3** will preserve only behaviour bouts at hierarchy level **3** which may exclude longer behavioral bouts **only** present at hierarch levels 1 and 2.  For example, when Hierarchical search is **ticked** and hierarchy is set to 3, SimBA will preserve all behaviour bouts at level 3, as well as behaviour bouts at level 2 that is not encompassed by the behavior bouts at level 3. 
  
-#### Hierarchical search example
+### Hierarchical search example
  ![](images/nastacias_fine_draw_kleinberg.png)
 
  
  
-#
 Author [Simon N](https://github.com/sronilsson)
