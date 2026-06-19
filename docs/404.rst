@@ -52,9 +52,10 @@
    <div class="simba-404">
      <img class="simba-404-logo" src="https://simba-uw-tf-dev.readthedocs.io/en/latest/_static/img/splash_soft.png" alt="SimBA">
      <div class="code">4<span>0</span>4</div>
-     <h1 class="title">This page wandered off</h1>
-     <p class="msg">The page you're looking for has moved, been renamed, or never existed.
-        Many tutorials were recently reorganized &mdash; try the docs home or the tutorials list.</p>
+     <h1 class="title">This one slipped out of frame</h1>
+     <p class="msg">SimBA tracks animals &mdash; not missing pages. The page you're after may have
+        moved, been renamed, or never existed (many tutorials were recently reorganized).
+        Pick the trail back up from the docs home, the tutorials, or search.</p>
      <div class="simba-btn-row">
        <a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html">🏠&nbsp;&nbsp;Docs home</a>
        <a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/tutorials.html" class="ghost">🧑‍🏫&nbsp;&nbsp;Tutorials</a>
