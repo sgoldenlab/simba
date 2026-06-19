@@ -243,3 +243,56 @@ cross-referenced from anywhere in the docs with the ``:term:`` role
       Unsupervised grouping of behavioral data without labels — e.g. projecting
       :term:`features <feature>` with UMAP/t-SNE and clustering the result to discover
       behavioral motifs.
+
+   blob tracking
+   contour tracking
+      Markerless tracking that segments each animal as a single connected region
+      (a *blob*) via background subtraction, instead of tracking individual
+      :term:`body-part` keypoints. Useful when full :term:`pose estimation` is
+      unnecessary or unavailable.
+
+   third-party annotation tool
+   BORIS
+   Ethovision
+   DeepEthogram
+   Observer
+   Solomon
+   BENTO
+      External behavior-annotation software whose labels SimBA can import and append to
+      extracted :term:`features <feature>` as ground truth. Supported tools include BORIS,
+      Noldus Ethovision, Noldus Observer, Solomon Coder, DeepEthogram and BENTO.
+
+   SuperAnimal-TopView
+      A zero-shot, pre-trained top-view mouse :term:`pose estimation` model (from the
+      DeepLabCut SuperAnimal family) that SimBA can use without user training.
+
+   FaceMap
+      An open-source keypoint/behavioral-motion tracking tool whose output SimBA can
+      import as a :term:`pose estimation` source.
+
+   AMBER
+      A pose-estimation pipeline for maternal-pup interaction analysis whose tracking
+      data SimBA can import.
+
+   CLAHE
+      Contrast Limited Adaptive Histogram Equalization - a local contrast-enhancement
+      step in SimBA's video tools, used to improve tracking on low-contrast footage.
+
+   UMAP
+      Uniform Manifold Approximation and Projection - a dimensionality-reduction method
+      used in SimBA's unsupervised workflows to embed high-dimensional
+      :term:`features <feature>` into 2-D for :term:`clustering` and visualization.
+
+   anchored ROI
+   animal-anchored ROI
+      An :term:`ROI` (bounding box or shape) attached to, and moving with, an animal or
+      :term:`body-part` across frames - as opposed to a fixed, frame-static :term:`ROI`.
+
+   cue light
+      An experimentally controlled light stimulus; SimBA's cue-light tools detect when
+      each light is on or off and quantify behavior and movement relative to those states.
+
+   spontaneous alternation
+      A Y- or T-maze assay of spatial working memory, scored as the tendency to visit
+      maze arms in non-repeating sequences. SimBA derives alternation metrics from
+      :term:`pose estimation`.
