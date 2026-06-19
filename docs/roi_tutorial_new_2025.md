@@ -1,4 +1,4 @@
-# <p align="center"> Regions of Interest (ROIs) in SimBA </p>
+# Regions of Interest (ROIs) in SimBA
 
 <p align="center">
 <img src="images/roi_new_1.png" />

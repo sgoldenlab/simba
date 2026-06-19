@@ -1,4 +1,4 @@
-# <p align="center"> Cue Light Analysis in SimBA </p>
+# Cue Light Analysis in SimBA
 
 <p align="center">
 <img src="images/cue_lights_89.png" />
