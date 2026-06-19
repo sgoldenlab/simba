@@ -1,7 +1,7 @@
-# THIRD-PARTY ANNOTATIONS (BEHAVIOR LABELS) IN SIMBA
+# 🏷️ Third-party annotations (behavior labels) in SimBA
 
 <p align="center">
-<img src=/images/third_party_label_new_0.png />
+<img src=images/third_party_label_new_0.png />
 </p>
 
 
@@ -32,13 +32,13 @@ In brief, before we can import the third-party annotations, we need to (i) creat
 **1.** After loading your project, click on the `[LABEL BEHAVIOR]` tab, and the `Append third-party annotations` button inside the `LABELLING TOOLS` sub-frame and you should see the following pop-up:
 
 <p align="center">
-<img src=/images/third_party_label_new_1.png />
+<img src=images/third_party_label_new_1.png />
 </p>
 
 **2.** In the first drop-down menu named 'THIRD-PARTY APPLICATION`, select the application which your annotations were created in:
 
 <p align="center">
-<img src=/images/third_party_label_new_2.png />
+<img src=images/third_party_label_new_2.png />
 </p>
 
 **3.** Next, where it says `DATA DIRECTORY`, click `Browse Folder` and select the directory where your third-party annotations are stored. 
@@ -48,7 +48,7 @@ In brief, before we can import the third-party annotations, we need to (i) creat
 Each of the `WARNINGS AND ERRORS` dropdowns have two options: `WARNING`, and `ERROR`:
 
 <p align="center">
-<img src=/images/third_party_label_new_3.png />
+<img src=images/third_party_label_new_3.png />
 </p>
 
 If `WARNING` is selected, then SimBA will warn you with printed text that an inconsistancy has been found, where it was found, and try to remedy the issue. If `ERROR` is selected, then SimBA will shut down the appending process and print a text saying an inconsistancy has been found and where it was found, so that the user can look into and fix the issue. Below we will go through the potential inconsistancies and conflicts that SimBA will look for:

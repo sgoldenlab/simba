@@ -1,5 +1,5 @@
 
-#### GPU vs CPU runtimes by video processing function
+# ⚡ GPU vs CPU runtimes by video processing function
 
 
 | TASK                                 | CPU   | GPU  |

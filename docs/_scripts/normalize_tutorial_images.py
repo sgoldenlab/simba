@@ -28,7 +28,7 @@ DOCS_IMAGES = DOCS / "images"
 # github.com/<org>/<repo>/blob|raw/<branch>/images/...  ->  images/...
 BLOB_RE = re.compile(r"https?://github\.com/[^/]+/[^/]+/(?:blob|raw)/[^/]+/(images/)")
 # absolute /images/ inside src="..." or ](...)  ->  images/
-ABS_RE = re.compile(r'(src=["\']|\]\()/images/')
+ABS_RE = re.compile(r'(src=["\']?|\]\()/images/')   # quote optional: handles src=/images/ too
 # any local images/<path>.<ext> reference (after rewriting)
 REF_RE = re.compile(r'images/[^)"\'\s>]+\.(?:png|jpe?g|webp|gif|svg)', re.I)
 

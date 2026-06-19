@@ -9,4 +9,4 @@ For up-to-date and additional labelling documentation, see markdown content on t
    tutorials_rst/standard_label
    tutorials_rst/advanced_label
    tutorials_rst/boris
-   tutorials_rst/third_party_annotations
+   third_party_annot_new

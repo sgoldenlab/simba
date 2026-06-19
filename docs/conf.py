@@ -68,6 +68,7 @@ MIGRATED_MD = {
     'yolo_train.md', 'yolo_inference.md', 'yolo_pose_plot.md',
     'spontaneous_alternation.md', 'light_dark_box.md', 'mutual_exclusivity_heuristic_rules.md',
     'validation_tutorial.md', 'cuml_simba.md',
+    'third_party_annot_new.md', 'gpu_vs_cpu_video_processing_runtimes.md', 'blob_data_project_simba.md',
 }
 _unmigrated_md = [f for f in _glob.glob('*.md') if f not in MIGRATED_MD]
 
@@ -122,6 +123,7 @@ redirects = {
     # stale duplicates removed from the toctree -> point at the real pages
     "tutorials_rst/roi": "../roi_tutorial_new_2025.html",
     "tutorials_rst/installation": "../installation.html",
+    "tutorials_rst/third_party_annotations": "../third_party_annot_new.html",
 }
 html_css_files = ['css/simba_theme.css',  # Include your existing CSS file
                   'custom.css']  # Include your additional CSS file

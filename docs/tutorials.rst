@@ -8,11 +8,13 @@ For up-to-date and additional tutorials, see markdown content on the `SimBA GitH
    :titlesonly:
 
    anchored_rois
+   blob_data_project_simba
    blob_track
    FSTTC
    cue_light_tutorial
    facemap_project
    feature_subsets
+   gpu_vs_cpu_video_processing_runtimes
    kleinberg_filter
    light_dark_box
    SHAP
