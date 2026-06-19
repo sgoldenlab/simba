@@ -47,6 +47,9 @@
      .simba-404 .simba-btn-row a:hover { background: #19465f; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(33,86,122,.35); }
      .simba-404 .simba-btn-row a.ghost { background: #fff; color: #21567a !important; border: 1px solid #cdd9e2; box-shadow: none; }
      .simba-404 .simba-btn-row a.ghost:hover { background: #eaf1f6; }
+     .simba-404 p.report { margin: 22px auto 0; font-size: 13.5px; color: #6b7a86; }
+     .simba-404 p.report a { color: #21567a; font-weight: 600; text-decoration: none; white-space: nowrap; }
+     .simba-404 p.report a:hover { text-decoration: underline; }
    </style>
 
    <div class="simba-404">
@@ -60,6 +63,8 @@
        <a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html">🏠&nbsp;&nbsp;Docs home</a>
        <a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/tutorials.html" class="ghost">🧑‍🏫&nbsp;&nbsp;Tutorials</a>
        <a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/search.html" class="ghost">🔍&nbsp;&nbsp;Search the docs</a>
-       <a href="https://github.com/sgoldenlab/simba" class="ghost">💻&nbsp;&nbsp;GitHub</a>
      </div>
+     <p class="report">Spotted a broken link or missing page? Let us know &mdash;
+       <a href="https://github.com/sgoldenlab/simba/issues">🐛&nbsp;report it on GitHub</a> or
+       <a href="https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im">💬&nbsp;ask on Gitter</a>.</p>
    </div>
