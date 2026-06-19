@@ -891,3 +891,34 @@ html.simba-landing .rst-content h1 { display: none !important; }
 .simba-nb #miscellaneous h2 { border-left-color: #cf8a2e; }
 .simba-nb #miscellaneous .toctree-l1 > a { border-left-color: #cf8a2e; background: #fdf8f0; }
 .simba-nb #miscellaneous .toctree-l1 > a::before { content: "🧰"; }
+
+
+/* --- Secondary gold accent (#c0a848) for highlights --- *
+ * The primary accent stays steel-blue (#21567a); gold is reserved for the few
+ * places we genuinely want to draw the eye: highlighted text, search hits,
+ * text selection, and heading anchors. Used sparingly on purpose. */
+:root {
+    --simba-gold: #c0a848;                       /* the accent itself */
+    --simba-gold-soft: rgba(192, 168, 72, 0.18); /* tint for backgrounds */
+    --simba-gold-line: rgba(192, 168, 72, 0.42); /* underline / marker stroke */
+}
+
+/* Highlighted text: <mark> and reST/MyST {mark} roles — gold "marker pen" look */
+.rst-content mark,
+.rst-content .highlighted {
+    background: var(--simba-gold-soft);
+    box-shadow: inset 0 -0.5em 0 var(--simba-gold-line);
+    color: inherit;
+    padding: 0 .12em;
+    border-radius: 2px;
+}
+
+/* Search-result term highlighting (RTD wraps matches in .highlighted, handled above) */
+
+/* Text selection picks up the same warm tint */
+::selection      { background: var(--simba-gold-soft); }
+::-moz-selection { background: var(--simba-gold-soft); }
+
+/* Heading anchor (¶): RTD reveals it on heading hover — tint it gold, not blue */
+.rst-content .headerlink { color: var(--simba-gold) !important; opacity: .85; }
+.rst-content .headerlink:hover { opacity: 1; }
