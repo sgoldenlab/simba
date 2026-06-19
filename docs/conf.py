@@ -115,6 +115,9 @@ redirects = {
     "tutorials_rst/create_user_defined_pose_config": "../Pose_config.html",
     "tutorials_rst/user_defined_feature_class": "../extractFeatures.html",
     "tutorials_rst/blob_tracking": "../blob_track.html",
+    # stale duplicates removed from the toctree -> point at the real pages
+    "tutorials_rst/roi": "../roi_tutorial_new_2025.html",
+    "tutorials_rst/installation": "../installation.html",
 }
 html_css_files = ['css/simba_theme.css',  # Include your existing CSS file
                   'custom.css']  # Include your additional CSS file
