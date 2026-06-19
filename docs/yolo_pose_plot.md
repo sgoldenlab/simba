@@ -218,6 +218,5 @@ The output format matches the input video format (MP4, AVI, etc.).
   - `simba.plotting.yolo_pose_visualizer.YOLOPoseVisualizer` - Regular pose visualization
   - `simba.plotting.yolo_pose_track_visualizer.YOLOPoseTrackVisualizer` - Track-based pose visualization
 
-##
 Author [Simon N](https://github.com/sronilsson)
 

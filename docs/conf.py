@@ -64,6 +64,8 @@ MIGRATED_MD = {
     'roi_tutorial_new_2025.md', 'Tools.md',
     'tutorial_process_videos.md', 'Pose_config.md', 'extractFeatures.md',
     'blob_track.md',
+    'facemap_project.md', 'superanimal_topview_project.md', 'Visualizations.md',
+    'yolo_train.md', 'yolo_inference.md', 'yolo_pose_plot.md',
 }
 _unmigrated_md = [f for f in _glob.glob('*.md') if f not in MIGRATED_MD]
 

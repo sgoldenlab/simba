@@ -177,9 +177,13 @@ The pop-up offers the following options:
 
 **Where output is saved:** Videos and frames are saved to the `project_folder/frames/output/sklearn_results/` directory.
 
-[sklearn_visualization.webm](https://github.com/user-attachments/assets/8a040763-267a-464b-9a33-fe139fc644bb)
+<p align="center">
+  <video src="images/visualizations/sklearn_visualization.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[sklearn_visualization_2.webm](https://github.com/user-attachments/assets/a65c89ed-37ae-423d-a0b2-e470b55c7f15)
+<p align="center">
+  <video src="images/visualizations/sklearn_visualization_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ![animal_vs_axis_aligned](https://github.com/user-attachments/assets/1036ef33-a365-4f7c-a252-bc77bdefd5b8)
 
@@ -367,7 +371,9 @@ Path plots show where each animal moved over time (trajectory lines) and, option
   <img src="images/scenario2/path_plot_5.webp" width="600">
 </p>
 
-[path_plot_2.webm](https://github.com/user-attachments/assets/4e0e249c-0571-4f8c-b705-7ff341f429fd)
+<p align="center">
+  <video src="images/visualizations/path_plot_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ---
 
@@ -501,9 +507,13 @@ Creates videos with ROI shapes overlaid on each frame, plus **counters** showing
 ![roi_plot_1](https://github.com/user-attachments/assets/406369ab-b90f-4f9c-9ca9-47016cca97ec)
 
 
-[roi_plot_2.webm](https://github.com/user-attachments/assets/7eb65e5d-8d1f-451a-b6fd-2558ba4afc5e)
+<p align="center">
+  <video src="images/visualizations/roi_plot_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[outside_roi_example.webm](https://github.com/user-attachments/assets/6174e057-2476-498e-8e5b-2de1390acd8f)
+<p align="center">
+  <video src="images/visualizations/outside_roi_example.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ![animal_axis_aligned_bbox_roi](https://github.com/user-attachments/assets/c9f55de3-3b45-4f54-a77e-7e5cdafc5907)
 
@@ -599,7 +609,9 @@ Location heatmaps visualize **time spent in different regions of the arena** (co
 
 **Where output is saved:** `project_folder/frames/output/heatmaps_locations/`. Per-video: `{video_name}.mp4`, `{video_name}_final_frm.png` (or similar), and (if CREATE FRAMES) subfolder `{video_name}/` with frame images.
 
-[location_heatmap.webm](https://github.com/user-attachments/assets/d124f790-bd80-4a1e-9020-3a31ea12fc35)
+<p align="center">
+  <video src="images/visualizations/location_heatmap.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 <p align="center">
   <img src="images/visualizations/location_heatmap_1.webp" width="600" alt="Location heatmap example">
@@ -644,9 +656,13 @@ Creates videos showing when each animal is **directing towards other animals** (
 
 **Where output is saved:** `project_folder/frames/output/Directing_animals/`
 
-[visualize_directionality_1.webm](https://github.com/user-attachments/assets/84538728-eb2c-40b2-9360-a5f73d8da506)
+<p align="center">
+  <video src="images/visualizations/visualize_directionality_1.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[visualize_directionality_2.webm](https://github.com/user-attachments/assets/cf73b602-932b-4ab4-82e0-2fa9f963531b)
+<p align="center">
+  <video src="images/visualizations/visualize_directionality_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ![visualize_directionality_3](https://github.com/user-attachments/assets/e607adf8-3227-4316-88da-cd6075f17a3c)
 
@@ -662,7 +678,9 @@ Creates videos showing when each animal is **directing towards user-defined ROIs
   <img src="images/visualizations/visualize_roi_directionality.webp" width="600" alt="Visualize ROI directionality pop-up">
 </p>
 
-[DirectingROIVisualizer.webm](https://github.com/user-attachments/assets/58506f7c-096c-47ae-9012-d30f64ecc0ac)
+<p align="center">
+  <video src="images/visualizations/DirectingROIVisualizer.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 **Prerequisites:**
@@ -874,7 +892,9 @@ Renders **videos with pose keypoints overlaid** on each frame. Use this to verif
 
 **Where output is saved:** The **SAVE DIRECTORY** you choose. Each input file produces one output video (e.g. `{filename}.mp4`).
 
-[pose_plotter.webm](https://github.com/user-attachments/assets/09810e7a-a63f-45e0-8f51-781d7ed77c15)
+<p align="center">
+  <video src="images/visualizations/pose_plotter.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 ![pose_plotter](https://github.com/user-attachments/assets/5339ccbe-3b0f-442f-a45c-e1c1b0a9a71b)
 
@@ -918,11 +938,17 @@ Renders **videos with blob-tracking overlays**: convex hulls, anterior (nose), p
 
 **Where output is saved:** The **SAVE DIRECTORY** you choose.
 
-[blob_tracking_2.webm](https://github.com/user-attachments/assets/f95d2841-992a-45d6-be1e-2e0dd9ad2dc8)
+<p align="center">
+  <video src="images/visualizations/blob_tracking_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[blob_tracking_3.webm](https://github.com/user-attachments/assets/4e24f131-4f0d-4af3-aeee-f241541f0b41)
+<p align="center">
+  <video src="images/visualizations/blob_tracking_3.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
-[blob_tracking_4.webm](https://github.com/user-attachments/assets/5fe5b899-102a-4ce4-9db8-57d3dff0939c)
+<p align="center">
+  <video src="images/visualizations/blob_tracking_4.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ---
@@ -963,7 +989,9 @@ Renders **videos with YOLO pose-estimation overlays**: keypoints, skeleton lines
 
 **Where output is saved:** The **SAVE DIRECTORY** you choose. Output videos have the same names as the input videos with pose overlays.
 
-[yolo_visualize_2.webm](https://github.com/user-attachments/assets/e7b552dd-b3e0-4ec1-bb95-27b09d447419)
+<p align="center">
+  <video src="images/visualizations/yolo_visualize_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ---
@@ -1001,7 +1029,9 @@ Rotates and translates **pose data** and **video frames** so one animal is cente
 
 **Where output is saved:** The **SAVE DIRECTORY** you choose. Aligned CSVs and rotated videos keep the same filenames as inputs.
 
-[egocentric_2.webm](https://github.com/user-attachments/assets/46df9a47-7266-48b4-8d6b-271ae6f0adba)
+<p align="center">
+  <video src="images/visualizations/egocentric_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ---
@@ -1037,7 +1067,9 @@ Creates a **simple path plot** for one body part in one video. Unlike the full p
 
 **Where output is saved:** `project_folder/frames/output/path_plots/`. Output: `{video_name}_simple_path_plot.png` (if LAST FRAME ONLY) or `{video_name}_simple_path_plot.mp4`.
 
-[EzPathPlot_2.webm](https://github.com/user-attachments/assets/f9f484dd-b5fa-4542-a9ee-8718b7c1b515)
+<p align="center">
+  <video src="images/visualizations/EzPathPlot_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ---
@@ -1066,7 +1098,9 @@ Joins **two videos** into a single output video, either **horizontally** (side b
 
 **Where output is saved:** Same directory as the **first video**. Filename: `{video1}_{video2}_concat.mp4` (e.g. `Video1_Video2_concat.mp4`).
 
-[concatenate_two_videos_1.webm](https://github.com/user-attachments/assets/04ab462f-a194-41f0-92b7-e21d9d0fe042)
+<p align="center">
+  <video src="images/visualizations/concatenate_two_videos_1.webm" width="600" controls>Your browser does not support the video tag.</video>
+</p>
 
 
 ---

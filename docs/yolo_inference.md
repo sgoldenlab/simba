@@ -176,6 +176,5 @@ The inference results are saved in the specified **SAVE DIRECTORY**. The output 
 - For importing YOLO pose estimation results into SimBA, see pose estimation import tools.
 - For more information on pose estimation in SimBA, see the [Multi-animal pose estimation tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/Multi_animal_pose.md).
 
-##
 Author [Simon N](https://github.com/sronilsson)
 

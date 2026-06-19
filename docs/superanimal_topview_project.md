@@ -1,6 +1,6 @@
 # SuperAnimal-Topview data in SimBA
 
-### CREATE A SuperAnimal-Topview PROJECT IN SIMBA
+## CREATE A SuperAnimal-Topview PROJECT IN SIMBA
 
 Before working with SuperAnimal-Topview data in SimBA, make sure you have the latest version of [SimBA installed](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md).
 
@@ -16,7 +16,7 @@ Next, under `TYPE OF TRACKING` select `Multi tracking`. Under `BODY PART CONFIGU
 
 Once selected, click the <kbd>CREATE PROJECT CONFIG</kbd> button to create the project in your chosen directory. 
 
-### IMPORT SuperAnimal-Topview VIDEOS TO YOU SIMBA PROJECT
+## IMPORT SuperAnimal-Topview VIDEOS TO YOU SIMBA PROJECT
 
 After clicking on the <kbd>CREATE PROJECT CONFIG</kbd> button, head to the [`IMPORT VIDEOS`] tab to import the videos representing your SuperAnimal-Topview data into your new SuperAnimal-Topview SimBA project:
 For more information on video import, see the [Scenario 1 documentation](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config). 
@@ -25,7 +25,7 @@ The import of videos is not a strict requirement, but recommended, for amongst o
 
 <img width="743" height="400" alt="image" src="https://github.com/user-attachments/assets/03182aff-189a-4b97-a69b-3b87bbf58be8" />
 
-### IMPORT SuperAnimal-Topview DATA TO YOU SIMBA PROJECT
+## IMPORT SuperAnimal-Topview DATA TO YOU SIMBA PROJECT
 
 Next, we need to import the SuperAnimal-Topview tracking data to the project. Click on the `[Import tracking data]` tab. Here, select `H5 (SuperAnimal-Topview)` from the `DATA TYPE` dropdown:
 

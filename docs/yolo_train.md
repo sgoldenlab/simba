@@ -345,6 +345,5 @@ The following conversion tools are available in SimBA for converting pose estima
   - `simba.third_party_label_appenders.transform.sleap_to_yolo.SleapAnnotations2Yolo` - SLEAP to YOLO conversion
   - `simba.third_party_label_appenders.transform.coco_keypoints_to_yolo.COCKeypoints2Yolo` - COCO to YOLO conversion
 
-##
 Author [Simon N](https://github.com/sronilsson)
 
