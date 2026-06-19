@@ -1,7 +1,7 @@
 
 
 
-### TRAIN RANDOM FOREST MODELS ON GPU IN SIMBA
+# TRAIN RANDOM FOREST MODELS ON GPU IN SIMBA
 
 
 **1)** In Linux, be in a python **3.10** environment with SimBA installed. you can create a SimBA python 3.10 environment as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md).
@@ -24,34 +24,34 @@ pip install cuml-cu12==24.12.0
 ```
 export CUML=True
 ```
-![image](https://github.com/user-attachments/assets/c6380386-6c45-480e-9c8e-ef11f6b1297b)
+![image](images/cuml_simba/cuml_simba_1.png)
 
 and hit <kbd>ENTER</kbd>.
 
 **4)** Next, launch SimBA with `simba`. If everything has gone to plan you should see the below beeing printed out. Specifically, you should see ``SimBA CUML enabled.`` followed by ``'CUML': True``, as in the below screengrab. 
 
-![image](https://github.com/user-attachments/assets/66d13d3d-b02a-4f3b-adfd-4016747cbf5e)
+![image](images/cuml_simba/cuml_simba_2.png)
 
 Set you global machine learning paramaters as usual in SimBA as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#train-single-model), or create multiple model config files as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#to-train-multiple-models) to train multiple models. However, don't click to train the model(s) yet, we need to modify one thing in the files to tell them to use the GPU libraries that we just have imported into SimBA.  
 
 **5)**
 
-#### TRAINING A SINGLE MODEL
+## TRAINING A SINGLE MODEL
 If you are training from the global environment, open the `project_config.ini` file and add one parameter to the [create ensemble settings] section. Add:
 
   ``cuda = True``
 
   as in screengrab below":
 
-  ![image](https://github.com/user-attachments/assets/7c2e7e8d-9056-4ec4-bd55-fdb31328c3e3)
+  ![image](images/cuml_simba/cuml_simba_3.png)
 
 and save the file. 
 
 
-#### TRAINING MULTPLE MODELS
+## TRAINING MULTPLE MODELS
 If you are training multiple models, open each of the CSV files in the project_folder/configs and add one header named ``cuda`` and set the value to TRUE, as in the screengrab below:
 
-![image](https://github.com/user-attachments/assets/d2302531-876c-44e6-8e17-d1919e75d74d)
+![image](images/cuml_simba/cuml_simba_4.png)
 
 **6)** Train your models in SimBA from your config files by clicking the green or blue <kbd>TRAIN SINGLE MODEL</kbd> or <kbd>TRAIN MULTIPLE MODELS</kbd> buttons in the [TRAIN MACHINE MODEL] tab as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model). The models should now be trained on the GPU and you should see significant speed up for the training part (NOTE: the evaluation parts, e.g., learning curves, PR curves, feature importance calculations etc, might not be as quick.)
 

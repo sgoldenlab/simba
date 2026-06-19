@@ -16,6 +16,10 @@ For up-to-date and additional tutorials, see markdown content on the `SimBA GitH
    SHAP
    directionality_between_animals
    classifier_validation
+   validation_tutorial
+   mutual_exclusivity_heuristic_rules
+   spontaneous_alternation
+   light_dark_box
    cue_light_tutorial
    Multi_animal_pose
    facemap_project
@@ -28,4 +32,5 @@ For up-to-date and additional tutorials, see markdown content on the `SimBA GitH
    yolo_train
    yolo_inference
    yolo_pose_plot
+   cuml_simba
    simba.env

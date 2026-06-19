@@ -66,6 +66,8 @@ MIGRATED_MD = {
     'blob_track.md',
     'facemap_project.md', 'superanimal_topview_project.md', 'Visualizations.md',
     'yolo_train.md', 'yolo_inference.md', 'yolo_pose_plot.md',
+    'spontaneous_alternation.md', 'light_dark_box.md', 'mutual_exclusivity_heuristic_rules.md',
+    'validation_tutorial.md', 'cuml_simba.md',
 }
 _unmigrated_md = [f for f in _glob.glob('*.md') if f not in MIGRATED_MD]
 

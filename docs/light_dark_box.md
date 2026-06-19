@@ -1,7 +1,7 @@
-# <p align="center"> Light dark box analysis in SimBA </p>
+# Light dark box analysis in SimBA
 
 
-# GENERAL REQUIREMENTS 
+## GENERAL REQUIREMENTS
 
 >[!NOTE]
 >This analysis does **NOT** require the creation of a SimBA project. For data, all that is needed is a directory containing CSV files presenting pose-estimation data from DeepLabCut. The CSV files are expected to be in [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/light_dark_box_expected_input.csv) general format.
@@ -10,17 +10,17 @@
 >
 >Make sure you have SimBA version 3.1.7 or later. 
 
-## ANALYSIS
+### ANALYSIS
 
-### STEP 1 - GET THE REQUIRED PYTHON FILE
+#### STEP 1 - GET THE REQUIRED PYTHON FILE
 
 **1.** Locate the `light_dark_box_analyzer.py` script. It is located [HERE](https://github.com/sgoldenlab/simba/blob/master/simba/data_processors/light_dark_box_analyzer.py). It could also be found at path `simba.data_processors.light_dark_box_analyzer.LightDarkBoxAnalyzer` in the github repository. If you already have a SimBA environment installed on your computer, you can locate the file by (i) typing `pip show simba-uw-tf-dev` in your SimBA environment, (ii) enter the path that is shown (as in the scrrengrab below) into a file explorer, and navigate to the `simba/data_processors/light_dark_box_analyzer` inside that shown directory.
 
-![image](https://github.com/user-attachments/assets/46304438-4eb6-4de0-8f5e-4c57b60e2a99)
+![image](images/light_dark_box/light_dark_box_1.png)
 
 **2.** Copy this file (or paste the content of this file into an empty file named `light_dark_box_analyzer.py`) to an accessable location on your computer. For example, I have copied this file to location `C:\projects\light_dark_box\light_dark_box_analyzer.py` for writing this documentation.  
 
-### STEP 2 - FORMULATE A COMMAND
+#### STEP 2 - FORMULATE A COMMAND
 
 To run the file above, we need to formulate a command line text string specifying how we want the python .py file to run. This inlcudes things like where our deeplabcut data is saved, where we want to save the output, the frame rate of out videos, and a few other things detailed below:
 
@@ -44,7 +44,7 @@ python light_dark_box_analyzer.py --data_dir "C:\projects\light_dark_box\data" -
 
 I often put this text string together in some notepad or other texteditor document, and later copy-paste it to the terminal window (as in example video below).  
 
-### STEP 3 - RUN THE COMMAND.
+#### STEP 3 - RUN THE COMMAND.
 
 **1.** Open a command line terminal and navigate to the directory which stores `light_dark_box_analyzer.py`
 
@@ -59,20 +59,20 @@ conda activate simba
 In the below video, you can see my completing these three things to analyze 15 DeppLabCut pose-estimation files:
 
 
-https://github.com/user-attachments/assets/583f4d75-09dc-4249-9ea3-80a871faf74d
+<p align="center"><video src="images/light_dark_box/light_dark_box_1.mp4" width="600" controls></video></p>
 
 The results are saved in a single CSV file at location "C:\projects\light_dark_box\light_dark_data.csv" indexed according to video name where each row is a episode in the ligh or dark compartment together with information of episode start time, end time, duration, start frame and end frame etc. For a small expected output example, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/light_dark_data.csv) file.
 
 
-## VISUALIZATION
+### VISUALIZATION
 
-### STEP 1 - GET THE REQUIRED PYTHON FILE
+#### STEP 1 - GET THE REQUIRED PYTHON FILE
 
 **1.** Locate the `light_dark_box_plotter.py` script. It is located [HERE](https://github.com/sgoldenlab/simba/blob/master/simba/plotting/light_dark_box_plotter.py). It could also be found at path `simba.plotting.light_dark_box_plotter.LightDarkBoxPlotter` in the github repository. If you already have a SimBA environment installed on your computer, you can locate the file by (i) typing `pip show simba-uw-tf-dev` in your SimBA environment, (ii) enter the path that is shown (as in the screengrab below) into a file explorer, and navigate to the `simba/plotting/light_dark_box_plotter` inside that shown directory.
 
 **2.** Copy this file (or paste the content of this file into an empty file named `light_dark_box_plotter.py`) to an accessible location on your computer. For example, I have copied this file to location `C:\projects\light_dark_box\light_dark_box_plotter.py` for writing this documentation.  
 
-### STEP 2 - FORMULATE A COMMAND
+#### STEP 2 - FORMULATE A COMMAND
 
 To run the file above, we need to formulate a command line text string specifying how we want the light_dark_box_plotter.py file to run. This includes things like where our input deeplabcut data is stored, where our videos are stored, where we want to save the new output videos, the frame rate of out videos, and a few other things detailed below. Many of them are the same as when just performing the analysis:
 
