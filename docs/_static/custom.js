@@ -1117,3 +1117,49 @@ gtag('config', 'G-PEKR9R5J47');
     });
   });
 })();
+
+/* ------------------------------------------------------------------ *
+ * Global lazy-loading of media (page-load speedup).
+ *
+ * Docs pages stack many large .webp/.png images and .webm/.mp4 clips;
+ * downloading the off-screen ones blocks first paint. Native
+ * loading="lazy" defers images that are NOT in the initial viewport
+ * (in-viewport ones — logo, hero — still load immediately, so LCP is
+ * unaffected). For <video> we set preload="none" so the demo clips
+ * fetch no data until the user hits play.
+ *
+ * The attribute must be set BEFORE the browser begins fetching, so a
+ * MutationObserver tags nodes as they stream into the DOM — a
+ * DOMContentLoaded-only pass would run too late for images already in
+ * flight. A final sweep + disconnect runs once the DOM is parsed.
+ * ------------------------------------------------------------------ */
+(function () {
+  function tagImg(img) {
+    if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+    if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
+  }
+  function tagVideo(v) {
+    // Don't override autoplay clips; otherwise defer the download.
+    if (!v.autoplay && !v.hasAttribute('preload')) v.setAttribute('preload', 'none');
+  }
+  function scan(node) {
+    if (node.nodeType !== 1) return;                         // elements only
+    if (node.tagName === 'IMG') tagImg(node);
+    else if (node.tagName === 'VIDEO') tagVideo(node);
+    if (node.querySelectorAll) {
+      Array.prototype.forEach.call(node.querySelectorAll('img'), tagImg);
+      Array.prototype.forEach.call(node.querySelectorAll('video'), tagVideo);
+    }
+  }
+  var mo = new MutationObserver(function (muts) {
+    for (var i = 0; i < muts.length; i++) {
+      var added = muts[i].addedNodes;
+      for (var j = 0; j < added.length; j++) scan(added[j]);
+    }
+  });
+  mo.observe(document.documentElement, { childList: true, subtree: true });
+  document.addEventListener('DOMContentLoaded', function () {
+    scan(document.documentElement);
+    mo.disconnect();
+  });
+})();

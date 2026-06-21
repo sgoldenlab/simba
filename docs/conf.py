@@ -177,6 +177,63 @@ def _convert_github_alerts(app, doctree):
         bq.replace_self(admonition)
 
 
+# Build-time lazy-loading of media (page-load speedup).
+#
+# These docs stack many large .webp/.png images and .webm/.mp4 demo clips per page;
+# downloading the off-screen ones blocks first paint. We inject loading="lazy" +
+# decoding="async" on every <img>, and preload="none" on every non-autoplay <video>,
+# directly into the generated HTML. custom.js does the same client-side, but the
+# browser's preload scanner can start fetching the first images before that script
+# runs — doing it at build time guarantees the attributes are present in the served
+# markup. Off-screen media then defers; in-viewport media (logo, hero) still loads
+# immediately, so there is no LCP regression. Idempotent: the negative lookaheads
+# skip tags that already carry loading=/preload=, so re-runs and the JS pass never
+# double-apply.
+_IMG_LAZY_RE = _re.compile(r'<img\b(?![^>]*\bloading=)([^>]*?)(\s*/?)>', _re.IGNORECASE)
+_VIDEO_RE = _re.compile(r'<video\b([^>]*)>', _re.IGNORECASE)
+_PRELOAD_TOKEN_RE = _re.compile(r'\bpreload\s*=\s*"?([\w-]+)"?', _re.IGNORECASE)
+
+
+def _inject_lazy_media(app, exception):
+    if exception is not None or getattr(app.builder, 'format', '') != 'html':
+        return
+    from pathlib import Path
+    from sphinx.util import logging as _sphinx_logging
+    logger = _sphinx_logging.getLogger(__name__)
+
+    def _fix_img(m):
+        attrs, close = m.group(1), m.group(2)
+        add = ' loading="lazy"'
+        if 'decoding=' not in attrs.lower():
+            add += ' decoding="async"'
+        return '<img' + attrs + add + close + '>'
+
+    def _fix_video(m):
+        # autoplay clips need their data, so never defer them. For the rest:
+        # add preload="none" when absent, and downgrade the sphinxcontrib.video
+        # default preload="auto" (full download on page load) to "none" so the
+        # clip fetches nothing until the user presses play. An explicit
+        # "metadata"/"none" the author chose is left untouched.
+        attrs = m.group(1)
+        if _re.search(r'\bautoplay\b', attrs, _re.IGNORECASE):
+            return m.group(0)
+        pm = _PRELOAD_TOKEN_RE.search(attrs)
+        if pm is None:
+            return '<video' + attrs + ' preload="none">'
+        if pm.group(1).lower() == 'auto':
+            return '<video' + attrs[:pm.start()] + 'preload="none"' + attrs[pm.end():] + '>'
+        return m.group(0)
+
+    changed = 0
+    for html in Path(app.outdir).rglob('*.html'):
+        text = html.read_text(encoding='utf-8')
+        new = _VIDEO_RE.sub(_fix_video, _IMG_LAZY_RE.sub(_fix_img, text))
+        if new != text:
+            html.write_text(new, encoding='utf-8')
+            changed += 1
+    logger.info('lazy-media: injected loading/preload attributes into %d HTML files', changed)
+
+
 def setup(app):
     """Build-time hooks for the Markdown tutorials.
 
@@ -186,6 +243,7 @@ def setup(app):
        copies a directory's *contents* to the output root (flattening the ``images/``
        prefix the tags rely on). Copying explicitly preserves the structure.
     2. Convert GitHub-style alerts to admonitions (see ``_convert_github_alerts``).
+    3. Inject lazy-loading attributes into the generated HTML (see ``_inject_lazy_media``).
     """
     from sphinx.util.fileutil import copy_asset
 
@@ -196,4 +254,5 @@ def setup(app):
                 copy_asset(src, os.path.join(app.outdir, 'images'))
 
     app.connect('build-finished', _copy_images)
+    app.connect('build-finished', _inject_lazy_media)
     app.connect('doctree-read', _convert_github_alerts)
