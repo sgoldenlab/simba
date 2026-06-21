@@ -72,9 +72,11 @@ class PathPlotterSingleCore(ConfigReader, PlottingMixin):
        :width: 300
        :align: center
 
-    .. image:: _static/img/path_plot_mp.gif
-       :alt: Path plot mp
+    .. video:: _static/img/path_plot_mp.webm
        :width: 500
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     .. image:: _static/img/path_plot_1.png

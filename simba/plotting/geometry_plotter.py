@@ -136,9 +136,11 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
        To quickly create static geometries on a white background (useful for troubleshooting unexpected geometries), see :func:`simba.mixins.geometry_mixin.GeometryMixin.view_shapes`
        and :func:`simba.mixins.geometry_mixin.GeometryMixin.geometry_video`
 
-    .. image:: _static/img/GeometryPlotter.gif
-       :alt: Geometry Plotter
+    .. video:: _static/img/GeometryPlotter.webm
        :width: 600
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     .. video:: _static/img/GeometryPlotter_1.webm

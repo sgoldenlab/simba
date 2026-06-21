@@ -163,9 +163,11 @@ class ROIPlotMultiprocess(ConfigReader, PlottingMixin):
        :width: 1000
        :align: center
 
-    .. image:: _static/img/ROIPlot_2.gif
-       :alt: ROIPlot 2
+    .. video:: _static/img/ROIPlot_2.webm
        :width: 1000
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     .. video:: _static/img/outside_roi_example.mp4

@@ -26,9 +26,11 @@ class ROISelectorCircle(object):
     :raises InvalidFileTypeError: If the file type is not supported.
     :raises CropWarning: If the selected ROI extends beyond the image boundaries or if the ROI radius equals zero.
 
-    .. image:: _static/img/circle_crop_2.gif
-       :alt: Circle crop 2
+    .. video:: _static/img/circle_crop_2.webm
        :width: 700
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     .. note::

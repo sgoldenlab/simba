@@ -45,9 +45,11 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
        For improved run-time, see :meth:`simba.plotting.plot_clf_results_mp.PlotSklearnResultsMultiProcess` for multiprocess class.
        Scikit visualization documentation <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-sklearn-visualization__.
 
-    .. image:: _static/img/sklearn_visualization.gif
-       :alt: Sklearn visualization
+    .. video:: _static/img/sklearn_visualization.webm
        :width: 600
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
 

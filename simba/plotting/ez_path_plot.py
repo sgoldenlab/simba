@@ -30,14 +30,18 @@ class EzPathPlot(object):
     .. note::
        For more refined / complex path plots with/without multiprocessing for inproved speed, see ``simba.plotting.path_plotter.PathPlotterSingleCore`` and ``simba.plotting.path_plotter_mp.PathPlotterMulticore``.
 
-    .. image:: _static/img/EzPathPlot.gif
-       :alt: Ez Path Plot
+    .. video:: _static/img/EzPathPlot.webm
        :width: 500
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
-    .. image:: _static/img/EzPathPlot_2.gif
-       :alt: Ez Path Plot 2
+    .. video:: _static/img/EzPathPlot_2.webm
        :width: 500
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     :param Union[str, os.PathLike] data_path: The path to the data file in H5c or CSV format containing the pose estimation coordinates.

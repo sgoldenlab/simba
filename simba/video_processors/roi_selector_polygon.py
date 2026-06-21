@@ -20,9 +20,11 @@ class ROISelectorPolygon(object):
     Class for selecting a polygonal region of interest (ROI) within an image or video frame.
     The selected region vertices are stored in self: polygon_vertices.
 
-    .. image:: _static/img/roi_selector_polygon.gif
-       :alt: Roi selector polygon
+    .. video:: _static/img/roi_selector_polygon.webm
        :width: 700
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     :param Union[str, os.PathLike] path: Path to the image or video file. Can also be an image represented as a numpy array.

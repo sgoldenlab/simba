@@ -21,9 +21,11 @@ def interactive_clahe_ui(data: Union[str, os.PathLike]) -> Tuple[float, int]:
     """
     Create a user interface using OpenCV to explore and set appropriate CLAHE settings tile size and clip limit.
 
-    .. image:: _static/img/interactive_clahe_ui.gif
-       :alt: Interactive clahe ui
+    .. video:: _static/img/interactive_clahe_ui.webm
        :width: 500
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     :param Union[str, os.PathLike, np.ndarray] data: Path to a video file.

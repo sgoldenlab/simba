@@ -48,9 +48,11 @@ class ROIPlotter(ConfigReader):
        :width: 800
        :align: center
 
-    .. image:: _static/img/ROIPlot_1.gif
-       :alt: ROIPlot 1
+    .. video:: _static/img/ROIPlot.webm
        :width: 800
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     .. video:: _static/img/outside_roi_example.mp4

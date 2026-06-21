@@ -109,9 +109,11 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
        :width: 600
        :align: center
 
-    .. image:: _static/img/DistancePlotterMultiCore_1.gif
-       :alt: Distance Plotter Multi Core 1
+    .. video:: _static/img/DistancePlotterMultiCore_1.webm
        :width: 600
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     :example:

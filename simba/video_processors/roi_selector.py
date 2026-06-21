@@ -19,9 +19,11 @@ class ROISelector(object):
     A class for selecting and reflecting Regions of Interest (ROI) in an image.
     The selected region variables are stored in self: top_left, bottom_right, width, height etc.
 
-    .. image:: _static/img/roi_selector.gif
-       :alt: Roi selector
+    .. video:: _static/img/roi_selector.webm
        :width: 600
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     :param Union[str, os.PathLike] path: Path to the image or video file. Can also be an image represented as a numpy array.

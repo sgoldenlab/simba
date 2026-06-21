@@ -16,9 +16,11 @@ class BrightnessContrastUI:
      .. note::
         Adapted from `geeksforgeeks <https://www.geeksforgeeks.org/changing-the-contrast-and-brightness-of-an-image-using-python-opencv/>`_.
 
-     .. image:: _static/img/brightness_contrast_ui.gif
-        :alt: Brightness contrast ui
+     .. video:: _static/img/brightness_contrast_ui.webm
         :width: 700
+        :autoplay:
+        :loop:
+        :muted:
         :align: center
 
      :param Union[str, os.PathLike] video_path: Path to the video file or an image in numpy array format.

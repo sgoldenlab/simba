@@ -245,9 +245,11 @@ class Smooth(ConfigReader):
     .. note::
         `Smoothing tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files>`__.
 
-    .. image:: _static/img/smoothing.gif
-       :alt: Smoothing
+    .. video:: _static/img/smoothing.webm
        :width: 600
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     :references:

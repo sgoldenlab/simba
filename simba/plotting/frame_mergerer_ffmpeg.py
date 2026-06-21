@@ -37,10 +37,12 @@ class FrameMergererFFmpeg(ConfigReader):
     .. note::
        `GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-12-merge-frames>`_.
 
-        .. image:: _static/img/mosaic_videos.gif
-          :alt: Mosaic videos
-          :width: 600
-          :align: center
+        .. video:: _static/img/mosaic_videos.webm
+           :width: 600
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
 
     :param str config_path: Optional path to SimBA project config file in Configparser format.
     :param Literal["horizontal", "vertical", "mosaic", "mixed_mosaic"] concat_type: Type of concatenation. OPTIONS: 'horizontal', 'vertical', 'mosaic', 'mixed_mosaic'.

@@ -115,9 +115,11 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
     .. note::
        `GitHub visualizations tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
-    .. image:: _static/img/heatmap_location.gif
-       :alt: Heatmap location
+    .. video:: _static/img/heatmap_location.webm
        :width: 500
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     ..  youtube:: O41x96kXUHE

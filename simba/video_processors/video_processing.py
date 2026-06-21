@@ -416,9 +416,11 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike],
     .. seealso::
        For multicore method, see :func:`simba.video_processors.video_processing.clahe_enhance_video_mp`.
 
-    .. image:: _static/img/clahe_enhance_video.gif
-       :alt: Clahe enhance video
+    .. video:: _static/img/clahe_enhance_video.webm
        :width: 800
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     ..  youtube:: 6zDh7E0F8IY
@@ -524,9 +526,11 @@ def clahe_enhance_video_mp(file_path: Union[str, os.PathLike],
     .. seealso::
        For single core method, see :func:`simba.video_processors.video_processing.clahe_enhance_video`.
 
-    .. image:: _static/img/clahe_enhance_video.gif
-       :alt: Clahe enhance video
+    .. video:: _static/img/clahe_enhance_video.webm
        :width: 800
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     .. csv-table::
@@ -878,9 +882,11 @@ def video_to_greyscale(file_path: Union[str, os.PathLike],
     """
     Convert a video file to greyscale mp4 format.
 
-    .. image:: _static/img/to_greyscale.gif
-       :alt: To greyscale
+    .. video:: _static/img/to_greyscale.webm
        :width: 700
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     .. seealso::
@@ -938,9 +944,11 @@ def batch_video_to_greyscale(path: Union[str, os.PathLike, List[Union[str, os.Pa
     """
     Convert a directory of video file to greyscale mp4 format.
 
-    .. image:: _static/img/to_greyscale.gif
-       :alt: To greyscale
+    .. video:: _static/img/to_greyscale.webm
        :width: 700
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     .. seealso::
@@ -1020,9 +1028,11 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
        :width: 700
        :align: center
 
-    .. image:: _static/img/superimpose_frame_count.gif
-       :alt: Superimpose frame count
+    .. video:: _static/img/superimpose_frame_count.webm
        :width: 500
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     ..  youtube:: TMQmNr8Ssyg
@@ -1697,9 +1707,11 @@ def crop_single_video(file_path: Union[str, os.PathLike],
 
     Results is saved in the same directory as input video with the ``_cropped.mp4`` suffix.
 
-    .. image:: _static/img/crop_single_video.gif
-       :alt: Crop single video
+    .. video:: _static/img/crop_single_video.webm
        :width: 700
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     .. seealso::
@@ -1888,9 +1900,11 @@ def video_concatenator(video_one_path: Union[str, os.PathLike],
     """
     Concatenate two videos to a single video either horizontally or vertically
 
-    .. image:: _static/img/horizontal_video_concatenator.gif
-       :alt: Horizontal video concatenator
+    .. video:: _static/img/horizontal_video_concatenator.webm
        :width: 1000
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     .. video:: _static/img/vertical_concat.webm
@@ -1984,9 +1998,11 @@ class VideoRotator(ConfigReader):
     GUI Tool for rotating video.
 
 
-    .. image:: _static/img/VideoRotator.gif
-       :alt: Video Rotator
+    .. video:: _static/img/VideoRotator.webm
        :width: 700
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     :param str input_path: Path to video to rotate.
@@ -2339,9 +2355,11 @@ def crop_single_video_circle(file_path: Union[str, os.PathLike]) -> None:
     """
     Crop a video based on circular regions of interest (ROIs) selected by the user.
 
-    .. image:: _static/img/crop_single_video_circle.gif
-       :alt: Crop single video circle
+    .. video:: _static/img/crop_single_video_circle.webm
        :width: 600
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
     .. note::
        This function crops the input video based on circular regions of interest (ROIs) selected by the user.
@@ -2380,9 +2398,11 @@ def crop_multiple_videos_circles(in_dir: Union[str, os.PathLike], out_dir: Union
     Crop multiple videos based on circular regions of interest (ROIs) selected by the user.
 
 
-    .. image:: _static/img/crop_single_video_circle.gif
-       :alt: Crop single video circle
+    .. video:: _static/img/crop_single_video_circle.webm
        :width: 600
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     .. note::
@@ -2448,9 +2468,11 @@ def crop_single_video_polygon(file_path: Union[str, os.PathLike]) -> None:
     """
     Crop a video based on polygonal regions of interest (ROIs) selected by the user.
 
-    .. image:: _static/img/roi_selector_polygon.gif
-       :alt: Roi selector polygon
+    .. video:: _static/img/roi_selector_polygon.webm
        :width: 400
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     .. note::
@@ -2771,9 +2793,11 @@ def horizontal_video_concatenator(video_paths: List[Union[str, os.PathLike]],
     """
     Concatenates multiple videos horizontally.
 
-    .. image:: _static/img/horizontal_video_concatenator.gif
-       :alt: Horizontal video concatenator
+    .. video:: _static/img/horizontal_video_concatenator.webm
        :width: 1000
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     .. seealso::

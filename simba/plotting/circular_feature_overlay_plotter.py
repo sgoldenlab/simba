@@ -27,9 +27,11 @@ class CircularFeaturePlotter(ConfigReader, PlottingMixin, FeatureExtractionMixin
     Create visualization of base angular features overlay on video. E.g., use to confirm
     accurate cardinality and angle degree computation.
 
-    .. image:: _static/img/circular_visualiation.gif
-       :alt: Circular visualiation
+    .. video:: _static/img/circular_visualiation.webm
        :width: 600
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format

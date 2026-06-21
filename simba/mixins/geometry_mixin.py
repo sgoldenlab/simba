@@ -231,9 +231,11 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
-        .. image:: _static/img/bodyparts_to_circle.gif
-           :alt: Bodyparts to circle
+        .. video:: _static/img/bodyparts_to_circle.webm
            :width: 450
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :param np.ndarray data: Body-part coordinate(s) as 1D array [x, y] or 2D array [[x1, y1], [x2, y2], ...]. E.g., np.array([364, 308]) or np.array([[364, 308], [100, 200]]).
@@ -279,9 +281,11 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
-        .. image:: _static/img/bodyparts_to_multistring_skeleton.gif
-           :alt: Bodyparts to multistring skeleton
+        .. video:: _static/img/bodyparts_to_multistring_skeleton.webm
            :width: 450
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :example:
@@ -1071,9 +1075,11 @@ class GeometryMixin(object):
            * If more aesthetic videos are needed, overlaid on video, then use func:`simba.plotting.geometry_plotter.GeometryPlotter`
            * If single images of geometries are needed, then use :func:`simba.mixins.geometry_mixin.view_shapes()`
 
-        .. image:: _static/img/geometry_video.gif
-           :alt: Geometry video
+        .. video:: _static/img/geometry_video.webm
            :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :param List[List[Union[LineString, Polygon, MultiPolygon, MultiPoint, MultiLineString]]] shapes: List of lists containing geometric shapes to be included in the video. Each sublist represents a frame, and each element within the sublist represents a shape for that frame.
@@ -1492,9 +1498,11 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
-        .. image:: _static/img/delaunay_triangulate_keypoints.gif
-           :alt: Delaunay triangulate keypoints
+        .. video:: _static/img/delaunay_triangulate_keypoints.webm
            :width: 450
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         .. image:: _static/img/delaunay_triangulate_keypoints_2.png
@@ -2009,9 +2017,11 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
-        .. image:: _static/img/extend_line_to_bounding_box_edge.gif
-           :alt: Extend line to bounding box edge
+        .. video:: _static/img/extend_line_to_bounding_box_edge.webm
            :width: 450
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :param np.ndarray line_points: Intersection points where the extended line crosses the bounding box edges. The shape of the array is (2, 2), where each row represents a point (x, y).

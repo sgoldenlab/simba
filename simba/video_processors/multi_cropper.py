@@ -37,9 +37,11 @@ class MultiCropper(object):
 
        `Expected GPU timesavings <https://github.com/sgoldenlab/simba/blob/master/docs/gpu_vs_cpu_video_processing_runtimes.md>`__.
 
-    .. image:: _static/img/multicrop.gif
-       :alt: Multicrop
+    .. video:: _static/img/multicrop.webm
        :width: 700
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     :param Union[str, os.PathLike] input_folder: Folder path holding videos to be cropped.

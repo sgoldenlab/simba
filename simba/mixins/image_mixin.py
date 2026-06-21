@@ -1517,19 +1517,25 @@ class ImageMixin(object):
            For GPU acceleration, see :func:`simba.data_processors.cuda.image.slice_imgs`
            For single core process, use :func:`simba.mixins.image_mixin.ImageMixin.slice_shapes_in_img`
 
-        .. image:: _static/img/slice_shapes_in_imgs_4.gif
-           :alt: Slice shapes in imgs 4
+        .. video:: _static/img/slice_shapes_in_imgs_4.webm
            :width: 400
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
-        .. image:: _static/img/bodyparts_to_circle_1.gif
-           :alt: Bodyparts to circle 1
+        .. video:: _static/img/bodyparts_to_circle_1.webm
            :width: 400
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
-        .. image:: _static/img/bodyparts_to_circle_2.gif
-           :alt: Bodyparts to circle 2
+        .. video:: _static/img/bodyparts_to_circle_2.webm
            :width: 400
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :example I:

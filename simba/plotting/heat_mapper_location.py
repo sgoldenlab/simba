@@ -37,9 +37,11 @@ class HeatmapperLocationSingleCore(ConfigReader, PlottingMixin):
        `GitHub visualizations tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
         For improved run-time of videos, see :meth:`simba.heat_mapper_location_mp.HeatMapperLocationMultiprocess` for multiprocess class.
 
-    .. image:: _static/img/heatmap_location.gif
-       :alt: Heatmap location
+    .. video:: _static/img/heatmap_location.webm
        :width: 1000
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     :param str config_path: path to SimBA project config file in Configparser format

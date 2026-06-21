@@ -202,9 +202,11 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-sklearn-visualization>`__.
        For single-core processing, see :meth:`simba.plotting.plot_clf_results.PlotSklearnResultsSingleCore`.
 
-    .. image:: _static/img/sklearn_visualization.gif
-       :alt: Sklearn visualization
+    .. video:: _static/img/sklearn_visualization.webm
        :width: 600
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     .. video:: _static/img/T1.webm

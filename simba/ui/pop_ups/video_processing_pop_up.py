@@ -1978,9 +1978,11 @@ class InitiateClipMultipleVideosByTimestampsPopUp(PopUpMixin):
 
 class BrightnessContrastPopUp(PopUpMixin):
     """
-    .. image:: _static/img/brightness_contrast_ui.gif
-       :alt: Brightness contrast ui
+    .. video:: _static/img/brightness_contrast_ui.webm
        :width: 700
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
     """
     def __init__(self):
@@ -2050,9 +2052,11 @@ class BrightnessContrastPopUp(PopUpMixin):
 
 class InteractiveClahePopUp(PopUpMixin):
     """
-    .. image:: _static/img/interactive_clahe_ui.gif
-       :alt: Interactive clahe ui
+    .. video:: _static/img/interactive_clahe_ui.webm
        :width: 500
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
     """
 
