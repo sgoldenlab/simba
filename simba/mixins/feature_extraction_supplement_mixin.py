@@ -809,6 +809,11 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         """
         Compute the sum distance moved and the mean velocity during a defined event.
 
+        .. image:: _static/img/movement_stats_from_bouts_df.webp
+           :alt: Movement stats from bouts
+           :width: 700
+           :align: center
+
         .. seealso::
            To compute ``bout_df``, use :func:`simba.utils.data.detect_bouts`
 
