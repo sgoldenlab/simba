@@ -111,6 +111,11 @@ class ImageMixin(object):
         Gaussian blurring is used to reduce image noise and detail by smoothing the image. It applies a weighted average
         where more importance is given to the central pixels, creating a soft blur effect.
 
+        .. image:: _static/img/gaussian_blur.webp
+           :alt: Gaussian blur
+           :width: 700
+           :align: center
+
         :param np.ndarray img: Input image as a NumPy array. The image should be a valid 2D (grayscale) or 3D (color) array.
         :param Optional[Tuple] kernel_size: A tuple (height, width) representing the size of the Gaussian kernel. The values must be positive odd integers. Default is (9, 9).
         :return: A NumPy array representing the blurred image with the same dimensions as the input image.
@@ -129,6 +134,11 @@ class ImageMixin(object):
         """
         Applies morphological erosion to the input image using the specified kernel size and number of iterations.
 
+        .. image:: _static/img/erode.webp
+           :alt: Erode
+           :width: 700
+           :align: center
+
         :param np.ndarray img: A 2D or 3D NumPy array representing the input image on which erosion will be applied. It should be in the form of a binary or greyscale image.
         :param Optional[Tuple[int, int]] kernel_size: A tuple (width, height) specifying the size of the kernel to be used for erosion. The default kernel size is (3, 3).
         :param Optional[int] iterations: The number of times the erosion operation is applied. The default value is 3.
@@ -141,7 +151,7 @@ class ImageMixin(object):
         check_instance(source=ImageMixin.gaussian_blur.__name__, instance=kernel_size, accepted_types=(tuple,))
         check_valid_lst(data=list(kernel_size), source=ImageMixin.gaussian_blur.__name__, valid_dtypes=(int,), exact_len=2)
         check_int(name=ImageMixin.erode.__name__, value=iterations, min_value=1)
-        return cv2.erode(img, np.ones((3, 3), np.uint8), iterations=3)
+        return cv2.erode(img, np.ones(kernel_size, np.uint8), iterations=iterations)
 
     @staticmethod
     def get_histocomparison(
@@ -163,10 +173,19 @@ class ImageMixin(object):
         """
         Compare histograms of two images using OpenCV's histogram comparison methods.
 
-        Computes a similarity metric between the histograms of two images. The method determines how the comparison
-        is performed (e.g., correlation, chi-square, Bhattacharyya distance). Lower values typically indicate
-        greater similarity for correlation and intersection methods, while higher values indicate similarity for
-        chi-square methods.
+        Each image is reduced to a normalized intensity histogram (256 bins per channel) and the two histograms are
+        compared with the chosen method. Because only the distribution of intensities is compared, the score is blind
+        to where pixels sit (a spatially shuffled image scores identically) and to image content (two different images
+        with similar tone distributions score as alike).
+
+        The "more similar" direction depends on the method: for ``correlation`` and ``intersection`` higher values
+        indicate greater similarity, while for ``chi_square`` and ``bhattacharyya``/``hellinger`` lower values
+        (0 = identical) indicate greater similarity.
+
+        .. image:: _static/img/get_histocomparison.webp
+           :alt: Get histocomparison
+           :width: 700
+           :align: center
 
         .. seealso::
            For histogram comparison within specific geometries, see :func:`simba.mixins.geometry_mixin.GeometryMixin.geometry_histocomparison`.
@@ -195,16 +214,26 @@ class ImageMixin(object):
             options=tuple(GeometryEnum.HISTOGRAM_COMPARISON_MAP.value.keys()),
         )
         method = GeometryEnum.HISTOGRAM_COMPARISON_MAP.value[method]
+        if img_1.ndim != img_2.ndim:
+            raise InvalidInputError(
+                msg=f"img_1 and img_2 must have the same number of channels (got {img_1.ndim}D and {img_2.ndim}D)",
+                source=ImageMixin.get_histocomparison.__name__,
+            )
+
+        def _histogram(img: np.ndarray) -> np.ndarray:
+            img = img.astype(np.uint8)
+            if img.ndim == 2:
+                channels = [cv2.calcHist([img], [0], None, [256], [0, 256])]
+            else:
+                channels = [cv2.calcHist([img], [c], None, [256], [0, 256]) for c in range(img.shape[2])]
+            hist = np.concatenate(channels, axis=0)
+            return cv2.normalize(hist, hist).flatten()
+
+        hist_1, hist_2 = _histogram(img_1), _histogram(img_2)
         if absolute:
-            return abs(
-                cv2.compareHist(
-                    img_1.astype(np.float32), img_2.astype(np.float32), method
-                )
-            )
+            return abs(cv2.compareHist(hist_1, hist_2, method))
         else:
-            return cv2.compareHist(
-                img_1.astype(np.float32), img_2.astype(np.float32), method
-            )
+            return cv2.compareHist(hist_1, hist_2, method)
 
     @staticmethod
     def get_contourmatch(img_1: np.ndarray,
@@ -413,6 +442,11 @@ class ImageMixin(object):
         .. note::
            See wiki ` https://en.wikipedia.org/wiki/Image_moment#Hu_invariant_moments <See https://en.wikipedia.org/wiki/Image_moment#Hu_invariant_moments>`__.
 
+        .. image:: _static/img/img_moments.webp
+           :alt: Image moments
+           :width: 700
+           :align: center
+
         :param np.ndarray img: The input image as a 2D or 3D NumPy array. If the image has multiple channels (e.g., RGB or BGR), it will be converted to grayscale.
         :param  Optional[bool] hu_moments: If set to True, the function computes and returns the 7 Hu moments.  If False, it returns the standard moments of the image. Default is False.
         :return: A 24x1 2D-array if `hu_moments` is False (representing standard moments), or a 7x1 2D-array if `hu_moments` is True (representing Hu moments).
@@ -438,6 +472,11 @@ class ImageMixin(object):
 
         """
         Find contours in an image.
+
+        .. image:: _static/img/find_contours.webp
+           :alt: Find contours
+           :width: 700
+           :align: center
 
         .. seealso::
            For contour comparisons, see :func:`simba.mixins.image_mixin.ImageMixin.get_contourmatch`
@@ -524,6 +563,11 @@ class ImageMixin(object):
         Perform template matching on CPU using multiprocessing for parallelization.
 
         E.g., having a cropped image, find the image and frame number in a video it most likely has been cropped from.
+
+        .. image:: _static/img/template_matching_cpu.webp
+           :alt: Template matching CPU
+           :width: 700
+           :align: center
 
         :param Union[str, os.PathLike] video_path: Path to the video file on disk.
         :param np.ndarray img: Template image for matching. E.g., a cropped image from ``video_path``.
@@ -737,6 +781,11 @@ class ImageMixin(object):
         """
         Segment a horizontal part of all images in stack.
 
+        .. image:: _static/img/segment_img_stack_horizontal.webp
+           :alt: Segment img stack horizontal
+           :width: 800
+           :align: center
+
         .. seealso::
            :func:`simba.mixins.image_mixin.ImageMixin.segment_img_horizontal`
            :func:`simba.data_processors.cuda.image.segment_img_stack_horizontal`,
@@ -909,6 +958,11 @@ class ImageMixin(object):
     def img_stack_mse(imgs_1: np.ndarray, imgs_2: np.ndarray) -> np.ndarray:
         """
         Jitted pairwise comparison of images in two stacks of equal length using mean squared errors.
+
+        .. image:: _static/img/img_stack_mse.webp
+           :alt: Image stack MSE
+           :width: 700
+           :align: center
 
         .. note::
            Useful for noting subtle changes, each imgs_2 equals imgs_1 with images shifted by 1. Images has to be in uint8 format.

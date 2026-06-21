@@ -344,9 +344,9 @@ class LitPoseMergeProjects:
 
 
 
-# merger = LitPoseMergeProjects(master_dir=r'Z:\home\simon\LPProjects\project_0609_5cam_simon',
-#                               other_dirs=[r"Z:\home\simon\LPProjects\project_0609_5cam"],
-#                               duplicate_method='skip',
-#                               verbose=True,
-#                               skip_videos=True)
-# merger.run()
+merger = LitPoseMergeProjects(master_dir=r'H:\sina\project_0609_5cam\project_0609_5cam',
+                              other_dirs=[r"H:\sina\project_0609_5cam_simon", r"H:\sina\project_0615\project_0615"],
+                              duplicate_method='skip',
+                              verbose=True,
+                              skip_videos=False)
+merger.run()

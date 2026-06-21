@@ -86,6 +86,11 @@ class FeatureExtractionMixin(object):
             For GPU acceleration through CuPy, use :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cupy`.
             For GPU acceleration through numba CUDA, use :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`.
 
+        .. image:: _static/img/euclidean_distance.webp
+           :alt: Euclidean distance between two body-parts
+           :width: 400
+           :align: center
+
         :param np.ndarray bp_1_x: 2D array of size len(frames) x 1 with bodypart 1 x-coordinates.
         :param np.ndarray bp_2_x: 2D array of size len(frames) x 1 with bodypart 2 x-coordinates.
         :param np.ndarray bp_1_y: 2D array of size len(frames) x 1 with bodypart 1 y-coordinates.
@@ -582,6 +587,10 @@ class FeatureExtractionMixin(object):
         Jitted analogue of meth:`scipy.cdist` for 3D array. Use to calculate Euclidean distances between
         all coordinates in of one array and itself.
 
+        .. image:: _static/img/cdist_3d.webp
+           :width: 700
+           :align: center
+
         :param np.ndarray data: 3D array of body-part coordinates of size len(frames) x -1 x 2.
         :return np.ndarray: 3D array of size data.shape[0], data.shape[1], data.shape[1].
         """
@@ -598,8 +607,14 @@ class FeatureExtractionMixin(object):
     # @njit('(float32[:],)')
     def cosine_similarity(data: np.ndarray) -> np.ndarray:
         """
-        Jitted analogue of sklearn.metrics.pairwise import cosine_similarity. Similar to scipy.cdist.
-        calculates the cosine similarity between all pairs in 2D array.
+        Analogue of ``sklearn.metrics.pairwise.cosine_similarity``. Similar to scipy.cdist.
+        Calculates the cosine similarity (the cosine of the angle between two vectors, so magnitude is
+        ignored) between all pairs of rows in a 2D array. Values range from 1 (same direction) through
+        0 (orthogonal) to -1 (opposite). Zero-vectors yield a similarity of 0.
+
+        .. image:: _static/img/cosine_similarity.webp
+           :width: 700
+           :align: center
 
         :param np.ndarray data: 2D array of observations.
         :return: Matrix representing the cosine similarity between all observations in ``data``.
@@ -608,11 +623,12 @@ class FeatureExtractionMixin(object):
         :example:
         >>> data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).astype(np.float32)
         >>> FeatureExtractionMixin().cosine_similarity(data=data)
-        >>> [[1.0, 0.974, 0.959][0.974,  1.0, 0.998] [0.959, 0.998, 1.0]
+        >>> [[1.0, 0.974, 0.959], [0.974, 1.0, 0.998], [0.959, 0.998, 1.0]]
         """
 
         dot_product = np.dot(data, data.T)
         norms = np.linalg.norm(data, axis=1).reshape(-1, 1)
+        norms[norms == 0] = 1  # avoid division by zero; zero-vectors yield a similarity of 0
         similarity = dot_product / (norms * norms.T)
         return similarity
 

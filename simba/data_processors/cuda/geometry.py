@@ -78,6 +78,11 @@ def is_inside_circle(x: np.ndarray, y: np.ndarray, r: float) -> np.ndarray:
     """
     Determines whether points in array `x` are inside the circle with center ``y`` and radius ``r``
 
+    .. image:: _static/img/simba.data_processors.cuda.geometry.is_inside_circle.webp
+       :alt: Is inside circle
+       :width: 700
+       :align: center
+
     .. csv-table::
        :header: EXPECTED RUNTIMES
        :file: ../../../docs/tables/is_inside_circle.csv

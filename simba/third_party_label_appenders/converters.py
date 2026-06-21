@@ -82,6 +82,11 @@ def geometries_to_coco(geometries: Dict[str, np.ndarray],
     them into COCO format annotations. The geometries are associated with frames of a video, and the corresponding
     images are extracted from the video, saved as PNG files, and linked to the annotations.
 
+    .. image:: _static/img/geometries_to_coco.webp
+       :alt: Geometries to COCO
+       :width: 700
+       :align: center
+
     :example:
     >>> data_path = r"C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\FRR_gq_Saline_0624.csv"
     >>> animal_data = read_df(file_path=data_path, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y', 'Left_side_x', 'Left_side_y', 'Right_side_x', 'Right_side_y']).values.reshape(-1, 4, 2)[0:20].astype(np.int32)
@@ -114,7 +119,7 @@ def geometries_to_coco(geometries: Dict[str, np.ndarray],
                 img_save_path = os.path.join(save_img_dir, img_name)
                 cv2.imwrite(img_save_path, img)
                 img_names.append(img_name)
-            annotation_id = category_cnt * img_cnt + 1
+            annotation_id = len(annotations) + 1
             d = GeometryMixin().get_shape_lengths_widths(shapes=Polygon(img_geometry))
             a_h, a_w, a_a = d['max_length'], d['max_width'], d['max_area']
             bbox = [int(category_data[img_cnt][0][0]), int(category_data[img_cnt][0][1]), int(a_w), int(a_h)]
@@ -136,6 +141,11 @@ def geometries_to_yolo(geometries: Dict[Union[str, int], np.ndarray],
                        map: Optional[Dict[int, str]] = None) -> None:
     """
     Converts geometrical shapes (like polygons) into YOLO format annotations and saves them along with corresponding video frames as images.
+
+    .. image:: _static/img/geometries_to_yolo.webp
+       :alt: Geometries to YOLO
+       :width: 700
+       :align: center
 
     :param Dict[Union[str, int], np.ndarray geometries: A dictionary where the keys represent category IDs (either string or int), and the values are NumPy arrays of shape `(n_frames, n_points, 2)`. Each entry in the array represents the geometry of an object in a particular frame (e.g., keypoints or polygons).
     :param Union[str, os.PathLike] video_path: Path to the video file from which frames are extracted. The video is used to extract images corresponding to the geometrical annotations.
@@ -204,7 +214,7 @@ def geometries_to_yolo(geometries: Dict[Union[str, int], np.ndarray],
                     results[img_name] = [img_results]
                 else:
                     results[img_name].append(img_results)
-                lbl_cnt =+ 1
+                lbl_cnt += 1
 
     for k, v in results.items():
         name = k.split(sep='.', maxsplit=2)[0]
@@ -366,6 +376,11 @@ def dlc_to_labelme(dlc_dir: Union[str, os.PathLike],
 
     """
     Convert a folder of DLC annotations into labelme json format.
+
+    .. image:: _static/img/dlc_to_labelme.webp
+       :alt: DLC to Labelme
+       :width: 700
+       :align: center
 
     :param Union[str, os.PathLike] dlc_dir: Folder with DLC annotations. I.e., directory inside
     :param Union[str, os.PathLike] save_dir: Directory to where to save the labelme json files.
@@ -741,6 +756,11 @@ def simba_rois_to_yolo(config_path: Optional[Union[str, os.PathLike]] = None,
     """
     Converts SimBA roi definitions into annotations and images for training yolo network.
 
+    .. image:: _static/img/simba_rois_to_yolo.webp
+       :alt: SimBA ROIs to YOLO
+       :width: 700
+       :align: center
+
     :param Optional[Union[str, os.PathLike]] config_path: Optional path to the project config file in SimBA project.
     :param Optional[Union[str, os.PathLike]] roi_path: Path to the SimBA roi definitions .h5 file. If None, then the ``roi_coordinates_path`` of the project.
     :param Optional[Union[str, os.PathLike]] video_dir: Directory where to find the videos. If None, then the videos folder of the project.
@@ -883,12 +903,16 @@ def yolo_obb_data_to_bounding_box(center_x: float, center_y: float, width: float
     this function computes the coordinates of the four corner points of the bounding box,
     with rotation applied about the center.
 
+    .. image:: _static/img/yolo_obb_data_to_bounding_box.webp
+       :alt: YOLO OBB data to bounding box
+       :width: 600
+       :align: center
+
     :param float center_x: The x-coordinate of the bounding box center.
     :param float center_y: The y-coordinate of the bounding box center.
     :param float width: The width of the bounding box.
     :param float height: The height of the bounding box.
     :param float angle: The rotation angle of the bounding box in degrees, measured counterclockwise.
-
     :return: An array of shape (4, 2) containing the (x, y) coordinates of the four corners of the bounding box in the following order: top-left, top-right, bottom-right, and bottom-left.
     :rtype: np.ndarray
     """

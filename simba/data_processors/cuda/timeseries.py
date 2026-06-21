@@ -44,6 +44,11 @@ def sliding_threshold(data: np.ndarray, time_window: float, sample_rate: float, 
     """
     Compute the count of observations above or below threshold crossings over a sliding window using GPU acceleration.
 
+    .. image:: _static/img/sliding_threshold.webp
+       :alt: Sliding threshold
+       :width: 700
+       :align: center
+
     :param np.ndarray data: Input data array.
     :param float time_window: Size of the sliding window in seconds.
     :param float sample_rate: Number of samples per second in the data.
@@ -85,9 +90,7 @@ def _sliding_percent_beyond_n_std_kernel(data, time, std_n, results):
         std_val = _cuda_std(sample, m) * std_n[0]
         cnt = 0
         for i in range(sample.shape[0]):
-
             if (sample[i] > (m + std_val)) or (sample[i] < (m - std_val)):
-                print(sample[i], m + std_val)
                 cnt += 1
         results[r-1] = cnt
 
@@ -97,6 +100,11 @@ def sliding_percent_beyond_n_std(data: np.ndarray, time_window: float, sample_ra
     `n` standard deviations from the mean of that window.
 
     This function uses GPU acceleration via CUDA to efficiently compute the result over large datasets.
+
+    .. image:: _static/img/simba.data_processors.cuda.timeseries.sliding_percent_beyond_n_std.webp
+       :alt: Sliding percent beyond n std
+       :width: 700
+       :align: center
 
     :param np.ndarray data: The input 1D data array for which the sliding window computation is to be performed.
     :param float time_window: The length of the time window in seconds.

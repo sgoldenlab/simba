@@ -172,7 +172,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
                 if window_data[-1] > window_data[-2]:
                     peak_cnt += 1
                 for k in prange(1, len(window_data) - 1):
-                    if window_data[j] > window_data[j - 1]:
+                    if window_data[k] > window_data[k - 1] and window_data[k] > window_data[k + 1]:
                         peak_cnt += 1
                 peak_ratio = peak_cnt / window_data.shape[0]
                 results[j, i] = peak_ratio

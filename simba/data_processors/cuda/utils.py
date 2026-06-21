@@ -53,7 +53,7 @@ def _cuda_standard_deviation(x):
 def _cuda_std(x: np.ndarray, x_hat: float):
     std = 0
     for i in range(x.shape[0]):
-        std += (x[0] - x_hat) ** 2
+        std += (x[i] - x_hat) ** 2
     return math.sqrt(std / x.shape[0])
 
 @cuda.jit(device=True)

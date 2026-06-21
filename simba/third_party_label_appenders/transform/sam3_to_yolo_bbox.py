@@ -58,7 +58,7 @@ class SAM3ToYoloBBox:
        * :class:`~simba.third_party_label_appenders.transform.merge_yolo_projects.MergeYoloProjects` — merge multiple YOLO ``map.yaml`` projects into one training set.
        * :class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_seg.SAM3ToYoloSeg` — SAM3 to YOLO **segmentation** labels from the same predictor stack.
 
-    :param Union[str, os.PathLike, List[Union[str, os.PathLike]]] video_data: Input videos. Accepts: (1) a directory containing video files (combine with ``recursive=True`` to also search subdirectories), (2) a path to a single video file, or (3) a list of video file paths.
+    :param Union[str, os.PathLike, List[Union[str, os.PathLike]]] video_data: Input videos. Accepts: (1) a directory containing video files (combine with ``recursive=True`` to also search subdirectories), (2) a path to a single video file, or (3) a list whose items may be video file paths, directories, or a mix of both. Each directory in the list is scanned for videos (honouring ``recursive``).
     :param Union[str, os.PathLike] sam_path: Path to SAM3 model weights (e.g. sam3.pt).
     :param Union[str, os.PathLike] save_dir: Root output directory for the YOLO project.
     :param str txt_prompt: Text prompt for SAM3 (e.g. "mouse", "mouse tail").
@@ -74,6 +74,7 @@ class SAM3ToYoloBBox:
     :param bool recursive: If True and ``video_data`` is a directory, search it and all subdirectories for videos. Ignored if ``video_data`` is a file path or a list. Default False.
     :param Optional[int] seed: Random seed for reproducible frame sampling.
     :param Optional[int] max_detections: Maximum number of detections to keep per frame (sorted by confidence descending). If None, all detections above ``conf`` are kept. Default None.
+    :param Optional[Tuple[int, int]] min_size: If provided, a ``(height, width)`` tuple in pixels. Only bounding boxes at or above this size (measured on the raw SAM3 detection, before ``buffer_pct`` expansion and image clipping) are retained; smaller boxes are discarded. If None, no size filtering is applied. Default None.
     :param bool visualize: If True, saves annotated images with bounding-box overlays to a ``visualizations`` subfolder inside ``save_dir``. Useful for verifying SAM3 annotation quality. Default False.
     :param Optional[int] min_frame_gap: Minimum number of frames between sampled frames. Enforces temporal diversity so samples are spread across the video rather than clustered. If ``None``, frames are sampled purely at random. Default ``None``.
     :param bool shuffle_videos: If True, randomize the order in which videos are processed. Default False.
@@ -106,6 +107,7 @@ class SAM3ToYoloBBox:
                  buffer_pct: float = 0.0,
                  consecutive_miss_limit: int = 100,
                  max_detections: Optional[int] = None,
+                 min_size: Optional[Tuple[int, int]] = None,
                  recursive: bool = False,
                  seed: Optional[int] = None,
                  visualize: bool = False,
@@ -126,7 +128,10 @@ class SAM3ToYoloBBox:
         if isinstance(video_data, list):
             check_valid_lst(data=video_data, source=f'{self.__class__.__name__} video_data', valid_dtypes=(str, os.PathLike), min_len=1)
             for v in video_data:
-                check_file_exist_and_readable(file_path=v)
+                if os.path.isdir(v):
+                    check_if_dir_exists(in_dir=v, source=f'{self.__class__.__name__} video_data')
+                else:
+                    check_file_exist_and_readable(file_path=v)
         elif os.path.isfile(video_data):
             check_file_exist_and_readable(file_path=video_data)
         else:
@@ -149,6 +154,10 @@ class SAM3ToYoloBBox:
         if min_frame_gap is not None: check_int(name=f'{self.__class__.__name__} min_frame_gap', value=min_frame_gap, min_value=1)
         check_float(name=f'{self.__class__.__name__} io_timeout', value=io_timeout, min_value=0.0)
         if max_detections is not None: check_int(name=f'{self.__class__.__name__} max_detections', value=max_detections, min_value=1)
+        if min_size is not None:
+            check_valid_tuple(x=min_size, source=f'{self.__class__.__name__} min_size', accepted_lengths=(2,), valid_dtypes=(int,))
+            check_int(name=f'{self.__class__.__name__} min_size height', value=min_size[0], min_value=1)
+            check_int(name=f'{self.__class__.__name__} min_size width', value=min_size[1], min_value=1)
         if seed is not None: check_int(name=f'{self.__class__.__name__} seed', value=seed)
         check_valid_boolean(value=preview, source=f'{self.__class__.__name__} preview')
         if skip_substr is not None:
@@ -156,6 +165,7 @@ class SAM3ToYoloBBox:
         if video_size is not None:
             check_valid_tuple(x=video_size, source=f'{self.__class__.__name__} video_size', minimum_length=2, valid_dtypes=(int,))
         self.preview = preview
+        self.min_size = min_size
         self.skip_substr = skip_substr
         self.video_size = video_size
         self.video_data, self.sam_path, self.save_dir, self.txt_prompt = video_data, sam_path, save_dir, txt_prompt
@@ -163,7 +173,16 @@ class SAM3ToYoloBBox:
         self.greyscale, self.clahe, self.buffer_pct, self.consecutive_miss_limit, self.max_detections, self.seed, self.verbose, self.visualize, self.min_frame_gap, self.io_timeout = greyscale, clahe, buffer_pct, consecutive_miss_limit, max_detections, seed, verbose, visualize, min_frame_gap, io_timeout
         self.name_map = {name: idx for idx, name in enumerate(names)}
         if isinstance(video_data, list):
-            self.video_paths = {get_fn_ext(filepath=v)[1]: str(v) for v in video_data}
+            self.video_paths = {}
+            for v in video_data:
+                if os.path.isdir(v):
+                    if recursive:
+                        dir_videos = recursive_file_search(directory=v, extensions=[".avi", ".mp4", ".mov", ".flv", ".m4v", ".webm", ".h264"], as_dict=True, raise_error=True)
+                    else:
+                        dir_videos = find_all_videos_in_directory(directory=v, as_dict=True, raise_error=True)
+                    self.video_paths.update(dir_videos)
+                else:
+                    self.video_paths[get_fn_ext(filepath=v)[1]] = str(v)
         elif isinstance(video_data, (str, os.PathLike)) and os.path.isfile(video_data):
             self.video_paths = {get_fn_ext(filepath=video_data)[1]: str(video_data)}
         elif recursive:
@@ -208,9 +227,9 @@ class SAM3ToYoloBBox:
         """Show a preview window with detections drawn at original resolution. Auto-advances. Returns False if user pressed 'q' to quit."""
         vis = frame.copy()
         has_det = result is not None and result.boxes is not None and len(result.boxes) > 0
+        drawn = 0
         if has_det:
             box_indices = sorted(range(len(result.boxes)), key=lambda i: float(result.boxes.conf[i].cpu()), reverse=True)
-            drawn = 0
             for i in box_indices:
                 if float(result.boxes.conf[i].cpu()) < self.conf:
                     continue
@@ -218,6 +237,8 @@ class SAM3ToYoloBBox:
                     break
                 xyxy = result.boxes.xyxy[i].cpu().numpy()
                 bx1, by1, bx2, by2 = float(xyxy[0]), float(xyxy[1]), float(xyxy[2]), float(xyxy[3])
+                if self.min_size is not None and ((by2 - by1) < self.min_size[0] or (bx2 - bx1) < self.min_size[1]):
+                    continue
                 if self.buffer_pct > 0:
                     bw, bh = bx2 - bx1, by2 - by1
                     bx1 -= bw * self.buffer_pct
@@ -232,7 +253,7 @@ class SAM3ToYoloBBox:
                 conf_val = float(result.boxes.conf[i].cpu())
                 cv2.putText(vis, f'{conf_val:.2f}', (x1, max(y1 - 5, 12)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
                 drawn += 1
-        else:
+        if drawn == 0:
             cv2.putText(vis, 'NO DETECTION', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
         title = f'{video_name} | frm {frame_idx}'
         cv2.putText(vis, title, (10, img_h - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1)
@@ -393,6 +414,8 @@ class SAM3ToYoloBBox:
 
             xyxy = result.boxes.xyxy[box_idx].cpu().numpy()
             x1, y1, x2, y2 = float(xyxy[0]), float(xyxy[1]), float(xyxy[2]), float(xyxy[3])
+            if self.min_size is not None and ((y2 - y1) < self.min_size[0] or (x2 - x1) < self.min_size[1]):
+                continue
             if self.buffer_pct > 0:
                 bw, bh = x2 - x1, y2 - y1
                 x1 -= bw * self.buffer_pct
@@ -412,23 +435,24 @@ class SAM3ToYoloBBox:
 
         return '\n'.join(lines) + '\n' if lines else ''
 
-# runner = SAM3ToYoloBBox(video_data=r'F:\netholabs\tars_0506',
-#                         sam_path=r'D:\sam3\sam3.pt',
-#                         save_dir=r'G:\netholabs\yolo_project_0516_4',
-#                         txt_prompt='black mouse',
-#                         n_frames=25,
-#                         verbose=True,
-#                         conf=0.05,
-#                         max_detections=1,
-#                         buffer_pct=0.15,
-#                         recursive=True,
-#                         consecutive_miss_limit=25,
-#                         skip_substr=('mosaic',),
-#                         video_size=(896, 2016),
-#                         shuffle_videos=True,
-#                         visualize=False,
-#                         preview=True)
-# runner.run()
+runner = SAM3ToYoloBBox(video_data=[r"G:\netholabs\6.01.005", r"G:\netholabs\6.01.006", r"G:\netholabs\6.01.005_batch_2", r"G:\netholabs\6.01.006_batch_2", r"G:\netholabs\6.01.007"],
+                        sam_path=r'D:\sam3\sam3.pt',
+                        save_dir=r'G:\netholabs\yolo_mdl_0619',
+                        txt_prompt='black mouse',
+                        n_frames=10,
+                        verbose=True,
+                        conf=0.10,
+                        max_detections=1,
+                        buffer_pct=0.15,
+                        recursive=True,
+                        consecutive_miss_limit=25,
+                        skip_substr=('mosaic',),
+                        video_size=(896, 2016),
+                        min_size=(75, 75),
+                        shuffle_videos=True,
+                        visualize=False,
+                        preview=True)
+runner.run()
 
 
 #NEXCT F:\netholabs\tars_0506

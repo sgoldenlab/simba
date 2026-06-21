@@ -730,7 +730,7 @@ class GeometryEnum(Enum):
         "chi_square_alternative": 5,
     }
     CONTOURS_MODE_MAP = {"exterior": 0, "all": 1, "interior": 3}
-    CONTOURS_RETRIEVAL_MAP = {"simple": 2, "none": 0, "l1": 3, "kcos": 4}
+    CONTOURS_RETRIEVAL_MAP = {"simple": 2, "none": 1, "l1": 3, "kcos": 4}
     RANKING_METHODS = [
         "area",
         "min_distance",

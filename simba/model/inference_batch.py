@@ -113,49 +113,49 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
 
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.feature_file_paths)
-        # for file_cnt, file_path in enumerate(self.feature_file_paths):
-        #     video_timer = SimbaTimer(start=True)
-        #     _, file_name, _ = get_fn_ext(file_path)
-        #     if self.verbose: stdout_information(msg=f"Analyzing video {file_name}... (Video {file_cnt+1}/{len(self.feature_file_paths)})")
-        #     file_save_path = os.path.join(self.save_dir, f"{file_name}.{self.file_type}")
-        #     in_df = read_df(file_path, self.file_type)
-        #     x_df = self.drop_bp_cords(df=in_df).astype(np.float32)
-        #     self.check_df_dataset_integrity(df=x_df, logs_path=self.logs_path, file_name=file_name)
-        #     _, px_per_mm, fps = self.read_video_info(video_name=file_name, raise_error=False)
-        #     out_df = deepcopy(in_df)
-        #     for m, m_hyp in self.model_dict.items():
-        #         check_if_keys_exist_in_dict(data=m_hyp, key=[MODEL_PATH, MODEL_NAME, THRESHOLD, MINIMUM_BOUT_LENGTH], name=f'classifier {m}', raise_error=False)
-        #         if not os.path.isfile(m_hyp[MODEL_PATH]):
-        #             NoFileFoundWarning(msg=f'SKIPPING CLASSIFIER {m} for video {file_name}. The classifier model file {m_hyp[MODEL_PATH]} could not be found.', source=self.__class__.__name__)
-        #             continue
-        #         clf = self.read_pickle(file_path=m_hyp[MODEL_PATH])
-        #         if self.feature_subsets_by_clf is None or m_hyp[MODEL_NAME] not in self.feature_subsets_by_clf:
-        #             probability_column = f"Probability_{m_hyp[MODEL_NAME]}"
-        #             out_df[probability_column] = self.clf_predict_proba(clf=clf, x_df=x_df, data_path=file_path, model_name=m_hyp[MODEL_NAME])
-        #             out_df[m_hyp[MODEL_NAME]] = np.where(out_df[probability_column] > m_hyp[THRESHOLD], 1, 0)
-        #             clf_min_bout = self.minimum_bout_length if self.minimum_bout_length is not None else m_hyp[MINIMUM_BOUT_LENGTH]
-        #             if int(clf_min_bout) > 0:
-        #                 if self.verbose: stdout_information(msg=f'Correcting minimum bouts in video {file_name} and classifier {m_hyp[MODEL_NAME]} ({clf_min_bout}ms)...')
-        #                 out_df = plug_holes_shortest_bout(data_df=out_df, clf_name=m_hyp[MODEL_NAME], fps=fps, shortest_bout=clf_min_bout)
-        #         else:
-        #             subset_cnts = len(self.feature_subsets_by_clf[m_hyp[MODEL_NAME]].keys())
-        #             self.config.set(section=ConfigKey.SML_SETTINGS.value, option=ConfigKey.TARGET_CNT.value, value=str(subset_cnts))
-        #             for mdl_cnt, (model_subset_name, model_x) in enumerate(self.feature_subsets_by_clf[m_hyp[MODEL_NAME]].items()):
-        #                 probability_column = f"Probability_{m_hyp[MODEL_NAME]}_{model_subset_name}"
-        #                 self.config.set(section=ConfigKey.SML_SETTINGS.value, option=f'target_name_{mdl_cnt+1}', value=f'{m_hyp[MODEL_NAME]}_{model_subset_name}')
-        #                 self.config.set(section=ConfigKey.THRESHOLD_SETTINGS.value, option=f'threshold_{mdl_cnt+1}', value=f'{m_hyp[THRESHOLD]}')
-        #                 self.config.set(section=ConfigKey.MIN_BOUT_LENGTH.value, option=f'min_bout_{mdl_cnt+1}', value=f'{m_hyp[MINIMUM_BOUT_LENGTH]}')
-        #                 check_that_column_exist(df=x_df, column_name=model_x, file_name=file_path, raise_error=True)
-        #                 out_df[probability_column] = self.clf_predict_proba(clf=clf, x_df=x_df[model_x], data_path=file_path, model_name=model_subset_name)
-        #                 out_df[f'{m_hyp[MODEL_NAME]}_{model_subset_name}'] = np.where(out_df[probability_column] > m_hyp[THRESHOLD], 1, 0)
-        #                 clf_min_bout = self.minimum_bout_length if self.minimum_bout_length is not None else m_hyp[MINIMUM_BOUT_LENGTH]
-        #                 if int(clf_min_bout) > 0:
-        #                     if self.verbose: stdout_information(msg=f'Correcting minimum bouts in video {file_name} and classifier {m_hyp[MODEL_NAME]} ({clf_min_bout}ms)...')
-        #                     out_df = plug_holes_shortest_bout(data_df=out_df, clf_name=f'{m_hyp[MODEL_NAME]}_{model_subset_name}', fps=fps, shortest_bout=clf_min_bout)
-        #             with open(self.config_path, "w") as f: self.config.write(f)
-        #     write_df(df=out_df, file_type=self.file_type, save_path=file_save_path)
-        #     video_timer.stop_timer()
-        #     if self.verbose: stdout_information(msg=f"Predictions created for {file_name} (frame count: {len(in_df)}, elapsed time: {video_timer.elapsed_time_str}) ...")
+        for file_cnt, file_path in enumerate(self.feature_file_paths):
+            video_timer = SimbaTimer(start=True)
+            _, file_name, _ = get_fn_ext(file_path)
+            if self.verbose: stdout_information(msg=f"Analyzing video {file_name}... (Video {file_cnt+1}/{len(self.feature_file_paths)})")
+            file_save_path = os.path.join(self.save_dir, f"{file_name}.{self.file_type}")
+            in_df = read_df(file_path, self.file_type)
+            x_df = self.drop_bp_cords(df=in_df).astype(np.float32)
+            self.check_df_dataset_integrity(df=x_df, logs_path=self.logs_path, file_name=file_name)
+            _, px_per_mm, fps = self.read_video_info(video_name=file_name, raise_error=False)
+            out_df = deepcopy(in_df)
+            for m, m_hyp in self.model_dict.items():
+                check_if_keys_exist_in_dict(data=m_hyp, key=[MODEL_PATH, MODEL_NAME, THRESHOLD, MINIMUM_BOUT_LENGTH], name=f'classifier {m}', raise_error=False)
+                if not os.path.isfile(m_hyp[MODEL_PATH]):
+                    NoFileFoundWarning(msg=f'SKIPPING CLASSIFIER {m} for video {file_name}. The classifier model file {m_hyp[MODEL_PATH]} could not be found.', source=self.__class__.__name__)
+                    continue
+                clf = self.read_pickle(file_path=m_hyp[MODEL_PATH])
+                if self.feature_subsets_by_clf is None or m_hyp[MODEL_NAME] not in self.feature_subsets_by_clf:
+                    probability_column = f"Probability_{m_hyp[MODEL_NAME]}"
+                    out_df[probability_column] = self.clf_predict_proba(clf=clf, x_df=x_df, data_path=file_path, model_name=m_hyp[MODEL_NAME])
+                    out_df[m_hyp[MODEL_NAME]] = np.where(out_df[probability_column] > m_hyp[THRESHOLD], 1, 0)
+                    clf_min_bout = self.minimum_bout_length if self.minimum_bout_length is not None else m_hyp[MINIMUM_BOUT_LENGTH]
+                    if int(clf_min_bout) > 0:
+                        if self.verbose: stdout_information(msg=f'Correcting minimum bouts in video {file_name} and classifier {m_hyp[MODEL_NAME]} ({clf_min_bout}ms)...')
+                        out_df = plug_holes_shortest_bout(data_df=out_df, clf_name=m_hyp[MODEL_NAME], fps=fps, shortest_bout=clf_min_bout)
+                else:
+                    subset_cnts = len(self.feature_subsets_by_clf[m_hyp[MODEL_NAME]].keys())
+                    self.config.set(section=ConfigKey.SML_SETTINGS.value, option=ConfigKey.TARGET_CNT.value, value=str(subset_cnts))
+                    for mdl_cnt, (model_subset_name, model_x) in enumerate(self.feature_subsets_by_clf[m_hyp[MODEL_NAME]].items()):
+                        probability_column = f"Probability_{m_hyp[MODEL_NAME]}_{model_subset_name}"
+                        self.config.set(section=ConfigKey.SML_SETTINGS.value, option=f'target_name_{mdl_cnt+1}', value=f'{m_hyp[MODEL_NAME]}_{model_subset_name}')
+                        self.config.set(section=ConfigKey.THRESHOLD_SETTINGS.value, option=f'threshold_{mdl_cnt+1}', value=f'{m_hyp[THRESHOLD]}')
+                        self.config.set(section=ConfigKey.MIN_BOUT_LENGTH.value, option=f'min_bout_{mdl_cnt+1}', value=f'{m_hyp[MINIMUM_BOUT_LENGTH]}')
+                        check_that_column_exist(df=x_df, column_name=model_x, file_name=file_path, raise_error=True)
+                        out_df[probability_column] = self.clf_predict_proba(clf=clf, x_df=x_df[model_x], data_path=file_path, model_name=model_subset_name)
+                        out_df[f'{m_hyp[MODEL_NAME]}_{model_subset_name}'] = np.where(out_df[probability_column] > m_hyp[THRESHOLD], 1, 0)
+                        clf_min_bout = self.minimum_bout_length if self.minimum_bout_length is not None else m_hyp[MINIMUM_BOUT_LENGTH]
+                        if int(clf_min_bout) > 0:
+                            if self.verbose: stdout_information(msg=f'Correcting minimum bouts in video {file_name} and classifier {m_hyp[MODEL_NAME]} ({clf_min_bout}ms)...')
+                            out_df = plug_holes_shortest_bout(data_df=out_df, clf_name=f'{m_hyp[MODEL_NAME]}_{model_subset_name}', fps=fps, shortest_bout=clf_min_bout)
+                    with open(self.config_path, "w") as f: self.config.write(f)
+            write_df(df=out_df, file_type=self.file_type, save_path=file_save_path)
+            video_timer.stop_timer()
+            if self.verbose: stdout_information(msg=f"Predictions created for {file_name} (frame count: {len(in_df)}, elapsed time: {video_timer.elapsed_time_str}) ...")
         if self.save_agg_stats is not None:
             if self.verbose: stdout_information(msg=f"Computing aggregate classifier statistics into {self.save_agg_stats}...")
             agg = AggregateClfCalculator(config_path=self.config_path, classifiers=list(self.clf_names), data_dir=self.save_dir, save_dir=self.save_agg_stats)
@@ -174,9 +174,9 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
 
 #
 # test = InferenceBatch(config_path=r"H:\projects\jason_zhang\jason_project\project_folder\project_config.ini",
-#                       save_dir=r'H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING',
-#                       model_dict={'GROOMING': {'model_path': r"H:\projects\jason_zhang\jason_project\models\GROOMING.sav", 'minimum_bout_length': 500, 'threshold': 0.24}},
-#                       save_agg_stats=r'H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING')
+#                       save_dir=r'H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING\500_0.275_smoothing_500ms\csv',
+#                       model_dict={'GROOMING': {'model_path': r"H:\projects\jason_zhang\jason_project\models\GROOMING.sav", 'minimum_bout_length': 500, 'threshold': 0.275}},
+#                       save_agg_stats=r'H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING\500_0.25\csv')
 # test.run()
 
 #

@@ -319,6 +319,11 @@ def get_ear_tags_for_rectangle(center: Tuple[int, int], width: int, height: int)
     """
     Knowing the center, width, and height of rectangle, return its vertices.
 
+    .. image:: _static/img/get_ear_tags_for_rectangle.webp
+       :alt: Get ear tags for rectangle
+       :width: 600
+       :align: center
+
     :param Tuple[int, int] center: The center x and y coordinates of the rectangle
     :param int width: The width of the rectangle in pixels.
     :param Tuple[int, int] height: The width of the rectangle in pixels.

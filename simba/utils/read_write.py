@@ -2629,6 +2629,11 @@ def img_to_bw(img: np.ndarray) -> np.ndarray:
     """
     Jitted conversion of a single image (grayscale or RGB) to black and white.
 
+    .. image:: _static/img/simba.utils.read_write.img_to_bw.webp
+       :alt: Image to black and white
+       :width: 700
+       :align: center
+
     :param img: A 2D grayscale image (H, W) or 3D RGB image (H, W, 3), dtype uint8.
     :return: A 2D binary black and white image with values 0 or 255.
     """

@@ -1798,6 +1798,11 @@ def resample_geometry_vertices(vertices: Union[List[np.ndarray], np.ndarray], ve
     interpolating the distances between consecutive vertices and then uniformly distributing the
     requested number of vertices along the perimeter of each polygon.
 
+    .. image:: _static/img/resample_geometry_vertices.webp
+       :alt: Resample geometry vertices
+       :width: 700
+       :align: center
+
     :param Union[List[np.ndarray], np.ndarray]: A list of 2D coordinate arrays or a single 3D array  representing the vertices of polygons. Each 2D array should have shape (n, 2), where `n` is the number of  vertices.
     :param int vertice_cnt: The target number of vertices for resampling in each polygon. This value should be at least 3.
     :return: A 3D array of shape (len(vertices), vertice_cnt, 2), where each 2D array in the result contains the resampled vertices of the corresponding polygon.
