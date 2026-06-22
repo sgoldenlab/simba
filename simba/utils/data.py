@@ -856,6 +856,11 @@ def hist_1d_mp(data: np.ndarray, bin_counts: np.ndarray, bin_widths: np.ndarray,
     """
     Jitted helper to compute 1D histograms with counts or rations (if normalize is True) for a 2D dataset
 
+    .. image:: _static/img/hist_1d_mp.webp
+       :alt: Per-row 1D histograms
+       :width: 700
+       :align: center
+
     .. note::
        For non-heuristic rules for bin counts and bin ranges, see ``simba.data.freedman_diaconis`` or simba.data.bucket_data``.
 
@@ -1227,6 +1232,11 @@ def sample_df_n_by_unique(df: pd.DataFrame, field: str, n: int) -> pd.DataFrame:
 def get_mode(x: np.ndarray) -> Union[float, int]:
     """
     Get the mode (most frequent value) within an array
+
+    .. image:: _static/img/get_mode.webp
+       :alt: Get mode
+       :width: 600
+       :align: center
 
     :param np.ndarray x: 1d array of numerics.
     :return: The mode of `x`.
