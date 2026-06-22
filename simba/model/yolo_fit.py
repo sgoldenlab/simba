@@ -60,6 +60,7 @@ class FitYolo():
     :param bool verbose: Emit detailed progress information. Default ``True``.
     :param int workers: Data-loader worker processes. Use ``-1`` for all cores. Default ``8``.
     :param int patience: Early-stopping patience (epochs without improvement). Default ``100``.
+    :param Union[bool, Literal['disk']] cache: Image caching strategy. ``True`` caches all dataset images in RAM on the first epoch so subsequent epochs read from memory instead of disk (fastest, requires the dataset to fit in RAM). ``"disk"`` caches decoded images as ``.npy`` files on disk (avoids re-decoding each epoch without needing the dataset to fit in RAM, but uses more disk space). ``False`` disables caching. Default ``False``.
     :raises SimBAGPUError: If no CUDA-capable GPU is detected.
     :raises SimBAPAckageVersionError: If ``ultralytics`` is unavailable in the environment.
     :raises FileNotFoundError: If ``weights_path`` or ``model_yaml`` do not exist.
@@ -92,6 +93,7 @@ class FitYolo():
                  verbose: bool = True,
                  workers: int = 8,
                  patience: int = 500,
+                 cache: Union[bool, Literal['disk']] = False,
                  device_id: Optional[int] = None):
 
         os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -115,6 +117,10 @@ class FitYolo():
         check_file_exist_and_readable(file_path=model_yaml)
         check_valid_boolean(value=verbose, source=f'{__class__.__name__} verbose', raise_error=True)
         check_valid_boolean(value=plots, source=f'{__class__.__name__} plots', raise_error=True)
+        if not isinstance(cache, bool):
+            check_str(name=f'{__class__.__name__} cache', value=cache, options=('disk',), raise_error=True)
+        else:
+            check_valid_boolean(value=cache, source=f'{__class__.__name__} cache', raise_error=True)
         check_if_dir_exists(in_dir=save_path)
         if format is not None: check_str(name=f'{__class__.__name__} format', value=format.lower(), options=Options.VALID_YOLO_FORMATS.value, raise_error=True)
         check_int(name=f'{__class__.__name__} epochs', value=epochs, min_value=1)
@@ -126,6 +132,7 @@ class FitYolo():
         self.model_yaml, self.epochs, self.batch  = model_yaml, epochs, batch
         self.imgsz, self.device, self.workers, self.format = imgsz, device, workers, format
         self.plots, self.save_path, self.verbose, self.patience = plots, save_path, verbose, patience
+        self.cache = cache
 
     def _download_start_weights(self, url: str = YOLO_M_PATH, save_path: Union[str, os.PathLike] = "yolo11m-pose.pt"):
         print(f'No start weights provided, downloading {save_path} from {url}...')
@@ -154,7 +161,8 @@ class FitYolo():
                         imgsz=self.imgsz,
                         workers=self.workers,
                         device=self.device,
-                        patience=self.patience)
+                        patience=self.patience,
+                        cache=self.cache)
 
 
 # if __name__ == "__main__" and not hasattr(sys, 'ps1'):
