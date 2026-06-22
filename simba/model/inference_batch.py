@@ -174,9 +174,9 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
 
 #
 # test = InferenceBatch(config_path=r"H:\projects\jason_zhang\jason_project\project_folder\project_config.ini",
-#                       save_dir=r'H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING\500_0.275_smoothing_500ms\csv',
+#                       save_dir=r'H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING\500_0.275_smoothing_500ms\csvs',
 #                       model_dict={'GROOMING': {'model_path': r"H:\projects\jason_zhang\jason_project\models\GROOMING.sav", 'minimum_bout_length': 500, 'threshold': 0.275}},
-#                       save_agg_stats=r'H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING\500_0.25\csv')
+#                       save_agg_stats=r'H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING\500_0.275_smoothing_500ms\csvs')
 # test.run()
 
 #

@@ -517,12 +517,12 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         if self.frame_setting:
             stdout_success(f"Frames for {len(self.video_paths)} videos saved in sub-folders within {self.save_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
-
+#
 # if __name__ == "__main__":
 #     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"H:\projects\jason_zhang\jason_project\project_folder\project_config.ini",
 #                                                  video_paths=r"H:\projects\jason_zhang\jason_project\project_folder\videos",
-#                                                  data_dir=r"H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING\500_0.275_smoothing_500ms\csvs",
-#                                                  save_dir=r'H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING\500_0.275_smoothing_500ms\videos',
+#                                                  data_dir=r"H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING\500_0.25_smoothing_500ms\csvs",
+#                                                  save_dir=r'H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING\500_0.25_smoothing_500ms\videos',
 #                                                  clf_names=('GROOMING',),
 #                                                  video_setting=True,
 #                                                  frame_setting=False,
