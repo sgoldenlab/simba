@@ -93,8 +93,9 @@ Distance plotter
 Distance plotter - multiprocess
 -------------------------------------------
 
-.. automodule:: simba.plotting.distance_plotter_mp.DistancePlotterMultiCore
+.. automodule:: simba.plotting.distance_plotter_mp
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Quick path plot (Ez path plot)
@@ -121,8 +122,9 @@ Gantt plot
 Gantt plot - multiprocess
 ----------------------------------------
 
-.. automodule:: simba.plotting.gantt_creator_mp.GanttCreatorMultiprocess
+.. automodule:: simba.plotting.gantt_creator_mp
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Gantt plot - fancy
@@ -178,8 +180,9 @@ Path plotter
 Path plotter - multiprocess
 ---------------------------------------
 
-.. automodule:: simba.plotting.path_plotter_mp.PathPlotterMulticore
+.. automodule:: simba.plotting.path_plotter_mp
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Classification plotter
@@ -206,8 +209,9 @@ Annotation bout plotter
 Pose-estimation plotter
 -----------------------------------------
 
-.. automodule:: simba.plotting.pose_plotter_mp.PosePlotterMultiProcess
+.. automodule:: simba.plotting.pose_plotter_mp
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Skeleton video creator

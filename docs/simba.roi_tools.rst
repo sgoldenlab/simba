@@ -142,6 +142,7 @@ ROI GUI Utils
 
 .. automodule:: simba.roi_tools.roi_utils
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Shape Selectors

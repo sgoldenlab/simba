@@ -33,6 +33,7 @@ extensions = ['sphinx.ext.napoleon',
               'sphinx.ext.intersphinx',
               'sphinxcontrib.video',
               'sphinx.ext.autosummary',
+              'sphinx.ext.coverage',
               'sphinxcontrib.youtube',
               'myst_parser',
               'sphinx_reredirects']
@@ -138,6 +139,10 @@ html_js_files = [
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'shapely': ('https://shapely.readthedocs.io/en/stable/', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy/', None),
+    'pandas': ('https://pandas.pydata.org/docs/', None),
+    'sklearn': ('https://scikit-learn.org/stable/', None),
 }
 
 # Mock imports for modules that may not be available during documentation build
