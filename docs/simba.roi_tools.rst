@@ -55,10 +55,6 @@ ROI Directing Analyzer
    :members:
    :show-inheritance:
 
-.. autoclass:: simba.roi_tools.ROI_directing_analyzer.DirectingROIAnalyzer
-   :members:
-   :show-inheritance:
-
 ROI Time-Bin Calculator
 -----------------------
 
@@ -89,6 +85,7 @@ ROI Plotter - Single Core
 .. autoclass:: simba.plotting.roi_plotter.ROIPlotter
    :members:
    :show-inheritance:
+   :noindex:
 
 ROI Plotter - Multiprocess
 ---------------------------
@@ -96,6 +93,7 @@ ROI Plotter - Multiprocess
 .. autoclass:: simba.plotting.roi_plotter_mp.ROIPlotMultiprocess
    :members:
    :show-inheritance:
+   :noindex:
 
 ROI Feature Visualizer - Single Core
 --------------------------------------
@@ -103,6 +101,7 @@ ROI Feature Visualizer - Single Core
 .. autoclass:: simba.plotting.ROI_feature_visualizer.ROIfeatureVisualizer
    :members:
    :show-inheritance:
+   :noindex:
 
 ROI Feature Visualizer - Multiprocess
 ---------------------------------------
@@ -110,6 +109,7 @@ ROI Feature Visualizer - Multiprocess
 .. autoclass:: simba.plotting.ROI_feature_visualizer_mp.ROIfeatureVisualizerMultiprocess
    :members:
    :show-inheritance:
+   :noindex:
 
 ROI Directing Visualizer
 -------------------------
@@ -117,6 +117,7 @@ ROI Directing Visualizer
 .. autoclass:: simba.plotting.roi_directing_visualizer.DirectingROIVisualizer
    :members:
    :show-inheritance:
+   :noindex:
 
 ROI GUI Tools
 =============
@@ -152,13 +153,6 @@ ROI GUI Utils
 
 ROI Shape Selectors
 ===================
-
-ROI Rectangle Selector
-----------------------
-
-.. automodule:: simba.roi_tools.roi_selector_polygon_tkinter
-   :members:
-   :show-inheritance:
 
 ROI Circle Selector
 -------------------

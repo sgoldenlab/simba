@@ -49,6 +49,7 @@ Background Subtraction: CPU Multiprocessing
 CPU-based background subtraction using multiprocessing for parallel frame processing.
 
 .. autofunction:: simba.video_processors.video_processing.video_bg_subtraction_mp
+   :noindex:
 
 Background Subtraction: GPU (CuPy)
 -----------------------------------------------------------------------
@@ -74,6 +75,7 @@ CPU-based average frame computation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: simba.video_processors.video_processing.create_average_frm
+   :noindex:
 
 GPU-based average frame computation (CuPy)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -94,6 +96,7 @@ Import blob tracking data into SimBA projects.
 .. autoclass:: simba.pose_importers.simba_blob_importer.SimBABlobImporter
    :members:
    :show-inheritance:
+   :noindex:
 
 Visualization
 -----------------------------------------------------------------------
@@ -103,11 +106,14 @@ Tools for visualizing blob tracking results.
 .. autoclass:: simba.plotting.blob_plotter.BlobPlotter
    :members:
    :show-inheritance:
+   :noindex:
 
 .. autoclass:: simba.plotting.blob_visualizer.BlobVisualizer
    :members:
    :show-inheritance:
+   :noindex:
 
 .. autoclass:: simba.plotting.geometry_plotter.GeometryPlotter
    :members:
    :show-inheritance:
+   :noindex:

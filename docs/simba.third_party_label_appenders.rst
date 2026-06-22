@@ -190,6 +190,7 @@ Create Lightning Pose bounding box files
 ---------------------------------------
 
 .. autofunction:: simba.third_party_label_appenders.transform.utils.get_litpose_project_bboxes
+   :noindex:
 
 
 Multi-animal DeepLabCut -> YOLO pose-estimation annotations
@@ -225,14 +226,6 @@ Labelme annotations -> DeepLabCut annotations
 
 
 Labelme annotations -> DataFrame
----------------------------------------
-
-.. autoclass:: simba.third_party_label_appenders.transform.labelme_to_df.LabelMe2DataFrame
-   :members:
-   :show-inheritance:
-
-
-Labelme annotations -> DeepLabCut annotations
 ---------------------------------------
 
 .. autoclass:: simba.third_party_label_appenders.transform.labelme_to_df.LabelMe2DataFrame

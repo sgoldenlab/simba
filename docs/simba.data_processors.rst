@@ -48,13 +48,6 @@ Directing-other-animals calculator
    :members:
    :undoc-members:
 
-Directing-other-animals body-parts calculator
--------------------------------------------------------------------
-
-.. automodule:: simba.data_processors.directing_other_animals_calculator
-   :members:
-   :undoc-members:
-
 Forward-spike-time-tiling coefficient calculator
 -----------------------------------------------
 

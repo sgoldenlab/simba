@@ -23,6 +23,7 @@ Bounding-box inference
 .. autoclass:: simba.model.yolo_inference.YoloInference
    :members:
    :show-inheritance:
+   :noindex:
 
 NVDEC GPU-accelerated YOLO inference
 -----------------------------------------------------------------------
@@ -82,6 +83,7 @@ Bounding box plotting
 .. autoclass:: simba.plotting.yolo_visualize.YOLOVisualizer
    :members:
    :show-inheritance:
+   :noindex:
 
 YOLO annotation visualizer
 -----------------------------------------------------------------------
@@ -96,6 +98,7 @@ COCO key-points -> YOLO pose-estimation format conversion
 .. autoclass:: simba.third_party_label_appenders.transform.coco_keypoints_to_yolo.COCOKeypoints2Yolo
    :members:
    :show-inheritance:
+   :noindex:
 
 
 COCO key-points -> YOLO bounding box conversion
@@ -104,6 +107,7 @@ COCO key-points -> YOLO bounding box conversion
 .. autoclass:: simba.third_party_label_appenders.transform.coco_keypoints_to_yolo_bbox.COCOKeypoints2YoloBbox
    :members:
    :show-inheritance:
+   :noindex:
 
 
 
@@ -113,6 +117,7 @@ COCO key-points -> YOLO segmentation conversion
 .. autoclass:: simba.third_party_label_appenders.transform.coco_keypoints_to_yolo_seg.COCOKeypoints2YoloSeg
    :members:
    :show-inheritance:
+   :noindex:
 
 
 SAM3 -> YOLO segmentation project
@@ -121,6 +126,7 @@ SAM3 -> YOLO segmentation project
 .. autoclass:: simba.third_party_label_appenders.transform.sam3_to_yolo_seg.SAM3ToYoloSeg
    :members:
    :show-inheritance:
+   :noindex:
 
 
 SAM3 -> YOLO bounding-box (detection) project
@@ -129,6 +135,7 @@ SAM3 -> YOLO bounding-box (detection) project
 .. autoclass:: simba.third_party_label_appenders.transform.sam3_to_yolo_bbox.SAM3ToYoloBBox
    :members:
    :show-inheritance:
+   :noindex:
 
 
 Merge multiple YOLO projects
@@ -137,6 +144,7 @@ Merge multiple YOLO projects
 .. autoclass:: simba.third_party_label_appenders.transform.merge_yolo_projects.MergeYoloProjects
    :members:
    :show-inheritance:
+   :noindex:
 
 
 Multi-animal DeepLabCut predictions -> YOLO pose-estimation annotations format conversion
@@ -145,6 +153,7 @@ Multi-animal DeepLabCut predictions -> YOLO pose-estimation annotations format c
 .. autoclass:: simba.third_party_label_appenders.transform.dlc_ma_h5_to_yolo.MADLCH52Yolo
    :members:
    :show-inheritance:
+   :noindex:
 
 
 DeepLabCut predictions -> YOLO pose-estimation annotations
@@ -153,6 +162,7 @@ DeepLabCut predictions -> YOLO pose-estimation annotations
 .. autoclass:: simba.third_party_label_appenders.transform.dlc_to_yolo.DLC2Yolo
    :members:
    :show-inheritance:
+   :noindex:
 
 
 
@@ -162,6 +172,7 @@ Labelme annotations -> YOLO bounding box annotations
 .. autoclass:: simba.third_party_label_appenders.transform.labelme_to_yolo.LabelmeBoundingBoxes2YoloBoundingBoxes
    :members:
    :show-inheritance:
+   :noindex:
 
 
 Labelme points -> YOLO keypoints annotations
@@ -170,6 +181,7 @@ Labelme points -> YOLO keypoints annotations
 .. autoclass:: simba.third_party_label_appenders.transform.labelme_to_yolo_keypoints.LabelmeKeypoints2YoloKeypoints
    :members:
    :show-inheritance:
+   :noindex:
 
 
 Labelme points -> YOLO segmentation annotations
@@ -178,6 +190,7 @@ Labelme points -> YOLO segmentation annotations
 .. autoclass:: simba.third_party_label_appenders.transform.labelme_to_yolo_seg.LabelmeKeypoints2YoloSeg
    :members:
    :show-inheritance:
+   :noindex:
 
 SimBA ROIs -> YOLO bounding box annotations
 ---------------------------------------
@@ -185,6 +198,7 @@ SimBA ROIs -> YOLO bounding box annotations
 .. autoclass:: simba.third_party_label_appenders.transform.simba_roi_to_yolo.SimBAROI2Yolo
    :members:
    :show-inheritance:
+   :noindex:
 
 SimBA pose-estimation -> YOLO pose-estimation annotations
 ---------------------------------------
@@ -192,6 +206,7 @@ SimBA pose-estimation -> YOLO pose-estimation annotations
 .. autoclass:: simba.third_party_label_appenders.transform.simba_to_yolo.SimBA2Yolo
    :members:
    :show-inheritance:
+   :noindex:
 
 
 SimBA pose-estimation -> YOLO segmentation annotations
@@ -207,6 +222,7 @@ SLEAP CSV predictions -> YOLO pose-estimation annotations
 .. autoclass:: simba.third_party_label_appenders.transform.sleap_csv_to_yolo.Sleap2Yolo
    :members:
    :show-inheritance:
+   :noindex:
 
 SLEAP H5 predictions -> YOLO pose-estimation annotations
 ---------------------------------------
@@ -214,6 +230,7 @@ SLEAP H5 predictions -> YOLO pose-estimation annotations
 .. autoclass:: simba.third_party_label_appenders.transform.sleap_h5_to_yolo.SleapH52Yolo
    :members:
    :show-inheritance:
+   :noindex:
 
 SLEAP annotations -> YOLO pose-estimation annotations
 ---------------------------------------
@@ -221,6 +238,7 @@ SLEAP annotations -> YOLO pose-estimation annotations
 .. autoclass:: simba.third_party_label_appenders.transform.sleap_to_yolo.SleapAnnotations2Yolo
    :members:
    :show-inheritance:
+   :noindex:
 
 
 LightningPose keypoints -> YOLO bounding box conversion
@@ -229,6 +247,7 @@ LightningPose keypoints -> YOLO bounding box conversion
 .. autoclass:: simba.third_party_label_appenders.transform.litpose_to_yolo_bbox.LitPose2YOLOBbox
    :members:
    :show-inheritance:
+   :noindex:
 
 
 LightningPose keypoints -> YOLO pose-estimation annotations
@@ -237,3 +256,4 @@ LightningPose keypoints -> YOLO pose-estimation annotations
 .. autoclass:: simba.third_party_label_appenders.transform.litpose_to_yolo_keypoints.LitPose2YOLO
    :members:
    :show-inheritance:
+   :noindex:

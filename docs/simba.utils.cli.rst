@@ -5,4 +5,5 @@ SimBA CLI tools
    :members:
    :undoc-members:
    :show-inheritance:
+   :noindex:
 
