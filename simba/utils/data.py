@@ -1991,6 +1991,11 @@ def scale_pose_keypoints(keypoints: np.ndarray,
     """
     Scale pose keypoints from original image dimensions to new image dimensions.
 
+    .. image:: _static/img/scale_pose_keypoints.webp
+       :alt: Scale pose keypoints
+       :width: 600
+       :align: center
+
     :param np.ndarray keypoints: Nx2 array of (x, y) coordinates in pixel space, or 1D array of (x, y) for a single point.
     :param Tuple[int, int] original_size: (width, height) of the original image.
     :param Tuple[int, int] new_size: (width, height) of the target image.
