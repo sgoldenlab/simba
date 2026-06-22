@@ -1,3 +1,10 @@
+Labeling tools
+==============
+
+.. contents:: On this page
+   :local:
+   :depth: 1
+
 Extracting labelled images
 ------------------------------------------------
 

@@ -1,3 +1,10 @@
+Data processing tools
+=====================
+
+.. contents:: On this page
+   :local:
+   :depth: 1
+
 Aggregate classifier statistics calculator
 --------------------------------------------------
 

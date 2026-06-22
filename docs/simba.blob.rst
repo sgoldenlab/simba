@@ -1,6 +1,11 @@
 SimBA Blob Tracking Methods
 ===============================
 
+
+.. contents:: On this page
+   :local:
+   :depth: 1
+
 This section documents SimBA's blob tracking functionality, which uses background subtraction and blob detection to track animals in videos without requiring pose-estimation data.
 
 Main Executor

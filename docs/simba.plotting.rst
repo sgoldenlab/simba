@@ -1,3 +1,10 @@
+Plotting and visualization tools
+================================
+
+.. contents:: On this page
+   :local:
+   :depth: 1
+
 Direction between animals
 ----------------------------------------------------
 

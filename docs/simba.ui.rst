@@ -1,3 +1,10 @@
+User Interface (UI) tools
+=========================
+
+.. contents:: On this page
+   :local:
+   :depth: 1
+
 Create project UI
 -----------------------------------
 

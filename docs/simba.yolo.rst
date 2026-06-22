@@ -1,6 +1,11 @@
 YOLO methods
 ===============================
 
+
+.. contents:: On this page
+   :local:
+   :depth: 1
+
 Methods for training YOLO models, creating training and validation datasets, and
 converting behavioral neuroscience specific datasets to YOLO datasets.
 

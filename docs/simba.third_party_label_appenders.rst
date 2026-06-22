@@ -1,3 +1,10 @@
+Third-party label appenders
+===========================
+
+.. contents:: On this page
+   :local:
+   :depth: 1
+
 BENTO
 -----------------------------------------------------------
 

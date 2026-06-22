@@ -1,3 +1,10 @@
+Outlier correction
+==================
+
+.. contents:: On this page
+   :local:
+   :depth: 1
+
 Location outlier removed
 --------------------------------------------------------
 

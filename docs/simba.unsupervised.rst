@@ -1,3 +1,10 @@
+Unsupervised learning
+=====================
+
+.. contents:: On this page
+   :local:
+   :depth: 1
+
 Bout aggregation helper
 ------------------------------------------
 

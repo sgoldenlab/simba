@@ -1,3 +1,10 @@
+Feature extraction wrappers
+===========================
+
+.. contents:: On this page
+   :local:
+   :depth: 1
+
 Default feature extractor for 2 animals and 14 body-parts
 ---------------------------------------------------------
 

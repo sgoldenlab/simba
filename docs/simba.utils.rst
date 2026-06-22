@@ -1,3 +1,10 @@
+Utilities
+=========
+
+.. contents:: On this page
+   :local:
+   :depth: 1
+
 SimBA argument checks
 -------------------------
 

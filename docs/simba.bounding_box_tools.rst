@@ -1,3 +1,10 @@
+Bounding-box tools
+==================
+
+.. contents:: On this page
+   :local:
+   :depth: 1
+
 Aggregate Statistics
 ------------------------------------------------------
 

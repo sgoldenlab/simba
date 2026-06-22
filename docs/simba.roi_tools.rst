@@ -1,6 +1,11 @@
 ROI Analysis Tools
 ==================
 
+
+.. contents:: On this page
+   :local:
+   :depth: 1
+
 ROI Analyzer
 ------------
 

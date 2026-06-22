@@ -1,3 +1,10 @@
+Cue-light tools
+===============
+
+.. contents:: On this page
+   :local:
+   :depth: 1
+
 Cue light analyzer
 ---------------------------------------------------
 
