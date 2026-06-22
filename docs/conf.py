@@ -234,6 +234,79 @@ def _inject_lazy_media(app, exception):
     logger.info('lazy-media: injected loading/preload attributes into %d HTML files', changed)
 
 
+# Auto-link glossary terms (see docs/glossary.rst) wherever they appear in prose,
+# so jargon in docstrings/tutorials cross-references the glossary without authors
+# hand-writing `:term:` everywhere. Curated to UNAMBIGUOUS terms only: multi-word
+# phrases, acronyms/proper nouns, and distinctive single words. Deliberately
+# excludes words that double as parameters/identifiers (feature, target, behavior,
+# velocity, smoothing, geometry, p, F1, identity, precision, recall, validation,
+# Observer, Solomon). Only the FIRST occurrence per page is linked, and matches
+# inside code/literals/signatures/titles/existing refs are skipped — keeping the
+# linking informative rather than noisy.
+_GLOSSARY_TERMS = [
+    "pose estimation", "convex hull", "bounding box", "random forest", "circular statistics",
+    "Kleinberg smoothing", "burst detection", "egocentric alignment", "feature extraction",
+    "outlier correction", "confusion matrix", "Gantt plot", "spontaneous alternation",
+    "sliding window", "rolling window", "time bins", "machine results", "minimum bout length",
+    "discrimination threshold", "probability threshold", "blob tracking", "contour tracking",
+    "cross-validation", "feature importance", "pose confidence", "multi-animal tracking",
+    "path plot", "aggregate statistics", "anchored ROI", "cue light", "severity scoring",
+    "sequential analysis", "third-party annotation tool", "video info", "project config",
+    "pixels per millimeter", "DeepLabCut", "SLEAP", "YOLO", "SHAP", "FSTTC", "CLAHE", "UMAP",
+    "ROI", "FPS", "maDLC", "DLC", "BORIS", "Ethovision", "DeepEthogram", "BENTO",
+    "SuperAnimal-TopView", "FaceMap", "AMBER", "px/mm", "ethogram", "occlusion", "centroid",
+    "heatmap", "keypoint", "directionality", "interpolation", "classifier", "clustering",
+]
+_GLOSSARY_TERM_RE = _re.compile(
+    r'(?<![\w-])(' + '|'.join(_re.escape(t) for t in sorted(set(_GLOSSARY_TERMS), key=len, reverse=True))
+    + r')(s?)(?![\w-])', _re.IGNORECASE)
+
+
+def _autolink_glossary_terms(app, doctree):
+    from docutils import nodes
+    from sphinx import addnodes
+    if getattr(app.env, 'docname', None) == 'glossary':
+        return  # the glossary defines the terms; don't self-link it
+    SKIP = (nodes.literal, nodes.literal_block, nodes.reference, nodes.title,
+            nodes.comment, addnodes.pending_xref, addnodes.desc_signature)
+    try:
+        doctree_block = nodes.doctest_block
+        SKIP = SKIP + (doctree_block,)
+    except AttributeError:
+        pass
+    linked = set()  # lowercased terms already linked on this page (first-occurrence only)
+    for text_node in list(doctree.findall(nodes.Text)):
+        anc = text_node.parent
+        skip = False
+        while anc is not None:
+            if isinstance(anc, SKIP):
+                skip = True
+                break
+            anc = anc.parent
+        if skip:
+            continue
+        text = text_node.astext()
+        match = None
+        for m in _GLOSSARY_TERM_RE.finditer(text):
+            if m.group(1).lower() not in linked:
+                match = m
+                break
+        if match is None:
+            continue
+        term, plural = match.group(1), match.group(2)
+        linked.add(term.lower())
+        new_nodes = []
+        if match.start():
+            new_nodes.append(nodes.Text(text[:match.start()]))
+        xref = addnodes.pending_xref('', refdomain='std', reftype='term',
+                                     reftarget=term.lower(), refexplicit=False, refwarn=False)
+        xref += nodes.inline(term + plural, term + plural, classes=['xref', 'std', 'std-term'])
+        new_nodes.append(xref)
+        if match.end() < len(text):
+            new_nodes.append(nodes.Text(text[match.end():]))
+        text_node.parent.replace(text_node, new_nodes)
+
+
 def setup(app):
     """Build-time hooks for the Markdown tutorials.
 
@@ -256,3 +329,4 @@ def setup(app):
     app.connect('build-finished', _copy_images)
     app.connect('build-finished', _inject_lazy_media)
     app.connect('doctree-read', _convert_github_alerts)
+    app.connect('doctree-read', _autolink_glossary_terms)
