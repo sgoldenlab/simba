@@ -922,3 +922,61 @@ html.simba-landing .rst-content h1 { display: none !important; }
 /* Heading anchor (¶): RTD reveals it on heading hover — tint it gold, not blue */
 .rst-content .headerlink { color: var(--simba-gold) !important; opacity: .85; }
 .rst-content .headerlink:hover { opacity: 1; }
+
+/* ------------------------------------------------------------------ *
+ * Visualization gallery (visualization_gallery.rst) — responsive grid
+ * of thumbnail cards, each linking to the plotter class that makes it.
+ * ------------------------------------------------------------------ */
+.simba-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+  margin: 1.5em 0;
+}
+.simba-gallery-card {
+  border: 1px solid #e3e3e3;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .07);
+  transition: box-shadow .15s ease, transform .15s ease;
+  display: flex;
+  flex-direction: column;
+}
+.simba-gallery-card:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .15);
+  transform: translateY(-2px);
+}
+.simba-gallery-card img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  display: block;
+  margin: 0;
+  background: #f3f3f3;
+}
+/* first paragraph after the image = title (the :class: cross-ref) */
+.simba-gallery-card p {
+  margin: 0;
+  padding: 9px 12px 0;
+  line-height: 1.35;
+}
+.simba-gallery-card p:last-child {
+  padding: 4px 12px 12px;
+  font-size: .82em;
+  color: #555;
+}
+/* de-monospace the :class: title link, make it the card heading */
+.simba-gallery-card a,
+.simba-gallery-card a code,
+.simba-gallery-card .xref {
+  font-family: inherit !important;
+  font-weight: 600;
+  font-size: .98rem;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--simba-gold, #b8860b);
+}
+.simba-gallery-card a:hover .xref,
+.simba-gallery-card a:hover { text-decoration: underline; }

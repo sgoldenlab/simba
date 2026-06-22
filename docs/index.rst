@@ -143,6 +143,12 @@ ________________________________________________
 
 .. toctree::
    :maxdepth: 1
+   :caption: GALLERY:
+
+   visualization_gallery
+
+.. toctree::
+   :maxdepth: 1
    :caption: DOCS:
 
    docs/workflow
