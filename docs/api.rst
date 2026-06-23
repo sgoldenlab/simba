@@ -8,7 +8,7 @@ This section provides a categorized reference of SimBA's modules and methods, gr
 
    **Browse the** :ref:`Module Index <modindex>` — an alphabetical list of every SimBA module, and the quickest way to find where a class or function lives.
 
-   Or use :ref:`full-text search <search>` to jump straight to a specific name.
+   Or jump to the :ref:`General Index <genindex>` (every class, function and term, A–Z), or use :ref:`full-text search <search>`.
 
 .. contents::
    :local:

@@ -980,3 +980,42 @@ html.simba-landing .rst-content h1 { display: none !important; }
 }
 .simba-gallery-card a:hover .xref,
 .simba-gallery-card a:hover { text-decoration: underline; }
+
+/* ------------------------------------------------------------------ *
+ * General Index (genindex): the stock 3-column (width:33%) table made
+ * SimBA's long fully-qualified names wrap into ragged, misaligned
+ * columns. Render the index as a single clean full-width column
+ * instead — entries stay alphabetical, the A–Z jumpbox handles
+ * navigation, and long names get the full width so they rarely wrap.
+ * ------------------------------------------------------------------ */
+.genindextable,
+.genindextable tbody,
+.genindextable tr,
+.genindextable td {
+  display: block !important;
+  width: 100% !important;
+  padding: 0;
+  border: none;
+}
+.genindextable ul {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+.genindextable li {
+  line-height: 1.55;
+  margin: 0;
+  padding: 1px 0;
+}
+.genindextable a {
+  overflow-wrap: anywhere;
+}
+.genindextable li ul {          /* sub-entries (e.g. "X (class in ...)") */
+  padding-left: 1.5em;
+  list-style: none;
+}
+/* the A–Z jump links at the top of the page */
+.genindex-jumpbox {
+  margin: .4em 0 1.2em;
+  line-height: 2;
+}
