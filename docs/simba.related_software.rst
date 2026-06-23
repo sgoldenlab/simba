@@ -41,6 +41,9 @@ Pose estimation
    * - `MMPose <https://github.com/open-mmlab/mmpose>`__
      - Open source
      - General-purpose pose estimation toolbox (OpenMMLab)
+   * - `YOLO (Ultralytics) <https://github.com/ultralytics/ultralytics>`__
+     - Open source
+     - Real-time keypoint/pose estimation (SimBA-supported); also object detection and segmentation
 
 3D pose estimation
 ------------------
