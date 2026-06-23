@@ -37,6 +37,11 @@ class COCOKeypoints2Yolo:
     the data into training and validation sets. Images are copied to the output directory and annotations
     are converted to YOLO format text files. A YAML configuration file is automatically generated.
 
+    .. image:: _static/img/coco_keypoints_to_yolo.webp
+       :alt: COCO keypoints to YOLO
+       :width: 700
+       :align: center
+
     .. note::
        COCO keypoint files can be created using `https://www.cvat.ai/ <https://www.cvat.ai/>`__.
 
