@@ -5,12 +5,13 @@
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+import datetime
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../'))
 
 project = 'SimBA'
-copyright = '2025, sronilsson'
+copyright = f'{datetime.datetime.now().year}, sronilsson'
 author = 'sronilsson'
 release = '0.0.2'
 
@@ -96,6 +97,7 @@ html_theme_options = {
     'sticky_navigation': True,
 }
 html_static_path = ['_static']
+html_show_sphinx = False          # drop the "Built with Sphinx using a theme provided by Read the Docs." footer credit
 
 # Markdown tutorials are published at the repo-root depth their relative paths assume
 # (e.g. Scenario1.md -> /Scenario1.html). Redirect the legacy rST URLs so existing

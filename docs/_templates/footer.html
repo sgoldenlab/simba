@@ -1,0 +1,30 @@
+{% extends "!footer.html" %}
+
+{# Override the copyright line so "sronilsson" links to the author's site.
+   The theme HTML-escapes the `copyright` string, so a link can't live in
+   conf.py's copyright value — it has to go in the template. The year is still
+   taken from conf.py (copyright = "<year>, sronilsson"). Build/revision/
+   last-updated spans are preserved from the stock theme. #}
+{% block contentinfo %}
+    <p>
+    {%- if show_copyright %}
+      &#169; Copyright {{ copyright.split(',')[0] }}, <a href="https://sronilsson.netlify.app/">sronilsson</a>.
+    {%- endif %}
+
+    {%- if build_id and build_url %}
+      <span class="build">
+        {%- trans %}Build{% endtrans -%}
+        <a href="{{ build_url }}">{{ build_id }}</a>.
+      </span>
+    {%- elif commit %}
+      <span class="commit">
+        {%- trans %}Revision{% endtrans %} <code>{{ commit }}</code>.
+      </span>
+    {%- endif %}
+    {%- if last_updated %}
+      <span class="lastupdated">
+        {%- trans last_updated=last_updated|e %}Last updated on {{ last_updated }}.{% endtrans %}
+      </span>
+    {%- endif -%}
+    </p>
+{% endblock %}

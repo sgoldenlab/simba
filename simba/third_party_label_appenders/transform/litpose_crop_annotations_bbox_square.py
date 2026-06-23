@@ -8,9 +8,10 @@ import cv2
 import numpy as np
 import pandas as pd
 
-from simba.utils.checks import check_if_dir_exists, check_int
+from simba.utils.checks import check_if_dir_exists, check_int, check_valid_boolean
 from simba.utils.errors import InvalidInputError
-from simba.utils.printing import SimbaTimer, stdout_success, stdout_warning
+from simba.utils.printing import (SimbaTimer, stdout_information,
+                                   stdout_success, stdout_warning)
 from simba.utils.read_write import get_fn_ext
 
 
@@ -34,6 +35,7 @@ class CropLPAnnotationsBboxSquare:
     :param Tuple[int, int] crop_size: Output size (width, height), e.g. (512, 512).
     :param float bbox_pad_frac: Fraction to pad the bbox on each side (default 0.15 = 15%).
     :param Optional[Union[bool, int]] visualize: Save annotated overlays for QC.
+    :param bool verbose: If True, print per-frame progress (frame i/N within view j/M) as each image is cropped. Default False.
     """
 
     def __init__(self,
@@ -41,16 +43,19 @@ class CropLPAnnotationsBboxSquare:
                  save_dir: str,
                  crop_size: Tuple[int, int] = (512, 512),
                  bbox_pad_frac: float = 0.15,
-                 visualize: Optional[Union[bool, int]] = None):
+                 visualize: Optional[Union[bool, int]] = None,
+                 verbose: bool = False):
 
         check_if_dir_exists(in_dir=lp_project_dir)
         check_int(name="crop_size width", value=crop_size[0], min_value=1)
         check_int(name="crop_size height", value=crop_size[1], min_value=1)
+        check_valid_boolean(value=verbose, source=f"{self.__class__.__name__} verbose")
         self.lp_project_dir = lp_project_dir
         self.save_dir = save_dir
         self.crop_size = crop_size
         self.bbox_pad_frac = bbox_pad_frac
         self.visualize = visualize
+        self.verbose = verbose
         self.csv_paths = sorted([os.path.join(lp_project_dir, f) for f in os.listdir(lp_project_dir)
                                  if f.startswith("CollectedData_") and f.endswith(".csv")])
         if len(self.csv_paths) == 0:
@@ -119,13 +124,19 @@ class CropLPAnnotationsBboxSquare:
         if drop_positions:
             stdout_warning(msg=f"Dropping {len(drop_positions)} row position(s) all-NaN in every view: {sorted(drop_positions)}")
         viz_candidates = []
-        for csv_path in self.csv_paths:
+        n_views = len(self.csv_paths)
+        if self.verbose:
+            stdout_information(msg=f"Cropping Lightning Pose annotations across {n_views} view(s)...",
+                               source=self.__class__.__name__)
+        for view_idx, csv_path in enumerate(self.csv_paths):
             self._process_csv(csv_path=csv_path,
                               lp_project_dir=self.lp_project_dir,
                               save_dir=self.save_dir,
                               crop_size=self.crop_size,
                               viz_candidates=viz_candidates,
-                              drop_positions=drop_positions)
+                              drop_positions=drop_positions,
+                              view_idx=view_idx,
+                              n_views=n_views)
         if self.visualize and len(viz_candidates) > 0:
             viz_dir = os.path.join(self.save_dir, "visualizations")
             os.makedirs(viz_dir, exist_ok=True)
@@ -150,12 +161,17 @@ class CropLPAnnotationsBboxSquare:
         timer.stop_timer()
         stdout_success(msg=f"Cropped LP annotations saved in {self.save_dir}", elapsed_time=timer.elapsed_time_str)
 
-    def _process_csv(self, csv_path, lp_project_dir, save_dir, crop_size, viz_candidates, drop_positions):
+    def _process_csv(self, csv_path, lp_project_dir, save_dir, crop_size, viz_candidates, drop_positions,
+                     view_idx=0, n_views=1):
         _, csv_fn, csv_ext = get_fn_ext(filepath=csv_path)
         df = pd.read_csv(csv_path, header=[0, 1, 2], index_col=0)
         bp_names = [df.columns[i][1] for i in range(0, len(df.columns), 2)]
+        n_frames = len(df)
         out_rows = []
-        for row_pos in range(len(df)):
+        for row_pos in range(n_frames):
+            if self.verbose:
+                stdout_information(msg=f"View {view_idx + 1}/{n_views} ({csv_fn}): processing frame {row_pos + 1}/{n_frames}...",
+                                   source=self.__class__.__name__)
             if row_pos in drop_positions:
                 continue
             idx = df.index[row_pos]
@@ -294,9 +310,10 @@ class CropLPAnnotationsBboxSquare:
         return common
 
 
-# #if __name__ == "__main__":
-# cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"Z:\home\simon\LPProjects\project_0609_5cam_simon",
-#                                               save_dir=r"Z:\home\simon\LPProjects\project_0609_5cam_cropped",
-#                                               bbox_pad_frac=0.25,
-#                                               visualize=100)
-# cropper.run()
+if __name__ == "__main__":
+    cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"H:\sina\project_0609_5cam\project_0609_5cam",
+                                          save_dir=r"H:\sina\project_0609_5cam_cropped",
+                                          bbox_pad_frac=0.25,
+                                          visualize=100,
+                                          verbose=True)
+    cropper.run()
