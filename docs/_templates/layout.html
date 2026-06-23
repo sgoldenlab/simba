@@ -1,13 +1,19 @@
 {% extends "!layout.html" %}
 
-{# Add quick links to the auto-generated alphabetical indexes in the left
-   sidebar (Sphinx toctrees can't contain genindex/modindex, so append them
-   here). Renders after the normal navigation. #}
+{# Nest the auto-generated alphabetical indexes under the "API REFERENCE"
+   sidebar caption. Sphinx toctrees can't contain genindex/modindex, so render
+   the normal navigation and splice the links in right after that caption. #}
 {% block menu %}
-  {{ super() }}
-  <p class="caption" role="heading"><span class="caption-text">API INDEX</span></p>
-  <ul>
-    <li class="toctree-l1"><a class="reference internal" href="{{ pathto('genindex') }}">🔤 A–Z Index</a></li>
-    <li class="toctree-l1"><a class="reference internal" href="{{ pathto('py-modindex') }}">📦 Module Index</a></li>
-  </ul>
+  {%- set toctree = toctree(maxdepth=theme_navigation_depth|int,
+                            collapse=theme_collapse_navigation|tobool,
+                            includehidden=theme_includehidden|tobool,
+                            titles_only=theme_titles_only|tobool) %}
+  {%- set _idx = '<ul><li class="toctree-l1"><a class="reference internal" href="' ~ pathto('genindex')
+                 ~ '">🔤 A–Z Index</a></li><li class="toctree-l1"><a class="reference internal" href="'
+                 ~ pathto('py-modindex') ~ '">📦 Module Index</a></li></ul>' %}
+  {%- if toctree %}
+    {{ toctree | replace('API REFERENCE:</span></p>', 'API REFERENCE:</span></p>' ~ _idx) | safe }}
+  {%- else %}
+    <div class="local-toc">{{ toc }}</div>
+  {%- endif %}
 {% endblock %}
