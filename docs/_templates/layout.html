@@ -1,0 +1,13 @@
+{% extends "!layout.html" %}
+
+{# Add quick links to the auto-generated alphabetical indexes in the left
+   sidebar (Sphinx toctrees can't contain genindex/modindex, so append them
+   here). Renders after the normal navigation. #}
+{% block menu %}
+  {{ super() }}
+  <p class="caption" role="heading"><span class="caption-text">API INDEX</span></p>
+  <ul>
+    <li class="toctree-l1"><a class="reference internal" href="{{ pathto('genindex') }}">🔤 A–Z Index</a></li>
+    <li class="toctree-l1"><a class="reference internal" href="{{ pathto('py-modindex') }}">📦 Module Index</a></li>
+  </ul>
+{% endblock %}
