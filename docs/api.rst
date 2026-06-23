@@ -1,7 +1,14 @@
 📖 API Reference
-=============
+================
 
 This section provides a categorized reference of SimBA's modules and methods, grouped by their functionality such as feature extraction, plotting, transformation, and modeling.
+
+.. admonition:: 📑 Find anything fast
+   :class: tip
+
+   * :ref:`Module Index <modindex>` — every module, listed alphabetically
+   * :ref:`General Index <genindex>` — every class, function and term, A–Z
+   * :ref:`Full-text search <search>`
 
 .. contents::
    :local:
