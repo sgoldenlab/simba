@@ -612,9 +612,12 @@ a:hover, .rst-content a:hover { color: #143d56; }
 .simba-hero-banner {
     display: flex; flex-direction: column; align-items: center; text-align: center;
     gap: 14px;
-    background: linear-gradient(135deg, #07273a, #11597e, #1f7aa6, #38a8d4, #176993, #0c3b56, #0a2c44);
-    background-size: 320% 320%;
-    animation: simbaGradient 13s ease-in-out infinite;
+    background:
+        radial-gradient(circle at 22% 28%, rgba(192, 168, 72, 0.60) 0%, rgba(192, 168, 72, 0) 42%),   /* gold glow (salient accent) */
+        radial-gradient(circle at 80% 72%, rgba(31, 122, 166, 0.55) 0%, rgba(31, 122, 166, 0) 48%),    /* steel-blue glow (movement) */
+        radial-gradient(circle at 50% 50%, #11597e 0%, #06223a 72%);                                   /* deep-navy radial base */
+    background-size: 230% 230%, 250% 250%, 100% 100%;
+    animation: simbaHeroGlow 12s ease-in-out infinite;
     border-radius: 0; padding: 40px 28px; margin: 0 0 1.6em 0; width: 100%;
     box-shadow: 0 6px 20px rgba(16, 40, 60, 0.28);
     color: #fff;
@@ -628,6 +631,16 @@ a:hover, .rst-content a:hover { color: #143d56; }
     50%  { background-position: 100% 50%; }
     75%  { background-position: 50% 0%; }
     100% { background-position: 0% 50%; }
+}
+/* hero: sweep the gold + steel-blue radial glows across the whole banner in
+   opposite directions so they cross and intermix over the fixed navy base */
+@keyframes simbaHeroGlow {
+    0%   { background-position:   0% 100%, 100%   0%, center; }
+    20%  { background-position:  60%  55%,  40%  45%, center; }
+    40%  { background-position: 100%   0%,   0% 100%, center; }
+    60%  { background-position:  45%  45%,  55%  55%, center; }
+    80%  { background-position:   0%  55%, 100%  45%, center; }
+    100% { background-position:   0% 100%, 100%   0%, center; }
 }
 .simba-hero-vid {
     width: 100%; max-width: 1100px; height: auto; display: block;
