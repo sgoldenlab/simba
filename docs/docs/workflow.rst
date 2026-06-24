@@ -115,6 +115,15 @@ download links on each card.
      </div>
 
      <div class="simba-res-card">
+       <a class="simba-res-thumb" href="https://osf.io/32vtd/files/ajdz6" style="background-image:url('../_static/img/qr_styled_thumb.webp')"></a>
+       <div class="simba-res-body">
+         <h3>𝄃𝄃𝄂𝄂𝄀𝄁 Styled QR Codes</h3>
+         <p>Branded SimBA QR codes &mdash; neon, gradient, and animated designs. Printable PDF, or browse them all on the <a href="../qr_gallery.html">QR Codes page</a>.</p>
+         <div class="simba-res-links"><a href="https://osf.io/32vtd/files/ajdz6">🔗 PDF</a> <a href="../qr_gallery.html">🔳 Gallery</a></div>
+       </div>
+     </div>
+
+     <div class="simba-res-card">
        <a class="simba-res-thumb" href="https://simba-uw-tf-dev.readthedocs.io/en/latest/overview_video_202510.html" style="background-image:url('../_static/img/overview_video.webp')"></a>
        <div class="simba-res-body">
          <h3>🎥 Overview (2025/10)</h3>

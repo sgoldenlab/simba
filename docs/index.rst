@@ -153,6 +153,7 @@ ________________________________________________
 
    docs/workflow
    glossary
+   qr_gallery
 
 .. toctree::
    :maxdepth: 2
