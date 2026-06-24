@@ -314,6 +314,133 @@ def _autolink_glossary_terms(app, doctree):
         text_node.parent.replace(text_node, new_nodes)
 
 
+def _generate_github_contributors(app):
+    """Fetch GitHub contributor commit counts and (re)generate the credits bar chart and
+    avatar grid on every build.
+
+    Runs at ``builder-inited`` (before sources are read) so the generated files exist when
+    ``credits.rst`` is processed. On any failure (no network, API rate-limit, missing
+    matplotlib) it prints a notice and keeps the committed snapshot, so the build never breaks.
+    Set a ``GITHUB_TOKEN`` env var to raise the API rate limit on shared CI IPs.
+    """
+    import json
+    import urllib.request
+
+    here = os.path.dirname(os.path.abspath(__file__))
+    gen_dir = os.path.join(here, '_generated')
+    html_path = os.path.join(gen_dir, 'github_contributors.html')
+    os.makedirs(gen_dir, exist_ok=True)
+
+    try:
+        headers = {'Accept': 'application/vnd.github+json', 'User-Agent': 'simba-docs'}
+        token = os.environ.get('GITHUB_TOKEN')
+        if token:
+            headers['Authorization'] = f'Bearer {token}'
+        req = urllib.request.Request(
+            'https://api.github.com/repos/sgoldenlab/simba/contributors?per_page=100&anon=0',
+            headers=headers)
+        with urllib.request.urlopen(req, timeout=25) as resp:
+            raw = json.load(resp)
+        contribs = sorted(((c['login'], int(c['contributions'])) for c in raw if c.get('type') == 'User'),
+                          key=lambda t: t[1], reverse=True)
+        if not contribs:
+            raise RuntimeError('no contributors returned')
+    except Exception as e:  # noqa: BLE001 - never fail the build over this
+        print(f'[credits] GitHub contributor fetch failed ({e!r}); keeping existing snapshot.')
+        return
+
+    stamp = datetime.datetime.now().strftime('%B %Y')
+
+    # ---- per-contributor lines changed (additions/deletions) from the stats API ----
+    # This endpoint is computed asynchronously and returns HTTP 202 with an empty body
+    # while GitHub builds the cache, so retry a few times. Matched to the commit list by login.
+    loc = {}
+    try:
+        import time as _time
+        for _ in range(5):
+            with urllib.request.urlopen(urllib.request.Request(
+                    'https://api.github.com/repos/sgoldenlab/simba/stats/contributors',
+                    headers=headers), timeout=30) as sresp:
+                code, body = sresp.getcode(), sresp.read()
+            if code == 202 or not body.strip():
+                _time.sleep(3)
+                continue
+            for c in json.loads(body):
+                wk = c.get('weeks', [])
+                loc[c['author']['login']] = (sum(w['a'] for w in wk), sum(w['d'] for w in wk))
+            break
+    except Exception as e:  # noqa: BLE001
+        print(f'[credits] line-count fetch failed ({e!r}); showing commits only.')
+
+    # ---- responsive HTML bar chart with a GitHub card popover on hover (no image, no matplotlib) ----
+    # Consumed by credits.rst via a `.. raw:: html :file:` include; regenerated every build.
+    try:
+        import html as _htmllib
+        import math
+        INK, MUT, TRACK, BLUE, LEAD = '#23272e', '#6b7280', '#eef2f7', '#2a7fb8', '#21567a'
+        mx = max(c for _, c in contribs)
+
+        def _w(v):  # log-scaled bar width (%), with a floor so 1-commit bars stay visible
+            return 100.0 if mx <= 1 else round(max(5.0, math.log10(v) / math.log10(mx) * 100.0), 1)
+
+        def _fmt(n):  # compact line count: 1.2M / 162K / 1.5K / 405
+            if n >= 1_000_000:
+                return f'{n / 1_000_000:.1f}M'
+            if n >= 10_000:
+                return f'{round(n / 1000)}K'
+            if n >= 1000:
+                return f'{n / 1000:.1f}K'
+            return str(int(n))
+
+        style = (
+            "<style>\n"
+            ".simba-cc{max-width:820px;margin:10px auto 4px;padding-top:74px;}\n"
+            ".simba-cc-row{display:flex;align-items:center;gap:10px;margin:5px 0;position:relative;text-decoration:none!important;}\n"
+            ".simba-cc-name{flex:0 0 140px;text-align:right;font-size:13px;color:#23272e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}\n"
+            ".simba-cc-track{flex:1;background:#eef2f7;border-radius:5px;height:22px;display:block;}\n"
+            ".simba-cc-bar{display:block;height:100%;border-radius:5px;transition:filter .12s ease;}\n"
+            ".simba-cc-row:hover .simba-cc-bar{filter:brightness(1.08);}\n"
+            ".simba-cc-count{flex:0 0 52px;font-size:12px;font-weight:700;color:#23272e;}\n"
+            ".simba-cc-loc{flex:0 0 86px;font-size:11.5px;color:#6b7280;white-space:nowrap;}\n"
+            ".simba-cc-card{position:absolute;left:150px;bottom:24px;z-index:40;display:none;align-items:center;gap:11px;"
+            "background:#fff;border:1px solid #e2e6ec;border-radius:12px;box-shadow:0 8px 24px rgba(33,86,122,.20);"
+            "padding:9px 16px 9px 9px;white-space:nowrap;pointer-events:none;}\n"
+            ".simba-cc-card::after{content:'';position:absolute;left:26px;bottom:-7px;width:13px;height:13px;background:#fff;"
+            "border-right:1px solid #e2e6ec;border-bottom:1px solid #e2e6ec;transform:rotate(45deg);}\n"
+            ".simba-cc-card img{width:50px;height:50px;border-radius:50%;display:block;}\n"
+            ".simba-cc-card .cci{display:flex;flex-direction:column;line-height:1.3;}\n"
+            ".simba-cc-card .cci b{font-size:13.5px;color:#23272e;}\n"
+            ".simba-cc-card .cci em{font-size:12px;color:#6b7280;font-style:normal;}\n"
+            ".simba-cc-row:hover .simba-cc-card{display:flex;}\n"
+            "</style>\n")
+
+        rows = []
+        for i, (login, c) in enumerate(contribs):
+            le = _htmllib.escape(login)
+            col = LEAD if i == 0 else BLUE
+            commit_lbl = f"{c:,} commit" + ('' if c == 1 else 's')
+            ad = loc.get(login)
+            loc_lbl = (_fmt(ad[0] + ad[1]) + ' loc') if ad else ''
+            loc_card = f' · +{_fmt(ad[0])} / −{_fmt(ad[1])} lines' if ad else ''
+            rows.append(
+                f'     <a class="simba-cc-row" href="https://github.com/{le}">'
+                f'<span class="simba-cc-name">@{le}</span>'
+                f'<span class="simba-cc-track"><span class="simba-cc-bar" style="width:{_w(c)}%;background:{col};"></span></span>'
+                f'<span class="simba-cc-count">{c:,}</span>'
+                f'<span class="simba-cc-loc">{loc_lbl}</span>'
+                f'<span class="simba-cc-card"><img src="https://github.com/{le}.png?size=96" alt="@{le}" loading="lazy">'
+                f'<span class="cci"><b>@{le}</b><em>{commit_lbl}{loc_card}</em></span></span>'
+                f'</a>')
+        chart = (style + '<div class="simba-cc">\n' + '\n'.join(rows) +
+                 f'\n     <p style="text-align:right;font-size:11px;color:{MUT};font-style:italic;margin:10px 4px 0;">'
+                 f'bar &amp; bold number = commits (log scale) · loc = lines changed (added + removed) · hover for details · {stamp}</p>\n   </div>')
+
+        with open(html_path, 'w', encoding='utf-8') as f:
+            f.write(chart + '\n')
+    except Exception as e:  # noqa: BLE001
+        print(f'[credits] contributor HTML render failed ({e!r}); keeping existing snapshot.')
+
+
 def setup(app):
     """Build-time hooks for the Markdown tutorials.
 
@@ -333,6 +460,7 @@ def setup(app):
             if os.path.isdir(src):
                 copy_asset(src, os.path.join(app.outdir, 'images'))
 
+    app.connect('builder-inited', _generate_github_contributors)
     app.connect('build-finished', _copy_images)
     app.connect('build-finished', _inject_lazy_media)
     app.connect('doctree-read', _convert_github_alerts)

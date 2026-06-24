@@ -21,6 +21,17 @@ The code, documentation, and support channels are written, maintained, and devel
      <a class="simba-person" href="https://github.com/sgoldenlab"><img src="https://github.com/sgoldenlab.png?size=160" alt="Sam Golden Lab" loading="lazy"><span class="simba-person-name">Sam Golden Lab</span><span class="simba-person-gh">@sgoldenlab</span></a>
    </div>
 
+GitHub contributors
+----------------------------------------------------------
+
+SimBA is shaped by everyone who has contributed code on GitHub. The chart and list below show the number of commits per
+contributor on the `sgoldenlab/simba <https://github.com/sgoldenlab/simba/graphs/contributors>`_ repository (log scale),
+along with the lines of code each has changed. Hover a bar for the contributor's GitHub card. Everything is pulled from
+the GitHub API and regenerated automatically every time these docs are built.
+
+.. raw:: html
+   :file: _generated/github_contributors.html
+
 Who writes this stuff??
 ----------------------------------------------------------
 
