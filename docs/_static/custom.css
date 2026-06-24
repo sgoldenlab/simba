@@ -617,7 +617,8 @@ a:hover, .rst-content a:hover { color: #143d56; }
         radial-gradient(circle at 80% 72%, rgba(31, 122, 166, 0.55) 0%, rgba(31, 122, 166, 0) 48%),    /* steel-blue glow (movement) */
         radial-gradient(circle at 50% 50%, #11597e 0%, #06223a 72%);                                   /* deep-navy radial base */
     background-size: 230% 230%, 250% 250%, 100% 100%;
-    animation: simbaHeroGlow 12s ease-in-out infinite;
+    animation: simbaHeroGlow 9s ease-in-out infinite;
+    position: relative; overflow: hidden;
     border-radius: 0; padding: 40px 28px; margin: 0 0 1.6em 0; width: 100%;
     box-shadow: 0 6px 20px rgba(16, 40, 60, 0.28);
     color: #fff;
@@ -641,6 +642,29 @@ a:hover, .rst-content a:hover { color: #143d56; }
     60%  { background-position:  45%  45%,  55%  55%, center; }
     80%  { background-position:   0%  55%, 100%  45%, center; }
     100% { background-position:   0% 100%, 100%   0%, center; }
+}
+/* periodic "diamond" shine: a bright glint sweeps across at the start, then
+   every 20s (sweep takes ~1.8s, then idle off-screen until the next cycle) */
+.simba-hero-banner::after {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none; z-index: 2;
+    background: linear-gradient(110deg,
+        transparent 34%,
+        rgba(255, 255, 255, 0.00) 41%,
+        rgba(255, 255, 255, 0.55) 47%,
+        rgba(255, 255, 255, 0.95) 50%,
+        rgba(255, 246, 205, 0.65) 54%,
+        rgba(255, 255, 255, 0.00) 60%,
+        transparent 67%);
+    transform: translateX(-150%);
+    animation: simbaHeroShine 20s ease-in-out infinite;
+}
+@keyframes simbaHeroShine {
+    0%   { transform: translateX(-150%); opacity: 0; }
+    1%   { opacity: 1; }
+    14%  { transform: translateX(150%); opacity: 1; }   /* ~2.8s sweep, then idle until next 20s cycle */
+    15%  { transform: translateX(150%); opacity: 0; }
+    100% { transform: translateX(150%); opacity: 0; }
 }
 .simba-hero-vid {
     width: 100%; max-width: 1100px; height: auto; display: block;
