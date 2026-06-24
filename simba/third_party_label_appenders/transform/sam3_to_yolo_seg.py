@@ -37,6 +37,14 @@ class SAM3ToYoloSeg:
     """
     Sample N random frames from each video in a directory, run SAM3 with a text prompt, and write the resulting masks as a YOLO segmentation project.
 
+    For each sampled frame, every SAM3 mask above ``conf`` has its outline traced as a polygon, optionally resampled
+    to ``vertice_cnt`` vertices, and written as ``class x1 y1 x2 y2 ... xn yn`` normalized to ``[0, 1]`` - one line per mask.
+
+    .. image:: _static/img/sam3_to_yolo_seg.webp
+       :alt: Text-prompted SAM3 segmentation to YOLO polygon labels
+       :width: 700
+       :align: center
+
     .. note::
        To fit a YOLO segmentation model, see :class:`~simba.model.yolo_fit.FitYolo`.
        For YOLO segmentation inference, see :class:`~simba.model.yolo_seg_inference.YOLOSegmentationInference`.

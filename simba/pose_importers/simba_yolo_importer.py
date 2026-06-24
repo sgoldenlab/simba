@@ -27,6 +27,18 @@ class SimBAYoloImporter(ConfigReader):
     """
     Import YOLO pose estimation results into SimBA project format with optional interpolation and smoothing.
 
+    Each YOLO results CSV holds one row per detection (``FRAME``, ``CLASS_ID``, ``CLASS_NAME``, ``CONFIDENCE``, the four
+    bounding-box corners ``X1..Y4``, and the keypoint columns). On import, the bounding-box corners, ``CLASS_ID`` and
+    ``CONFIDENCE`` are dropped, and the data is pivoted from long (one row per detection) to wide (one row per frame) with
+    each class's keypoints placed side-by-side as ``<class>_<bp>_x`` / ``_y`` / ``_p`` columns. The body-part names and
+    multi-animal IDs are written to the project, and the result is saved to the ``outlier_corrected_movement_location``
+    directory (optionally interpolated and smoothed, and optionally with video metadata added to ``video_info.csv``).
+
+    .. image:: _static/img/simba.pose_importers.simba_yolo_importer.SimBAYoloImporter.webp
+       :alt: YOLO multi-animal pose detections (class, confidence, bbox corners, keypoints) reshaped from long to wide into a SimBA multi-animal pose CSV
+       :width: 800
+       :align: center
+
     .. seealso::
        YOLO pose data can be created with :func:`simba.model.yolo_pose_inference.YOLOPoseInference` or :func:`simba.model.yolo_pose_track_inference.YOLOPoseTrackInference`.
 

@@ -45,6 +45,15 @@ class TimeBinsClfCalculator(ConfigReader):
     Computes aggregate classification results in user-defined time-bins. Results are stored in
     the ``project_folder/logs`` directory of the SimBA project.
 
+    The session is split into ``bin_length``-second bins; within each bin, every classifier's behavior bouts are
+    summarized into the requested measurements - event count, total / mean / median bout duration, first-occurrence
+    time, and mean / median inter-event interval.
+
+    .. image:: _static/img/timebins_clf_calculator.webp
+       :alt: Classifier bout statistics per time bin
+       :width: 700
+       :align: center
+
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file in Configparser format.
     :param int bin_length: Integer representing the time bin size in seconds.
     :param List[str] classifiers: Names of classifiers to calculate aggregate statistics in time-bins for. EXAMPLE: ['Attack', 'Sniffing']

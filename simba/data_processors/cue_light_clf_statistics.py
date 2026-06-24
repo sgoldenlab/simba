@@ -24,6 +24,15 @@ class CueLightClfAnalyzer(ConfigReader):
     Compute aggregate statistics when classified behaviors are occurring in relation to the cue light
     ON and OFF states.
 
+    For every cue-light ON bout, the time each classifier is PRESENT vs ABSENT is tallied in three windows:
+    the ``pre_window`` seconds before bout onset, DURING the bout, and the ``post_window`` seconds after bout
+    offset. Present seconds are the classified frames divided by FPS; absent seconds are the window remainder.
+
+    .. image:: _static/img/cue_light_clf_statistics.webp
+       :alt: Classifier behavior around cue-light bouts
+       :width: 700
+       :align: center
+
     :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
     :param int pre_window: Time period (in millisecond) before the onset of each cue light to compute aggregate classification statistics within.
     :param int post_window: Time period (in millisecond) after the offset of each cue light to compute aggregate classification statistics within.

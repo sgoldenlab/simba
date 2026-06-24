@@ -17,6 +17,39 @@ from simba.utils.read_write import (find_files_of_filetypes_in_directory,
 
 class FaceMapImporter(ConfigReader):
     """
+    Import FaceMap orofacial keypoint tracking data into a SimBA project.
+
+    FaceMap tracks 15 keypoints on the mouse face (4 eye, 5 nose, 3 whisker, mouth + lowerlip, and paw),
+    storing each keypoint's ``x``, ``y`` and ``likelihood`` per frame in an ``.h5`` file. This class reads each
+    ``.h5`` file, converts it to a SimBA pose-estimation CSV (one ``<keypoint>_x``, ``<keypoint>_y``, ``<keypoint>_p``
+    triplet per keypoint), and saves it into the project's ``outlier_corrected_movement_location`` directory.
+    Interpolation and smoothing are applied afterwards if requested.
+
+    .. image:: _static/img/simba.pose_importers.facemap_h5_importer.FaceMapImporter.webp
+       :alt: FaceMap tracks 15 mouse-face keypoints; FaceMapImporter converts each .h5 to a SimBA CSV with optional interpolation and smoothing
+       :width: 800
+       :align: center
+
+    .. seealso::
+       The ``.h5`` parsing is performed by :func:`simba.utils.read_write.read_facemap_h5`
+
+    .. note::
+       The SimBA project must be created as a FaceMap project (``pose_estimation_body_parts: Facemap``); importing into a project of any other pose-configuration raises an error.
+
+       `FaceMap GitHub repository <https://github.com/mouseland/facemap>`__.
+
+    References
+    ----------
+    .. [1] Syeda, A., Zhong, L., Tung, R., et al. Facemap: a framework for modeling neural activity based on orofacial tracking. `Nature Neuroscience, 26, 1775–1783 (2023) <https://www.nature.com/articles/s41593-023-01490-6>`_.
+    .. [2] FaceMap, MouseLand, `https://github.com/mouseland/facemap <https://github.com/mouseland/facemap>`__.
+
+    :param Union[str, os.PathLike] config_path: Path to SimBA project ``project_config.ini`` (must be a FaceMap project).
+    :param Union[str, os.PathLike] data_path: Path to a FaceMap ``.h5`` file, or a directory containing one or more ``.h5`` files.
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory to save the imported CSVs. If None, defaults to the project's ``outlier_corrected_movement_location`` directory.
+    :param Optional[dict] smoothing_settings: Optional smoothing, e.g. ``{'method': 'savitzky-golay', 'time_window': 100}``. ``method`` is one of ``'savitzky-golay'`` / ``'gaussian'``; ``time_window`` is in milliseconds. Default None (no smoothing).
+    :param Optional[dict] interpolation_settings: Optional interpolation, e.g. ``{'type': 'body-parts', 'method': 'linear'}``. ``type`` is ``'body-parts'`` / ``'animals'``; ``method`` is ``'linear'`` / ``'quadratic'`` / ``'nearest'``. Default None (no interpolation).
+    :param Optional[bool] verbose: If True, print per-file progress. Default True.
+
     :example:
     >>> r = FaceMapImporter(config_path=r"C:\troubleshooting\facemap_project\project_folder\project_config.ini", data_path=r'C:\troubleshooting\facemap_project\data', smoothing_settings={'method': 'savitzky-golay', 'time_window': 100})
     >>> r.run()

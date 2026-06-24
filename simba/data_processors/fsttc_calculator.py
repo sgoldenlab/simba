@@ -19,8 +19,17 @@ from simba.utils.read_write import get_fn_ext, read_df
 
 class FSTTCCalculator(ConfigReader, PlottingMixin):
     """
-    Compute forward spike-time tiling coefficients between pairs of
-    classified behaviors.
+    Compute forward spike-time tiling coefficients between pairs of classified behaviors.
+
+    For an ordered pair (A, B), each bout of A opens a forward time window; if a bout of B starts inside that
+    window the pair counts as a forward transition. The coefficient combines the transition probability ``P`` with
+    the window/behavior coverage terms ``Ta`` and ``Tb`` (see the worked example below). FSTTC is directional, so
+    ``A -> B`` and ``B -> A`` are computed separately.
+
+    .. image:: _static/img/fsttc_forward_window.webp
+       :alt: FSTTC forward window worked example
+       :width: 700
+       :align: center
 
     :param str config_path: path to SimBA project config file in Configparser format.
     :param: Optional[bool] join_bouts_within_delta: If several bouts onsets (of the same classifier) occurs within a single time-delta, then join the bouts into a single bout.

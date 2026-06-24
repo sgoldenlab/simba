@@ -50,6 +50,15 @@ class SAM3ToYoloBBox:
     """
     Sample N random frames from each video in a directory, run SAM3 with a text prompt, and write the resulting bounding boxes as a YOLO detection project.
 
+    For each sampled frame SAM3 returns boxes matching the text prompt; boxes are kept if their confidence is
+    ``>= conf`` (capped at ``max_detections``, optionally size-filtered), optionally grown by ``buffer_pct``,
+    clipped to the frame, and written as ``class cx cy w h`` normalized to ``[0, 1]`` - one line per box.
+
+    .. image:: _static/img/sam3_to_yolo_bbox.webp
+       :alt: Text-prompted SAM3 detection to YOLO bounding boxes
+       :width: 700
+       :align: center
+
     .. note::
        To fit a YOLO detection model, see :class:`~simba.model.yolo_fit.FitYolo`.
 
@@ -434,25 +443,25 @@ class SAM3ToYoloBBox:
             lines.append(f'{cls_id} {x_center:.6f} {y_center:.6f} {w:.6f} {h:.6f}')
 
         return '\n'.join(lines) + '\n' if lines else ''
-
-runner = SAM3ToYoloBBox(video_data=[r"G:\netholabs\6.01.005", r"G:\netholabs\6.01.006", r"G:\netholabs\6.01.005_batch_2", r"G:\netholabs\6.01.006_batch_2", r"G:\netholabs\6.01.007"],
-                        sam_path=r'D:\sam3\sam3.pt',
-                        save_dir=r'G:\netholabs\yolo_mdl_0619',
-                        txt_prompt='black mouse',
-                        n_frames=10,
-                        verbose=True,
-                        conf=0.10,
-                        max_detections=1,
-                        buffer_pct=0.15,
-                        recursive=True,
-                        consecutive_miss_limit=25,
-                        skip_substr=('mosaic',),
-                        video_size=(896, 2016),
-                        min_size=(75, 75),
-                        shuffle_videos=True,
-                        visualize=False,
-                        preview=True)
-runner.run()
+#
+# runner = SAM3ToYoloBBox(video_data=[r"G:\netholabs\6.01.005", r"G:\netholabs\6.01.006", r"G:\netholabs\6.01.005_batch_2", r"G:\netholabs\6.01.006_batch_2", r"G:\netholabs\6.01.007"],
+#                         sam_path=r'D:\sam3\sam3.pt',
+#                         save_dir=r'G:\netholabs\yolo_mdl_0619',
+#                         txt_prompt='black mouse',
+#                         n_frames=10,
+#                         verbose=True,
+#                         conf=0.10,
+#                         max_detections=1,
+#                         buffer_pct=0.15,
+#                         recursive=True,
+#                         consecutive_miss_limit=25,
+#                         skip_substr=('mosaic',),
+#                         video_size=(896, 2016),
+#                         min_size=(75, 75),
+#                         shuffle_videos=True,
+#                         visualize=False,
+#                         preview=True)
+# runner.run()
 
 
 #NEXCT F:\netholabs\tars_0506

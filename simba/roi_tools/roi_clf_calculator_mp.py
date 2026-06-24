@@ -133,6 +133,18 @@ class ROIClfCalculatorMultiprocess(ConfigReader):
     """
     Compute aggregate statistics of classification results within user-defined ROIs. Results are stored in `project_folder/logs` directory of the SimBA project.
 
+    For each video, classifier, ROI and body-part, a frame counts only when the body-part is **inside the ROI** *and*
+    the **classifier is active** (logical AND) - behaviour occurring outside the ROI is excluded. Bouts of this
+    in-ROI behaviour are detected and summarised as ``TOTAL BEHAVIOR TIME IN ROI (S)``,
+    ``STARTED BEHAVIOR BOUTS IN ROI (COUNT)`` and ``ENDED BEHAVIOR BOUTS IN ROI (COUNT)``, returned in long format (one
+    row per measure, optionally transposed to wide). With ``bout_table=True`` a detailed per-bout table is also saved.
+    This class distributes videos across multiple CPU cores.
+
+    .. image:: _static/img/simba.roi_tools.roi_clf_calculator.ROIClfCalculator.webp
+       :alt: Classified behaviour is counted only when the body-part is inside the ROI and the classifier is active (logical AND); in-ROI behaviour bouts are summarised per classifier x ROI
+       :width: 800
+       :align: center
+
     .. seealso::
        For single core process, see :func:`simba.roi_tools.roi_clf_calculator.ROIClfCalculator`
 

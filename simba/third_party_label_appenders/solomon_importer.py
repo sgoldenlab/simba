@@ -17,6 +17,17 @@ class SolomonImporter(ConfigReader):
     """
     Append SOLOMON human annotations onto featurized pose-estimation data.
 
+    For each video, the SOLOMON Coder CSV's per-frame ``Behaviour`` column is converted into one binary target column per
+    SimBA classifier: a frame is set to ``1`` where ``Behaviour`` equals that classifier's name, otherwise ``0``. These
+    target columns are appended to the existing feature data (features unchanged) and written to the project's
+    ``targets_inserted`` directory, ready for classifier training. Annotations referencing frames beyond the imported
+    video's length are dropped with a warning.
+
+    .. image:: _static/img/simba.third_party_label_appenders.solomon_importer.SolomonImporter.webp
+       :alt: SOLOMON Coder per-frame Behaviour annotations are converted into one binary target column per classifier and appended to the feature data in the targets_inserted directory
+       :width: 800
+       :align: center
+
     :param str config_path: path to SimBA project config file in Configparser format
     :param str data_dir: path to folder holding SOLOMON data files is CSV format
 

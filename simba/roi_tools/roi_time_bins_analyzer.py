@@ -47,6 +47,22 @@ class ROITimebinAnalyzer(ConfigReader):
     This class computes various statistics related to body-part movements inside defined ROIs,
     including entry counts, total time spent, and bout durations.
 
+    The video is divided into consecutive fixed-length time bins (``bin_size`` seconds), and the per-ROI metrics
+    (``TOTAL ROI TIME (S)``, ``ROI ENTRIES (COUNTS)``, ``FIRST``/``LAST ROI ENTRY TIME (S)`` and, optionally,
+    ``TOTAL ROI MOVEMENT (CM)`` / ``AVERAGE ROI VELOCITY (CM/S)``) are reported **separately for each time bin**. An ROI
+    bout that spans a bin boundary has its time split across the bins, while its entry is counted in the bin where it
+    starts. Results are returned in long format (one row per ROI x time-bin x measure), optionally transposed to wide; if
+    ``outside_rois`` is enabled, all area not covered by any ROI is treated as an additional ``OUTSIDE REGIONS OF INTEREST`` zone.
+
+    .. image:: _static/img/simba.roi_tools.roi_time_bins_analyzer.ROITimebinAnalyzer.webp
+       :alt: ROI occupancy is split into fixed-length time bins; per-ROI time, entry-count and movement metrics are reported separately for each bin
+       :width: 800
+       :align: center
+
+    .. seealso::
+       For ROI statistics over the whole session (no time bins), see
+       :func:`simba.roi_tools.roi_aggregate_statistics_analyzer.ROIAggregateStatisticsAnalyzer`.
+
     :param config_path (str | os.PathLike): Path to the configuration file.
     :param data_path (str | os.PathLike | List[str], optional): Path(s) to the data files.
     :param threshold (float): Probability threshold for body-part inclusion.
@@ -62,8 +78,6 @@ class ROITimebinAnalyzer(ConfigReader):
     :param transpose (bool): Whether to transpose the final results.
     :param detailed_bout_data_save_path (str | os.PathLike, optional): Path to save detailed bout data.
     :param save_path (str | os.PathLike, optional): Path to save summary statistics.
-
-    .. note::
 
     :example:
     >>> test = ROITimebinAnalyzer(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", bin_size=61, body_parts=['Nose'], detailed_bout_data=True, calculate_distances=True, transpose=True)

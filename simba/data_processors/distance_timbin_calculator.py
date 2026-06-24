@@ -24,7 +24,16 @@ class DistanceTimeBinCalculator(ConfigReader, FeatureExtractionMixin):
     Compute body-part pair distance statistics per time bin.
 
     For each input video/data file and each selected body-part pair, computes frame-wise Euclidean distances (converted using project pixel/mm calibration), splits
-    them into fixed-duration time bins, and summarizes the selected statistics per bin.
+    them into fixed-duration time bins (``fps * time_bin`` frames each), and summarizes the selected statistics (mean / median / variance) per bin.
+
+    .. image:: _static/img/distance_timebin_calculator.webp
+       :alt: Body-part pair distance summarized per time bin
+       :width: 700
+       :align: center
+
+    .. seealso::
+       For a single summary over the whole video (no time bins), use
+       :class:`~simba.data_processors.distance_calculator.DistanceCalculator`.
 
     :param Union[str, os.PathLike] config_path: Path to the SimBA project config file.
     :param Iterable[Tuple[str, str]] body_parts: Iterable of 2-tuples defining body-part pairs to compare, e.g. ``(("Nose_1", "Nose_2"), ("Center_1", "Center_2"))``.

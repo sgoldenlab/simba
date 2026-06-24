@@ -37,9 +37,9 @@ class SuperAnimalTopViewImporter(PoseImporterMixin, ConfigReader):
        assumed to follow the SuperAnimal-TopView 27 body-part schema, with animals in the
        order supplied via ``id_lst`` (positional mapping).
 
-    .. image:: _static/img/superanimal_topview.png
-       :alt: Superanimal topview
-       :width: 150
+    .. image:: _static/img/simba.pose_importers.superanimal_import.SuperAnimalTopViewImporter.webp
+       :alt: SuperAnimal-TopView tracks 27 body parts per mouse from a zenith view; the importer reads DLC H5 (TF or PyTorch backends), assigns multi-animal identities, and writes a multi-index SimBA pose CSV
+       :width: 800
        :align: center
 
     :param config_path: path to SimBA project config file in Configparser format

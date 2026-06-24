@@ -32,6 +32,15 @@ class MADLCH52Yolo:
     """
     Convert multi-animal DeepLabCut pose estimation H5 data and corresponding videos into YOLO keypoint dataset format.
 
+    Each sampled video frame is written as one image, and every individual in that frame becomes one YOLO instance:
+    the body-parts that pass the likelihood ``threshold`` are enclosed in a bounding box (with optional ``padding``)
+    and the box together with the keypoints is written as ``class cx cy w h  x y v  ...``, all normalized to ``[0, 1]``.
+
+    .. image:: _static/img/dlc_ma_h5_to_yolo.webp
+       :alt: Multi-animal DeepLabCut H5 to YOLO keypoints
+       :width: 700
+       :align: center
+
     .. note::
        This converts DeepLabCut **inference** data to YOLO keypoints (not DeepLabcut annotations).
 

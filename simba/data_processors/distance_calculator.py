@@ -24,8 +24,17 @@ class DistanceCalculator(ConfigReader, FeatureExtractionMixin):
     Compute per-video body-part distance summaries from pose-estimation data.
 
     For each input file and selected body-part pair, this class computes frame-wise
-    Euclidean distances in millimeters and summarizes results (mean and/or median).
+    Euclidean distances in millimeters and summarizes results (mean and/or median) over the whole video.
     Optional filtering is available by body-part confidence and by distance threshold.
+
+    .. image:: _static/img/distance_calculator.webp
+       :alt: Body-part pair distance summarized per video
+       :width: 700
+       :align: center
+
+    .. seealso::
+       For the same statistics computed within fixed-duration time bins, use
+       :class:`~simba.data_processors.distance_timbin_calculator.DistanceTimeBinCalculator`.
 
     :param Union[str, os.PathLike] config_path: Path to the SimBA project config file.
     :param Iterable[Tuple[str, str]] body_parts: Iterable of 2-tuples defining body-part pairs to compare, e.g. ``(("Nose_1", "Nose_2"), ("Tail_base_1", "Tail_base_2"))``.

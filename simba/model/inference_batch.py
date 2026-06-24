@@ -179,6 +179,14 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
 #                       save_agg_stats=r'H:\projects\jason_zhang\jason_project\project_folder\csv\GROOMING\500_0.275_smoothing_500ms\csvs')
 # test.run()
 
+
+# test = InferenceBatch(config_path=r"H:\projects\jason_zhang\jason_project\project_folder\project_config.ini",
+#                       save_dir=r'H:\projects\jason_zhang\jason_project\project_folder\csv\REARING\200_0.23_smoothing_500ms\csvs',
+#                       model_dict={'REARING': {'model_path': r"H:\projects\jason_zhang\jason_project\models\REARING.sav", 'minimum_bout_length': 200, 'threshold': 0.23}},
+#                       save_agg_stats=r'H:\projects\jason_zhang\jason_project\project_folder\csv\REARING\200_0.23_smoothing_500ms\csvs')
+# test.run()
+
+
 #
 # test = InferenceBatch(config_path=r"E:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
 # test.run()

@@ -14,6 +14,16 @@ class GibbSampler():
     """
      Gibbs sampling for finding "motifs" in categorical sequences.
 
+     Each observation (row) holds a sequence of categorical samples (e.g. behaviors). The sampler iteratively holds out
+     one observation, builds a position-by-value probability table from the current motif windows of the others, and
+     re-samples the held-out window proportionally to its likelihood ratio against the background. Over iterations the
+     windows align onto a recurring motif, and the ranked motif counts are written to CSV.
+
+     .. image:: _static/img/gibbs_sampler.webp
+        :alt: Gibbs sampling motif search in behavior sequences
+        :width: 700
+        :align: center
+
      :param np.ndarray data: 2-dimensional array where observations are organised by row and each sequential sample in the observation is organized by column.
      :param Union[str, os.PathLike] save_path: The path location where to save the CSV results.
      :param int sequence_length: The length of the motif sequence searched for.

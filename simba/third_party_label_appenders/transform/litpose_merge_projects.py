@@ -345,7 +345,7 @@ class LitPoseMergeProjects:
 
 
 merger = LitPoseMergeProjects(master_dir=r'H:\sina\project_0609_5cam\project_0609_5cam',
-                              other_dirs=[r"H:\sina\project_0609_5cam_simon", r"H:\sina\project_0615\project_0615"],
+                              other_dirs=[r"H:\sina\project_0609_5cam_current\project_0609_5cam_current"],
                               duplicate_method='skip',
                               verbose=True,
                               skip_videos=False)

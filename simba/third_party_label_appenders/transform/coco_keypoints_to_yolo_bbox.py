@@ -37,6 +37,15 @@ class COCOKeypoints2YoloBbox:
     """
     Convert COCO Keypoints version 1.0 data format into a YOLO bounding box training set.
 
+    The keypoints of each annotated instance are enclosed in a bounding box: an axis-aligned box
+    (``obb=False``, written as ``class cx cy w h``) or an oriented box (``obb=True``, written as four
+    normalized corner points). All coordinates are normalized to ``[0, 1]`` by the image width and height.
+
+    .. image:: _static/img/coco_keypoints_to_yolo_bbox.webp
+       :alt: COCO keypoints to YOLO bounding box
+       :width: 700
+       :align: center
+
     .. note::
        COCO keypoint files can be created using `https://www.cvat.ai/ <https://www.cvat.ai/>`__.
 

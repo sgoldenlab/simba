@@ -98,8 +98,16 @@ def _get_intensity_scores_in_rois(frm_list: List[int],
 
 class CueLightAnalyzer(ConfigReader):
     """
-    Analyze when cue lights are in ON and OFF states. Results are stored in the
-    ``project_folder/csv/cue_lights`` cue lights directory.
+    Analyze when cue lights are in ON and OFF states. Results are stored in the ``project_folder/csv/cue_lights`` cue lights directory.
+
+    For each cue-light ROI, the mean pixel intensity inside the ROI is measured every frame; a 1D k-means (``k=2``)
+    splits the intensity series into a low (OFF) and high (ON) cluster, assigning each frame an ON/OFF label. Brief
+    flicker bouts (shorter than a small time threshold) are dropped, and ON-bout onsets/offsets are written out.
+
+    .. image:: _static/img/cue_light_analyzer.webp
+       :alt: Cue light ON/OFF state classification
+       :width: 700
+       :align: center
 
     :param Union[str, os.PathLike], config_path: path to SimBA project config file in Configparser format
     :param Union[str, os.PathLike], data_dir: directory holding pose-estimation data. E.g., ``project_folder/csv/outlier_corrected_movement_location``
@@ -110,8 +118,7 @@ class CueLightAnalyzer(ConfigReader):
 
     References
     ----------
-    .. [1] López-Moraga, A., Luyten, L., & Beckers, T. (2025). Generalization and extinction of platform-mediated avoidance in male and female rats.
-           `Scientific Reports, 15, 9730 <https://doi.org/10.1038/s41598-025-94265-x>`_.
+    .. [1] López-Moraga, A., Luyten, L., & Beckers, T. (2025). Generalization and extinction of platform-mediated avoidance in male and female rats. `Scientific Reports, 15, 9730 <https://doi.org/10.1038/s41598-025-94265-x>`_.
 
     :example:
     >>> cue_light_analyzer = CueLightAnalyzer(config_path='MyProjectConfig', in_dir='project_folder/csv/outlier_corrected_movement_location', cue_light_names=['Cue_light'])

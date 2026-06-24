@@ -29,6 +29,16 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
     """
     Compute aggregate movement statistics from pose-estimation data in SimBA project.
 
+    For each body-part track, frame-to-frame displacements are converted to real-world units (via ``px_per_mm``):
+    ``DISTANCE`` is the total path length summed over all frames, and ``VELOCITY`` is the mean of the per-second
+    speeds (each 1-second window = ``fps`` frames). ``Animal_name CENTER OF GRAVITY`` first approximates the
+    centroid from the convex hull of all body-parts.
+
+    .. image:: _static/img/movement_calculator_distance_velocity.webp
+       :alt: Movement Calculator distance and velocity
+       :width: 700
+       :align: center
+
     :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
     :param List[str] body_parts: Body-parts to use for movement calculations OR ``Animal_name CENTER OF GRAVITY``. If ``Animal_name CENTER OF GRAVITY``, then SimBA will approximate animal centroids through convex hull.
     :param float threshold: Filter body-part detection below set threshold (Value 0-1). Default: 0.00

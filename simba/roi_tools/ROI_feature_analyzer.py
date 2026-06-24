@@ -31,6 +31,17 @@ class ROIFeatureCreator(ConfigReader, FeatureExtractionMixin):
     user-defined ROIs. This includes the distance to the ROIs, if the animals are inside the ROIs, and if the
     animals are directing towards the ROIs (if viable)
 
+    For every frame, body-part and ROI, three feature columns are generated: ``... distance`` (body-part-to-ROI-centre
+    distance in mm), ``... in zone`` (1 if the body-part is inside the ROI, else 0) and ``... facing`` (1 if the animal is
+    directing toward the ROI, only when directionality is viable). When ``append_data=True`` these columns are appended to
+    the ``features_extracted`` files for use in machine-learning models. A per-ROI summary (``Average distance (mm)`` and
+    ``Total direction time (s)``) is also written to the project ``logs`` directory.
+
+    .. image:: _static/img/simba.roi_tools.ROI_feature_analyzer.ROIFeatureCreator.webp
+       :alt: For each frame, body-part and ROI, SimBA computes distance-to-ROI, in-zone (inside/outside) and facing (directing toward) features that are appended to the features-extracted files
+       :width: 800
+       :align: center
+
     .. note::
         `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
 

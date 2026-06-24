@@ -30,6 +30,12 @@ class OrdinalClassifier():
 
     It is particularly useful for problems where the target variable has an inherent order but uneven intervals between levels. Thi includes human severity scores, for example, seizures, stereotopy, convulsion, bizarre behavior scores ranging fro 0-5.
 
+    .. image:: _static/img/simba.model.ordinal_clf.OrdinalClassifier.webp
+       :alt: Frank & Hall threshold decomposition: K-1 binary models predict cumulative P(y<=k), differenced into per-class probabilities
+       :width: 800
+       :align: center
+
+    For an ordered target with :math:`K` classes, :func:`simba.model.ordinal_clf.OrdinalClassifier.fit` trains :math:`K-1` binary classifiers, where model :math:`b_k` predicts the cumulative probability :math:`P(y \\leq k)`. :func:`simba.model.ordinal_clf.OrdinalClassifier.predict_proba` recovers the per-class probabilities by differencing the padded cumulative vector :math:`[\\,0,\\;P(y \\leq k),\\;1\\,]`, and :func:`simba.model.ordinal_clf.OrdinalClassifier.predict` returns their ``argmax``.
 
     .. warning::
        If larger data sizes (>2m) pass a GPU ``cuml.ensemble.RandomForestClassifier`` object.
@@ -50,8 +56,7 @@ class OrdinalClassifier():
     .. [2] Sabnis, Gautam, Leinani Hession, J. Matthew Mahoney, Arie Mobley, Marina Santos, and Vivek Kumar. “Visual Detection of Seizures in Mice Using Supervised Machine Learning,” May 31, 2024. https://doi.org/10.1101/2024.05.29.596520.
     .. [3] Another implementation / benchmarking by Lee Prevost - `https://github.com/leeprevost/OrdinalClassifier/tree/main <https://github.com/leeprevost/OrdinalClassifier/tree/main>`_.
     .. [4] https://github.com/fabianp/mord
-    .. [5] Wurm, M. J., Rathouz, P. J., & Hanlon, B. M. (2021). Regularized ordinal regression and the ordinalNet R package.
-           `Journal of Statistical Software, 99(6) <https://doi.org/10.18637/jss.v099.i06>`_.
+    .. [5] Wurm, M. J., Rathouz, P. J., & Hanlon, B. M. (2021). Regularized ordinal regression and the ordinalNet R package. `Journal of Statistical Software, 99(6) <https://doi.org/10.18637/jss.v099.i06>`_.
 
     :example:
     >>> X = np.random.randint(0, 500, (100, 50))

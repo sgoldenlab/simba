@@ -148,6 +148,18 @@ class ROIAggregateStatisticsAnalyzerMultiprocess(ConfigReader, FeatureExtraction
 
     This class computes various statistics related to body-part movements inside defined ROIs, including entry counts, total time spent, and bout durations.
 
+    For each video, animal/body-part and ROI (rectangle, circle or polygon), the body-part location is tested against the
+    ROI on every frame, entry **bouts** are detected, and per-ROI metrics are computed: ``ROI ENTRIES (COUNTS)``,
+    ``TOTAL ROI TIME (S)``, ``MEAN ROI BOUT TIME (S)``, ``FIRST``/``LAST ROI ENTRY TIME (S)`` and, optionally,
+    ``TOTAL ROI MOVEMENT (CM)`` / ``AVERAGE ROI VELOCITY (CM/S)``. Results are returned in long format (one row per
+    measurement), optionally transposed to wide. If ``outside_rois`` is enabled, all area not covered by any ROI is treated
+    as a single additional ``OUTSIDE REGIONS OF INTEREST`` zone. This class distributes videos across multiple CPU cores.
+
+    .. image:: _static/img/simba.roi_tools.roi_aggregate_statistics_analyzer.ROIAggregateStatisticsAnalyzer.webp
+       :alt: A tracked body part is tested against each ROI (rectangle, circle, polygon) every frame; entry bouts are detected and per-ROI time, entry-count and movement metrics are computed
+       :width: 800
+       :align: center
+
     .. note::
        For single core process, see :func:`simba.roi_tools.roi_aggregate_statistics_analyzer.ROIAggregateStatisticsAnalyzer`
 

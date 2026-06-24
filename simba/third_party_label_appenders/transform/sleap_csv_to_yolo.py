@@ -32,6 +32,15 @@ class Sleap2Yolo:
     """
     Convert SLEAP pose estimation CSV data and corresponding videos into YOLO keypoint dataset format.
 
+    Each sampled video frame is written as one image, and every track that passes the ``instance_threshold`` becomes
+    one YOLO instance: its body-parts are enclosed in a bounding box (with optional ``padding``) and the box together
+    with the keypoints is written as ``class cx cy w h  x y v  ...``, all normalized to ``[0, 1]``.
+
+    .. image:: _static/img/sleap_csv_to_yolo.webp
+       :alt: SLEAP pose CSV to YOLO keypoints
+       :width: 700
+       :align: center
+
     .. note::
        This converts SLEAP **inference** data to YOLO keypoints (not SLEAP annotations).
 

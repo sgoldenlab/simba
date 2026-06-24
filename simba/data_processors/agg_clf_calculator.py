@@ -46,9 +46,13 @@ class AggregateClfCalculator(ConfigReader):
     statistics such as bout counts, durations, intervals, and first occurrences for each
     classifier in each video. Results can be saved in detailed or summary formats.
 
-    .. seealso::
-       For multi core class, see :func:`simba.data_processors.agg_clf_calculator.AggregateClfCalculator`
+    .. image:: _static/img/agg_clf_calculator.webp
+       :alt: Aggregate classifier bout statistics over the whole session
+       :width: 700
+       :align: center
 
+    .. seealso::
+       For multi core class, see :class:`simba.data_processors.agg_clf_counter_mp.AggregateClfCalculatorMultiprocess`
 
     .. note::
        `GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results>`__.

@@ -24,6 +24,15 @@ class CueLightMovementAnalyzer(ConfigReader):
     Compute aggregate statistics of animal movement in relation to the cue light
     ON and OFF states.
 
+    For every cue-light ON bout, a body-part's distance moved (cm) and mean velocity (cm/s) are computed in three
+    windows: the ``pre_window`` seconds before bout onset, DURING the bout, and the ``post_window`` seconds after
+    bout offset (distance summed over frames, velocity averaged over 1-second windows).
+
+    .. image:: _static/img/cue_light_movement_statistics.webp
+       :alt: Body-part movement around cue-light bouts
+       :width: 700
+       :align: center
+
     :param str config_path: path to SimBA project config file in Configparser format
     :param int pre_window: Time period (in millisecond) before the onset of each cue light to compute aggregate classification statistics within.
     :param int post_window: Time period (in millisecond) after the offset of each cue light to compute aggregate classification statistics within.
@@ -32,7 +41,6 @@ class CueLightMovementAnalyzer(ConfigReader):
 
     .. note::
        `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
-
 
     :examples:
     >>> test = CueLightMovementAnalyzer(config_path=r"C:\troubleshooting\cue_light\t1\project_folder\project_config.ini",

@@ -97,6 +97,15 @@ class TimeBinsMovementCalculatorMultiprocess(ConfigReader, FeatureExtractionMixi
     """
     Computes aggregate movement statistics in user-defined time-bins using multiprocessing for improved performance.
 
+    The body-part track is split into ``bin_length``-second bins; per bin, the distance moved (cm) and mean
+    velocity (cm/s) are computed (the last position of the previous bin is carried over so cross-bin movement is
+    not lost). Optionally a per-video movement line plot is produced for each body-part.
+
+    .. image:: _static/img/timebins_movement_calculator_method.webp
+       :alt: Movement and velocity per time bin
+       :width: 700
+       :align: center
+
     .. note::
         `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results>`__.
 

@@ -30,6 +30,15 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
     """
     Compute aggregate movement and/or velocity statistics in user-defined time-bins.
 
+    The body-part track is split into ``bin_length``-second bins; per bin, the distance moved (cm) and mean
+    velocity (cm/s) are computed (the last position of the previous bin is carried over so cross-bin movement is
+    not lost). Optionally a per-video movement line plot is produced for each body-part.
+
+    .. image:: _static/img/timebins_movement_calculator_method.webp
+       :alt: Movement and velocity per time bin
+       :width: 700
+       :align: center
+
     .. note::
         `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results>`__.
 
@@ -39,7 +48,7 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
        :align: center
 
     .. seealso::
-       For multicore processing, see :class:`simba.data_processors.timebins_movement_calculator_mp.TimeBinsMovementCalculator`.
+       For multicore processing, see :class:`simba.data_processors.timebins_movement_calculator_mp.TimeBinsMovementCalculatorMultiprocess`.
 
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
     :param Union[int, float] bin_length: Time-bin size in seconds.
