@@ -1056,3 +1056,15 @@ html.simba-landing .rst-content h1 { display: none !important; }
   margin: .4em 0 1.2em;
   line-height: 2;
 }
+
+/* --- Credits people cards: nice 3D spin on click (handler in custom.js) --- */
+.simba-person.simba-spin {
+  animation: simbaPersonSpin 0.7s ease-in-out;
+  box-shadow: 0 12px 30px rgba(33, 86, 122, 0.28);
+  z-index: 1;
+}
+@keyframes simbaPersonSpin {
+  0%   { transform: perspective(800px) rotateY(0deg)   scale(1);    }
+  50%  { transform: perspective(800px) rotateY(180deg) scale(1.05); }
+  100% { transform: perspective(800px) rotateY(360deg) scale(1);    }
+}

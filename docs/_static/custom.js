@@ -1163,3 +1163,24 @@ gtag('config', 'G-PEKR9R5J47');
     mo.disconnect();
   });
 })();
+
+/* --- Credits page: spin a person card on click, open their link in a new tab --- */
+(function () {
+  document.addEventListener('click', function (e) {
+    var card = e.target.closest && e.target.closest('a.simba-person');
+    if (!card) return;
+    // let modified clicks (new tab, etc.) behave normally
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (card.classList.contains('simba-spin')) return;
+    // Spin the card FIRST (page stays in front so the flip is visible), then
+    // open the link in a new tab. The 0.7s delay is within the browser's
+    // user-activation window, so window.open is not treated as a popup.
+    e.preventDefault();
+    var href = card.getAttribute('href');
+    card.classList.add('simba-spin');
+    setTimeout(function () {
+      card.classList.remove('simba-spin');
+      if (href) window.open(href, '_blank', 'noopener');
+    }, 700);
+  });
+})();
