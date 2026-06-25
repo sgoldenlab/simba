@@ -31,6 +31,11 @@ class KleinbergCalculator(ConfigReader):
     .. note::
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/kleinberg_filter.md>`__.
 
+    .. image:: _static/img/simba.data_processors.kleinberg_calculator.KleinbergCalculator.webp
+       :alt: Raw classification detections are organised into a hierarchy of bursts; selecting a hierarchy level yields a smoothed bout where within-burst gaps are filled and sparse, isolated detections are dropped
+       :width: 700
+       :align: center
+
     .. image:: _static/img/kleinberg.png
        :alt: Kleinberg
        :width: 400

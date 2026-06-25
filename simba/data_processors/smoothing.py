@@ -30,6 +30,11 @@ class Smoothing(ConfigReader):
     """
     Smooth pose-estimation data according to user-defined method.
 
+    .. image:: _static/img/simba.data_processors.smoothing.Smoothing.webp
+       :alt: A jittery pose keypoint trajectory is denoised by a rolling time-window smoother (gaussian or Savitzky-Golay); larger time-windows produce more smoothing
+       :width: 700
+       :align: center
+
     .. video:: _static/img/smoothing.webm
        :width: 600
        :autoplay:

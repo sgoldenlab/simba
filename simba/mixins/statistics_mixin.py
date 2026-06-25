@@ -234,6 +234,11 @@ class Statistics(FeatureExtractionMixin):
 
         Higher values indicate a larger effect size, with 0.2 considered a small effect, 0.5 a medium effect, and 0.8 or above a large effect. Negative values indicate that the mean of sample 2 is larger than the mean of sample 1.
 
+        .. image:: _static/img/simba.mixins.statistics_mixin.Statistics.cohens_d.webp
+           :alt: Cohen's d is the gap between the two sample means divided by the pooled standard deviation; the magnitude maps onto a small (0.2) / medium (0.5) / large (0.8) effect-size scale and the sign shows which mean is larger
+           :width: 700
+           :align: center
+
         .. seealso::
            For time-series based method, see :func:`simba.mixins.statistics_mixin.Statistics.rolling_cohens_d`
 
@@ -256,9 +261,7 @@ class Statistics(FeatureExtractionMixin):
         -0.5952099775170546
         """
 
-        return (np.mean(sample_1) - np.mean(sample_2)) / (
-            np.sqrt((np.std(sample_1) ** 2 + np.std(sample_2) ** 2) / 2)
-        )
+        return (np.mean(sample_1) - np.mean(sample_2)) / (np.sqrt((np.std(sample_1) ** 2 + np.std(sample_2) ** 2) / 2))
 
     @staticmethod
     @dynamic_numba_decorator(dtypes="(float64[:], float64[:], float64)", cache=True, fastmath=False)
@@ -269,6 +272,11 @@ class Statistics(FeatureExtractionMixin):
 
         .. seealso::
            For single non-timeseries comparison, see :func:`simba.mixins.statistics_mixin.Statistics.cohens_d`
+
+        .. image:: _static/img/simba.mixins.statistics_mixin.Statistics.rolling_cohens_d.webp
+           :alt: A behaviour feature is split into consecutive time-windows; each window's rolling Cohen's d compares it to the preceding window, spiking large when the behaviour changes between windows and staying near zero when it does not
+           :width: 700
+           :align: center
 
         :param ndarray data: 1D array of size len(frames) representing feature values.
         :param np.ndarray[ints] time_window: Time windows to compute ANOVAs for in seconds.
@@ -311,6 +319,11 @@ class Statistics(FeatureExtractionMixin):
         .. seealso::
            For single non-timeseries based comparison, see :func:`simba.mixins.statistics_mixin.Statistics.two_sample_ks`
 
+        .. image:: _static/img/simba.mixins.statistics_mixin.Statistics.rolling_two_sample_ks.webp
+           :alt: A behaviour feature is split into consecutive time-windows; each window's two-sample Kolmogorov-Smirnov statistic is the maximum gap between its empirical CDF and that of the preceding window, rising when the feature distribution shifts between windows
+           :width: 750
+           :align: center
+
         :param ndarray data: 1D array of size len(frames) representing feature values.
         :param float time_window: The size of the buckets in seconds.
         :param int fps: Frame-rate of recorded video.
@@ -331,10 +344,10 @@ class Statistics(FeatureExtractionMixin):
             sample_1, sample_2 = data[i - 1], data[i]
             combined_samples = np.sort(np.concatenate((sample_1, sample_2)))
             ecdf_sample_1 = np.searchsorted(
-                sample_1, combined_samples, side="right"
+                np.sort(sample_1), combined_samples, side="right"
             ) / len(sample_1)
             ecdf_sample_2 = np.searchsorted(
-                sample_2, combined_samples, side="right"
+                np.sort(sample_2), combined_samples, side="right"
             ) / len(sample_2)
             ks = np.max(np.abs(ecdf_sample_1 - ecdf_sample_2))
             results[start:end] = ks
@@ -379,16 +392,16 @@ class Statistics(FeatureExtractionMixin):
         >>> sample_2 = np.array([10, 5, 10, 4, 8, 10, 7, 10, 7, 10, 10]).astype(np.float32)
         >>> critical_values = pickle.load(open("simba/assets/lookups/critical_values_5.pickle", "rb"))['two_sample_KS']['one_tail'].values
         >>> Statistics.two_sample_ks(sample_1=sample_1, sample_2=sample_2, critical_values=critical_values)
-        >>> (0.7272727272727273, True)
+        >>> (0.6363636363636364, True)
         """
         significance_bool = None
         combined_samples = np.sort(np.concatenate((sample_1, sample_2)))
-        ecdf_sample_1 = np.searchsorted(sample_1, combined_samples, side="right") / len(
-            sample_1
-        )
-        ecdf_sample_2 = np.searchsorted(sample_2, combined_samples, side="right") / len(
-            sample_2
-        )
+        ecdf_sample_1 = np.searchsorted(
+            np.sort(sample_1), combined_samples, side="right"
+        ) / len(sample_1)
+        ecdf_sample_2 = np.searchsorted(
+            np.sort(sample_2), combined_samples, side="right"
+        ) / len(sample_2)
         ks = np.max(np.abs(ecdf_sample_1 - ecdf_sample_2))
         if critical_values is not None:
             combined_sample_size = len(sample_1) + len(sample_2)

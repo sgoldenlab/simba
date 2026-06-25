@@ -510,6 +510,14 @@ def cardinality_to_integer_lookup() -> Dict[str, int]:
     """
     Create dictionary that maps cardinal compass directions to integers.
 
+    .. seealso::
+       For the inverse mapping (integers to compass directions), see :func:`simba.utils.lookups.integer_to_cardinality_lookup`.
+
+    .. image:: _static/img/simba.utils.lookups.cardinality_to_integer_lookup.webp
+       :alt: The eight compass directions map to integers 0-7 clockwise from North (N=0, NE=1, E=2, SE=3, S=4, SW=5, W=6, NW=7)
+       :width: 500
+       :align: center
+
     :example:
     >>> data = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
     >>> [cardinality_to_integer_lookup()[d] for d in data]
@@ -522,6 +530,19 @@ def cardinality_to_integer_lookup() -> Dict[str, int]:
 def integer_to_cardinality_lookup():
     """
     Create dictionary that maps integers to cardinal compass directions.
+
+    .. seealso::
+       For the inverse mapping (compass directions to integers), see :func:`simba.utils.lookups.cardinality_to_integer_lookup`.
+
+    .. image:: _static/img/simba.utils.lookups.integer_to_cardinality_lookup.webp
+       :alt: The integers 0-7 map back to the eight compass directions clockwise from North (0=N, 1=NE, 2=E, 3=SE, 4=S, 5=SW, 6=W, 7=NW)
+       :width: 500
+       :align: center
+
+    :example:
+    >>> data = [0, 1, 2, 3, 4, 5, 6, 7]
+    >>> [integer_to_cardinality_lookup()[i] for i in data]
+    >>> ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
     """
     return {0: "N", 1: "NE", 2: "E", 3: "SE", 4: "S", 5: "SW", 6: "W", 7: "NW"}
 
@@ -531,6 +552,14 @@ def percent_to_crf_lookup() -> Dict[str, int]:
     Create dictionary that matches human-readable percent values to FFmpeg Constant Rate Factor (CRF)
     values that regulates video quality in CPU codecs. Higher CRF values translates to lower video quality and reduced
     file sizes.
+
+    .. seealso::
+       For the qscale (-qv) equivalent used by AVI codecs such as 'divx' and 'mjpeg', see :func:`simba.utils.lookups.percent_to_qv_lk`.
+
+    .. image:: _static/img/simba.utils.lookups.percent_to_crf_lookup.webp
+       :alt: A higher quality percent maps to a lower FFmpeg CRF value (linearly, roughly -3 CRF per +10 percent); lower CRF means higher quality and larger files
+       :width: 600
+       :align: center
     """
     return {
         "10": 37,
@@ -555,6 +584,14 @@ def percent_to_qv_lk():
     """
     Create dictionary that matches human-readable percent values to FFmpeg regulates video quality in CPU codecs.
     Higher FFmpeg quality scores maps to smaller, lower quality videos. Used in some AVI codecs such as 'divx' and 'mjpeg'.
+
+    .. seealso::
+       For the Constant Rate Factor (CRF) equivalent used by CPU codecs, see :func:`simba.utils.lookups.percent_to_crf_lookup`.
+
+    .. image:: _static/img/simba.utils.lookups.percent_to_qv_lk.webp
+       :alt: A higher quality percent maps to a lower FFmpeg qscale (-qv) value (linearly, roughly -2 qv per +10 percent); lower qv means higher quality and larger files
+       :width: 600
+       :align: center
     """
     return {100: 3,
             90: 5,
@@ -890,6 +927,11 @@ def get_monitor_info() -> Tuple[Dict[int, Dict[str, Union[int, bool]]], Tuple[in
     """
     Helper to get main monitor / display resolution.
 
+    .. image:: _static/img/simba.utils.lookups.get_monitor_info.webp
+       :alt: Every connected monitor is enumerated into a per-monitor dict of width, height and primary flag (the primary being the monitor at x=0, y=0), plus a tuple of the primary monitor width and height
+       :width: 600
+       :align: center
+
     .. note::
        Returns dict containing the resolution of each available monitor. To get the virtual geometry, see :func:`simba.utils.lookups.get_display_resolution`, and tuple of main monitor width and height.
     """
@@ -1175,6 +1217,11 @@ def intermittent_palette(n: int = 10,
     """
     Generate a categorical colour palette with evenly spaced hues and alternating lightness.
 
+    .. image:: _static/img/simba.utils.lookups.intermittent_palette.webp
+       :alt: A categorical palette whose adjacent colours stay distinct by stepping the hue by the golden ratio (0.618) each colour and alternating the lightness above and below a baseline
+       :width: 750
+       :align: center
+
     .. note::
        Use to get color palette where immediate colors are distinct.
 
@@ -1334,6 +1381,11 @@ def get_ffmpeg_codec(file_name: Union[str, os.PathLike],
 def get_nvdec_count(gpu_name: Optional[str] = None) -> int:
     """
     Return the number of concurrent NVDEC (hardware video decode) sessions typical for the GPU model.
+
+    .. image:: _static/img/simba.utils.lookups.get_nvdec_count.webp
+       :alt: GPU models grouped by the number of concurrent NVDEC hardware decode sessions they support (1, 2, 3, 4, 5 or 7); matched by longest GPU-name substring, unknown GPUs default to 1
+       :width: 750
+       :align: center
 
     .. csv-table::
        :header: EXPECTED RUNTIMES SINGLE NVDEC

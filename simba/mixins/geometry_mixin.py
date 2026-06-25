@@ -3576,8 +3576,8 @@ class GeometryMixin(object):
            To calculate the cumulative time the animal has spent in each geometry using a single key-point, see :func:`simba.mixins.geometry_mixin.GeometryMixin.cumsum_coord_geometries`.
 
         .. image:: _static/img/cumsum_animal_geometries_grid.webp
-           :alt: Cumsum animal geometries grid
-           :width: 400
+           :alt: For each frame a grid cell is counted when the animal convex hull overlaps it; accumulating over all frames and dividing by fps yields the cumulative seconds spent in each cell
+           :width: 700
            :align: center
 
         :param List[Polygon] data: List of polygons where every index represent a frame and every value the animal convex hull

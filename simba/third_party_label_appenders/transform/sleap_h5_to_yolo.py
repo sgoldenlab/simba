@@ -30,6 +30,11 @@ class SleapH52Yolo:
     threshold, extracts keypoints for one or more animals, and saves image-label pairs in a format
     compatible with YOLOv8 keypoint training.
 
+    .. image:: _static/img/simba.third_party_label_appenders.transform.sleap_h5_to_yolo.SleapH52Yolo.webp
+       :alt: SLEAP .h5 pose tracking paired with videos is filtered to frames where all body-part confidences exceed the threshold, sampled, read from video, and written as a multi-animal YOLO keypoint dataset (one label line per animal) with a map.yaml
+       :width: 800
+       :align: center
+
     :param Union[str, os.PathLike] data_dir: Directory containing SLEAP `.h5` files.
     :param Union[str, os.PathLike] video_dir: Directory containing the videos associated with `.h5` files.
     :param Union[str, os.PathLike] save_dir: Directory to save YOLO-formatted images, labels, and metadata.

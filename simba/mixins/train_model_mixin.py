@@ -221,6 +221,11 @@ class TrainModelMixin(object):
         """
         Perform random under-sampling of behavior-absent frames in a dataframe.
 
+        .. image:: _static/img/simba.mixins.train_model_mixin.TrainModelMixin.random_undersampler.webp
+           :alt: All behavior-present frames are kept while behavior-absent frames are randomly down-sampled to (present count times sample_ratio); a ratio of 1.0 yields an equal number of present and absent frames
+           :width: 700
+           :align: center
+
         :param np.ndarray x_train: 2-dimensional array representing the features in train set
         :param np.ndarray y_train: Array representing the target in the training set.
         :param float sample_ratio: Ratio of behavior-absent frames to keep relative to the behavior-present frames. E.g., ``1.0`` returns an equal count of behavior-absent and behavior-present frames. ``2.0`` returns twice as many behavior-absent frames as  and behavior-present frames.
@@ -2612,6 +2617,11 @@ class TrainModelMixin(object):
     def find_low_variance_fields(data: pd.DataFrame, variance_threshold: float) -> List[str]:
         """
         Finds fields with variance below provided threshold.
+
+        .. image:: _static/img/simba.mixins.train_model_mixin.TrainModelMixin.find_low_variance_fields.webp
+           :alt: Each feature's variance is compared to a threshold; near-constant features whose variance falls below the threshold are flagged for removal, while higher-variance features are kept
+           :width: 700
+           :align: center
 
         :param pd.DataFrame data: Dataframe with continoues numerical features.
         :param float variance: Variance threshold (0.0-1.0).

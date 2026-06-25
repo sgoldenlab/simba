@@ -35,6 +35,11 @@ class LabelmeKeypoints2YoloKeypoints:
         """
         Converts LabelMe points into YOLO keypoint format formatted for model training.
 
+        .. image:: _static/img/simba.third_party_label_appenders.transform.labelme_to_yolo_keypoints.LabelmeKeypoints2YoloKeypoints.webp
+           :alt: LabelMe keypoint annotations (labeled points plus a base64 image) are decoded, optionally greyscaled and CLAHE-enhanced, normalized to YOLO pose lines, and split into a train/val YOLO dataset with a map.yaml
+           :width: 800
+           :align: center
+
         .. seealso::
            To convert Labelme points annotations to YOLO bounding box training format data, see :func:`simba.third_party_label_appenders.transform.labelme_to_yolo.LabelmeBoundingBoxes2YoloBoundingBoxes`.
 

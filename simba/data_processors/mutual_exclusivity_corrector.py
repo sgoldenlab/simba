@@ -26,6 +26,11 @@ class MutualExclusivityCorrector(ConfigReader):
     """
     Refactor classification results according to user-defined mutual exclusivity rules.
 
+    .. image:: _static/img/simba.data_processors.mutual_exclusivity_corrector.MutualExclusivityCorrector.webp
+       :alt: When mutually-exclusive behaviours are classified as present in the same frame, the corrector keeps a single winner (here the behaviour with the highest probability) and sets the others to 0
+       :width: 800
+       :align: center
+
     .. note::
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/mutual_exclusivity_heuristic_rules.md>`__.
 
