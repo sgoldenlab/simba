@@ -62,7 +62,7 @@ print-ready stills to neon, full-bleed gradients, and animated (looping) version
          <p class="qrg-lede">Branded QR codes for the SimBA docs &mdash; clean classics, neon, full-bleed gradients, and living animated versions. Every code opens this site.</p>
          <a class="qrg-btn" href="https://simba-uw-tf-dev.readthedocs.io/" target="_blank" rel="noopener"><span class="d"></span>Open the SimBA docs</a>
        </div>
-       <figure class="qrg-herofig"><video src="_static/img/qr/anim_aurora_flow.webm" autoplay loop muted playsinline></video></figure>
+       <figure class="qrg-herofig"><video autoplay loop muted playsinline><source src="_static/img/qr/anim_aurora_flow.mp4" type="video/mp4"><source src="_static/img/qr/anim_aurora_flow.webm" type="video/webm"></video></figure>
      </div>
    <div class="qrg-sec">
      <p class="qrg-eyebrow">Static</p>
@@ -171,20 +171,20 @@ print-ready stills to neon, full-bleed gradients, and animated (looping) version
      <p class="qrg-blurb">Looping WebM &mdash; every frame scans. Use on screens; grab a still frame for print.</p>
    </div>
    <div class="qrg-grid">
-     <a class="qrg-card" href="_static/img/qr/anim_aurora_flow.webm" download title="Click to download this WebM">
-       <div class="qrg-frame"><span class="qrg-live">LIVE</span><span class="qrg-dl">&#x2913; WEBM</span><video src="_static/img/qr/anim_aurora_flow.webm" autoplay loop muted playsinline></video></div>
+     <a class="qrg-card" href="_static/img/qr/anim_aurora_flow.mp4" download title="Click to download (MP4)">
+       <div class="qrg-frame"><span class="qrg-live">LIVE</span><span class="qrg-dl">&#x2913; MP4</span><video autoplay loop muted playsinline><source src="_static/img/qr/anim_aurora_flow.mp4" type="video/mp4"><source src="_static/img/qr/anim_aurora_flow.webm" type="video/webm"></video></div>
        <figcaption><span class="qrg-nm">Aurora flow</span><span class="qrg-tg">flowing gradient</span></figcaption>
      </a>
-     <a class="qrg-card" href="_static/img/qr/anim_gold_shine.webm" download title="Click to download this WebM">
-       <div class="qrg-frame"><span class="qrg-live">LIVE</span><span class="qrg-dl">&#x2913; WEBM</span><video src="_static/img/qr/anim_gold_shine.webm" autoplay loop muted playsinline></video></div>
+     <a class="qrg-card" href="_static/img/qr/anim_gold_shine.mp4" download title="Click to download (MP4)">
+       <div class="qrg-frame"><span class="qrg-live">LIVE</span><span class="qrg-dl">&#x2913; MP4</span><video autoplay loop muted playsinline><source src="_static/img/qr/anim_gold_shine.mp4" type="video/mp4"><source src="_static/img/qr/anim_gold_shine.webm" type="video/webm"></video></div>
        <figcaption><span class="qrg-nm">Gold shine</span><span class="qrg-tg">sweeping glint</span></figcaption>
      </a>
-     <a class="qrg-card" href="_static/img/qr/anim_gold_pulse.webm" download title="Click to download this WebM">
-       <div class="qrg-frame"><span class="qrg-live">LIVE</span><span class="qrg-dl">&#x2913; WEBM</span><video src="_static/img/qr/anim_gold_pulse.webm" autoplay loop muted playsinline></video></div>
+     <a class="qrg-card" href="_static/img/qr/anim_gold_pulse.mp4" download title="Click to download (MP4)">
+       <div class="qrg-frame"><span class="qrg-live">LIVE</span><span class="qrg-dl">&#x2913; MP4</span><video autoplay loop muted playsinline><source src="_static/img/qr/anim_gold_pulse.mp4" type="video/mp4"><source src="_static/img/qr/anim_gold_pulse.webm" type="video/webm"></video></div>
        <figcaption><span class="qrg-nm">Gold pulse</span><span class="qrg-tg">breathing</span></figcaption>
      </a>
-     <a class="qrg-card" href="_static/img/qr/anim_color_cycle.webm" download title="Click to download this WebM">
-       <div class="qrg-frame"><span class="qrg-live">LIVE</span><span class="qrg-dl">&#x2913; WEBM</span><video src="_static/img/qr/anim_color_cycle.webm" autoplay loop muted playsinline></video></div>
+     <a class="qrg-card" href="_static/img/qr/anim_color_cycle.mp4" download title="Click to download (MP4)">
+       <div class="qrg-frame"><span class="qrg-live">LIVE</span><span class="qrg-dl">&#x2913; MP4</span><video autoplay loop muted playsinline><source src="_static/img/qr/anim_color_cycle.mp4" type="video/mp4"><source src="_static/img/qr/anim_color_cycle.webm" type="video/webm"></video></div>
        <figcaption><span class="qrg-nm">Color cycle</span><span class="qrg-tg">palette shift</span></figcaption>
      </a>
    </div>
