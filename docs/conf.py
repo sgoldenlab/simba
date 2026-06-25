@@ -351,26 +351,60 @@ def _generate_github_contributors(app):
 
     stamp = datetime.datetime.now().strftime('%B %Y')
 
-    # ---- per-contributor lines changed (additions/deletions) from the stats API ----
-    # This endpoint is computed asynchronously and returns HTTP 202 with an empty body
-    # while GitHub builds the cache, so retry a few times. Matched to the commit list by login.
+    # ---- per-contributor lines changed (additions/deletions), computed from local git ----
+    # GitHub's stats/contributors REST endpoint is computed asynchronously and keeps returning
+    # HTTP 202 (empty body) for minutes on a cold cache, so it never resolves within a CI build
+    # window. The docs always build inside a clone of the repo, so we aggregate `git log
+    # --numstat` locally instead: reliable, instant, no API/rate-limit. A single person commits
+    # under several name/email identities, so identities are folded onto the API login set via
+    # the noreply-email username, an exact name==login match, and a small alias map for the rest.
+    import re
+    import subprocess
     loc = {}
     try:
-        import time as _time
-        for _ in range(5):
-            with urllib.request.urlopen(urllib.request.Request(
-                    'https://api.github.com/repos/sgoldenlab/simba/stats/contributors',
-                    headers=headers), timeout=30) as sresp:
-                code, body = sresp.getcode(), sresp.read()
-            if code == 202 or not body.strip():
-                _time.sleep(3)
+        repo_root = os.path.dirname(here)
+        login_by_lower = {login.lower(): login for login, _ in contribs}
+        # git author name (lowercased) -> GitHub login, for identities that are neither a
+        # noreply email nor a literal login. Extend if a new contributor's bar shows no LOC.
+        aliases = {
+            'simon nilsson': 'sronilsson', 'simon': 'sronilsson',
+            'jia jie choong': 'inoejj',
+            'aasiya islam': 'aasiya-islam',
+            'tzuk': 'tzukpolinsky', 'tzuk polinsky': 'tzukpolinsky',
+            'jens schweihoff': 'JensBlack',
+            'justin shenk': 'justinshenk',
+            'nastacia l. goodwin': 'goodwinnastacia', 'nastacia goodwin': 'goodwinnastacia',
+            "thomas o'shea-wheller": 'Toshea111',
+        }
+        noreply_re = re.compile(r'(?:\d+\+)?([^@]+)@users\.noreply\.github\.com$', re.I)
+
+        def _resolve(email, name):
+            m = noreply_re.match((email or '').strip())
+            if m and m.group(1).lower() in login_by_lower:
+                return login_by_lower[m.group(1).lower()]
+            nl = (name or '').strip().lower()
+            return login_by_lower.get(nl) or aliases.get(nl)
+
+        out = subprocess.run(
+            ['git', 'log', '--no-merges', '--numstat', '--format=COMMIT\t%ae\t%an'],
+            cwd=repo_root, capture_output=True, text=True, encoding='utf-8',
+            errors='replace', timeout=60).stdout
+        cur = None
+        for line in out.splitlines():
+            if line.startswith('COMMIT\t'):
+                _, email, name = line.split('\t', 2)
+                cur = _resolve(email, name)
                 continue
-            for c in json.loads(body):
-                wk = c.get('weeks', [])
-                loc[c['author']['login']] = (sum(w['a'] for w in wk), sum(w['d'] for w in wk))
-            break
+            if cur is None or not line.strip():
+                continue
+            a, d, _rest = (line.split('\t', 2) + ['', '', ''])[:3]
+            if a.isdigit() and d.isdigit():
+                pa, pd = loc.get(cur, (0, 0))
+                loc[cur] = (pa + int(a), pd + int(d))
+        if not loc:
+            print('[credits] no local git LOC resolved (shallow clone?); showing commits only.')
     except Exception as e:  # noqa: BLE001
-        print(f'[credits] line-count fetch failed ({e!r}); showing commits only.')
+        print(f'[credits] local git line-count failed ({e!r}); showing commits only.')
 
     # ---- responsive HTML bar chart with a GitHub card popover on hover (no image, no matplotlib) ----
     # Consumed by credits.rst via a `.. raw:: html :file:` include; regenerated every build.
