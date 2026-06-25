@@ -136,6 +136,36 @@ download links on each card.
        </div>
      </div>
 
+     <div class="simba-res-card">
+       <a class="simba-res-thumb" href="https://osf.io/tmu6y/" style="background-image:url('../_static/img/workflow_osf.webp')"></a>
+       <div class="simba-res-body">
+         <h3>🗄️ OSF Repository</h3>
+         <p>SimBA&rsquo;s Open Science Framework repository &mdash; models, annotations, features, and videos, organised into behavioral-classifier and animal-tracking sections.</p>
+         <div class="simba-res-links">
+           <a href="https://osf.io/d69jt/">🧠 Behavioral classifiers</a>
+           <a href="https://osf.io/sr3ck/">🐭 Animal tracking</a>
+         </div>
+       </div>
+     </div>
+
+     <div class="simba-res-card">
+       <a class="simba-res-thumb" href="../index.html#how-to-cite-simba" style="background-image:url('../_static/img/workflow_citation.webp')"></a>
+       <div class="simba-res-body">
+         <h3>📑 Cite SimBA</h3>
+         <p>How to cite SimBA &mdash; the <em>Nature Neuroscience</em> reference, DOI, and ready-to-use BibTeX.</p>
+         <div class="simba-res-links"><a href="../index.html#how-to-cite-simba">📑 How to cite</a> <a href="https://doi.org/10.1038/s41593-024-01649-9">🔗 DOI</a></div>
+       </div>
+     </div>
+
+     <div class="simba-res-card">
+       <a class="simba-res-thumb" href="https://sronilsson.github.io/download_stats/" style="background-image:url('../_static/img/workflow_download_stats.webp')"></a>
+       <div class="simba-res-body">
+         <h3>📊 Download Stats</h3>
+         <p>Live dashboard of SimBA&rsquo;s PyPI download statistics, updated automatically over time.</p>
+         <div class="simba-res-links"><a href="https://sronilsson.github.io/download_stats/">🔗 Open dashboard</a></div>
+       </div>
+     </div>
+
    </div>
 
 
