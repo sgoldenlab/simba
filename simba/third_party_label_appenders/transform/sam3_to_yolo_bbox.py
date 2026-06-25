@@ -444,24 +444,24 @@ class SAM3ToYoloBBox:
 
         return '\n'.join(lines) + '\n' if lines else ''
 #
-runner = SAM3ToYoloBBox(video_data=[r"G:\netholabs\6.01.005", r"G:\netholabs\6.01.006", r"G:\netholabs\6.01.005_batch_2", r"G:\netholabs\6.01.006_batch_2", r"G:\netholabs\6.01.007"],
-                        sam_path=r'D:\sam3\sam3.pt',
-                        save_dir=r'G:\netholabs\yolo_mdl_0624',
-                        txt_prompt='black mouse body',
-                        n_frames=10,
-                        verbose=True,
-                        conf=0.10,
-                        max_detections=1,
-                        buffer_pct=0.15,
-                        recursive=True,
-                        consecutive_miss_limit=25,
-                        skip_substr=('mosaic',),
-                        video_size=(896, 2016),
-                        min_size=(75, 75),
-                        shuffle_videos=True,
-                        visualize=False,
-                        preview=True)
-runner.run()
+# runner = SAM3ToYoloBBox(video_data=[r"G:\netholabs\6.01.005", r"G:\netholabs\6.01.006", r"G:\netholabs\6.01.005_batch_2", r"G:\netholabs\6.01.006_batch_2", r"G:\netholabs\6.01.007"],
+#                         sam_path=r'D:\sam3\sam3.pt',
+#                         save_dir=r'G:\netholabs\yolo_mdl_0624',
+#                         txt_prompt='black mouse body',
+#                         n_frames=10,
+#                         verbose=True,
+#                         conf=0.10,
+#                         max_detections=1,
+#                         buffer_pct=0.15,
+#                         recursive=True,
+#                         consecutive_miss_limit=25,
+#                         skip_substr=('mosaic',),
+#                         video_size=(896, 2016),
+#                         min_size=(75, 75),
+#                         shuffle_videos=True,
+#                         visualize=False,
+#                         preview=True)
+# runner.run()
 
 
 #NEXCT F:\netholabs\tars_0506
