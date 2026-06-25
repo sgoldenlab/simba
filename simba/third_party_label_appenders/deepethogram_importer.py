@@ -18,6 +18,18 @@ class DeepEthogramImporter(ConfigReader):
     """
     Append DeepEthogram optical flow annotations onto featurized pose-estimation data.
 
+    DeepEthogram exports one **already-binary** column per behaviour (``0``/``1`` per frame). For each video, this importer
+    copies the columns matching the SimBA project's classifiers straight into the feature data (behaviours that are not
+    project classifiers are ignored), aligns the annotation frame count to the features (extra annotation frames are
+    truncated; missing frames are zero-padded), and writes the result to the project's ``targets_inserted`` directory,
+    ready for classifier training. DeepEthogram annotation files may carry a ``_labels`` filename suffix, which is matched
+    automatically to the corresponding feature file.
+
+    .. image:: _static/img/simba.third_party_label_appenders.deepethogram_importer.DeepEthogramImporter.webp
+       :alt: DeepEthogram exports one binary column per behaviour; SimBA copies the columns matching its classifiers into the feature data (aligning frame counts) and saves to targets_inserted
+       :width: 800
+       :align: center
+
     :param str config_path: path to SimBA project config file in Configparser format
     :param str data_dir: path to folder holding DeepEthogram data files is CSV format
 

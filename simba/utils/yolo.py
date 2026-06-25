@@ -243,6 +243,16 @@ def keypoint_array_to_yolo_annotation_str(x: np.ndarray,
 
     [x_center y_center width height x1 y1 v1 x2 y2 v2 ... xn yn vn]
 
+    A bounding box is derived from the keypoint extent (min/max x and y, optionally expanded by ``padding``); the box centre,
+    width, height and every keypoint coordinate are normalized to ``[0, 1]`` by the image width/height, and each keypoint is
+    followed by its integer visibility flag (``2`` = visible, ``1`` = labelled/occluded, ``0`` = missing). Keypoints at
+    ``(0, 0)`` are treated as missing and excluded from the bounding box.
+
+    .. image:: _static/img/simba.utils.yolo.keypoint_array_to_yolo_annotation_str.webp
+       :alt: Keypoints (x, y, visibility) are bounded by a box derived from their extent and normalized by image size into a YOLO pose annotation line
+       :width: 700
+       :align: center
+
     :param np.ndarray x: Array of keypoints with shape (N, 3), where each row contains (x, y, visibility).
     :param int img_h: Height of the image.
     :param int img_w: Width of the image.
@@ -305,6 +315,11 @@ def apply_fixed_bbox_size(data: pd.DataFrame,
     The current box center is preserved, then the box is resized to ``bbox_size`` (``h, w``). If the resized box would exceed frame boundaries, the box is shifted so it remains fully inside the image while preserving the requested size.
 
     The function expects YOLO corner columns ``X1..Y4`` and updates them in-place on the input dataframe before returning it.
+
+    .. image:: _static/img/simba.utils.yolo.apply_fixed_bbox_size.webp
+       :alt: Each detection box is resized to a fixed size about its own centre; a box that would leave the frame is shifted back fully inside while keeping the fixed size
+       :width: 700
+       :align: center
 
     :param pd.DataFrame data: Detection dataframe containing ``CONFIDENCE`` and corner coordinate columns ``X1, Y1, X2, Y2, X3, Y3, X4, Y4``.
     :param str video_name: Video identifier used in error messages.

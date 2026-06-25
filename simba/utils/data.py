@@ -144,6 +144,16 @@ def detect_bouts_multiclass(data: pd.DataFrame, target: str, fps: int = 1, class
     """
     Detect bouts in a multiclass time series dataset and return the bout event types, their start times, end times and duration.
 
+    Each maximal run of consecutive identical class labels becomes one bout, timed as ``start_time = start_frame / fps``,
+    ``end_time = (end_frame + 1) / fps`` and ``bout_time = end_time - start_time``. If a ``classifier_map`` is supplied the
+    numeric labels in the ``Event`` column are replaced with their names (otherwise the numeric labels are kept). Rows are
+    grouped by class label rather than by time.
+
+    .. image:: _static/img/simba.utils.data.detect_bouts_multiclass.webp
+       :alt: A multiclass per-frame time series is split into contiguous bouts of each class, each with a start/end frame, start/end time and duration
+       :width: 700
+       :align: center
+
     .. seealso::
        For single class Boolean classifiers, see :func:`simba.utils.data.detect_bouts`.
 
@@ -646,6 +656,14 @@ def find_frame_numbers_from_time_stamp(start_time: str, end_time: str, fps: int)
     Given start and end timestamps in HH:MM:SS formats and the fps, return the frame numbers representing
     the time period.
 
+    Each timestamp is converted to seconds (``h*3600 + m*60 + s``) and multiplied by ``fps`` to get a frame index; the
+    returned list spans ``int(start_s * fps)`` through ``int(end_s * fps) + 1`` inclusive.
+
+    .. image:: _static/img/simba.utils.data.find_frame_numbers_from_time_stamp.webp
+       :alt: An HH:MM:SS start/end period is converted to seconds, multiplied by fps, and returned as the list of frame numbers inside the period
+       :width: 700
+       :align: center
+
     .. note::
        For the converse (find frame numbers from start and in HH:MM:SS format), use func:`simba.utils.read_write.find_time_stamp_from_frame_numbers`.
 
@@ -657,7 +675,7 @@ def find_frame_numbers_from_time_stamp(start_time: str, end_time: str, fps: int)
 
     :example:
     >>> find_frame_numbers_from_time_stamp(start_time='00:00:00', end_time='00:00:01', fps=10)
-    >>> [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    >>> [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     """
     check_if_string_value_is_valid_video_timestamp(value=start_time, name="Start time")
     check_if_string_value_is_valid_video_timestamp(value=start_time, name="End time")
