@@ -154,6 +154,7 @@ ________________________________________________
    docs/workflow
    glossary
    qr_gallery
+   download_stats
 
 .. toctree::
    :maxdepth: 2

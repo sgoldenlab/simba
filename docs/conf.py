@@ -406,6 +406,17 @@ def _generate_github_contributors(app):
     except Exception as e:  # noqa: BLE001
         print(f'[credits] local git line-count failed ({e!r}); showing commits only.')
 
+    # Safety net: if line counts could not be computed here (e.g. a shallow CI
+    # clone) but the committed snapshot already includes them, keep that snapshot
+    # rather than overwriting it with a commits-only chart that loses the lines.
+    if not loc and os.path.exists(html_path):
+        try:
+            if 'lines</em>' in open(html_path, encoding='utf-8').read():
+                print('[credits] keeping committed snapshot (already includes line counts).')
+                return
+        except Exception:  # noqa: BLE001
+            pass
+
     # ---- responsive HTML bar chart with a GitHub card popover on hover (no image, no matplotlib) ----
     # Consumed by credits.rst via a `.. raw:: html :file:` include; regenerated every build.
     try:
@@ -475,6 +486,260 @@ def _generate_github_contributors(app):
         print(f'[credits] contributor HTML render failed ({e!r}); keeping existing snapshot.')
 
 
+def _generate_download_stats(app):
+    """Fetch the PyPI download-stats CSV (BigQuery, last 30 days) from the ``download_stats``
+    branch and render an interactive Chart.js dashboard for ``download_stats.rst``.
+
+    The CSV is produced daily by the ``Get BigQuery Download Stats`` GitHub Action
+    (``misc/bigquery_download_stats.py``) and force-pushed to the ``download_stats`` branch.
+    On any failure (no network, parse error, missing pandas) a notice is printed and the
+    committed snapshot is kept, so the build never breaks. Starts with a single panel:
+    downloads by country.
+    """
+    import io
+    import json
+    import urllib.request
+
+    here = os.path.dirname(os.path.abspath(__file__))
+    gen_dir = os.path.join(here, '_generated')
+    html_path = os.path.join(gen_dir, 'download_stats.html')
+    os.makedirs(gen_dir, exist_ok=True)
+    CSV_URL = 'https://raw.githubusercontent.com/sgoldenlab/simba/download_stats/misc/bigquery_download_stats.csv'
+
+    try:
+        import pandas as pd
+        req = urllib.request.Request(CSV_URL, headers={'User-Agent': 'simba-docs'})
+        with urllib.request.urlopen(req, timeout=25) as resp:
+            df = pd.read_csv(io.StringIO(resp.read().decode('utf-8')))
+        if df.empty or 'country' not in df.columns or 'download_count' not in df.columns:
+            raise RuntimeError('unexpected CSV shape')
+    except Exception as e:  # noqa: BLE001 - never fail the build over this
+        print(f'[download_stats] CSV fetch/parse failed ({e!r}); keeping existing snapshot.')
+        return
+
+    try:
+        import pycountry
+    except Exception:  # noqa: BLE001 - fall back to raw codes if unavailable
+        pycountry = None
+
+    def _country_name(code):
+        code = str(code)
+        if pycountry is None:
+            return code
+        try:
+            c = pycountry.countries.get(alpha_2=code)
+            return (getattr(c, 'common_name', None) or c.name) if c is not None else code
+        except Exception:  # noqa: BLE001
+            return code
+
+    TOP = 20
+    by_country = df.groupby('country')['download_count'].sum().sort_values(ascending=False)
+    top = by_country.head(TOP)
+    codes = [str(c) for c in top.index]
+    labels = [_country_name(c) for c in codes]
+    vals = [int(v) for v in top.values]
+    # per-bar colour: red (highest) -> blue (lowest) gradient across the sorted bars
+    n = len(vals)
+    (r0, g0, b0), (r1, g1, b1) = (214, 69, 59), (47, 127, 192)
+    colors = ['#%02x%02x%02x' % (round(r0 + (r1 - r0) * t), round(g0 + (g1 - g0) * t), round(b0 + (b1 - b0) * t))
+              for t in ([i / (n - 1) for i in range(n)] if n > 1 else [0.0])]
+    data_json = json.dumps({'labels': labels, 'vals': vals, 'colors': colors})
+    # full per-country totals (alpha-2 keyed) for the world map (used for the boolean fill + tooltip)
+    map_json = json.dumps({str(c): int(v) for c, v in by_country.items()})
+    total = int(df['download_count'].sum())
+    n_country = int(df['country'].nunique())
+    n_version = int(df['package_version'].nunique())
+    daily = df.groupby('download_date')['download_count'].sum()
+    n_days = int(daily.shape[0]) or 1
+    daily_avg = int(round(total / n_days))
+    try:
+        peak_val = int(daily.max())
+        peak_date = pd.to_datetime(str(daily.idxmax())).strftime('%b %d')
+    except Exception:  # noqa: BLE001
+        peak_date, peak_val = '', 0
+    try:
+        dmin = str(df['download_date'].min())
+        dmax = str(df['download_date'].max())
+    except Exception:  # noqa: BLE001
+        dmin = dmax = ''
+    stamp = datetime.datetime.now().strftime('%B %d, %Y')
+
+    # ---- time-series, version & day-of-week aggregations for the extra panels ----
+    daily_sorted = daily.sort_index()
+    date_labels = [pd.to_datetime(str(d)).strftime('%b %d') for d in daily_sorted.index]
+    daily_vals = [int(v) for v in daily_sorted.values]
+    cumulative_vals = [int(v) for v in daily_sorted.cumsum().values]
+    ver = df.groupby('package_version')['download_count'].sum().sort_values(ascending=False)
+    ver_top = ver.head(15)
+    ver_labels = [str(v) for v in ver_top.index]
+    ver_vals = [int(v) for v in ver_top.values]
+    top6 = [str(v) for v in ver.head(6).index]
+    piv = df.pivot_table(index='download_date', columns='package_version', values='download_count',
+                         aggfunc='sum', fill_value=0).sort_index()
+    piv.columns = [str(c) for c in piv.columns]
+    adopt_dates = [pd.to_datetime(str(d)).strftime('%b %d') for d in piv.index]
+    adopt = [{'label': v, 'data': [int(x) for x in piv[v].values]} for v in top6 if v in piv.columns]
+    other_cols = [c for c in piv.columns if c not in top6]
+    if other_cols:
+        adopt.append({'label': 'other', 'data': [int(x) for x in piv[other_cols].sum(axis=1).values]})
+    dow_series = pd.to_datetime(df['download_date']).dt.dayofweek
+    dow_tot = df.groupby(dow_series)['download_count'].sum()
+    dow_vals = [int(dow_tot.get(i, 0)) for i in range(7)]
+    dash_json = json.dumps({'date_labels': date_labels, 'daily': daily_vals, 'cumulative': cumulative_vals,
+                            'dow': dow_vals, 'ver_labels': ver_labels, 'ver': ver_vals,
+                            'adopt_dates': adopt_dates, 'adopt': adopt})
+
+    try:
+        MUT = '#8a9099'
+        style = (
+            "<style>\n"
+            ".simba-dl{max-width:860px;margin:14px auto 6px;}\n"
+            ".simba-dl-sub{font-size:13px;color:#6b7280;margin:0 0 14px;}\n"
+            ".simba-dl-sub b{color:#23272e;}\n"
+            ".simba-dl-cards{display:flex;flex-wrap:nowrap;gap:12px;margin:4px 0 8px;}\n"
+            ".simba-dl-card{flex:1 1 0;min-width:0;background:#fff;border:1px solid #e2e8f0;border-radius:12px;"
+            "box-shadow:0 4px 14px rgba(33,86,122,.08);padding:13px 8px;text-align:center;}\n"
+            ".simba-dl-card .v{display:block;font-size:22px;font-weight:800;color:#21567a;line-height:1.1;}\n"
+            ".simba-dl-card .l{display:block;font-size:10.5px;color:#6b7280;margin-top:4px;}\n"
+            ".simba-dl-h3{font-size:15px;color:#23272e;font-weight:700;margin:24px 0 10px;}\n"
+            ".simba-dl-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;margin-top:8px;}\n"
+            ".simba-dl-cell{min-width:0;}\n"
+            ".simba-dl-cell .simba-dl-h3{margin:0 0 8px;}\n"
+            ".simba-dl-cell--wide{grid-column:1 / -1;}\n"
+            "@media (max-width:680px){.simba-dl-grid{grid-template-columns:1fr;}}\n"
+            ".simba-dl-panel{position:relative;height:340px;box-sizing:border-box;background:#fff;border:1px solid #e2e8f0;"
+            "border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);padding:14px 16px 10px;}\n"
+            ".simba-dl-map{position:relative;height:680px;background:radial-gradient(120% 120% at 50% 0%,#f4f9fd,#e8f1f8);"
+            "border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);padding:10px;box-sizing:border-box;}\n"
+            ".simba-dl-legend{display:flex;align-items:center;gap:8px;justify-content:flex-end;font-size:11px;color:#6b7280;margin:8px 4px 0;}\n"
+            ".simba-dl-legend i{width:140px;height:10px;border-radius:5px;display:inline-block;"
+            "background:linear-gradient(90deg,#e8f4fb,#7fc1e3,#2a7fb8,#1a3f6b);}\n"
+            ".simba-dl-legend .dot{width:11px;height:11px;border-radius:50%;background:#e0433a;display:inline-block;margin-left:14px;}\n"
+            ".simba-dl-legend .sw{width:13px;height:13px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.06);}\n"
+            ".simba-dl-more{text-align:center;margin:26px 0 6px;}\n"
+            ".simba-dl-more a{display:inline-flex;align-items:center;gap:8px;text-decoration:none !important;background:#21567a;"
+            "color:#fff !important;font-weight:600;font-size:14px;padding:11px 20px;border-radius:24px;box-shadow:0 2px 10px rgba(33,86,122,.25);}\n"
+            ".simba-dl-more a:hover{background:#19465f;}\n"
+            ".simba-dl-chart{position:relative;height:600px;box-sizing:border-box;background:#fff;"
+            "border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);padding:16px 18px 8px;}\n"
+            ".simba-dl-foot{text-align:right;font-size:11px;color:#8a9099;font-style:italic;margin:12px 4px 0;}\n"
+            "</style>\n")
+        body = (
+            '<div class="simba-dl">\n'
+            f'  <p class="simba-dl-sub">PyPI downloads of <b>simba-uw-tf-dev</b> &middot; last 30 days &middot; {dmin} &ndash; {dmax}</p>\n'
+            '  <div class="simba-dl-cards">\n'
+            f'    <div class="simba-dl-card"><span class="v">{total:,}</span><span class="l">downloads &middot; 30 days</span></div>\n'
+            f'    <div class="simba-dl-card"><span class="v">{daily_avg:,}</span><span class="l">avg / day</span></div>\n'
+            f'    <div class="simba-dl-card"><span class="v">{peak_val:,}</span><span class="l">peak day ({peak_date})</span></div>\n'
+            f'    <div class="simba-dl-card"><span class="v">{n_version:,}</span><span class="l">versions</span></div>\n'
+            f'    <div class="simba-dl-card"><span class="v">{n_country}</span><span class="l">countries</span></div>\n'
+            '  </div>\n'
+            '  <div class="simba-dl-grid">\n'
+            '    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Downloads over time</h3>\n'
+            '      <div class="simba-dl-panel"><canvas id="dlOverTime"></canvas></div></div>\n'
+            '    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Downloads by day of week</h3>\n'
+            '      <div class="simba-dl-panel"><canvas id="dlDow"></canvas></div></div>\n'
+            '    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Top 15 versions</h3>\n'
+            '      <div class="simba-dl-panel"><canvas id="dlVersions"></canvas></div></div>\n'
+            '    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Version adoption over time</h3>\n'
+            '      <div class="simba-dl-panel"><canvas id="dlAdoption"></canvas></div></div>\n'
+            '    <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Downloads by country &mdash; world map</h3>\n'
+            '      <div class="simba-dl-map" id="dlMap"></div>\n'
+            '      <div class="simba-dl-legend"><span class="sw" style="background:#2a7fb8"></span><span>&ge;1 download</span>'
+            '<span class="sw" style="background:#dce4ee;margin-left:14px"></span><span>no downloads</span></div></div>\n'
+            f'    <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Top {TOP} countries</h3>\n'
+            '      <div class="simba-dl-chart"><canvas id="dlCountries"></canvas></div></div>\n'
+            '  </div>\n'
+            '  <p class="simba-dl-more"><a href="https://sronilsson.github.io/download_stats/" target="_blank" rel="noopener">'
+            '\U0001F4CA  Full interactive download dashboard &rarr;</a></p>\n'
+            f'  <p class="simba-dl-foot">Source: PyPI downloads via Google BigQuery &middot; updated {stamp}</p>\n'
+            '</div>\n')
+        script = (
+            # RTD theme loads RequireJS; disable AMD while the UMD libs load so they set
+            # window.Chart / window.jsVectorMap globals instead of registering as AMD modules
+            '<script>window.__odef = window.define; try { window.define = undefined; } catch (e) {}</script>\n'
+            '<link rel="stylesheet" href="_static/css/jsvectormap.min.css">\n'
+            '<script src="_static/js/jsvectormap.min.js"></script>\n'
+            '<script src="_static/js/jsvectormap-world.js"></script>\n'
+            '<script>\n(function(){\n'
+            f'  const MAP = {map_json};\n'
+            '  const el = document.getElementById("dlMap");\n'
+            '  if (!el || typeof jsVectorMap === "undefined") return;\n'
+            '  // boolean fill: countries with >= 1 download get one colour, the rest stay grey\n'
+            '  const HAS = {}; for (const k in MAP) { HAS[k] = 1; }\n'
+            '  new jsVectorMap({\n'
+            '    selector: "#dlMap", map: "world",\n'
+            '    zoomButtons: true, zoomOnScroll: true, backgroundColor: "transparent",\n'
+            '    regionStyle: {initial: {fill: "#dce4ee", stroke: "#ffffff", "stroke-width": 0.5},\n'
+            '      hover: {fill: "#f0c44a", "fill-opacity": 1}},\n'
+            '    series: {regions: [{attribute: "fill", values: HAS, scale: ["#2a7fb8", "#2a7fb8"]}]},\n'
+            '    onRegionTooltipShow(event, tooltip, code) {\n'
+            '      const v = MAP[code] || 0;\n'
+            '      tooltip.text(tooltip.text() + (v ? ": " + v.toLocaleString() + " downloads" : ": no downloads"), true);\n'
+            '    }\n'
+            '  });\n})();\n</script>\n'
+            '<script src="_static/js/chart.umd.min.js"></script>\n'
+            '<script>\n(function(){\n'
+            '  if (!window.Chart) return;\n'
+            f'  const DL = {data_json};\n'
+            f'  const DASH = {dash_json};\n'
+            '  const C = (id) => document.getElementById(id);\n'
+            '  const GRID = "#eef2f7", INK = "#23272e", MUT = "#6b7280";\n'
+            '  const PAL = ["#21567a","#2a7fb8","#38a8d4","#5cc6b3","#e0a33a","#e0653a","#b9c0c9"];\n'
+            '  // light rounded track behind each horizontal bar (like the credits chart)\n'
+            '  const track = {id: "track", beforeDatasetsDraw(chart) {\n'
+            '    const ctx = chart.ctx, right = chart.chartArea.right, x0 = chart.scales.x.getPixelForValue(0);\n'
+            '    ctx.save(); ctx.fillStyle = GRID;\n'
+            '    chart.getDatasetMeta(0).data.forEach(function(b) {\n'
+            '      const h = b.height, y = b.y - h / 2, w = right - x0, r = Math.min(6, h / 2);\n'
+            '      if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(x0, y, w, h, r); ctx.fill(); } else { ctx.fillRect(x0, y, w, h); }\n'
+            '    }); ctx.restore();\n'
+            '  }};\n'
+            '  if (C("dlCountries")) new Chart(C("dlCountries"), {\n'
+            '    type: "bar", plugins: [track],\n'
+            '    data: {labels: DL.labels, datasets: [{label: "Downloads", data: DL.vals, backgroundColor: DL.colors, hoverBackgroundColor: DL.colors, borderRadius: 4, maxBarThickness: 24}]},\n'
+            '    options: {indexAxis: "y", responsive: true, maintainAspectRatio: false, layout: {padding: {right: 6}},\n'
+            '      plugins: {legend: {display: false}, tooltip: {callbacks: {label: (c) => " " + c.parsed.x.toLocaleString() + " downloads"}}},\n'
+            '      scales: {x: {beginAtZero: true, grid: {display: false}, ticks: {color: MUT}}, y: {grid: {display: false}, ticks: {color: INK, font: {weight: "600"}}}}}\n'
+            '  });\n'
+            '  if (C("dlOverTime")) new Chart(C("dlOverTime"), {\n'
+            '    data: {labels: DASH.date_labels, datasets: [\n'
+            '      {type: "bar", label: "Daily", data: DASH.daily, backgroundColor: "#7fc1e3", borderRadius: 3, order: 2, yAxisID: "y"},\n'
+            '      {type: "line", label: "Cumulative", data: DASH.cumulative, borderColor: "#21567a", backgroundColor: "rgba(33,86,122,.08)", fill: true, tension: .3, pointRadius: 0, borderWidth: 2.5, order: 1, yAxisID: "y1"}]},\n'
+            '    options: {responsive: true, maintainAspectRatio: false,\n'
+            '      plugins: {legend: {display: true, position: "top", labels: {boxWidth: 12, font: {size: 11}}}},\n'
+            '      scales: {y: {beginAtZero: true, position: "left", grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "daily", color: MUT}},\n'
+            '               y1: {beginAtZero: true, position: "right", grid: {display: false}, ticks: {color: MUT}, title: {display: true, text: "cumulative", color: MUT}},\n'
+            '               x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 0, autoSkip: true, maxTicksLimit: 12}}}}\n'
+            '  });\n'
+            '  if (C("dlDow")) new Chart(C("dlDow"), {\n'
+            '    type: "bar",\n'
+            '    data: {labels: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"], datasets: [{label: "Downloads", data: DASH.dow,\n'
+            '      backgroundColor: ["#2a7fb8","#2a7fb8","#2a7fb8","#2a7fb8","#2a7fb8","#e0a33a","#e0a33a"], borderRadius: 4, maxBarThickness: 52}]},\n'
+            '    options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}},\n'
+            '      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}}, x: {grid: {display: false}, ticks: {color: INK, font: {weight: "600"}}}}}\n'
+            '  });\n'
+            '  if (C("dlVersions")) new Chart(C("dlVersions"), {\n'
+            '    type: "bar",\n'
+            '    data: {labels: DASH.ver_labels, datasets: [{label: "Downloads", data: DASH.ver, backgroundColor: "#2a7fb8", borderRadius: 4, maxBarThickness: 30}]},\n'
+            '    options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, tooltip: {callbacks: {label: (c) => " " + c.parsed.y.toLocaleString() + " downloads"}}},\n'
+            '      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}}, x: {grid: {display: false}, ticks: {color: INK, maxRotation: 60, minRotation: 45, font: {weight: "600", size: 10}}}}}\n'
+            '  });\n'
+            '  if (C("dlAdoption")) new Chart(C("dlAdoption"), {\n'
+            '    type: "line",\n'
+            '    data: {labels: DASH.adopt_dates, datasets: DASH.adopt.map(function(s, i){ return {label: s.label, data: s.data, backgroundColor: PAL[i % PAL.length], borderColor: PAL[i % PAL.length], fill: true, tension: .25, pointRadius: 0, borderWidth: 1}; })},\n'
+            '    options: {responsive: true, maintainAspectRatio: false, interaction: {intersect: false, mode: "index"},\n'
+            '      plugins: {legend: {display: true, position: "top", labels: {boxWidth: 10, font: {size: 10}}}},\n'
+            '      scales: {y: {stacked: true, beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}}, x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 0, autoSkip: true, maxTicksLimit: 12}}}}\n'
+            '  });\n'
+            '})();\n</script>\n'
+            '<script>try { window.define = window.__odef; } catch (e) {}</script>\n')
+        with open(html_path, 'w', encoding='utf-8') as f:
+            f.write(style + body + script)
+    except Exception as e:  # noqa: BLE001
+        print(f'[download_stats] render failed ({e!r}); keeping existing snapshot.')
+
+
 def setup(app):
     """Build-time hooks for the Markdown tutorials.
 
@@ -495,6 +760,7 @@ def setup(app):
                 copy_asset(src, os.path.join(app.outdir, 'images'))
 
     app.connect('builder-inited', _generate_github_contributors)
+    app.connect('builder-inited', _generate_download_stats)
     app.connect('build-finished', _copy_images)
     app.connect('build-finished', _inject_lazy_media)
     app.connect('doctree-read', _convert_github_alerts)

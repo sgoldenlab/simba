@@ -23,4 +23,5 @@ dependencies:
       - sphinxcontrib-youtube==1.3.0
       - myst-parser==0.16.1
       - sphinx-reredirects==0.1.4
+      - pycountry==20.7.3
 prefix: /Users/simon/.conda/envs/simba_dev

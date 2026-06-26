@@ -57,9 +57,6 @@ print-ready stills to neon, full-bleed gradients, and animated (looping) version
    <div class="qrg-wrap">
      <div class="qrg-hero">
        <div class="t">
-         <p class="qrg-eyebrow">QR Code Collection</p>
-         <h1>SimBA codes, built to <span class="y">scan</span> &amp; shine.</h1>
-         <p class="qrg-lede">Branded QR codes for the SimBA docs &mdash; clean classics, neon, full-bleed gradients, and living animated versions. Every code opens this site.</p>
          <a class="qrg-btn" href="https://simba-uw-tf-dev.readthedocs.io/" target="_blank" rel="noopener"><span class="d"></span>Open the SimBA docs</a>
        </div>
        <figure class="qrg-herofig"><video autoplay loop muted playsinline><source src="_static/img/qr/anim_aurora_flow.mp4" type="video/mp4"><source src="_static/img/qr/anim_aurora_flow.webm" type="video/webm"></video></figure>
