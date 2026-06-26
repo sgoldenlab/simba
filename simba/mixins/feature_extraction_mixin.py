@@ -116,20 +116,19 @@ class FeatureExtractionMixin(object):
            For multicore numba based method across multiple observations, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_vectorized`.
            For GPU acceleration, use :func:`simba.data_processors.cuda.statistics.get_3pt_angle`.
 
-
         .. image:: _static/img/get_3pt_angle.webp
            :alt: Get 3pt angle
            :width: 300
            :align: center
 
-         :param float ax: x coordinate of the first body-part (e.g., nape).
-         :param float ay: y coordinate of the first body-part (e.g., nape).
-         :param float bx: x coordinate of the second body-part (e.g., center).
-         :param float by: y coordinate of the second body-part (e.g., center).
-         :param float cx: x coordinate of the second body-part (e.g., tail-base).
-         :param float cy: y coordinate of the second body-part (e.g., tail-base).
-         :return: Angle between 0-360.
-         :rtype: float
+        :param float ax: x coordinate of the first body-part (e.g., nape).
+        :param float ay: y coordinate of the first body-part (e.g., nape).
+        :param float bx: x coordinate of the second body-part (e.g., center).
+        :param float by: y coordinate of the second body-part (e.g., center).
+        :param float cx: x coordinate of the second body-part (e.g., tail-base).
+        :param float cy: y coordinate of the second body-part (e.g., tail-base).
+        :return: Angle between 0-360.
+        :rtype: float
 
         :example:
         >>> FeatureExtractionMixin.angle3pt(ax=122.0, ay=198.0, bx=237.0, by=138.0, cx=191.0, cy=109)
