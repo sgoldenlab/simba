@@ -26,6 +26,11 @@ class LabelmeBoundingBoxes2YoloBoundingBoxes:
     """
     Convert LabelMe annotations in json to YOLO format and save the corresponding images and labels in txt format.
 
+    .. image:: _static/img/simba.third_party_label_appenders.transform.labelme_to_yolo.LabelmeBoundingBoxes2YoloBoundingBoxes.webp
+       :alt: LabelMe rectangle annotations (two corner points plus a base64 image) are decoded and converted into a YOLO bounding-box dataset (class, x_center, y_center, width, height; or 8 oriented-corner coordinates when obb=True), split into train/val with a map.json
+       :width: 800
+       :align: center
+
     .. note::
        For more information on the LabelMe annotation tool, see the `LabelMe GitHub repository <https://github.com/wkentaro/labelme>`_.
        The Labelme Json files **has too** contain a `imageData` key holding the image as a b64 string.

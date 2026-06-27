@@ -29,6 +29,11 @@ class MergeYoloProjects:
 
     Reads each project's YAML, validates that all projects share the same task type (bounding-box detection, segmentation, or keypoint pose) and class names, then copies all images and labels into a single output project with train/val splits.
 
+    .. image:: _static/img/simba.third_party_label_appenders.transform.merge_yolo_projects.MergeYoloProjects.webp
+       :alt: Several YOLO projects that share the same task type and class names are merged into one project; their images and labels are combined into train/val splits (optionally reshuffled), duplicate filenames keep the first occurrence, and a single map.yaml is written
+       :width: 800
+       :align: center
+
     .. seealso::
 
        * :class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_seg.SAM3ToYoloSeg`

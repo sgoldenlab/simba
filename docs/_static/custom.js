@@ -11,6 +11,66 @@ gtag('config', 'G-PEKR9R5J47');
 })();
 
 /* ------------------------------------------------------------------ *
+ * Splash screen — full-viewport intro overlay, shown ONCE per browser
+ * session. Runs at parse time (in <head>) so it paints before page
+ * content; dismisses after a short minimum, on window load, or on any
+ * click / keypress. sessionStorage suppresses it for the rest of the
+ * session, so it never delays repeat navigation.
+ * ------------------------------------------------------------------ */
+(function () {
+  try { if (sessionStorage.getItem('simbaSplashSeen')) return; } catch (e) { /* private mode: still show once */ }
+
+  var ROOT = (function () {
+    var el = document.getElementById('documentation_options');   // precedes custom.js in <head>
+    return (el && el.getAttribute('data-url_root')) || './';
+  })();
+
+  var root = document.documentElement;
+  root.classList.add('simba-splash-on');
+
+  var letters = 'SimBA'.split('').map(function (ch, i) {
+    return '<span style="animation-delay:' + (0.15 + i * 0.09).toFixed(2) + 's">' + ch + '</span>';
+  }).join('');
+
+  var overlay = document.createElement('div');
+  overlay.className = 'simba-splash';
+  overlay.setAttribute('role', 'img');
+  overlay.setAttribute('aria-label', 'SimBA — Simple Behavioral Analysis');
+  overlay.innerHTML =
+    '<div class="simba-splash-inner">' +
+      '<div class="simba-splash-word">' + letters + '</div>' +
+      '<div class="simba-splash-underline"></div>' +
+      '<video class="simba-splash-mouse" autoplay loop muted playsinline preload="auto">' +
+        '<source src="' + ROOT + '_static/img/mouse_run.webm" type="video/webm">' +
+      '</video>' +
+      '<div class="simba-splash-cap">Simple Behavioral Analysis</div>' +
+    '</div>' +
+    '<div class="simba-splash-skip">click anywhere to skip</div>';
+  root.appendChild(overlay);   // body does not exist yet at parse time; documentElement is fine for position:fixed
+
+  var shownAt = (window.performance && performance.now) ? performance.now() : (+new Date());
+  var MIN_MS = 1900, MAX_MS = 3400, done = false;   // hold through the letter / underline / tagline choreography
+
+  function dismiss() {
+    if (done) return;
+    done = true;
+    try { sessionStorage.setItem('simbaSplashSeen', '1'); } catch (e) {}
+    overlay.classList.add('leaving');
+    root.classList.remove('simba-splash-on');
+    setTimeout(function () { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 600);
+  }
+  function dismissAfterMin() {
+    var elapsed = ((window.performance && performance.now) ? performance.now() : (+new Date())) - shownAt;
+    setTimeout(dismiss, Math.max(0, MIN_MS - elapsed));
+  }
+
+  window.addEventListener('load', dismissAfterMin);
+  setTimeout(dismiss, MAX_MS);                       // hard cap if load never fires
+  overlay.addEventListener('click', dismiss);        // let users skip it
+  window.addEventListener('keydown', dismiss, { once: true });
+})();
+
+/* ------------------------------------------------------------------ *
  * DOI paper hovercard — hover a doi.org link to preview the paper.
  * Metadata fetched live from the CrossRef API (free, CORS-enabled).
  * ------------------------------------------------------------------ */

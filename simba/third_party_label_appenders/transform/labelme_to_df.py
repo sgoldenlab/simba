@@ -27,6 +27,11 @@ class LabelMe2DataFrame:
     """
     Convert a directory of labelme .json files into a pandas dataframe.
 
+    .. image:: _static/img/simba.third_party_label_appenders.transform.labelme_to_df.LabelMe2DataFrame.webp
+       :alt: A folder of LabelMe .json annotations is converted into one pandas DataFrame with a row per image, columns for each labeled point's x/y coordinates, the image_name, and the image stored as a base64 string
+       :width: 800
+       :align: center
+
     .. note::
        The images are stores as a 64-bit bytestring under the ``image`` header of the output dataframe.
 

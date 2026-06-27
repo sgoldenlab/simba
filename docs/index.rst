@@ -139,7 +139,7 @@ ________________________________________________
    :maxdepth: 1
    :caption: FAQ:
 
-   FAQ
+   ❓ FAQ <FAQ>
 
 .. toctree::
    :maxdepth: 1
@@ -151,7 +151,7 @@ ________________________________________________
    :maxdepth: 1
    :caption: DOCS:
 
-   docs/workflow
+   📈 Presentations & Docs <docs/workflow>
    glossary
    qr_gallery
    download_stats
@@ -160,15 +160,15 @@ ________________________________________________
    :maxdepth: 2
    :caption: ABOUT:
 
-   credits
+   👥 Credits <credits>
    links
 
 .. toctree::
    :maxdepth: 2
    :caption: OTHER:
 
-   simba.related_software
-   simba.license
+   🧩 Related Software <simba.related_software>
+   📜 License <simba.license>
 
 
 

@@ -21,6 +21,11 @@ class LitPose2YOLOBbox:
     """
     Convert LitPose keypoint annotations into a YOLO bounding-box dataset.
 
+    .. image:: _static/img/simba.third_party_label_appenders.transform.litpose_to_yolo_bbox.LitPose2YOLOBbox.webp
+       :alt: LitPose keypoint annotations are read from CollectedData CSVs; for each animal an axis-aligned bounding box is inferred from the keypoints' min/max extent plus padding, normalized to a YOLO bbox, sampled and split into a train/val dataset with a map.yaml
+       :width: 800
+       :align: center
+
     :param Union[str, os.PathLike] litpose_dir: Path to LitPose directory containing annotation CSV files and the ``labeled-data`` image folder.
     :param Union[str, os.PathLike] save_dir: Output directory where YOLO-formatted ``images`` and ``labels`` subdirectories are created.
     :param float train_size: Fraction of samples assigned to the training split. Default 0.7.
