@@ -41,15 +41,16 @@ gtag('config', 'G-PEKR9R5J47');
       '<div class="simba-splash-word">' + letters + '</div>' +
       '<div class="simba-splash-underline"></div>' +
       '<video class="simba-splash-mouse" autoplay loop muted playsinline preload="auto">' +
-        '<source src="' + ROOT + '_static/img/mouse_run.webm" type="video/webm">' +
+        '<source src="' + ROOT + '_static/img/mouse_run.webm" type="video/webm">' +   // mesh mouse + baked keypoints
       '</video>' +
       '<div class="simba-splash-cap">Simple Behavioral Analysis</div>' +
     '</div>' +
     '<div class="simba-splash-skip">click anywhere to skip</div>';
   root.appendChild(overlay);   // body does not exist yet at parse time; documentElement is fine for position:fixed
 
+
   var shownAt = (window.performance && performance.now) ? performance.now() : (+new Date());
-  var MIN_MS = 1900, MAX_MS = 3400, done = false;   // hold through the letter / underline / tagline choreography
+  var MIN_MS = 3400, MAX_MS = 5200, done = false;   // hold long enough to enjoy the assembled scene + running mouse
 
   function dismiss() {
     if (done) return;

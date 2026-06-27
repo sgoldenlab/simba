@@ -1082,9 +1082,7 @@ html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.0
 .simba-splash {
   position: fixed; inset: 0; z-index: 100000; overflow: hidden;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #07273a, #11597e, #1f7aa6, #38a8d4, #176993, #0c3b56, #0a2c44);
-  background-size: 320% 320%;
-  animation: simbaGradient 13s ease-in-out infinite;
+  background: #0b3553;
   opacity: 1; transition: opacity .55s ease;
   cursor: pointer;
 }
@@ -1116,15 +1114,14 @@ html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.0
   animation: simbaSplashUnderline .5s ease 1.0s forwards;
 }
 .simba-splash-mouse {
-  display: block; margin: 14px auto 4px;
-  width: min(300px, 56vw); height: auto;
-  filter: drop-shadow(0 14px 26px rgba(0,0,0,.45));
+  display: block; margin: 8px auto 0;
+  width: min(680px, 90vw); height: auto;   /* mesh mouse + baked keypoints; rendered spotlight supplies depth */
   opacity: 0; animation: simbaSplashFade .7s ease .9s forwards;
 }
 .simba-splash-cap {
-  margin-top: 14px;
-  font-family: 'Poppins', sans-serif; font-size: clamp(11px,1.6vw,15px); font-weight: 500;
-  letter-spacing: .26em; text-transform: uppercase; color: rgba(255,255,255,.85);
+  margin-top: 4px;
+  font-family: 'Poppins', sans-serif; font-size: clamp(14px,2.2vw,20px); font-weight: 600;
+  letter-spacing: .24em; text-transform: uppercase; color: rgba(255,255,255,.9);
   opacity: 0; animation: simbaSplashFade .6s ease 1.2s forwards;
 }
 .simba-splash-skip {
@@ -1141,6 +1138,6 @@ html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.0
   .simba-splash-vid { display: none; }
   .simba-splash-word span { animation: none; opacity: 1; transform: none; }
   .simba-splash-underline { animation: none; transform: scaleX(1); }
-  .simba-splash-mouse, .simba-splash-cap, .simba-splash-skip { animation: none; opacity: 1; }
+  .simba-splash-mouse, .simba-splash-kp, .simba-splash-cap, .simba-splash-skip { animation: none; opacity: 1; }
   html.simba-splash-on .wy-grid-for-nav { filter: none; transform: none; }
 }
