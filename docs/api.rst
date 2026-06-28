@@ -4,9 +4,10 @@
 .. raw:: html
 
    <div style="text-align:center; margin:4px 0 20px;">
-     <video autoplay loop muted playsinline preload="auto"
+     <video autoplay loop muted playsinline preload="metadata"
+            poster="_static/img/mouse_idle_poster.jpg"
             style="width:min(360px,72%); height:auto;"
-            aria-label="Animated SimBA mouse with pose-estimation mesh">
+            aria-label="Animated SimBA lab mouse">
        <source src="_static/img/mouse_idle_front.webm" type="video/webm">
      </video>
    </div>
