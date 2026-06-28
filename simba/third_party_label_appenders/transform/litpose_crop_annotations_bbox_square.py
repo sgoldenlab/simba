@@ -311,10 +311,10 @@ class CropLPAnnotationsBboxSquare:
         return common
 
 
-if __name__ == "__main__":
-    cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"H:\sina\project_0609_5cam\project_0609_5cam",
-                                              save_dir=r"H:\sina\project_0609_5cam_cropped",
-                                              bbox_pad_frac=0.25,
-                                              visualize=100,
-                                              verbose=True)
-    cropper.run()
+#if __name__ == "__main__":
+# cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"H:\sina\project_0609_5cam_0626\project_0609_5cam_0626",
+#                                               save_dir=r"H:\sina\project_0609_5cam_0626_cropped",
+#                                               bbox_pad_frac=0.25,
+#                                               visualize=100,
+#                                               verbose=True)
+# cropper.run()

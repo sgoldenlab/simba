@@ -109,7 +109,7 @@ class Paths(Enum):
     SHAP_LOGS = Path("logs/shap/")
     SPLASH_PATH_WINDOWS = Path("assets/img/splash.png")
     SPLASH_PATH_LINUX = Path("assets/img/splash.PNG")
-    SPLASH_PATH_MOVIE = Path("assets/img/splash_2024.mp4")
+    SPLASH_PATH_MOVIE = Path("assets/img/splash_2026.mp4")
     SIMON_SMALL_IMG = Path("assets/img/simon_n.webp")
     LANDING_MOVIE = Path("assets/img/landing.mp4")
     BG_IMG_PATH = Path("assets/img/bg_2024.png")

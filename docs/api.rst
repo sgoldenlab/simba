@@ -1,6 +1,16 @@
 📖 API Reference
 ================
 
+.. raw:: html
+
+   <div style="text-align:center; margin:4px 0 20px;">
+     <video autoplay loop muted playsinline preload="auto"
+            style="width:min(360px,72%); height:auto;"
+            aria-label="Animated SimBA mouse with pose-estimation mesh">
+       <source src="_static/img/mouse_idle_front.webm" type="video/webm">
+     </video>
+   </div>
+
 This section provides a categorized reference of SimBA's modules and methods, grouped by their functionality such as feature extraction, plotting, transformation, and modeling.
 
 .. admonition:: 📑 Find anything fast
