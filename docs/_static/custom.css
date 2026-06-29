@@ -1125,8 +1125,8 @@ html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.0
   opacity: 0; animation: simbaSplashFade .6s ease 1.2s forwards;
 }
 .simba-splash-skip {
-  position: absolute; bottom: 28px; left: 0; right: 0;
-  font-family: 'Poppins', sans-serif; font-size: 12px; letter-spacing: .12em;
+  margin-top: 32px; text-align: center;
+  font-family: 'Poppins', sans-serif; font-size: 18px; letter-spacing: .12em;
   text-transform: uppercase; color: rgba(255,255,255,.5);
   opacity: 0; animation: simbaSplashFade .8s ease 1.6s forwards;
 }
@@ -1140,4 +1140,14 @@ html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.0
   .simba-splash-underline { animation: none; transform: scaleX(1); }
   .simba-splash-mouse, .simba-splash-kp, .simba-splash-cap, .simba-splash-skip { animation: none; opacity: 1; }
   html.simba-splash-on .wy-grid-for-nav { filter: none; transform: none; }
+}
+
+/* --- Index page: orbiting pose-estimation keypoints at the foot of the page --- */
+.simba-orbit-foot {
+  display: flex; justify-content: center; align-items: center;
+  margin: 24px auto 8px;
+}
+.simba-orbit-foot video {
+  width: min(460px, 80vw); height: auto;
+  background: transparent;   /* webm carries its own alpha channel */
 }

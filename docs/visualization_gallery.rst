@@ -677,3 +677,11 @@ Video & image tools
 
       Watermark a video file or a directory of video files with specified watermark size, opacity, and location.
 
+.. raw:: html
+
+   <div class="simba-orbit-foot" style="margin:28px 0 8px;">
+     <video autoplay loop muted playsinline preload="auto" aria-label="Running SimBA mouse">
+       <source src="_static/img/mouse_run_simba_grunge.webm" type="video/webm">
+     </video>
+   </div>
+

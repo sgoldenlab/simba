@@ -3,6 +3,14 @@ SimBA Presentations, Workflow, Documents
 
 .. raw:: html
 
+   <div class="simba-orbit-foot" style="margin:6px 0 18px;">
+     <video autoplay loop muted playsinline preload="auto" aria-label="Running SimBA mouse">
+       <source src="../_static/img/mouse_run_simba.webm" type="video/webm">
+     </video>
+   </div>
+
+.. raw:: html
+
    <div class="simba-workflow">
 
 📈 Workflow Diagram

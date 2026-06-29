@@ -65,6 +65,14 @@ how you like to work:
    Both routes also use **FFmpeg** for SimBA's video pre-processing, editing, and visualization tools.
    It is strongly recommended — see the FFmpeg install links on the :doc:`pip / conda page <pip_installation>`.
 
+.. raw:: html
+
+   <div class="simba-orbit-foot" style="margin:30px 0 8px;">
+     <video autoplay loop muted playsinline preload="auto" aria-label="Running SimBA mouse">
+       <source src="_static/img/mouse_run_simba_black_2.webm" type="video/webm">
+     </video>
+   </div>
+
 .. toctree::
    :maxdepth: 1
    :hidden:

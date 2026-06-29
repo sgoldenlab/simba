@@ -57,8 +57,7 @@ class CropLPAnnotationsBboxSquare:
         self.bbox_pad_frac = bbox_pad_frac
         self.visualize = visualize
         self.verbose = verbose
-        self.csv_paths = sorted([os.path.join(lp_project_dir, f) for f in os.listdir(lp_project_dir)
-                                 if f.startswith("CollectedData_") and f.endswith(".csv")])
+        self.csv_paths = sorted([os.path.join(lp_project_dir, f) for f in os.listdir(lp_project_dir) if f.startswith("CollectedData_") and f.endswith(".csv")])
         if len(self.csv_paths) == 0:
             raise InvalidInputError(msg=f"No CollectedData_*.csv files found in {lp_project_dir}.")
         check_if_dir_exists(in_dir=os.path.join(lp_project_dir, "labeled-data"))

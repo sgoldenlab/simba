@@ -5,10 +5,10 @@
 
    <div style="text-align:center; margin:4px 0 20px;">
      <video autoplay loop muted playsinline preload="metadata"
-            poster="_static/img/mouse_idle_poster.jpg"
-            style="width:min(360px,72%); height:auto;"
-            aria-label="Animated SimBA lab mouse">
-       <source src="_static/img/mouse_idle_front.webm" type="video/webm">
+            poster="_static/img/mouse_run_simba_hat_poster.jpg"
+            style="width:min(440px,82%); height:auto;"
+            aria-label="Animated SimBA lab mouse in a top hat">
+       <source src="_static/img/mouse_run_simba_hat.webm" type="video/webm">
      </video>
    </div>
 
@@ -211,6 +211,13 @@ Parse, load, and process pose-estimation data from common formats.
 --------------------------------------------------
 
 Define and analyze regions-of-interest (ROIs) in relation to tracking data.
+
+.. video:: _static/img/arena_move.mp4
+   :width: 700
+   :autoplay:
+   :loop:
+   :muted:
+   :align: center
 
 .. toctree::
    :maxdepth: 3

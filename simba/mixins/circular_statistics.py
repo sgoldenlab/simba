@@ -110,6 +110,13 @@ class CircularStatisticsMixin(object):
            :width: 600
            :align: center
 
+        .. video:: _static/img/fish_circuit_mrv.mp4
+           :width: 450
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            :func:`simba.data_processors.cuda.circular_statistics.sliding_resultant_vector_length`,
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.mean_resultant_vector_length`
@@ -278,6 +285,13 @@ class CircularStatisticsMixin(object):
            :width: 600
            :align: center
 
+        .. video:: _static/img/fish_circuit_std.mp4
+           :width: 450
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            :func:`simba.data_processors.cuda.circular_statistics.sliding_circular_std`,
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.circular_std`
@@ -323,6 +337,13 @@ class CircularStatisticsMixin(object):
         .. image:: _static/img/instantaneous_angular_velocity.png
            :alt: Instantaneous angular velocity
            :width: 600
+           :align: center
+
+        .. video:: _static/img/fish_circuit_angvel.mp4
+           :width: 450
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         .. seealso::
@@ -533,6 +554,13 @@ class CircularStatisticsMixin(object):
            :width: 1200
            :align: center
 
+        .. video:: _static/img/fish_around.mp4
+           :width: 450
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_three_bps`
            :func:`simba.data_processors.cuda.circular_statistics.direction_from_two_bps`
@@ -607,6 +635,13 @@ class CircularStatisticsMixin(object):
         .. image:: _static/img/rayleigh.webp
            :alt: Rayleigh
            :width: 600
+           :align: center
+
+        .. video:: _static/img/fish_circuit_rayleigh.mp4
+           :width: 450
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         The Rayleigh Z score is calculated as follows:
@@ -1227,6 +1262,13 @@ class CircularStatisticsMixin(object):
            :width: 600
            :align: center
 
+        .. video:: _static/img/fish_circuit_range.mp4
+           :width: 450
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. note::
            Output data in the beginning of the series where a full time-window is not satisfied (e.g., first 9 observations when
            fps equals 10 and time_windows = [1.0], will be populated by ``0``.
@@ -1308,6 +1350,13 @@ class CircularStatisticsMixin(object):
         """
         Jitted compute of sliding circular hotspots in a dataset. Calculates circular hotspots in a time-series dataset by sliding a time window
         across the data and computing hotspot statistics for specified circular bins.
+
+        .. video:: _static/img/fish_hotspots_shuttle.mp4
+           :width: 450
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
 
         :param ndarray data: 1D array of circular data measured in degrees.
         :param ndarray bins: 2D array of shape representing circular bins defining [start_degree, end_degree] inclusive.

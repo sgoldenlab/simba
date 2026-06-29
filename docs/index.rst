@@ -170,6 +170,15 @@ ________________________________________________
    🧩 Related Software <simba.related_software>
    📜 License <simba.license>
 
+.. raw:: html
+
+   <div class="simba-orbit-foot">
+     <video autoplay loop muted playsinline preload="auto"
+            aria-label="Rotating SimBA pose-estimation keypoints">
+       <source src="_static/img/blackkp_idle_spin_alpha.webm" type="video/webm">
+     </video>
+   </div>
+
 
 
    

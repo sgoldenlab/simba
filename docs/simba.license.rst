@@ -32,3 +32,11 @@ Redistribution and use in source and binary forms, with or without modification,
    <div class="simba-btn-row" style="justify-content:flex-start;">
      <a href="mailto:sronilsson@gmail.com?subject=SimBA%20commercial%20licensing%20inquiry">📧&nbsp;&nbsp;Commercial licensing inquiry</a>
    </div>
+
+.. raw:: html
+
+   <div class="simba-orbit-foot" style="margin:30px 0 8px;">
+     <video autoplay loop muted playsinline preload="auto" aria-label="Idle SimBA mouse">
+       <source src="_static/img/mouse_idle_simba.webm" type="video/webm">
+     </video>
+   </div>

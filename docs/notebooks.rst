@@ -81,6 +81,14 @@ Data import, multi-class classifiers, and ROI-definition helpers.
 
    </div>
 
+.. raw:: html
+
+   <div class="simba-orbit-foot" style="margin:30px 0 8px;">
+     <video autoplay loop muted playsinline preload="auto" aria-label="Running SimBA mouse">
+       <source src="_static/img/mouse_run_simba_brown.webm" type="video/webm">
+     </video>
+   </div>
+
 
 
 
