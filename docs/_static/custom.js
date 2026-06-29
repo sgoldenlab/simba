@@ -1245,3 +1245,23 @@ gtag('config', 'G-PEKR9R5J47');
     }, 700);
   });
 })();
+/* --- Idle SimBA mouse at the top of the auto-generated A–Z index (genindex) --- */
+(function () {
+  window.addEventListener('load', function () {
+    if (location.pathname.split('/').pop() !== 'genindex.html') return;
+    var main = document.querySelector('[role="main"]');
+    if (!main || main.querySelector('.simba-genindex-mouse')) return;
+    var ROOT = (function () {
+      var el = document.getElementById('documentation_options');
+      return (el && el.getAttribute('data-url_root')) || '';
+    })();
+    var wrap = document.createElement('div');
+    wrap.className = 'simba-orbit-foot simba-genindex-mouse';
+    wrap.style.margin = '4px 0 22px';
+    wrap.innerHTML =
+      '<video autoplay loop muted playsinline preload="auto" aria-label="Idle SimBA mouse">' +
+        '<source src="' + ROOT + '_static/img/mouse_idle_simba.webm" type="video/webm">' +
+      '</video>';
+    main.insertBefore(wrap, main.firstChild);
+  });
+})();

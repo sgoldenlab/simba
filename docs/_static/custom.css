@@ -619,9 +619,11 @@ a:hover, .rst-content a:hover { color: #143d56; }
     background-size: 230% 230%, 250% 250%, 100% 100%;
     animation: simbaHeroGlow 9s ease-in-out infinite;
     position: relative; overflow: hidden;
-    border-radius: 0; padding: 40px 28px; margin: 0 0 1.6em 0; width: 100%;
-    box-shadow: 0 6px 20px rgba(16, 40, 60, 0.28);
+    border-radius: 0; padding: 40px 28px 140px; margin: 0 0 1.2em 0; width: 100%;
     color: #fff;
+    /* long, gentle fade so the banner melts into the page (no hard navy->white cut) */
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 150px), rgba(0,0,0,0.75) calc(100% - 95px), rgba(0,0,0,0.3) calc(100% - 45px), transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 150px), rgba(0,0,0,0.75) calc(100% - 95px), rgba(0,0,0,0.3) calc(100% - 45px), transparent 100%);
     opacity: 0; transform: translateY(14px);
     transition: opacity .5s ease, transform .5s ease;
 }
