@@ -203,6 +203,13 @@ class CircularStatisticsMixin(object):
            :width: 600
            :align: center
 
+        .. video:: _static/img/fish_circuit_cmean.mp4
+           :width: 450
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. attention::
            The returned values represents the angular mean dispersion in the time-window ``[current_frame-time_window->current_frame]``.
            `-1` is returned when ``current_frame-time_window`` is less than 0.
@@ -996,6 +1003,13 @@ class CircularStatisticsMixin(object):
            :width: 800
            :align: center
 
+        .. video:: _static/img/fish_circuit_rao.mp4
+           :width: 450
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         The Rao's Spacing (:math:`U`) is calculated as follows:
 
         .. math::
@@ -1619,6 +1633,13 @@ class CircularStatisticsMixin(object):
         .. image:: _static/img/sliding_preferred_turning_direction.webp
            :alt: Sliding preferred turning direction
            :width: 600
+           :align: center
+
+        .. video:: _static/img/fish_circuit_turn.mp4
+           :width: 450
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         .. seealso::
