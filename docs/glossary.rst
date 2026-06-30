@@ -5,6 +5,134 @@ Common terms used throughout the SimBA documentation. Terms defined here can be
 cross-referenced from anywhere in the docs with the ``:term:`` role
 (e.g. ``:term:`ROI``` renders as :term:`ROI`).
 
+.. raw:: html
+
+   <style>
+   #gloss-tools{position:sticky;top:0;z-index:5;background:#fff;padding:12px 0 10px;margin:0 0 10px;border-bottom:1px solid #e2e8f0;}
+   #gloss-search{width:100%;box-sizing:border-box;font-size:15px;padding:9px 12px;border:1px solid #cbd5e1;border-radius:8px;}
+   #gloss-search:focus{outline:none;border-color:#2a7fb8;box-shadow:0 0 0 3px rgba(42,127,184,.15);}
+   #gloss-az{display:flex;flex-wrap:wrap;gap:2px;margin-top:9px;}
+   #gloss-az a{font-size:12px;font-weight:700;color:#2a7fb8;text-decoration:none;padding:2px 7px;border-radius:5px;line-height:1.4;}
+   #gloss-az a:hover{background:#eaf3fa;}
+   #gloss-az a.disabled{color:#cbd5e1;pointer-events:none;}
+   #gloss-count{font-size:12px;color:#6b7280;margin-top:7px;}
+   #gloss-empty{display:none;color:#6b7280;font-style:italic;margin:14px 0;}
+   dl.glossary dt{scroll-margin-top:130px;}
+   dl.glossary dt.gloss-grp-term{display:inline;}
+   dl.glossary dt.gloss-syn .headerlink{display:none;}
+   dl.glossary dt.gloss-syn::after{content:",\00a0";font-weight:inherit;color:inherit;}
+   mark.gloss-hl{background:#fde68a;color:inherit;padding:0 1px;border-radius:2px;}
+   #gloss-top{position:fixed;right:22px;bottom:22px;z-index:20;width:42px;height:42px;border:none;border-radius:50%;background:#2a7fb8;color:#fff;font-size:20px;line-height:42px;text-align:center;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s;}
+   #gloss-top.show{opacity:.92;pointer-events:auto;}
+   #gloss-top:hover{opacity:1;background:#21567a;}
+   </style>
+   <div id="gloss-tools">
+     <input id="gloss-search" type="search" placeholder="Filter terms… — press / to focus (e.g. ROI, classifier, angle)" aria-label="Filter glossary terms">
+     <div id="gloss-az"></div>
+     <div id="gloss-count"></div>
+   </div>
+   <p id="gloss-empty">No terms match your filter.</p>
+   <button id="gloss-top" title="Back to top" aria-label="Back to top">&#8593;</button>
+   <script>
+   (function(){
+     function init(){
+       var dl=document.querySelector('dl.glossary');
+       if(!dl){return;}
+       var entries=[],cur=null,kids=dl.children,i;
+       for(i=0;i<kids.length;i++){
+         var el=kids[i];
+         if(el.tagName==='DT'){
+           if(!cur||cur.closed){cur={dts:[],dd:null,closed:false};entries.push(cur);}
+           cur.dts.push(el);
+         }else if(el.tagName==='DD'){
+           if(cur){cur.dd=el;cur.closed=true;}
+         }
+       }
+       entries.forEach(function(e){
+         var terms=e.dts.map(function(d){return (d.textContent||'').replace(//g,'').trim();});
+         e.terms=terms;
+         e.text=(terms.join(' ')+' '+(e.dd?e.dd.textContent:'')).toLowerCase();
+         var fl=(terms[0]||'#').charAt(0).toUpperCase();
+         e.letter=/[A-Z]/.test(fl)?fl:'#';
+       });
+       // synonym terms: when several terms share one definition (Sphinx places it under the LAST
+       // term, leaving the earlier ones looking like orphaned headings). Render the group as one
+       // combined heading line, e.g. "annotation, labelling", followed by the single definition.
+       entries.forEach(function(e){
+         if(e.dts.length<2){return;}
+         e.dts.forEach(function(d,idx){
+           d.classList.add('gloss-grp-term');
+           if(idx<e.dts.length-1){d.classList.add('gloss-syn');}
+         });
+       });
+       var az=document.getElementById('gloss-az'),present={};
+       entries.forEach(function(e){if(!present[e.letter]){present[e.letter]=e;}});
+       'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(function(L){
+         var a=document.createElement('a');a.textContent=L;
+         if(present[L]&&present[L].dts[0].id){a.href='#'+present[L].dts[0].id;}
+         else{a.className='disabled';}
+         az.appendChild(a);
+       });
+       var countEl=document.getElementById('gloss-count'),emptyEl=document.getElementById('gloss-empty'),total=entries.length;
+       function clearMarks(){
+         var marks=dl.querySelectorAll('mark.gloss-hl'),k;
+         for(k=marks.length-1;k>=0;k--){var m=marks[k],p=m.parentNode;p.replaceChild(document.createTextNode(m.textContent),m);p.normalize();}
+       }
+       function markEl(el,q){
+         var walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null,false),nodes=[],n;
+         while((n=walker.nextNode())){nodes.push(n);}
+         nodes.forEach(function(node){
+           var t=node.nodeValue,lt=t.toLowerCase(),idx=lt.indexOf(q);
+           if(idx<0){return;}
+           var frag=document.createDocumentFragment(),pos=0;
+           while(idx>=0){
+             if(idx>pos){frag.appendChild(document.createTextNode(t.slice(pos,idx)));}
+             var mk=document.createElement('mark');mk.className='gloss-hl';mk.textContent=t.slice(idx,idx+q.length);
+             frag.appendChild(mk);pos=idx+q.length;idx=lt.indexOf(q,pos);
+           }
+           if(pos<t.length){frag.appendChild(document.createTextNode(t.slice(pos)));}
+           node.parentNode.replaceChild(frag,node);
+         });
+       }
+       function update(q){
+         q=(q||'').trim().toLowerCase();var shown=0;
+         clearMarks();
+         entries.forEach(function(e){
+           var match=!q||e.text.indexOf(q)>=0;
+           e.dts.forEach(function(d){d.style.display=match?'':'none';});
+           if(e.dd){e.dd.style.display=match?'':'none';}
+           if(match){
+             shown++;
+             if(q){e.dts.forEach(function(d){markEl(d,q);});if(e.dd){markEl(e.dd,q);}}
+           }
+         });
+         countEl.textContent=q?(shown+' of '+total+' terms'):(total+' terms');
+         emptyEl.style.display=(q&&shown===0)?'block':'none';
+       }
+       var inp=document.getElementById('gloss-search');
+       inp.addEventListener('input',function(){update(inp.value);});
+       update('');
+       // press "/" anywhere to jump to the filter box
+       document.addEventListener('keydown',function(ev){
+         if(ev.key!=='/'||ev.metaKey||ev.ctrlKey||ev.altKey){return;}
+         var ae=document.activeElement,tag=(ae&&ae.tagName||'').toLowerCase();
+         if(tag==='input'||tag==='textarea'||(ae&&ae.isContentEditable)){return;}
+         ev.preventDefault();inp.focus();
+       });
+       // floating back-to-top button
+       var topBtn=document.getElementById('gloss-top');
+       function onScroll(){
+         var y=window.scrollY||document.documentElement.scrollTop||0;
+         if(y>500){topBtn.classList.add('show');}else{topBtn.classList.remove('show');}
+       }
+       window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+       topBtn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+     }
+     if(document.readyState!=='loading'){init();}
+     else{document.addEventListener('DOMContentLoaded',init);}
+   })();
+   </script>
+
 .. glossary::
    :sorted:
 
@@ -252,15 +380,34 @@ cross-referenced from anywhere in the docs with the ``:term:`` role
       unnecessary or unavailable.
 
    third-party annotation tool
+      External behavior-annotation software whose frame-by-frame labels SimBA can import and
+      append to extracted :term:`features <feature>` as ground-truth :term:`annotation`.
+      Supported tools include :term:`BORIS`, :term:`Ethovision`, :term:`Observer`,
+      :term:`Solomon`, :term:`DeepEthogram` and :term:`BENTO`.
+
    BORIS
+      Behavioral Observation Research Interactive Software — a free, open-source event-logging
+      program for manual behavioral coding; SimBA imports its exported annotations.
+
    Ethovision
-   DeepEthogram
+      Noldus EthoVision XT — commercial video-tracking and behavioral-analysis software; SimBA
+      can import its exported annotations.
+
    Observer
+      Noldus The Observer XT — commercial event-logging software for manual behavioral
+      annotation; importable into SimBA.
+
    Solomon
+      Solomon Coder — a free manual event-logging / ethogram coding tool; SimBA imports its
+      coded annotations.
+
+   DeepEthogram
+      An open-source supervised deep-learning tool that classifies behaviors directly from raw
+      video frames; SimBA can import its predictions as labels.
+
    BENTO
-      External behavior-annotation software whose labels SimBA can import and append to
-      extracted :term:`features <feature>` as ground truth. Supported tools include BORIS,
-      Noldus Ethovision, Noldus Observer, Solomon Coder, DeepEthogram and BENTO.
+      A MATLAB GUI (Caltech) for browsing, annotating and analysing synchronised behavioral,
+      tracking and neural data; SimBA imports its annotations.
 
    SuperAnimal-TopView
       A zero-shot, pre-trained top-view mouse :term:`pose estimation` model (from the
@@ -273,6 +420,50 @@ cross-referenced from anywhere in the docs with the ``:term:`` role
    AMBER
       A pose-estimation pipeline for maternal-pup interaction analysis whose tracking
       data SimBA can import.
+
+   arena
+      The experimental enclosure (open field, home cage, box, etc.) in which an animal is
+      recorded. SimBA maps arena pixels to real-world units via :term:`px/mm` and can restrict
+      analyses to it or to :term:`ROIs <ROI>` drawn within it.
+
+   background subtraction
+      A markerless segmentation technique that models the static scene and flags pixels
+      differing from it as the moving animal; the basis of SimBA's :term:`blob tracking`.
+
+   class imbalance
+      The common situation where the :term:`behavior` of interest is present in far fewer
+      frames than it is absent, which can bias a :term:`classifier` toward predicting
+      "absent". Addressed with re-sampling (see :term:`oversampling`, :term:`undersampling`,
+      :term:`SMOTE`).
+
+   oversampling
+      Re-balancing training data by duplicating (or synthesising) minority-class
+      (:term:`behavior`-present) frames so the :term:`classifier` sees them more often. See
+      :term:`class imbalance`.
+
+   undersampling
+      Re-balancing training data by randomly dropping majority-class
+      (:term:`behavior`-absent) frames to a target ratio of absent-to-present frames. See
+      :term:`class imbalance`.
+
+   SMOTE
+      Synthetic Minority Over-sampling Technique — generates new synthetic minority-class
+      training examples by interpolating between existing ones, rather than plain
+      duplication. One of SimBA's :term:`oversampling` options.
+
+   hyperparameters
+      The configurable settings of a :term:`classifier` fixed before training — for a
+      :term:`random forest`: number of trees, max features, min samples per leaf, split
+      criterion. Set per classifier in the SimBA training interface.
+
+   latency
+      The time from the start of a session (or a trigger) to the first occurrence of a
+      :term:`behavior`; reported per video in SimBA's :term:`aggregate statistics`.
+
+   directing
+      An animal orienting toward a target — another animal, a :term:`body-part` or an
+      :term:`ROI`. SimBA quantifies directing (see :term:`directionality`) from the angle
+      between an animal's heading and the target.
 
    CLAHE
       Contrast Limited Adaptive Histogram Equalization - a local contrast-enhancement

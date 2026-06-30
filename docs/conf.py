@@ -547,6 +547,24 @@ def _generate_download_stats(app):
     data_json = json.dumps({'labels': labels, 'vals': vals, 'colors': colors})
     # full per-country totals (alpha-2 keyed) for the world map (used for the boolean fill + tooltip)
     map_json = json.dumps({str(c): int(v) for c, v in by_country.items()})
+
+    # ---- continent rollup (ISO alpha-2 -> continent); unmapped codes fall into "Other" ----
+    _CONT_CODES = {
+        'Africa': 'DZ AO BJ BW BF BI CM CV CF TD KM CG CD CI DJ EG GQ ER ET GA GM GH GN GW KE LS LR LY MG MW ML MR MU MA MZ NA NE NG RW ST SN SC SL SO ZA SS SD SZ TZ TG TN UG ZM ZW',
+        'Asia': 'AF AM AZ BH BD BT BN KH CN CY GE HK IN ID IR IQ IL JP JO KZ KW KG LA LB MO MY MV MN MM NP KP OM PK PS PH QA SA SG KR LK SY TW TJ TH TL TR TM AE UZ VN YE',
+        'Europe': 'AL AD AT BY BE BA BG HR CZ DK EE FI FR DE GR HU IS IE IT XK LV LI LT LU MT MD MC ME NL MK NO PL PT RO RU SM RS SK SI ES SE CH UA GB VA',
+        'North America': 'AG BS BB BZ CA CR CU DM DO SV GD GT HT HN JM MX NI PA KN LC VC TT US VG AI AW BM KY GP MQ PR',
+        'South America': 'AR BO BR CL CO EC FK GF GY PE PY SR UY VE',
+        'Oceania': 'AU FJ KI MH FM NR NZ PW PG WS SB TO TV VU NC PF GU',
+    }
+    _code2cont = {cc: cont for cont, codes in _CONT_CODES.items() for cc in codes.split()}
+    _cont_tot = {}
+    for _cc, _v in by_country.items():
+        _key = _code2cont.get(str(_cc), 'Other')
+        _cont_tot[_key] = _cont_tot.get(_key, 0) + int(_v)
+    _cont_order = sorted(_cont_tot, key=lambda k: _cont_tot[k], reverse=True)
+    cont_json = json.dumps({'labels': _cont_order, 'vals': [_cont_tot[k] for k in _cont_order]})
+
     total = int(df['download_count'].sum())
     n_country = int(df['country'].nunique())
     n_version = int(df['package_version'].nunique())
@@ -590,6 +608,51 @@ def _generate_download_stats(app):
                             'dow': dow_vals, 'ver_labels': ver_labels, 'ver': ver_vals,
                             'adopt_dates': adopt_dates, 'adopt': adopt})
 
+    # ---- scholarly citations of the SimBA paper (OpenAlex, summed across journal + preprint DOIs) ----
+    # OpenAlex is keyless, covers preprints + all venues, and uniquely returns a per-year breakdown.
+    CITE_DOIS = ['10.1038/s41593-024-01649-9',   # Nature Neuroscience (2024)
+                 '10.1101/2020.04.19.049452']    # bioRxiv preprint (2020)
+    try:
+        import collections
+        _per_year = collections.defaultdict(int)
+        _ctot = 0
+        for _doi in CITE_DOIS:
+            _url = f'https://api.openalex.org/works/doi:{_doi}?mailto=simon@netholabs.com'
+            _req = urllib.request.Request(_url, headers={'User-Agent': 'simba-docs'})
+            with urllib.request.urlopen(_req, timeout=25) as _resp:
+                _w = json.loads(_resp.read().decode('utf-8'))
+            _ctot += int(_w.get('cited_by_count') or 0)
+            for _c in _w.get('counts_by_year', []):
+                _per_year[int(_c['year'])] += int(_c['cited_by_count'])
+        if not _per_year:
+            raise RuntimeError('no counts_by_year returned')
+        _yrs = sorted(_per_year)
+        cite_years = [str(y) for y in _yrs]
+        cite_counts = [_per_year[y] for y in _yrs]
+        cite_total = _ctot
+    except Exception as e:  # noqa: BLE001 - never fail the build over this; keep last-known values
+        print(f'[download_stats] OpenAlex citation fetch failed ({e!r}); using fallback snapshot.')
+        cite_years = ['2020', '2021', '2022', '2023', '2024', '2025', '2026']
+        cite_counts = [21, 39, 56, 69, 89, 108, 50]
+        cite_total = 433
+    _cur_year = str(datetime.datetime.now().year)
+    cite_partial = cite_years.index(_cur_year) if _cur_year in cite_years else -1
+    cites_json = json.dumps({'years': cite_years, 'counts': cite_counts,
+                             'total': cite_total, 'partial': cite_partial})
+
+    # ---- NIH iCite Relative Citation Ratio (field- & time-normalised impact; 1.0 = median NIH paper) ----
+    # Only the journal article is PubMed-indexed; the preprint has no PMID, so RCR is for the journal paper.
+    CITE_PMID = '38778146'   # Nature Neuroscience article (resolved from its DOI)
+    try:
+        _ic_url = f'https://icite.od.nih.gov/api/pubs?pmids={CITE_PMID}'
+        _ic_req = urllib.request.Request(_ic_url, headers={'User-Agent': 'simba-docs'})
+        with urllib.request.urlopen(_ic_req, timeout=25) as _ic_resp:
+            _ic = json.loads(_ic_resp.read().decode('utf-8'))['data'][0]
+        rcr = round(float(_ic['relative_citation_ratio']), 1)
+    except Exception as e:  # noqa: BLE001 - never fail the build over this; keep last-known value
+        print(f'[download_stats] NIH iCite RCR fetch failed ({e!r}); using fallback snapshot.')
+        rcr = 24.8
+
     try:
         MUT = '#8a9099'
         style = (
@@ -603,9 +666,11 @@ def _generate_download_stats(app):
             ".simba-dl-card .v{display:block;font-size:clamp(16px,5vw,22px);font-weight:800;color:#21567a;line-height:1.1;}\n"
             ".simba-dl-card .l{display:block;font-size:10.5px;color:#6b7280;margin-top:4px;}\n"
             ".simba-dl-h3{font-size:15px;color:#23272e;font-weight:700;margin:24px 0 10px;}\n"
+            ".simba-dl-badge{display:inline-block;font-size:11px;font-weight:700;color:#8a5a00;background:#fdf1d6;"
+            "border:1px solid #f0d68f;border-radius:999px;padding:2px 9px;margin-left:8px;vertical-align:middle;white-space:nowrap;cursor:help;}\n"
             ".simba-dl-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;margin-top:8px;}\n"
             ".simba-dl-cell{min-width:0;}\n"
-            ".simba-dl-cell .simba-dl-h3{margin:0 0 8px;}\n"
+            ".simba-dl-cell .simba-dl-h3{margin:0 0 8px;min-height:38px;display:flex;align-items:center;flex-wrap:wrap;gap:0 4px;}\n"
             ".simba-dl-cell--wide{grid-column:1 / -1;}\n"
             "@media (max-width:680px){.simba-dl-grid{grid-template-columns:1fr;}}\n"
             ".simba-dl-panel{position:relative;height:340px;box-sizing:border-box;background:#fff;border:1px solid #e2e8f0;"
@@ -638,22 +703,32 @@ def _generate_download_stats(app):
             '  <div class="simba-dl-grid">\n'
             '    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Downloads over time</h3>\n'
             '      <div class="simba-dl-panel"><canvas id="dlOverTime"></canvas></div></div>\n'
+            '    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Cumulative downloads</h3>\n'
+            '      <div class="simba-dl-panel"><canvas id="dlCumulative"></canvas></div></div>\n'
             '    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Downloads by day of week</h3>\n'
             '      <div class="simba-dl-panel"><canvas id="dlDow"></canvas></div></div>\n'
             '    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Top 15 versions</h3>\n'
             '      <div class="simba-dl-panel"><canvas id="dlVersions"></canvas></div></div>\n'
             '    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Version adoption over time</h3>\n'
             '      <div class="simba-dl-panel"><canvas id="dlAdoption"></canvas></div></div>\n'
+            f'    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Paper citations per year &middot; {cite_total:,} total'
+            f'      <span class="simba-dl-badge" title="NIH iCite Relative Citation Ratio: field- and time-normalised citation impact, where 1.0 = the median NIH-funded paper.">NIH RCR {rcr:g} &middot; ~{round(rcr)}&times; median</span></h3>\n'
+            '      <div class="simba-dl-panel"><canvas id="dlCitations"></canvas></div></div>\n'
             '    <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Downloads by country &mdash; world map</h3>\n'
             '      <div class="simba-dl-map" id="dlMap"></div>\n'
-            '      <div class="simba-dl-legend"><span class="sw" style="background:#2a7fb8"></span><span>&ge;1 download</span>'
-            '<span class="sw" style="background:#dce4ee;margin-left:14px"></span><span>no downloads</span></div></div>\n'
+            '      <div class="simba-dl-legend"><span>fewer</span><i></i><span>more</span>'
+            '<span class="sw" style="background:#dce4ee;margin-left:14px"></span><span>none</span></div></div>\n'
+            '    <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Downloads by continent</h3>\n'
+            '      <div class="simba-dl-panel" style="height:300px"><canvas id="dlContinents"></canvas></div></div>\n'
             f'    <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Top {TOP} countries</h3>\n'
             '      <div class="simba-dl-chart"><canvas id="dlCountries"></canvas></div></div>\n'
             '  </div>\n'
             '  <p class="simba-dl-more"><a href="https://sronilsson.github.io/download_stats/" target="_blank" rel="noopener">'
             '\U0001F4CA  Full interactive download dashboard &rarr;</a></p>\n'
             f'  <p class="simba-dl-foot">Source: PyPI downloads via Google BigQuery &middot; updated {stamp}</p>\n'
+            '  <p class="simba-dl-foot">Citation counts from <a href="https://openalex.org" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">OpenAlex</a>'
+            ' &middot; SimBA journal (10.1038/s41593-024-01649-9) + preprint (10.1101/2020.04.19.049452) DOIs &middot; current year to date'
+            ' &middot; RCR from <a href="https://icite.od.nih.gov" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">NIH iCite</a></p>\n'
             '</div>\n')
         script = (
             # RTD theme loads RequireJS; disable AMD while the UMD libs load so they set
@@ -666,14 +741,21 @@ def _generate_download_stats(app):
             f'  const MAP = {map_json};\n'
             '  const el = document.getElementById("dlMap");\n'
             '  if (!el || typeof jsVectorMap === "undefined") return;\n'
-            '  // boolean fill: countries with >= 1 download get one colour, the rest stay grey\n'
-            '  const HAS = {}; for (const k in MAP) { HAS[k] = 1; }\n'
+            '  // graduated choropleth. The jsVectorMap series scale is an ordinal lookup (value -> scale[value]),\n'
+            '  // NOT a gradient, so we bucket each country into 1..N by log of its (highly skewed) count and\n'
+            '  // index a colour ramp with that bucket. (Bucket 0 is skipped by the lib, so buckets start at 1.)\n'
+            '  const SCALE = ["#e8f4fb", "#cfe6f5", "#9bcde9", "#5aa7d4", "#3a86c0", "#2a6299", "#143a5e"];\n'
+            '  const NB = SCALE.length - 1;\n'
+            '  const _counts = Object.keys(MAP).map((k) => MAP[k] || 0);\n'
+            '  const _maxLog = Math.log10(Math.max.apply(null, _counts.concat([1])) + 1) || 1;\n'
+            '  const BUCK = {};\n'
+            '  for (const k in MAP) { let b = Math.ceil(Math.log10((MAP[k] || 0) + 1) / _maxLog * NB); BUCK[k] = b < 1 ? 1 : (b > NB ? NB : b); }\n'
             '  new jsVectorMap({\n'
             '    selector: "#dlMap", map: "world",\n'
             '    zoomButtons: true, zoomOnScroll: true, backgroundColor: "transparent",\n'
             '    regionStyle: {initial: {fill: "#dce4ee", stroke: "#ffffff", "stroke-width": 0.5},\n'
             '      hover: {fill: "#f0c44a", "fill-opacity": 1}},\n'
-            '    series: {regions: [{attribute: "fill", values: HAS, scale: ["#2a7fb8", "#2a7fb8"]}]},\n'
+            '    series: {regions: [{attribute: "fill", values: BUCK, scale: SCALE}]},\n'
             '    onRegionTooltipShow(event, tooltip, code) {\n'
             '      const v = MAP[code] || 0;\n'
             '      tooltip.text(tooltip.text() + (v ? ": " + v.toLocaleString() + " downloads" : ": no downloads"), true);\n'
@@ -684,6 +766,8 @@ def _generate_download_stats(app):
             '  if (!window.Chart) return;\n'
             f'  const DL = {data_json};\n'
             f'  const DASH = {dash_json};\n'
+            f'  const CITES = {cites_json};\n'
+            f'  const CONT = {cont_json};\n'
             '  const C = (id) => document.getElementById(id);\n'
             '  const GRID = "#eef2f7", INK = "#23272e", MUT = "#6b7280";\n'
             '  const PAL = ["#21567a","#2a7fb8","#38a8d4","#5cc6b3","#e0a33a","#e0653a","#b9c0c9"];\n'
@@ -703,15 +787,35 @@ def _generate_download_stats(app):
             '      plugins: {legend: {display: false}, tooltip: {callbacks: {label: (c) => " " + c.parsed.x.toLocaleString() + " downloads"}}},\n'
             '      scales: {x: {beginAtZero: true, grid: {display: false}, ticks: {color: MUT}}, y: {grid: {display: false}, ticks: {color: INK, font: {weight: "600"}}}}}\n'
             '  });\n'
+            '  if (C("dlContinents")) new Chart(C("dlContinents"), {\n'
+            '    type: "bar", plugins: [track],\n'
+            '    data: {labels: CONT.labels, datasets: [{label: "Downloads", data: CONT.vals,\n'
+            '      backgroundColor: PAL, hoverBackgroundColor: PAL, borderRadius: 4, maxBarThickness: 26}]},\n'
+            '    options: {indexAxis: "y", responsive: true, maintainAspectRatio: false, layout: {padding: {right: 6}},\n'
+            '      plugins: {legend: {display: false}, tooltip: {callbacks: {label: function(c) {\n'
+            '        const t = CONT.vals.reduce((a, b) => a + b, 0), p = t ? Math.round(c.parsed.x / t * 100) : 0;\n'
+            '        return " " + c.parsed.x.toLocaleString() + " downloads (" + p + "%)"; }}}},\n'
+            '      scales: {x: {beginAtZero: true, grid: {display: false}, ticks: {color: MUT}}, y: {grid: {display: false}, ticks: {color: INK, font: {weight: "600"}}}}}\n'
+            '  });\n'
             '  if (C("dlOverTime")) new Chart(C("dlOverTime"), {\n'
+            '    type: "bar",\n'
             '    data: {labels: DASH.date_labels, datasets: [\n'
-            '      {type: "bar", label: "Daily", data: DASH.daily, backgroundColor: "#7fc1e3", borderRadius: 3, order: 2, yAxisID: "y"},\n'
-            '      {type: "line", label: "Cumulative", data: DASH.cumulative, borderColor: "#21567a", backgroundColor: "rgba(33,86,122,.08)", fill: true, tension: .3, pointRadius: 0, borderWidth: 2.5, order: 1, yAxisID: "y1"}]},\n'
+            '      {label: "Daily", data: DASH.daily, backgroundColor: "#7fc1e3", borderRadius: 3}]},\n'
             '    options: {responsive: true, maintainAspectRatio: false,\n'
-            '      plugins: {legend: {display: true, position: "top", labels: {boxWidth: 12, font: {size: 11}}}},\n'
-            '      scales: {y: {beginAtZero: true, position: "left", grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "daily", color: MUT}},\n'
-            '               y1: {beginAtZero: true, position: "right", grid: {display: false}, ticks: {color: MUT}, title: {display: true, text: "cumulative", color: MUT}},\n'
-            '               x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 0, autoSkip: true, maxTicksLimit: 12}}}}\n'
+            '      plugins: {legend: {display: false}},\n'
+            '      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "daily", color: MUT}},\n'
+            '               x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 10}}}}\n'
+            '  });\n'
+            '  if (C("dlCumulative")) new Chart(C("dlCumulative"), {\n'
+            '    type: "line",\n'
+            '    data: {labels: DASH.date_labels, datasets: [\n'
+            '      {label: "Cumulative", data: DASH.cumulative, borderColor: "#21567a", backgroundColor: "rgba(33,86,122,.10)", fill: true, tension: .3, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: "#21567a", pointHoverBorderColor: "#fff", pointHoverBorderWidth: 2, borderWidth: 2.5}]},\n'
+            '    options: {responsive: true, maintainAspectRatio: false, interaction: {intersect: false, mode: "index"},\n'
+            '      plugins: {legend: {display: false}, tooltip: {displayColors: false,\n'
+            '        callbacks: {title: (items) => "Through " + items[0].label,\n'
+            '                    label: (c) => " " + c.parsed.y.toLocaleString() + " downloads total"}}},\n'
+            '      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "cumulative \\u00b7 30 days", color: MUT}},\n'
+            '               x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 10}}}}\n'
             '  });\n'
             '  if (C("dlDow")) new Chart(C("dlDow"), {\n'
             '    type: "bar",\n'
@@ -731,7 +835,18 @@ def _generate_download_stats(app):
             '    data: {labels: DASH.adopt_dates, datasets: DASH.adopt.map(function(s, i){ return {label: s.label, data: s.data, backgroundColor: PAL[i % PAL.length], borderColor: PAL[i % PAL.length], fill: true, tension: .25, pointRadius: 0, borderWidth: 1}; })},\n'
             '    options: {responsive: true, maintainAspectRatio: false, interaction: {intersect: false, mode: "index"},\n'
             '      plugins: {legend: {display: true, position: "top", labels: {boxWidth: 10, font: {size: 10}}}},\n'
-            '      scales: {y: {stacked: true, beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}}, x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 0, autoSkip: true, maxTicksLimit: 12}}}}\n'
+            '      scales: {y: {stacked: true, beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}}, x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 10}}}}\n'
+            '  });\n'
+            '  if (C("dlCitations")) new Chart(C("dlCitations"), {\n'
+            '    type: "bar",\n'
+            '    data: {labels: CITES.years, datasets: [{label: "Citations", data: CITES.counts,\n'
+            '      backgroundColor: CITES.years.map((y, i) => i === CITES.partial ? "#9ec9e6" : "#2a7fb8"), borderRadius: 4, maxBarThickness: 54}]},\n'
+            '    options: {responsive: true, maintainAspectRatio: false,\n'
+            '      plugins: {legend: {display: false}, tooltip: {displayColors: false, callbacks: {\n'
+            '        title: (i) => i[0].label + (i[0].dataIndex === CITES.partial ? " (partial \\u00b7 to date)" : ""),\n'
+            '        label: (c) => " " + c.parsed.y.toLocaleString() + " citing publications"}}},\n'
+            '      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "citing publications", color: MUT}},\n'
+            '               x: {grid: {display: false}, ticks: {color: INK, font: {weight: "600"}}}}}\n'
             '  });\n'
             '})();\n</script>\n'
             '<script>try { window.define = window.__odef; } catch (e) {}</script>\n')

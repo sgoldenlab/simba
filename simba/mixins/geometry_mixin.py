@@ -94,6 +94,12 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
+        .. video:: _static/img/mouse_jog_bodyparts_to_polygon.webm
+           :width: 320
+           :autoplay:
+           :loop:
+           :muted:
+
         :param np.ndarray data: 3D array with body-part coordinates where rows are frames and columns are x and y coordinates.
         :param Literal["round", "square", "flat"] cap_style: How intersections between lines are handled in the polygon. Default: round.
         :param int parallel_offset: How much to "buffer" the polygon from the original size in millimeters. Default: 1.
@@ -231,7 +237,7 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
-        .. video:: _static/img/bodyparts_to_circle.webm
+        .. video:: _static/img/bodyparts_to_circle_3.webm
            :width: 450
            :autoplay:
            :loop:
@@ -315,6 +321,13 @@ class GeometryMixin(object):
         .. image:: _static/img/parallel_offset_polygon.webp
            :alt: Parallel offset polygon
            :width: 450
+           :align: center
+
+        .. video:: _static/img/parallel_offset_polygon.webm
+           :width: 320
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :param Polygon polygon: The input polygon to offset.
@@ -743,6 +756,13 @@ class GeometryMixin(object):
         .. image:: _static/img/get_center.png
            :alt: Get center
            :width: 500
+           :align: center
+
+        .. video:: _static/img/get_center.webm
+           :width: 320
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :param Union[LineString, Polygon, MultiPolygon, List[Union[LineString, Polygon, MultiPolygon]]] shape: A single geometry or a list of geometries. If None, then None is returned.
@@ -1177,6 +1197,13 @@ class GeometryMixin(object):
         .. image:: _static/img/minimum_rotated_rectangle.png
            :alt: Minimum rotated rectangle
            :width: 500
+           :align: center
+
+        .. video:: _static/img/minimum_rotated_rectangle.webm
+           :width: 320
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         .. seealso::
@@ -3400,6 +3427,13 @@ class GeometryMixin(object):
            :width: 500
            :align: center
 
+        .. video:: _static/img/cumsum_coord_geometries.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            To create grid ``geometries``, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
 
@@ -3478,6 +3512,13 @@ class GeometryMixin(object):
         .. image:: _static/img/cumsum_bool_geometries.webp
            :alt: Cumsum bool geometries
            :width: 500
+           :align: center
+
+        .. video:: _static/img/cumsum_bool_geometries.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         .. seealso::

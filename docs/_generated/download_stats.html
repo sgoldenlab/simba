@@ -7,9 +7,10 @@
 .simba-dl-card .v{display:block;font-size:clamp(16px,5vw,22px);font-weight:800;color:#21567a;line-height:1.1;}
 .simba-dl-card .l{display:block;font-size:10.5px;color:#6b7280;margin-top:4px;}
 .simba-dl-h3{font-size:15px;color:#23272e;font-weight:700;margin:24px 0 10px;}
+.simba-dl-badge{display:inline-block;font-size:11px;font-weight:700;color:#8a5a00;background:#fdf1d6;border:1px solid #f0d68f;border-radius:999px;padding:2px 9px;margin-left:8px;vertical-align:middle;white-space:nowrap;cursor:help;}
 .simba-dl-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;margin-top:8px;}
 .simba-dl-cell{min-width:0;}
-.simba-dl-cell .simba-dl-h3{margin:0 0 8px;}
+.simba-dl-cell .simba-dl-h3{margin:0 0 8px;min-height:38px;display:flex;align-items:center;flex-wrap:wrap;gap:0 4px;}
 .simba-dl-cell--wide{grid-column:1 / -1;}
 @media (max-width:680px){.simba-dl-grid{grid-template-columns:1fr;}}
 .simba-dl-panel{position:relative;height:340px;box-sizing:border-box;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);padding:14px 16px 10px;}
@@ -25,31 +26,38 @@
 .simba-dl-foot{text-align:right;font-size:11px;color:#8a9099;font-style:italic;margin:12px 4px 0;}
 </style>
 <div class="simba-dl">
-  <p class="simba-dl-sub">PyPI downloads of <b>simba-uw-tf-dev</b> &middot; last 30 days &middot; 2026-05-30 &ndash; 2026-06-29</p>
+  <p class="simba-dl-sub">PyPI downloads of <b>simba-uw-tf-dev</b> &middot; last 30 days &middot; 2026-05-31 &ndash; 2026-06-30</p>
   <div class="simba-dl-cards">
-    <div class="simba-dl-card"><span class="v">25,592</span><span class="l">downloads &middot; 30 days</span></div>
-    <div class="simba-dl-card"><span class="v">826</span><span class="l">avg / day</span></div>
+    <div class="simba-dl-card"><span class="v">24,234</span><span class="l">downloads &middot; 30 days</span></div>
+    <div class="simba-dl-card"><span class="v">782</span><span class="l">avg / day</span></div>
     <div class="simba-dl-card"><span class="v">2,403</span><span class="l">peak day (Jun 06)</span></div>
-    <div class="simba-dl-card"><span class="v">818</span><span class="l">versions</span></div>
+    <div class="simba-dl-card"><span class="v">817</span><span class="l">versions</span></div>
     <div class="simba-dl-card"><span class="v">47</span><span class="l">countries</span></div>
   </div>
   <div class="simba-dl-grid">
     <div class="simba-dl-cell"><h3 class="simba-dl-h3">Downloads over time</h3>
       <div class="simba-dl-panel"><canvas id="dlOverTime"></canvas></div></div>
+    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Cumulative downloads</h3>
+      <div class="simba-dl-panel"><canvas id="dlCumulative"></canvas></div></div>
     <div class="simba-dl-cell"><h3 class="simba-dl-h3">Downloads by day of week</h3>
       <div class="simba-dl-panel"><canvas id="dlDow"></canvas></div></div>
     <div class="simba-dl-cell"><h3 class="simba-dl-h3">Top 15 versions</h3>
       <div class="simba-dl-panel"><canvas id="dlVersions"></canvas></div></div>
     <div class="simba-dl-cell"><h3 class="simba-dl-h3">Version adoption over time</h3>
       <div class="simba-dl-panel"><canvas id="dlAdoption"></canvas></div></div>
+    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Paper citations per year &middot; 433 total      <span class="simba-dl-badge" title="NIH iCite Relative Citation Ratio: field- and time-normalised citation impact, where 1.0 = the median NIH-funded paper.">NIH RCR 24.8 &middot; ~25&times; median</span></h3>
+      <div class="simba-dl-panel"><canvas id="dlCitations"></canvas></div></div>
     <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Downloads by country &mdash; world map</h3>
       <div class="simba-dl-map" id="dlMap"></div>
-      <div class="simba-dl-legend"><span class="sw" style="background:#2a7fb8"></span><span>&ge;1 download</span><span class="sw" style="background:#dce4ee;margin-left:14px"></span><span>no downloads</span></div></div>
+      <div class="simba-dl-legend"><span>fewer</span><i></i><span>more</span><span class="sw" style="background:#dce4ee;margin-left:14px"></span><span>none</span></div></div>
+    <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Downloads by continent</h3>
+      <div class="simba-dl-panel" style="height:300px"><canvas id="dlContinents"></canvas></div></div>
     <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Top 20 countries</h3>
       <div class="simba-dl-chart"><canvas id="dlCountries"></canvas></div></div>
   </div>
   <p class="simba-dl-more"><a href="https://sronilsson.github.io/download_stats/" target="_blank" rel="noopener">📊  Full interactive download dashboard &rarr;</a></p>
-  <p class="simba-dl-foot">Source: PyPI downloads via Google BigQuery &middot; updated June 29, 2026</p>
+  <p class="simba-dl-foot">Source: PyPI downloads via Google BigQuery &middot; updated June 30, 2026</p>
+  <p class="simba-dl-foot">Citation counts from <a href="https://openalex.org" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">OpenAlex</a> &middot; SimBA journal (10.1038/s41593-024-01649-9) + preprint (10.1101/2020.04.19.049452) DOIs &middot; current year to date &middot; RCR from <a href="https://icite.od.nih.gov" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">NIH iCite</a></p>
 </div>
 <script>window.__odef = window.define; try { window.define = undefined; } catch (e) {}</script>
 <link rel="stylesheet" href="_static/css/jsvectormap.min.css">
@@ -57,17 +65,24 @@
 <script src="_static/js/jsvectormap-world.js"></script>
 <script>
 (function(){
-  const MAP = {"US": 13095, "DE": 2937, "HK": 2902, "CN": 1140, "GB": 1098, "TW": 1084, "PL": 689, "FR": 412, "IE": 353, "ES": 292, "KR": 281, "CA": 187, "SG": 167, "BR": 165, "IN": 144, "JP": 132, "RU": 124, "NL": 75, "SE": 72, "AU": 42, "NO": 31, "IL": 24, "FI": 24, "DK": 24, "IR": 11, "MX": 11, "PH": 10, "AT": 8, "IT": 8, "ID": 7, "CL": 6, "CZ": 5, "MD": 5, "BE": 5, "AR": 4, "MA": 3, "UA": 3, "ZA": 3, "NP": 1, "ME": 1, "RO": 1, "LT": 1, "LK": 1, "TR": 1, "EE": 1, "CH": 1, "VG": 1};
+  const MAP = {"US": 13100, "DE": 2939, "HK": 1533, "CN": 1109, "GB": 1098, "TW": 1084, "PL": 687, "FR": 410, "IE": 353, "ES": 292, "KR": 281, "CA": 187, "SG": 166, "BR": 165, "IN": 143, "JP": 132, "RU": 122, "NL": 75, "SE": 72, "AT": 49, "AU": 42, "NO": 31, "FI": 24, "IL": 24, "DK": 24, "PH": 15, "MX": 11, "IR": 11, "IT": 8, "ID": 7, "CL": 6, "MD": 5, "BE": 5, "CZ": 5, "UA": 3, "ZA": 3, "MA": 3, "NP": 1, "RO": 1, "ME": 1, "LT": 1, "TR": 1, "LK": 1, "EE": 1, "CH": 1, "VG": 1, "AR": 1};
   const el = document.getElementById("dlMap");
   if (!el || typeof jsVectorMap === "undefined") return;
-  // boolean fill: countries with >= 1 download get one colour, the rest stay grey
-  const HAS = {}; for (const k in MAP) { HAS[k] = 1; }
+  // graduated choropleth. The jsVectorMap series scale is an ordinal lookup (value -> scale[value]),
+  // NOT a gradient, so we bucket each country into 1..N by log of its (highly skewed) count and
+  // index a colour ramp with that bucket. (Bucket 0 is skipped by the lib, so buckets start at 1.)
+  const SCALE = ["#e8f4fb", "#cfe6f5", "#9bcde9", "#5aa7d4", "#3a86c0", "#2a6299", "#143a5e"];
+  const NB = SCALE.length - 1;
+  const _counts = Object.keys(MAP).map((k) => MAP[k] || 0);
+  const _maxLog = Math.log10(Math.max.apply(null, _counts.concat([1])) + 1) || 1;
+  const BUCK = {};
+  for (const k in MAP) { let b = Math.ceil(Math.log10((MAP[k] || 0) + 1) / _maxLog * NB); BUCK[k] = b < 1 ? 1 : (b > NB ? NB : b); }
   new jsVectorMap({
     selector: "#dlMap", map: "world",
     zoomButtons: true, zoomOnScroll: true, backgroundColor: "transparent",
     regionStyle: {initial: {fill: "#dce4ee", stroke: "#ffffff", "stroke-width": 0.5},
       hover: {fill: "#f0c44a", "fill-opacity": 1}},
-    series: {regions: [{attribute: "fill", values: HAS, scale: ["#2a7fb8", "#2a7fb8"]}]},
+    series: {regions: [{attribute: "fill", values: BUCK, scale: SCALE}]},
     onRegionTooltipShow(event, tooltip, code) {
       const v = MAP[code] || 0;
       tooltip.text(tooltip.text() + (v ? ": " + v.toLocaleString() + " downloads" : ": no downloads"), true);
@@ -79,8 +94,10 @@
 <script>
 (function(){
   if (!window.Chart) return;
-  const DL = {"labels": ["United States", "Germany", "Hong Kong", "China", "United Kingdom", "Taiwan", "Poland", "France", "Ireland", "Spain", "Korea, Republic of", "Canada", "Singapore", "Brazil", "India", "Japan", "Russian Federation", "Netherlands", "Sweden", "Australia"], "vals": [13095, 2937, 2902, 1140, 1098, 1084, 689, 412, 353, 292, 281, 187, 167, 165, 144, 132, 124, 75, 72, 42], "colors": ["#d6453b", "#cd4842", "#c44b49", "#bc4e50", "#b35157", "#aa545e", "#a15765", "#985a6c", "#905d73", "#87607a", "#7e6481", "#756788", "#6d6a8f", "#646d96", "#5b709d", "#5273a4", "#4976ab", "#4179b2", "#387cb9", "#2f7fc0"]};
-  const DASH = {"date_labels": ["May 30", "May 31", "Jun 01", "Jun 02", "Jun 03", "Jun 04", "Jun 05", "Jun 06", "Jun 07", "Jun 08", "Jun 09", "Jun 10", "Jun 11", "Jun 12", "Jun 13", "Jun 14", "Jun 15", "Jun 16", "Jun 17", "Jun 18", "Jun 19", "Jun 20", "Jun 21", "Jun 22", "Jun 23", "Jun 24", "Jun 25", "Jun 26", "Jun 27", "Jun 28", "Jun 29"], "daily": [1430, 320, 628, 628, 1121, 1901, 488, 2403, 850, 1566, 350, 934, 2064, 252, 65, 59, 113, 216, 64, 1850, 451, 421, 2013, 2139, 1789, 786, 213, 280, 150, 25, 23], "cumulative": [1430, 1750, 2378, 3006, 4127, 6028, 6516, 8919, 9769, 11335, 11685, 12619, 14683, 14935, 15000, 15059, 15172, 15388, 15452, 17302, 17753, 18174, 20187, 22326, 24115, 24901, 25114, 25394, 25544, 25569, 25592], "dow": [4469, 2983, 2905, 6028, 1471, 4469, 3267], "ver_labels": ["5.3.9", "5.4.4", "5.4.2", "5.3.8", "5.4.3", "5.4.1", "5.3.7", "5.3.6", "5.3.4", "5.3.5", "5.3.3", "5.3.2", "5.3.1", "5.2.9", "3.7.6"], "ver": [656, 636, 586, 563, 501, 501, 267, 118, 101, 94, 68, 66, 62, 62, 60], "adopt_dates": ["May 30", "May 31", "Jun 01", "Jun 02", "Jun 03", "Jun 04", "Jun 05", "Jun 06", "Jun 07", "Jun 08", "Jun 09", "Jun 10", "Jun 11", "Jun 12", "Jun 13", "Jun 14", "Jun 15", "Jun 16", "Jun 17", "Jun 18", "Jun 19", "Jun 20", "Jun 21", "Jun 22", "Jun 23", "Jun 24", "Jun 25", "Jun 26", "Jun 27", "Jun 28", "Jun 29"], "adopt": [{"label": "5.3.9", "data": [0, 0, 0, 0, 0, 0, 0, 351, 52, 71, 47, 20, 34, 7, 5, 8, 5, 5, 4, 6, 8, 3, 4, 8, 3, 2, 4, 2, 6, 0, 1]}, {"label": "5.4.4", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 327, 81, 51, 31, 30, 51, 53, 9, 3]}, {"label": "5.4.2", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 315, 55, 22, 20, 29, 33, 25, 23, 17, 3, 7, 10, 3, 3, 4, 6, 9, 0, 2]}, {"label": "5.3.8", "data": [0, 0, 0, 0, 0, 0, 296, 83, 27, 20, 13, 20, 29, 4, 6, 5, 7, 5, 2, 6, 8, 3, 4, 8, 3, 2, 4, 2, 5, 0, 1]}, {"label": "5.4.3", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 257, 98, 30, 56, 14, 11, 5, 4, 8, 16, 0, 2]}, {"label": "5.4.1", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 253, 80, 60, 9, 12, 10, 5, 8, 6, 8, 11, 5, 4, 6, 3, 1, 5, 6, 8, 0, 1]}, {"label": "other", "data": [1430, 320, 628, 628, 1121, 1901, 192, 1969, 771, 1475, 37, 814, 1626, 177, 20, 16, 67, 165, 27, 1550, 309, 377, 1611, 2012, 1715, 742, 162, 205, 53, 16, 13]}]};
+  const DL = {"labels": ["United States", "Germany", "Hong Kong", "China", "United Kingdom", "Taiwan", "Poland", "France", "Ireland", "Spain", "Korea, Republic of", "Canada", "Singapore", "Brazil", "India", "Japan", "Russian Federation", "Netherlands", "Sweden", "Austria"], "vals": [13100, 2939, 1533, 1109, 1098, 1084, 687, 410, 353, 292, 281, 187, 166, 165, 143, 132, 122, 75, 72, 49], "colors": ["#d6453b", "#cd4842", "#c44b49", "#bc4e50", "#b35157", "#aa545e", "#a15765", "#985a6c", "#905d73", "#87607a", "#7e6481", "#756788", "#6d6a8f", "#646d96", "#5b709d", "#5273a4", "#4976ab", "#4179b2", "#387cb9", "#2f7fc0"]};
+  const DASH = {"date_labels": ["May 31", "Jun 01", "Jun 02", "Jun 03", "Jun 04", "Jun 05", "Jun 06", "Jun 07", "Jun 08", "Jun 09", "Jun 10", "Jun 11", "Jun 12", "Jun 13", "Jun 14", "Jun 15", "Jun 16", "Jun 17", "Jun 18", "Jun 19", "Jun 20", "Jun 21", "Jun 22", "Jun 23", "Jun 24", "Jun 25", "Jun 26", "Jun 27", "Jun 28", "Jun 29", "Jun 30"], "daily": [320, 628, 628, 1121, 1901, 488, 2403, 850, 1566, 350, 934, 2064, 252, 65, 59, 113, 216, 64, 1850, 451, 421, 2013, 2139, 1789, 786, 213, 280, 150, 25, 33, 62], "cumulative": [320, 948, 1576, 2697, 4598, 5086, 7489, 8339, 9905, 10255, 11189, 13253, 13505, 13570, 13629, 13742, 13958, 14022, 15872, 16323, 16744, 18757, 20896, 22685, 23471, 23684, 23964, 24114, 24139, 24172, 24234], "dow": [4479, 3045, 2905, 6028, 1471, 3039, 3267], "ver_labels": ["5.4.4", "5.3.9", "5.4.2", "5.3.8", "5.4.3", "5.4.1", "5.3.7", "5.3.6", "5.3.4", "5.3.5", "5.3.3", "5.3.2", "5.2.9", "5.3.1", "5.2.4"], "ver": [659, 658, 588, 565, 503, 503, 248, 119, 103, 96, 69, 68, 65, 64, 62], "adopt_dates": ["May 31", "Jun 01", "Jun 02", "Jun 03", "Jun 04", "Jun 05", "Jun 06", "Jun 07", "Jun 08", "Jun 09", "Jun 10", "Jun 11", "Jun 12", "Jun 13", "Jun 14", "Jun 15", "Jun 16", "Jun 17", "Jun 18", "Jun 19", "Jun 20", "Jun 21", "Jun 22", "Jun 23", "Jun 24", "Jun 25", "Jun 26", "Jun 27", "Jun 28", "Jun 29", "Jun 30"], "adopt": [{"label": "5.4.4", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 327, 81, 51, 31, 30, 51, 53, 9, 9, 17]}, {"label": "5.3.9", "data": [0, 0, 0, 0, 0, 0, 351, 52, 71, 47, 20, 34, 7, 5, 8, 5, 5, 4, 6, 8, 3, 4, 8, 3, 2, 4, 2, 6, 0, 1, 2]}, {"label": "5.4.2", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 315, 55, 22, 20, 29, 33, 25, 23, 17, 3, 7, 10, 3, 3, 4, 6, 9, 0, 2, 2]}, {"label": "5.3.8", "data": [0, 0, 0, 0, 0, 296, 83, 27, 20, 13, 20, 29, 4, 6, 5, 7, 5, 2, 6, 8, 3, 4, 8, 3, 2, 4, 2, 5, 0, 1, 2]}, {"label": "5.4.3", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 257, 98, 30, 56, 14, 11, 5, 4, 8, 16, 0, 2, 2]}, {"label": "5.4.1", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 253, 80, 60, 9, 12, 10, 5, 8, 6, 8, 11, 5, 4, 6, 3, 1, 5, 6, 8, 0, 1, 2]}, {"label": "other", "data": [320, 628, 628, 1121, 1901, 192, 1969, 771, 1475, 37, 814, 1626, 177, 20, 16, 67, 165, 27, 1550, 309, 377, 1611, 2012, 1715, 742, 162, 205, 53, 16, 17, 35]}]};
+  const CITES = {"years": ["2020", "2021", "2022", "2023", "2024", "2025", "2026"], "counts": [21, 39, 56, 69, 89, 108, 50], "total": 433, "partial": 6};
+  const CONT = {"labels": ["North America", "Europe", "Asia", "South America", "Oceania", "Africa"], "vals": [13299, 6207, 4508, 172, 42, 6]};
   const C = (id) => document.getElementById(id);
   const GRID = "#eef2f7", INK = "#23272e", MUT = "#6b7280";
   const PAL = ["#21567a","#2a7fb8","#38a8d4","#5cc6b3","#e0a33a","#e0653a","#b9c0c9"];
@@ -100,15 +117,35 @@
       plugins: {legend: {display: false}, tooltip: {callbacks: {label: (c) => " " + c.parsed.x.toLocaleString() + " downloads"}}},
       scales: {x: {beginAtZero: true, grid: {display: false}, ticks: {color: MUT}}, y: {grid: {display: false}, ticks: {color: INK, font: {weight: "600"}}}}}
   });
+  if (C("dlContinents")) new Chart(C("dlContinents"), {
+    type: "bar", plugins: [track],
+    data: {labels: CONT.labels, datasets: [{label: "Downloads", data: CONT.vals,
+      backgroundColor: PAL, hoverBackgroundColor: PAL, borderRadius: 4, maxBarThickness: 26}]},
+    options: {indexAxis: "y", responsive: true, maintainAspectRatio: false, layout: {padding: {right: 6}},
+      plugins: {legend: {display: false}, tooltip: {callbacks: {label: function(c) {
+        const t = CONT.vals.reduce((a, b) => a + b, 0), p = t ? Math.round(c.parsed.x / t * 100) : 0;
+        return " " + c.parsed.x.toLocaleString() + " downloads (" + p + "%)"; }}}},
+      scales: {x: {beginAtZero: true, grid: {display: false}, ticks: {color: MUT}}, y: {grid: {display: false}, ticks: {color: INK, font: {weight: "600"}}}}}
+  });
   if (C("dlOverTime")) new Chart(C("dlOverTime"), {
+    type: "bar",
     data: {labels: DASH.date_labels, datasets: [
-      {type: "bar", label: "Daily", data: DASH.daily, backgroundColor: "#7fc1e3", borderRadius: 3, order: 2, yAxisID: "y"},
-      {type: "line", label: "Cumulative", data: DASH.cumulative, borderColor: "#21567a", backgroundColor: "rgba(33,86,122,.08)", fill: true, tension: .3, pointRadius: 0, borderWidth: 2.5, order: 1, yAxisID: "y1"}]},
+      {label: "Daily", data: DASH.daily, backgroundColor: "#7fc1e3", borderRadius: 3}]},
     options: {responsive: true, maintainAspectRatio: false,
-      plugins: {legend: {display: true, position: "top", labels: {boxWidth: 12, font: {size: 11}}}},
-      scales: {y: {beginAtZero: true, position: "left", grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "daily", color: MUT}},
-               y1: {beginAtZero: true, position: "right", grid: {display: false}, ticks: {color: MUT}, title: {display: true, text: "cumulative", color: MUT}},
-               x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 0, autoSkip: true, maxTicksLimit: 12}}}}
+      plugins: {legend: {display: false}},
+      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "daily", color: MUT}},
+               x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 10}}}}
+  });
+  if (C("dlCumulative")) new Chart(C("dlCumulative"), {
+    type: "line",
+    data: {labels: DASH.date_labels, datasets: [
+      {label: "Cumulative", data: DASH.cumulative, borderColor: "#21567a", backgroundColor: "rgba(33,86,122,.10)", fill: true, tension: .3, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: "#21567a", pointHoverBorderColor: "#fff", pointHoverBorderWidth: 2, borderWidth: 2.5}]},
+    options: {responsive: true, maintainAspectRatio: false, interaction: {intersect: false, mode: "index"},
+      plugins: {legend: {display: false}, tooltip: {displayColors: false,
+        callbacks: {title: (items) => "Through " + items[0].label,
+                    label: (c) => " " + c.parsed.y.toLocaleString() + " downloads total"}}},
+      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "cumulative \u00b7 30 days", color: MUT}},
+               x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 10}}}}
   });
   if (C("dlDow")) new Chart(C("dlDow"), {
     type: "bar",
@@ -128,7 +165,18 @@
     data: {labels: DASH.adopt_dates, datasets: DASH.adopt.map(function(s, i){ return {label: s.label, data: s.data, backgroundColor: PAL[i % PAL.length], borderColor: PAL[i % PAL.length], fill: true, tension: .25, pointRadius: 0, borderWidth: 1}; })},
     options: {responsive: true, maintainAspectRatio: false, interaction: {intersect: false, mode: "index"},
       plugins: {legend: {display: true, position: "top", labels: {boxWidth: 10, font: {size: 10}}}},
-      scales: {y: {stacked: true, beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}}, x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 0, autoSkip: true, maxTicksLimit: 12}}}}
+      scales: {y: {stacked: true, beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}}, x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 10}}}}
+  });
+  if (C("dlCitations")) new Chart(C("dlCitations"), {
+    type: "bar",
+    data: {labels: CITES.years, datasets: [{label: "Citations", data: CITES.counts,
+      backgroundColor: CITES.years.map((y, i) => i === CITES.partial ? "#9ec9e6" : "#2a7fb8"), borderRadius: 4, maxBarThickness: 54}]},
+    options: {responsive: true, maintainAspectRatio: false,
+      plugins: {legend: {display: false}, tooltip: {displayColors: false, callbacks: {
+        title: (i) => i[0].label + (i[0].dataIndex === CITES.partial ? " (partial \u00b7 to date)" : ""),
+        label: (c) => " " + c.parsed.y.toLocaleString() + " citing publications"}}},
+      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "citing publications", color: MUT}},
+               x: {grid: {display: false}, ticks: {color: INK, font: {weight: "600"}}}}}
   });
 })();
 </script>

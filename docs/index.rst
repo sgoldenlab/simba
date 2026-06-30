@@ -98,7 +98,7 @@ Everything in one place — code, API, community, publications, and data:
      <a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/api.html" title="Full API reference">📖&nbsp;API docs</a>
      <a href="https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im" title="Community chat on Gitter">💬&nbsp;Gitter</a>
      <a href="https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2" title="bioRxiv preprint">📄&nbsp;bioRxiv</a>
-     <a href="https://www.nature.com/articles/s41593-024-01649-9" title="Nature Neuroscience paper">📰&nbsp;Nature paper</a>
+     <a href="https://www.nature.com/articles/s41593-024-01649-9" title="Nature Neuroscience paper">📰&nbsp;Nature Neuroscience</a>
      <a href="https://osf.io/tmu6y/" title="Open Science Framework data buckets">💾&nbsp;OSF data</a>
      <a href="https://pypi.org/project/Simba-UW-tf-dev/" title="Python Package Index">📦&nbsp;PyPI</a>
    </div>
