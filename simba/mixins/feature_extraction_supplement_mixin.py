@@ -271,6 +271,13 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
            :width: 700
            :align: center
 
+        .. video:: _static/img/rolling_horizontal_vs_vertical_movement.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         :param np.ndarray data: 2d array of size len(frames)x2 with body-part coordinates.
         :param int fps: FPS of the recorded video
         :param float pixels_per_mm: Pixels per millimeter of recorded video.
