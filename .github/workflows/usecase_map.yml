@@ -1,0 +1,39 @@
+name: Update SimBA Use-Case Map
+
+on:
+  schedule:
+    - cron: '30 7 * * *'   # daily at 07:30 UTC (just after the download-stats job)
+  workflow_dispatch:        # "Run workflow" button — click after editing the sheet
+
+permissions:
+  contents: write           # needed to commit the regenerated HTML
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # No pip install and no secrets needed — the generator uses only the
+      # Python standard library and reads the public Google Sheet as CSV.
+      - name: Regenerate use-case map from the public sheet
+        run: python misc/usecase_map_stats.py
+
+      - name: Configure Git
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Actions"
+
+      - name: Commit updated map (if changed)
+        run: |
+          git add docs/_generated/usecase_map.html
+          git commit -m "Update SimBA use-case global-reach map" || echo "Nothing to commit"
+          git push

@@ -350,17 +350,25 @@ def _generate_github_contributors(app):
         return
 
     stamp = datetime.datetime.now().strftime('%B %Y')
+    SINCE = '2020-12-01'   # SimBA has been maintained by Simon since Dec 2020; only count contributions from then on
 
-    # ---- per-contributor lines changed (additions/deletions), computed from local git ----
-    # GitHub's stats/contributors REST endpoint is computed asynchronously and keeps returning
-    # HTTP 202 (empty body) for minutes on a cold cache, so it never resolves within a CI build
-    # window. The docs always build inside a clone of the repo, so we aggregate `git log
-    # --numstat` locally instead: reliable, instant, no API/rate-limit. A single person commits
-    # under several name/email identities, so identities are folded onto the API login set via
-    # the noreply-email username, an exact name==login match, and a small alias map for the rest.
+    # ---- per-contributor lines-of-code changed + commits SINCE 2020-12, computed from local git ----
+    # LOC is the headline metric (linear bar). GitHub's stats/contributors REST endpoint returns
+    # HTTP 202 for minutes on a cold cache, so we aggregate `git log --numstat` locally instead:
+    # reliable, instant, no API/rate-limit. One person commits under several name/email identities,
+    # so identities are folded onto the API login set via the noreply-email username, an exact
+    # name==login match, and a small alias map for the rest.
     import re
     import subprocess
-    loc = {}
+    loc = {}       # login -> (additions, deletions) since SINCE
+    commits = {}   # login -> commit count since SINCE
+    latest = {}    # login -> most recent commit date (YYYY-MM-DD) since SINCE
+    monthly = {}   # 'YYYY-MM' -> {login -> commit count}
+    def _mony(s):  # '2026-06-30' -> "Jun 2026"
+        try:
+            return datetime.datetime.strptime(s, '%Y-%m-%d').strftime('%b %Y')
+        except Exception:  # noqa: BLE001
+            return s
     try:
         repo_root = os.path.dirname(here)
         login_by_lower = {login.lower(): login for login, _ in contribs}
@@ -386,14 +394,22 @@ def _generate_github_contributors(app):
             return login_by_lower.get(nl) or aliases.get(nl)
 
         out = subprocess.run(
-            ['git', 'log', '--no-merges', '--numstat', '--format=COMMIT\t%ae\t%an'],
+            ['git', 'log', '--no-merges', f'--since={SINCE}', '--numstat', '--format=COMMIT\t%ae\t%an\t%as'],
             cwd=repo_root, capture_output=True, text=True, encoding='utf-8',
             errors='replace', timeout=60).stdout
         cur = None
         for line in out.splitlines():
             if line.startswith('COMMIT\t'):
-                _, email, name = line.split('\t', 2)
+                parts = line.split('\t', 3); email = parts[1] if len(parts) > 1 else ''
+                name = parts[2] if len(parts) > 2 else ''; cdate = parts[3] if len(parts) > 3 else ''
                 cur = _resolve(email, name)
+                if cur is not None:
+                    commits[cur] = commits.get(cur, 0) + 1
+                    if cdate > latest.get(cur, ''):   # ISO dates compare lexically
+                        latest[cur] = cdate
+                    mo = cdate[:7]
+                    if len(mo) == 7:
+                        monthly.setdefault(mo, {})[cur] = monthly.setdefault(mo, {}).get(cur, 0) + 1
                 continue
             if cur is None or not line.strip():
                 continue
@@ -402,33 +418,58 @@ def _generate_github_contributors(app):
                 pa, pd = loc.get(cur, (0, 0))
                 loc[cur] = (pa + int(a), pd + int(d))
         if not loc:
-            print('[credits] no local git LOC resolved (shallow clone?); showing commits only.')
+            print('[credits] no local git LOC resolved (shallow clone?); keeping snapshot.')
     except Exception as e:  # noqa: BLE001
-        print(f'[credits] local git line-count failed ({e!r}); showing commits only.')
+        print(f'[credits] local git line-count failed ({e!r}); keeping snapshot.')
 
-    # Safety net: if line counts could not be computed here (e.g. a shallow CI
-    # clone) but the committed snapshot already includes them, keep that snapshot
-    # rather than overwriting it with a commits-only chart that loses the lines.
-    if not loc and os.path.exists(html_path):
-        try:
-            if 'lines</em>' in open(html_path, encoding='utf-8').read():
-                print('[credits] keeping committed snapshot (already includes line counts).')
-                return
-        except Exception:  # noqa: BLE001
-            pass
+    # Safety net: if LOC could not be computed here (e.g. a shallow CI clone) keep the committed
+    # snapshot rather than overwriting it with an empty/partial chart.
+    if not loc:
+        return
 
-    # ---- responsive HTML bar chart with a GitHub card popover on hover (no image, no matplotlib) ----
+    # Every GitHub contributor is listed (even those active only before Dec 2020); their since-Dec-2020
+    # totals are simply 0. data: (login, commits, total_loc, additions, deletions) sorted by LOC desc.
+    all_logins = list(dict.fromkeys([lg for lg, _ in contribs] + list(loc) + list(commits)))
+    data = sorted(((lg, commits.get(lg, 0),
+                    loc.get(lg, (0, 0))[0] + loc.get(lg, (0, 0))[1],
+                    loc.get(lg, (0, 0))[0], loc.get(lg, (0, 0))[1]) for lg in all_logins),
+                  key=lambda t: t[2], reverse=True)
+    if not data:
+        return
+
+    # ---- authorship of the CURRENT release: git blame line ownership of the package source ----
+    # Who wrote the lines that exist NOW (HEAD), not lifetime churn. `git blame` every tracked
+    # simba/*.py, fold authors onto logins, express as a percentage of surviving lines.
+    blame = {}
+    try:
+        files = subprocess.run(['git', 'ls-files', 'simba/*.py'], cwd=repo_root,
+                               capture_output=True, text=True, timeout=30).stdout.split()
+        for fp in files:
+            b = subprocess.run(['git', 'blame', '--line-porcelain', '-w', 'HEAD', '--', fp],
+                               cwd=repo_root, capture_output=True, text=True, encoding='utf-8',
+                               errors='replace', timeout=30).stdout
+            em = nm = None
+            for line in b.splitlines():
+                if line.startswith('author-mail '):
+                    em = line[12:].strip('<> ')
+                elif line.startswith('author '):
+                    nm = line[7:]
+                elif line.startswith('\t'):
+                    lg = _resolve(em, nm)
+                    if lg:
+                        blame[lg] = blame.get(lg, 0) + 1
+    except Exception as e:  # noqa: BLE001
+        print(f'[credits] git blame authorship failed ({e!r}); skipping that chart.')
+        blame = {}
+
+    # ---- responsive HTML bar charts + monthly timeline (no image, no matplotlib) ----
     # Consumed by credits.rst via a `.. raw:: html :file:` include; regenerated every build.
     try:
         import html as _htmllib
-        import math
         INK, MUT, TRACK, BLUE, LEAD = '#23272e', '#6b7280', '#eef2f7', '#2a7fb8', '#21567a'
-        mx = max(c for _, c in contribs)
+        esc = _htmllib.escape
 
-        def _w(v):  # log-scaled bar width (%), with a floor so 1-commit bars stay visible
-            return 100.0 if mx <= 1 else round(max(5.0, math.log10(v) / math.log10(mx) * 100.0), 1)
-
-        def _fmt(n):  # compact line count: 1.2M / 162K / 1.5K / 405
+        def _fmt(n):  # compact count: 1.2M / 162K / 1.5K / 405
             if n >= 1_000_000:
                 return f'{n / 1_000_000:.1f}M'
             if n >= 10_000:
@@ -439,14 +480,17 @@ def _generate_github_contributors(app):
 
         style = (
             "<style>\n"
-            ".simba-cc{max-width:820px;margin:10px auto 4px;padding-top:74px;}\n"
+            ".simba-cc-h{max-width:820px;margin:40px auto 10px;font-size:21px;font-weight:800;color:#21567a;text-align:center;line-height:1.25;}\n"
+            ".simba-cc-h span{display:block;font-weight:400;color:#6b7280;font-size:13.5px;margin-top:2px;}\n"
+            ".simba-cc-cap{text-align:right;font-size:11px;color:#6b7280;font-style:italic;margin:10px 4px 0;}\n"
+            ".simba-cc{max-width:820px;margin:6px auto 4px;padding-top:38px;}\n"
             ".simba-cc-row{display:flex;align-items:center;gap:10px;margin:5px 0;position:relative;text-decoration:none!important;}\n"
             ".simba-cc-name{flex:0 0 140px;text-align:right;font-size:13px;color:#23272e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}\n"
             ".simba-cc-track{flex:1;background:#eef2f7;border-radius:5px;height:22px;display:block;}\n"
             ".simba-cc-bar{display:block;height:100%;border-radius:5px;transition:filter .12s ease;}\n"
             ".simba-cc-row:hover .simba-cc-bar{filter:brightness(1.08);}\n"
-            ".simba-cc-count{flex:0 0 52px;font-size:12px;font-weight:700;color:#23272e;}\n"
-            ".simba-cc-loc{flex:0 0 86px;font-size:11.5px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}\n"
+            ".simba-cc-count{flex:0 0 58px;font-size:12px;font-weight:700;color:#23272e;}\n"
+            ".simba-cc-loc{flex:0 0 176px;font-size:11.5px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}\n"
             "@media (max-width:600px){.simba-cc-name{flex-basis:96px;}.simba-cc-loc{display:none;}}\n"
             ".simba-cc-card{position:absolute;left:150px;bottom:24px;z-index:40;display:none;align-items:center;gap:11px;"
             "background:#fff;border:1px solid #e2e6ec;border-radius:12px;box-shadow:0 8px 24px rgba(33,86,122,.20);"
@@ -458,29 +502,97 @@ def _generate_github_contributors(app):
             ".simba-cc-card .cci b{font-size:13.5px;color:#23272e;}\n"
             ".simba-cc-card .cci em{font-size:12px;color:#6b7280;font-style:normal;}\n"
             ".simba-cc-row:hover .simba-cc-card{display:flex;}\n"
+            ".simba-tl{max-width:820px;margin:6px auto 4px;}\n"
+            ".simba-tl-leg{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;font-size:12px;color:#23272e;margin:10px 0 0;}\n"
+            ".simba-tl-leg span,.simba-tl-leg a{display:inline-flex;align-items:center;gap:5px;}\n"
+            ".simba-tl-leg i{width:11px;height:11px;border-radius:3px;display:inline-block;}\n"
+            ".simba-tl-li{text-decoration:none!important;color:#23272e;}\n"
+            ".simba-tl-li:hover{color:#21567a;text-decoration:underline!important;}\n"
             "</style>\n")
 
-        rows = []
-        for i, (login, c) in enumerate(contribs):
-            le = _htmllib.escape(login)
-            col = LEAD if i == 0 else BLUE
-            commit_lbl = f"{c:,} commit" + ('' if c == 1 else 's')
-            ad = loc.get(login)
-            loc_lbl = (_fmt(ad[0] + ad[1]) + ' loc') if ad else ''
-            loc_card = f' · +{_fmt(ad[0])} / −{_fmt(ad[1])} lines' if ad else ''
-            rows.append(
-                f'     <a class="simba-cc-row" href="https://github.com/{le}">'
-                f'<span class="simba-cc-name">@{le}</span>'
-                f'<span class="simba-cc-track"><span class="simba-cc-bar" style="width:{_w(c)}%;background:{col};"></span></span>'
-                f'<span class="simba-cc-count">{c:,}</span>'
-                f'<span class="simba-cc-loc">{loc_lbl}</span>'
-                f'<span class="simba-cc-card"><img src="https://github.com/{le}.png?size=96" alt="@{le}" loading="lazy">'
-                f'<span class="cci"><b>@{le}</b><em>{commit_lbl}{loc_card}</em></span></span>'
-                f'</a>')
-        chart = (style + '<div class="simba-cc">\n' + '\n'.join(rows) +
-                 f'\n     <p style="text-align:right;font-size:11px;color:{MUT};font-style:italic;margin:10px 4px 0;">'
-                 f'bar &amp; bold number = commits (log scale) · loc = lines changed (added + removed) · hover for details · {stamp}</p>\n   </div>')
+        def bar_rows(items):
+            out = []
+            for i, it in enumerate(items):
+                le = esc(it['login']); col = LEAD if i == 0 else BLUE
+                out.append(
+                    f'     <a class="simba-cc-row" href="https://github.com/{le}">'
+                    f'<span class="simba-cc-name">@{le}</span>'
+                    f'<span class="simba-cc-track"><span class="simba-cc-bar" style="width:{it["pct"]}%;background:{col};"></span></span>'
+                    f'<span class="simba-cc-count">{it["main"]}</span>'
+                    f'<span class="simba-cc-loc">{it["sub"]}</span>'
+                    f'<span class="simba-cc-card"><img src="https://github.com/{le}.png?size=96" alt="@{le}" loading="lazy">'
+                    f'<span class="cci"><b>@{le}</b><em>{it["card"]}</em></span></span></a>')
+            return '\n'.join(out)
 
+        # ---- Graph 1: lines changed (churn) since Dec 2020 ----
+        mxloc = max(t[2] for t in data)
+        g1 = []
+        for (login, c, tot, add, dele) in data:
+            last = latest.get(login, ''); cl = f"{c:,} commit" + ('' if c == 1 else 's')
+            pct = 0 if tot == 0 else round(max(0.4, tot / mxloc * 100.0), 2)
+            sub = (cl + (f" · latest {_mony(last)}" if last else '')) if c else 'none since Dec 2020'
+            g1.append(dict(login=login, pct=pct, main=_fmt(tot), sub=sub,
+                           card=f'{_fmt(tot)} lines changed · +{_fmt(add)} / −{_fmt(dele)} · {cl}' + (f", latest {last}" if last else '')))
+        g1_html = ('<h4 class="simba-cc-h">Lines changed since Dec 2020 <span>(added + removed · linear)</span></h4>\n'
+                   '<div class="simba-cc">\n' + bar_rows(g1) +
+                   f'\n     <p class="simba-cc-cap">bar &amp; bold number = lines changed (added + removed) since Dec 2020 · '
+                   f'linear scale · commits &amp; latest at right · {stamp}</p>\n   </div>')
+
+        # ---- Graph 2: authorship of the current release (git blame %) ----
+        g2_html = ''
+        if blame:
+            btot = sum(blame.values())
+            g2 = []
+            for login in sorted(all_logins, key=lambda lg: blame.get(lg, 0), reverse=True):
+                n = blame.get(login, 0); pct = 100.0 * n / btot if btot else 0.0
+                g2.append(dict(login=login, pct=0 if n == 0 else round(max(0.4, pct), 2), main=f'{pct:.1f}%',
+                               sub=(f'{n:,} lines' if n else 'no surviving lines'),
+                               card=f'{pct:.1f}% of current source · {n:,} lines in HEAD'))
+            g2_html = ('\n<h4 class="simba-cc-h">Authorship of the current release <span>(git blame · % of lines in HEAD)</span></h4>\n'
+                       '<div class="simba-cc">\n' + bar_rows(g2) +
+                       f'\n     <p class="simba-cc-cap">bar &amp; bold number = share of the current <code>simba</code> Python source '
+                       f'owned in git blame · {_fmt(btot)} lines total · {stamp}</p>\n   </div>')
+
+        # ---- Graph 3: commits per month since Dec 2020, stacked by contributor ----
+        months = sorted(monthly.keys())
+        PALETTE = ['#21567a', '#2a7fb8', '#e08a1e', '#3a9d5d', '#b8433a', '#7b5bbd', '#c65b9c']
+        OTHER = '#9aa3ad'
+        color_logins = [lg for lg, _ in sorted(commits.items(), key=lambda t: t[1], reverse=True)][:len(PALETTE)]
+        cmap = {lg: PALETTE[i] for i, lg in enumerate(color_logins)}
+        maxc = max((sum(d.values()) for d in monthly.values()), default=1) or 1
+        W, H, PL, PR, PT, PB = 820, 210, 30, 6, 10, 42
+        plotw, ploth = W - PL - PR, H - PT - PB
+        bw = plotw / max(1, len(months)); gap = min(2.0, bw * 0.18)
+        parts = [f'<line x1="{PL}" y1="{PT+ploth}" x2="{W-PR}" y2="{PT+ploth}" stroke="#d5dbe2" stroke-width="1"/>',
+                 f'<text x="{PL-4}" y="{PT+8}" text-anchor="end" font-size="10" fill="{MUT}">{maxc}</text>',
+                 f'<text x="{PL-4}" y="{PT+ploth}" text-anchor="end" font-size="10" fill="{MUT}">0</text>']
+        for i, mo in enumerate(months):
+            x = PL + i * bw
+            if mo.endswith('-01'):   # one tick per year (January); Dec-2020 start is unlabelled to avoid a collision
+                xc = x + (bw - gap) / 2
+                parts.append(f'<line x1="{xc:.1f}" y1="{PT+ploth}" x2="{xc:.1f}" y2="{PT+ploth+4}" stroke="#b9c1cb" stroke-width="1"/>')
+                parts.append(f'<text x="{xc:.1f}" y="{PT+ploth+17}" text-anchor="middle" font-size="11" fill="{MUT}">{mo[:4]}</text>')
+            d = monthly[mo]; y = PT + ploth
+            order = [lg for lg in color_logins if lg in d] + [lg for lg in d if lg not in cmap]
+            for lg in order:
+                hh = d[lg] / maxc * ploth; y -= hh
+                parts.append(f'<rect x="{x:.1f}" y="{y:.2f}" width="{max(0.6, bw-gap):.1f}" height="{hh:.2f}" '
+                             f'fill="{cmap.get(lg, OTHER)}"><title>@{esc(lg)} · {mo}: {d[lg]} commits</title></rect>')
+        svg = (f'<svg viewBox="0 0 {W} {H}" width="100%" style="max-width:{W}px;display:block;margin:6px auto 0;font-family:inherit;">'
+               + ''.join(parts) + '</svg>')
+        has_other = any(lg not in cmap for d in monthly.values() for lg in d)
+
+        def _leg_item(lg):   # plain clickable link to the contributor's GitHub, no popup card
+            le = esc(lg)
+            return f'<a class="simba-tl-li" href="https://github.com/{le}"><i style="background:{cmap[lg]}"></i>@{le}</a>'
+        leg = ''.join(_leg_item(lg) for lg in color_logins)
+        if has_other:
+            leg += f'<span style="cursor:default"><i style="background:{OTHER}"></i>others</span>'
+        g3_html = ('\n<h4 class="simba-cc-h">Commits per month since Dec 2020 <span>(stacked by contributor)</span></h4>\n'
+                   f'<div class="simba-tl">{svg}<div class="simba-tl-leg">{leg}</div>'
+                   f'<p class="simba-cc-cap">each bar = one month · height = commits that month · colour = contributor · {stamp}</p></div>')
+
+        chart = style + g1_html + '\n' + g2_html + '\n' + g3_html
         with open(html_path, 'w', encoding='utf-8') as f:
             f.write(chart + '\n')
     except Exception as e:  # noqa: BLE001

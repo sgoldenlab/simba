@@ -24,10 +24,11 @@ The code, documentation, and support channels are written, maintained, and devel
 GitHub contributors
 ----------------------------------------------------------
 
-SimBA is shaped by everyone who has contributed code on GitHub. The chart and list below show the number of commits per
-contributor on the `sgoldenlab/simba <https://github.com/sgoldenlab/simba/graphs/contributors>`_ repository (log scale),
-along with the lines of code each has changed. Hover a bar for the contributor's GitHub card. Everything is pulled from
-the GitHub API and regenerated automatically every time these docs are built.
+SimBA is shaped by everyone who has contributed code on GitHub. The chart and list below rank contributors on the
+`sgoldenlab/simba <https://github.com/sgoldenlab/simba/graphs/contributors>`_ repository by the **lines of code changed**
+(additions + deletions, linear scale) **since December 2020**, with each contributor's commit count shown alongside.
+Hover a bar for the contributor's GitHub card. Line counts are aggregated from the local git history and the chart is
+regenerated automatically every time these docs are built.
 
 .. raw:: html
    :file: _generated/github_contributors.html

@@ -7,6 +7,12 @@ Google BigQuery PyPI dataset. The chart below shows downloads by country over th
 .. raw:: html
    :file: _generated/download_stats.html
 
+Published studies / validations
+=====================================
+
+.. raw:: html
+   :file: _generated/usecase_map.html
+
 .. raw:: html
 
    <div class="simba-orbit-foot" style="margin:30px 0 8px;">
