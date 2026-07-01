@@ -325,6 +325,13 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
            :width: 700
            :align: center
 
+        .. video:: _static/img/border_distances.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. attention::
            Output for initial frames where [current_frm - window_size] < 0 will be populated with ``-1``.
 
@@ -375,6 +382,13 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         .. image:: _static/img/img_edge_distances.webp
            :alt: Img edge distances
            :width: 400
+           :align: center
+
+        .. video:: _static/img/img_edge_distances.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :param np.ndarray data: 3d array of size len(frames) x N x 2 with body-part coordinates.

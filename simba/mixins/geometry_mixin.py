@@ -410,6 +410,16 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
+        .. video:: _static/img/buffer_shape.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
+        .. seealso::
+           :func:`simba.mixins.geometry_mixin.GeometryMixin.parallel_offset_polygon` scales vertices from the centroid (sharp corners, fixed vertex count); ``buffer_shape`` is a true constant-distance buffer (rounds corners, works on LineStrings).
+
         :param Union[Polygon, LineString] shape: The input Polygon or LineString to be buffered. Or a list of Polygons or LineStrings to be buffered.
         :param int size_mm: The size of the buffer in millimeters. Use a negative value for an inward buffer.
         :param float pixels_per_mm: The conversion factor from millimeters to pixels.
@@ -452,6 +462,13 @@ class GeometryMixin(object):
         .. image:: _static/img/compute_pct_shape_overlap.png
            :alt: Compute pct shape overlap
            :width: 400
+           :align: center
+
+        .. video:: _static/img/compute_pct_shape_overlap.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         .. seealso::
@@ -521,6 +538,13 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
+        .. video:: _static/img/compute_shape_overlap.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         :param List[Union[LineString, Polygon, None]] shapes: A 2d array of Polygon or LineString shapes. If the array contains a row with None, no overlap will be returned for that row.
         :return: Returns 1 if the two shapes overlap, otherwise returns 0.
         :rtype: np.ndarray
@@ -550,6 +574,13 @@ class GeometryMixin(object):
         .. image:: _static/img/are_lines_crossing.png
            :alt: Are lines crossing
            :width: 400
+           :align: center
+
+        .. video:: _static/img/crosses.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :param List[LineString] shapes: A list containing two LineString objects.
@@ -584,6 +615,13 @@ class GeometryMixin(object):
         .. image:: _static/img/is_line_covered.png
            :alt: Is line covered
            :width: 400
+           :align: center
+
+        .. video:: _static/img/is_shape_covered.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :param Union[LineString, Polygon, MultiPolygon, MultiPoint] shapes: List of 2 geometries, checks if the second geometry fully covers the first geometry.
@@ -664,6 +702,13 @@ class GeometryMixin(object):
         .. image:: _static/img/multiframe_shape_distance.webp
            :alt: Multiframe shape distance
            :width: 400
+           :align: center
+
+        .. video:: _static/img/shape_distance.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         >>> from shapely.geometry import Polygon
@@ -804,6 +849,13 @@ class GeometryMixin(object):
            :width: 500
            :align: center
 
+        .. video:: _static/img/is_touching.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. note::
            Different from GeometryMixin().crosses: Touches requires a common boundary, and does not require the sharing of interior space.
 
@@ -841,6 +893,13 @@ class GeometryMixin(object):
            :width: 500
            :align: center
 
+        .. video:: _static/img/is_containing.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         :example:
         >>> polygon1 = Polygon([(0, 0), (10, 0), (10, 10), (0, 10), (0, 0)])
         >>> polygon2 = Polygon([(3, 3), (7, 3), (7, 7), (3, 7), (3, 3)])
@@ -865,6 +924,13 @@ class GeometryMixin(object):
         .. image:: _static/img/difference_1.png
            :alt: Difference 1
            :width: 400
+           :align: center
+
+        .. video:: _static/img/difference.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         .. seealso::
@@ -952,6 +1018,13 @@ class GeometryMixin(object):
         .. image:: _static/img/symmetric_difference.png
            :alt: Symmetric difference
            :width: 400
+           :align: center
+
+        .. video:: _static/img/symmetric_difference.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         .. seealso::
@@ -1245,6 +1318,13 @@ class GeometryMixin(object):
         .. image:: _static/img/length.png
            :alt: Length
            :width: 400
+           :align: center
+
+        .. video:: _static/img/length.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         .. seealso::
@@ -3766,6 +3846,13 @@ class GeometryMixin(object):
            :width: 450
            :align: center
 
+        .. video:: _static/img/hausdorff_distance.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_hausdorff_distance`
 
@@ -4229,6 +4316,13 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
+        .. video:: _static/img/keypoints_to_axis_aligned_bounding_box.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            * For minimum rotated bounding boxes, see :func:`simba.mixins.geometry_mixin.GeometryMixin.minimum_rotated_rectangle` or :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_minimum_rotated_rectangle`
 
@@ -4302,6 +4396,13 @@ class GeometryMixin(object):
         .. image:: _static/img/smooth_geometry_bspline.webp
            :alt: Smooth geometry bspline
            :width: 650
+           :align: center
+
+        .. video:: _static/img/smooth_geometry_bspline.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :param Union[np.ndarray, Polygon, List[Polygon]] data: The input geometry to be smoothed. This can be: A NumPy array of shape (N, 2) representing a single polygon. A NumPy array of shape (M, N, 2) representing multiple polygons. A `Polygon` object from Shapely. A list of `Polygon` objects.

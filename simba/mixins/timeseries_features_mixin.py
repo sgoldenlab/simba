@@ -2129,6 +2129,13 @@ class TimeseriesFeatureMixin(object):
            :width: 400
            :align: center
 
+        .. video:: _static/img/linearity_index.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_linearity_index`, :func:`simba.data_processors.cuda.timeseries.sliding_linearity_index_cuda`
 
@@ -2326,6 +2333,13 @@ class TimeseriesFeatureMixin(object):
            :width: 600
            :align: center
 
+        .. video:: _static/img/path_curvature.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         :param x: A 2D numpy array of shape (N, 2), where N is the number of points and each row is (x, y).
         :param Literal['mean', 'median', 'max'] agg_type: The type of summary statistic to return. Options are 'mean', 'median', or 'max'.
         :return: A single float value representing the path curvature based on the specified summary type.
@@ -2425,6 +2439,13 @@ class TimeseriesFeatureMixin(object):
            :width: 400
            :align: center
 
+        .. video:: _static/img/spatial_density.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_spatial_density`, :func:`simba.data_processors.cuda.timeseries.sliding_spatial_density_cuda`
 
@@ -2515,6 +2536,13 @@ class TimeseriesFeatureMixin(object):
            :width: 400
            :align: center
 
+        .. video:: _static/img/path_aspect_ratio.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         :param np.ndarray x: A 2D array of shape (N, 2) representing the path, where N is the number of points and each point has two spatial coordinates (e.g., x and y for 2D space). The path should be in the form of an array of consecutive (x, y) points.
         :param float px_per_mm: Conversion factor representing the number of pixels per millimeter
         :return: The aspect ratio of the bounding box enclosing the path. If the width or height of the bounding box is zero (e.g., if all points are aligned vertically or horizontally), returns -1.
@@ -2592,6 +2620,13 @@ class TimeseriesFeatureMixin(object):
            :width: 700
            :align: center
 
+        .. video:: _static/img/radial_eccentricity.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         :param np.ndarray x: 2-dimensional numpy array representing the input data with shape (n, m), where n is the number of frames and m is the coordinates.
         :param np.ndarray data: A 1D array of shape (n_dimensions,) representing the reference point with  respect to which the radial eccentricity is calculated.
 
@@ -2652,6 +2687,13 @@ class TimeseriesFeatureMixin(object):
         .. image:: _static/img/avg_kinetic_energy.webp
            :alt: Avg kinetic energy
            :width: 600
+           :align: center
+
+        .. video:: _static/img/avg_kinetic_energy.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :example:
@@ -2724,6 +2766,13 @@ class TimeseriesFeatureMixin(object):
         .. image:: _static/img/momentum_magnitude.webp
            :alt: Momentum magnitude
            :width: 600
+           :align: center
+
+        .. video:: _static/img/momentum_magnitude.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
         """
 
