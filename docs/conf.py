@@ -132,8 +132,53 @@ html_css_files = ['css/simba_theme.css',  # Include your existing CSS file
                   'custom.css']  # Include your additional CSS file
 
 
+# ------------------------------------------------------------------ #
+# Auto-build the landing-page demo list from every ".. video::"        #
+# reference in the package docstrings and docs .rst, newest file       #
+# first. The carousel and "explore all demos" wall (custom.js) read    #
+# window.SIMBA_DEMOS_ALL and merge it after their curated openers, so   #
+# every video embedded anywhere in the docs shows up in the showcase   #
+# automatically -- no hand-maintained list to fall out of date.        #
+# ------------------------------------------------------------------ #
+import re as _re_vid, json as _json_vid, pathlib as _pl_vid
+
+
+def _build_demo_manifest():
+    here = _pl_vid.Path(__file__).resolve().parent
+    img = here / "_static" / "img"
+    if not img.is_dir():
+        return
+    existing = {p.name: p.stat().st_mtime for p in img.iterdir()
+                if p.suffix.lower() in (".webm", ".mp4")}
+    pat = _re_vid.compile(r'\.\.\s*video::\s*_static/img/([A-Za-z0-9_./-]+\.(?:webm|mp4))', _re_vid.I)
+    refs = set()
+    for root in (here.parent / "simba", here):          # package docstrings + docs .rst
+        if not root.exists():
+            continue
+        for f in root.rglob("*"):
+            if f.suffix.lower() not in (".py", ".rst") or not f.is_file():
+                continue
+            try:
+                txt = f.read_text(encoding="utf-8", errors="ignore")
+            except Exception:
+                continue
+            for m in pat.finditer(txt):
+                refs.add(m.group(1).split("/")[-1])
+    names = [n for n in refs if n in existing]          # only videos whose file actually exists
+    names.sort(key=lambda n: existing[n], reverse=True)  # newest file first
+    (here / "_static" / "demo_manifest.js").write_text(
+        "window.SIMBA_DEMOS_ALL = " + _json_vid.dumps(names) + ";\n", encoding="utf-8")
+
+
+try:
+    _build_demo_manifest()
+except Exception as _e_vid:
+    print("demo_manifest generation skipped:", _e_vid)
+
+
 html_js_files = [
     "https://www.googletagmanager.com/gtag/js?id=G-PEKR9R5J47",
+    "demo_manifest.js",   # generated above; defines window.SIMBA_DEMOS_ALL (must load before custom.js)
     "custom.js"
 ]
 

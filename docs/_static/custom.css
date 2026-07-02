@@ -352,6 +352,59 @@ h1, h2, h3, h4, h5, h6, .rst-content .toctree-wrapper > p.caption { font-weight:
 }
 .simba-carousel-progress > i { display: block; height: 100%; width: 0; background: #4f8fb5; }
 
+/* --- Landing page "explore all demos" wall (hybrid: below the hero carousel) --- */
+.simba-wall {
+    position: relative; margin: 1.8em 0; padding: 24px 0;
+    border-top: 1px solid #dfe4e9; border-bottom: 1px solid #dfe4e9;   /* demarcation lines, like the carousel */
+}
+.simba-wall-rows {
+    display: flex; flex-direction: column; gap: 14px;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%);   /* fade edges */
+}
+.simba-wall-row { overflow: hidden; }
+.simba-wall-track {
+    display: flex; gap: 14px; width: max-content; will-change: transform;
+    animation-name: simba-wall-scroll; animation-timing-function: linear; animation-iteration-count: infinite;
+}
+.simba-wall-row.rev .simba-wall-track { animation-direction: reverse; }   /* alternate rows drift opposite ways */
+.simba-wall-row:hover .simba-wall-track { animation-play-state: paused; } /* hold still so tiles aren't moving targets */
+.simba-wall.offscreen .simba-wall-track { animation-play-state: paused; } /* freeze drift when the wall is off-screen */
+.simba-wall.static .simba-wall-track { animation: none; width: auto; }    /* reduced-motion / Save-Data: static strip */
+.simba-wall.static .simba-wall-row { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+@keyframes simba-wall-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.simba-wall-tile {
+    flex: 0 0 auto; width: 208px; height: 136px; border-radius: 10px; overflow: hidden;
+    background: #000; box-shadow: 0 3px 14px rgba(0, 0, 0, .26); cursor: zoom-in; position: relative;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.simba-wall-tile:hover { transform: scale(1.07); box-shadow: 0 10px 28px rgba(0, 0, 0, .5); z-index: 2; }
+.simba-wall-tile video { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.simba-wall-tile .cap {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 16px 8px 6px;
+    font-size: 11px; font-weight: 600; color: #fff; text-align: center; line-height: 1.25;
+    background: linear-gradient(transparent, rgba(0, 0, 0, .8));
+    opacity: 0; transition: opacity .2s ease; pointer-events: none;
+}
+.simba-wall-tile:hover .cap { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+    .simba-wall-track { animation: none; width: auto; }
+    .simba-wall-row { overflow-x: auto; }                 /* static, manually scrollable */
+}
+@media (max-width: 700px) {
+    /* wall: smaller tiles, tighter rows */
+    .simba-wall-tile { width: 150px; height: 100px; }
+    .simba-wall-rows { gap: 10px; }
+    .simba-wall { padding: 18px 0; }
+    /* carousel: the 580px hero is too tall for a phone -> shrink it and the nav buttons */
+    .simba-carousel-viewport { height: 300px; }
+    .simba-carousel-nav { width: 40px; height: 40px; font-size: 26px; }
+    .simba-carousel-nav.prev { left: 6px; }
+    .simba-carousel-nav.next { right: 6px; }
+    .simba-carousel-cap { font-size: 14px; bottom: 34px; padding: 5px 12px; }
+    .simba-carousel-hint { display: none; }              /* keyboard hint is irrelevant on touch */
+}
+
 /* --- Content tables: zebra striping, rounded corners, lighter borders --- */
 .rst-content table.docutils {
     border: 1px solid #e3e8ec;
