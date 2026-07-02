@@ -8,7 +8,7 @@ Credits
    <div class="simba-credits">
 
 The code, documentation, and support channels are written, maintained, and developed by
-`Simon Nilsson <https://github.com/sronilsson>`_ with help from the open-source community.
+`Simon Nilsson <https://github.com/sronilsson>`_ with help from the community.
 
 .. raw:: html
 
@@ -24,7 +24,7 @@ The code, documentation, and support channels are written, maintained, and devel
 GitHub contributors
 ----------------------------------------------------------
 
-SimBA is shaped by everyone who has contributed code on GitHub. The chart and list below rank contributors on the
+SimBA is shaped by everyone who has contributed code on GitHub. The chart and list below show contributors on the
 `sgoldenlab/simba <https://github.com/sgoldenlab/simba/graphs/contributors>`_ repository by the **lines of code changed**
 (additions + deletions, linear scale) **since December 2020**, with each contributor's commit count shown alongside.
 Hover a bar for the contributor's GitHub card. Line counts are aggregated from the local git history and the chart is
@@ -32,6 +32,12 @@ regenerated automatically every time these docs are built.
 
 .. raw:: html
    :file: _generated/github_contributors.html
+
+.. raw:: html
+   :file: _generated/docs_authorship.html
+
+.. raw:: html
+   :file: _generated/commit_heatmap.html
 
 Who writes this stuff??
 ----------------------------------------------------------
@@ -46,10 +52,12 @@ it is not object-oriented and has no tests or checks — but if needed, it can b
 prior to ``0.77.0`` from PyPI.
 
 .. note::
-   Simon Nilsson left the Golden lab in 2020 and has maintained SimBA in his spare time from North Carolina ever
-   since. As of October 2020, the SimBA codebase, GitHub repository, pip package, API, documentation, and support channels are
-   developed exclusively by Simon — without grants, hardware, or other support. This is only possible thanks to the collaborative,
-   friendly open-source community and their expert feedback and suggestions!
+   I left the Golden lab in 2020 and have maintained SimBA in my spare time from North Carolina ever since. Since
+   October 2020 I have written and maintained the codebase, GitHub repository, pip package, API, documentation, and
+   support channels myself — without dedicated funding, hardware, or staff. This is only possible thanks to the
+   collaborative, friendly community and their expert feedback and suggestions!
+
+   — Simon
 
 Notes on development
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,7 +65,7 @@ Notes on development
 .. tip::
    Coming from pose-estimation packages such as DeepLabCut or SLEAP, users of SimBA can occasionally feel some frustration at the lack
    of UX design, unit/regression tests, version control, CI/CD, and repo layout. Please be mindful that SimBA is not supported by
-   grants or developers, so we have not been able to prioritize these best practices. If you need help troubleshooting your SimBA
+   dedicated funding or a developer team, so we have not been able to prioritize these best practices. If you need help troubleshooting your SimBA
    project, it is very helpful to have a small data sample ready. SimBA development is not supported by any GPUs, and we have a
    restricted set of smaller projects to test with that may be unrelated to your use-case.
 

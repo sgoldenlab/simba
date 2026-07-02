@@ -968,6 +968,229 @@ def _generate_download_stats(app):
         print(f'[download_stats] render failed ({e!r}); keeping existing snapshot.')
 
 
+def _generate_commit_heatmap(app):
+    """(Re)generate a GitHub-style calendar heatmap of commit activity on every build.
+
+    Runs at ``builder-inited`` so the file exists when ``credits.rst`` is read. On any
+    failure (shallow clone, no git) it keeps the committed snapshot so the build never breaks.
+    """
+    import subprocess
+    import collections
+    import datetime as _dt
+
+    here = os.path.dirname(os.path.abspath(__file__))
+    gen_dir = os.path.join(here, '_generated')
+    html_path = os.path.join(gen_dir, 'commit_heatmap.html')
+    os.makedirs(gen_dir, exist_ok=True)
+    try:
+        repo_root = os.path.dirname(here)
+        out = subprocess.run(['git', 'log', '--no-merges', '--format=%as'],
+                             cwd=repo_root, capture_output=True, text=True,
+                             encoding='utf-8', errors='replace', timeout=60).stdout
+        per_day = collections.Counter()
+        for line in out.splitlines():
+            s = line.strip()
+            if len(s) == 10:
+                per_day[s] += 1
+        if not per_day:
+            print('[heatmap] no commits resolved (shallow clone?); keeping snapshot.')
+            return
+
+        days = sorted(per_day)
+        first_year, last_year = int(days[0][:4]), int(days[-1][:4])
+        start_year = max(first_year, 2021)   # solo-maintenance era; skip the 2019-2020 lab period
+        shown = {d: c for d, c in per_day.items() if int(d[:4]) >= start_year}
+        total = sum(shown.values())
+        active = len(shown)
+        CELL, GAP = 10, 3
+        STEP = CELL + GAP
+        ML, MT = 30, 6
+        COLORS = ["#ebedf0", "#cfe6f5", "#7fc1e3", "#2a7fb8", "#143a5e"]
+
+        def bucket(n):
+            if n <= 0:
+                return 0
+            if n <= 2:
+                return 1
+            if n <= 5:
+                return 2
+            if n <= 10:
+                return 3
+            return 4
+
+        strip_h = 7 * STEP
+        width = ML + 54 * STEP + 8
+        today = _dt.date.today()
+        blocks = []
+        y_off = MT
+        for Y in range(start_year, last_year + 1):
+            start, end = _dt.date(Y, 1, 1), _dt.date(Y, 12, 31)
+            if Y == today.year:
+                end = today
+            cells, col, d = [], 0, start
+            while d <= end:
+                sun = (d.weekday() + 1) % 7   # Sun=0 .. Sat=6
+                if d != start and sun == 0:
+                    col += 1
+                n = per_day.get(d.isoformat(), 0)
+                x, yy = ML + col * STEP, y_off + sun * STEP
+                tip = f"{d.isoformat()}: {n} commit{'s' if n != 1 else ''}" if n else f"{d.isoformat()}: no commits"
+                cells.append(f'<rect x="{x}" y="{yy}" width="{CELL}" height="{CELL}" rx="2" '
+                             f'fill="{COLORS[bucket(n)]}"><title>{tip}</title></rect>')
+                d += _dt.timedelta(days=1)
+            blocks.append(f'<text x="0" y="{y_off + strip_h / 2}" font-size="11" fill="#6b7280" '
+                          f'dominant-baseline="middle">{Y}</text>' + ''.join(cells))
+            y_off += strip_h + 10
+        height = y_off + 2
+        svg = (f'<svg viewBox="0 0 {width} {height}" width="100%" style="max-width:{width}px;height:auto" '
+               f'role="img" aria-label="SimBA commit activity, {first_year}-{last_year}">'
+               + ''.join(blocks) + '</svg>')
+        legend = ('<div class="simba-hm-legend">Less '
+                  + ''.join(f'<span style="background:{c}"></span>' for c in COLORS) + ' More</div>')
+        style = ("<style>.simba-hm{max-width:860px;margin:8px auto;}"
+                 ".simba-hm-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;"
+                 "box-shadow:0 6px 20px rgba(33,86,122,.10);padding:16px 18px;overflow-x:auto;}"
+                 ".simba-hm-cap{font-size:12.5px;color:#6b7280;margin:0 0 12px;}"
+                 ".simba-hm-cap b{color:#21567a;}"
+                 ".simba-hm-legend{display:flex;align-items:center;gap:3px;justify-content:flex-end;"
+                 "font-size:11px;color:#6b7280;margin-top:10px;}"
+                 ".simba-hm-legend span{width:10px;height:10px;border-radius:2px;display:inline-block;}"
+                 "</style>")
+        cap = (f'<p class="simba-hm-cap"><b>{total:,}</b> commits across <b>{active:,}</b> days, '
+               f'{start_year}–{last_year} · a single maintainer</p>')
+        with open(html_path, 'w', encoding='utf-8') as f:
+            f.write(style + f'<div class="simba-hm"><div class="simba-hm-card">{cap}{svg}{legend}</div></div>')
+    except Exception as e:  # noqa: BLE001
+        print(f'[heatmap] generation failed ({e!r}); keeping existing snapshot.')
+
+
+def _generate_docs_authorship(app):
+    """(Re)generate a small panel crediting authorship of the docs & tutorials on every build.
+
+    Counts documentation source files and blames the prose (``.rst`` / ``.md``) to attribute
+    authorship. Keeps the committed snapshot on any failure so the build never breaks.
+    """
+    import subprocess
+    import re
+
+    here = os.path.dirname(os.path.abspath(__file__))
+    gen_dir = os.path.join(here, '_generated')
+    html_path = os.path.join(gen_dir, 'docs_authorship.html')
+    os.makedirs(gen_dir, exist_ok=True)
+    SINCE = '2020-12-01'
+    aliases = {
+        'simon nilsson': 'sronilsson', 'simon': 'sronilsson', 'sronilsson': 'sronilsson',
+        'jia jie choong': 'inoejj', 'inoejj': 'inoejj',
+        'aasiya islam': 'aasiya-islam', 'aasiya-islam': 'aasiya-islam',
+        'tzuk': 'tzukpolinsky', 'tzuk polinsky': 'tzukpolinsky',
+        'jens schweihoff': 'JensBlack',
+        'justin shenk': 'justinshenk',
+        'nastacia l. goodwin': 'goodwinnastacia', 'nastacia goodwin': 'goodwinnastacia',
+        "thomas o'shea-wheller": 'Toshea111',
+        'sam golden lab': 'sgoldenlab', 'sgoldenlab': 'sgoldenlab',
+        'florian duclot': 'florianduclot', 'florianduclot': 'florianduclot',
+        'sophia hwang': 'sophihwang26', 'sophihwang26': 'sophihwang26',
+    }
+    noreply_re = re.compile(r'(?:\d+\+)?([^@]+)@users\.noreply\.github\.com$', re.I)
+
+    def _login(email, name):
+        mm = noreply_re.match((email or '').strip())
+        if mm:
+            return mm.group(1)
+        nl = (name or '').strip().lower()
+        if nl in aliases:
+            return aliases[nl]
+        return aliases.get((email or '').split('@')[0].strip().lower())
+
+    def _h(n):
+        if n >= 1_000_000:
+            return f'{n / 1e6:.1f}M'
+        if n >= 1000:
+            return f'{n / 1e3:.1f}K'
+        return str(int(n))
+
+    def _mon(s):
+        try:
+            return datetime.datetime.strptime(s, '%Y-%m-%d').strftime('%b %Y')
+        except Exception:  # noqa: BLE001
+            return s
+
+    try:
+        repo_root = os.path.dirname(here)
+        listed = subprocess.run(['git', 'ls-files', 'docs/*.rst', 'docs/*.md', 'docs/*.ipynb'],
+                                cwd=repo_root, capture_output=True, text=True,
+                                encoding='utf-8', errors='replace', timeout=60).stdout
+        allf = [f for f in listed.split('\n') if f.strip() and '/_build/' not in f]
+        n_rst = sum(1 for f in allf if f.endswith('.rst') and '/_generated/' not in f)
+        n_md = sum(1 for f in allf if f.endswith('.md'))
+        n_nb = sum(1 for f in allf if f.endswith('.ipynb'))
+
+        # Same metric as the code-contributors chart: lines changed (added + removed) since
+        # Dec 2020, restricted to the documentation/tutorial prose sources via pathspec.
+        out = subprocess.run(
+            ['git', 'log', '--no-merges', f'--since={SINCE}', '--numstat',
+             '--format=COMMIT\t%ae\t%an\t%as', '--', 'docs/*.rst', 'docs/*.md'],
+            cwd=repo_root, capture_output=True, text=True, encoding='utf-8',
+            errors='replace', timeout=90).stdout
+        loc, commits, latest, cur = {}, {}, {}, None
+        for line in out.splitlines():
+            if line.startswith('COMMIT\t'):
+                parts = line.split('\t', 3)
+                email = parts[1] if len(parts) > 1 else ''
+                name = parts[2] if len(parts) > 2 else ''
+                cdate = parts[3] if len(parts) > 3 else ''
+                cur = _login(email, name)
+                if cur is not None:
+                    commits[cur] = commits.get(cur, 0) + 1
+                    if cdate > latest.get(cur, ''):
+                        latest[cur] = cdate
+                continue
+            if cur is None or not line.strip():
+                continue
+            a, d, _rest = (line.split('\t', 2) + ['', '', ''])[:3]
+            if a.isdigit() and d.isdigit():
+                pa, pd = loc.get(cur, (0, 0))
+                loc[cur] = (pa + int(a), pd + int(d))
+        if not loc:
+            print('[docs_authorship] no doc contributions resolved (shallow clone?); keeping snapshot.')
+            return
+
+        data = sorted(((lg, loc[lg][0] + loc[lg][1], loc[lg][0], loc[lg][1],
+                        commits.get(lg, 0), latest.get(lg, '')) for lg in loc),
+                      key=lambda t: t[1], reverse=True)
+        maxtot = data[0][1] or 1
+        stamp = datetime.datetime.now().strftime('%B %Y')
+
+        rows = []
+        for i, (lg, tot, add, dele, ncom, ldate) in enumerate(data):
+            wpct = 0 if tot == 0 else max(0.4, tot / maxtot * 100)
+            color = '#21567a' if i == 0 else '#2a7fb8'
+            locline = (f'{ncom:,} commit{"s" if ncom != 1 else ""} &middot; latest {_mon(ldate)}'
+                       if ncom else 'none since Dec 2020')
+            rows.append(
+                f'<a class="simba-cc-row" href="https://github.com/{lg}">'
+                f'<span class="simba-cc-name">@{lg}</span>'
+                f'<span class="simba-cc-track"><span class="simba-cc-bar" '
+                f'style="width:{wpct:.2f}%;background:{color};"></span></span>'
+                f'<span class="simba-cc-count">{_h(tot)}</span>'
+                f'<span class="simba-cc-loc">{locline}</span>'
+                f'<span class="simba-cc-card"><img src="https://github.com/{lg}.png?size=96" '
+                f'alt="@{lg}" loading="lazy"><span class="cci"><b>@{lg}</b>'
+                f'<em>{_h(tot)} doc lines changed &middot; +{add:,} / −{dele:,} &middot; '
+                f'{ncom:,} commits{f", latest {ldate}" if ldate else ""}</em></span></span></a>')
+        cap = (f'bar &amp; bold number = documentation lines changed (added + removed) since Dec 2020 '
+               f'&middot; linear scale &middot; {n_rst} pages &middot; {n_md} tutorials &middot; '
+               f'{n_nb} notebooks &middot; {stamp}')
+        html = ('<h4 class="simba-cc-h">Documentation lines changed since Dec 2020 '
+                '<span>(added + removed &middot; linear)</span></h4>\n<div class="simba-cc">\n     '
+                + '\n     '.join(rows)
+                + f'\n     <p class="simba-cc-cap">{cap}</p>\n   </div>\n')
+        with open(html_path, 'w', encoding='utf-8') as f:
+            f.write(html)
+    except Exception as e:  # noqa: BLE001
+        print(f'[docs_authorship] generation failed ({e!r}); keeping existing snapshot.')
+
+
 def setup(app):
     """Build-time hooks for the Markdown tutorials.
 
@@ -989,6 +1212,8 @@ def setup(app):
 
     app.connect('builder-inited', _generate_github_contributors)
     app.connect('builder-inited', _generate_download_stats)
+    app.connect('builder-inited', _generate_commit_heatmap)
+    app.connect('builder-inited', _generate_docs_authorship)
     app.connect('build-finished', _copy_images)
     app.connect('build-finished', _inject_lazy_media)
     app.connect('doctree-read', _convert_github_alerts)

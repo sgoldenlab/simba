@@ -427,6 +427,13 @@ class CircularStatisticsMixin(object):
            :width: 600
            :align: center
 
+        .. video:: _static/img/sliding_bearing.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            :func:`simba.data_processors.cuda.circular_statistics.sliding_bearing`
 
@@ -446,7 +453,7 @@ class CircularStatisticsMixin(object):
         lag = int(lag * fps)
         for i in range(lag, x.shape[0]):
             x1, y1 = x[i - lag, 0], x[i - lag, 1]
-            x2, y2 = x[i, 1], x[i, 1]
+            x2, y2 = x[i, 0], x[i, 1]
             bearing = np.degrees(np.arctan2(x2 - x1, y2 - y1))
             results[i] = (bearing + 360) % 360
         return results
@@ -462,6 +469,13 @@ class CircularStatisticsMixin(object):
           :alt: Angle from 3 bps
           :width: 600
           :align: center
+
+        .. video:: _static/img/direction_three_bps.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
 
         .. seealso::
            For two-point direction calculation, see :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_two_bps`.
@@ -1449,6 +1463,13 @@ class CircularStatisticsMixin(object):
         .. image:: _static/img/rotational_direction.png
            :alt: Rotational direction
            :width: 600
+           :align: center
+
+        .. video:: _static/img/rotational_direction.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         The result array contains values:

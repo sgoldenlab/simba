@@ -1886,6 +1886,13 @@ class TimeseriesFeatureMixin(object):
            :width: 600
            :align: center
 
+        .. video:: _static/img/sliding_displacement.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         :param np.ndarray x: An array of shape (n, 2) representing the time-series sequence of 2D points.
         :param np.ndarray time_windows: Array of time windows (in seconds).
         :param float fps: The sample rate (frames per second) of the sequence.
