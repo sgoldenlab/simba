@@ -871,6 +871,13 @@ class CircularStatisticsMixin(object):
            :width: 600
            :align: center
 
+        .. video:: _static/img/sliding_angular_diff.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         :param ndarray data: 1D array of size len(frames) representing degrees. Can be computed by `CircularStatisticsMixin().direction_three_bps` or `CircularStatisticsMixin().direction_two_bps`.
         :param np.ndarray time_window: Rolling time-window as float in seconds.
         :param int fps: fps of the recorded video

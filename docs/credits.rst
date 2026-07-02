@@ -39,6 +39,9 @@ regenerated automatically every time these docs are built.
 .. raw:: html
    :file: _generated/commit_heatmap.html
 
+.. raw:: html
+   :file: _generated/code_growth.html
+
 Who writes this stuff??
 ----------------------------------------------------------
 

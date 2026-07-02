@@ -1191,6 +1191,117 @@ def _generate_docs_authorship(app):
         print(f'[docs_authorship] generation failed ({e!r}); keeping existing snapshot.')
 
 
+def _generate_code_growth(app):
+    """(Re)generate a cumulative code-growth curve (net Python lines over time) on every build.
+
+    Sums rename-aware ``git log --numstat`` additions minus deletions for ``*.py`` by month and
+    plots the running total as a self-contained SVG. Keeps the committed snapshot on failure.
+    """
+    import subprocess
+
+    here = os.path.dirname(os.path.abspath(__file__))
+    gen_dir = os.path.join(here, '_generated')
+    html_path = os.path.join(gen_dir, 'code_growth.html')
+    os.makedirs(gen_dir, exist_ok=True)
+
+    def _hn(v):
+        if v >= 1_000_000:
+            return f'{v / 1e6:.1f}M'
+        if v >= 1000:
+            return f'{v / 1e3:.0f}K'
+        return str(int(v))
+
+    try:
+        repo_root = os.path.dirname(here)
+        out = subprocess.run(
+            ['git', 'log', '--no-merges', '--reverse', '-M', '--numstat', '--format=C\t%as'],
+            cwd=repo_root, capture_output=True, text=True, encoding='utf-8',
+            errors='replace', timeout=180).stdout
+        code_m, docs_m, curmon = {}, {}, None
+        for line in out.splitlines():
+            if line.startswith('C\t'):
+                curmon = line.split('\t', 1)[1][:7]
+                continue
+            p = line.split('\t')
+            if not (curmon and len(p) >= 3 and p[0].isdigit() and p[1].isdigit()):
+                continue
+            net = int(p[0]) - int(p[1])
+            path = p[2].lower()
+            if path.endswith('.py'):
+                code_m[curmon] = code_m.get(curmon, 0) + net
+            elif path.endswith('.rst') or path.endswith('.md'):
+                docs_m[curmon] = docs_m.get(curmon, 0) + net
+        if not code_m and not docs_m:
+            print('[code_growth] no numstat resolved (shallow clone?); keeping snapshot.')
+            return
+
+        allm = sorted(set(code_m) | set(docs_m))
+        yy, mm = int(allm[0][:4]), int(allm[0][5:7])
+        ey, em = int(allm[-1][:4]), int(allm[-1][5:7])
+        months = []
+        while (yy, mm) <= (ey, em):
+            months.append(f'{yy:04d}-{mm:02d}')
+            mm += 1
+            if mm > 12:
+                mm, yy = 1, yy + 1
+        cc = dc = 0
+        code_cum, docs_cum = [], []
+        for m in months:
+            cc = max(0, cc + code_m.get(m, 0))
+            dc = max(0, dc + docs_m.get(m, 0))
+            code_cum.append(cc)
+            docs_cum.append(dc)
+        total = [c + d for c, d in zip(code_cum, docs_cum)]
+        maxv = max(total) or 1
+        code_final, docs_final = code_cum[-1], docs_cum[-1]
+        stamp = datetime.datetime.now().strftime('%B %Y')
+
+        W, H, L, R, T, B = 820, 210, 36, 812, 14, 164
+        n = len(months)
+
+        def X(i):
+            return L + (R - L) * (i / (n - 1) if n > 1 else 0)
+
+        def Y(v):
+            return B - (B - T) * (v / maxv)
+
+        codeY = [Y(v) for v in code_cum]
+        totalY = [Y(v) for v in total]
+        code_area = (f'M {X(0):.1f},{B:.1f}' + ''.join(f' L {X(i):.1f},{codeY[i]:.1f}' for i in range(n))
+                     + f' L {X(n - 1):.1f},{B:.1f} Z')
+        docs_band = (f'M {X(0):.1f},{codeY[0]:.1f}'
+                     + ''.join(f' L {X(i):.1f},{codeY[i]:.1f}' for i in range(1, n))
+                     + ''.join(f' L {X(i):.1f},{totalY[i]:.1f}' for i in range(n - 1, -1, -1)) + ' Z')
+        total_line = ' '.join(f'{X(i):.1f},{totalY[i]:.1f}' for i in range(n))
+        ticks = ''
+        for i, m in enumerate(months):
+            if m.endswith('-01'):
+                x = X(i)
+                ticks += (f'<line x1="{x:.1f}" y1="{B}" x2="{x:.1f}" y2="{B + 4}" stroke="#b9c1cb" '
+                          f'stroke-width="1"/><text x="{x:.1f}" y="{B + 17}" text-anchor="middle" '
+                          f'font-size="11" fill="#6b7280">{m[:4]}</text>')
+        svg = (f'<svg viewBox="0 0 {W} {H}" width="100%" style="max-width:{W}px;display:block;'
+               f'margin:6px auto 0;font-family:inherit;" role="img" '
+               f'aria-label="Cumulative Python and documentation lines over time">'
+               f'<line x1="{L}" y1="{B}" x2="{R}" y2="{B}" stroke="#d5dbe2" stroke-width="1"/>'
+               f'<text x="{L - 5}" y="{T + 4}" text-anchor="end" font-size="10" fill="#6b7280">{_hn(maxv)}</text>'
+               f'<text x="{L - 5}" y="{B}" text-anchor="end" font-size="10" fill="#6b7280">0</text>'
+               f'<path d="{docs_band}" fill="rgba(56,168,212,.22)"/>'
+               f'<path d="{code_area}" fill="rgba(33,86,122,.16)"/>'
+               f'<polyline points="{total_line}" fill="none" stroke="#21567a" stroke-width="2.2"/>'
+               f'{ticks}</svg>')
+        leg = ('<div class="simba-tl-leg"><span><i style="background:#21567a"></i>Python code</span>'
+               '<span><i style="background:#38a8d4"></i>documentation</span></div>')
+        cap = f'net lines accumulated over time · ≈{_hn(code_final)} Python + ≈{_hn(docs_final)} docs · {stamp}'
+        html = ('<h4 class="simba-cc-h">Codebase growth '
+                '<span>(cumulative Python + documentation lines)</span></h4>\n'
+                f'<div class="simba-tl">{svg}{leg}<p class="simba-cc-cap">{cap}</p></div>\n')
+        with open(html_path, 'w', encoding='utf-8') as f:
+            f.write(html)
+    except Exception as e:  # noqa: BLE001
+        print(f'[code_growth] generation failed ({e!r}); keeping existing snapshot.')
+
+
 def setup(app):
     """Build-time hooks for the Markdown tutorials.
 
@@ -1214,6 +1325,7 @@ def setup(app):
     app.connect('builder-inited', _generate_download_stats)
     app.connect('builder-inited', _generate_commit_heatmap)
     app.connect('builder-inited', _generate_docs_authorship)
+    app.connect('builder-inited', _generate_code_growth)
     app.connect('build-finished', _copy_images)
     app.connect('build-finished', _inject_lazy_media)
     app.connect('doctree-read', _convert_github_alerts)
