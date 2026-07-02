@@ -1130,6 +1130,13 @@ class CircularStatisticsMixin(object):
            :width: 600
            :align: center
 
+        .. video:: _static/img/sliding_kuipers_two_sample_test.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.kuipers_two_sample_test`
 
@@ -1263,6 +1270,13 @@ class CircularStatisticsMixin(object):
         .. image:: _static/img/circular_range.png
            :alt: Circular range
            :width: 400
+           :align: center
+
+        .. video:: _static/img/circular_range.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         .. seealso::

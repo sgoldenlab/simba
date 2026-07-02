@@ -109,6 +109,13 @@ class CueLightAnalyzer(ConfigReader):
        :width: 700
        :align: center
 
+    .. video:: _static/img/cue_light_analyzer.webm
+       :width: 500
+       :autoplay:
+       :loop:
+       :muted:
+       :align: center
+
     :param Union[str, os.PathLike], config_path: path to SimBA project config file in Configparser format
     :param Union[str, os.PathLike], data_dir: directory holding pose-estimation data. E.g., ``project_folder/csv/outlier_corrected_movement_location``
     :param List[str] cue_light_names: Names of cue light ROIs, as defined in the SimBA ROI interface.

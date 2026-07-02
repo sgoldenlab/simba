@@ -1186,6 +1186,13 @@ class FeatureExtractionMixin(object):
            :width: 600
            :align: center
 
+        .. video:: _static/img/change_in_bodypart_euclidean_distance.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         :param np.ndarray location_1: 2D array (n_frames, 2) with the x,y positions of the first body-part.
         :param np.ndarray location_2: 2D array (n_frames, 2) with the x,y positions of the second body-part.
         :param int fps: Frame-rate of the video.
