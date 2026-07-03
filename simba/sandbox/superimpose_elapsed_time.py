@@ -45,6 +45,7 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> superimpose_elapsed_time(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test_4/1.mp4', position='middle_top', font_color='black', font_border_color='pink', font_border_width=5, font_size=30)
     """
 

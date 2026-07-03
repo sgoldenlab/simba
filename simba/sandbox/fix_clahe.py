@@ -17,6 +17,7 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike]) -> None:
     :parameter Union[str, os.PathLike] file_path: Path to video file.
 
     :example:
+
     >>> _ = clahe_enhance_video(file_path: 'project_folder/videos/Video_1.mp4')
     """
 

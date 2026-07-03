@@ -27,6 +27,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
 
     """
     :example:
+
     >>> _ = VisualizeROIFeaturesPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini')
     """
     def __init__(self,

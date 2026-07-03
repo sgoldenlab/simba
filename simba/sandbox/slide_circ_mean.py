@@ -41,6 +41,7 @@ def acceleration(
     :param Literal['mm', 'cm', 'dm', 'm'] unit:  If acceleration should be presented as millimeter, centimeters, decimeter, or meter. Default millimeters.
     :return: Array of accelerations corresponding to each frame.
     :example:
+
     >>> data = np.array([1, 2, 3, 4, 5, 5, 5, 5, 5, 6]).astype(np.float32)
     >>> TimeseriesFeatureMixin().acceleration(data=data, pixels_per_mm=1.0, fps=2, time_window=1.0)
     >>> [ 0.,  0.,  0.,  0., -1., -1.,  0.,  0.,  1.,  1.]

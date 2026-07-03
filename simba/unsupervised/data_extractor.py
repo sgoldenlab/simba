@@ -50,6 +50,7 @@ class DataExtractor(UMLMixin, ConfigReader):
     :param settings: User-defined parameters for data extraction.
 
     :example:
+
     >>> extractor = DataExtractor(data_path='unsupervised/cluster_models/awesome_curran.pickle', data_type=['BOUTS_TARGETS'], settings=None, config_path='unsupervised/project_folder/project_config.ini')
     >>> extractor.run()
     """

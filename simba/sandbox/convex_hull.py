@@ -93,6 +93,7 @@ def get_convex_hull(pts: np.ndarray) -> np.ndarray:
 
 
     :example:
+
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0514.mp4"
     >>> data_path = r"/mnt/c/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/501_MA142_Gi_CNO_0514 - test.csv"
     >>> df = read_df(file_path=data_path, file_type='csv')

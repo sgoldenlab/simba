@@ -46,6 +46,7 @@ class MergeYoloProjects:
     :param bool verbose: If True, print progress. Default True.
 
     :example:
+
     >>> merger = MergeYoloProjects(yaml_paths=[r'/project_a/map.yaml', r'/project_b/map.yaml'], save_dir=r'/merged_project', train_val_split=0.8)
     >>> merger.run()
     """

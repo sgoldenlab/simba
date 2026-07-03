@@ -51,6 +51,7 @@ class SleapH52Yolo:
 
 
     :example:
+
     >>>DATA_DIR = r'D:/ares/data/termite_1/data'
     >>>VIDEO_DIR = r'D:/ares/data/termite_1/video'
     >>>SAVE_DIR = r"D:/imgs/sleap_h5"

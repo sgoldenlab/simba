@@ -97,6 +97,7 @@ class InteractiveROIModifier():
                                                     Gridlines will be drawn on the image for alignment assistance.
 
     :example:
+
     >>> import cv2
     >>> import numpy as np
     >>> from simba.roi_tools.interactive_modifier_ui import InteractiveROIModifier

@@ -30,6 +30,7 @@ def vertical_video_concatenator(video_paths: List[Union[str, os.PathLike]],
     :raises InvalidInputError: If both or neither width_px and width_idx are provided.
 
     :example:
+
     >>> video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat7_8(2).mp4',
     >>>                '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12.mp4',
     >>>                '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12_1.mp4']

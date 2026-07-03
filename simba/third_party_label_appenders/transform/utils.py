@@ -82,6 +82,7 @@ def scale_pose_img_sizes(pose_data: np.ndarray,
     :rtype: Tuple[np.ndarray, Iterable[Union[np.ndarray, str]]]
 
     :example:
+
     >>> df = labelme_to_df(labelme_dir=r'C:\troubleshooting\coco_data\labels\test_read', greyscale=False, pad=False, normalize=False)
     >>> imgs = list(df['image'])
     >>> pose_data = df.drop(['image', 'image_name'], axis=1)
@@ -331,12 +332,14 @@ def merge_coco_keypoints_files(data_dir: Union[str, os.PathLike],
     :return: None. Results are saved in ``save_path``.
 
     :example I:
+
     >>> DATA_DIR = r'D:\cvat_annotations\frames\coco_keypoints_1\TEST'
     >>> SAVE_PATH = r"D:\cvat_annotations\frames\coco_keypoints_1\TEST\merged.json"
     >>> merge_coco_keypoints_files(data_dir=DATA_DIR, save_path=SAVE_PATH)
 
 
     :example II:
+
     >>> merge_coco_keypoints_files(data_dir=DATA_DIR, save_path=SAVE_PATH, max_width=662, max_height=217)
     """
 
@@ -462,6 +465,7 @@ def downsample_coco_dataset(json_path: Union[str, os.PathLike],
     :return None: Saves new images and updated COCO JSON to `save_dir`.
 
     :example:
+
     >>> downsample_coco_dataset(
     ...     json_path=r"D:\\cvat_annotations\\frames\\coco_keypoints_1\\merged\\merged_08132025.json",
     ...     img_dir=r"D:\\cvat_annotations\\frames\\all_imgs_071325",
@@ -525,6 +529,7 @@ def concatenate_dlc_annotations(data_dir: Union[str, os.PathLike], save_dir: Uni
     :return: None. Creates concatenated CSV file and copies PNG images to 'labeled-data' subdirectory in save_dir.
 
     :example:
+
     >>> concatenate_dlc_annotations(
     ...     data_dir='/path/to/dlc/annotations',
     ...     save_dir='/path/to/output',
@@ -576,6 +581,7 @@ def get_litpose_project_bboxes(project_dir: Union[str, os.PathLike],
     :param Optional[bool] verbose: If True, print progress messages. Default True.
 
     :example:
+
     >>> get_litpose_project_bboxes(project_dir=r'Z:\home\simon\LPProjects\mini_project_0504', padding=0.15, verbose=True, visualize=20)
     """
 

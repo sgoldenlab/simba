@@ -122,6 +122,7 @@ class CueLightVisualizer(ConfigReader):
        :align: center
 
     :examples:
+
     >>> cue_light_visualizer = CueLightVisualizer(config_path='SimBAConfig', cue_light_names=['Cue_light'], video_path='VideoPath', video_setting=True, frame_setting=False)
     >>> cue_light_visualizer.run()
     """

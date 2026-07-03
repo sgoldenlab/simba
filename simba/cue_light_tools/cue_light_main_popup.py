@@ -42,6 +42,7 @@ class CueLightMainPopUp(ConfigReader, PopUpMixin):
 
 
     :examples:
+
     >>> cue_light_gui = CueLightAnalyzerMenu(config_path='MySimBAConfigPath')
     >>> cue_light_gui.main_frm.mainloop()
     """

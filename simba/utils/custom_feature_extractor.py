@@ -54,6 +54,7 @@ class CustomFeatureExtractor(ConfigReader):
         We can give prompt help with troubleshooting through Gitter or GitHb.
 
     :example:
+
     >>> test = CustomFeatureExtractor(extractor_file_path='/simba/misc/piotr.py', config_path='/Users/simon/Desktop/envs/troubleshooting/piotr/project_folder/train-20231108-sh9-frames-with-p-lt-2_plus3-&3_best-f1.ini')
     >>> test.run()
     >>> test = CustomFeatureExtractor(config_path='/Users/simon/Desktop/envs/troubleshooting/piotr/project_folder/train-20231108-sh9-frames-with-p-lt-2_plus3-&3_best-f1.ini', file_path='/simba/misc/piotr.py')

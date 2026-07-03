@@ -106,6 +106,7 @@ def create_average_frm_cupy(video_path: Union[str, os.PathLike],
     :return: Returns `None` if the result is saved to `save_path`. Otherwise, returns the average frame as a NumPy array.
 
     :example:
+
     >>> create_average_frm_cupy(video_path=r"C:/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4_downsampled.mp4", verbose=True, start_frm=0, end_frm=9000)
     >>> create_average_frm_cupy(video_path=r"C:/videos/my_video.mp4", start_time="00:00:00", end_time="00:01:00", async_frame_read=True, save_path=r"C:/output/avg_frame.png")
 
@@ -246,6 +247,7 @@ def create_average_frm_cuda(video_path: Union[str, os.PathLike],
     :return: Returns `None` if the result is saved to `save_path`. Otherwise, returns the average frame as a NumPy array.
 
     :example:
+
     >>> create_average_frm_cuda(video_path=r"C:/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4_downsampled.mp4", verbose=True, start_frm=0, end_frm=9000)
 
     """
@@ -375,6 +377,7 @@ def img_stack_brightness(x: np.ndarray,
 
 
     :example:
+
     >>> imgs = read_img_batch_from_video_gpu(video_path=r"/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4_downsampled.mp4", start_frm=0, end_frm=5000)
     >>> imgs = np.stack(list(imgs.values()), axis=0)
     >>> x = img_stack_brightness(x=imgs)
@@ -552,6 +555,7 @@ def img_stack_to_grayscale_cupy(imgs: Union[np.ndarray, cp.ndarray],
     :return np.ndarray: m A 3D NumPy or CuPy array of shape (num_images, height, width) containing the grayscale images. If the input array is not 4D, the function returns the input as is.
 
     :example:
+
     >>> imgs = read_img_batch_from_video_gpu(video_path=r"/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_IOT_1_cropped.mp4", verbose=False, start_frm=0, end_frm=i)
     >>> imgs = np.stack(list(imgs.values()), axis=0).astype(np.uint8)
     >>> gray_imgs = img_stack_to_grayscale_cupy(imgs=imgs)
@@ -615,6 +619,7 @@ def img_stack_to_grayscale_cuda(x: np.ndarray) -> np.ndarray:
     :return np.ndarray: 3D array of greyscaled images.
 
     :example:
+
     >>> imgs = read_img_batch_from_video_gpu(video_path=r"/mnt/c/troubleshooting/mitra/project_folder/videos/temp_2/592_MA147_Gq_Saline_0516_downsampled.mp4", verbose=False, start_frm=0, end_frm=i)
     >>> imgs = np.stack(list(imgs.values()), axis=0).astype(np.uint8)
     >>> grey_images = img_stack_to_grayscale_cuda(x=imgs)
@@ -1092,6 +1097,7 @@ def sliding_psnr(data: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> data = ImageMixin().read_img_batch_from_video(video_path =r"/mnt/c/troubleshooting/mitra/project_folder/videos/clipped/501_MA142_Gi_CNO_0514_clipped.mp4", start_frm=0, end_frm=299)
     >>> data = np.stack(list(data.values()), axis=0).astype(np.uint8)
     >>> data = ImageMixin.img_stack_to_greyscale(imgs=data)
@@ -1124,6 +1130,7 @@ def rotate_img_stack_cupy(imgs: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/F0_gq_Saline_0626_clipped.mp4"
     >>> imgs = read_img_batch_from_video_gpu(video_path=video_path)
     >>> imgs = np.stack(np.array(list(imgs.values())), axis=0)
@@ -1173,6 +1180,7 @@ def rotate_video_cupy(video_path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/F0_gq_Saline_0626_clipped.mp4"
     >>> rotate_video_cupy(video_path=video_path, rotation_degrees=45)
     """
@@ -1287,6 +1295,7 @@ def bg_subtraction_cuda(video_path: Union[str, os.PathLike],
     :param Optional[int] threshold: Value between 0-255 representing the difference threshold between the average frame subtracted from each frame. Higher values and more pixels will be considered background. Default: 50.
 
     :example:
+
     >>> video_path = "/mnt/c/troubleshooting/mitra/project_folder/videos/clipped/592_MA147_Gq_CNO_0515.mp4"
     >>> avg_frm = create_average_frm(video_path=video_path)
     >>> bg_subtraction_cuda(video_path=video_path, avg_frm=avg_frm, fg_clr=(255, 255, 255))
@@ -1375,6 +1384,7 @@ def bg_subtraction_cupy(video_path: Union[str, os.PathLike],
 
 
     :example:
+
     >>> avg_frm = create_average_frm(video_path="/mnt/c/troubleshooting/mitra/project_folder/videos/temp/temp_ex_bg_subtraction/original/844_MA131_gq_CNO_0624.mp4")
     >>> video_path = "/mnt/c/troubleshooting/mitra/project_folder/videos/temp/temp_ex_bg_subtraction/844_MA131_gq_CNO_0624_7.mp4"
     >>> bg_subtraction_cupy(video_path=video_path, avg_frm=avg_frm, batch_size=500)
@@ -1510,6 +1520,7 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
     :param int batch_size: The number of frames to process concurrently on the GPU. Default: 750. Increase of host and device RAM allows it to improve runtime. Decrease if you hit memory errors.
 
     :example:
+
     >>> DATA_PATH = "/mnt/c/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/501_MA142_Gi_CNO_0521.csv"
     >>> VIDEO_PATH = "/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
     >>> SAVE_PATH = "/mnt/c/troubleshooting/mitra/project_folder/frames/output/pose_ex/test.mp4"

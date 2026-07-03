@@ -99,6 +99,7 @@ class TimeseriesFeatureMixin(object):
            degenerate case the function returns ``(0, 0, 0)`` to avoid division by zero.
 
         :example:
+
         >>> data = np.array([1.0, 3.0, 2.0, 6.0, 4.0, 5.0], dtype=np.float32)
         >>> TimeseriesFeatureMixin().hjort_parameters(data)
         >>> (2.9166667, 1.2503713, 1.6617813)  # (activity, mobility, complexity)
@@ -179,6 +180,7 @@ class TimeseriesFeatureMixin(object):
         :return np.ndarray: 2D np.ndarray with columns representing idx in input data in first column and values of local maxima in second column
 
         :example:
+
         >>> data = np.array([3.9, 7.5,  4.2, 6.2, 7.5, 3.9, 6.2, 6.5, 7.2, 9.5]).astype(np.float32)
         >>> TimeseriesFeatureMixin().local_maxima_minima(data=data, maxima=True)
         >>> [[1, 7.5], [4, 7.5], [9, 9.5]]
@@ -235,6 +237,7 @@ class TimeseriesFeatureMixin(object):
         :return int: Count of events where sequential values crosses ``val``.
 
         :example:
+
         >>> data = np.array([3.9, 7.5,  4.2, 6.2, 7.5, 3.9, 6.2, 6.5, 7.2, 9.5]).astype(np.float32)
         >>> TimeseriesFeatureMixin().crossings(data=data, val=7)
         >>> 5
@@ -284,6 +287,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.array([3.9, 7.5,  4.2, 6.2, 7.5, 3.9, 6.2, 6.5, 7.2, 9.5]).astype(np.float32)
         >>> results = TimeseriesFeatureMixin().sliding_crossings(data=data, time_windows=np.array([1.0]), fps=2.0, val=7.0)
         """
@@ -335,6 +339,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: float
 
         :examples:
+
         >>> data = np.array([3.9, 7.5,  4.2, 6.2, 7.5, 3.9, 6.2, 6.5, 7.2, 9.5]).astype(np.float32)
         >>> TimeseriesFeatureMixin().percentile_difference(data=data, upper_pct=95, lower_pct=5)
         >>> 0.7401574764125177
@@ -422,6 +427,7 @@ class TimeseriesFeatureMixin(object):
 
 
         :examples:
+
         >>> data = np.array([3.9, 7.5,  4.2, 6.2, 7.5, 3.9, 6.2, 6.5, 7.2, 9.5]).astype(np.float32)
         >>> TimeseriesFeatureMixin().percent_beyond_n_std(data=data, n=1)
         >>> 0.1
@@ -531,6 +537,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: float
 
         :example:
+
         >>> data = np.array([3.9, 7.5,  4.2, 6.2, 7.5, 3.9, 6.2, 6.5, 7.2, 9.5]).astype(np.float32)
         >>> TimeseriesFeatureMixin().percent_in_percentile_window(data, upper_pct=70, lower_pct=30)
         >>> 0.4
@@ -615,6 +622,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: float
 
         :examples:
+
         >>> t = np.linspace(0, 50, int(44100 * 2.0), endpoint=False)
         >>> sine_wave = 1.0 * np.sin(2 * np.pi * 1.0 * t).astype(np.float32)
         >>> TimeseriesFeatureMixin().petrosian_fractal_dimension(data=sine_wave)
@@ -728,6 +736,7 @@ class TimeseriesFeatureMixin(object):
            HFD = \frac{\log(N)}{\log(N) + \log\left(\frac{N}{N + 0.4 \cdot zC}\right)}
 
         :example:
+
         >>> t = np.linspace(0, 50, int(44100 * 2.0), endpoint=False)
         >>> sine_wave = 1.0 * np.sin(2 * np.pi * 1.0 * t).astype(np.float32)
         >>> sine_wave = (sine_wave - np.min(sine_wave)) / (np.max(sine_wave) - np.min(sine_wave))
@@ -793,6 +802,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: float
 
         :example:
+
         >>> t = np.linspace(0, 50, int(44100 * 2.0), endpoint=False)
         >>> sine_wave = 1.0 * np.sin(2 * np.pi * 1.0 * t).astype(np.float32)
         >>> TimeseriesFeatureMixin().permutation_entropy(data=sine_wave, dimension=3, delay=1)
@@ -865,6 +875,7 @@ class TimeseriesFeatureMixin(object):
 
 
         :example:
+
         >>> data = np.array([1, 4, 2, 3, 5, 6, 8, 7, 9, 10]).astype(np.float32)
         >>> TimeseriesFeatureMixin().line_length(data=data)
         >>> 12.0
@@ -900,6 +911,7 @@ class TimeseriesFeatureMixin(object):
 
 
         :examples:
+
         >>> data = np.array([1, 4, 2, 3, 5, 6, 8, 7, 9, 10]).astype(np.float32)
         >>> TimeseriesFeatureMixin().sliding_line_length(data=data, window_sizes=np.array([1.0]), sample_rate=2)
         """
@@ -934,6 +946,7 @@ class TimeseriesFeatureMixin(object):
         :return: Variance values for each window size and data point. The shape of the result array is (data.shape[0], window_sizes.shape[0]).
 
         :example:
+
         >>> data = np.array([1, 2, 3, 1, 2, 9, 17, 2, 10, 4]).astype(np.float32)
         >>> TimeseriesFeatureMixin().sliding_variance(data=data, window_sizes=np.array([0.5]), sample_rate=10)
         >>> [[-1.],[-1.],[-1.],[-1.],[ 0.56],[ 8.23],[35.84],[39.20],[34.15],[30.15]])
@@ -1003,6 +1016,7 @@ class TimeseriesFeatureMixin(object):
            E.g., If the statistics list is ['var', 'max', 'mean'], the 3rd dimension order in the result array will be: [variance, maximum, mean]
 
         :example:
+
         >>> data = np.array([1, 4, 2, 3, 5, 6, 8, 7, 9, 10]).astype(np.float32)
         >>> results = TimeseriesFeatureMixin().sliding_descriptive_statistics(data=data, window_sizes=np.array([1.0, 5.0]), sample_rate=2, statistics=typed.List(['var', 'max']))
         """
@@ -1091,6 +1105,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.array([1.0, 4.0, 2.0, 3.0, 5.0, 6.0, 8.0, 7.0, 9.0, 10.0]).astype(np.float32)
         >>> window_sizes = [0.5, 1.0, 1.5, 2.0]
         >>> sample_rate = 30.0  # 30 fps
@@ -1137,6 +1152,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: int
 
         :example:
+
         >>> data = np.array([1, 8, 2, 10, 8, 6, 8, 1, 1, 1]).astype(np.float32)
         >>> TimeseriesFeatureMixin().longest_strike(data=data, threshold=7, above=True)
         >>> 2
@@ -1205,6 +1221,7 @@ class TimeseriesFeatureMixin(object):
         corresponding time window.
 
         :example:
+
         >>> data = np.array([1, 8, 2, 10, 8, 6, 8, 1, 1, 1]).astype(np.float32)
         >>> TimeseriesFeatureMixin().sliding_longest_strike(data=data, threshold=7, above=True, time_windows=np.array([1.0]), sample_rate=2)
         >>> [[-1.][ 1.][ 1.][ 1.][ 2.][ 1.][ 1.][ 1.][ 0.][ 0.]]
@@ -1276,6 +1293,7 @@ class TimeseriesFeatureMixin(object):
         :return np.ndarray: A 1D array of the same length as the input data. Each element represents the time elapsed (in seconds) since the last occurrence of the threshold value. If no threshold value is found before the current data point, the corresponding result is set to -1.0.
 
         :examples:
+
         >>> data = np.array([1, 8, 2, 10, 8, 6, 8, 1, 1, 1]).astype(np.float32)
         >>> TimeseriesFeatureMixin().time_since_previous_threshold(data=data, threshold=7.0, above=True, sample_rate=2.0)
         >>> [-1. ,  0. ,  0.5,  0. ,  0. ,  0.5,  0. ,  0.5,  1. ,  1.5]
@@ -1334,6 +1352,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.array([8, 8, 2, 10, 8, 6, 8, 1, 1, 1]).astype(np.float32)
         >>> TimeseriesFeatureMixin().time_since_previous_target_value(data=data, value=8.0, inverse=False, sample_rate=2.0)
         >>> [0. , 0. , 0.5, 1. , 0. , 0.5, 0. , 0.5, 1. , 1.5])
@@ -1388,6 +1407,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: float
 
         :examples:
+
         >>> data = np.array([1, 8, 2, 10, 8, 6, 8, 1, 1, 1]).astype(np.float32)
         >>> TimeseriesFeatureMixin().benford_correlation(data=data)
         >>> 0.6797500374831786
@@ -1440,6 +1460,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: np.ndarray
 
         :examples:
+
         >>> data = np.array([1, 8, 2, 10, 8, 6, 8, 1, 1, 1]).astype(np.float32)
         >>> TimeseriesFeatureMixin.sliding_benford_correlation(data=data, time_windows=np.array([1.0]), sample_rate=2)
         >>> [[ 0.][0.447][0.017][0.877][0.447][0.358][0.358][0.447][0.864][0.864]]
@@ -1504,6 +1525,7 @@ class TimeseriesFeatureMixin(object):
            - The function uses the Numba JIT (Just-In-Time) compilation for optimized performance. Without fastmath=True there is no runtime improvement over standard numpy.
 
         :example:
+
         >>> data = np.array([0.1, 0.1, 0.3, 0.1, 10, 10, 8, 0.1, 0.1, 0.1, 10, 10, 8, 99, 0.1, 99, 99, 0.1]).astype(np.float32)
         >>> spike_idx, spike_vals, spike_stats = TimeseriesFeatureMixin().spike_finder(data=data, baseline=1, min_spike_amplitude=5, sample_rate=2, min_fwhm=-np.inf, min_half_width=0.0002)
         """
@@ -1591,6 +1613,7 @@ class TimeseriesFeatureMixin(object):
             - 'train_max_amplitude': Maximum spike amplitude.
 
         :example:
+
         >>> data = np.array([0.1, 0.1, 0.3, 0.1, 10, 10, 8, 0.1, 0.1, 0.1, 10, 10, 8, 99, 0.1, 99, 99, 0.1]).astype(np.float32)
         >>> spike_idx, _, _ = TimeseriesFeatureMixin().spike_finder(data=data, baseline=0.3, min_spike_amplitude=0.2, sample_rate=2, min_fwhm=-np.inf, min_half_width=-np.inf)
         >>> results = TimeseriesFeatureMixin().spike_train_finder(data=data, spike_idx=typed.List(spike_idx), sample_rate=2.0, min_spike_train_length=2.0, max_spike_train_separation=2.0)
@@ -1722,6 +1745,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: Tuple[np.ndarray, np.ndarray]
 
         :example:
+
         >>> data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
         >>> TimeseriesFeatureMixin().sliding_stationary(data=data, time_windows=np.array([2.0]), test='KPSS', sample_rate=2)
         """
@@ -1822,6 +1846,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.array([0, 1, 1, 1, 2, 2, 2, 1, 1, 0]).astype(np.float32)
         >>> TimeseriesFeatureMixin.acceleration(data=data, pixels_per_mm=1.0, fps=2, time_window=1.0)
         >>> [ 0.,  0.,  2.,  0.,  2.,  2.,  0., -2., -2., -2.]
@@ -1871,6 +1896,7 @@ class TimeseriesFeatureMixin(object):
            :align: center
 
         :example:
+
         >>> x = np.random.randint(0, 50, (100, 2))
         >>> data = pd.DataFrame(x, columns=['r', 'k'])
         >>> TimeseriesFeatureMixin.granger_tests(data=data, variables=['r', 'k'], lag=4, test='ssr_chi2test')
@@ -1936,6 +1962,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> x = np.random.randint(0, 50, (100, 2)).astype(np.int32)
         >>> TimeseriesFeatureMixin.sliding_displacement(x=x, time_windows=np.array([1.0]), fps=1.0, px_per_mm=1.0)
         """
@@ -1982,6 +2009,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> x = np.random.randint(0, 10, size=(20,))
         >>> y = np.random.randint(0, 10, size=(20,))
         >>> TimeseriesFeatureMixin.sliding_two_signal_crosscorrelation(x=x, y=y, windows=np.array([1.0, 1.2]), sample_rate=10, normalize=True, lag=0.0)
@@ -2033,6 +2061,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> x = np.random.randint(0, 10, (100000,))
         >>> results = TimeseriesFeatureMixin.sliding_pct_in_top_n(x=x, windows=np.array([1.0]), n=4, fps=10)
         """
@@ -2107,6 +2136,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: float
 
         :example I:
+
         >>> x = np.random.randint(0, 500, (100, 2))
         >>> TimeseriesFeatureMixin.mean_squared_jerk(x=x, time_step=1.0, sample_rate=30)
         """
@@ -2140,10 +2170,12 @@ class TimeseriesFeatureMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> x = np.random.randint(0, 500, (12, 2))
         >>> TimeseriesFeatureMixin.sliding_mean_squared_jerk(x=x, window_size=1.0, sample_rate=2)
 
         :example II:
+
         >>> jerky_path = np.zeros((100, 2))
         >>> jerky_path[::10] = np.random.randint(0, 500, (10, 2))
         >>> non_jerky_path = np.linspace(0, 500, 100).reshape(-1, 1)
@@ -2201,6 +2233,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: float
 
         :example:
+
         >>> x = np.array([[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5]])
         >>> TimeseriesFeatureMixin.linearity_index(x=x)
         >>> x = np.random.randint(0, 100, (100, 2))
@@ -2240,6 +2273,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> x = np.random.randint(0, 100, (100, 2))
         >>> TimeseriesFeatureMixin.sliding_linearity_index(x=x, window_size=1, sample_rate=10)
         """
@@ -2303,6 +2337,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: float
 
         :example:
+
         >>> x = np.random.randint(0, 500, (100, 2))
         >>> TimeseriesFeatureMixin.entropy_of_directional_changes(x, 3)
         """
@@ -2351,6 +2386,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> x = np.random.randint(0, 100, (400, 2))
         >>> results_1 = TimeseriesFeatureMixin.sliding_entropy_of_directional_changes(x=x, bins=16, window_size=5.0, sample_rate=30)
         >>> x = pd.read_csv(r"C:/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv/Together_1.csv")[['Ear_left_1_x', 'Ear_left_1_y']].values
@@ -2409,6 +2445,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: float
 
         :example:
+
         >>> x = np.array([[0, 0], [1, 0.1], [2, 0.2], [3, 0.3], [4, 0.4]])
         >>> low = TimeseriesFeatureMixin.path_curvature(x)
         >>> x = np.array([[0, 0], [1, 1], [2, 0], [3, 1], [4, 0]])
@@ -2456,6 +2493,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> x = np.random.randint(0, 500, (91, 2))
         >>> results = TimeseriesFeatureMixin.sliding_path_curvature(x=x, agg_type='mean', window_size=1, sample_rate=30)
         """
@@ -2518,6 +2556,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: float
 
         :example:
+
         >>> x = np.array([[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [1, 0.5], [1.5, 1.5]])
         >>> density = TimeseriesFeatureMixin.spatial_density(x, pixels_per_mm=2.5, radius=5)
         >>> high_density_points = np.array([[0, 0], [0.5, 0], [1, 0], [1.5, 0], [2, 0], [0, 0.5], [0.5, 0.5], [1, 0.5], [1.5, 0.5], [2, 0.5]])
@@ -2570,6 +2609,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> x = np.random.randint(0, 20, (100, 2))  # Example trajectory with 100 points in 2D space
         >>> results = TimeseriesFeatureMixin.sliding_spatial_density(x=x, radius=5.0, pixels_per_mm=10.0, window_size=1, sample_rate=31)
         """
@@ -2612,6 +2652,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: float
 
         :example:
+
         >>> x = np.random.randint(0, 500, (10, 2))
         >>> TimeseriesFeatureMixin.path_aspect_ratio(x=x)
         """
@@ -2651,6 +2692,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> x = np.random.randint(0, 500, (10, 2))
         >>> TimeseriesFeatureMixin.(x=x, window_size=1, sample_rate=2)
         """
@@ -2694,6 +2736,7 @@ class TimeseriesFeatureMixin(object):
         :param np.ndarray data: A 1D array of shape (n_dimensions,) representing the reference point with  respect to which the radial eccentricity is calculated.
 
         :example:
+
         >>> points = np.random.randint(0, 1000, (100000, 2))
         >>> reference_point = np.mean(points, axis=0)
         >>> TimeseriesFeatureMixin.radial_eccentricity(x=points, reference_point=reference_point)
@@ -2733,6 +2776,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: float
 
         :example:
+
         >>> points = np.random.randint(0, 1000, (100000, 2))
         >>> reference_point = np.mean(points, axis=0)
         >>> TimeseriesFeatureMixin.radial_dispersion_index(x=points, reference_point=reference_point)
@@ -2767,6 +2811,7 @@ class TimeseriesFeatureMixin(object):
            :align: center
 
         :example:
+
         >>> x = np.random.randint(0, 500, (200, 2))
         >>> TimeseriesFeatureMixin.avg_kinetic_energy(x=x, mass=35, sample_rate=30)
         """
@@ -2801,6 +2846,7 @@ class TimeseriesFeatureMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> df = read_df(file_path='/home/simon/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/501_MA142_Gi_Saline_0513.csv', file_type='csv')
         >>> data = df[['Nose_x', 'Nose_y', 'Left_ear_x', 'Left_ear_y', 'Right_ear_x', 'Right_ear_y', 'Left_side_x', 'Left_side_y', 'Right_side_x', 'Right_side_y', 'Tail_base_x', 'Tail_base_y']].values.astype(np.float32)
         >>> area = jitted_hull(points=data.reshape(-1, 6, 2), target='perimeter') / 4

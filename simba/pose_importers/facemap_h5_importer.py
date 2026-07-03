@@ -51,6 +51,7 @@ class FaceMapImporter(ConfigReader):
     :param Optional[bool] verbose: If True, print per-file progress. Default True.
 
     :example:
+
     >>> r = FaceMapImporter(config_path=r"C:\troubleshooting\facemap_project\project_folder\project_config.ini", data_path=r'C:\troubleshooting\facemap_project\data', smoothing_settings={'method': 'savitzky-golay', 'time_window': 100})
     >>> r.run()
     """

@@ -53,10 +53,12 @@ class SimBAYoloImporter(ConfigReader):
     :param Optional[Dict[str, str]] smoothing_settings: Dictionary with 'method' ('savitzky-golay', 'gaussian') and 'time_window' (int, milliseconds). If None, no smoothing applied.
 
     :example:
+
         >>> importer = SimBAYoloImporter(data_dir='yolo_results/', config_path='project_config.ini', verbose=True, px_per_mm=1.43, fps=30)
         >>> importer.run()
 
     :example:
+
         >>> # With interpolation and smoothing
         >>> interpolation = {'method': 'linear', 'type': 'body-parts'}
         >>> smoothing = {'method': 'savitzky-golay', 'time_window': 200}

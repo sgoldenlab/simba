@@ -190,6 +190,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
        :align: center
 
     :example:
+
     >>> # Create multiprocess validation video with dynamic Gantt chart
     >>> validator = ValidateModelOneVideoMultiprocess(
     ...     config_path=r'/path/to/project_config.ini',

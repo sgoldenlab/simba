@@ -80,6 +80,7 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
     :param save_path (str | os.PathLike, optional): Path to save summary statistics.
 
     :example:
+
     >>> analyzer = ROIAggregateStatisticsAnalyzer(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", body_parts=['Center'], first_entry_time=True, threshold=0.0, calculate_distances=True, transpose=False, detailed_bout_data=True)
     >>> analyzer.run()
     >>> analyzer.save()

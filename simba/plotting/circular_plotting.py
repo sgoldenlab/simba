@@ -38,6 +38,7 @@ class CircularPlotting(PlottingMixin):
         :param Optional[Union[str, os.PathLike]] save_path: Plot save location on disk. If None, then return plt.figure polar plot.
 
         :example:
+
         >>> data = np.random.normal(loc=180, scale=99, size=5000)
         >>> _ = CircularPlotting().diffusion_plot(data=data, title='Mean 180 degree plot', fps=30, degree_width=5, palette='jet', save_path='/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/frames/output/dispersion/20200730_AB_7dpf_850nm_0004.png')
         """
@@ -97,6 +98,7 @@ class CircularPlotting(PlottingMixin):
         :param Optional[Union[str, os.PathLike]] save_path: Plot save location on disk. If None, then return plt.figure polar plot.
 
         :example:
+
         >>> data = np.random.normal(loc=180, scale=99, size=5000)
         >>> _ = CircularPlotting().diffusion_time_bin_plot(data=data, fps=30, degree_width=40, palette='jet', save_path='/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/frames/output/dispertion_time_series/20200730_AB_7dpf_850nm_0004', time_bin=10)
         """

@@ -26,6 +26,7 @@ def adjust_geometry_locations(geometries: List[Polygon],
     :return List[Polygon]: List of adjusted polygons.
 
     :example:
+
     >>> shapes = GeometryMixin().adjust_geometry_locations(geometries=shapes, shift=(0, 333))
     """
 

@@ -30,6 +30,7 @@ def img_stack_to_grayscale_cuda(x: np.ndarray) -> np.ndarray:
     :return np.ndarray: 3D array of greyscaled images.
 
     :example:
+
     >>> imgs = read_img_batch_from_video_gpu(video_path=r"/mnt/c/troubleshooting/mitra/project_folder/videos/temp_2/592_MA147_Gq_Saline_0516_downsampled.mp4", verbose=False, start_frm=0, end_frm=i)
     >>> imgs = np.stack(list(imgs.values()), axis=0).astype(np.uint8)
     >>> grey_images = img_stack_to_grayscale_cuda(x=imgs)

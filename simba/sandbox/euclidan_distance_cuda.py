@@ -31,6 +31,7 @@ def get_euclidean_distance_cuda(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     :return np.ndarray: A 1D array of shape (n,) where each element represents the Euclidean distance  between the corresponding points in `x` and `y`.
 
     :example:
+
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0514.mp4"
     >>> data_path = r"/mnt/c/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/501_MA142_Gi_CNO_0514 - test.csv"
     >>> df = read_df(file_path=data_path, file_type='csv')[['Center_x', 'Center_y']]

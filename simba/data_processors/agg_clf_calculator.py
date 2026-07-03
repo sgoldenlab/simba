@@ -77,6 +77,7 @@ class AggregateClfCalculator(ConfigReader):
     :raises NoChoosenMeasurementError: If no measurement types are selected (all measurement booleans are False).
 
     :example:
+
     >>> clf_calculator = AggregateClfCalculator(
     ...     config_path="project_folder/project_config.ini",
     ...     classifiers=['Attack', 'Sniffing'],

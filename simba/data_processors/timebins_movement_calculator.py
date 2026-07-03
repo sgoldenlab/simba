@@ -63,6 +63,7 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
     :param bool include_timestamp: If ``True``, include start/end timestamps for each time-bin in saved results. Default: ``False``.
 
     :example:
+
     >>> calculator = TimeBinsMovementCalculator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', bin_length=0.04, plots=True, body_parts=['Nose_1', 'Nose_2'])
     >>> calculator.run()
     """

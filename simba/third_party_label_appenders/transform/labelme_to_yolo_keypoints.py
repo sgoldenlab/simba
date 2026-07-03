@@ -60,6 +60,7 @@ class LabelmeKeypoints2YoloKeypoints:
         :return: None. Results saved in ``save_dir``.
 
         :example:
+
         >>> x = LabelmeKeypoints2YoloKeypoints(data_path=r"D:\platea\ts_annotations", save_dir=r'D:\platea\yolo_071525')
         >>> x.run()
         """

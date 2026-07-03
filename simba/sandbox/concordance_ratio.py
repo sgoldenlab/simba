@@ -14,6 +14,7 @@ def concordance_ratio(x: np.ndarray, invert: bool) -> float:
     :return float: The concordance ratio, representing the count of rows with only one unique value divided by the total number of rows in the array.
 
     :example:
+
     >>> x = np.random.randint(0, 2, (5000, 4))
     >>> results = concordance_ratio(x=x, invert=False)
     """

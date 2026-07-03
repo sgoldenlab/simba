@@ -16,6 +16,7 @@ def radial_eccentricity(x: np.ndarray, reference_point: np.ndarray):
     :param np.ndarray data: A 1D array of shape (n_dimensions,) representing the reference point with  respect to which the radial eccentricity is calculated.
 
     :example:
+
     >>> points = np.random.randint(0, 1000, (100000, 2))
     >>> reference_point = np.mean(points, axis=0)
     >>> radial_eccentricity(x=points, reference_point=reference_point)

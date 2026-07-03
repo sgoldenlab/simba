@@ -36,6 +36,7 @@ class ClustererComparisonCalculator(ConfigReader, Statistics):
        `Example of exepcted output <https://github.com/sgoldenlab/simba/blob/master/misc/clusterer_comparisons_20240401112101.xlsx>`__.
 
     :example:
+
     >>> cluster_comparer = ClustererComparisonCalculator(config_path="/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini", data_dir='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/clusters', statistics=STATS_OPTIONS)
     >>> cluster_comparer.run()
     """

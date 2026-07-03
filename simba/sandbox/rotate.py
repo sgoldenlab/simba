@@ -147,6 +147,7 @@ def rotate_video(video_path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> rotate_video(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/reptile/rot_test.mp4', degrees=180)
     """
 

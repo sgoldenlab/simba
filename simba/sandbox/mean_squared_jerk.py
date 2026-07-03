@@ -22,6 +22,7 @@ def mean_squared_jerk(x: np.ndarray,
     :rtype: float
 
     :example I:
+
     >>> x = np.random.randint(0, 500, (100, 2))
     >>> mean_squared_jerk(x=x, time_step=1.0, sample_rate=30)
     """
@@ -55,10 +56,12 @@ def sliding_mean_squared_jerk(x: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(0, 500, (12, 2))
     >>> sliding_mean_squared_jerk(x=x, window_size=1.0, sample_rate=2)
 
     :example II:
+
     >>> jerky_path = np.zeros((100, 2))
     >>> jerky_path[::10] = np.random.randint(0, 500, (10, 2))
     >>> non_jerky_path = np.linspace(0, 500, 100).reshape(-1, 1)

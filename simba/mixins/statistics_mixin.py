@@ -132,6 +132,7 @@ class Statistics(FeatureExtractionMixin):
            For single non-timeseries independent t, see :func:`simba.mixins.statistics_mixin.Statistics.independent_samples_t`
 
         :example:
+
         >>> data_1, data_2 = np.random.normal(loc=10, scale=2, size=10), np.random.normal(loc=20, scale=2, size=10)
         >>> data = np.hstack([data_1, data_2])
         >>> Statistics().rolling_independent_sample_t(data, time_window=1, fps=10)
@@ -191,6 +192,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: Tuple[float, Union[None, bool]]
 
         :example:
+
         >>> sample_1 = np.array([1, 2, 3, 1, 3, 2, 1, 10, 8, 4, 10])
         >>> sample_2 = np.array([2, 5, 10, 4, 8, 10, 7, 10, 7, 10, 10])
         >>> Statistics().independent_samples_t(sample_1=sample_1, sample_2=sample_2)
@@ -255,6 +257,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> sample_1 = [2, 4, 7, 3, 7, 35, 8, 9]
         >>> sample_2 = [4, 8, 14, 6, 14, 70, 16, 18]
         >>> Statistics().cohens_d(sample_1=sample_1, sample_2=sample_2)
@@ -285,6 +288,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> sample_1, sample_2 = np.random.normal(loc=10, scale=1, size=4), np.random.normal(loc=11, scale=2, size=4)
         >>> sample = np.hstack((sample_1, sample_2))
         >>> Statistics().rolling_cohens_d(data=sample, window_sizes=np.array([1]), fps=4)
@@ -331,6 +335,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.random.randint(low=0, high=100, size=(200)).astype('float32')
         >>> results = Statistics().rolling_two_sample_ks(data=data, time_window=1, fps=30)
         """
@@ -388,6 +393,7 @@ class Statistics(FeatureExtractionMixin):
         :return (float Union[bool, None]): Returns a tuple containing the KS statistic and a boolean indicating whether the test is statistically significant.
 
         :example:
+
         >>> sample_1 = np.array([1, 2, 3, 1, 3, 2, 1, 10, 8, 4, 10]).astype(np.float32)
         >>> sample_2 = np.array([10, 5, 10, 4, 8, 10, 7, 10, 7, 10, 10]).astype(np.float32)
         >>> critical_values = pickle.load(open("simba/assets/lookups/critical_values_5.pickle", "rb"))['two_sample_KS']['one_tail'].values
@@ -445,6 +451,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: Tuple[float, float]
 
         :example:
+
         >>> sample_1 = np.array([1, 2, 3, 1, 3, 2, 1, 10, 8, 4, 10])
         >>> sample_2 = np.array([8, 5, 5, 8, 8, 9, 10, 1, 7, 10, 10])
         >>> Statistics().one_way_anova(sample_1=sample_2, sample_2=sample_1)
@@ -519,6 +526,7 @@ class Statistics(FeatureExtractionMixin):
 
 
         :example:
+
         >>> sample = np.random.normal(loc=10, scale=1, size=10).astype(np.float32)
         >>> Statistics().rolling_one_way_anova(data=sample, time_windows=np.array([1.0]), fps=2)
         >>> [[0.00000000e+00][0.00000000e+00][2.26221263e-06][2.26221263e-06][5.39119950e-03][5.39119950e-03][1.46725486e-03][1.46725486e-03][1.16392111e-02][1.16392111e-02]]
@@ -630,6 +638,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> sample_1, sample_2 = np.random.normal(loc=10, scale=700, size=5), np.random.normal(loc=50, scale=700, size=5)
         >>> data = np.hstack((sample_1, sample_2))
         >>> Statistics().rolling_kullback_leibler_divergence(data=data, time_windows=np.array([1]), fps=2)
@@ -707,6 +716,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> sample_1, sample_2 = np.array([1, 2, 3, 4, 5, 10, 1, 2, 3]), np.array([1, 5, 10, 9, 10, 1, 10, 6, 7])
         >>> Statistics().jensen_shannon_divergence(sample_1=sample_1, sample_2=sample_2, bucket_method='fd')
         >>> 0.3403  # 0 = identical distributions, 1 = maximally dissimilar (log base 2)
@@ -826,6 +836,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> sample_1 = np.random.normal(loc=10, scale=2, size=10000)
         >>> sample_2 = np.random.normal(loc=12, scale=2, size=10000)
         >>> Statistics().wasserstein_distance(sample_1=sample_1, sample_2=sample_2)
@@ -878,6 +889,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.random.randint(0, 100, (100,))
         >>> Statistics().rolling_wasserstein_distance(data=data, time_windows=np.array([1, 2]), fps=30)
         """
@@ -936,6 +948,7 @@ class Statistics(FeatureExtractionMixin):
            :align: center
 
         :example:
+
         >>> total_variation_distance(x=np.array([1, 5, 10, 20, 50]), y=np.array([1, 5, 10, 100, 110]))
         >>> 0.3999999761581421
         """
@@ -999,6 +1012,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> sample_1, sample_2 = np.random.randint(0, 100, (100,)), np.random.randint(0, 10, (100,))
         >>> Statistics().population_stability_index(sample_1=sample_1, sample_2=sample_2, fill_value=1, bucket_method='auto')
         >>> 3.9657026867553817
@@ -1107,6 +1121,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> sample_1 = np.array([1, 1, 3, 4, 5]).astype(np.float64)
         >>> sample_2 = np.array([6, 7, 8, 9, 10]).astype(np.float64)
         >>> Statistics().kruskal_wallis(sample_1=sample_1, sample_2=sample_2)
@@ -1141,6 +1156,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.random.randint(0, 10, (100,))
         >>> Statistics.pct_in_top_n(x=x, n=5)
         """
@@ -1182,6 +1198,7 @@ class Statistics(FeatureExtractionMixin):
         `Modified from James Webber gist on GitHub <https://gist.github.com/jamestwebber/38ab26d281f97feb8196b3d93edeeb7b>`__.
 
         :example:
+
         >>> sample_1 = np.array([1, 1, 3, 4, 5])
         >>> sample_2 = np.array([6, 7, 8, 9, 10])
         >>> results = Statistics().mann_whitney(sample_1=sample_1, sample_2=sample_2)
@@ -1217,6 +1234,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: Tuple[float, Union[bool, None]]
 
         :examples:
+
         >>> sample_1 = np.array(list(range(0, 50)))
         >>> sample_2 = np.array(list(range(25, 100)))
         >>> Statistics().levenes(sample_1=sample_1, sample_2=sample_2)
@@ -1276,6 +1294,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.random.randint(0, 50, (100)).astype(np.float64)
         >>> Statistics().rolling_levenes(data=data, time_windows=np.array([1]).astype(np.float64), fps=5.0)
         """
@@ -1338,6 +1357,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> sample_1, sample_2 = np.random.normal(loc=10, scale=2, size=10), np.random.normal(loc=20, scale=2, size=10)
         >>> Statistics().brunner_munzel(sample_1=sample_1, sample_2=sample_2)
         0.5751408161437165
@@ -1394,6 +1414,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.random.normal(loc=0, scale=1, size=(100,)).astype(np.float32)
         >>> Statistics().rolling_barletts_test(data=data, time_windows=np.array([1.0, 2.0]), fps=10.0)
         """
@@ -1461,6 +1482,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> sample_1 = np.array([7, 2, 9, 4, 5, 6, 7, 8, 9]).astype(np.float32)
         >>> sample_2 = np.array([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5]).astype(np.float32)
         >>> Statistics().pearsons_r(sample_1=sample_1, sample_2=sample_2)
@@ -1497,6 +1519,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> sample_1 = np.array([7, 2, 9, 4, 5, 6, 7, 8, 9]).astype(np.float32)
         >>> sample_2 = np.array([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5]).astype(np.float32)
         >>> Statistics().spearman_rank_correlation(sample_1=sample_1, sample_2=sample_2)
@@ -1536,6 +1559,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> sample_1 = np.random.randint(0, 50, (10)).astype(np.float32)
         >>> sample_2 = np.random.randint(0, 50, (10)).astype(np.float32)
         >>> Statistics().sliding_pearsons_r(sample_1=sample_1, sample_2=sample_2, time_windows=np.array([0.5]), fps=10)
@@ -1600,6 +1624,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: Tuple[float, Union[bool, None]]
 
         :example:
+
         >>> sample_1 = np.array([1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5]).astype(np.float32)
         >>> sample_2 = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).astype(np.float32)
         >>> critical_values = pickle.load(open("simba/assets/lookups/critical_values_5.pickle", "rb"))['chi_square']['one_tail'].values
@@ -1672,6 +1697,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.random.randint(0, 50, (10)).astype(np.float32)
         >>> critical_values = pickle.load(open("simba/assets/lookups/critical_values_05.pickle", "rb"))['independent_t_test']['one_tail'].values.astype(np.float32)
         >>> results = Statistics().sliding_independent_samples_t(data=data, time_window=0.5, fps=5.0, critical_values=critical_values, slide_time=0.30)
@@ -1733,6 +1759,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :examples:
+
         >>> data = np.random.randint(0, 4, (200)).astype(np.float32)
         >>> results = Statistics().rolling_mann_whitney(data=data, time_windows=np.array([1.0]), fps=1)
         """
@@ -1795,6 +1822,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.random.randint(0, 2, (5000, 4))
         >>> results = Statistics.concordance_ratio(x=x, invert=False)
         """
@@ -1834,6 +1862,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> sample_1 = np.array([9,10,13,22,15,18,15,19,32,11]).astype(np.float32)
         >>> sample_2 = np.array([11, 12, 15, 19, 21, 26, 19, 20, 22, 19]).astype(np.float32)
         >>> Statistics().sliding_spearman_rank_correlation(sample_1=sample_1, sample_2=sample_2, time_windows=np.array([0.5]), fps=10)
@@ -1869,6 +1898,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.array([0,1,2,3,4, 5,6,7,8,1,10,11,12,13,14]).astype(np.float32)
         >>> Statistics().sliding_autocorrelation(data=data, max_lag=0.5, time_window=1.0, fps=10)
         >>> [ 0., 0., 0.,  0.,  0., 0., 0.,  0. ,  0., -3.686, -2.029, -1.323, -1.753, -3.807, -4.634]
@@ -1957,6 +1987,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: Tuple[float, float]
 
         :examples:
+
         >>> sample_1 = np.array([4, 2, 3, 4, 5, 7]).astype(np.float32)
         >>> sample_2 = np.array([1, 2, 3, 4, 5, 7]).astype(np.float32)
         >>> Statistics().kendall_tau(sample_1=sample_1, sample_2=sample_2)
@@ -2054,6 +2085,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: List[str]
 
         :example:
+
         >>> x = pd.DataFrame(np.random.randint(0, 100, (100, 100)))
         >>> names = Statistics.find_collinear_features(df=x, threshold=0.2, method='pearson', verbose=True)
         """
@@ -2132,6 +2164,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data, lbls = make_blobs(n_samples=2000, n_features=2, centers=10, random_state=42)
         >>> data = np.hstack((data, lbls.reshape(-1, 1)))
         >>> lof = Statistics.local_outlier_factor(data=data, groupby_idx=2, k=100, normalize=True)
@@ -2234,6 +2267,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data, lbls = make_blobs(n_samples=2000, n_features=2, centers=1, random_state=42)
         >>> envelope_score = elliptic_envelope(data=data, normalize=True)
         >>> results = np.hstack((data[:, 0:2], envelope_score.reshape(lof.shape[0], 1)))
@@ -2330,6 +2364,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> x, lbls = make_blobs(n_samples=10000, n_features=2, centers=10, random_state=42)
         >>> x = np.hstack((x, lbls.reshape(-1, 1)))
         >>> scores = isolation_forest(x=x, estimators=10, normalize=True)
@@ -2456,6 +2491,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> sample_1 = np.random.random_integers(low=1, high=2, size=(10, 50)).astype(np.float64)
         >>> sample_2 = np.random.random_integers(low=7, high=20, size=(2, 50)).astype(np.float64)
         >>> data = np.vstack([sample_1, sample_2])
@@ -2507,6 +2543,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.random.randint(low=0, high=100, size=(200)).astype('float32')
         >>> results = self.rolling_shapiro_wilks(data=data, time_window=1, fps=30)
         """
@@ -2554,6 +2591,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.random.randint(0, 100, (1000,)).astype(np.float32)
         >>> z_scores = Statistics().sliding_z_scores(data=data, time_windows=np.array([1.0, 2.5]), fps=10)
         """
@@ -2605,6 +2643,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> data = np.array([[0, 1], [1, 0], [1, 0], [1, 1]]).astype(np.int64)
         >>> Statistics().phi_coefficient(data=data)
         >>> 0.5773502691896258
@@ -2696,6 +2735,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> x = np.random.randint(0, 10, (10000,))
         >>> y = np.random.randint(0, 2, (10000,))
         >>> Statistics.sliding_eta_squared(x=x, y=y, window_sizes=np.array([1.0, 2.0]), sample_rate=10)
@@ -2747,6 +2787,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.random.randint(0, 2, (200, 2))
         >>> Statistics().sliding_phi_coefficient(data=data, window_sizes=np.array([1.0, 4.0]), sample_rate=10)
         """
@@ -2808,6 +2849,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> Statistics.relative_risk(x=np.array([0, 1, 1]), y=np.array([0, 1, 0]))
         >>> 2.0
         """
@@ -2836,6 +2878,7 @@ class Statistics(FeatureExtractionMixin):
         :return np.ndarray: Array of size  x.shape[0] x window_sizes.shape[0] with sliding eta squared values.
 
         :example:
+
         >>> Statistics.sliding_relative_risk(x=np.array([0, 1, 1, 0]), y=np.array([0, 1, 0, 0]), window_sizes=np.array([1.0]), sample_rate=2)
         """
         results = np.full((x.shape[0], window_sizes.shape[0]), -1.0)
@@ -2877,6 +2920,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> sample_1 = np.array([1, 0, 0, 1])
         >>> sample_2 = np.array([1, 1, 1, 0])
         >>> Statistics().cohens_h(sample_1=sample_1, sample_2=sample_2)
@@ -2908,6 +2952,7 @@ class Statistics(FeatureExtractionMixin):
         :return np.ndarray: 2D array of skewness`1 values with rows corresponding to data points and columns corresponding to time windows.
 
         :example:
+
         >>> data = np.random.randint(0, 100, (10,))
         >>> skewness = Statistics().sliding_skew(data=data.astype(np.float32), time_windows=np.array([1.0, 2.0]), sample_rate=2)
         """
@@ -2940,6 +2985,7 @@ class Statistics(FeatureExtractionMixin):
         :return np.ndarray: 2D array of skewness`1 values with rows corresponding to data points and columns corresponding to time windows.
 
         :example:
+
         >>> data = np.random.randint(0, 100, (10,))
         >>> kurtosis = Statistics().sliding_kurtosis(data=data.astype(np.float32), time_windows=np.array([1.0, 2.0]), sample_rate=2)
         """
@@ -2974,6 +3020,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: Tuple[np.ndarray, np.ndarray, Union[None, types.DictType]]
 
         :example:
+
         >>> data_1d = np.array([1, 2, 3, 55, 65, 40, 43, 40]).astype(np.float64)
         >>> centroids, labels, medians = Statistics().kmeans_1d(data_1d, 2, 1000, True)
         """
@@ -3079,6 +3126,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x, y = np.random.randint(0, 2, (10,)).astype(np.int8), np.random.randint(0, 2, (10,)).astype(np.int8)
         >>> Statistics().hamming_distance(x=x, y=y)
         >>> 0.91
@@ -3121,6 +3169,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.random.randint(0, 2, (50,)).astype(np.int8)
         >>> y = x ^ 1
         >>> Statistics().yule_coef(x=x, y=y)
@@ -3176,6 +3225,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.array([0, 1, 0, 0, 1]).astype(np.int8)
         >>> y = np.array([1, 0, 1, 1, 0]).astype(np.int8)
         >>> Statistics().sokal_sneath(x, y)
@@ -3226,6 +3276,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> x = np.array([[1, 1, 1, 1, 1], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [1, 1, 1, 1, 1]]).astype(np.float32)
         >>> Statistics().bray_curtis_dissimilarity(x=x)
         >>> [[0, 1., 1., 0.], [1., 0., 0., 1.], [1., 0., 0., 1.], [0., 1., 1., 0.]]
@@ -3295,6 +3346,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.random.randint(0, 9000, (500000,))
         >>> y = np.random.randint(0, 9000, (500000,))
         >>> Statistics().hellinger_distance(x=x, y=y, bucket_method='auto')
@@ -3347,6 +3399,7 @@ class Statistics(FeatureExtractionMixin):
                `Cancer, 3(1), 32–35 <https://doi.org/10.1002/1097-0142(1950)3:1%3C32::AID-CNCR2820030106%3E3.0.CO;2-3>`_.
 
         :example:
+
         >>> y_true = np.array([1, 1, 0, 0, 1, 0, 1, 1, 0, 0])
         >>> y_pred = np.array([1, 1, 0, 1, 1, 0, 1, 0, 0, 0])
         >>> j = Statistics.youden_j(sample_1=y_true, sample_2=y_pred)
@@ -3403,6 +3456,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.random.randint(0, 5, (100))
         >>> y = np.random.randint(0, 7, (100))
         >>> Statistics.jaccard_distance(x=x, y=y)
@@ -3433,6 +3487,7 @@ class Statistics(FeatureExtractionMixin):
         :return np.ndarray: Pairwise Manhattan distance matrix where element (i, j) represents the distance between points i and j.
 
         :example:
+
         >>> data = np.random.randint(0, 50, (10000, 2))
         >>> Statistics.manhattan_distance_cdist(data=data)
         """
@@ -3459,6 +3514,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.random.randint(0, 5, (100000,))
         >>> y = np.random.randint(0, 4, (100000,))
         >>> p = Statistics.get_clustering_purity(x=x, y=y)
@@ -3496,6 +3552,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.random.randint(0, 50, (1000, 200)).astype(np.float32)
         >>> x = Statistics.mahalanobis_distance_cdist(data=data)
         """
@@ -3539,6 +3596,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> sample_1 = np.random.randint(0, 2, size=(10000,))
         >>> sample_2 = np.random.randint(0, 2, size=(10000,))
         >>> Statistics.cohens_kappa(sample_1=sample_1, sample_2=sample_2))
@@ -3595,6 +3653,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.random.randint(0, 2, (1000,))
         >>> y = np.random.randint(0, 2, (1000,))
         >>> Statistics.d_prime(x=x, y=y)
@@ -3673,6 +3732,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: Tuple[float, float]
 
         :example:
+
         >>> x = np.random.randint(0, 2, (100000, ))
         >>> y = np.random.randint(0, 2, (100000, ))
         >>> ground_truth = np.random.randint(0, 2, (100000, ))
@@ -3758,6 +3818,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: Tuple[float, float]
 
         :example:
+
         >>> data = np.random.randint(0, 2, (100000, 4))
         >>> Statistics.cochrans_q(data=data)
         """
@@ -3811,6 +3872,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.random.random((100,))
         >>> y = np.random.random((100,))
         >>> Statistics.hartley_fmax(x=x, y=y)
@@ -3857,6 +3919,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.random.random((100,))
         >>> Statistics.grubbs_test(x=x)
         """
@@ -3936,6 +3999,7 @@ class Statistics(FeatureExtractionMixin):
         :return: Covariance matrix of the input data with shape (m, m). The (i, j)-th element of the matrix represents the covariance between the i-th and j-th features in the data.
 
         :example:
+
         >>> data = np.random.randint(0,2, (200, 40)).astype(np.float32)
         >>> covariance_matrix = Statistics.cov_matrix(data=data)
         """
@@ -3975,6 +4039,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.random.randint(0, 600, (9000000,)).astype(np.float32)
         >>> Statistics.mad_median_rule(data=data, k=1)
         """
@@ -4009,6 +4074,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.random.randint(0, 50, (50000,)).astype(np.float32)
         >>> Statistics.sliding_mad_median_rule(data=data, k=2, time_windows=np.array([20.0]), fps=1.0)
         """
@@ -4069,6 +4135,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.random.randint(0, 100, (100, 2))
         >>> y = np.random.randint(0, 3, (100,))
         >>> Statistics.dunn_index(x=x, y=y)
@@ -4130,6 +4197,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.random.randint(0, 100, (100, 2))
         >>> y = np.random.randint(0, 3, (100,))
         >>> Statistics.davis_bouldin(x=x, y=y)
@@ -4214,6 +4282,7 @@ class Statistics(FeatureExtractionMixin):
 
         :example:
         :example:
+
         >>> x = np.random.random((100, 2)).astype(np.float32)
         >>> y = np.random.randint(0, 100, (100,)).astype(np.int64)
         >>> Statistics.calinski_harabasz(x=x, y=y)
@@ -4254,6 +4323,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x, y = make_blobs(n_samples=10000, n_features=400, centers=5, cluster_std=10, center_box=(-1, 1))
         >>> score = silhouette_score(x=x, y=y)
 
@@ -4312,6 +4382,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> from sklearn.datasets import make_blobs
         >>> X, y = make_blobs(n_samples=100000, centers=40, n_features=600, random_state=0, cluster_std=0.3)
         >>> Statistics.xie_beni(x=X, y=y)
@@ -4356,6 +4427,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> from sklearn.datasets import make_blobs
         >>> X, y = make_blobs(n_samples=500, centers=3, random_state=42)
         >>> Statistics.bouguessa_wang_sun_v2(X, y)
@@ -4412,6 +4484,7 @@ class Statistics(FeatureExtractionMixin):
                `Springer <https://doi.org/10.1007/978-3-642-04921-7_32>`_.
 
         :example:
+
         >>> X, y = make_blobs(n_samples=5000, centers=20, n_features=3, random_state=0, cluster_std=0.1)
         >>> Statistics.i_index(x=X, y=y)
         """
@@ -4459,6 +4532,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> X, y = make_blobs(n_samples=800, centers=2, n_features=3, random_state=0, cluster_std=0.1)
         >>> Statistics.sd_index(x=X, y=y)
 
@@ -4520,6 +4594,7 @@ class Statistics(FeatureExtractionMixin):
 
 
         :example:
+
         >>> X, y = make_blobs(n_samples=800, centers=2, n_features=3, random_state=0, cluster_std=0.1)
         >>> Statistics.c_index(x=X, y=y)
         """
@@ -4576,6 +4651,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.array([0, 0, 0, 0, 0])
         >>> y = np.array([1, 1, 1, 1, 1])
         >>> Statistics.adjusted_rand(x=x, y=y)
@@ -4614,6 +4690,7 @@ class Statistics(FeatureExtractionMixin):
                `Psychometrika, 50(2), 159–179 <https://doi.org/10.1007/BF02294245>`_.
 
         :example:
+
         >>> X, y = make_blobs(n_samples=100, centers=10, n_features=3, random_state=0, cluster_std=0.1)
         >>> d = Statistics.rmsstd(x=X, y=y)
         """
@@ -4651,6 +4728,7 @@ class Statistics(FeatureExtractionMixin):
                `Biometrics, 44(1), 23–34 <https://doi.org/10.2307/2531893>`_.
 
         :example:
+
         >>> X, y = make_blobs(n_samples=100, centers=10, n_features=3, random_state=0, cluster_std=100)
         >>> Statistics.krzanowski_lai_index(x=X, y=y)
         """
@@ -4690,6 +4768,7 @@ class Statistics(FeatureExtractionMixin):
                `Pattern Recognition, 44(4), 810–820 <https://doi.org/10.1016/j.patcog.2010.10.002>`_.
 
         :example:
+
         >>> X, y = make_blobs(n_samples=50000, centers=10, n_features=3, random_state=0, cluster_std=1)
         >>> Statistics.cop_index(x=X, y=y)
         """
@@ -4741,6 +4820,7 @@ class Statistics(FeatureExtractionMixin):
                `CRAN <https://cran.r-project.org/web/packages/clusterCrit/vignettes/clusterCrit.pdf>`_.
 
         :example:
+
         >>> X, y = make_blobs(n_samples=5, centers=2, n_features=3, random_state=0, cluster_std=5)
         >>> Statistics.pbm_index(x=X, y=y)
 
@@ -4925,6 +5005,7 @@ class Statistics(FeatureExtractionMixin):
            Behaves weird as the number of dimensions increase (> 20).
 
         :example:
+
         >>> from sklearn.datasets import make_blobs
         >>> X, labels = make_blobs(n_samples=5000, centers=5, random_state=42, n_features=3, cluster_std=2)
         >>> score = Statistics.s_dbw_index(X, labels)
@@ -4985,6 +5066,7 @@ class Statistics(FeatureExtractionMixin):
 
 
         :example:
+
         >>> x, y = make_blobs(n_samples=1000, n_features=2, centers=5, random_state=42, cluster_std=0.1)
         >>> Statistics.dunn_symmetry_idx(x=x, y=y)
         """
@@ -5019,6 +5101,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> from sklearn.datasets import make_blobs
         >>> X, labels = make_blobs(n_samples=5000, centers=5, random_state=42, n_features=3, cluster_std=2)
         >>> score = Statistics.s_dbw_index(X, labels)
@@ -5174,6 +5257,7 @@ class Statistics(FeatureExtractionMixin):
         :return float: The Czebyshev distance between the two samples.
 
         :example:
+
         >>> sample_1 = np.random.randint(0, 10, (10000,100))
         >>> sample_2 = np.random.randint(0, 10, (10000,100))
         >>> Statistics.czebyshev_distance(sample_1=sample_1, sample_2=sample_2)
@@ -5210,6 +5294,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> sample_1 = np.random.randint(0, 10, (200,5)).astype(np.float32)
         >>> sample_2 = np.random.randint(0, 10, (10000,100))
         >>> Statistics.sliding_czebyshev_distance(x=sample_1, window_sizes=np.array([1.0, 2.0]), sample_rate=10.0)
@@ -5259,6 +5344,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.random.randint(0, 2, (200,))
         >>> y = np.random.randint(0, 2, (200,))
         >>> sokal_michener = Statistics.sokal_michener(x=x, y=y)
@@ -5286,6 +5372,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x, y = np.random.randint(0, 500, (1000,)), np.random.randint(0, 500, (1000,))
         >>> Statistics.kumar_hassebrook_similarity(x=x, y=y)
         """
@@ -5314,6 +5401,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.random.randint(0, 500, (1000,))
         >>> y = np.random.randint(0, 500, (1000,))
         >>> Statistics().wave_hedges_distance(x=x, y=y)
@@ -5351,6 +5439,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> x, y = np.random.randint(0, 500, (1000, 6000)), np.random.randint(0, 500, (1000, 6000))
         >>> Statistics.gower_distance(x=x, y=y)
 
@@ -5407,6 +5496,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x, y = np.random.randint(0, 500, (1000,200)), np.random.randint(0, 500, (1000,200))
         >>> Statistics.normalized_google_distance(x=y, y=x)
 
@@ -5455,6 +5545,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: float
 
         :example:
+
         >>> x = np.random.randint(0, 155, (100,))
         >>>y = np.random.randint(0, 155, (100,))
         >>> Statistics.symmetry_index(x=x, y=y)
@@ -5489,6 +5580,7 @@ class Statistics(FeatureExtractionMixin):
             .. [1] Hession, Leinani E., Gautam S. Sabnis, Gary A. Churchill, and Vivek Kumar. “A Machine-Vision-Based Frailty Index for Mice.” Nature Aging 2, no. 8 (August 16, 2022): 756–66. https://doi.org/10.1038/s43587-022-00266-0.
 
         :example:
+
         >>> data = np.random.randint(0, 50, (90,)).astype(np.float32)
         >>> window_size = 0.5
         >>> Statistics.sliding_iqr(x=data, window_size=0.5, sample_rate=10.0)
@@ -5631,6 +5723,7 @@ class Statistics(FeatureExtractionMixin):
            Adapted from `pynndescent <https://pynndescent.readthedocs.io/en/latest/>`_.
 
         :example:
+
         >>> x, y = np.random.normal(loc=65, scale=10, size=10000000), np.random.normal(loc=90, scale=1, size=10000000)
         >>> b =Statistics.circular_euclidean_kantorovich(x, y)
         """

@@ -167,6 +167,7 @@ def is_inside_polygon(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(0, 200, (i, 2)).astype(np.int8)
     >>> y = np.random.randint(0, 200, (4, 2)).astype(np.int8)
     >>> results = is_inside_polygon(x=x, y=y)
@@ -282,6 +283,7 @@ def get_convex_hull(pts: np.ndarray) -> np.ndarray:
 
 
     :example:
+
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0514.mp4"
     >>> data_path = r"/mnt/c/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/501_MA142_Gi_CNO_0514 - test.csv"
     >>> df = read_df(file_path=data_path, file_type='csv')
@@ -387,6 +389,7 @@ def find_midpoints(x: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(0, 100, (100, 2)).astype(np.int8)
     >>> y = np.random.randint(0, 100, (100, 2)).astype(np.int8)
     >>> p = find_midpoints(x=x, y=y)
@@ -496,6 +499,7 @@ def directionality_to_static_targets(left_ear: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> left_ear = np.random.randint(0, 500, (100, 2))
     >>> right_ear = np.random.randint(0, 500, (100, 2))
     >>> nose = np.random.randint(0, 500, (100, 2))
@@ -600,6 +604,7 @@ def directionality_to_nonstatic_target(left_ear: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> left_ear = np.random.randint(0, 500, (100, 2))
     >>> right_ear = np.random.randint(0, 500, (100, 2))
     >>> nose = np.random.randint(0, 500, (100, 2))

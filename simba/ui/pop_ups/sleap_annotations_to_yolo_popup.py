@@ -32,6 +32,7 @@ class SLEAPAnnotations2YoloPopUp(PopUpMixin):
     GUI for converting DeepLabCut (DLC) annotations to YOLOv8 keypoint format.
 
     :example:
+
     >>> SLEAPAnnotations2YoloPopUp()
     """
 

@@ -128,6 +128,7 @@ class ROIPlotMultiprocess(ConfigReader, PlottingMixin):
     :param int core_cnt: Number of cores to use. Default to -1 representing all available cores
 
     :example:
+
     >>> test = ROIPlotMultiprocess(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
     >>>                            video_path="/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi",
     >>>                            core_cnt=7,

@@ -41,6 +41,7 @@ class BorisAppender(ConfigReader):
        :align: center
 
     :example:
+
     >>> test = BorisAppender(config_path=r"C:\troubleshooting\boris_test\project_folder\project_config.ini", data_dir=r"C:\troubleshooting\boris_test\project_folder\boris_files")
     >>> test.run()
 

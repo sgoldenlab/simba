@@ -281,14 +281,6 @@ simba.ui.pop\_ups.roi\_tracking\_plot\_pop\_up module
    :undoc-members:
    :show-inheritance:
 
-simba.ui.pop\_ups.set\_machine\_model\_parameters\_pop\_up module
------------------------------------------------------------------
-
-.. automodule:: simba.ui.pop_ups.set_machine_model_parameters_pop_up
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 simba.ui.pop\_ups.severity\_analysis\_pop\_up module
 ----------------------------------------------------
 
@@ -297,10 +289,18 @@ simba.ui.pop\_ups.severity\_analysis\_pop\_up module
    :undoc-members:
    :show-inheritance:
 
-simba.ui.pop\_ups.smoothing\_interpolation\_pop\_up module
-----------------------------------------------------------
+simba.ui.pop\_ups.smoothing\_popup module
+-----------------------------------------
 
-.. automodule:: simba.ui.pop_ups.smoothing_interpolation_pop_up
+.. automodule:: simba.ui.pop_ups.smoothing_popup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+simba.ui.pop\_ups.interpolate\_pop\_up module
+---------------------------------------------
+
+.. automodule:: simba.ui.pop_ups.interpolate_pop_up
    :members:
    :undoc-members:
    :show-inheritance:

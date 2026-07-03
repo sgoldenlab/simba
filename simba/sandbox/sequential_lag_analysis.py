@@ -21,6 +21,7 @@ def sequential_lag_analysis(data: pd.DataFrame, criterion: str, target:str, time
     that behavior T never precede nor proceed behavior C.
 
     :example:
+
     >>> df = read_df(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/targets_inserted/Together_1.csv', file_type='csv')
     >>> sequential_lag_analysis(data=df, criterion='Attack', target='Sniffing', fps=5, time_window=2.0)
 

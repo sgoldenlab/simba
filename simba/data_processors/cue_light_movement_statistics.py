@@ -50,6 +50,7 @@ class CueLightMovementAnalyzer(ConfigReader):
        `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
 
     :examples:
+
     >>> test = CueLightMovementAnalyzer(config_path=r"C:\troubleshooting\cue_light\t1\project_folder\project_config.ini",
     >>>                                 pre_window=0,
     >>>                                 post_window=0,

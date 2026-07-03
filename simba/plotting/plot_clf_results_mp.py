@@ -250,6 +250,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
     :param Optional[Union[List[str], Tuple[str, ...]]] clf_names: Optional subset of classifier names to visualize. Each entry must match a classifier defined in the project config. If None, all project classifiers are plotted (current behavior). Default None.
 
     :example:
+
     >>> clf_plotter = PlotSklearnResultsMultiProcess(
     ...     config_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini',
     ...     video_setting=True,

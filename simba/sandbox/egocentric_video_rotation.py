@@ -70,6 +70,7 @@ class EgocentricVideoRotator():
     :param Optional[Union[str, os.PathLike]] save_path:
 
     :example:
+
     >>> DATA_PATH = "C:\501_MA142_Gi_Saline_0513.csv"
     >>> VIDEO_PATH = "C:\501_MA142_Gi_Saline_0513.mp4"
     >>> SAVE_PATH = "C:\501_MA142_Gi_Saline_0513_rotated.mp4"

@@ -33,6 +33,7 @@ class ROISelector(object):
     :param bool destroy: If True, destroy drawing window when completed. Default: True.
 
     :example:
+
     >>> img_selector = ROISelector(path='/Users/simon/Desktop/compute_overlap.png', clr=(0, 255, 0), thickness=2)
     >>> img_selector.run()
     """

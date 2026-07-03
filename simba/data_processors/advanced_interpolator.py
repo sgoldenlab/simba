@@ -63,6 +63,7 @@ class AdvancedInterpolator(ConfigReader):
     :param Optional[int] max_interpolation_length: Maximum length of gaps to interpolate. If None, interpolates all gaps. Default: None.
 
     :examples:
+
     >>> # Animal-level interpolation
     >>> interpolator = AdvancedInterpolator(
     ...     data_path='/path/to/project_folder/csv/input_csv',

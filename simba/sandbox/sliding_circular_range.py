@@ -40,6 +40,7 @@ def sliding_circular_range(x: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(0, 361, (19, )).astype(np.int32)
     >>> p = sliding_circular_range(x, 1, 10)
     """

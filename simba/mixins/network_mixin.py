@@ -66,6 +66,7 @@ class NetworkMixin(object):
         :return nx.Graph: A networkx graph with nodes and edges defined by the input data.
 
         :example:
+
         >>> data = {('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5}
         >>> graph = NetworkMixin.create_graph(data=data)
         """
@@ -96,6 +97,7 @@ class NetworkMixin(object):
         :return nx.MultiGraph: A NetworkX multigraph with nodes and edges specified by the input data. Each edge is labeled and weighted based on the provided information.
 
         :example:
+
         >>> data = {('Animal_1', 'Animal_2'): [0, 0, 0, 6], ('Animal_1', 'Animal_3'): [0, 0, 0, 0], ('Animal_1', 'Animal_4'): [0, 0, 0, 0], ('Animal_1', 'Animal_5'): [0, 0, 0, 0], ('Animal_2', 'Animal_3'): [0, 0, 0, 0], ('Animal_2', 'Animal_4'): [5, 0, 0, 2], ('Animal_2', 'Animal_5'): [0, 0, 0, 0], ('Animal_3', 'Animal_4'): [0, 0, 0, 0], ('Animal_3', 'Animal_5'): [0, 2, 22, 0], ('Animal_4', 'Animal_5'): [0, 0, 0, 0]}
         >>> NetworkMixin().create_multigraph(data=data)
         """
@@ -142,6 +144,7 @@ class NetworkMixin(object):
         Calculate the PageRank of nodes in a graph.
 
         :example:
+
         >>> graph = NetworkMixin.create_graph(data={('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5})
         >>> NetworkMixin().graph_page_rank(graph=graph)
         """
@@ -183,6 +186,7 @@ class NetworkMixin(object):
         See networkx documentation
 
         :example:
+
         >>> graph = NetworkMixin.create_graph(data={('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5})
         >>> NetworkMixin().graph_katz_centrality(graph=graph)
         """
@@ -209,6 +213,7 @@ class NetworkMixin(object):
 
         """
         :example:
+
         >>> graph = NetworkMixin.create_graph(data={('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5})
         >>> NetworkMixin().graph_current_flow_closeness_centrality(graph=graph)
         """
@@ -246,6 +251,7 @@ class NetworkMixin(object):
     ):
         """
         :example:
+
         >>> graph = NetworkMixin.create_graph({ ('Animal_1', 'Animal_2'): 0.0, ('Animal_1', 'Animal_3'): 0.0, ('Animal_1', 'Animal_4'): 0.0, ('Animal_1', 'Animal_5'): 0.0, ('Animal_2', 'Animal_3'): 1.0, ('Animal_2', 'Animal_4'): 1.0, ('Animal_2', 'Animal_5'): 1.0, ('Animal_3', 'Animal_4'): 1.0, ('Animal_3', 'Animal_5'): 1.0, ('Animal_4', 'Animal_5'): 1.0})
         >>> NetworkMixin().girvan_newman(graph=graph, levels = 1)
         >>> [({'Animal_1'}, {'Animal_2', 'Animal_3', 'Animal_4', 'Animal_5'})]
@@ -285,6 +291,7 @@ class NetworkMixin(object):
         :param nx.MultiGraph graph: The input MultiGraph, created by ``NetworkMixin.create_multigraph()``.
 
         :example:
+
         >>> multigraph = NetworkMixin().create_multigraph(data={('Animal_1', 'Animal_2'): [0, 0, 0, 6], ('Animal_1', 'Animal_3'): [0, 0, 0, 0], ('Animal_1', 'Animal_4'): [0, 0, 0, 0], ('Animal_1', 'Animal_5'): [0, 0, 0, 0], ('Animal_2', 'Animal_3'): [0, 0, 0, 0], ('Animal_2', 'Animal_4'): [5, 0, 0, 2], ('Animal_2', 'Animal_5'): [0, 0, 0, 0], ('Animal_3', 'Animal_4'): [0, 0, 0, 0], ('Animal_3', 'Animal_5'): [0, 2, 22, 0], ('Animal_4', 'Animal_5'): [0, 0, 0, 0]})
         >>> NetworkMixin().multigraph_page_rank(graph=multigraph)
         >>> {'Animal_1': [0.06122524589028524, 0.06122524589028524, 0.06122524589028524, 0.32739635847890775], 'Animal_2': [0.06122524589028524, 0.40816213116457223, 0.06122524589028524, 0.442259400816002], 'Animal_3': [0.40816213116457223, 0.06122524589028524, 0.40816213116457223, 0.04545454545454547], 'Animal_4': [0.06122524589028524, 0.40816213116457223, 0.06122524589028524, 0.13943514979599955], 'Animal_5': [0.40816213116457223, 0.06122524589028524, 0.40816213116457223, 0.04545454545454547]}
@@ -361,6 +368,7 @@ class NetworkMixin(object):
         :param Optional[Literal] smooth_type: The dynamics of the interactive graph.
 
         :example:
+
         >>> graph = NetworkMixin.create_graph(data={('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5})
         >>> graph_pg = NetworkMixin.visualize(graph=graph, node_size={'Animal_1': 10, 'Animal_2': 26, 'Animal_3': 50}, save_path='/Users/simon/Downloads/graph.html', node_shape='box', palette='spring')
         >>> multigraph = NetworkMixin().create_multigraph(data={('Animal_1', 'Animal_2'): [0, 0, 0, 6], ('Animal_1', 'Animal_3'): [0, 0, 0, 0], ('Animal_1', 'Animal_4'): [0, 0, 0, 0], ('Animal_1', 'Animal_5'): [0, 0, 0, 0], ('Animal_2', 'Animal_3'): [0, 0, 0, 0], ('Animal_2', 'Animal_4'): [5, 0, 0, 2], ('Animal_2', 'Animal_5'): [0, 0, 0, 0], ('Animal_3', 'Animal_4'): [0, 0, 0, 0], ('Animal_3', 'Animal_5'): [0, 2, 22, 0], ('Animal_4', 'Animal_5'): [0, 0, 0, 0]})
@@ -508,6 +516,7 @@ class NetworkMixin(object):
         :return float: Berger-Parker index value for the input array `x`
 
         :example:
+
         >>> x = np.random.randint(0, 25, (100,)).astype(np.float32)
         >>> z = NetworkMixin.berger_parker(x=x)
         """
@@ -540,6 +549,7 @@ class NetworkMixin(object):
         :return float: Shannon Diversity Index value for the input array `x`
 
         :example:
+
         >>> x = np.random.randint(0, 100, (100, ))
         >>> NetworkMixin.shannon_diversity_index(x=x)
         """
@@ -579,6 +589,7 @@ class NetworkMixin(object):
 
 
         :example:
+
         >>> x = np.random.randint(0, 100, (100,))
         >>> NetworkMixin.margalef_diversification_index(x=x)
         """
@@ -615,6 +626,7 @@ class NetworkMixin(object):
          :return float: Menhinick's Index value for the input array `x`
 
         :example:
+
         >>> x = np.random.randint(0, 5, (1000,))
         >>> NetworkMixin.menhinicks_index(x=x)
         """
@@ -651,6 +663,7 @@ class NetworkMixin(object):
         :return float: Brillouin's Diversity Index value for the input array `x`
 
         :example:
+
         >>> x = np.random.randint(0, 10, (100,))
         >>> NetworkMixin.brillouins_index(x)
         """
@@ -700,6 +713,7 @@ class NetworkMixin(object):
         :return: Sørensen's Similarity Index between x and y.
 
         :example:
+
         >>> x = np.random.randint(0, 10, (100,))
         >>> y = np.random.randint(0, 10, (100,))
         >>> NetworkMixin.sorensen_dice_coefficient(x=x, y=y)

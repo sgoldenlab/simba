@@ -22,6 +22,7 @@ def davis_bouldin(x: np.ndarray, y: np.ndarray) -> float:
     :return float: Davis-Bouldin score.
 
     :example:
+
     >>> x = np.random.randint(0, 100, (100, 2))
     >>> y = np.random.randint(0, 3, (100,))
     >>> Statistics.davis_bouldin(x=x, y=y)

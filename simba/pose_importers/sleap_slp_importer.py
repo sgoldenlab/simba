@@ -50,6 +50,7 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
     :param Optional[Dict[str, Union[str, int]]] smoothing_settings: Dictionary defining the pose estimation smoothing method e.g. {'time_window': 500, 'method': 'gaussian'}.
 
     :example:
+
     >>> slp_importer = SLEAPImporterSLP(project_path="MyConfigPath", data_folder=r'MySLPDataFolder', id_lst=['Mouse_1', 'Mouse_2'], interpolation_settings={'type': 'animals', 'method': 'linear'}, smoothing_settings={'time_window': 200, 'method': 'savitzky-golay'})
     >>> slp_importer.run()
 

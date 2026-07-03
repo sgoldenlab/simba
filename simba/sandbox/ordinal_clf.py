@@ -30,6 +30,7 @@ class OrdinalClassifier():
     .. [1] Frank, Eibe, and Mark Hall. “A Simple Approach to Ordinal Classification.” In Machine Learning: ECML 2001, edited by Luc De Raedt and Peter Flach, 2167:145–56. Lecture Notes in Computer Science. Berlin, Heidelberg: Springer Berlin Heidelberg, 2001. https://doi.org/10.1007/3-540-44795-4_13.
 
     :example:
+
     >>> X = np.random.randint(0, 500, (100, 50))
     >>> y = np.random.randint(1, 6, (100))
     >>> rf_mdl = TrainModelMixin().clf_define()

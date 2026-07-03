@@ -116,6 +116,7 @@ def get_nose_tail_from_vertices(vertices: np.ndarray,
     :rtype: Tuple[np.ndarray, np.ndarray]
 
     :example:
+
     >>> vertices = np.random.randint(0, 100, (100, 50, 2)).astype(np.float32)
     >>> nose, tail = get_nose_tail_from_vertices(vertices=vertices, fps=30, smooth_factor=0.5, jump_threshold=0.75)
     """
@@ -211,6 +212,7 @@ def get_left_right_points(hull_vertices: np.ndarray,
     :rtype: Tuple[np.ndarray, np.ndarray]
 
     :example:
+
     >>> vertices = np.random.randint(0, 100, (100, 50, 2)).astype(np.float32)
     >>> anterior = np.random.randint(0, 100, (100, 2)).astype(np.float32)
     >>> center = np.mean(vertices, axis=1)
@@ -270,6 +272,7 @@ def get_blob_vertices_from_imgs(frm_idxs: Tuple[int, List[int]],
     :rtype: Dict[int, np.ndarray]
 
     :example:
+
     >>> imgs = read_img_batch_from_video_gpu(video_path=r"C:\troubleshooting\mitra\test\temp\501_MA142_Gi_Saline_0515.mp4", start_frm=0, end_frm=0, black_and_white=True)
     >>> data = get_blob_vertices_from_imgs(imgs=imgs, window_size=3)
     >>> data = pd.DataFrame.from_dict(data, orient='index')
@@ -356,6 +359,7 @@ def get_blob_vertices_from_video(video_path: Union[str, os.PathLike],
     :rtype: np.ndarray
 
     :example:
+
     >>> x = get_blob_vertices_from_video(video_path=r"/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", gpu=True)
     >>> y = get_blob_vertices_from_video(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_IOT_1_bg_subtracted.mp4", gpu=True)
     """

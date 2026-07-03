@@ -87,6 +87,7 @@ def video_to_frames(video_path: Union[str, os.PathLike],
     :return: None. Frames are saved to disk in the specified directory.
 
     :example:
+
     >>> video_to_frames(video_path=r"C:/troubleshooting/SDS_pre_post/project_folder/videos/SDI100 x ALR2 post_d7.mp4", 
     ...                save_dir=r'C:/troubleshooting/SDS_pre_post/project_folder/videos/test', 
     ...                black_and_white=False, 

@@ -9,6 +9,7 @@ def siegel_tukey(x: np.ndarray, y: np.ndarray):
     Non-parametric test to check if the variability between two groups (e.g., features) and similar.
 
     :example:
+
     >>> x = np.random.random((10,))
     >>> y = np.random.random((10,))
     >>> siegel_tukey(x=x, y=y)

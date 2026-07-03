@@ -99,6 +99,7 @@ class YoloInference():
     :rtype: Union[None, Dict[str, pd.DataFrame]]
 
     :example:
+
     >>> video_path = "/mnt/d/netholabs/yolo_videos/input/mp4_20250606083508/2025-05-28_19-50-23.mp4"
     >>> i = YoloInference(
     ...     weights=r"/mnt/c/troubleshooting/coco_data/mdl/train8/weights/best.pt",

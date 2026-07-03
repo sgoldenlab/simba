@@ -1289,6 +1289,7 @@ class ImportFrameDirectoryPopUp(PopUpMixin, ConfigReader):
 class ExtractAnnotationFramesPopUp(PopUpMixin, ConfigReader):
     """
     :example:
+
     >>> ExtractAnnotationFramesPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
     """
 
@@ -1616,6 +1617,7 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
         :param save_dir: Directory where to save the clipped videos.
 
         :example:
+
         >>> ClipMultipleVideosByFrameNumbersPopUp(data_dir='/Users/simon/Downloads/test__/test__', save_dir='/Users/simon/Downloads/test__/res')
         """
 
@@ -1804,6 +1806,7 @@ class InitiateClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
 class ClipMultipleVideosByTimestamps(PopUpMixin):
     """
     :example:
+
     >>> ClipMultipleVideosByTimestamps(data_dir=r"C:\troubleshooting\RAT_NOR\project_folder\videos\test", save_dir=r"C:\troubleshooting\RAT_NOR\project_folder\videos\test\out")
     >>> ClipMultipleVideosByTimestamps(data_dir=r"C:\troubleshooting\mitra\project_folder\videos", save_dir=r"C:\troubleshooting\mitra\project_folder\videos\temp_3")
     """
@@ -2431,6 +2434,7 @@ class Convert2PNGPopUp(PopUpMixin):
 class Convert2MP4PopUp(PopUpMixin):
     """
     :example:
+
     >>> Convert2MP4PopUp()
     """
     def __init__(self):
@@ -2494,6 +2498,7 @@ class Convert2MP4PopUp(PopUpMixin):
 class Convert2AVIPopUp(PopUpMixin):
     """
     :example:
+
     >>> Convert2AVIPopUp()
     """
 
@@ -2535,6 +2540,7 @@ class Convert2AVIPopUp(PopUpMixin):
 class Convert2WEBMPopUp(PopUpMixin):
     """
     :example:
+
     >>> Convert2WEBMPopUp()
     """
 
@@ -2580,6 +2586,7 @@ class Convert2WEBMPopUp(PopUpMixin):
 class Convert2MOVPopUp(PopUpMixin):
     """
     :example:
+
     >>> Convert2MOVPopUp()
     """
     def __init__(self):

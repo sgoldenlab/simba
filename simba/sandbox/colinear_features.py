@@ -29,6 +29,7 @@ def find_collinear_features(df: pd.DataFrame,
     :return: Set of feature names identified as collinear. Returns one feature for every feature pair with correlation value above specified threshold.
 
     :example:
+
     >>> x = pd.DataFrame(np.random.randint(0, 100, (100, 100)))
     >>> names = find_collinear_features(df=x, threshold=0.2, method='pearson', verbose=True)
     """

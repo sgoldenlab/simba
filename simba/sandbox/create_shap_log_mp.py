@@ -81,6 +81,7 @@ def create_shap_log(rf_clf: RandomForestClassifier,
     :param Optional[int] save_file_suffix: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search.
 
     :example:
+
     >>> from simba.mixins.train_model_mixin import TrainModelMixin
     >>> x_cols = list(pd.read_csv('/Users/simon/Desktop/envs/simba/simba/tests/data/sample_data/shap_test.csv', index_col=0).columns)
     >>> x = pd.DataFrame(np.random.randint(0, 500, (9000, len(x_cols))), columns=x_cols)
@@ -230,6 +231,7 @@ def create_shap_log_mp(rf_clf: RandomForestClassifier,
     :param bool plot: If True, create SHAP aggregation and plots.
 
     :example:
+
     >>> from simba.mixins.train_model_mixin import TrainModelMixin
     >>> x_cols = list(pd.read_csv('/Users/simon/Desktop/envs/simba/simba/tests/data/sample_data/shap_test.csv', index_col=0).columns)
     >>> x = pd.DataFrame(np.random.randint(0, 500, (9000, len(x_cols))), columns=x_cols)

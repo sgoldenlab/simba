@@ -26,6 +26,7 @@ def symmetry_index(x: np.ndarray, y: np.ndarray, agg_type: Literal['mean', 'medi
     :rtype: float
 
     :example:
+
     >>> x = np.random.randint(0, 155, (100,))
     >>>y = np.random.randint(0, 155, (100,))
     >>> symmetry_index(x=x, y=y)

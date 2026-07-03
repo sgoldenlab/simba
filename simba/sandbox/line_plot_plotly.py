@@ -58,6 +58,7 @@ def make_line_plot_plotly(data: List[np.ndarray],
     :return: If save_path is None, returns a numpy array representing the plot image.
 
     :example:
+
     >>> x = np.random.randint(0, 50, (100,))
     >>> y = np.random.randint(0, 50, (200,))
     >>> data = [x, y]

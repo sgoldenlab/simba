@@ -117,6 +117,7 @@ def read_df(file_path: Union[str, os.PathLike],
     :rtype: pd.DataFrame
 
     :example:
+
     >>> read_df(file_path='project_folder/csv/input_csv/Video_1.csv', file_type='csv', check_multiindex=True)
     """
     check_file_exist_and_readable(file_path=file_path)
@@ -227,6 +228,7 @@ def write_df(df: pd.DataFrame,
     :param bool verbose: Prints message on completion. Default: False.
 
     :example:
+
     >>> write_df(df=df, file_type='csv', save_path='project_folder/csv/input_csv/Video_1.csv')
     """
 
@@ -281,6 +283,7 @@ def get_fn_ext(filepath: Union[os.PathLike, str],
     :rtype: Union[Tuple[str, str, str], Tuple[None, None, None]]
 
     :example:
+
     >>> get_fn_ext(filepath='C:/My_videos/MyVideo.mp4')
     ('C:/My_videos', 'MyVideo', '.mp4')
     >>> get_fn_ext(filepath='invalid_path', raise_error=False)
@@ -318,6 +321,7 @@ def read_config_entry(config: configparser.ConfigParser,
     :return Any
 
     :example:
+
     >>> read_config_entry(config='project_folder/project_config.ini', section='General settings', option='project_name', data_type='str')
     >>> 'two_animals_14_bps'
     """
@@ -450,6 +454,7 @@ def read_config_file(config_path: Union[str, os.PathLike]) -> configparser.Confi
     :raise MissingProjectConfigEntryError: Invalid file format.
 
     :example:
+
     >>> read_config_file(config_path='project_folder/project_config.ini')
     """
 
@@ -481,6 +486,7 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture],
     :rtype: Dict[str, Any].
 
     :example:
+
     >>> get_video_meta_data('test_data/video_tests/Video_1.avi')
     {'video_name': 'Video_1', 'fps': 30, 'width': 400, 'height': 600, 'frame_count': 300, 'resolution_str': '400 x 600', 'video_length_s': 10}
     """
@@ -737,6 +743,7 @@ def read_video_info(video_name: str,
     :rtype: Union[Tuple[pd.DataFrame, float, float], Tuple[None, None, None]]
 
     :example:
+
     >>> video_info_df = read_video_info_csv(file_path='project_folder/logs/video_info.csv')
     >>> read_video_info(vid_info_df=video_info_df, video_name='Together_1')
     """
@@ -799,6 +806,7 @@ def find_all_videos_in_directory(directory: Union[str, os.PathLike],
     :raises NoFilesFoundError: If ``raise_error`` and ``directory`` has no files in formats ``video_formats``.
 
     :examples:
+
     >>> find_all_videos_in_directory(directory='project_folder/videos')
     """
 
@@ -861,6 +869,7 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
     :rtype: Union[np.ndarray, None]
 
     :example:
+
     >>> img = read_frm_of_video(video_path='/Users/simon/Desktop/envs/platea_featurizer/data/video/3D_Mouse_5-choice_MouseTouchBasic_s9_a4_grayscale.mp4')
     >>> cv2.imshow('img', img)
     >>> cv2.waitKey(5000)
@@ -1006,6 +1015,7 @@ def find_video_of_file(video_dir: Union[str, os.PathLike],
     :rtype: Union[str, os.PathLike, None]
 
     :examples:
+
     >>> find_video_of_file(video_dir='project_folder/videos', filename='Together_1')
     >>> 'project_folder/videos/Together_1.avi'
 
@@ -1091,6 +1101,7 @@ def find_files_of_filetypes_in_directory(directory: Union[str, os.PathLike],
     :rtype: Union[List[str], Dict[str, str]]
 
     :example:
+
     >>> find_files_of_filetypes_in_directory(directory='project_folder/videos', extensions=['mp4', 'avi', 'png'], raise_warning=False)
     """
 
@@ -1150,6 +1161,7 @@ def convert_parquet_to_csv(directory: str) -> None:
     :raise NoFilesFoundError: The directory has no ``parquet`` files.
 
     :examples:
+
     >>> convert_parquet_to_csv(directory='project_folder/csv/input_csv')
     """
 
@@ -1185,6 +1197,7 @@ def convert_csv_to_parquet(directory: Union[str, os.PathLike]) -> None:
     :raise NoFilesFoundError: The directory has no ``csv`` files.
 
     :examples:
+
     >>> convert_parquet_to_csv(directory='project_folder/csv/input_csv')
     """
     if not os.path.isdir(directory):
@@ -1224,6 +1237,7 @@ def get_file_name_info_in_directory(directory: Union[str, os.PathLike], file_typ
     :return dict: All found files as values and file base names as keys.
 
     :example:
+
     >>> get_file_name_info_in_directory(directory='C:/project_folder/csv/machine_results', file_type='csv')
     >>> {'Video_1': 'C:/project_folder/csv/machine_results/Video_1'}
     """
@@ -1248,6 +1262,7 @@ def archive_processed_files(config_path: Union[str, os.PathLike], archive_name: 
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4_new.md>`_
 
     :example:
+
     >>> archive_processed_files(config_path='project_folder/project_config.ini', archive_name='my_archive')
     """
 
@@ -1325,6 +1340,7 @@ def str_2_bool(input_str: str) -> bool:
     Helper to convert string representation of bool to bool.
 
     :example:
+
     >>> str_2_bool(input_str='yes')
     >>> True
     """
@@ -1415,6 +1431,7 @@ def get_all_clf_names(config: configparser.ConfigParser, target_cnt: int) -> Lis
     :rtype: List[str]
 
     :example:
+
     >>> get_all_clf_names(config=config, target_cnt=2)
     >>> ['Attack', 'Sniffing']
     """
@@ -1434,6 +1451,7 @@ def read_meta_file(meta_file_path: Union[str, os.PathLike]) -> dict:
     :return dict: Dictionary holding model parameters.
 
     :example:
+
     >>> read_meta_file('project_folder/configs/Attack_meta_0.csv')
     >>> {'Classifier_name': 'Attack', 'RF_n_estimators': 2000, 'RF_max_features': 'sqrt', 'RF_criterion': 'gini', ...}
     """
@@ -1451,6 +1469,7 @@ def read_simba_meta_files(folder_path: str, raise_error: bool = False) -> List[s
     :rtype: List[str]
 
     :example:
+
     >>> read_simba_meta_files(folder_path='/project_folder/configs')
     >>> ['project_folder/configs/Attack_meta_1.csv', 'project_folder/configs/Attack_meta_0.csv']
     """
@@ -1484,6 +1503,7 @@ def find_core_cnt() -> Tuple[int, int]:
     :return int: The local cpu count // 4
 
     :example:
+
     >>> find_core_cnt()
     >>> (8, 2)
 
@@ -1502,6 +1522,7 @@ def get_number_of_header_columns_in_df(df: pd.DataFrame) -> int:
     :param pd.DataFrame df: Dataframe to check the count of non-numerical header rows for.
 
     :example:
+
     >>> get_number_of_header_columns_in_df(df='project_folder/csv/input_csv/Video_1.csv')
     >>> 3
     """
@@ -1526,6 +1547,7 @@ def get_memory_usage_of_df(df: pd.DataFrame) -> Dict[str, float]:
     :rtype: Dict[str, float]
 
     :example:
+
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
     >>> {'bytes': 3328, 'megabytes': 0.003328, 'gigabytes': 3e-06}
     """
@@ -1673,6 +1695,7 @@ def find_all_videos_in_project(videos_dir: Union[str, os.PathLike],
     :param bool basename: If true returns basenames, else file paths.
 
     :example:
+
     >>> find_all_videos_in_project(videos_dir='project_folder/videos')
     >>> ['project_folder/videos/Together_2.avi', 'project_folder/videos/Together_3.avi', 'project_folder/videos/Together_1.avi']
 
@@ -1711,6 +1734,7 @@ def check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp: str, video_path:
     :raises FrameRangeError: If timestamp is not in the video file. E.g., timestamp 00:01:00 will raise FrameRangeError if the video is 59s long.
 
     :example:
+
     >>> check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp='01:00:05', video_path='/Users/simon/Desktop/video_tests/Together_1.avi')
     >>> "FrameRangeError: The timestamp '01:00:05' does not occur in video Together_1.avi, the video has length 10s"
     """
@@ -1737,6 +1761,7 @@ def timestamp_to_seconds(timestamp: str) -> int:
     :raises FrameRangeError: If timestamp is not a valid format.
 
     :example:
+
     >>> timestamp_to_seconds(timestamp='00:00:05')
     >>> 5
     """
@@ -1760,6 +1785,7 @@ def find_time_stamp_from_frame_numbers(start_frame: int, end_frame: int, fps: fl
     :rtype: List[str]
 
     :example:
+
     >>> find_time_stamp_from_frame_numbers(start_frame=11, end_frame=20, fps=3.4)
     >>> ['00:00:03:235', '00:00:05:882']
     """
@@ -1878,6 +1904,7 @@ def find_max_vertices_coordinates(shapes: List[Union[Polygon, LineString, MultiP
     :rtype: Tuple[int, int]
 
     :example:
+
     >>> polygon = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
     >>> line = LineString([(1, 1), (2, 2), (3, 1), (4, 0)])
     >>> multi_polygon = MultiPolygon([Polygon([(0, 0), (1, 0), (1, 1), (0, 1)]), Polygon([(1, 1), (2, 1), (2, 2), (1, 2)])])
@@ -1936,6 +1963,7 @@ def clean_sleap_file_name(filename: str) -> str:
     :return str: The cleaned filename.
 
     :example:
+
     >>> clean_sleap_file_name("projectname.v00x.00x_videoname.analysis.csv")
     >>> 'videoname.csv'
     >>> clean_sleap_file_name("projectname.v00x.00x_videoname.analysis.h5")
@@ -1995,6 +2023,7 @@ def read_dlc_superanimal_h5(path: Union[str, os.PathLike], col_names: List[str])
         number of columns in the file is less than the number of expected column names.
 
     :example:
+
     >>> col_names = ['Animal_1_Nose_x', 'Animal_1_Nose_y', 'Animal_1_Nose_p', 'Animal_1_Ear_left_x', ...]
     >>> df = read_dlc_superanimal_h5(path='project_folder/videos/Video_1.h5', col_names=col_names)
     """
@@ -2069,6 +2098,7 @@ def get_h5_frame_count(path: Union[str, os.PathLike]) -> Optional[int]:
     :rtype: Optional[int]
 
     :example:
+
     >>> n = get_h5_frame_count(r'video_DLC_HrnetW32_..._el.h5')
     >>> # 5400
     """
@@ -2115,6 +2145,7 @@ def clean_sleap_filenames_in_directory(dir: Union[str, os.PathLike],
     :param Union[str, os.PathLike] dir: The directory path where the SLEAP CSV or H5 files are located.
 
     :example:
+
     >>> clean_sleap_filenames_in_directory(dir='/Users/simon/Desktop/envs/troubleshooting/Hornet_SLEAP/import/')
     """
 
@@ -2148,6 +2179,7 @@ def copy_files_in_directory(in_dir: Union[str, os.PathLike],
 
 
     :example:
+
     >>> copy_files_in_directory('/input_dir', '/output_dir', raise_error=True, filetype='txt')
     """
 
@@ -2196,6 +2228,7 @@ def remove_multiple_folders(folders: List[Union[os.PathLike, str]], raise_error:
     :raises NotDirectoryError: If ``raise_error`` and directory does not exist.
 
     :example:
+
     >>> remove_multiple_folders(folders= ['gerbil/gerbil_data/featurized_data/temp'])
     """
 
@@ -2219,6 +2252,7 @@ def remove_files(file_paths: List[Union[str, os.PathLike]], raise_error: Optiona
     :param Optional[bool] raise_error: If True, raise exceptions for errors during file deletion. Else, pass. Defaults to False.
 
     :examples:
+
     >>> file_paths = ['/path/to/file1.txt', '/path/to/file2.txt']
     >>> remove_files(file_paths, raise_error=True)
     """
@@ -2252,6 +2286,7 @@ def get_pkg_version(pkg: str, raise_error: Optional[bool] = False):
     Helper to get the version of a package in the current python environment.
 
     :example:
+
     >>> get_pkg_version(pkg='simba-uw-tf-dev')
     >>> 1.82.7
     >>> get_pkg_version(pkg='bla-bla')
@@ -2282,6 +2317,7 @@ def fetch_pip_data(pip_url: str = Links.SIMBA_PIP_URL.value,
     :rtype: Union[Tuple[Dict[str, Any], str], Tuple[None, None]]
 
     :example:
+
     >>> json_data, version = fetch_pip_data()
     >>> if version:
     >>>     print(f"Latest version: {version}")
@@ -2312,6 +2348,7 @@ def write_pickle(data: Dict[Any, Any], save_path: Union[str, os.PathLike]) -> No
     :param str save_path: Location of saved pickle.
 
     :example:
+
     >>> write_pickle(data=my_model, save_path='/test/unsupervised/cluster_models/My_model.pickle')
     """
 
@@ -2337,6 +2374,7 @@ def read_pickle(data_path: Union[str, os.PathLike], verbose: Optional[bool] = Fa
     :rtype: Dict[Any, Any]
 
     :example:
+
     >>> data = read_pickle(data_path='/test/unsupervised/cluster_models')
     """
     data = None
@@ -2589,6 +2627,7 @@ def img_stack_to_greyscale(imgs: np.ndarray):
     :return np.ndarray: A 3D array containing the grayscale versions of the input images. The shape of the output array is (num_images, height, width).
 
     :example:
+
     >>> imgs = ImageMixin().read_img_batch_from_video( video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=100)
     >>> imgs = np.stack(list(imgs.values()))
     >>> imgs_gray = ImageMixin.img_stack_to_greyscale(imgs=imgs)
@@ -2614,6 +2653,7 @@ def img_stack_to_bw(imgs: np.ndarray):
     :return np.ndarray: A 3D array containing the black and white versions of the input images. The shape of the output array is (num_images, height, width).
 
     :example:
+
     >>> imgs = ImageMixin().read_img_batch_from_video( video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=100)
     >>> imgs = np.stack(list(imgs.values()))
     >>> imgs_gray = ImageMixin.img_stack_to_greyscale(imgs=imgs)
@@ -2833,6 +2873,7 @@ def bento_file_reader(file_path: Union[str, os.PathLike],
     :rtype: Dict[str, pd.DataFrame]
 
     :example:
+
     >>> bento_file_reader(file_path=r"C:/troubleshooting/bento_test/bento_files/20240812_crumpling3.annot")
     """
 
@@ -3156,6 +3197,7 @@ def labelme_to_dlc(labelme_dir: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> labelme_dir = r'D:/ts_annotations'
     >>> labelme_to_dlc(labelme_dir=labelme_dir)
     """
@@ -3458,6 +3500,7 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
     :rtype: Dict[int, np.ndarray]
 
     :example:
+
     >>> read_img_batch_from_video(video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=50)
     """
 
@@ -3835,6 +3878,7 @@ def osf_download(project_id: str, save_dir: Union[str, os.PathLike], storage: st
     :param bool overwrite: If True, overwrite existing files. If False, skip existing files (default: False).
 
     :example:
+
     >>> osf_download(project_id="7fgwn", save_dir=r'E:/rgb_white_vs_black_imgs')
     >>> osf_download(project_id="kym42", save_dir=r'E:/crim13_imgs', overwrite=True)
     """
@@ -3896,6 +3940,7 @@ def extract_audio_from_video(video_path: Union[str, os.PathLike],
     :raises FFMPEGCodecGPUError: If ffmpeg extraction fails.
 
     :example:
+
     >>> extract_audio_from_video(video_path='my_video.mp4', save_path='audio.mp3')
     >>> extract_audio_from_video(video_path='my_video.mp4', save_path='audio.mp3', bitrate='320k')
     """
@@ -3953,6 +3998,7 @@ def find_closest_readable_frame(video_path: Union[str, os.PathLike],
     :rtype: Tuple[Optional[np.ndarray], Optional[int]]
 
     :example:
+
     >>> frame, actual_idx = find_closest_readable_frame(video_path='video.mp4', target_frame=10810)
     >>> if frame is not None:
     >>>     print(f"Read frame {actual_idx} (target was 10810, offset: {actual_idx - 10810})")
@@ -4001,6 +4047,7 @@ def terminate_cpu_pool(pool: multiprocessing.Pool,
     :param Optional[str] source: Optional identifier string for logging purposes (e.g., 'VideoProcessor'). Default: None.
 
     :example:
+
     >>> import multiprocessing
     >>> pool = multiprocessing.Pool(4)
     >>> terminate_cpu_pool(pool=pool, force=False, verbose=True, source='FeatureExtractor')
@@ -4039,6 +4086,7 @@ def get_cpu_pool(core_cnt: int = -1,
     :rtype: multiprocessing.Pool
 
     :example:
+
     >>> pool = get_cpu_pool(core_cnt=4, source='FeatureExtractor')
     >>> pool = get_cpu_pool(core_cnt=-1, context='spawn', verbose=True)
     >>> pool = get_cpu_pool(core_cnt=8, maxtasksperchild=100, source='VideoProcessor')

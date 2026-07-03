@@ -10,6 +10,7 @@ def sliding_autocorrelation(data: np.ndarray, max_lag: float, time_window: float
     Jitted compute of sliding auto-correlations (the correlation of a feature with itself using lagged windows).
 
     :example:
+
     >>> data = np.array([0,1,2,3,4, 5,6,7,8,1,10,11,12,13,14]).astype(np.float32)
     >>> Statistics().sliding_autocorrelation(data=data, max_lag=0.5, time_window=1.0, fps=10)
     >>> [ 0., 0., 0.,  0.,  0., 0., 0.,  0. ,  0., -3.686, -2.029, -1.323, -1.753, -3.807, -4.634]

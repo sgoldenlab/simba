@@ -12,6 +12,7 @@ def pct_in_top_n(x: np.ndarray, n: float) -> float:
     :return: Percentage of elements in the top 'n' frequencies.
 
     :example:
+
     >>> x = np.random.randint(0, 10, (100,))
     >>> pct_in_top_n(x=x, n=5)
     """
@@ -35,6 +36,7 @@ def sliding_pct_in_top_n(x: np.ndarray, windows: np.ndarray, n: int, fps: float)
     :return np.ndarray: 2D array of computed percentages of elements in the top 'n' frequencies for each sliding window.
 
     :example:
+
     >>> x = np.random.randint(0, 10, (100000,))
     >>> results = sliding_pct_in_top_n(x=x, windows=np.array([1.0]), n=4, fps=10)
     """

@@ -22,6 +22,7 @@ OUTSIDE_ROI = 'OUTSIDE REGIONS OF INTEREST'
 class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
     """
     :example:
+
     >>> analyzer = ROIAggregateDataAnalyzerPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
     """
     def __init__(self, config_path: Union[str, os.PathLike]):

@@ -26,6 +26,7 @@ def brillouins_index(x: np.array) -> float:
     :return float: Brillouin's Diversity Index value for the input array `x`
 
     :example:
+
     >>> x = np.random.randint(0, 10, (100,))
     >>> brillouins_index(x)
     """

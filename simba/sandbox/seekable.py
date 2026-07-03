@@ -24,6 +24,7 @@ def check_if_video_corrupted(video: Union[str, os.PathLike, cv2.VideoCapture],
     :return None:
 
     :example:
+
     >>> check_if_video_corrupted(video_path='/Users/simon/Downloads/NOR ENCODING FExMP8.mp4')
     """
     check_instance(source=f'{check_if_video_corrupted.__name__} video', instance=video, accepted_types=(str, cv2.VideoCapture))

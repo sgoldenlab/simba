@@ -28,6 +28,7 @@ def joint_plot(data: Union[np.ndarray, pd.DataFrame],
 
     """
     :example:
+
     >>> x = np.hstack([np.random.normal(loc=10, scale=4, size=(100, 2)), np.random.randint(0, 1, size=(100, 1))])
     >>> y = np.hstack([np.random.normal(loc=25, scale=4, size=(100, 2)), np.random.randint(1, 2, size=(100, 1))])
     >>> plot = joint_plot(data=np.vstack([x, y]), columns=['X', 'Y', 'Cluster'], title='The plot')

@@ -35,6 +35,7 @@ class GridSearchVisualizer(UMLMixin):
     :param settings: User-defined image attributes (e.g., continous and catehorical palettes)
 
     :example:
+
     >>> settings = {'CATEGORICAL_PALETTE': 'Pastel1', 'CONTINUOUS_PALETTE': 'magma', 'SCATTER_SIZE': 10}
     >>> visualizer = GridSearchVisualizer(model_dir='/Users/simon/Desktop/envs/troubleshooting/unsupervised/cluster_models_042023', save_dir='/Users/simon/Desktop/envs/troubleshooting/unsupervised/images', settings=settings)
     >>> visualizer.continuous_visualizer(continuous_vars=['START_FRAME'])

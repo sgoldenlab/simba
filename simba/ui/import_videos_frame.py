@@ -32,6 +32,7 @@ class ImportVideosFrame(PopUpMixin, ConfigReader):
     :param Optional[int] idx_column: The column in parent_frm to insert the Videos frame into. Default: 0.
 
     :example:
+
     >>> ImportVideosFrame(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
     """
 

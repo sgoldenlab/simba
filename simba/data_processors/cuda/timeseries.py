@@ -114,6 +114,7 @@ def sliding_percent_beyond_n_std(data: np.ndarray, time_window: float, sample_ra
     :rtype: np.ndarray
 
     :example:
+
     >>> data = np.random.randint(0, 100, (100,))
     >>> results = sliding_percent_beyond_n_std(data=data, time_window=1, sample_rate=10, value=2)
     """
@@ -184,6 +185,7 @@ def sliding_spatial_density_cuda(x: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> df = pd.read_csv("/mnt/c/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Test_3.csv")
     >>> x = df[['Nose_1_x', 'Nose_1_y']].values
     >>> results_cuda = sliding_spatial_density_cuda(x=x, radius=10.0, pixels_per_mm=4.0, window_size=1, sample_rate=20)
@@ -254,6 +256,7 @@ def sliding_linearity_index_cuda(x: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(0, 500, (100, 2)).astype(np.float32)
     >>> q = sliding_linearity_index_cuda(x=x, window_size=2, sample_rate=30)
     """
@@ -325,6 +328,7 @@ def sliding_hjort_parameters_gpu(data: np.ndarray, window_sizes: np.ndarray, sam
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(0, 500, (10,)).astype(np.float32)
     >>> window_sizes = np.array([1.0, 0.5]).astype(np.float64)
     >>> sample_rate = 10

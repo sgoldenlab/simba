@@ -21,6 +21,7 @@ def mean_absolute_percentage_error(y_true: np.ndarray,
     :rtype: float
 
     :example:
+
     >>> x, y = np.random.random(size=(100000,)), np.random.random(size=(100000,))
     >>> mean_absolute_percentage_error(y_true=x, y_pred=y)
     """

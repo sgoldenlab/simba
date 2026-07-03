@@ -30,6 +30,7 @@ def crop_multiple_videos_circles(
        using the first video and saves the videos in the ``out_dir`` with the same filenames as the original videos..
 
     :example:
+
     >>> crop_multiple_videos_circles(in_dir='/Users/simon/Desktop/edited/tests', out_dir='/Users/simon/Desktop')
     """
 

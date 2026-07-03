@@ -15,6 +15,7 @@ def jaccard_distance(x: np.ndarray, y: np.ndarray) -> float:
     :return float: The Jaccard distance between arrays x and y.
 
     :example:
+
     >>> x = np.random.randint(0, 5, (100))
     >>> y = np.random.randint(0, 7, (100))
     >>> jaccard_distance(x=x, y=y)

@@ -101,6 +101,7 @@ class YOLOPoseTrackVisualizer():
 
 
     :example:
+
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
     >>> data_path = "/mnt/c/troubleshooting/mitra/yolo_pose/501_MA142_Gi_CNO_0521.csv"
     >>> kp_vis = YOLOPoseTrackVisualizer(data_path=data_path,

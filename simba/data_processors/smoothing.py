@@ -66,6 +66,7 @@ class Smoothing(ConfigReader):
         .. [1] `Video expected putput <https://www.youtube.com/watch?v=d9-Bi4_HyfQ>`__.
 
     :examples:
+
     >>> smoother = Smoothing(data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv/Together_1.csv', config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', method='Savitzky-Golay', time_window=500, multi_index_df_headers=True, copy_originals=True)
     >>> smoother.run()
     """

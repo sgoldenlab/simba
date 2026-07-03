@@ -122,6 +122,7 @@ class PopUpMixin(object):
         :return Dict[str, BooleanVar]: Dictionary holding the ``cb_titles`` as keys and the BooleanVar representing if the checkbox is ticked or not.
 
         :example:
+
         >>> PopUpMixin.create_cb_frame(cb_titles=['Attack', 'Sniffing', 'Rearing'], frm_title='My classifiers')
         """
 
@@ -177,6 +178,7 @@ class PopUpMixin(object):
         :return Dict[str, BooleanVar]: Dictionary holding the ``drop_down_titles`` as keys and the drop-down menus as values.
 
         :example:
+
         >>> PopUpMixin.create_dropdown_frame(drop_down_titles=['Dropdown 1', 'Dropdown 2', 'Dropdown 2'], drop_down_options=['Option 1', 'Option 2'], frm_title='My dropdown frame')
         """
 

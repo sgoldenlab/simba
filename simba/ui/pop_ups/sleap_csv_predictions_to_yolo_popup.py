@@ -33,6 +33,7 @@ class SLEAPcsvInference2Yolo(PopUpMixin):
     GUI for converting DeepLabCut (DLC) annotations to YOLOv8 keypoint format.
 
     :example:
+
     >>> SLEAPcsvInference2Yolo()
     """
 

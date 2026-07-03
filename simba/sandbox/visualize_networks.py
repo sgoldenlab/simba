@@ -46,6 +46,7 @@ def visualize(graph: Union[nx.Graph, nx.MultiGraph],
     :param Optional[Literal] smooth_type: The dynamics of the interactive graph.
 
     :example:
+
     >>> graph = NetworkMixin.create_graph(data={('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5})
     >>> graph_pg = visualize(graph=graph, node_size={'Animal_1': 10, 'Animal_2': 26, 'Animal_3': 50}, save_path='/Users/simon/Downloads/graph.html', node_shape='box', palette='spring')
     >>> multigraph = NetworkMixin().create_multigraph(data={('Animal_1', 'Animal_2'): [0, 0, 0, 6], ('Animal_1', 'Animal_3'): [0, 0, 0, 0], ('Animal_1', 'Animal_4'): [0, 0, 0, 0], ('Animal_1', 'Animal_5'): [0, 0, 0, 0], ('Animal_2', 'Animal_3'): [0, 0, 0, 0], ('Animal_2', 'Animal_4'): [5, 0, 0, 2], ('Animal_2', 'Animal_5'): [0, 0, 0, 0], ('Animal_3', 'Animal_4'): [0, 0, 0, 0], ('Animal_3', 'Animal_5'): [0, 2, 22, 0], ('Animal_4', 'Animal_5'): [0, 0, 0, 0]})

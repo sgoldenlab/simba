@@ -24,6 +24,7 @@ class InferenceMultiAnimalBatch(TrainModelMixin, ConfigReader):
     :param str clf_name: Name of the configured classifier to run multi-animal inference for.
 
     :example:
+
     >>> InferenceMultiAnimalBatch(config_path=r'/path/project_folder/project_config.ini', clf_name='wing_wave').run()
     """
 

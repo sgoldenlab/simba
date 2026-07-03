@@ -43,6 +43,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
     :param Union[str, os.PathLike] config_path: Path to the SimBA project configuration file.
 
     :example:
+
     >>> VisualizeROITrackingPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
     """
     def __init__(self,

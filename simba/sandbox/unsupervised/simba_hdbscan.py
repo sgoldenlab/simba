@@ -67,6 +67,7 @@ class SimBAHdbscan():
         :return:
 
         :example:
+
         >>> alpha = (1.0,)
         >>> min_cluster_size = (15,)
         >>> min_samples = (1,)

@@ -70,6 +70,7 @@ def extract_frames_single_video(file_path: Union[str, os.PathLike],
     results are stored within a subdirectory in the same directory as the input file.
 
     :example:
+
     >>> _ = extract_frames_single_video(file_path='project_folder/videos/Video_1.mp4')
     >>> extract_frames_single_video(file_path='/Users/simon/Desktop/imgs_4/test.mp4', save_dir='/Users/simon/Desktop/imgs_4/frames')
     """

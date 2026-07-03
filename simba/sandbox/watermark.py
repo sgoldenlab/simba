@@ -37,6 +37,7 @@ def watermark_video(video_path: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> watermark_video(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/multi_animal_dlc_two_c57/project_folder/videos/watermark/Together_1_powerpointready.mp4', watermark_path='/Users/simon/Desktop/splash.png', position='top_left', opacity=1.0, scale=0.2)
     """
     timer = SimbaTimer(start=True)

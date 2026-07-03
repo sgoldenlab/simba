@@ -108,6 +108,7 @@ class PosePlotterMultiProcess():
        :align: center
 
     :example:
+
     >>> test = PosePlotterMultiProcess(data_path='project_folder/csv/outlier_corrected_movement_location', out_dir='/project_folder/test_viz', circle_size=10, core_cnt=1, palettes={'Animal_1': 'Set1', 'Animal_2': 'Pastel1'})
     >>> test.run()
     """

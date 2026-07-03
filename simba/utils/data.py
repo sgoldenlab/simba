@@ -85,6 +85,7 @@ def detect_bouts(data_df: pd.DataFrame, target_lst: Union[List[str], str], fps: 
     :rtype: pd.DataFrame
 
     :example:
+
     >>> data_df = read_df(file_path='tests/data/test_projects/two_c57/project_folder/csv/machine_results/Together_1.csv', file_type='csv')
     >>> detect_bouts(data_df=data_df, target_lst=['Attack', 'Sniffing'], fps=25)
     >>>     'Event'  'Start_time'  'End Time'  'Start_frame'  'End_frame'  'Bout_time'
@@ -165,6 +166,7 @@ def detect_bouts_multiclass(data: pd.DataFrame, target: str, fps: int = 1, class
     :rtype: pd.DataFrame
 
     :example:
+
     >>> df = pd.DataFrame({'value': [0, 0, 0, 2, 2, 1, 1, 1, 3, 3]})
     >>> detect_bouts_multiclass(data=df, target='value', fps=3, classifier_map={0: 'None', 1: 'sharp', 2: 'track', 3: 'sync'})
     >>>    'Event'  'Start_time'  'End_time'  'Start_frame'  'End_frame'  'Bout_time'
@@ -243,6 +245,7 @@ def plug_holes_shortest_bout(data_df: pd.DataFrame,
     :rtype: pd.DataFrame
 
     :example:
+
     >>>  data_df = pd.DataFrame(data=[1, 0, 1, 1, 1], columns=['target'])
     >>>  # the single 0-frame gap (0.1 s) is shorter than 300 ms, so it is bridged; the resulting 0.5 s bout survives
     >>>  plug_holes_shortest_bout(data_df=data_df, clf_name='target', fps=10, shortest_bout=300)
@@ -298,6 +301,7 @@ def create_color_palettes(no_animals: int, map_size: int, cmaps: Optional[List[s
     :rtype: List[List[int]]
 
     :example:
+
     >>> create_color_palettes(no_animals=2, map_size=2)
     >>> [[[255.0, 0.0, 255.0], [0.0, 255.0, 255.0]], [[102.0, 127.5, 0.0], [102.0, 255.0, 255.0]]]
     """
@@ -362,6 +366,7 @@ def create_color_palette(pallete_name: str,
     :rtype: List[Union[str, float]]
 
     :example:
+
     >>> create_color_palette(pallete_name='jet', increments=3)
     >>> [[127.5, 0.0, 0.0], [255.0, 212.5, 0.0], [0.0, 229.81481481481478, 255.0], [0.0, 0.0, 127.5]]
     >>> create_color_palette(pallete_name='jet', increments=3, as_rgb_ratio=True)
@@ -404,6 +409,7 @@ def interpolate_color_palette(start_color: Tuple[int, int, int],
     :rtype: List[Tuple[int, int, int]]
 
     :example:
+
     >>> red, black = (255, 0, 0), (0, 0, 0)
     >>> colors = interpolate_color_palette(start_color=red, end_color=black, n = 10)
     """
@@ -439,6 +445,7 @@ def smooth_data_savitzky_golay(
     :param bool overwrite: If True, overwrites the input data. If False, returns the smoothened dataframe.
 
     :example:
+
     >>> config = read_config_file(config_path='Tests_022023/project_folder/project_config.ini')
     >>> smooth_data_savitzky_golay(config=config, file_path='Tests_022023/project_folder/csv/input_csv/Together_1.csv', time_window_parameter=500)
     """
@@ -639,6 +646,7 @@ def get_confusion_matrix(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(0, 5, (100000,))
     >>> y = np.random.randint(0, 5, (100000,))
     >>> c = get_confusion_matrix(x=x, y=y)
@@ -674,6 +682,7 @@ def find_frame_numbers_from_time_stamp(start_time: str, end_time: str, fps: int)
     :rtype: List[int]
 
     :example:
+
     >>> find_frame_numbers_from_time_stamp(start_time='00:00:00', end_time='00:00:01', fps=10)
     >>> [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     """
@@ -893,6 +902,7 @@ def hist_1d_mp(data: np.ndarray, bin_counts: np.ndarray, bin_widths: np.ndarray,
 
 
     :example:
+
     >>> data = np.random.randint(0, 100, (900, 300))
     >>> bin_counts, bin_widths = bucket_data_mp(data=data)
     >>> r = hist_1d_mp(data=data, bin_counts=bin_counts, bin_widths=bin_widths, normalize=True)
@@ -931,6 +941,7 @@ def bucket_data(data: np.ndarray, method: Literal["fd", "doane", "auto", "scott"
     :rtype: Tuple[float, int]
 
     :example:
+
     >>> data = np.random.randint(low=1, high=1000, size=(100,))
     >>> bucket_data(data=data, method='fd')
     >>> (190.8, 6)
@@ -995,6 +1006,7 @@ def fast_minimum_rank(data: np.ndarray, descending: Optional[bool] = True) -> np
         `Jérôme Richard on StackOverflow <https://stackoverflow.com/a/69869255>`__.
 
     :example:
+
     >>> data = np.array([1, 1, 3, 4, 5, 6, 7, 8, 9, 10])
     >>> fast_minimum_rank(data=data, descending=True)
     >>> [9, 9, 8, 7, 6, 5, 4, 3, 2, 1]
@@ -1036,6 +1048,7 @@ def fast_mean_rank(data: np.ndarray, descending: Optional[bool] = True) -> np.nd
         `Modified from James Webber gist on GitHub <https://gist.github.com/jamestwebber/38ab26d281f97feb8196b3d93edeeb7b>`__.
 
     :example:
+
     >>> data = np.array([1, 1, 3, 4, 5, 6, 7, 8, 9, 10])
     >>> fast_mean_rank(data=data, descending=True)
     >>> [9.5, 9.5, 8. , 7. , 6. , 5. , 4. , 3. , 2. , 1. ]
@@ -1075,6 +1088,7 @@ def slp_to_df_convert(
     :return pd.DataFrame: With animal ID, Track ID and body-part names as columns.
 
     :example:
+
     >>> headers = ['d_nose_1', 'd_neck_1', 'd_back_1', 'd_tail_1', 'nest_s_2', 'nest_cc_2', 'nest_cv_2', 'nest_cc_2', 'nest_csc_2', 'nest_cscd_2']
     >>> new_headers = []
     >>> for h in headers: new_headers.append(h + '_x'); new_headers.append(h + '_y'); new_headers.append(h + '_p')
@@ -1187,6 +1201,7 @@ def find_ranked_colors(data: Dict[Any, float],
     :rtype: Dict[str, Union[Tuple[int], str]]
 
     :examples:
+
     >>> data = {'Animal_1': 0.34786870380536705, 'Animal_2': 0.4307923198152757, 'Animal_3': 0.221338976379357}
     >>> find_ranked_colors(data=data, palette='magma', as_hex=True)
     >>> {'Animal_2': '#040000', 'Animal_1': '#7937b7', 'Animal_3': '#bffdfc'}
@@ -1294,6 +1309,7 @@ def run_user_defined_feature_extraction_class(file_path: Union[str, os.PathLike]
        throttled by the graphical interface mainloop.
 
     :example:
+
     >>> run_user_defined_feature_extraction_class(config_path='/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/project_config.ini', file_path='/Users/simon/Desktop/fish_feature_extractor_2023_version_5.py')
     >>> run_user_defined_feature_extraction_class(config_path='/Users/simon/Desktop/envs/troubleshooting/piotr/project_folder/train-20231108-sh9-frames-with-p-lt-2_plus3-&3_best-f1.ini', file_path='/simba/misc/piotr.py')
     """
@@ -1363,6 +1379,7 @@ def animal_interpolator(df: pd.DataFrame,
     :return pd.DataFrame: The DataFrame with interpolated values for the specified animal body parts.
 
     :example:
+
     >>> animal_bp_dict = {'Animal_1': {'X_bps': ['Ear_left_1_x', 'Ear_right_1_x', 'Nose_1_x', 'Center_1_x', 'Lat_left_1_x', 'Lat_right_1_x', 'Tail_base_1_x'], 'Y_bps': ['Ear_left_1_y', 'Ear_right_1_y', 'Nose_1_y', 'Center_1_y', 'Lat_left_1_y', 'Lat_right_1_y', 'Tail_base_1_y']}, 'Animal_2': {'X_bps': ['Ear_left_2_x', 'Ear_right_2_x', 'Nose_2_x', 'Center_2_x', 'Lat_left_2_x', 'Lat_right_2_x', 'Tail_base_2_x'], 'Y_bps': ['Ear_left_2_y', 'Ear_right_2_y', 'Nose_2_y', 'Center_2_y', 'Lat_left_2_y', 'Lat_right_2_y', 'Tail_base_2_y']}}
     >>> df = pd.read_csv('/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv', index_col=0)
     >>> interpolated_df = animal_interpolator(df=df, animal_bp_dict=animal_bp_dict, source='test')
@@ -1408,6 +1425,7 @@ def body_part_interpolator(df: pd.DataFrame,
     :return pd.DataFrame: The DataFrame with interpolated values for the specified animal body parts.
 
     :example:
+
     >>> animal_bp_dict = {'Animal_1': {'X_bps': ['Ear_left_1_x', 'Ear_right_1_x', 'Nose_1_x', 'Center_1_x', 'Lat_left_1_x', 'Lat_right_1_x', 'Tail_base_1_x'], 'Y_bps': ['Ear_left_1_y', 'Ear_right_1_y', 'Nose_1_y', 'Center_1_y', 'Lat_left_1_y', 'Lat_right_1_y', 'Tail_base_1_y']}, 'Animal_2': {'X_bps': ['Ear_left_2_x', 'Ear_right_2_x', 'Nose_2_x', 'Center_2_x', 'Lat_left_2_x', 'Lat_right_2_x', 'Tail_base_2_x'], 'Y_bps': ['Ear_left_2_y', 'Ear_right_2_y', 'Nose_2_y', 'Center_2_y', 'Lat_left_2_y', 'Lat_right_2_y', 'Tail_base_2_y']}}
     >>> df = pd.read_csv('/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv', index_col=0)
     >>> interpolated_df = body_part_interpolator(df=df, animal_bp_dict=animal_bp_dict, source='test')
@@ -1456,6 +1474,7 @@ def savgol_smoother(data: Union[pd.DataFrame, np.ndarray],
     :return Union[pd.DataFrame, np.ndarray]: The smoothed data, returned as a DataFrame if the input was a DataFrame, or a NumPy array if the input was an array.
 
     :example:
+
     >>> data = pd.read_csv('/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv', index_col=0)
     >>> savgol_smoother(data=data.values, fps=15, time_window=1000)
     """
@@ -1540,6 +1559,7 @@ def get_library_version(library_name: str,
     :return str: Library version name, if installed
 
     :example:
+
     >>> get_library_version(library_name='sklearn')
     >>> 0.22.2
     """
@@ -1593,6 +1613,7 @@ def egocentrically_align_pose(data: np.ndarray,
     :rtype: Tuple[np.ndarray, np.ndarray, np.ndarray]
 
     :example:
+
     >>> data = np.random.randint(0, 500, (100, 7, 2))
     >>> anchor_1_idx = 5 # E.g., the animal tail-base is the 5th body-part
     >>> anchor_2_idx = 7 # E.g., the animal nose is the 7th row in the data
@@ -1677,6 +1698,7 @@ def egocentrically_align_pose_numba(data: np.ndarray,
     :rtype: Tuple[np.ndarray, np.ndarray, np.ndarray]
 
     :example:
+
     >>> data = np.random.randint(0, 500, (100, 7, 2))
     >>> anchor_1_idx = 5 # E.g., the animal tail-base is the 5th body-part
     >>> anchor_2_idx = 7 # E.g., the animal nose is the 7th row in the data
@@ -1779,6 +1801,7 @@ def egocentric_frm_rotator(frames: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> DATA_PATH = r"/mnt/c/Users/sroni/OneDrive/Desktop/rotate_ex/data/501_MA142_Gi_Saline_0513.csv"
     >>> VIDEO_PATH = r"/mnt/c/Users/sroni/OneDrive/Desktop/rotate_ex/videos/501_MA142_Gi_Saline_0513.mp4"
     >>> SAVE_PATH = r"/mnt/c/Users/sroni/OneDrive/Desktop/rotate_ex/videos/501_MA142_Gi_Saline_0513_rotated.mp4"
@@ -1870,6 +1893,7 @@ def fft_lowpass_filter(data: np.ndarray, cut_off: float = 0.1) -> np.ndarray:
     :return np.ndarray: Filtered data with same shape and dtype as input
 
     :example:
+
     >>> from simba.utils.read_write import read_df
     >>> IN_PATH = r"C:/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/2022-06-20_NOB_DOT_4.csv"
     >>> OUT_PATH = r"C:/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/2022-06-20_NOB_DOT_4_filtered.csv"
@@ -1919,6 +1943,7 @@ def terminate_cpu_pool(pool: multiprocessing.pool.Pool,
     :param Optional[str] source: Optional identifier string for logging purposes (e.g., 'VideoProcessor'). Default: None.
 
     :example:
+
     >>> import multiprocessing
     >>> pool = multiprocessing.Pool(4)
     >>> terminate_cpu_pool(pool=pool, force=False, verbose=True, source='FeatureExtractor')
@@ -1957,6 +1982,7 @@ def get_cpu_pool(core_cnt: int = -1,
     :rtype: multiprocessing.Pool
 
     :example:
+
     >>> pool = get_cpu_pool(core_cnt=4, source='FeatureExtractor')
     >>> pool = get_cpu_pool(core_cnt=-1, context='spawn', verbose=True)
     >>> pool = get_cpu_pool(core_cnt=8, maxtasksperchild=100, source='VideoProcessor')
@@ -2020,6 +2046,7 @@ def scale_pose_keypoints(keypoints: np.ndarray,
     :return: Array of scaled (x, y) coordinates. Same shape as input (1D if input was 1D, else Nx2).
 
     :example:
+
     >>> kp = np.array([[100, 200], [300, 400]])
     >>> scale_pose_keypoints(kp, original_size=(640, 480), new_size=(320, 240))
     >>> scale_pose_keypoints(np.array([100, 200]), original_size=(640, 480), new_size=(320, 240))

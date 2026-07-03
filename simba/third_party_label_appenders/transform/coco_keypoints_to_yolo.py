@@ -68,14 +68,17 @@ class COCOKeypoints2Yolo:
     :return: None. YOLO formatted data is saved to ``save_dir`` with structure: images/train, images/val, labels/train, labels/val, and map.yaml.
 
     :example:
+
     >>> runner = COCOKeypoints2Yolo(coco_path=r"D:/cvat_annotations/frames/coco_keypoints_1/s1/annotations/s1.json", img_dir=r"D:/cvat_annotations/frames/simon", save_dir=r"D:/cvat_annotations/frames/yolo_keypoints", clahe=True)
     >>> runner.run()
 
     :example II:
+
     >>> runner = COCOKeypoints2Yolo(coco_path=r"D:/cvat_annotations/frames/coco_keypoints_1/merged.json", img_dir=r"D:/cvat_annotations/frames", save_dir=r"D:/cvat_annotations/frames/yolo", clahe=False)
     >>> runner.run()
 
     :example III:
+
     >>> runner = COCOKeypoints2Yolo(coco_path=r"E:/netholabs_videos/mosaics/subset/to_annotate/2d_mosaic_batch_1.json", img_dir=r"E:/netholabs_videos/mosaics/subset/to_annotate", save_dir=r"E:/netholabs_videos/mosaics/yolo_mdl", clahe=False, bbox_pad=0.1)
     >>> runner.run()
 

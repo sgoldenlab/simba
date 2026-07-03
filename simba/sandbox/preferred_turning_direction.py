@@ -27,6 +27,7 @@ def preferred_turning_direction(x: np.ndarray) -> int:
     :rtype: int
 
     :example:
+
     >>> x = np.random.randint(0, 361, (200,))
     >>> preferred_turning_direction(x=x)
     """

@@ -23,6 +23,7 @@ def mahalanobis_distance_cdist(data: np.ndarray) -> np.ndarray:
     :return np.ndarray: Pairwise Mahalanobis distance matrix where element (i, j) represents the Mahalanobis distance between  observations i and j.
 
     :example:
+
     >>> data = np.random.randint(0, 50, (1000, 200)).astype(np.float32)
     >>> x = mahalanobis_distance_cdist(data=data)
     """

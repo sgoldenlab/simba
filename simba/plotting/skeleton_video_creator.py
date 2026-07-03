@@ -137,6 +137,7 @@ class SkeletonVideoCreator:
     :raises NoFilesFoundError: If ``data_path`` is not a valid file or directory.
 
     :example:
+
     >>> creator = SkeletonVideoCreator(
     ...     config_path=r'E:/project/project_config.ini',
     ...     resolution=(500, 500),

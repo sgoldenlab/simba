@@ -78,6 +78,7 @@ class MitraFeatureExtractor(ConfigReader,
     :return: None. Featurized pose-estimation data is saved in the simba project `project_folder/csv/features_extracted` directory.
 
     :example:
+
     >>> feature_extractor = MitraFeatureExtractor(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini")
     >>> feature_extractor.run()
 

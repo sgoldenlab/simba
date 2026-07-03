@@ -16,6 +16,7 @@ class OutlierCorrectionSkipper(ConfigReader):
     :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
 
     :example:
+
     >>> _ = OutlierCorrectionSkipper(config_path='MyProjectConfig').run()
     """
 

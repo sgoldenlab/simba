@@ -27,6 +27,7 @@ def sliding_preferred_turning_direction(x: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(0, 361, (213,))
     >>> sliding_preferred_turning_direction(x=x, time_window=1, sample_rate=10)
     """

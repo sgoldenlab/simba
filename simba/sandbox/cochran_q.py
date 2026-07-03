@@ -21,6 +21,7 @@ def cochrans_q(data: np.ndarray) -> float:
     :return float: Cochran's Q statistic
 
     :example:
+
     >>> data = np.random.randint(0, 2, (100000, 4))
     >>> cochrans_q(data=data)
     """

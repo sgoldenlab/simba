@@ -19,6 +19,7 @@ class DistanceStatistics(object):
     Computes distances between probability distributions. Useful for (i) measure drift in datasets, and (ii) featurization of distribution shifts across.
 
     :examples:
+
     >>> x = np.array([1, 5, 10, 20, 50]).astype(np.float32)
     >>> y = np.array([1, 5, 10, 100, 110]).astype(np.float32)
     >>> distance_statistics = DistanceStatistics()
@@ -140,6 +141,7 @@ class DistanceStatistics(object):
         :returns float: PSI distance between ``sample_1`` and ``sample_2``
 
         :example:
+
         >>> sample_1, sample_2 = np.random.randint(0, 100, (100,)), np.random.randint(0, 10, (100,))
         >>> Statistics().population_stability_index(sample_1=sample_1, sample_2=sample_2, fill_value=1, bucket_method='auto')
         >>> 3.9657026867553817
@@ -170,6 +172,7 @@ class DistanceStatistics(object):
         to the same event :math:`i`, respectively.
 
         :example:
+
         >>> DistanceStatistics.total_variation_distance(x=np.array([1, 5, 10, 20, 50]), y=np.array([1, 5, 10, 100, 110]))
         >>> 0.3999999761581421
         """

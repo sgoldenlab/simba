@@ -31,6 +31,7 @@ def horizontal_video_concatenator(video_paths: List[Union[str, os.PathLike]],
     :param Optional[bool] verbose:Whether to print progress messages (default: True).
 
     :example:
+
     >>> video_paths = ['video1.mp4', 'video2.mp4']
     >>> x = horizontal_video_concatenator(video_paths=video_paths, height_px=50, save_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/08102021_DOT_Rat7_8(2)_.mp4', gpu=False)
     """
@@ -81,6 +82,7 @@ def vertical_video_concatenator(video_paths: List[Union[str, os.PathLike]],
     :raises InvalidInputError: If both or neither width_px and width_idx are provided.
 
     :example:
+
     >>> video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat7_8(2).mp4',
     >>>                '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12.mp4',
     >>>                '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12_1.mp4']
@@ -139,6 +141,7 @@ def mosaic_concatenator(video_paths: List[Union[str, os.PathLike]],
     :param Optional[bool] verbose: Whether to print progress messages (default: True).
 
     :example:
+
     >>> video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat7_8(2).mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12.mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/2022-06-21_NOB_IOT_23.mp4']
     >>> save_path = '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/blank_test.mp4'
     >>> mosaic_concatenator(video_paths=video_paths, save_path=save_path, width_idx=1, height_idx=1, gpu=False)
@@ -213,6 +216,7 @@ def mixed_mosaic_concatenator(video_paths: List[Union[str, os.PathLike]],
     :param Optional[bool] verbose: Whether to print progress messages (default: True).
 
     :example:
+
     >>> video_paths = ['video1.mp4', 'video2.mp4', 'video3.mp4']
     >>> save_path = '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/blank_test.mp4'
     >>> mixed_mosaic_concatenator(video_paths=video_paths, save_path=save_path, gpu=False, verbose=True)

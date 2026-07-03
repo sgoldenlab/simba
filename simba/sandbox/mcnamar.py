@@ -23,6 +23,7 @@ def mcnemar(x: np.ndarray, y: np.ndarray, ground_truth: np.ndarray, continuity_c
     :param Optional[bool] continuity_corrected : Whether to apply continuity correction. Default is True.
 
     :example:
+
     >>> x = np.random.randint(0, 2, (100000, ))
     >>> y = np.random.randint(0, 2, (100000, ))
     >>> ground_truth = np.random.randint(0, 2, (100000, ))

@@ -155,6 +155,7 @@ class DirectingROIVisualizer(ConfigReader, PlottingMixin):
        :align: center
 
     :example:
+
     >>> viz = DirectingROIVisualizer(config_path='/path/to/project_config.ini',
     ...                              video_path='/path/to/video.mp4',
     ...                              direction_style='funnel',

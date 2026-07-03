@@ -34,6 +34,7 @@ class TwoFishFeatureExtractor(ConfigReader, FeatureExtractionMixin):
     """
 
     :example:
+
     >>> feature_extractor = TwoFishFeatureExtractor(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_fish/project_folder/project_config.ini')
     >>> feature_extractor.run()
     """

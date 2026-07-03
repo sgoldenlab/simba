@@ -92,6 +92,7 @@ def change_img_format(directory: Union[str, os.PathLike],
     :param Optional[bool] verbose: If True, prints progress. Default False.
 
     :example:
+
     >>> _ = change_img_format(directory='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/test_img', file_type_in='png', file_type_out='bmp', verbose=True)
 
     """
@@ -140,6 +141,7 @@ def convert_to_jpeg(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]]
     :return: None. New images are saved in ``save_dir``.
 
     :example:
+
     >>> convert_to_jpeg(path='/Users/simon/Desktop/imgs', verbose=False, quality=15)
     >>> convert_to_jpeg(path='/Users/simon/Desktop/my_image.png', verbose=False, quality=15)
     >>> convert_to_jpeg(path=['/Users/simon/Desktop/my_image_1.png', '/Users/simon/Desktop/my_image_2.png'], verbose=True, quality=40)
@@ -194,6 +196,7 @@ def convert_to_bmp(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]],
     :return: None. New images are saved in ``save_dir``.
 
     :example:
+
     >>> convert_to_bmp(path='/Users/simon/Desktop/test_jpg_/landing_40.jpeg', save_dir='/Users/simon/Desktop/test_jpg_/test__')
     """
 
@@ -248,6 +251,7 @@ def convert_to_png(path: Union[str, os.PathLike],
     :return: None. New images are saved in ``save_dir``.
 
     :example:
+
     >>> convert_to_png(path=['/Users/simon/Desktop/test_jpg_/test__/landing_40.bmp', '/Users/simon/Desktop/test_jpg_/landing_30.jpeg'], save_dir='/Users/simon/Desktop/test_jpg_/test__/HELLO_3')
     """
 
@@ -303,6 +307,7 @@ def convert_to_tiff(directory: Union[str, os.PathLike],
     :return: None. New images are saved in ``save_dir``.
 
     :example:
+
     >>> convert_to_tiff('/Users/simon/Desktop/imgs', stack=True, compression='tiff_lzw')
 
     """
@@ -371,6 +376,7 @@ def convert_to_webp(path: Union[str, os.PathLike],
     :return: None. New images are saved in ``save_dir``.
 
     :example:
+
     >>> convert_to_webp('/Users/simon/Desktop/imgs', quality=80)
     >>> convert_to_webp(path=['/Users/simon/Desktop/test_jpg_/test__/landing_40.bmp', '/Users/simon/Desktop/test_jpg_/landing_30.jpeg'], save_dir='/Users/simon/Desktop/test_jpg_/test__/HELLO_4')
     """
@@ -435,6 +441,7 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> _ = clahe_enhance_video(file_path: 'project_folder/videos/Video_1.mp4')
     """
 
@@ -549,6 +556,7 @@ def clahe_enhance_video_mp(file_path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> _ = clahe_enhance_video_mp(file_path= 'project_folder/videos/Video_1.mp4')
     """
 
@@ -625,6 +633,7 @@ def extract_frame_range(file_path: Union[str, os.PathLike],
     :return: None. Frames are saved to disk in the specified directory.
 
     :example:
+
     >>> _ = extract_frame_range(file_path='project_folder/videos/Video_1.mp4', 
     ...                        start_frame=100, 
     ...                        end_frame=500, 
@@ -703,6 +712,7 @@ def change_single_video_fps(file_path: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> _ = change_single_video_fps(file_path='project_folder/videos/Video_1.mp4', fps=15)
     """
 
@@ -769,6 +779,7 @@ def change_fps_of_multiple_videos(path: Union[str, os.PathLike, List[Union[str, 
        GPU accelerates only decode and encode; the ``fps`` filter runs on CPU, so GPU may give little or no speedup for FPS conversion compared to CPU.
 
     :example:
+
     >>> _ = change_fps_of_multiple_videos(path='project_folder/videos/Video_1.mp4', fps=15)
     >>> change_fps_of_multiple_videos(path='/Users/simon/Desktop/imgs', save_dir='/Users/simon/Desktop/imgs_4', fps=15)
     """
@@ -838,6 +849,7 @@ def convert_video_powerpoint_compatible_format(file_path: Union[str, os.PathLike
        Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
 
     :example:
+
     >>> _ = convert_video_powerpoint_compatible_format(file_path='project_folder/videos/Video_1.mp4')
     """
 
@@ -906,6 +918,7 @@ def video_to_greyscale(file_path: Union[str, os.PathLike],
     :raise FileExistError: If video name with ``_grayscale`` suffix already exist and save_path is None.
 
     :example:
+
     >>> _ = video_to_greyscale(file_path='project_folder/videos/Video_1.avi')
     """
     check_ffmpeg_available(raise_error=True)
@@ -968,6 +981,7 @@ def batch_video_to_greyscale(path: Union[str, os.PathLike, List[Union[str, os.Pa
        Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
 
     :example:
+
     >>> _ = batch_video_to_greyscale(path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test_2')
     >>> batch_video_to_greyscale(path='/Users/simon/Desktop/imgs_4', save_dir='/Users/simon/Desktop/imgs_4/test')
     """
@@ -1055,6 +1069,7 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
     :return: None. The result is stored in the same directory as the input file with the ``_frame_no.mp4`` suffix if ``save_path`` is None.
 
     :example:
+
     >>> _ = superimpose_frame_count(file_path='/Users/simon/Downloads/1_LH_0_3.mp4', fontsize=90)
     >>> superimpose_frame_count(file_path='/Users/simon/Desktop/imgs_4/test/Screen Recording 2024-02-26 at 4.43.26 PM_frame_no.mp4', save_path='/Users/simon/Desktop/imgs_4/test/blahhhh.mp4', fontsize=90)
     """
@@ -1150,6 +1165,7 @@ def remove_beginning_of_video(file_path: Union[str, os.PathLike],
        Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
 
     :example:
+
     >>> _ = remove_beginning_of_video(file_path='project_folder/videos/Video_1.avi', time=10)
     >>> remove_beginning_of_video(file_path=f'/Users/simon/Desktop/imgs_4/test/blahhhh.mp4', save_path='/Users/simon/Desktop/imgs_4/test/CUT.mp4', time=3)
     """
@@ -1204,6 +1220,7 @@ def remove_end_of_video(file_path: Union[str, os.PathLike],
        Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
 
     :example:
+
     >>> _ = remove_end_of_video(file_path='project_folder/videos/Video_1.avi', time=10)
     >>> remove_end_of_video(file_path=f'/Users/simon/Desktop/imgs_4/test/blahhhh.mp4', save_path='/Users/simon/Desktop/imgs_4/test/CUT.mp4', time=3)
     """
@@ -1270,6 +1287,7 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
     :return: None. The clip is stored in the same directory as the input video with the ``_clipped.mp4`` suffix if save_path and out_dir are None.
 
     :example:
+
     >>> _ = clip_video_in_range(file_path='project_folder/videos/Video_1.avi', start_time='00:00:05', end_time='00:00:10')
     """
 
@@ -1335,6 +1353,7 @@ def downsample_video(file_path: Union[str, os.PathLike],
     :return: None. The result is stored in the same directory as the input file with the ``_downsampled.mp4`` suffix if save_path is None.
 
     :example:
+
     >>> _ = downsample_video(file_path='project_folder/videos/Video_1.avi', video_height=600, video_width=400)
     """
     check_ffmpeg_available(raise_error=True)
@@ -1403,6 +1422,7 @@ def gif_creator(file_path: Union[str, os.PathLike],
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
 
     :example:
+
     >>> _ = gif_creator(file_path='project_folder/videos/Video_1.avi', start_time=5, duration=10, width=600)
     >>> gif_creator(file_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT.mp4', start_time=5, duration=15, width=600, gpu=False, save_path='/Users/simon/Desktop/imgs_4/Test.gif')
     """
@@ -1458,6 +1478,7 @@ def batch_convert_video_format(directory: Union[str, os.PathLike],
        Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
 
     :example:
+
     >>> _ = batch_convert_video_format(directory='project_folder/videos', input_format='avi', output_format='mp4')
     """
 
@@ -1532,6 +1553,7 @@ def batch_create_frames(directory: Union[str, os.PathLike]) -> None:
     :return: None. Results are stored within sub-directories in the input directory named according to the video files.
 
     :example:
+
     >>> _ = batch_create_frames(directory='project_folder/videos')
     """
 
@@ -1584,6 +1606,7 @@ def extract_frames_single_video(file_path: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> _ = extract_frames_single_video(file_path='project_folder/videos/Video_1.mp4')
     >>> extract_frames_single_video(file_path='/Users/simon/Desktop/imgs_4/test.mp4', save_dir='/Users/simon/Desktop/imgs_4/frames')
     """
@@ -1628,6 +1651,7 @@ def multi_split_video(file_path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> _ = multi_split_video(file_path='project_folder/videos/Video_1.mp4', start_times=['00:00:05', '00:00:20'], end_times=['00:00:10', '00:00:25'])
     """
 
@@ -1723,6 +1747,7 @@ def crop_single_video(file_path: Union[str, os.PathLike],
     :return: None. Results is saved in the same directory as input video with the ``_cropped.mp4`` suffix.
 
     :example:
+
     >>> _ = crop_single_video(file_path='project_folder/videos/Video_1.mp4')
     """
 
@@ -1773,6 +1798,7 @@ def crop_multiple_videos(directory_path: Union[str, os.PathLike],
     :return: None. Results are stored in passed ``output_path``.
 
     :example:
+
     >>> _ = crop_multiple_videos(directory_path='project_folder/videos', output_path='project_folder/videos/my_new_folder')
     >>> _ = crop_multiple_videos(directory_path=r'C:/troubleshooting/mitra/test', output_path=r'C:/troubleshooting/mitra/test/cropped', gpu=True)
     """
@@ -1926,6 +1952,7 @@ def video_concatenator(video_one_path: Union[str, os.PathLike],
        Codec is automatically selected: libx264 for CPU encoding (ignored if gpu=True).
 
     :example:
+
     >>> video_concatenator(video_one_path='project_folder/videos/Video_1.mp4', video_two_path='project_folder/videos/Video_2.mp4', resolution=800, horizontal=True)
     """
 
@@ -2012,6 +2039,7 @@ class VideoRotator(ConfigReader):
     :return: None. Rotated video is saved with the ``_rotated_DATETIME.mp4`` suffix.
 
     :example:
+
     >>> VideoRotator(input_path='project_folder/videos/Video_1.mp4', output_dir='project_folder/videos')
     """
 
@@ -2201,6 +2229,7 @@ def extract_frames_from_all_videos_in_directory(config_path: Union[str, os.PathL
     :return: None. Frames are saved in ``project_folder/frames/input`` of the SimBA project.
 
     :example:
+
     >>> extract_frames_from_all_videos_in_directory(config_path='project_folder/project_config.ini', directory='/tests/test_data/video_tests')
     >>> extract_frames_from_all_videos_in_directory(config_path=config_path, directory=video_dir, confirm_popup=True)
     """
@@ -2240,6 +2269,7 @@ def copy_img_folder(
     :param str source: path to image folder outside SimBA project.
 
     :example:
+
     >>> copy_img_folder(config_path='MySimBAprojectConfig', source='/DirectoryWithVideos/')
 
     """
@@ -2292,6 +2322,7 @@ def append_audio(
     :param Literal['video', 'audio'] audio_src_type: Type of audio source of "video_two_path" (e.g., video or audio file).
 
     :example:
+
     >>> append_audio(video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/merged_video_20230425201637.mp4',
     >>> audio_path="/Users/simon/Documents/Zoom/ddd/video1180732233.mp4")
     """
@@ -2370,6 +2401,7 @@ def crop_single_video_circle(file_path: Union[str, os.PathLike]) -> None:
     :param  Union[str, os.PathLike] file_path: The path to the input video file.
 
     :example:
+
     >>> crop_single_video_circle(file_path='/Users/simon/Desktop/AGGRESSIVITY_4_11_21_Trial_2_camera1_rotated_20240211143355.mp4')
     """
 
@@ -2422,6 +2454,7 @@ def crop_multiple_videos_circles(in_dir: Union[str, os.PathLike], out_dir: Union
 
 
     :example:
+
     >>> crop_multiple_videos_circles(in_dir='/Users/simon/Desktop/edited/tests', out_dir='/Users/simon/Desktop')
     """
 
@@ -2484,6 +2517,7 @@ def crop_single_video_polygon(file_path: Union[str, os.PathLike]) -> None:
     :param  Union[str, os.PathLike] file_path: The path to the input video file.
 
     :example:
+
     >>> crop_single_video_polygon(file_path='/Users/simon/Desktop/AGGRESSIVITY_4_11_21_Trial_2_camera1_rotated_20240211143355.mp4')
     """
 
@@ -2529,6 +2563,7 @@ def crop_multiple_videos_polygons(
        using the first video and saves the videos in the ``out_dir`` with the same filenames as the original videos..
 
     :example:
+
     >>> crop_multiple_videos_polygons(in_dir='/Users/simon/Desktop/edited/tests', out_dir='/Users/simon/Desktop')
     """
 
@@ -2585,6 +2620,7 @@ def resize_videos_by_height(video_paths: List[Union[str, os.PathLike]],
     :return Union[None, List[Union[str, os.PathLike]]]: If save_dir is not None, returns the paths of the re-sized videos. Else returns empty list.
 
     :example:
+
     >>> video_paths= ['/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat7_8(2).mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12.mp4']
     >>> _ = resize_videos_by_height(video_paths=video_paths, height=300, overwrite=False, save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new')
     """
@@ -2668,6 +2704,7 @@ def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
     :return Union[None, List[Union[str, os.PathLike]]]: If save_dir is not None, returns the paths of the re-sized videos. Else returns empty list.
 
     :example:
+
     >>> video_paths= ['/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat7_8(2).mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12.mp4']
     >>> _ = resize_videos_by_width(video_paths=video_paths, width=300, overwrite=False, save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new')
     >>> video_paths= [r"D:/videos/4A_Mouse_5-choice_MustTouchTrainingNEWFINAL_a8_grayscale.mp4"]
@@ -2757,6 +2794,7 @@ def create_blank_video(path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> _ = create_blank_video(path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/blank_test.mp4', length=5, width=300, height=400, gpu=False, verbose=True, color='orange')
     """
 
@@ -2815,6 +2853,7 @@ def horizontal_video_concatenator(video_paths: List[Union[str, os.PathLike]],
     :param Optional[bool] verbose:Whether to print progress messages (default: True).
 
     :example:
+
     >>> video_paths = ['video1.mp4', 'video2.mp4']
     >>> x = horizontal_video_concatenator(video_paths=video_paths, height_px=50, save_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/08102021_DOT_Rat7_8(2)_.mp4', gpu=False)
     """
@@ -2876,6 +2915,7 @@ def vertical_video_concatenator(video_paths: List[Union[str, os.PathLike]],
     :raises InvalidInputError: If both or neither width_px and width_idx are provided.
 
     :example:
+
     >>> video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat7_8(2).mp4',
     >>>                '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12.mp4',
     >>>                '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12_1.mp4']
@@ -2974,6 +3014,7 @@ def mosaic_concatenator(
     :param Optional[bool] verbose: Whether to print progress messages (default: True).
 
     :example:
+
     >>> video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat7_8(2).mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12.mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/2022-06-21_NOB_IOT_23.mp4']
     >>> save_path = '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/blank_test.mp4'
     >>> mosaic_concatenator(video_paths=video_paths, save_path=save_path, width_idx=1, height_idx=1, gpu=False)
@@ -3068,6 +3109,7 @@ def mixed_mosaic_concatenator(
     :param Optional[bool] verbose: Whether to print progress messages (default: True).
 
     :example:
+
     >>> video_paths = ['video1.mp4', 'video2.mp4', 'video3.mp4']
     >>> save_path = '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/blank_test.mp4'
     >>> mixed_mosaic_concatenator(video_paths=video_paths, save_path=save_path, gpu=False, verbose=True)
@@ -3184,6 +3226,7 @@ def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]],
     :return: None.
 
     :example:
+
     >>> file_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/path_plots/Trial    10.mp4',
     >>>               '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/path_plots/Trial    10_1.mp4']
     >>> frm_ids = [[0, 20], [20, 40]]
@@ -3258,6 +3301,7 @@ def convert_to_mp4(path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> convert_to_mp4(path='/Users/simon/Desktop/video_test', quality="60", codec='vp9')
     """
 
@@ -3331,6 +3375,7 @@ def convert_to_avi(path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> convert_to_avi(path='/Users/simon/Desktop/video_test/Screen Recording 2024-05-06 at 5.34.34 PM_converted.mp4', quality=100, codec='xvid')
     """
 
@@ -3398,6 +3443,7 @@ def convert_to_webm(path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> convert_to_webm(path='/Users/simon/Desktop/video_test/Screen Recording 2024-05-06 at 5.34.34 PM_converted.mp4', quality=100, codec='vp8')
     """
 
@@ -3524,6 +3570,7 @@ def superimpose_video_progressbar(video_path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> superimpose_video_progressbar(video_path='/home/plateabiosciences/Downloads/031723/3A_Mouse_5-choice_MouseTouchBasic_s9_a6.mp4', gpu=False)
     """
 
@@ -3602,6 +3649,7 @@ def crossfade_two_videos(video_path_1: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> crossfade_two_videos(video_path_1='/Users/simon/Desktop/envs/simba/troubleshooting/reptile/1.mp4', video_path_2='/Users/simon/Desktop/envs/simba/troubleshooting/reptile/1.mp4', crossfade_duration=5, crossfade_method='zoomin', save_path='/Users/simon/Desktop/cross_test.mp4')
     """
 
@@ -3668,6 +3716,7 @@ def watermark_video(video_path: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> watermark_video(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/multi_animal_dlc_two_c57/project_folder/videos/watermark/Together_1_powerpointready.mp4', watermark_path='/Users/simon/Desktop/splash.png', position='top_left', opacity=1.0, scale=0.2)
     """
     check_ffmpeg_available(raise_error=True)
@@ -3751,6 +3800,7 @@ def superimpose_overlay_video(video_path: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> superimpose_overlay_video(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/multi_animal_dlc_two_c57/project_folder/videos/watermark/Together_1_powerpointready.mp4', overlay_video_path='/Users/simon/Desktop/splash.png', position='top_left', opacity=1.0, scale=0.2)
     """
 
@@ -3829,6 +3879,7 @@ def roi_blurbox(video_path: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> roi_blurbox(video_path='/Users/simon/Downloads/1_LH_clipped_downsampled.mp4', blur_level=0.2, invert=True)
     """
 
@@ -3890,6 +3941,7 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> superimpose_elapsed_time(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test_4/1.mp4', position='middle_top', font_color='black', font_border_color='pink', font_border_width=5, font_size=30)
     """
 
@@ -3984,6 +4036,7 @@ def reverse_videos(path: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> reverse_videos(path='/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/videos/reverse/TheVideoName_video_name_2_frame_no.mp4')
     """
 
@@ -4051,6 +4104,7 @@ def video_to_bw(video_path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> video_to_bw(video_path='/Users/simon/Downloads/1_LH_clipped_cropped_eq_20240515135926.mp4', threshold=0.02)
     """
 
@@ -4277,6 +4331,7 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> video_bg_subtraction(video_path='/Users/simon/Downloads/1_LH_cropped.mp4', bg_start_time='00:00:00', bg_end_time='00:00:10', bg_color=(0, 106, 167), fg_color=(254, 204, 2))
     """
 
@@ -4370,6 +4425,7 @@ def reencode_mp4_video(file_path: Union[str, os.PathLike],
     :return: None. The original file is replaced with the re-encoded version.
 
     :example:
+
     >>> reencode_mp4_video(file_path=r'project_folder/videos/Video_1.mp4', codec='libx264', quality=23)
     >>> reencode_mp4_video(file_path=r'C:/videos/my_video.mp4', codec='libx265', quality=20)
     """
@@ -4532,6 +4588,7 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> video_bg_subtraction_mp(video_path='/Users/simon/Downloads/1_LH.mp4', bg_start_time='00:00:00', bg_end_time='00:00:10', bg_color=(0, 0, 0), fg_color=(255, 255, 255))
     """
 
@@ -4638,6 +4695,7 @@ def superimpose_video_names(video_path: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> superimpose_video_names(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test_4/1.mp4', position='middle_top', font_color='black', font_border_color='pink', font_border_width=5, font_size=30)
     """
 
@@ -4814,6 +4872,7 @@ def rotate_video(video_path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> rotate_video(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/reptile/rot_test.mp4', degrees=180)
     >>> rotate_video(video_path=r"C:/troubleshooting/mitra/project_folder/videos/clipped/501_MA142_Gi_CNO_0514_clipped.mp4", degrees=65)
     >>> rotate_video(video_path=r"C:/troubleshooting/mitra/project_folder/videos/clipped/501_MA142_Gi_CNO_0514_clipped.mp4", degrees=10, fill_color='deeppink', gpu=True)
@@ -4943,6 +5002,7 @@ def upsample_fps(video_path: Union[str, os.PathLike],
     :return: None. The function saves the upsampled video(s) to the specified directory.
 
     :example:
+
     >>> upsample_fps(video_path='/Users/simon/Desktop/Box2_IF19_7_20211109T173625_4_851_873_1_cropped.mp4', fps=100, quality=100)
     """
 
@@ -5041,6 +5101,7 @@ def get_img_slic(img: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> img = read_frm_of_video(video_path=r"C:/troubleshooting/mitra/project_folder/videos/FRR_gq_Saline_0626.mp4", frame_index=0)
     >>> sliced_img = get_img_slic(img=img)
     """
@@ -5107,6 +5168,7 @@ def get_video_slic(video_path: Union[str, os.PathLike],
     :return: None. The segmented video is saved to `save_path`.
 
     :example:
+
     >>> #video_path = r"C:\troubleshooting\mitra\project_folder\videos\FRR_gq_Saline_0626.mp4"
     """
     timer = SimbaTimer(start=True)
@@ -5158,6 +5220,7 @@ def is_video_seekable(data_path: Union[str, os.PathLike],
     :param bool raise_error: If True, raises error if not all passed videos are seeakable.
 
     :example:
+
     >>> _ = is_video_seekable(data_path='/Users/simon/Desktop/unseekable/20200730_AB_7dpf_850nm_0003_fps_5.mp4', batch_size=400)
     """
 
@@ -5289,6 +5352,7 @@ def split_mosaic(video_path: Union[str, os.PathLike],
     :param bool verbose: If True, prints progress information and status messages during processing.
 
     :example:
+
     >>> split_mosaic(video_path=r"3.mp4", tile_size=(1280, 720), save_dir=r"3_cropped")
 
     """
@@ -5353,6 +5417,7 @@ def change_playback_speed(video_path: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> change_playback_speed(video_path=r"project_folder/videos/Video_1.mp4", speed=1.5)
     >>> change_playback_speed(video_path=r"project_folder/videos/Video_1.mp4", speed=0.5, quality=80)
     >>> change_playback_speed(video_path=r"C:/troubleshooting/RAT_NOR/project_folder/videos/03152021_NOB_IOT_8.mp4", speed=2.0, gpu=False)
@@ -5417,6 +5482,7 @@ def change_playback_speed_dir(data_dir: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> change_playback_speed_dir(data_dir=r'E:/open_video/barnes_maze/test', speed=5)
     >>> change_playback_speed_dir(data_dir=r'project_folder/videos', speed=2.0, quality=80, gpu=True)
     """

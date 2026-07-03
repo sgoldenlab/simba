@@ -75,6 +75,7 @@ class FreezingDetector(ConfigReader):
         - Aggregate results: `aggregate_freezing_results.csv` containing summary statistics for all videos
 
     :example:
+
     >>> x = FreezingDetector(data_dir=r'D:\\troubleshooting\\mitra\\project_folder\\csv\\outlier_corrected_movement_location', config_path=r"D:\\troubleshooting\\mitra\\project_folder\\project_config.ini", min_freezing_ms=1500, movement_threshold=5, min_immobility_ms=2000)
     >>> x.run()
 

@@ -52,6 +52,7 @@ class DistanceTimeBinCalculator(ConfigReader, FeatureExtractionMixin):
     :raises NoDataError: If no valid input data files are found.
 
     :example:
+
     >>> runner = DistanceTimeBinCalculator(
     ...     config_path=r"C:\\my_project\\project_config.ini",
     ...     body_parts=(("Nose_1", "Nose_2"),),

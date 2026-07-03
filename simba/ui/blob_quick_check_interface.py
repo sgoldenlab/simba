@@ -42,6 +42,7 @@ class BlobQuickChecker():
     :param Optional[Union[Polygon, MultiPolygon]] inclusion_zones: Optional geometric regions of interest to highlight in the processed frames.
 
     :example:
+
     >>> _ = BlobQuickChecker(video_path=r"C:/troubleshooting/mitra/test/501_MA142_Gi_Saline_0515.mp4", bg_video_path=r"C:/troubleshooting/mitra/test/background_dir/501_MA142_Gi_Saline_0515.mp4")
     """
 

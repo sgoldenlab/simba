@@ -28,6 +28,7 @@ class InferenceValidation(ConfigReader, TrainModelMixin):
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data>`_
 
     :example:
+
     >>> InferenceValidation(config_path=r"MyProjectConfigPath", input_file_path=r"FeatureFilePath", clf_path=r"ClassifierPath")
 
     """

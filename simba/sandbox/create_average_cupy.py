@@ -51,6 +51,7 @@ def create_average_frm(video_path: Union[str, os.PathLike],
     :return: Returns `None` if the result is saved to `save_path`. Otherwise, returns the average frame as a NumPy array.
 
     :example:
+
     >>> create_average_frm(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled.mp4", verbose=True, start_frm=0, end_frm=9000)
     """
 

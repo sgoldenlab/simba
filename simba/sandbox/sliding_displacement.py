@@ -22,6 +22,7 @@ def sliding_displacement(x: np.ndarray,
     :return np.ndarray: 1D array containing the calculated displacements.
 
     :example:
+
     >>> x = np.random.randint(0, 50, (100, 2)).astype(np.int32)
     >>> sliding_displacement(x=x, time_windows=np.array([1.0]), fps=1.0, px_per_mm=1.0)
     """

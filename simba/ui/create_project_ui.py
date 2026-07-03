@@ -39,6 +39,7 @@ class ProjectCreatorPopUp():
        :align: center
 
     :example:
+
     >>> ProjectCreatorPopUp()
     """
 

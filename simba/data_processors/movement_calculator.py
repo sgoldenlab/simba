@@ -61,6 +61,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
        :align: center
 
     :examples:
+
     >>> body_parts=['Animal_1 CENTER OF GRAVITY']
     >>> movement_processor = MovementCalculator(config_path='project_folder/project_config.ini', body_parts=body_parts)
     >>> movement_processor.run()

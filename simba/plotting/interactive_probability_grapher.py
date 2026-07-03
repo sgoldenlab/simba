@@ -46,6 +46,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
     :param bool show_statistics_legend: If True, displays statistics box (max, mean, frame count). Default: True.
 
     :example:
+
         >>> interactive_plotter = InteractiveProbabilityGrapher(config_path='project_config.ini', file_path='features.csv', model_path='classifier.sav')
         >>> interactive_plotter.run()
     """

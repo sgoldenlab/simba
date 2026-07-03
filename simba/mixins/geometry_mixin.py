@@ -110,6 +110,7 @@ class GeometryMixin(object):
         :return: List of polygons, with one entry for every 2D input array.
 
         :example:
+
         >>> data = [[[364, 308],[383, 323],[403, 335], [423, 351]]]
         >>> GeometryMixin().bodyparts_to_polygon(data=data)
         """
@@ -174,6 +175,7 @@ class GeometryMixin(object):
         :rtype: List[Union[Point, Polygon]]
 
         :example:
+
         >>> data = np.random.randint(0, 100, (1, 2))
         >>> GeometryMixin().bodyparts_to_points(data=data)
         """
@@ -207,6 +209,7 @@ class GeometryMixin(object):
         :rtype: LineString
 
         :example:
+
         >>> data = np.load('/Users/simon/Desktop/envs/simba/simba/simba/sandbox/data.npy')
         >>> linestring = GeometryMixin.to_linestring(data=data)
         """
@@ -251,6 +254,7 @@ class GeometryMixin(object):
         :rtype: Union[Polygon, List[Polygon]]
 
         :example:
+
         >>> # Single coordinate
         >>> data = np.array([364, 308])
         >>> polygon = GeometryMixin.bodyparts_to_circle(data=data, parallel_offset=10, pixels_per_mm=4)
@@ -295,6 +299,7 @@ class GeometryMixin(object):
            :align: center
 
         :example:
+
         >>> skeleton = np.array([[[5, 5], [1, 10]], [[5, 5], [9, 10]], [[9, 10], [1, 10]], [[9, 10], [9, 25]], [[1, 10], [1, 25]], [[9, 25], [5, 50]], [[1, 25], [5, 50]]])
         >>> shape_multistring = GeometryMixin().bodyparts_to_multistring_skeleton(data=skeleton)
         """
@@ -337,6 +342,7 @@ class GeometryMixin(object):
         :rtype: Polygon
         
         :example:
+
         >>> polygon = Polygon([(0, 0), (10, 0), (10, 10), (0, 10)])
         >>> offset = GeometryMixin().parallel_offset_polygon(polygon=polygon, size_mm=2.0, pixels_per_mm=1.0)
         """
@@ -428,6 +434,7 @@ class GeometryMixin(object):
         :rtype: Polygon
 
         :example:
+
         >>> polygon = GeometryMixin().bodyparts_to_polygon(np.array([[100, 110],[100, 100],[110, 100],[110, 110]]))
         >>> buffered_polygon = GeometryMixin().buffer_shape(shape=polygon[0], size_mm=-1, pixels_per_mm=1)
         """
@@ -481,6 +488,7 @@ class GeometryMixin(object):
         :rtype: int
 
         :example:
+
         >>> polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[364, 308],[383, 323],[403, 335],[423, 351]]))
         >>> polygon_2 = GeometryMixin().bodyparts_to_polygon(np.array([[356, 307],[376, 319],[396, 331],[419, 347]]))
         >>> polygon_1 = [polygon_1 for x in range(100)]
@@ -588,6 +596,7 @@ class GeometryMixin(object):
         :rtype: bool
 
         :example:
+
         >>> line_1 = GeometryMixin().bodyparts_to_line(np.array([[10, 10],[20, 10],[30, 10],[40, 10]]))
         >>> line_2 = GeometryMixin().bodyparts_to_line(np.array([[25, 5],[25, 20],[25, 30],[25, 40]]))
         >>> GeometryMixin().crosses(shapes=[line_1, line_2])
@@ -659,6 +668,7 @@ class GeometryMixin(object):
         :rtype: float
 
         :example:
+
         >>> polygon = GeometryMixin().bodyparts_to_polygon(np.array([[10, 10], [10, 100], [100, 10], [100, 100]]))
         >>> GeometryMixin().area(shape=polygon[0], pixels_per_mm=4.9)
         >>> 1701.556313816644
@@ -762,6 +772,7 @@ class GeometryMixin(object):
 
 
         :example:
+
         >>> data = np.array([[364, 308],[383, 323], [403, 335],[423, 351]])
         >>> line = GeometryMixin().bodyparts_to_line(data=data)
         >>> GeometryMixin().bodyparts_to_line(data=data, buffer=10, px_per_mm=4)
@@ -815,6 +826,7 @@ class GeometryMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> multipolygon = MultiPolygon([Polygon([[200, 110],[200, 100],[200, 100],[200, 110]]), Polygon([[70, 70],[70, 60],[10, 50],[1, 70]])])
         >>> GeometryMixin().get_center(shape=multipolygon)
         >>> [33.96969697, 62.32323232]
@@ -864,6 +876,7 @@ class GeometryMixin(object):
         :rtype: bool
 
         :example:
+
         >>> rectangle_1 = Polygon(np.array([[0, 0], [10, 10], [0, 10], [10, 0]]))
         >>> rectangle_2 = Polygon(np.array([[20, 20], [30, 30], [20, 30], [30, 20]]))
         >>> GeometryMixin().is_touching(shapes=[rectangle_1, rectangle_2])
@@ -901,6 +914,7 @@ class GeometryMixin(object):
            :align: center
 
         :example:
+
         >>> polygon1 = Polygon([(0, 0), (10, 0), (10, 10), (0, 10), (0, 0)])
         >>> polygon2 = Polygon([(3, 3), (7, 3), (7, 7), (3, 7), (3, 3)])
         >>> GeometryMixin.is_containing(shapes=[polygon1, polygon2])
@@ -941,6 +955,7 @@ class GeometryMixin(object):
         :rtype: Polygon
 
         :example:
+
         >>> polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[10, 10], [10, 100], [100, 10], [100, 100]]))
         >>> polygon_2 = GeometryMixin().bodyparts_to_polygon(np.array([[25, 25],[25, 75],[90, 25],[90, 75]]))
         >>> polygon_3 = GeometryMixin().bodyparts_to_polygon(np.array([[1, 25],[1, 75],[110, 25],[110, 75]]))
@@ -991,6 +1006,7 @@ class GeometryMixin(object):
         :rtype: Union[MultiPolygon, Polygon]
 
         :example:
+
         >>> polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[10, 10], [10, 100], [100, 10], [100, 100]]))
         >>> polygon_2 = GeometryMixin().bodyparts_to_polygon(np.array([[1, 25],[1, 75],[110, 25],[110, 75]]))
         >>> union = GeometryMixin().union(shape = polygon_1, overlap_shapes=[polygon_2, polygon_2])
@@ -1035,6 +1051,7 @@ class GeometryMixin(object):
         :rtype: List[Union[Polygon, MultiPolygon]]
 
         :example:
+
         >>> polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[10, 10], [10, 100], [100, 10], [100, 100]]))
         >>> polygon_2 = GeometryMixin().bodyparts_to_polygon(np.array([[1, 25], [1, 75], [110, 25], [110, 75]]))
         >>> symmetric_difference = symmetric_difference(shapes=[polygon_1, polygon_2])
@@ -1082,6 +1099,7 @@ class GeometryMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> multipolygon_1 = MultiPolygon([Polygon([[200, 110],[200, 100],[200, 100],[200, 110]]), Polygon([[70, 70],[70, 60],[10, 50],[1, 70]])])
         >>> polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[100, 110],[100, 100],[110, 100],[110, 110]]))
         >>> line_1 = GeometryMixin().bodyparts_to_line(np.array([[10, 70],[20, 60],[30, 50],[40, 70]]))
@@ -1290,6 +1308,7 @@ class GeometryMixin(object):
         :rtype: Polygon | np.ndarray
 
         :example:
+
         >>> polygon = GeometryMixin().bodyparts_to_polygon(np.array([[364, 308],[383, 323],[403, 335],[423, 351]]))
         >>> rectangle = GeometryMixin().minimum_rotated_rectangle(shape=polygon[0])
         """
@@ -1336,6 +1355,7 @@ class GeometryMixin(object):
         :rtype: float
 
         :example:
+
         >>> line_1 = GeometryMixin().bodyparts_to_line(np.array([[10, 70],[20, 60],[30, 50],[40, 70]]))
         >>> GeometryMixin().length(shape=line_1, pixels_per_mm=1.0)
         >>> 50.6449510224598
@@ -1386,6 +1406,7 @@ class GeometryMixin(object):
         :rtype: List[Polygon]
 
         :example:
+
         >>> data = np.array([[[364, 308], [383, 323], [403, 335], [423, 351]],[[356, 307], [376, 319], [396, 331], [419, 347]]])
         >>> GeometryMixin().multiframe_bodyparts_to_polygon(data=data)
         """
@@ -1472,6 +1493,7 @@ class GeometryMixin(object):
            If buffer is provided, then also provide px_per_mm for accurate conversion factor between pixels and millimeters.
 
         :example:
+
         >>> data = np.random.randint(0, 100, (100, 2))
         >>> points_lst = GeometryMixin().multiframe_bodypart_to_point(data=data, buffer=10, px_per_mm=4)
         >>> data = np.random.randint(0, 100, (10, 10, 2))
@@ -1565,6 +1587,7 @@ class GeometryMixin(object):
         :rtype: List[Polygon]
 
         :example:
+
         >>> data = np.random.randint(0, 100, (100, 2))
         >>> circles = GeometryMixin().multiframe_bodyparts_to_circle(data=data)
         """
@@ -1625,6 +1648,7 @@ class GeometryMixin(object):
         :rtype: List[Polygon]
 
         :example:
+
         >>> data = np.array([[126, 122],[152, 116],[136,  85],[167, 172],[161, 206],[197, 193],[191, 237]])
         >>> triangulated_hull = GeometryMixin().delaunay_triangulate_keypoints(data=data)
         """
@@ -1662,6 +1686,7 @@ class GeometryMixin(object):
         :rtype: List[LineString]
 
         :example:
+
         >>> data = np.random.randint(0, 100, (100, 2))
         >>> data = data.reshape(50,-1, data.shape[1])
         >>> lines = GeometryMixin().multiframe_bodyparts_to_line(data=data)
@@ -1735,6 +1760,7 @@ class GeometryMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> df = read_df(file_path=r"C:/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_2.csv", file_type='csv').astype(int)
         >>> animal_1_cols = [x for x in df.columns if '_1_' in x and not '_p' in x]
         >>> animal_2_cols = [x for x in df.columns if '_2_' in x and not '_p' in x]
@@ -1804,6 +1830,7 @@ class GeometryMixin(object):
         :return List[int]: List of overlap between corresponding Polygons. If overlap 1, else 0.
 
         :example:
+
         >>> df = read_df(file_path=r"C:/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_2.csv", file_type='csv').astype(int)
         >>> animal_1_cols = [x for x in df.columns if '_1_' in x and not '_p' in x]
         >>> animal_2_cols = [x for x in df.columns if '_2_' in x and not '_p' in x]
@@ -1876,6 +1903,7 @@ class GeometryMixin(object):
         :rtype: List[float]
 
         :example:
+
         >>> df = read_df(file_path=r"C:/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_2.csv", file_type='csv').astype(int)
         >>> animal_1_cols = [x for x in df.columns if '_1_' in x and not '_p' in x]
         >>> animal_2_cols = [x for x in df.columns if '_2_' in x and not '_p' in x]
@@ -1948,6 +1976,7 @@ class GeometryMixin(object):
         :rtype: List[Polygon]
 
         :example:
+
         >>> df = read_df(file_path=r"C:/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_2.csv", file_type='csv').astype(int)
         >>> animal_1_cols = [x for x in df.columns if '_1_' in x and not '_p' in x]
         >>> animal_1_arr = df[animal_1_cols].values.reshape(len(df), int(len(animal_1_cols)/ 2), 2)
@@ -2005,6 +2034,7 @@ class GeometryMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> line = np.array([[[25, 25], [25, 20]], [[15, 25], [15, 20]], [[15, 25], [50, 20]]]).astype(np.float32)
         >>> point = np.array([20, 0]).astype(np.float64)
         >>> GeometryMixin().static_point_lineside(lines=line, point=point)
@@ -2040,6 +2070,7 @@ class GeometryMixin(object):
         :return np.ndarray: An array of length N containing the results for each line. 2 if the point is on the right side of the line. 1 if the point is on the left side of the line. 0 if the point is on the line.
 
         :example:
+
         >>> lines = np.array([[[25, 25], [25, 20]], [[15, 25], [15, 20]], [[15, 25], [50, 20]]]).astype(np.float32)
         >>> points = np.array([[20, 0], [15, 20], [90, 0]]).astype(np.float32)
         >>> GeometryMixin().point_lineside(lines=lines, points=points)
@@ -2077,6 +2108,7 @@ class GeometryMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> line_points = np.array([[25, 25], [45, 25]]).astype(np.float32)
         >>> bounding_box = np.array([0, 0, 50, 50]).astype(np.float32)
         >>> GeometryMixin().extend_line_to_bounding_box_edges(line_points, bounding_box)
@@ -2137,6 +2169,7 @@ class GeometryMixin(object):
         :rtype: GeometryCollection
 
         :example:
+
         >>> line_points = np.array([[25, 25], [45, 25]]).astype(np.float32)
         >>> bounding_box = np.array([0, 0, 50, 50]).astype(np.float32)
         >>> intersection_points = GeometryMixin().extend_line_to_bounding_box_edges(line_points, bounding_box)
@@ -2176,6 +2209,7 @@ class GeometryMixin(object):
         :rtype: List[float]
 
         :example:
+
         >>> data = np.random.randint(0, 100, (5000, 2))
         >>> data = data.reshape(2500,-1, data.shape[1])
         >>> lines = GeometryMixin().multiframe_bodyparts_to_line(data=data)
@@ -2229,6 +2263,7 @@ class GeometryMixin(object):
         :rtype: List[Union[LineString, MultiLineString, Polygon]]
 
         :example:
+
         >>> data_1 = np.random.randint(0, 100, (5000, 2)).reshape(1000,-1, 2)
         >>> data_2 = np.random.randint(0, 100, (5000, 2)).reshape(1000,-1, 2)
         >>> polygon_1 = GeometryMixin().multiframe_bodyparts_to_polygon(data=data_1)
@@ -2269,6 +2304,7 @@ class GeometryMixin(object):
         :rtype: List[Union[LineString, MultiLineString, Polygon]]
 
         :example:
+
         >>> data_1 = np.random.randint(0, 100, (5000, 2)).reshape(1000,-1, 2)
         >>> data_2 = np.random.randint(0, 100, (5000, 2)).reshape(1000,-1, 2)
         >>> polygon_1 = GeometryMixin().multiframe_bodyparts_to_polygon(data=data_1)
@@ -2311,6 +2347,7 @@ class GeometryMixin(object):
         :rtype: List[List[Polygon]]
 
         :example:
+
         >>> data_path = '/Users/simon/Desktop/envs/troubleshooting/Rat_NOR/project_folder/csv/machine_results/08102021_DOT_Rat7_8(2).csv'
         >>> data = pd.read_csv(data_path, index_col=0).head(1000).iloc[:, 0:21]
         >>> data = data[data.columns.drop(list(data.filter(regex='_p')))]
@@ -2515,6 +2552,7 @@ class GeometryMixin(object):
         :rtype: List[Union[LineString, MultiLineString]]
 
         :example:
+
         >>> df = pd.read_csv('/Users/simon/Desktop/envs/troubleshooting/Rat_NOR/project_folder/csv/machine_results/08102021_DOT_Rat7_8(2).csv', nrows=500).fillna(0).astype(int)
         >>> skeleton = [['Center', 'Lat_left'], ['Center', 'Lat_right'], ['Center', 'Nose'], ['Center', 'Tail_base'], ['Lat_left', 'Tail_base'], ['Lat_right', 'Tail_base'], ['Nose', 'Ear_left'], ['Nose', 'Ear_right'], ['Ear_left', 'Lat_left'], ['Ear_right', 'Lat_right']]
         >>> geometries = GeometryMixin().multiframe_bodyparts_to_multistring_skeleton(data_df=df, skeleton=skeleton, core_cnt=2, verbose=True)
@@ -2623,6 +2661,7 @@ class GeometryMixin(object):
         :rtype: List[float]
 
         :example:
+
         >>> img = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1_frames/1.png').astype(np.uint8)
         >>> data_path = '/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/csv/outlier_corrected_movement_location/Example_1.csv'
         >>> data = pd.read_csv(data_path, usecols=['Nose_x', 'Nose_y']).sample(n=3).fillna(1).values.astype(np.int64)
@@ -2697,6 +2736,7 @@ class GeometryMixin(object):
         :rtype: float
 
         :example:
+
         >>> img_1 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1_frames/1.png')
         >>> img_2 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1_frames/2.png')
         >>> data_path = '/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/csv/outlier_corrected_movement_location/Example_1.csv'
@@ -2796,6 +2836,7 @@ class GeometryMixin(object):
         :rtype: List[bool]
 
         :example:
+
         >>> shape_1 = GeometryMixin().multiframe_bodyparts_to_polygon(data=np.random.randint(0, 200, (100, 6, 2)))
         >>> shape_2 = [Polygon([[0, 0], [20, 20], [20, 10], [10, 20]]) for x in range(len(shape_1))]
         >>> GeometryMixin.multiframe_is_shape_covered(shape_1=shape_1, shape_2=shape_2, core_cnt=3)
@@ -2869,6 +2910,7 @@ class GeometryMixin(object):
 
 
         :example:
+
         >>> img_1 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1_frames/1978.png').astype(np.uint8)
         >>> img_2 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1_frames/1977.png').astype(np.uint8)
         >>> data = pd.read_csv('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/csv/outlier_corrected_movement_location/Example_1.csv', nrows=1, usecols=['Nose_x', 'Nose_y']).fillna(-1).values.astype(np.int64)
@@ -3030,6 +3072,7 @@ class GeometryMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = pd.read_csv('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/csv/outlier_corrected_movement_location/Example_1.csv', nrows=2100, usecols=['Nose_x', 'Nose_y']).fillna(-1).values.astype(np.int64)
         >>> results = GeometryMixin().multifrm_geometry_histocomparison(video_path='/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1.mp4', data= data, shape_type='circle', pixels_per_mm=1, parallel_offset=100)
         >>> data = pd.read_csv('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/csv/outlier_corrected_movement_location/Example_2.csv', nrows=2100, usecols=['Nose_x', 'Nose_y', 'Tail_base_x' , 'Tail_base_y', 'Center_x' , 'Center_y']).fillna(-1).values.astype(np.int64)
@@ -3177,6 +3220,7 @@ class GeometryMixin(object):
         :rtype: List[Polygon]
 
         :example:
+
         >>> video_frm = read_frm_of_video(video_path='/Users/simon/Desktop/envs/platea_featurizer/data/video/3D_Mouse_5-choice_MouseTouchBasic_s9_a4_grayscale.mp4')
         >>> contours = ImageMixin.find_contours(img=video_frm)
         >>> GeometryMixin.contours_to_geometries(contours=contours)
@@ -3219,6 +3263,7 @@ class GeometryMixin(object):
         :return List[Polygon]: List of adjusted polygons.
 
         :example:
+
         >>> shapes = GeometryMixin().adjust_geometry_locations(geometries=shapes, shift=(0, 333))
         """
 
@@ -3270,6 +3315,7 @@ class GeometryMixin(object):
         :rtype: Dict[Tuple[int, int], Point]
 
         :example:
+
         >>> GeometryMixin.bucket_img_into_grid_points(point_distance=20, px_per_mm=4, img_size=img.shape, border_sites=False)
         """
 
@@ -3330,6 +3376,7 @@ class GeometryMixin(object):
         :return: Size-2 Tuple with (i) Dictionary where the segment index is the key and polygon is the value, and (ii) float representing aspect ratio of each bucket.
 
         :example:
+
         >>> img = cv2.imread('/Users/simon/Desktop/Screenshot 2024-01-21 at 10.15.55 AM.png', 1)
         >>> polygons = GeometryMixin().bucket_img_into_grid_square(bucket_grid_size=(10, 5), bucket_grid_size_mm=None, img_size=(img.shape[1], img.shape[0]), px_per_mm=5.0)
         >>> for k, v in polygons[0].items(): cv2.polylines(img, [np.array(v.exterior.coords).astype(int)], True, (255, 0, 133), 2)
@@ -3437,6 +3484,7 @@ class GeometryMixin(object):
         :rtype: Tuple[Dict[Tuple[int, int], Polygon], float]
 
         :example:
+
         >>> polygons, aspect_ratio = GeometryMixin().bucket_img_into_grid_hexagon(bucket_size_mm=10, img_size=(800, 600), px_per_mm=5.0, add_correction=True)
         """
 
@@ -3527,6 +3575,7 @@ class GeometryMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> img_geometries = GeometryMixin.bucket_img_into_grid_square(img_size=(640, 640), bucket_grid_size=(10, 10), px_per_mm=1)
         >>> bp_arr = np.random.randint(0, 640, (5000, 2))
         >>> geo_data = GeometryMixin().cumsum_coord_geometries(data=bp_arr, geometries=img_geometries[0], verbose=False, fps=1)
@@ -3618,6 +3667,7 @@ class GeometryMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> geometries = GeometryMixin.bucket_img_into_grid_square(bucket_size_mm=50, img_size=(800, 800) , px_per_mm=5.0)[0]
         >>> coord_data = np.random.randint(0, 800, (500, 2))
         >>> bool_data = np.random.randint(0, 2, (500,))
@@ -3793,6 +3843,7 @@ class GeometryMixin(object):
         :rtype: Tuple[Dict[Tuple[int, int], Dict[Tuple[int, int], float]], Dict[Tuple[int, int], Dict[Tuple[int, int], int]]]
 
         :example:
+
         >>> video_meta_data = get_video_meta_data(video_path=r"C:/troubleshooting/mitra/project_folder/videos/708_MA149_Gq_CNO_0515.mp4")
         >>> w, h = video_meta_data['width'], video_meta_data['height']
         >>> grid = GeometryMixin().bucket_img_into_grid_square(bucket_grid_size=(5, 5), bucket_grid_size_mm=None, img_size=(h, w), verbose=False)[0]
@@ -3870,6 +3921,7 @@ class GeometryMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> x = Polygon([[0,1], [0, 2], [1,1]])
         >>> y = Polygon([[0,1], [0, 2], [0,1]])
         >>> GeometryMixin.hausdorff_distance(geometries=[[x, y]])
@@ -3917,6 +3969,7 @@ class GeometryMixin(object):
         :rtype: List[float]
 
         :example:
+
         >>> df = read_df(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/outlier_corrected_movement_location/SI_DAY3_308_CD1_PRESENT.csv', file_type='csv')
         >>> cols = [x for x in df.columns if not x.endswith('_p')]
         >>> data = df[cols].values.reshape(len(df), -1 , 2).astype(np.int)
@@ -3994,6 +4047,7 @@ class GeometryMixin(object):
         :rtype: Dict[str, float]
 
         :example:
+
         >>> line = LineString([[10, 10], [7.5, 7.5], [15, 15], [7.5, 7.5]])
         >>> polygon = Polygon([[0, 5], [0, 0], [5, 0], [5, 5]])
         >>> GeometryMixin.locate_line_point(path=line, geometry=polygon)
@@ -4098,6 +4152,7 @@ class GeometryMixin(object):
            Modified from `João Paulo Figueira <https://github.com/joaofig/discrete-frechet/blob/ff5629e5a43cfad44d5e962f4105dd25c90b9289/distances/discrete.py#L67>`_
 
         :example:
+
         >>> x = np.random.randint(0, 100, (10000, 2)).astype(np.float32)
         >>> y = np.random.randint(0, 100, (10000, 2)).astype(np.float32)
         >>> distance = GeometryMixin.linear_frechet_distance(x=x, y=y, sample=100)
@@ -4131,6 +4186,7 @@ class GeometryMixin(object):
         Convert SimBA dataframes holding ROI geometries to nested dictionary holding Shapley polygons.
 
         :example:
+
         >>> config_path = '/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini'
         >>> config = ConfigReader(config_path=config_path)
         >>> config.read_roi_data()
@@ -4197,6 +4253,7 @@ class GeometryMixin(object):
         Thus, no substitution can be made to when there are less than three unique body-part locations within a frame that falls above the threshold.
 
         :example:
+
         >>> x = np.random.randint(0, 500, (18000, 7, 2))
         >>> p = np.random.random(size=(18000, 7, 1))
         >>> x = GeometryMixin.filter_low_p_bps_for_shapes(x=x, p=p, threshold=0.1)
@@ -4291,6 +4348,7 @@ class GeometryMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> data_path = r"C:/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/FRR_gq_Saline_0624.csv"
         >>> animal_data = read_df(file_path=data_path, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y', 'Left_side_x', 'Left_side_y', 'Right_side_x', 'Right_side_y']).values.reshape(-1, 4, 2)[0:20].astype(np.int32)
         >>> animal_polygons = GeometryMixin().bodyparts_to_polygon(data=animal_data)
@@ -4340,6 +4398,7 @@ class GeometryMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.random.randint(0, 360, (30000, 7, 2))
         >>> results = GeometryMixin.keypoints_to_axis_aligned_bounding_box(keypoints=data)
         """
@@ -4367,6 +4426,7 @@ class GeometryMixin(object):
         :rtype: numba.typed.List[numba.types.Array]
 
         :example:
+
         >>> data_path = r"/mnt/c/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_1.csv" # PATH TO A DATA FILE
         >>> array_1 = read_df(file_path=data_path, file_type='csv', usecols=['Nose_1_x', 'Nose_1_y', 'Tail_base_1_x', 'Tail_base_1_y', 'Lat_left_1_x', 'Lat_left_1_y', 'Lat_right_1_x', 'Lat_right_1_y', 'Ear_left_1_x', 'Ear_left_1_y', 'Ear_right_1_x', 'Ear_right_1_y']).values.reshape(-1, 6, 2)[0:150]## READ THE BODY-PART THAT DEFINES THE HULL AND CONVERT TO ARRAY
         >>> polygons = GeometryMixin().multiframe_bodyparts_to_polygon(data=array_1, parallel_offset=50, simplify_tolerance=2, preserve_topology=True)
@@ -4421,6 +4481,7 @@ class GeometryMixin(object):
         :rtype: List[Polygon]
 
         :example:
+
         >>> polygon = np.array([[0, 0], [2, 1], [3, 3], [1, 4], [0, 3], [0, 0]])
         >>> polygon = Polygon(polygon)
         >>> smoothed_polygon = smooth_geometry_bspline(polygon)
@@ -4484,6 +4545,7 @@ class GeometryMixin(object):
          :rtype: Union[None, Dict[Any, dict]]
 
          :example I:
+
              >>> results = GeometryMixin.sleap_csv_to_geometries(data=r"C:/troubleshooting/ants/pose_data/ant.csv")
              >>> # Results structure: {track_id: {frame_idx: Polygon, ...}, ...}
 

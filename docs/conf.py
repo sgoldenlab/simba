@@ -199,7 +199,7 @@ intersphinx_mapping = {
 }
 
 # Mock imports for modules that may not be available during documentation build
-autodoc_mock_imports = ['torch', 'ultralytics', 'cupy']
+autodoc_mock_imports = ['torch', 'ultralytics', 'cupy', 'pyvis', 'hdbscan', 'umap', 'shap', 'hnswlib']
 
 # Hide type hints from signatures; the :param TYPE name: fields already document types.
 autodoc_typehints = 'none'

@@ -99,6 +99,7 @@ class OutlierCorrecterLocationMultiprocess(ConfigReader, FeatureExtractionMixin)
     :param Optional[float] criterion: The criterion multiplier. If None, grabs the info from the SimBA project config.
 
     :example:
+
     >>> _ = OutlierCorrecterLocationMultiprocess(config_path='MyProjectConfig').run()
     """
 

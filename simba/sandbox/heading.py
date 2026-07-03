@@ -20,6 +20,7 @@ def sliding_bearing(x: np.ndarray, lag: float, fps: float) -> np.ndarray:
     :return np.ndarray: An array containing the sliding bearings (in degrees) for each point in the sequence.
 
     :example:
+
     >>> x = np.array([[10, 10], [20, 10]])
     >>> sliding_bearing(x=x, lag=1, fps=1)
     >>> [-1. 90.]

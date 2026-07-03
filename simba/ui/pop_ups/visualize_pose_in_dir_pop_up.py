@@ -34,6 +34,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
        :align: center
 
     :example:
+
     >>> VisualizePoseInFolderPopUp()
     """
     def __init__(self):

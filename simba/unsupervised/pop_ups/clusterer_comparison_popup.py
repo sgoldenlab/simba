@@ -22,6 +22,7 @@ class ClustererComparisonPopUp(PopUpMixin, ConfigReader):
     Pop up for computing clusterer comparisons.
 
     :example:
+
     >>> _ = ClustererComparisonPopUp(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini')
     """
 

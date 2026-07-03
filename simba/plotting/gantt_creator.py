@@ -61,6 +61,7 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
     :param Optional[List[str]] clf_names: Optional subset of classifiers to include. If ``None``, uses all project classifiers.
 
     :example:
+
         >>> gantt_creator = GanttCreatorSingleProcess(config_path='project_config.ini', video_setting=True, data_paths=['csv/machine_results/video1.csv'], hhmmss=True, last_frm_setting=True)
         >>> gantt_creator.run()
     """

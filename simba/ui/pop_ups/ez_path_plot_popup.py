@@ -30,6 +30,7 @@ class EzPathPlotPopUp(PopUpMixin, ConfigReader):
     :param Union[str, os.PathLike] config_path: Path to the SimBA project config file (e.g. ``project_folder/project_config.ini``). The project must contain pose data in the outlier-corrected CSV directory.
 
     :example:
+
     >>> EzPathPlotPopUp(config_path=r'project_folder/project_config.ini')
     """
 

@@ -39,6 +39,7 @@ class EmbeddingCorrelationCalculator(UMLMixin, ConfigReader):
     :param dict settings: dict holding which statistical tests to use and how to create plots.
 
     :Example:
+
     >>> settings = {'correlation_methods': ['pearson', 'kendall', 'spearman'], 'plots': {'create': True, 'correlations': 'pearson', 'palette': 'jet'}}
     >>> calculator = EmbeddingCorrelationCalculator(config_path='unsupervised/project_folder/project_config.ini', data_path='unsupervised/cluster_models/quizzical_rhodes.pickle', settings=settings)
     >>> calculator.run()

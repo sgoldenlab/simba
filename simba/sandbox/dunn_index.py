@@ -24,6 +24,7 @@ def dunn_index(x: np.ndarray, y: np.ndarray) -> float:
     :return float: The Dunn index value
 
     :example:
+
     >>> x = np.random.randint(0, 100, (100, 2))
     >>> y = np.random.randint(0, 3, (100,))
     >>> dunn_index(x=x, y=y)

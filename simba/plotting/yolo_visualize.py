@@ -82,6 +82,7 @@ class YOLOVisualizer():
     :raises FrameRangeError: If YOLO result frame coverage does not match video frame count.
 
     :example:
+
     >>> test = YOLOVisualizer(
     ...     data_path=r"/mnt/c/troubleshooting/yolo_inference/08102021_DOT_Rat7_8(2).csv",
     ...     video_path=r"/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/08102021_DOT_Rat7_8(2).mp4",

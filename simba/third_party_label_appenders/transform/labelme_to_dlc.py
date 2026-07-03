@@ -44,6 +44,7 @@ class Labelme2DLC:
 
 
     :example:
+
     >>> labelme_dir = r"D:\platea\ts_annotations"
     >>> runner = Labelme2DLC(labelme_dir=labelme_dir)
     >>> runner.run()

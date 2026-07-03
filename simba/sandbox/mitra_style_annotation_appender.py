@@ -21,6 +21,7 @@ class MitraStyleAnnotationAppender(ConfigReader):
     :param Union[str, os.PathLike] save_dir: Directory where annotated files will be saved
 
     :example:
+
     >>> data_path = r"C:\annotations\Start-Stop Annotations.xlsx"
     >>> features_dir = r"C:\project_folder\features"
     >>> save_dir = r"C:\project_folder\features\targets_inserted"

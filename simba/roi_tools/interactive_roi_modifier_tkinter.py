@@ -107,6 +107,7 @@ class InteractiveROIModifier():
     :param Optional[List[Polygon]] rectangle_grid: Optional list of Shapely Polygon objects representing a rectangular grid overlay. Gridlines will be drawn on the image for alignment assistance.
 
     :example:
+
     >>> from tkinter import Toplevel, Label
     >>> import cv2
     >>> import numpy as np

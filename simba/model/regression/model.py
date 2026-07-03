@@ -30,6 +30,7 @@ def fit_xgb(x: pd.DataFrame,
     :rtype: xgb.XGBRegressor
 
     :example:
+
     >>> x = pd.DataFrame(np.random.randint(0, 500, (100, 20)))
     >>> y = np.random.randint(1, 6, (100,))
     >>> mdl = fit_xgb(x=x, y=y)
@@ -51,12 +52,14 @@ def transform_xgb(x: pd.DataFrame,
     :rtype: np.ndarray
 
     :example:
+
     >>> x, y = pd.DataFrame(np.random.randint(0, 500, (100, 20))), np.random.randint(1, 6, (100,))
     >>> mdl = fit_xgb(x=x, y=y)
     >>> new_x = pd.DataFrame(np.random.randint(0, 500, (100, 20)))
     >>> results = transform_xgb(x=new_x, mdl=mdl)
 
     :example:
+
     >>> x, y = pd.DataFrame(np.random.randint(0, 500, (100, 20))), np.random.randint(1, 6, (100,))
     >>> mdl = fit_xgb(x=x, y=y)
     >>> new_x = pd.DataFrame(np.random.randint(0, 500, (100, 20)))
@@ -94,6 +97,7 @@ def evaluate_xgb(y_pred: np.ndarray,
     :rtype: dict
 
     :example:
+
     >>> x = pd.DataFrame(np.random.randint(0, 500, (100, 20)))
     >>> y = np.random.randint(1, 6, (100,))
     >>> mdl = fit_xgb(x=x, y=y)

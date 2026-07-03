@@ -31,6 +31,7 @@ def crop_single_video_circle(file_path: Union[str, os.PathLike]) -> None:
        as the input video file.
 
     :example:
+
     >>> crop_single_video_circle(file_path='/Users/simon/Desktop/AGGRESSIVITY_4_11_21_Trial_2_camera1_rotated_20240211143355.mp4')
     """
 
@@ -80,6 +81,7 @@ def crop_multiple_videos_circles(
        using the first video and saves the videos in the ``out_dir`` with the same filenames as the original videos..
 
     :example:
+
     >>> crop_multiple_videos_circles(in_dir='/Users/simon/Desktop/edited/tests', out_dir='/Users/simon/Desktop')
     """
 

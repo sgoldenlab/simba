@@ -25,6 +25,7 @@ def img_stack_to_bw(imgs: np.ndarray,
     :return np.ndarray: 4-dimensional array with black and white image.
 
     :example:
+
     >>> imgs = ImageMixin.read_img_batch_from_video(video_path='/Users/simon/Downloads/3A_Mouse_5-choice_MouseTouchBasic_a1.mp4', start_frm=0, end_frm=100)
     >>> imgs = np.stack(imgs.values(), axis=0)
     >>> bw_imgs = img_stack_to_bw(imgs=imgs, upper_thresh=255, lower_thresh=20, invert=False)

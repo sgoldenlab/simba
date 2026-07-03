@@ -195,6 +195,7 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
        :align: center
 
     :example:
+
     >>> test = ROIfeatureVisualizerMultiprocess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini',
     ...     video_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/videos/NOR ENCODING FExMP8.mp4',
     ...     body_parts=['Center'],

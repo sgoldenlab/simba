@@ -49,6 +49,7 @@ class YoloTrackCleaner:
         :param bool overwrite: If True, overwrite existing output files. If False, skip files that already exist. Default: False.
 
         :example:
+
         >>> x = YoloTrackCleaner(data_path=r"E:\netholabs_videos\two_tracks_102725\csvs\cage_1_date_2025_09_13_hour_00_minute_23.csv", save_dir=r'E:\netholabs_videos\two_tracks_102725\tracks_cleaned', bp_loc='NOSE')
         >>> x.run()
         """

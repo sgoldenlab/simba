@@ -19,6 +19,7 @@ def rotate_img(img: np.ndarray, right: bool) -> np.ndarray:
     :returns: The rotated image as a numpy array of uint8 format.
 
     :example:
+
     >>> img = cv2.imread('/Users/simon/Desktop/test.png')
     >>> rotated_img = rotate_img(img=img, right=False)
     """

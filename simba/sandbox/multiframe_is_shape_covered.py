@@ -25,6 +25,7 @@ def multiframe_is_shape_covered(self,
 
 
     :example:
+
     >>> shape_1 = GeometryMixin().multiframe_bodyparts_to_polygon(data=np.random.randint(0, 200, (100, 6, 2)))
     >>> shape_2 = [Polygon([[0, 0], [20, 20], [20, 10], [10, 20]]) for x in range(len(shape_1))]
     >>> multiframe_is_shape_covered(shape_1=shape_1, shape_2=shape_2, core_cnt=3)

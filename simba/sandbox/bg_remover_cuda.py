@@ -93,6 +93,7 @@ def bg_subtraction_cuda(video_path: Union[str, os.PathLike],
     :param Optional[int] threshold: Value between 0-255 representing the difference threshold between the average frame subtracted from each frame. Higher values and more pixels will be considered background. Default: 100.
 
     :example:
+
     >>> video_path = "/mnt/c/troubleshooting/mitra/project_folder/videos/clipped/592_MA147_Gq_CNO_0515.mp4"
     >>> avg_frm = create_average_frm(video_path=video_path)
     >>> bg_subtraction_cuda(video_path=video_path, avg_frm=avg_frm, fg_clr=(255, 255, 255))

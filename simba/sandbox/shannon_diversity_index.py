@@ -10,6 +10,7 @@ def shannon_diversity_index(x: np.ndarray) -> float:
     and their relative abundances (evenness).
 
     :example:
+
     >>> x = np.random.randint(0, 100, (100, ))
     >>> shannon_diversity_index(x=x)
     """

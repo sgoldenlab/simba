@@ -43,6 +43,7 @@ def silhouette_score_gpu(x: np.ndarray,
     :rtype: float
 
     :example:
+
     >>> x, y = make_blobs(n_samples=50000, n_features=20, centers=5, cluster_std=10, center_box=(-1, 1))
     >>> score_gpu = silhouette_score_gpu(x=x, y=y)
     """
@@ -72,6 +73,7 @@ def silhouette_score(x: np.ndarray, y: np.ndarray) -> float:
     :rtype: float
 
     :example:
+
     >>> x, y = make_blobs(n_samples=10000, n_features=400, centers=5, cluster_std=10, center_box=(-1, 1))
     >>> score = silhouette_score(x=x, y=y)
 

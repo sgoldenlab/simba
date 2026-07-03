@@ -31,6 +31,7 @@ def total_variation_distance(x: np.ndarray, y: np.ndarray, bucket_method: Option
     to the same event :math:`i`, respectively.
 
     :example:
+
     >>> total_variation_distance(x=np.array([1, 5, 10, 20, 50]), y=np.array([1, 5, 10, 100, 110]))
     >>> 0.3999999761581421
     """

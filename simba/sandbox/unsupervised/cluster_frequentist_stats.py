@@ -32,6 +32,7 @@ class ClusterFrequentistCalculator():
     :param bool pairwise: If True, computes one-way ANOVAs and Kruskal-Wallis comparisons where each cluster is compared to each of the other clusters. Else computes one against all others.
 
     :example:
+
     >>> calculator = ClusterFrequentistCalculator(data_path=r"/Users/simon/Downloads/academic_elgamal.pickle", scaled=False, save_path=r"/Users/simon/Desktop/test.xlsx", pairwise=True, tukey=False)
     >>> calculator.run()
     """

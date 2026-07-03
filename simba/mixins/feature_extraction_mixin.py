@@ -99,6 +99,7 @@ class FeatureExtractionMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> x1, x2 = np.random.randint(1, 10, size=(10, 1)), np.random.randint(1, 10, size=(10, 1))
         >>> y1, y2 = np.random.randint(1, 10, size=(10, 1)), np.random.randint(1, 10, size=(10, 1))
         >>> FeatureExtractionMixin.euclidean_distance(bp_1_x=x1, bp_2_x=x2, bp_1_y=y1, bp_2_y=y2, px_per_mm=4.56)
@@ -131,6 +132,7 @@ class FeatureExtractionMixin(object):
         :rtype: float
 
         :example:
+
         >>> FeatureExtractionMixin.angle3pt(ax=122.0, ay=198.0, bx=237.0, by=138.0, cx=191.0, cy=109)
         >>> 59.78156901181637
         """
@@ -157,6 +159,7 @@ class FeatureExtractionMixin(object):
         :rtype: ndarray
 
         :examples:
+
         >>> coordinates = np.random.randint(1, 10, size=(6, 6))
         >>> FeatureExtractionMixin.angle3pt_vectorized(data=coordinates)
         >>> [ 67.16634582,   1.84761027, 334.23067238, 258.69006753, 11.30993247, 288.43494882]
@@ -198,6 +201,7 @@ class FeatureExtractionMixin(object):
         :rtype: float
 
         :example:
+
         >>> coordinates = np.random.randint(1, 200, size=(6, 2)).astype(np.float32)
         >>> FeatureExtractionMixin.convex_hull_calculator_mp(arr=coordinates, px_per_mm=4.56)
         >>> 98.6676814218373
@@ -238,6 +242,7 @@ class FeatureExtractionMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> bp_1 = np.array([[120, 200], [122, 198], [124, 197]], dtype=np.float32)
         >>> bp_2 = np.array([[200, 180], [201, 179], [202, 178]], dtype=np.float32)
         >>> bp_3 = np.array([[260, 140], [262, 139], [264, 138]], dtype=np.float32)
@@ -291,6 +296,7 @@ class FeatureExtractionMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> FeatureExtractionMixin.count_values_in_range(data=np.random.random((3,10)), ranges=np.array([[0.0, 0.25], [0.25, 0.5]]))
         >>> [[6, 1], [3, 2],[2, 1]]
         """
@@ -332,6 +338,7 @@ class FeatureExtractionMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> loc_1 = np.random.randint(1, 200, size=(6, 2)).astype(np.float32)
         >>> loc_2 = np.random.randint(1, 200, size=(1, 2)).astype(np.float32)
         >>> FeatureExtractionMixin.framewise_euclidean_distance_roi(location_1=loc_1, location_2=loc_2, px_per_mm=4.56, centimeter=False)
@@ -367,6 +374,7 @@ class FeatureExtractionMixin(object):
         :rtype: ndarray
 
         :example:
+
         >>> bp_loc = np.random.randint(1, 10, size=(6, 2)).astype(np.float32)
         >>> roi_coords = np.random.randint(1, 10, size=(2, 2)).astype(np.float32)
         >>> FeatureExtractionMixin.framewise_inside_rectangle_roi(bp_location=bp_loc, roi_coords=roi_coords)
@@ -445,6 +453,7 @@ class FeatureExtractionMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> bp_loc = np.random.randint(1, 10, size=(6, 2)).astype(np.float32)
         >>> roi_coords = np.random.randint(1, 10, size=(10, 2)).astype(np.float32)
         >>> FeatureExtractionMixin.framewise_inside_polygon_roi(bp_location=bp_loc, roi_coords=roi_coords)
@@ -495,6 +504,7 @@ class FeatureExtractionMixin(object):
         :rtype: pd.DataFrame
 
         :example:
+
         >>> feature_data = np.random.randint(1, 10, size=(100))
         >>> FeatureExtractionMixin.windowed_frequentist_distribution_tests(data=feature_data, fps=25, feature_name='Anima_1_velocity')
         """
@@ -566,6 +576,7 @@ class FeatureExtractionMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> array_1 = np.random.randint(1, 10, size=(3, 2)).astype(np.float32)
         >>> array_2 = np.random.randint(1, 10, size=(3, 2)).astype(np.float32)
         >>> FeatureExtractionMixin.cdist(array_1=array_1, array_2=array_2)
@@ -620,6 +631,7 @@ class FeatureExtractionMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).astype(np.float32)
         >>> FeatureExtractionMixin().cosine_similarity(data=data)
         >>> [[1.0, 0.974, 0.959], [0.974, 1.0, 0.998], [0.959, 0.998, 1.0]]
@@ -645,6 +657,7 @@ class FeatureExtractionMixin(object):
         :return pd.DataFrame: Dataframe including original and shifted columns.
 
         :example:
+
         >>> df = pd.DataFrame(np.random.randint(0,100,size=(3, 1)), columns=['Feature_1'])
         >>> FeatureExtractionMixin.create_shifted_df(df=df)
         >>>             Feature_1  Feature_1_shifted
@@ -674,6 +687,7 @@ class FeatureExtractionMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> arr = np.array([[10], [95], [85]])
         >>> FeatureExtractionMixin.create_shifted_array(data=arr, periods=1)
         >>> array([[10.], [10.], [95.]])
@@ -918,6 +932,7 @@ class FeatureExtractionMixin(object):
 
 
         :example:
+
         >>>   points = np.random.randint(1, 10, size=(10, 2))
         >>>   FeatureExtractionMixin.minimum_bounding_rectangle(points=points)
         >>> [[10.7260274 ,  3.39726027], [ 1.4109589 , -0.09589041], [-0.31506849,  4.50684932], [ 9., 8. ]]
@@ -995,6 +1010,7 @@ class FeatureExtractionMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> # Calculate distances between two body parts across frames
         >>> nose_coords = np.array([[100, 150], [102, 148], [105, 145]], dtype=np.float32)
         >>> ear_coords = np.array([[90, 140], [92, 138], [95, 135]], dtype=np.float32)
@@ -1032,6 +1048,7 @@ class FeatureExtractionMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> coords = np.array([[10, 10], [13, 14], [13, 20]], dtype=np.float32)
         >>> FeatureExtractionMixin.framewise_bodypart_movement(data=coords, px_per_mm=2.0, centimeter=False)
         """
@@ -1089,6 +1106,7 @@ class FeatureExtractionMixin(object):
         :rtype: np.ndarray[np.float32]
 
         :example:
+
         >>> bp1_coords = np.random.randint(0, 500, size=(1000, 2))
         >>> bp2_coords = np.random.randint(0, 500, size=(1000, 2))
         >>> FeatureExtractionMixin().bodypart_distance(bp1_coords=bp1_coords, bp2_coords=bp2_coords, px_per_mm=1.0, in_centimeters=False)
@@ -1149,6 +1167,7 @@ class FeatureExtractionMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> a = np.array([[0, 0], [3, 4], [6, 8]], dtype=np.float32)
         >>> b = np.array([[0, 0], [0, 0], [3, 4]], dtype=np.float32)
         >>> # px_per_mm = 1 -> distances reported in millimeters (same numeric scale as pixels)
@@ -1202,6 +1221,7 @@ class FeatureExtractionMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> loc1 = np.random.randint(0, 500, (200, 2)).astype(np.float64)
         >>> loc2 = np.random.randint(0, 500, (200, 2)).astype(np.float64)
         >>> FeatureExtractionMixin().change_in_bodypart_euclidean_distance(location_1=loc1, location_2=loc2, fps=25, px_per_mm=2.0)
@@ -1410,6 +1430,7 @@ class FeatureExtractionMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> bp_1 = np.array([[1, 3], [30, 10]]).astype(np.int64)
         >>> bp_2 = np.array([[10, 4], [20, 1]]).astype(np.int64)
         >>> FeatureExtractionMixin().find_midpoints(bp_1=bp_1, bp_2=bp_2, percentile=0.5)

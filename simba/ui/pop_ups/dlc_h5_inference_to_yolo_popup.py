@@ -31,6 +31,7 @@ class DLCH5Inference2YoloPopUp(PopUpMixin):
     GUI for converting DeepLabCut (DLC) annotations to YOLO keypoint format.
 
     :example:
+
     >>> DLCH5Inference2YoloPopUp()
     """
 

@@ -257,6 +257,7 @@ class Smooth(ConfigReader):
 
 
     :examples:
+
     >>> _ = Smooth(input_path=data_path, config_path=SimBaProjectConfigPath, smoothing_method='Savitzky-Golay', time_window=300)
     """
 
@@ -442,6 +443,7 @@ class AdvancedInterpolator(ConfigReader):
     :param bool overwrite: If True, overwrites the input data. If False, then saves input data in datetime-stamped sub-directory.
 
     :examples:
+
     >>> interpolator = AdvancedInterpolator(data_dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv',
     >>>                                     config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
     >>>                                     type='animal',

@@ -26,6 +26,7 @@ class SimBA2YoloKeypointsPopUp(PopUpMixin):
 
     """
     :example:
+
     >>> SimBA2YoloKeypointsPopUp()
     """
     def __init__(self):

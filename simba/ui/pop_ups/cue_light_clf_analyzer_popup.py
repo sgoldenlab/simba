@@ -18,6 +18,7 @@ class CueLightClfAnalyzerPopUp(ConfigReader, PopUpMixin):
 
     """
     :example:
+
     >>> CueLightClfAnalyzerPopUp(config_path=r"C:\troubleshooting\cue_light\t1\project_folder\project_config.ini", cue_light_names=['cl'])
     """
 

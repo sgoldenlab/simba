@@ -20,6 +20,7 @@ def img_stack_to_grayscale_cupy(imgs: np.ndarray,
     :return np.ndarray: m A 3D NumPy array of shape (num_images, height, width) containing the grayscale images. If the input array is not 4D, the function returns the input as is.
 
     :example:
+
     >>> imgs = read_img_batch_from_video_gpu(video_path=r"/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_IOT_1_cropped.mp4", verbose=False, start_frm=0, end_frm=i)
     >>> imgs = np.stack(list(imgs.values()), axis=0).astype(np.uint8)
     >>> gray_imgs = img_stack_to_grayscale_cupy(imgs=imgs)

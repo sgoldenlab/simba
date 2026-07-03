@@ -38,6 +38,7 @@ def sliding_spearmans_rank(x: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.array([9, 10, 13, 22, 15, 18, 15, 19, 32, 11])
     >>> y = np.array([11, 12, 15, 19, 21, 26, 19, 20, 22, 19])
     >>> sliding_spearmans_rank(x, y, time_window=0.5, sample_rate=2)

@@ -27,6 +27,7 @@ class UserDefinedFeatureExtractor(ConfigReader, FeatureExtractionMixin):
     :param str config_path: path to SimBA project config file in Configparser format
 
     :example:
+
     >>> feature_extractor = UserDefinedFeatureExtractor(config_path='MyProjectConfig')
     >>> feature_extractor.run()
     """

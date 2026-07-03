@@ -22,6 +22,7 @@ def get_optimal_font_scale(text: Union[str, List[str]],
     :returns Tuple[int, int, int]: The font size, the shift on x between successive columns, the shift in y between successive rows.
 
     :example:
+
     >>> img = cv2.imread('/Users/simon/Desktop/Screenshot 2024-07-08 at 4.46.03 PM.png')
     >>> accepted_px_width = int(img.shape[1] / 4)
     >>> accepted_px_height = int(img.shape[0] / 10)

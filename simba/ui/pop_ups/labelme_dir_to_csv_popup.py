@@ -15,6 +15,7 @@ class LabelmeDirectory2CSVPopUp(PopUpMixin):
 
     """
     :example:
+
     >>> LabelmeDirectory2CSVPopUp()
     """
     def __init__(self):

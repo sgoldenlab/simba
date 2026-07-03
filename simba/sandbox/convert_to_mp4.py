@@ -41,6 +41,7 @@ def frames_to_movie(directory: Union[str, os.PathLike],
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
 
     :example:
+
     >>> _ = frames_to_movie(directory_path='project_folder/video_img', fps=15, bitrate=32000, img_format='png')
     """
 
@@ -105,6 +106,7 @@ def convert_to_mp4(path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> convert_to_mp4(path='/Users/simon/Desktop/video_test', quality="100")
     """
 

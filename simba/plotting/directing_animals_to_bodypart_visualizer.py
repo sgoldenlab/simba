@@ -43,6 +43,7 @@ class DirectingAnimalsToBodyPartVisualizer(ConfigReader, PlottingMixin):
 
 
     :example:
+
     >>> style_attr = {'Show_pose': True,
     >>>               'Pose_circle_size': 3,
     >>>               "Direction_color": 'Random',

@@ -35,6 +35,7 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
     :param Optional[Union[str, os.PathLike]] save_dir: Optional directory where trained models and evaluation artifacts are saved. If None, defaults to ``<model_dir>/validations`` from project configuration.
 
     :example:
+
     >>> _ = GridSearchRandomForestClassifier(config_path='MyConfigPath').run()
     """
 

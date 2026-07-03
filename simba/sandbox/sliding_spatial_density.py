@@ -61,6 +61,7 @@ def sliding_spatial_density_cuda(x: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> df = pd.read_csv("/mnt/c/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Test_3.csv")
     >>> x = df[['Nose_1_x', 'Nose_1_y']].values
     >>> results_cuda = sliding_spatial_density_cuda(x=x, radius=10.0, pixels_per_mm=4.0, window_size=1, sample_rate=20)

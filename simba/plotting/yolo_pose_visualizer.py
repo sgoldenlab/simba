@@ -134,6 +134,7 @@ class YOLOPoseVisualizer():
     :param Optional[int] sample_n: Randomly sample ``sample_n`` data files to visualize. If None, visualize all detected files.
 
     :example:
+
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
     >>> data_path = "/mnt/c/troubleshooting/mitra/yolo_pose/501_MA142_Gi_CNO_0521.csv"
     >>> kp_vis = YOLOPoseVisualizer(data_path=data_path,

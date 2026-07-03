@@ -21,6 +21,7 @@ def linear_frechet_distance(x: np.ndarray, y: np.ndarray, sample: int = 100) -> 
        Slightly modified from `João Paulo Figueira <https://github.com/joaofig/discrete-frechet/blob/ff5629e5a43cfad44d5e962f4105dd25c90b9289/distances/discrete.py#L67>`_
 
     :example:
+
     >>> x = np.random.randint(0, 100, (10000, 2)).astype(np.float32)
     >>> y = np.random.randint(0, 100, (10000, 2)).astype(np.float32)
     >>> distance = linear_frechet_distance(x=x, y=y, sample=100)

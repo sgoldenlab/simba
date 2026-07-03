@@ -32,6 +32,7 @@ def d_prime(x: np.ndarray,
     :return float: The calculated d' (d-prime) value.
 
     :example:
+
     >>> x = np.random.randint(0, 2, (1000,))
     >>> y = np.random.randint(0, 2, (1000,))
     >>> d_prime(x=x, y=y)

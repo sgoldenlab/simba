@@ -22,6 +22,7 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
 
     """
     :example:
+
     >>>  _ = GanttPlotPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
     """
     def __init__(self,

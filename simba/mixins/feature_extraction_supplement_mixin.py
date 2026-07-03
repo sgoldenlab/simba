@@ -86,6 +86,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :rtype: np.array
 
         :example:
+
         >>> location_1 = np.random.randint(low=0, high=100, size=(2000, 2)).astype('float32')
         >>> location_2 = np.random.randint(low=0, high=100, size=(2000, 2)).astype('float32')
         >>> distances = self.euclidean_distance_timeseries_change(location_1=location_1, location_2=location_2, fps=10, px_per_mm=4.33, time_windows=np.array([0.2, 0.4, 0.8, 1.6]))
@@ -116,6 +117,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
 
         :example:
+
         >>> data = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
         >>> FeatureExtractionSupplemental().peak_ratio(data=data, bin_size_s=1, fps=10)
         >>> [0.9 0.9 0.9 0.9 0.9 0.9 0.9 0.9 0.9 0.9]
@@ -199,6 +201,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.array([0, 1, 1, 1, 4, 5, 6, 7, 8, 9])
         >>> FeatureExtractionSupplemental().rolling_categorical_switches_ratio(data=data, time_windows=np.array([1.0]), fps=10)
         >>> [[-1][-1][-1][-1][-1][-1][-1][-1][-1][ 0.7]]
@@ -240,6 +243,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.array([0, 1, 1, 1, 4, 5, 6, 7, 8, 9])
         >>> FeatureExtractionSupplemental().consecutive_time_series_categories_count(data=data, fps=10)
         >>> [0.1, 0.1, 0.2, 0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
@@ -286,6 +290,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.array([[250, 250], [250, 250], [250, 250], [250, 500], [500, 500], 500, 500]]).astype(float)
         >>> FeatureExtractionSupplemental().rolling_horizontal_vs_vertical_movement(data=data, time_windows=np.array([1.0]), fps=2, pixels_per_mm=1)
         >>> [[  -1.][   0.][   0.][-250.][ 250.][   0.]]
@@ -351,6 +356,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.array([[250, 250], [250, 250], [250, 250], [500, 500],[500, 500], [500, 500]]).astype(float)
         >>> img_resolution = np.array([500, 500])
         >>> FeatureExtractionSupplemental().border_distances(data=data, img_resolution=img_resolution, time_window=1, fps=2, pixels_per_mm=1)
@@ -407,10 +413,12 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :rtype: np.ndarray
 
         :example I:
+
         >>> data = np.array([[0, 0], [758, 540], [0, 540], [748, 540]])
         >>> img_edge_distances(data=data, pixels_per_mm=2.13, img_resolution=np.array([748, 540]), time_window=1.0, fps=1)
 
         :example II:
+
         >>> data = read_df(file_path=FILE_PATH, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y'])
         >>> data = data.values.reshape(len(data), 2, 2)
         >>> FeatureExtractionSupplemental.img_edge_distances(data=data, pixels_per_mm=2.13, img_resolution=np.array([748, 540]), time_window=1.0, fps=1)
@@ -449,6 +457,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :param Optional[bool] data_dir ts_plot: Whether to generate a time series plot of velocities for each data file. Defaults to True.
 
         :example:
+
         >>> config_path = '/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini'
         >>> data_dir = '/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location'
         >>> body_part = 'Nose_1'
@@ -550,6 +559,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         - 'arm_entry_sequence': Pandas dataframe with two columns: sequence of arm names entered, the frame the animal entered the arm, the frame that the animal left the arm.
 
         :example:
+
         >>> data = np.zeros((100, 4), dtype=int)
         >>> random_indices = np.random.randint(0, 4, size=100)
         >>> for i in range(100): data[i, random_indices[i]] = 1
@@ -648,6 +658,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :rtype: Dict[Tuple[int], List[int]]
 
         :example:
+
         >>> data = read_df(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/outlier_corrected_movement_location/SI_DAY3_308_CD1_PRESENT.csv', usecols=['Center_x', 'Center_y'], file_type='csv').values.astype(int)
         >>> FeatureExtractionSupplemental.find_path_loops(data=data)
         """
@@ -697,6 +708,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :rtype: float.
 
         :example:
+
         >>> df = pd.DataFrame(np.random.randint(0, 2, (100, 2)), columns=['Attack', 'Sniffing'])
         >>> FeatureExtractionSupplemental.sequential_lag_analysis(data=df, criterion='Attack', target='Sniffing', fps=5, time_window=2.0)
 
@@ -794,6 +806,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :rtype: Tuple[float, float]
 
         :example:
+
         >>> x = np.random.randint(0, 100, (100,))
         >>> sum_movement, avg_velocity = FeatureExtractionSupplemental.distance_and_velocity(x=x, fps=10, pixels_per_mm=10, centimeters=True)
 

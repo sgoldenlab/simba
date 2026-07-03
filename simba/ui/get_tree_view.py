@@ -31,6 +31,7 @@ class GetTreeView(PopUpMixin):
     :param str theme: Tkinter theme name to use. Default is 'clam' for better visual separation.
 
     :example:
+
     >>> from simba.utils.read_write import find_all_videos_in_directory
     >>> from simba.utils.read_write import get_video_meta_data
     >>> videos = find_all_videos_in_directory(directory=r'C:\troubleshooting\mitra\project_folder\videos', as_dict=True)
@@ -41,6 +42,7 @@ class GetTreeView(PopUpMixin):
     >>> GetTreeView(data=results, index_col_name='VIDEO')
     
     :example:
+
     >>> # Simple example with custom data
     >>> data = {
     >>>     'Video1': {'fps': 30, 'width': 1920, 'height': 1080},

@@ -38,10 +38,12 @@ class AgressionFeatureExtractor(ConfigReader, AbstractFeatureExtraction):
     :param Union[str, os.PathLike] save_dir: Directory where featurized CSV files will be saved. If None, uses the project's features_dir from the config.
 
     :example I:
+
     >>> extractor = AgressionFeatureExtractor(config_path='MyProjectConfig')
     >>> extractor.run()
 
     :example II:
+
     >>> f = AgressionFeatureExtractor(config_path=r"E:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
     >>> f.run()
     """

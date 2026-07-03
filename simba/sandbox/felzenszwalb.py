@@ -53,6 +53,7 @@ def felzenszwalb_video(video_path: Union[str, os.PathLike],
     :param Optional[int] scale: Path to the video file.
 
     :example:
+
     >>> felzenszwalb_video(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/videos/704_MA115_Gi_CNO_0521_clipped.mp4', save_path='/Users/simon/Desktop/feltz/test.mp4')
     """
 

@@ -95,6 +95,7 @@ def get_3pt_angle(x: np.ndarray, y: np.ndarray, z: np.ndarray) -> np.ndarray:
     :rtype: np.ndarray
 
     :example:
+
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0514.mp4"
     >>> data_path = r"/mnt/c/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/501_MA142_Gi_CNO_0514 - test.csv"
     >>> df = read_df(file_path=data_path, file_type='csv')
@@ -160,6 +161,7 @@ def count_values_in_ranges(x: np.ndarray, r: np.ndarray) -> np.ndarray:
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(1, 11, (10, 10)).astype(np.int8)
     >>> r = np.array([[1, 6], [6, 11]])
     >>> r_x = count_values_in_ranges(x=x, r=r)
@@ -205,6 +207,7 @@ def get_euclidean_distance_cuda(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     :return np.ndarray: A 1D array of shape (n,) where each element represents the Euclidean distance  between the corresponding points in `x` and `y`.
 
     :example:
+
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0514.mp4"
     >>> data_path = r"/mnt/c/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/501_MA142_Gi_CNO_0514 - test.csv"
     >>> df = read_df(file_path=data_path, file_type='csv')[['Center_x', 'Center_y']]
@@ -245,6 +248,7 @@ def get_euclidean_distance_cupy(x: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.array([[1, 2], [3, 4], [5, 6]])
     >>> y = np.array([[7, 8], [9, 10], [11, 12]])
     >>> distances = get_euclidean_distance_cupy(x, y)
@@ -295,6 +299,7 @@ def sliding_mean(x: np.ndarray, time_window: float, sample_rate: int) -> np.ndar
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(1, 11, (100, )).astype(np.float32)
     >>> time_window = 1
     >>> sample_rate = 10
@@ -323,6 +328,7 @@ def silhouette_score_gpu(x: np.ndarray,
     :rtype: float
 
     :example:
+
     >>> x, y = make_blobs(n_samples=50000, n_features=20, centers=5, cluster_std=10, center_box=(-1, 1))
     >>> score_gpu = silhouette_score_gpu(x=x, y=y)
     """
@@ -367,6 +373,7 @@ def sliding_min(x: np.ndarray, time_window: float, sample_rate: int) -> np.ndarr
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.arange(0, 10000000)
     >>> time_window = 1
     >>> sample_rate = 10
@@ -415,6 +422,7 @@ def sliding_spearmans_rank(x: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.array([9, 10, 13, 22, 15, 18, 15, 19, 32, 11])
     >>> y = np.array([11, 12, 15, 19, 21, 26, 19, 20, 22, 19])
     >>> sliding_spearmans_rank(x, y, time_window=0.5, sample_rate=2)
@@ -490,6 +498,7 @@ def sliding_std(x: np.ndarray, time_window: float, sample_rate: int) -> np.ndarr
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(1, 11, (100, )).astype(np.float32)
     >>> time_window = 1
     >>> sample_rate = 10
@@ -531,6 +540,7 @@ def sliding_sum(x: np.ndarray, time_window: float, sample_rate: int) -> np.ndarr
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(1, 11, (100, )).astype(np.float32)
     >>> time_window = 1
     >>> sample_rate = 10
@@ -616,6 +626,7 @@ def dunn_index(x: np.ndarray, y: np.ndarray) -> float:
     :rtype: float
 
     :example:
+
     >>> centers = [[0, 0], [5, 10], [10, 0], [20, 10]]  # Adjust distances between cluster centers
     >>> x, y = make_blobs(n_samples=80_000_000, n_features=10, centers=centers, cluster_std=1, random_state=10)
     >>> v = dunn_index(x=x, y=y)
@@ -676,6 +687,7 @@ def adjusted_rand_gpu(x: np.ndarray, y: np.ndarray) -> float:
     :rtype: float
 
     :example:
+
     >>> x = np.random.randint(low=0, high=55, size=100000000)
     >>> y = np.random.randint(low=0, high=55, size=100000000)
     >>> adjusted_rand_gpu(x=x, y=y)
@@ -710,6 +722,7 @@ def davis_bouldin(x: np.ndarray,
     :rtype: float
 
     :example:
+
     >>> centers = [[0, 0], [5, 10], [10, 0], [20, 10]]  # Adjust distances between cluster centers
     >>> x, y = make_blobs(n_samples=50000, n_features=4, centers=3, cluster_std=0.1)
     >>> p = davis_bouldin(x, y)
@@ -781,6 +794,7 @@ def xie_beni(x: np.ndarray, y: np.ndarray) -> float:
     :rtype: float
 
     :example:
+
     >>> from sklearn.datasets import make_blobs
     >>> X, y = make_blobs(n_samples=100000, centers=40, n_features=600, random_state=0, cluster_std=0.3)
     >>> xie_beni(x=X, y=y)
@@ -852,6 +866,7 @@ def i_index(x: np.ndarray, y: np.ndarray, verbose: bool = False) -> float:
            `Springer <https://doi.org/10.1007/978-3-642-04921-7_32>`_.
 
     :example:
+
     >>> X, y = make_blobs(n_samples=5000, centers=20, n_features=3, random_state=0, cluster_std=0.1)
     >>> i_index(x=X, y=y)
     """
@@ -901,6 +916,7 @@ def kullback_leibler_divergence_gpu(x: np.ndarray,
     :rtype: float
 
     :example:
+
     >>> x, y = np.random.normal(loc=150, scale=900, size=10000000), np.random.normal(loc=140, scale=900, size=10000000)
     >>> kl = kullback_leibler_divergence_gpu(x=x, y=y)
     """
@@ -954,6 +970,7 @@ def hamming_distance_gpu(x: np.ndarray,
 
 
     :example:
+
     >>> x, y = np.random.randint(0, 2, (10, 1)).astype(np.int8), np.random.randint(0, 2, (10, 1)).astype(np.int8)
     >>> gpu_hamming = hamming_distance_gpu(x=x, y=y)
     """

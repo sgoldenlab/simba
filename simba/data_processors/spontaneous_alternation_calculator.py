@@ -51,6 +51,7 @@ class SpontaneousAlternationCalculator(ConfigReader):
     :param Optional[Union[str, os.PathLike]] data_path: Directory of path to the file to be analyzed. If None, then ``project_folder/outlier_corrected_movement_location`` directory.
 
     :example:
+
     >>> x = SpontaneousAlternationCalculator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini', arm_names=['A', 'B', 'C'], center_name='Center', threshold=0.0, animal_area=100, buffer=2, detailed_data=True)
     >>> x.run()
     >>> x.save()

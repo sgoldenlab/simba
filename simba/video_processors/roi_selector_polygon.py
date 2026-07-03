@@ -36,6 +36,7 @@ class ROISelectorPolygon(object):
     :raises CropWarning: If the selected ROI extends beyond the image boundaries or if the number of vertices is less than 3.
 
     :example:
+
     >>> polygon_selector = ROISelectorPolygon(path='/Users/simon/Desktop/amber.png')
     >>> polygon_selector.run()
     >>> polygon_selector = ROISelectorPolygon(path='/Users/simon/Desktop/Box2_IF19_7_20211109T173625_4_851_873_1_cropped.mp4')

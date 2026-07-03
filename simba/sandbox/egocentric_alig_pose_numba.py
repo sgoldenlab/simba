@@ -48,6 +48,7 @@ def egocentrically_align_pose_numba(data: np.ndarray,
     :rtype: Tuple[np.ndarray, np.ndarray, np.ndarray]
 
     :example:
+
     >>> data = np.random.randint(0, 500, (100, 7, 2))
     >>> anchor_1_idx = 5 # E.g., the animal tail-base is the 5th body-part
     >>> anchor_2_idx = 7 # E.g., the animal nose is the 7th row in the data

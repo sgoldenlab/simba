@@ -35,6 +35,7 @@ def sliding_min(x: np.ndarray, time_window: float, sample_rate: int) -> np.ndarr
     :return: A numpy array containing the minimum value for each position of the sliding window.
 
     :example:
+
     >>> x = np.arange(0, 10000000)
     >>> time_window = 1
     >>> sample_rate = 10

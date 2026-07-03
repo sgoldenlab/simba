@@ -27,6 +27,7 @@ def sliding_two_signal_crosscorrelation(x: np.ndarray,
     :return: 2D array of sliding cross-correlation values. Each row corresponds to a time index, and each column corresponds to a window size specified in the `windows` parameter.
 
     :example:
+
     >>> x = np.random.randint(0, 10, size=(20,))
     >>> y = np.random.randint(0, 10, size=(20,))
     >>> sliding_two_signal_crosscorrelation(x=x, y=y, windows=np.array([1.0, 1.2]), sample_rate=10, normalize=True, lag=0.0)

@@ -136,6 +136,7 @@ class ShapAggregateStatisticsCalculator():
     :param bool plot: If True, creates a visualization of the aggregate SHAP values. Default True.
 
     :example:
+
     >>> shap_df = pd.read_csv('/Users/simon/Desktop/envs/simba/simba/tests/data/sample_data/shap_test.csv', index_col=0)
     >>> test = ShapAggregateStatisticsCalculator(classifier_name='target',
     >>>                                          shap_df=shap_df,

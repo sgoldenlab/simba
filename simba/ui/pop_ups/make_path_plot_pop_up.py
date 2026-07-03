@@ -31,6 +31,7 @@ class MakePathPlotPopUp(PopUpMixin):
     "CREATE PATH PLOTS" tool available in the SimBA project interface.
 
     :example:
+
     >>> popup = MakePathPlotPopUp()
     >>> # User selects video, data file, body-part, and styling options
     >>> # Then clicks RUN to generate the path plot

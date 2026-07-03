@@ -20,6 +20,7 @@ from simba.utils.read_write import (create_empty_xlsx_file, df_to_xlsx_sheet,
 class ClustererComparsionMetricCalculator():
     """
     :example:
+
     >>> x = ClustererComparsionMetricCalculator(data_dir=r'/Users/simon/Desktop/tests_', save_path=r'/Users/simon/Desktop/asdasdasd.xlsx')
     >>> x.run()
     """

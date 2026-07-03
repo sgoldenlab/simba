@@ -21,6 +21,7 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
                  config_path: Union[str, os.PathLike]):
         """
         :example:
+
         >>> _ = QuickLineplotPopup(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
         """
 

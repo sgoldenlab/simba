@@ -35,6 +35,7 @@ class CueLightMovementAnalyzer(ConfigReader):
 
 
     :examples:
+
     >>> cue_light_movement_analyzer = CueLightMovementAnalyzer(config_path='MyProjectConfig', cue_light_names=['Cue_light'], pre_window=1000, post_window=1000, threshold=0.0, roi_setting=True)
     >>> cue_light_movement_analyzer.calculate_whole_session_movement()
     >>> cue_light_movement_analyzer.organize_results()

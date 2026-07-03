@@ -24,6 +24,7 @@ def elliptic_envelope(data: np.ndarray,
     :return np.ndarray: The Mahalanobis distances of each observation in array. Larger values indicate outliers.
 
     :example:
+
     >>> data_path = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/clusters/beautiful_beaver.pickle'
     >>> x = read_pickle(data_path=data_path)['DR_MODEL']['MODEL'].embedding_
     >>> y = elliptic_envelope(data=x, contamination=0.1)

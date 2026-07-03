@@ -15,6 +15,7 @@ class DLCAnnotations2LabelMePopUp(PopUpMixin):
 
     """
     :example:
+
     >>> DLCAnnotations2LabelMePopUp()
     """
     def __init__(self):

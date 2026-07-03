@@ -24,6 +24,7 @@ def czebyshev_distance(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
     :return float: The Czebyshev distance between the two samples.
 
     :example:
+
     >>> sample_1 = np.random.randint(0, 10, (10000,100))
     >>> sample_2 = np.random.randint(0, 10, (10000,100))
     >>> czebyshev_distance(sample_1=sample_1, sample_2=sample_2)
@@ -86,6 +87,7 @@ def sokal_michener(x: np.ndarray, y: np.ndarray, w: Optional[np.ndarray] = None)
     :return float: Sokal-Michener dissimilarity between `x` and `y`.
 
     :example:
+
     >>> x = np.random.randint(0, 2, (200,))
     >>> y = np.random.randint(0, 2, (200,))
     >>> sokal_michener = sokal_michener(x=x, y=y)

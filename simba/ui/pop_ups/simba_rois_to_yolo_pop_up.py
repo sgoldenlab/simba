@@ -22,6 +22,7 @@ class SimBAROIs2YOLOPopUp(PopUpMixin):
 
     """
     :example:
+
     >>> SimBAROIs2YOLOPopUp()
     """
     def __init__(self):

@@ -41,6 +41,7 @@ class HeatMapperClfSingleCore(ConfigReader, PlottingMixin):
     :param Dict style_attr: Dict containing settings for colormap, bin-size, max scale, and smooothing operations. For example: {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 50, 'max_scale': 'auto'}.
 
     :example:
+
     >>> test = HeatMapperClfSingleCore(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini",
     >>>                  style_attr = {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 50, 'max_scale': 'auto'},
     >>>                  final_img_setting=True,

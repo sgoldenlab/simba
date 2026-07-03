@@ -20,6 +20,7 @@ def calinski_harabasz(x: np.ndarray,
     :return float: Calinski-Harabasz score.
 
     :example:
+
     >>> x = np.random.random((100, 2)).astype(np.float32)
     >>> y = np.random.randint(0, 100, (100,)).astype(np.int64)
     >>> calinski_harabasz(x=x, y=y)

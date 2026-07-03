@@ -46,6 +46,7 @@ class NvDecReader:
     :param bool bgr: If True, convert decoded RGB frames to BGR for OpenCV. Only applies when ``use_device_memory=False``. Default True.
 
     :example:
+
     >>> reader = NvDecReader(video_path='test.mp4', batch_size=64, max_batches_pending=2, n_decoders=2)
     >>> reader.start()
     >>> for frame_idx, frame in reader:

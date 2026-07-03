@@ -66,6 +66,7 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
     :param Optional[bool] show_bbox: If True, axis-aligned bounding boxes created from each anmals pose and displayed. Default True.
 
     :example:
+
     >>> text_settings = {'circle_scale': 5, 'font_size': 5, 'spacing_scale': 2, 'text_thickness': 10}
     >>> test = PlotSklearnResultsSingleCore(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
     >>>                                       video_setting=True,

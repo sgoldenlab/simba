@@ -66,6 +66,7 @@ def fit_yolo(weights_path: Union[str, os.PathLike],
     :return: None. The trained model and associated training logs are saved in the specified `project_path`.
 
     :example:
+
     >>> fit_yolo(initial_weights=r"C:/troubleshooting/coco_data/weights/yolov8n-obb.pt", data=r"C:/troubleshooting/coco_data/model.yaml", save_path=r"C:/troubleshooting/coco_data/mdl", batch=16)
     """
 
@@ -103,6 +104,7 @@ def load_yolo_model(weights_path: Union[str, os.PathLike],
     :param Union[Literal['cpu'], int]  device: Device to load model on. 'cpu', int GPU index.
 
     :example:
+
     >>> load_yolo_model(weights_path=r"/mnt/c/troubleshooting/coco_data/mdl/train8/weights/best.pt", format="onnx", device=0)
     """
 
@@ -261,6 +263,7 @@ def keypoint_array_to_yolo_annotation_str(x: np.ndarray,
     :rtype: str
 
     :example:
+
     >>> x = np.array([[100, 200, 2], [150, 250, 2], [120, 240, 1]])
     >>> keypoint_array_to_yolo_annotation_str(x=x, img_h=480, img_w=640)
     """
@@ -542,6 +545,7 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
     :raises InvalidInputError: On unsupported format or invalid precision combination.
 
     :example:
+
     >>> export_yolo_model(
     ...     model_path=r"F://netholabs\\primintellect_test\\mdl\\weights\\best.pt",
     ...     export_format='engine',
@@ -594,6 +598,7 @@ def read_yolo_metadata(model: Union[str, os.PathLike, YOLO]) -> dict:
     :raises InvalidInputError: If ``model`` is not a YOLO instance, not a valid path, or has an unsupported extension.
 
     :example:
+
     >>> meta = read_yolo_metadata('/models/best.engine')
     >>> meta['batch']
     192
@@ -681,6 +686,7 @@ def get_yolo_imgsz_and_batch_size(model: Union[str, os.PathLike, YOLO],
     :raises InvalidInputError: If ``raise_error`` is True and ``imgsz`` and/or ``batch`` is not present in the model metadata.
 
     :example:
+
     >>> get_yolo_imgsz_and_batch_size(r'/models/best.engine')
     (256, 192)
     >>> get_yolo_imgsz_and_batch_size(r'/models/best.pt', raise_error=False)

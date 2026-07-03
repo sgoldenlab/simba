@@ -31,6 +31,7 @@ def import_dlc_csv(config_path: Union[str, os.PathLike], source: str) -> List[st
     :return List[str]: Paths to location of imported files.
 
     :example:
+
     >>> import_dlc_csv(config_path='project_folder/project_config.ini', source='CSV_import/Together_1.csv')
     >>> ['project_folder/csv/input_csv/Together_1.csv']
     """
@@ -99,6 +100,7 @@ def import_dlc_csv_data(config_path: Union[str, os.PathLike],
     :return None:
 
     :example:
+
     >>> interpolation_settings = {'type': 'body-parts', 'method': 'linear'}
     >>> smoothing_settings = None #{'time_window': 500, 'method': 'savitzky-golay'}
     >>> import_dlc_csv_data(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/new_data', interpolation_settings=interpolation_settings, smoothing_settings=smoothing_settings)

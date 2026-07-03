@@ -34,6 +34,7 @@ class GetPixelsPerMillimeterInterface():
     :rtype: float
 
     :example:
+
     >>> runner = GetPixelsPerMillimeterInterface(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi', known_metric_mm=140)
     >>> runner.run()
     >>> runner = GetPixelsPerMillimeterInterface(video_path='/Users/simon/Desktop/blank_video.mp4', known_metric_mm=140)

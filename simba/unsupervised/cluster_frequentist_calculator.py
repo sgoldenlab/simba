@@ -57,6 +57,7 @@ class ClusterFrequentistCalculator(UMLMixin, ConfigReader):
     :param dict settings: Dict holding which statistical tests to use, with test name as keys and booleans as values.
 
     :example:
+
     >>> settings = {'scaled': True, 'ANOVA': True, 'tukey_posthoc': True, 'descriptive_statistics': True}
     >>> calculator = ClusterFrequentistCalculator(config_path='unsupervised/project_folder/project_config.ini', data_path='unsupervised/cluster_models/quizzical_rhodes.pickle', settings=settings)
     >>> calculator.run()

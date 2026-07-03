@@ -29,6 +29,7 @@ class SamInference():
 
     """
     :example:
+
     >>> i = SamInference(video_path=r"MyVideo",
     >>>                 labels=[[1]],
     >>>                 prompts=[[166, 428]],

@@ -88,6 +88,7 @@ def geometries_to_coco(geometries: Dict[str, np.ndarray],
        :align: center
 
     :example:
+
     >>> data_path = r"C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\FRR_gq_Saline_0624.csv"
     >>> animal_data = read_df(file_path=data_path, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y', 'Left_side_x', 'Left_side_y', 'Right_side_x', 'Right_side_y']).values.reshape(-1, 4, 2)[0:20].astype(np.int32)
     >>> animal_polygons = GeometryMixin().bodyparts_to_polygon(data=animal_data)
@@ -157,6 +158,7 @@ def geometries_to_yolo(geometries: Dict[Union[str, int], np.ndarray],
     :return None:
 
     :example:
+
     >>> data_path = r"C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\501_MA142_Gi_CNO_0514.csv"
     >>> animal_data = read_df(file_path=data_path, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y', 'Left_side_x', 'Left_side_y', 'Right_side_x', 'Right_side_y']).values.reshape(-1, 4, 2).astype(np.int32)
     >>> animal_polygons = GeometryMixin().bodyparts_to_polygon(data=animal_data)
@@ -320,6 +322,7 @@ def labelme_to_dlc(labelme_dir: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> labelme_dir = 'D:\ts_annotations'
     >>> labelme_to_dlc(labelme_dir=labelme_dir)
     """
@@ -390,6 +393,7 @@ def dlc_to_labelme(dlc_dir: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> dlc_to_labelme(dlc_dir="D:\TS_DLC\labeled-data\ts_annotations", save_dir="C:\troubleshooting\coco_data\labels\test")
     >>> dlc_to_labelme(dlc_dir=r'D:\rat_resident_intruder\dlc_data\WIN_20190816081353', save_dir=r'D:\rat_resident_intruder\labelme')
     """
@@ -456,6 +460,7 @@ def b64_dict_to_imgs(x: Dict[str, np.ndarray]):
     Helper to convert a dictionary of images in byte64 format to a dictionary of images in array format.
 
     :example:
+
     >>> df = labelme_to_df(labelme_dir=r'C:\troubleshooting\coco_data\labels\test_2')
     >>> x = df.set_index('image_name')['image'].to_dict()
     >>> b64_dict_to_imgs(x)
@@ -527,6 +532,7 @@ def labelme_to_df(labelme_dir: Union[str, os.PathLike],
     :rtype: Union[None, pd.DataFrame]
 
     :example:
+
     >>> labelme_to_df(labelme_dir=r'C:\troubleshooting\coco_data\labels\test_2')
     >>> df = labelme_to_df(labelme_dir=r'C:\troubleshooting\coco_data\labels\test_read', greyscale=False, pad=False, normalize=False, size='min')
     """
@@ -614,6 +620,7 @@ def scale_pose_img_sizes(pose_data: np.ndarray,
     :rtype: Tuple[np.ndarray, Iterable[Union[np.ndarray, str]]]
 
     :example:
+
     >>> df = labelme_to_df(labelme_dir=r'C:\troubleshooting\coco_data\labels\test_read', greyscale=False, pad=False, normalize=False)
     >>> imgs = list(df['image'])
     >>> pose_data = df.drop(['image', 'image_name'], axis=1)
@@ -773,12 +780,15 @@ def simba_rois_to_yolo(config_path: Optional[Union[str, os.PathLike]] = None,
     :return: None
 
     :example I:
+
     >>> simba_rois_to_yolo(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
 
     :example II:
+
     >>> simba_rois_to_yolo(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini", save_dir=r"C:\troubleshooting\RAT_NOR\project_folder\logs\yolo", video_dir=r"C:\troubleshooting\RAT_NOR\project_folder\videos", roi_path=r"C:\troubleshooting\RAT_NOR\project_folder\logs\measures\ROI_definitions.h5")
 
     :example III:
+
     >>> simba_rois_to_yolo(video_dir=r"C:\troubleshooting\RAT_NOR\project_folder\videos", roi_path=r"C:\troubleshooting\RAT_NOR\project_folder\logs\measures\ROI_definitions.h5", save_dir=r'C:\troubleshooting\RAT_NOR\project_folder\yolo', verbose=True, roi_frm_cnt=20, obb=True)
     """
 
@@ -946,6 +956,7 @@ def labelme_to_img_dir(labelme_dir: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> labelme_to_img_dir(img_dir=r"C:\troubleshooting\coco_data\labels\train_images", labelme_dir=r'C:\troubleshooting\coco_data\labels\train_')
     >>> labelme_to_img_dir(img_dir=r"D:\rat_resident_intruder\labelme", labelme_dir=r'D:\rat_resident_intruder\imgs')
     """
@@ -994,6 +1005,7 @@ def labelme_to_yolo(labelme_dir: Union[str, os.PathLike],
 
 
     :example:
+
     >>> LABELME_DIR = r'D:/annotations'
     >>> SAVE_DIR = r"D:/yolo_data"
     >>> labelme_to_yolo(labelme_dir=LABELME_DIR, save_dir=SAVE_DIR)
@@ -1143,6 +1155,7 @@ def coco_keypoints_to_yolo(coco_path: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> coco_path = r"D:\netholabs\imgs_vcat\batch_1\batch_1\coco_annotations\person_keypoints_default.json"
     >>> coco_keypoints_to_yolo(coco_path=coco_path, img_dir=r'D:\netholabs\imgs_vcat\batch_1', save_dir=r"D:\netholabs\imgs_vcat\batch_1\batch_1\yolo_annotations")
     """
@@ -1337,6 +1350,7 @@ def sleap_to_yolo_keypoints(data_dir: Union[str, os.PathLike],
     :return: None. Results saved in ``save_dir``.
 
     :example:
+
     >>> sleap_to_yolo_keypoints(data_dir=r'D:\ares\data\ant\sleap_csv', video_dir=r'D:\ares\data\ant\sleap_video', frms_cnt=550, train_size=0.8, instance_threshold=0.9, save_dir=r"D:\ares\data\ant\yolo")
 
     """
@@ -1528,6 +1542,7 @@ def dlc_to_yolo_keypoints(dlc_dir: Union[str, os.PathLike],
     :return: None. Results saved in ``save_dir``.
 
     :example:
+
     >>> dlc_to_yolo_keypoints(dlc_dir=r'D:\mouse_operant_data\Operant_C57_labelled_images\labeled-data', save_dir=r"D:\mouse_operant_data\yolo", verbose=True)
     >>> dlc_to_yolo_keypoints(dlc_dir=r'D:\rat_resident_intruder\dlc_data', save_dir=r"D:\rat_resident_intruder\yolo", verbose=True, bp_id_idx={0: list(range(0, 8)), 1: list(range(8, 16))},  map_dict={0: 'resident', 1: 'intruder'})
     """
@@ -1672,6 +1687,7 @@ def dlc_multi_animal_h5_to_yolo_keypoints(data_dir: Union[str, os.PathLike],
     :return: None. Results saved in ``save_dir``.
 
     :example:
+
     >>> dlc_multi_animal_h5_to_yolo_keypoints(data_dir=r'D:\troubleshooting\dlc_h5_multianimal_to_yolo\data', video_dir=r'D:\troubleshooting\dlc_h5_multianimal_to_yolo\videos', save_dir=r'D:\troubleshooting\dlc_h5_multianimal_to_yolo\yolo')
 
     """
@@ -1811,6 +1827,7 @@ def simba_to_yolo_keypoints(config_path: Union[str, os.PathLike],
     :return: None. Saves YOLO-formatted images and annotations to disk in the `save_dir` location.
 
     :example:
+
     >>> simba_to_yolo_keypoints(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", save_dir=r'C:\troubleshooting\mitra\yolo', sample_size=150, verbose=True)
     """
 

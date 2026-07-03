@@ -124,6 +124,7 @@ def upsample_fps(video_path: Union[str, os.PathLike],
     :return: None. The function saves the upsampled video(s) to the specified directory.
 
     :example:
+
     >>> upsample_fps(video_path='/Users/simon/Desktop/Box2_IF19_7_20211109T173625_4_851_873_1_cropped.mp4', fps=100, quality=100)
     """
 

@@ -64,6 +64,7 @@ def img_stack_brightness(x: np.ndarray,
 
 
     :example:
+
     >>> imgs = read_img_batch_from_video_gpu(video_path=r"/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4_downsampled.mp4", start_frm=0, end_frm=5000)
     >>> imgs = np.stack(list(imgs.values()), axis=0)
     >>> x = img_stack_brightness(x=imgs)

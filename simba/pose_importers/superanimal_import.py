@@ -67,6 +67,7 @@ class SuperAnimalTopViewImporter(PoseImporterMixin, ConfigReader):
         .. [2] mwmathis lab on huggingface - `https://huggingface.co/mwmathis/ <https://huggingface.co/mwmathis/>`_.
 
     :example:
+
     >>> importer = SuperAnimalTopViewImporter(config_path=r"C:\troubleshooting\super_animal_import\project_folder\project_config.ini", data_folder=r'C:\troubleshooting\super_animal_import\data_files', id_lst=['Animal_1'])
     >>> importer.run()
 

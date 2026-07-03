@@ -60,6 +60,7 @@ class BatchProcessFrame(PopUpMixin):
 
 
     :example:
+
     >>> batch_preprocessor = BatchProcessFrame(input_dir=r'MyInputVideosDir', output_dir=r'MyOutputVideosDir')
     >>> batch_preprocessor.create_main_window()
     >>> batch_preprocessor.create_video_table_headings()

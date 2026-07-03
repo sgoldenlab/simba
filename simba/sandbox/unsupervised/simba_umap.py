@@ -73,6 +73,7 @@ class SimBAUmap():
         :return: None
 
         :example:
+
         >>> hyperparameters = {"n_neighbors": (5,), "min_distance": (0.1, 0.5, 0.0), "spread": (1.0,)}
         >>> variance_threshold = 0.05
         >>> multicollinearity = 0.9999

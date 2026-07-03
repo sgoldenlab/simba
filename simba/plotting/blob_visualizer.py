@@ -65,6 +65,7 @@ class BlobVisualizer():
     :param right: RGB color tuple (R, G, B) for right body part point visualization. Default: (255, 255, 102). Set to None to disable right visualization.
 
     :example:
+
     >>> visualizer = BlobVisualizer(data_path=r'/path/to/blob_data.csv',
     ...                             video_path=r'/path/to/video.mp4',
     ...                             save_dir=r'/path/to/output',

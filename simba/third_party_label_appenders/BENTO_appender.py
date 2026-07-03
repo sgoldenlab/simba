@@ -34,6 +34,7 @@ class BentoAppender(ConfigReader):
     :param str data_dir: Path to folder containing BENTO data.
 
     :example:
+
     >>> bento_dir = 'tests/test_data/bento_example'
     >>> config_path = 'tests/test_data/import_tests/project_folder/project_config.ini'
     >>> bento_appender = BentoAppender(config_path=config_path, data_dir=bento_dir)

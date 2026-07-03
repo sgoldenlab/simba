@@ -25,10 +25,12 @@ def img_edge_distances(data: np.ndarray,
     :rtype: np.ndarray
 
     :example I:
+
     >>> data = np.array([[0, 0], [758, 540], [0, 540], [748, 540]])
     >>> img_edge_distances(data=data, pixels_per_mm=2.13, img_resolution=np.array([748, 540]), time_window=1.0, fps=1)
 
     :example II:
+
     >>> data = read_df(file_path=FILE_PATH, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y'])
     >>> data = data.values.reshape(len(data), 2, 2)
     >>> img_edge_distances(data=data, pixels_per_mm=2.13, img_resolution=np.array([748, 540]), time_window=1.0, fps=1)

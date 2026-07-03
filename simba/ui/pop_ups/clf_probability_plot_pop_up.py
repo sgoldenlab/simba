@@ -35,6 +35,7 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
 
     """
     :example:
+
     >>> _ = VisualizeClassificationProbabilityPopUp(config_path=r'C:\troubleshooting\RAT_NOR\project_folder\project_config.ini')
     """
     def __init__(self, config_path: Union[str, os.PathLike]):

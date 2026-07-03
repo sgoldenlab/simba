@@ -27,6 +27,7 @@ def sorensen_dice_coefficient(x: np.ndarray, y: np.ndarray) -> float:
     :return: Sørensen's Similarity Index between x and y.
 
     :example:
+
     >>> x = np.random.randint(0, 10, (100,))
     >>> y = np.random.randint(0, 10, (100,))
     >>> sorensen_dice_coefficient(x=x, y=y)

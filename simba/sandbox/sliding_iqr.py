@@ -17,6 +17,7 @@ def sliding_iqr(x: np.ndarray, window_size: float, sample_rate: float) -> np.nda
         .. [1] Hession, Leinani E., Gautam S. Sabnis, Gary A. Churchill, and Vivek Kumar. “A Machine-Vision-Based Frailty Index for Mice.” Nature Aging 2, no. 8 (August 16, 2022): 756–66. https://doi.org/10.1038/s43587-022-00266-0.
 
     :example:
+
     >>> data = np.random.randint(0, 50, (90,)).astype(np.float32)
     >>> window_size = 0.5
     >>> sliding_iqr(x=data, window_size=0.5, sample_rate=10.0)

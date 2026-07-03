@@ -14,6 +14,7 @@ from simba.utils.enums import Keys, Links, Options
 class Convert2MP4PopUp(PopUpMixin):
     """
     :example:
+
     >>> Convert2MP4PopUp()
     """
     def __init__(self):
@@ -58,6 +59,7 @@ class Convert2MP4PopUp(PopUpMixin):
 class Convert2AVIPopUp(PopUpMixin):
     """
     :example:
+
     >>> Convert2AVIPopUp()
     """
 
@@ -101,6 +103,7 @@ class Convert2AVIPopUp(PopUpMixin):
 class Convert2WEBMPopUp(PopUpMixin):
     """
     :example:
+
     >>> Convert2WEBMPopUp()
     """
 
@@ -144,6 +147,7 @@ class Convert2WEBMPopUp(PopUpMixin):
 class Convert2MOVPopUp(PopUpMixin):
     """
     :example:
+
     >>> Convert2MOVPopUp()
     """
 

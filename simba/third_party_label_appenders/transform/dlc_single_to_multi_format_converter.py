@@ -26,6 +26,7 @@ def convert_dlc_annotation_format(input_dir: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> INPUT_DIR = r'E:\maplight_videos'
     >>> OUTPUT_DIR = r'E:\maplight_videos\converted'
     >>> convert_dlc_annotation_format(input_dir=INPUT_DIR, output_dir=OUTPUT_DIR)

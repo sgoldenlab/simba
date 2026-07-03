@@ -130,6 +130,7 @@ def directory_clf_bout_aggregator(dir: Union[str, os.PathLike],
     :rtype: None
 
     :example:
+
     >>> feature_names = list(pd.read_csv(r"C:\troubleshooting\nastacia_unsupervised\feature_names.csv", usecols=['FEATURE_NAMES']).values[:, 0])
     >>> clf_names = ['Attack', 'Escape',	'Defensive', 'anogenital_prediction',	'face',	'body']
     >>> bp_names = list(pd.read_csv(r"C:\troubleshooting\nastacia_unsupervised\bp_names.csv", usecols=['BP_NAMES']).values[:, 0])

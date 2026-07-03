@@ -45,11 +45,13 @@ class LabelMe2DataFrame:
     :rtype: Union[None, pd.DataFrame]
 
     :example I:
+
     >>> LABELME_DIR = r'C:\troubleshooting\coco_data\labels\test_2'
     >>> runner = LabelMe2DataFrame(labelme_dir=LABELME_DIR)
     >>> runner.run()
 
     :example II:
+
     >>> LABELME_DIR = r'C:\troubleshooting\coco_data\labels\test_2'
     >>> runner = LabelMe2DataFrame(labelme_dir=LABELME_DIR, greyscale=True, pad=True, normalize=True, size='min')
     >>> runner.run()

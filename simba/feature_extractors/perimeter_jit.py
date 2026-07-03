@@ -97,6 +97,7 @@ def jitted_centroid(points: np.ndarray) -> np.ndarray:
     :return: (n_frames, 2) int32; centroid (x, y) per frame; NaN where hull fails.
 
     :example:
+
     >>> points = np.random.randint(1, 50, size=(50, 5, 2)).astype(np.float32)
     >>> centroids = jitted_centroid(points)
     """
@@ -133,6 +134,7 @@ def get_hull_sizes(points: np.ndarray,
     :return: (n_frames,) float32; hull size per frame (pixels or mm); NaN where hull fails.
 
     :example:
+
     >>> points = np.random.randint(0, 500, size=(100, 7, 2)).astype(np.float32)
     >>> get_hull_sizes(points, target='perimeter')
     >>> get_hull_sizes(points, target='area', pixels_per_mm=2.5)

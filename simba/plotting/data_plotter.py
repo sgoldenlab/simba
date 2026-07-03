@@ -52,6 +52,7 @@ class DataPlotter(ConfigReader):
        :align: center
 
     :examples:
+
     >>> _ = DataPlotter(config_path='MyConfigPath').run()
     """
 

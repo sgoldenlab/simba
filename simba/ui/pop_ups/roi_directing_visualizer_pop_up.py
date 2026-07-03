@@ -30,6 +30,7 @@ class DirectingROIVisualizerPopUp(ConfigReader, PopUpMixin):
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file in Configparser format.
 
     :example:
+
     >>> _ = DirectingROIVisualizerPopUp(config_path=r"C:\\troubleshooting\\two_black_animals_14bp\\project_folder\\project_config.ini")
     """
 

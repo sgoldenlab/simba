@@ -78,6 +78,7 @@ def reverse_videos(path: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> reverse_videos(path='/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/videos/reverse/TheVideoName_video_name_2_frame_no.mp4')
     """
 

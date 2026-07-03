@@ -25,6 +25,7 @@ class RunMachineModelsPopUp(PopUpMixin, ConfigReader):
 
     """
     :example:
+
     >>> _ = RunMachineModelsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 
     """

@@ -42,6 +42,7 @@ class ROIDefinitionsCSVImporter(ConfigReader):
     :param bool append: If True, append ROI definitions to existing ROI_definitions.h5 file. If False, overwrite existing file. Default: False.
 
     :example:
+
     >>> importer = ROIDefinitionsCSVImporter(
     ...     config_path=r"project_folder/project_config.ini",
     ...     rectangles_path=r"logs/measures/rectangles_20251122110043.csv",
@@ -52,6 +53,7 @@ class ROIDefinitionsCSVImporter(ConfigReader):
     >>> importer.run()
 
     :example:
+
     >>> importer = ROIDefinitionsCSVImporter(
     ...     config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini",
     ...     circles_path=r"C:\troubleshooting\mouse_open_field\project_folder\logs\measures\circles_20251122110043.csv",

@@ -126,6 +126,7 @@ def gif_creator(file_path: Union[str, os.PathLike],
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
 
     :example:
+
     >>> _ = gif_creator(file_path='project_folder/videos/Video_1.avi', start_time=5, duration=10, width=600)
     """
 

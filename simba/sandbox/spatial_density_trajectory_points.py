@@ -22,6 +22,7 @@ def spatial_density(x: np.ndarray,
     :rtype: float
 
     :example:
+
     >>> x = np.array([[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [1, 0.5], [1.5, 1.5]])
     >>> density = spatial_density(x, pixels_per_mm=2.5, radius=5)
     >>> high_density_points = np.array([[0, 0], [0.5, 0], [1, 0], [1.5, 0], [2, 0], [0, 0.5], [0.5, 0.5], [1, 0.5], [1.5, 0.5], [2, 0.5]])
@@ -67,6 +68,7 @@ def sliding_spatial_density(x: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(0, 20, (100, 2))  # Example trajectory with 100 points in 2D space
     >>> results = sliding_spatial_density(x=x, radius=5.0, pixels_per_mm=10.0, window_size=1, sample_rate=31)
     """

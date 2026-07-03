@@ -37,6 +37,7 @@ def get_img_slic(img: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> img = read_frm_of_video(video_path=r"C:\troubleshooting\mitra\project_folder\videos\FRR_gq_Saline_0626.mp4", frame_index=0)
     >>> sliced_img = get_img_slic(img=img)
     """
@@ -99,6 +100,7 @@ def get_video_slic(video_path: Union[str, os.PathLike],
     :return: None. The segmented video is saved to `save_path`.
 
     :example:
+
     >>> #video_path = r"C:\troubleshooting\mitra\project_folder\videos\FRR_gq_Saline_0626.mp4"
     """
     timer = SimbaTimer(start=True)

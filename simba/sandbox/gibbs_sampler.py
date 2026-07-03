@@ -33,6 +33,7 @@ class GibbSampler():
         :param float pseudo_number: Small error value for fuzzy search and avoid division by zero errors. Default: 10e-6.
 
         :example:
+
         >>> data = pd.read_csv(r"/Users/simon/Desktop/envs/simba/simba/tests/data/sample_data/gibbs_sample_cardinal.csv", index_col=0).values
         >>> sampler = GibbSampler(data=data, save_path=r'/Users/simon/Desktop/gibbs.csv', epochs=5, iterations=600)
         >>> sampler.run()

@@ -57,6 +57,7 @@ class MADLCH52Yolo:
     :return: None. Results saved in ``save_dir``.
 
     :example:
+
     >>> DATA_DIR = r'D:\troubleshooting\dlc_h5_multianimal_to_yolo\data'
     >>> VIDEO_DIR = r'D:\troubleshooting\dlc_h5_multianimal_to_yolo\videos'
     >>> SAVE_DIR = r"D:\imgs\madlc"

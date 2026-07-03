@@ -300,6 +300,7 @@ class ConfigReader(object):
         :raises DataHeaderWarning: If new headers are fewer/more than columns in dataframe
 
         :example:
+
         >>> df = pd.DataFrame(data=[[1, 2, 3], [1, 2, 3]], columns=['Feature_1', 'Feature_2', 'Feature_3'])
         >>> ConfigReader.insert_column_headers_for_outlier_correction(data_df=df, new_headers=['Feature_4', 'Feature_5', 'Feature_6'], filepath='test/my_test_file.csv')
         """
@@ -330,6 +331,7 @@ class ConfigReader(object):
         :raises DataHeaderError: All rows are non-numerical.
 
         :example:
+
         >>> ConfigReader.get_number_of_header_columns_in_df(df=pd.DataFrame(data=[[1, 2, 3], [1, 2, 3]]))
         >>> 0
         >>> ConfigReader.get_number_of_header_columns_in_df(df=pd.DataFrame(data=[['Head_1', 'Body_2', 'Tail_3'], ['Some_nonsense', 'A_mistake', 'Maybe_multi_headers?'], [11, 99, 109], [122, 43, 2091]]))
@@ -363,6 +365,7 @@ class ConfigReader(object):
 
 
         :example:
+
         >>> config_reader = ConfigReader(config_path='My_SimBA_Config')
         >>> config_reader.find_video_of_file(video_dir=config_reader.video_dir, filename='Video1')
         >>> '/project_folder/videos/Video1.mp4'
@@ -429,6 +432,7 @@ class ConfigReader(object):
         :raises NotDirectoryError: If ``raise_error`` and directory does not exist.
 
         :example:
+
         >>> self.remove_a_folder(folder_dir'gerbil/gerbil_data/featurized_data/temp')
         """
         shutil.rmtree(folder_dir, ignore_errors=True)
@@ -444,6 +448,7 @@ class ConfigReader(object):
         :raises NotDirectoryError: If ``raise_error`` and directory does not exist.
 
         :example:
+
         >>> self.remove_multiple_folders(folders= ['gerbil/gerbil_data/featurized_data/temp'])
         """
         folders = [x for x in folders if x is not None]
@@ -467,6 +472,7 @@ class ConfigReader(object):
         :return str
 
         :example:
+
         >>> config_reader = ConfigReader(config_path='tests/data/test_projects/two_c57/project_folder/project_config.ini')
         >>> ConfigReader.find_animal_name_from_body_part_name(bp_name='Ear_1', bp_dict=config_reader.animal_bp_dict)
         >>> 'simon'
@@ -500,6 +506,7 @@ class ConfigReader(object):
         :return dict
 
         :example:
+
         >>> ConfigReader.create_body_part_dictionary(multi_animal_status=True, animal_id_lst=['simon',])
         >>> {'simon': {'X_bps': ['Nose_1_x', 'Ear_left_1_x', 'Ear_right_1_x', 'Center_1_x', 'Lat_left_1_x', 'Lat_right_1_x', 'Tail_base_1_x', 'Tail_end_1_x'], 'Y_bps': ['Nose_1_y', 'Ear_left_1_y', 'Ear_right_1_y', 'Center_1_y', 'Lat_left_1_y', 'Lat_right_1_y', 'Tail_base_1_y', 'Tail_end_1_y'], 'colors': [[255.0, 0.0, 255.0], [223.125, 31.875, 255.0], [191.25, 63.75, 255.0], [159.375, 95.625, 255.0], [127.5, 127.5, 255.0], [95.625, 159.375, 255.0], [63.75, 191.25, 255.0], [31.875, 223.125, 255.0], [0.0, 255.0, 255.0]], 'P_bps': ['Nose_1_p', 'Ear_left_1_p', 'Ear_right_1_p', 'Center_1_p', 'Lat_left_1_p', 'Lat_right_1_p', 'Tail_base_1_p', 'Tail_end_1_p']}, 'jj': {'X_bps': ['Nose_2_x', 'Ear_left_2_x', 'Ear_right_2_x', 'Center_2_x', 'Lat_left_2_x', 'Lat_right_2_x', 'Tail_base_2_x', 'Tail_end_2_x'], 'Y_bps': ['Nose_2_y', 'Ear_left_2_y', 'Ear_right_2_y', 'Center_2_y', 'Lat_left_2_y', 'Lat_right_2_y', 'Tail_base_2_y', 'Tail_end_2_y'], 'colors': [[102.0, 127.5, 0.0], [102.0, 143.4375, 31.875], [102.0, 159.375, 63.75], [102.0, 175.3125, 95.625], [102.0, 191.25, 127.5], [102.0, 207.1875, 159.375], [102.0, 223.125, 191.25], [102.0, 239.0625, 223.125], [102.0, 255.0, 255.0]], 'P_bps': ['Nose_2_p', 'Ear_left_2_p', 'Ear_right_2_p', 'Center_2_p', 'Lat_left_2_p', 'Lat_right_2_p', 'Tail_base_2_p', 'Tail_end_2_p']}}
         """
@@ -567,6 +574,7 @@ class ConfigReader(object):
         Helper to extract pose-estimation data field names (x, y, p)
 
         :example:
+
         >>> config_reader = ConfigReader(config_path='test/project_config.csv')
         >>> config_reader.get_body_part_names()
         """
@@ -586,6 +594,7 @@ class ConfigReader(object):
         :return pd.DataFrame: ``df`` without pose-estimation fields
 
         :example:
+
         >>> config_reader = ConfigReader(config_path='test/project_folder/project_config.csv')
         >>> df = read_df(config_reader.machine_results_paths[0], file_type='csv')
         >>> df = config_reader.drop_bp_cords(df=df)
@@ -642,6 +651,7 @@ class ConfigReader(object):
         :return Union[str, float, int, os.Pathlike]
 
         :example:
+
         >>> config = ConfigReader(config_path='tests/data/test_projects/two_c57/project_folder/project_config.ini')
         >>> config.read_config_entry(config=self.config, section='Multi animal IDs', option='id_list', data_type='str')
         >>> 'simon,jj'
@@ -815,6 +825,7 @@ class ConfigReader(object):
         :param Union[str, os.PathLike] data_dir: directory with data to remove ROi features from.
 
         :example:
+
         >>> self.remove_roi_features('/project_folder/csv/features_extracted')
 
         """

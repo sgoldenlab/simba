@@ -58,10 +58,12 @@ class EzPathPlot(object):
 
 
     :example I:
+
     >>> path_plotter = EzPathPlot(data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/h5/Together_1DLC_resnet50_two_black_mice_DLC_052820May27shuffle1_150000_el.h5', video_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi', body_part='Mouse_1_Nose', bg_color=(255, 255, 255), line_color=(147,20,255))
     >>> path_plotter.run()
 
     :example II:
+
     >>> path_plotter = EzPathPlot(data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/h5/Together_1DLC_resnet50_two_black_mice_DLC_052820May27shuffle1_150000_el.h5', size=(2056, 1549), fps=30, body_part='Mouse_1_Nose', bg_color=(255, 255, 255), line_color=(147,20,255))
     >>> path_plotter.run()
     """

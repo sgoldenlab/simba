@@ -74,6 +74,7 @@ class SAM3ToYoloSeg:
     :param bool verbose: If True, print progress updates. Default True.
 
     :example:
+
     >>> runner = SAM3ToYoloSeg(video_dir=r'/path/to/videos', sam_path=r'/path/to/sam3.pt', save_dir=r'/path/to/yolo_project', txt_prompt='mouse', n_frames=50)
     >>> runner.run()
     """

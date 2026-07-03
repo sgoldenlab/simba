@@ -50,6 +50,7 @@ class YOLOAnnotationVisualizer(object):
     :param bool verbose: Print progress messages. Default ``True``.
 
     :example:
+
     >>> viz = YOLOAnnotationVisualizer(map_yaml_path=r'F:\netholabs\moira_lp_sam\map.yaml', save_dir=r'F:\netholabs\annotation_visualizations', n=400)
     >>> viz.run()
     >>> viz = YOLOAnnotationVisualizer(map_yaml_path=r'/path/to/map.yaml', save_dir=r'/path/to/output')

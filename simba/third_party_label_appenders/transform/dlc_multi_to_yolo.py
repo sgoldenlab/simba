@@ -31,6 +31,7 @@ class MultiDLC2Yolo:
     """
 
     :example:
+
     >>> DLC_DIR = r'E:\deeplabcut_projects\resident_intruder_white_black-SN-2025-09-30\labeled-data'
     >>> SAVE_DIR = r'E:\yolo_resident_intruder'
     >>> runner = MultiDLC2Yolo(dlc_dir=DLC_DIR, save_dir=SAVE_DIR, verbose=True, clahe=True, names=('resident', 'intruder'))

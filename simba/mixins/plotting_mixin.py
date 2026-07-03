@@ -205,6 +205,7 @@ class PlottingMixin(object):
            `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-distance-plots>`__.
 
         :example:
+
         >>> fps = 10
         >>> data = np.random.random((100,2))
         >>> line_attr = {0: ['Blue'], 1: ['Red']}
@@ -284,6 +285,7 @@ class PlottingMixin(object):
           `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-classification-probabilities>`__.
 
         :example:
+
         >>> data = pd.Series(np.random.random((100, 1)).flatten())
         >>> style_attr = {'width': 640, 'height': 480, 'font size': 10, 'line width': 6, 'color': 'blue', 'circle size': 20}
         >>> clf_name='Attack'
@@ -1010,6 +1012,7 @@ class PlottingMixin(object):
         :return: The rotated image as a numpy array of uint8 format.
 
         :example:
+
         >>> img = cv2.imread('/Users/simon/Desktop/test.png')
         >>> rotated_img = PlottingMixin.rotate_img(img=img, right=False)
         """
@@ -1200,6 +1203,7 @@ class PlottingMixin(object):
         :return sns.JointGrid or None: JointGrid object if save_path is None, else None.
 
         :example:
+
         >>> data, lbls = make_blobs(n_samples=100000, n_features=2, centers=10, random_state=42)
         >>> data = np.hstack((data, lbls.reshape(-1, 1)))
         >>> PlottingMixin.joint_plot(data=data, columns=['X', 'Y', 'Cluster'], title='The plot')
@@ -1624,6 +1628,7 @@ class PlottingMixin(object):
         :return: If save_path is None, returns a numpy array representing the plot image.
 
         :example:
+
         >>> p = np.random.randint(0, 50, (100,))
         >>> y = np.random.randint(0, 50, (200,))
         >>> img = PlottingMixin.make_line_plot_plotly(data=[p, y], show_box=False, font_size=20, bg_clr='white', show_grid=False, x_lbl_divisor=30, colors=['Red', 'Green'], save_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/line_plot/Trial     3_final_img.png')
@@ -1747,6 +1752,7 @@ class PlottingMixin(object):
 
 
         :example:
+
         >>> x = np.random.randint(0, 500, (100, 2))
         >>> y = np.random.randint(0, 500, (100, 2))
         >>> position_data = np.random.randint(0, 500, (100, 2))
@@ -2097,6 +2103,7 @@ class PlottingMixin(object):
         :return Tuple[int, int, int]: The font size, the shift on x between successive columns, the shift in y between successive rows.
 
         :example:
+
         >>> img = cv2.imread('/Users/simon/Desktop/Screenshot 2024-07-08 at 4.46.03 PM.png')
         >>> accepted_px_width = int(img.shape[1] / 4)
         >>> accepted_px_height = int(img.shape[0] / 10)
@@ -2146,6 +2153,7 @@ class PlottingMixin(object):
         :return Tuple[int, int, int]: The font pixel size, the shift on x between successive columns, the shift in y between successive rows.
 
         :example:
+
         >>> size_px, x_shift, y_shift = PlottingMixin.get_optimal_font_size_ttf(text='HELLO MY FELLOW', font_path='Poppins-Regular.ttf', accepted_px_width=480, accepted_px_height=108)
         """
 
@@ -2188,6 +2196,7 @@ class PlottingMixin(object):
         :return int: The recommended vertical pitch in pixels.
 
         :example:
+
         >>> PlottingMixin.get_optimal_font_spacing_ttf(font_path='Poppins Regular.ttf', size_px=13, text=['TIMERS:', 'grooming'])
         """
         check_int(name='size_px', value=size_px, min_value=1)
@@ -2457,6 +2466,7 @@ class PlottingMixin(object):
         :return: None.
 
         :example:
+
         >>> plot_clf_cumcount(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini", clf='CIRCLING', data_dir=r'D:\troubleshooting\mitra\project_folder\logs\test', seconds=True, bouts=True)
         """
 
@@ -2561,6 +2571,7 @@ class PlottingMixin(object):
            For more complex path plots with multiprocessing and advanced features, see :class:`simba.plotting.path_plotter.PathPlotterSingleCore` and :class:`simba.plotting.path_plotter_mp.PathPlotterMulticore`.
 
         :example:
+
         >>> df = pd.read_csv('/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/2022-06-20_NOB_DOT_4.csv')
         >>> data = df[['Nose_x', 'Nose_y']].values
         >>> img = read_frm_of_video(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4.mp4', frame_index=400)

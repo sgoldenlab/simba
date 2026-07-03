@@ -29,6 +29,7 @@ def rotate_img_stack_cupy(imgs: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/F0_gq_Saline_0626_clipped.mp4"
     >>> imgs = read_img_batch_from_video_gpu(video_path=video_path)
     >>> imgs = np.stack(np.array(list(imgs.values())), axis=0)
@@ -59,6 +60,7 @@ def rotate_video_cupy(video_path: Union[str, os.PathLike],
     :returns: None.
 
     :example:
+
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/F0_gq_Saline_0626_clipped.mp4"
     >>> rotate_video_cupy(video_path=video_path, rotation_degrees=45)
     """

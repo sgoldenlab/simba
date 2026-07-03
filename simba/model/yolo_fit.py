@@ -67,6 +67,7 @@ class FitYolo():
     :raises ValueError: If provided arguments fail SimBA validation checks.
 
     :example:
+
        >>> fitter = FitYolo(
        ...     weights_path=r"D:\\yolo_weights\\yolo11n-pose.pt",
        ...     model_yaml=r"D:\\datasets\\pose_project\\map.yaml",

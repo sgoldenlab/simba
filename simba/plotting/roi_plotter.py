@@ -82,6 +82,7 @@ class ROIPlotter(ConfigReader):
     :param Tuple[int, int, int] border_bg_clr: RGB tuple representing the background color of the border area where statistics are displayed. Default: (0, 0, 0).
 
     :example:
+
     >>> test = ROIPlotter(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini',
     >>>                video_path="/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT.mp4",
     >>>                body_parts=['Nose'],
@@ -90,6 +91,7 @@ class ROIPlotter(ConfigReader):
     >>> test.run()
 
     :example II:
+
     >>> test = ROIPlotter(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
     >>>               video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_Saline_0513.mp4",
     >>>               body_parts=['Nose'],

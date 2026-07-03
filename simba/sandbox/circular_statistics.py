@@ -163,6 +163,7 @@ def sliding_circular_mean(x: np.ndarray,
     :return np.ndarray: A 1D numpy array of the same length as `x`, containing the circular mean for each sliding window.  Values before the window is fully populated will be set to -1.
 
     :example:
+
     >>> x = np.random.randint(0, 361, (i, )).astype(np.int32)
     >>> results = sliding_circular_mean(x, 1, 10)
     """
@@ -224,6 +225,7 @@ def sliding_circular_range(x: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(0, 361, (19, )).astype(np.int32)
     >>> p = sliding_circular_range(x, 1, 10)
     """
@@ -425,6 +427,7 @@ def sliding_resultant_vector_length(x: np.ndarray,
     :return np.ndarray: A 1D numpy array of the same length as `x`, containing the resultant vector length for each sliding window. Values before the window is fully populated will be set to -1.
 
     :example:
+
     >>> x = np.random.randint(0, 361, (5000, )).astype(np.int32)
     >>> results = sliding_resultant_vector_length(x, 1, 10)
     """

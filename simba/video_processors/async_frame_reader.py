@@ -37,6 +37,7 @@ class AsyncVideoFrameReader:
     :param bool black_and_white: Whether to convert frames to black and white using thresholding (default=False).
 
     :example:
+
     >>> video_path = "/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/03152021_NOB_IOT_8.mp4"
     >>> runner = AsyncVideoFrameReader(video_path=video_path, batch_size=500)
     >>> reader_thread = threading.Thread(target=runner.run, daemon=True)

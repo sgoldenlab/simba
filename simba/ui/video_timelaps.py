@@ -41,6 +41,7 @@ class TimelapseSlider():
     :param bool use_timestamps: If True, display timestamps (HH:MM:SS) in labels and ruler. If False, display frame numbers. Default True.
 
     :example:
+
     >>> slider = TimelapseSlider(video_path='path/to/video.mp4', frame_cnt=25, crop_ratio=75)
     >>> slider.run()
     >>> # Use sliders to select segment, then access selected times and frames:

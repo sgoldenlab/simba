@@ -16,6 +16,7 @@ def cov_matrix(data: np.ndarray):
     :return: Covariance matrix of the input data with shape (m, m). The (i, j)-th element of the matrix represents the covariance between the i-th and j-th variables in the data.
 
     :example:
+
     >>> data = np.random.randint(0,2, (200, 40)).astype(np.float32)
     >>> covariance_matrix = cov_matrix(data=data)
     """
@@ -37,6 +38,7 @@ def cronbach_a(data: np.ndarray):
     (e.g., survey items, measure items) analyzed are continuous (interval or ratio measurement scale);
 
     :example:
+
     >>> data = np.random.randint(0,2, (200, 40)).astype(np.float32)
     >>> x = cronbach_a(data=data)
     """

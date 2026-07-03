@@ -65,6 +65,7 @@ def sliding_structural_similarity_index(imgs: List[np.ndarray],
     :return np.ndarray: A numpy array containing the SSI values for each pair of images.
 
     :example:
+
     >>> imgs = ImageMixin.read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/test')
     >>> imgs = {k: imgs[k] for k in sorted(imgs, key=lambda x: int(x.split('.')[0]))}
     >>> imgs = list(imgs.values())
@@ -100,6 +101,7 @@ def structural_similarity_matrix(imgs: List[np.array], verbose: Optional[bool] =
     :return np.array: A square numpy array where the element at [i, j] represents the SSI between imgs[i] and imgs[j].
 
     :example:
+
     >>> imgs = ImageMixin.read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/test')
     >>> imgs = {k: imgs[k] for k in sorted(imgs, key=lambda x: int(x.split('.')[0]))}
     >>> imgs = list(imgs.values())[0:10]

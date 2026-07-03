@@ -59,6 +59,7 @@ class OrdinalClassifier():
     .. [5] Wurm, M. J., Rathouz, P. J., & Hanlon, B. M. (2021). Regularized ordinal regression and the ordinalNet R package. `Journal of Statistical Software, 99(6) <https://doi.org/10.18637/jss.v099.i06>`_.
 
     :example:
+
     >>> X = np.random.randint(0, 500, (100, 50))
     >>> y = np.random.randint(1, 6, (100))
     >>> rf_mdl = TrainModelMixin().clf_define(cuda=False)

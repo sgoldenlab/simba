@@ -43,6 +43,7 @@ class MADLCImporterH5(ConfigReader, PoseImporterMixin):
        `Multi-animal import tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Multi_animal_pose.md>`__.
 
     :examples:
+
     >>> _ = MADLCImporterH5(config_path=r'MyConfigPath', data_folder=r'maDLCDataFolder', file_type='ellipse', id_lst=['Animal_1', 'Animal_2'], interpolation_settings={'type': 'animals', 'method': 'linear'}, smoothing_settings={'time_window': 500, 'method': 'gaussian'}).run()
 
     References

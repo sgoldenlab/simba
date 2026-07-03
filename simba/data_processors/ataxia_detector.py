@@ -69,6 +69,7 @@ class AtaxiaDetector(ConfigReader):
     .. [1] Lazaro et al., Brainwide Genetic Capture for Conscious State Transitions, `biorxiv`, doi: https://doi.org/10.1101/2025.03.28.646066
 
     :example:
+
     >>> detector = AtaxiaDetector(config_path=r"H:\projects\brainwide_trap\brainwide_trap\project_folder\project_config.ini", min_votes=3)
     >>> detector.run()
     """

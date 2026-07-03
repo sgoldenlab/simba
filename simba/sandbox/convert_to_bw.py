@@ -85,6 +85,7 @@ def video_to_bw(video_path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> video_to_bw(video_path='/Users/simon/Downloads/1_LH_clipped_cropped_eq_20240515135926.mp4', threshold=0.02)
     """
 

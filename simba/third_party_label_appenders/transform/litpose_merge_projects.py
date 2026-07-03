@@ -38,6 +38,7 @@ class LitPoseMergeProjects:
     :param bool verbose:                                    Print per-item progress.
 
     :example:
+
     >>> merger = LitPoseMergeProjects(master_dir=r'Z:\\home\\simon\\lp_300126', other_dirs=[r'F:\\netholabs\\projects_lp_compressed.8.4.2026\\projects_lp_compressed.8.4.2026'], duplicate_method='skip', verbose=True)
     >>> merger.run()
     """

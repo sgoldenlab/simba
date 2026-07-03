@@ -30,6 +30,7 @@ def plug_holes_shortest_bout(data_df: pd.DataFrame,
     :return pd.DataFrame data_df: Dataframe where behavior bouts with invalid lengths have been removed (< shortest_bout)
 
     :example:
+
     >>>  data_df = pd.DataFrame(data=[1, 0, 1, 1, 1], columns=['target'])
     >>>  plug_holes_shortest_bout(data_df=data_df, clf_name='target', fps=10, shortest_bout=2000)
     >>>         target
@@ -84,6 +85,7 @@ def plug_holes_shortest_bout_old(data_df: pd.DataFrame, clf_name: str, fps: int,
     :return pd.DataFrame data_df: Dataframe where behavior bouts with invalid lengths have been removed (< shortest_bout)
 
     :example:
+
     >>>  data_df = pd.DataFrame(data=[1, 0, 1, 1, 1], columns=['target'])
     >>>  plug_holes_shortest_bout(data_df=data_df, clf_name='target', fps=10, shortest_bout=2000)
     >>>         target

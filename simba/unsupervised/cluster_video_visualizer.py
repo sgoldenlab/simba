@@ -37,6 +37,7 @@ class ClusterVideoVisualizer(ConfigReader, UMLMixin):
     :param Optional[Literal] plot_type: Type of plot to generate ('VIDEO', 'HULL', 'SKELETON', 'POINTS'). Defaults to 'SKELETON'.
 
     :example:
+
     >>> config_path = '/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini'
     >>> data_path = '/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/cluster_mdls/hopeful_khorana.pickle'
     >>> visualizer = ClusterVideoVisualizer(config_path=config_path, data_path=data_path, bg_clr=(0, 0, 255), max_videos=20, speed=0.2, plot_type='POINTS')

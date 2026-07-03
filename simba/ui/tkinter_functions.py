@@ -811,6 +811,7 @@ class SimBADropDown(Frame):
     :param tooltip_key (str, optional): Key for tooltip lookup in TOOLTIPS dictionary. For dictionary, see `simba.assets.lookups.tooptips.json`. Default: None.
 
     :example:
+
     >>> dropdown = SimBADropDown(parent=parent_frm, dropdown_options=['Option 1', 'Option 2', 'Option 3'], label='Select option:', searchable=True)
     >>> selected = dropdown.get_value()
     """

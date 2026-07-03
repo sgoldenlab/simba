@@ -85,6 +85,7 @@ class CircularStatisticsMixin(object):
         :rtype: float
 
         :example:
+
         >>> data = np.array([50, 90, 70, 60, 20, 90]).astype(np.float32)
         >>> CircularStatisticsMixin().mean_resultant_vector_length(data=data)
         >>> 0.9132277170817057
@@ -128,6 +129,7 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> data_1, data_2 = np.random.normal(loc=45, scale=1, size=100), np.random.normal(loc=90, scale=45, size=100)
         >>> data = np.hstack([data_1, data_2])
         >>> CircularStatisticsMixin().sliding_mean_resultant_vector_length(data=data.astype(np.float32),time_windows=np.array([1.0]), fps=10)
@@ -180,6 +182,7 @@ class CircularStatisticsMixin(object):
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_mean`
 
         :example:
+
         >>> data = np.array([50, 90, 70, 60, 20, 90]).astype(np.float32)
         >>> CircularStatisticsMixin().circular_mean(data=data)
         >>> 63.737892150878906
@@ -226,6 +229,7 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.random.normal(loc=45, scale=1, size=20).astype(np.float32)
         >>> CircularStatisticsMixin().sliding_circular_mean(data=data,time_windows=np.array([0.5, 1.0]), fps=10)
         """
@@ -268,6 +272,7 @@ class CircularStatisticsMixin(object):
         :rtype: float
 
         :example:
+
         >>> data = np.array([180, 221, 32, 42, 212, 101, 139, 41, 69, 171, 149, 200]).astype(np.float32)
         >>> CircularStatisticsMixin().circular_std(data=data)
         >>> 75.03725024504664
@@ -311,6 +316,7 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.array([180, 221, 32, 42, 212, 101, 139, 41, 69, 171, 149, 200]).astype(np.float32)
         >>> CircularStatisticsMixin().sliding_circular_std(data=data.astype(np.float32), time_windows=np.array([0.5]), fps=10)
         """
@@ -363,6 +369,7 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.array([350, 360, 365, 360]).astype(np.float32)
         >>> CircularStatisticsMixin().instantaneous_angular_velocity(data=data, bin_size=1.0)
         >>> [-1., 10.00002532, 4.999999, 4.999999]
@@ -400,6 +407,7 @@ class CircularStatisticsMixin(object):
         :rtype: List[str]
 
         :example:
+
         >>> data = np.array(list(range(0, 405, 45))).astype(np.float32)
         >>> CircularStatisticsMixin().degrees_to_cardinal(degree_angles=data)
         >>> ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N']
@@ -444,6 +452,7 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> x = np.array([[10, 10], [20, 10]])
         >>> CircularStatisticsMixin.sliding_bearing(x=x, lag=1, fps=1)
         >>> [-1. 90.]
@@ -488,6 +497,7 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> nose_loc = np.random.randint(low=0, high=500, size=(50, 2)).astype(np.float32)
         >>> left_ear_loc = np.random.randint(low=0, high=500, size=(50, 2)).astype(np.float32)
         >>> right_ear_loc = np.random.randint(low=0, high=500, size=(50, 2)).astype(np.float32)
@@ -546,6 +556,7 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> nose_loc = np.array([[100, 150], [102, 148], [105, 145]], dtype=np.float32)
         >>> left_ear_loc = np.array([[95, 160], [97, 158], [100, 155]], dtype=np.float32)
         >>> right_ear_loc = np.array([[105, 160], [107, 158], [110, 155]], dtype=np.float32)
@@ -593,6 +604,7 @@ class CircularStatisticsMixin(object):
         :return np.ndarray: Frame-wise directionality in degrees.
 
         :example:
+
         >>> swim_bladder_loc = np.random.randint(low=0, high=500, size=(50, 2)).astype(np.float32)
         >>> tail_loc = np.random.randint(low=0, high=500, size=(50, 2)).astype(np.float32)
         >>> CircularStatisticsMixin().direction_two_bps(anterior_loc=swim_bladder_loc, posterior_loc=tail_loc)
@@ -722,6 +734,7 @@ class CircularStatisticsMixin(object):
         :rtype: Tuple[np.ndarray, np.ndarray]
 
         :example:
+
         >>> data = np.random.randint(low=0, high=361, size=(100,)).astype(np.float32)
         >>> CircularStatisticsMixin().sliding_rayleigh_z(data=data, time_windows=np.array([0.5, 1.0]), fps=10)
         """
@@ -776,6 +789,7 @@ class CircularStatisticsMixin(object):
         :rtype: float
 
         :example:
+
         >>> sample_1 = np.array([50, 90, 20, 60, 20, 90]).astype(np.float32)
         >>> sample_2 = np.array([50, 90, 70, 60, 20, 90]).astype(np.float32)
         >>> CircularStatisticsMixin().circular_correlation(sample_1=sample_1, sample_2=sample_2)
@@ -828,6 +842,7 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> sample_1 = np.random.randint(0, 361, (200,)).astype(np.float32)
         >>> sample_2 = np.random.randint(0, 361, (200,)).astype(np.float32)
         >>> CircularStatisticsMixin().sliding_circular_correlation(sample_1=sample_1, sample_2=sample_2, time_windows=np.array([0.5, 1.0]), fps=10.0)
@@ -883,6 +898,7 @@ class CircularStatisticsMixin(object):
         :param int fps: fps of the recorded video
 
         :example:
+
         >>> data = np.array([350, 350, 1, 1]).astype(np.float32)
         >>> CircularStatisticsMixin().sliding_angular_diff(data=data, fps=1.0, time_windows=np.array([1.0]))
         """
@@ -923,6 +939,7 @@ class CircularStatisticsMixin(object):
         :param int fps: fps of the recorded video
 
         :example:
+
         >>> data = np.random.normal(loc=45, scale=3, size=20).astype(np.float32)
         >>> CircularStatisticsMixin().agg_angular_diff_timebins(data=data,time_windows=np.array([1.0]), fps=5.0))
         """
@@ -988,6 +1005,7 @@ class CircularStatisticsMixin(object):
         .. [1] `UCSB <https://jammalam.faculty.pstat.ucsb.edu/html/favorite/test.htm>`__.
 
         :example:
+
         >>> data = np.random.randint(0, 360, (5000,)).astype(np.float32)
         >>> CircularStatisticsMixin.rao_spacing(data=data)
         """
@@ -1050,6 +1068,7 @@ class CircularStatisticsMixin(object):
         .. [1] `UCSB <https://jammalam.faculty.pstat.ucsb.edu/html/favorite/test.htm>`__.
 
         :example:
+
         >>> data = np.random.randint(low=0, high=360, size=(500,)).astype(np.float32)
         >>> result = CircularStatisticsMixin().sliding_rao_spacing(data=data, time_windows=np.array([0.5, 1.0]), fps=10)
         """
@@ -1108,6 +1127,7 @@ class CircularStatisticsMixin(object):
         :rtype: float
 
         :example:
+
         >>> sample_1, sample_2 = np.random.normal(loc=45, scale=1, size=100).astype(np.float32), np.random.normal(loc=180, scale=20, size=100).astype(np.float32)
         >>> CircularStatisticsMixin().kuipers_two_sample_test(sample_1=sample_1, sample_2=sample_2)
         """
@@ -1148,6 +1168,7 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :examples:
+
         >>> data = np.random.randint(low=0, high=360, size=(100,)).astype(np.float64)
         >>> D = CircularStatisticsMixin().sliding_kuipers_two_sample_test(data=data, time_windows=np.array([0.5, 5]), fps=2)
         """
@@ -1212,6 +1233,7 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.random.randint(low=0, high=361, size=(100,)).astype(np.float32)
         >>> CircularStatisticsMixin().sliding_hodges_ajne(data=data, time_window=1.0, fps=10)
         """
@@ -1288,6 +1310,7 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> CircularStatisticsMixin().circular_range(np.ndarray([350, 20, 60, 100]))
         >>> 110.0
         >>> CircularStatisticsMixin().circular_range(np.ndarray([110, 20, 60, 100]))
@@ -1333,6 +1356,7 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :examples:
+
         >>> data = np.array([260, 280, 300, 340, 360, 0, 10, 350, 0, 15]).astype(np.float32)
         >>> CircularStatisticsMixin().sliding_circular_range(data=data, time_windows=np.array([0.5]), fps=10)
         >>> [[ -1.],[ -1.],[ -1.],[ -1.],[100.],[80],[70],[30],[20],[25]]
@@ -1374,6 +1398,7 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.array([270, 360, 10, 90, 91, 180, 185, 260]).astype(np.float32)
         >>> bins = np.array([[270, 90], [91, 269]])
         >>> CircularStatisticsMixin().circular_hotspots(data=data, bins=bins)
@@ -1441,6 +1466,7 @@ class CircularStatisticsMixin(object):
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_hotspots`
 
         :example:
+
         >>> data = np.array([270, 360, 10, 20, 90, 91, 180, 185, 260, 265]).astype(np.float32)
         >>> bins = np.array([[270, 90], [91, 269]])
         >>> CircularStatisticsMixin().sliding_circular_hotspots(data=data, bins=bins, time_window=0.5, fps=10)
@@ -1504,6 +1530,7 @@ class CircularStatisticsMixin(object):
         :rtype: numpy.ndarray
 
         :example:
+
         >>> data = np.array([45, 50, 35, 50, 80, 350, 350, 0 , 180]).astype(np.float32)
         >>> CircularStatisticsMixin().rotational_direction(data)
         >>> [-1.,  1.,  2.,  1.,  1.,  2.,  0.,  1.,  1.]
@@ -1566,6 +1593,7 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> data = np.array([[[5, 10], [10, 5], [15, 10], [10, 15]]])
         >>> CircularStatisticsMixin().fit_circle(data=data, iter_max=88)
         >>> [[10, 10, 5]]
@@ -1653,6 +1681,7 @@ class CircularStatisticsMixin(object):
         :rtype: int
 
         :example:
+
         >>> x = np.random.randint(0, 361, (200,))
         >>> CircularStatisticsMixin.preferred_turning_direction(x=x)
         """
@@ -1701,6 +1730,7 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :example:
+
         >>> x = np.random.randint(0, 361, (213,))
         >>> CircularStatisticsMixin.sliding_preferred_turning_direction(x=x, time_window=1, sample_rate=10)
         """

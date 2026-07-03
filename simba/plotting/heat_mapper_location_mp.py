@@ -156,6 +156,7 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
     :param bool verbose: If True, print progress. Default True.
 
     :example:
+
     >>> style_attr = {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 100, 'max_scale': 'auto'}
     >>> heatmapper = HeatMapperLocationMultiprocess(config_path='project_config.ini', data_paths='csv/outlier_corrected_movement_location/Together_1.csv', bodypart='Nose_1', style_attr=style_attr, core_cnt=-1, final_img_setting=True, video_setting=False, frame_setting=False)
     >>> heatmapper.run()

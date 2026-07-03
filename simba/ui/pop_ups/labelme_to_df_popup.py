@@ -18,6 +18,7 @@ class Labelme2DataFramePopUp(PopUpMixin):
 
     """
     :example:
+
     >>> Labelme2DataFramePopUp()
     """
 

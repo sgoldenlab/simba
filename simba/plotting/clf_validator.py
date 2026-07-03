@@ -43,6 +43,7 @@ class ClassifierValidationClips(ConfigReader):
 
 
     :examples:
+
     >>> _ = ClassifierValidationClips(config_path='MyProjectConfigPath', window=5, clf_name='Attack', text_clr=(255,255,0), clips=False, concat_video=True).run()
     """
 

@@ -31,6 +31,7 @@ def locate_line_point(path: Union[LineString, np.ndarray],
        :align: center
 
     :example:
+
     >>> line = LineString([[10, 10], [7.5, 7.5], [15, 15], [7.5, 7.5]])
     >>> polygon = Polygon([[0, 5], [0, 0], [5, 0], [5, 5]])
     >>> locate_line_point(path=line, geometry=polygon)

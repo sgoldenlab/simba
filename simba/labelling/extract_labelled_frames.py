@@ -39,6 +39,7 @@ class AnnotationFrameExtractor(ConfigReader):
     :param Optional[bool] img_greyscale: If ``True``, save images in grayscale.
 
     :example:
+
     >>> extractor = AnnotationFrameExtractor(
     ...     config_path='project_folder/project_config.ini',
     ...     data_paths=['project_folder/csv/targets_inserted/video_1.csv'],

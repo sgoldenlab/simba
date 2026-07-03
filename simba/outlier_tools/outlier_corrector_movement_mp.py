@@ -97,6 +97,7 @@ class OutlierCorrecterMovementMultiProcess(ConfigReader, FeatureExtractionMixin)
        `Outlier correction documentation <https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf>`__.
 
     :example:
+
     >>> outlier_correcter_movement = OutlierCorrecterMovementMultiProcess(config_path='MyProjectConfig')
     >>> outlier_correcter_movement.run()
     """

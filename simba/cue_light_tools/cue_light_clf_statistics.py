@@ -34,6 +34,7 @@ class CueLightClfAnalyzer(ConfigReader):
        `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
 
     :example:
+
     >>> cue_light_clf_analyzer = CueLightClfAnalyzer(config_path='MyProjectConfig', pre_window=1000, post_window=1000, cue_light_names=['Cue_light'], clf_list=['Attack'])
     >>> cue_light_clf_analyzer.analyze_clf()
     >>> cue_light_clf_analyzer.organize_results()

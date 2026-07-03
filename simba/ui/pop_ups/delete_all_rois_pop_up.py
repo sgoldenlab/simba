@@ -18,6 +18,7 @@ def delete_all_rois_pop_up(config_path: Union[str, os.PathLike], roi_table_frm: 
     :return: None
 
     :example:
+
     >>> delete_all_rois_pop_up(config_path=r"C:\troubleshooting\ROI_movement_test\project_folder\project_config.ini")
     >>> delete_all_rois_pop_up(config_path=config_path, roi_table_frm=roi_table_frm)
     """

@@ -32,6 +32,7 @@ class ROISizeStandardizer(ConfigReader, FeatureExtractionMixin):
     :param str reference_video: Name of baseline video without extension, e.g., `Video_1`.
 
     :example:
+
     >>> test = ROISizeStandardizer(config_path='/Users/simon/Desktop/envs/troubleshooting/DLC_2_Black_animals/project_folder/project_config.ini', reference_video='Together_1')
     >>> test.run()
     >>> test.save()

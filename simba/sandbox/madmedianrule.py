@@ -10,6 +10,7 @@ def mad_median_rule(data: np.ndarray, k: int) -> np.ndarray:
     Detect outliers using the MAD-Median Rule. Returns 1d array of size data.shape[0] with 1 representing outlier and 0 representing inlier.
 
     :example:
+
     >>> data = np.random.randint(0, 600, (9000000,)).astype(np.float32)
     >>> mad_median_rule(data=data, k=1.0)
     """
@@ -32,6 +33,7 @@ def sliding_mad_median_rule(data: np.ndarray, k: int, time_windows: np.ndarray, 
     :return np.ndarray: Array of size (data.shape[0], time_windows.shape[0]) with counts if outliers detected.
 
     :example:
+
     >>> data = np.random.randint(0, 50, (50000,)).astype(np.float32)
     >>> sliding_mad_median_rule(data=data, k=2, time_windows=np.array([20.0]), fps=1.0)
     """

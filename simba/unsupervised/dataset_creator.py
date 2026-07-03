@@ -27,6 +27,7 @@ class DatasetCreator(ConfigReader, UMLMixin):
     :param Dict[str, Any] settings: Attributes for which data should be included and how the data should be aggregated.
 
     :example:
+
     >>> settings = {'data_slice': 'ALL FEATURES (EXCLUDING POSE)', 'clf_slice': 'Attack', 'bout_aggregation_type': 'MEDIAN', 'min_bout_length': 66, 'feature_path': '/Users/simon/Desktop/envs/simba_dev/simba/assets/unsupervised/features.csv'}
     >>> db_creator = DatasetCreator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini', settings=settings)
     >>> db_creator.run()

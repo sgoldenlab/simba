@@ -27,6 +27,7 @@ class AnnotationMetaDataExtractor(ConfigReader):
     :param Optional[bool] split_by_video: If True, includes a worksheet where the annotation counts are split by video. Default True.
 
     :example:
+
     >>> annotation_meta_extractor = AnnotationMetaDataExtractor(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
     >>> annotation_meta_extractor.run()
     >>> annotation_meta_extractor.save()

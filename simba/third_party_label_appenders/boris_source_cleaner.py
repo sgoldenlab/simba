@@ -53,6 +53,7 @@ class BorisSourceCleaner(object):
     :param dict settings: Rules for how to change the behavior names.
 
     :example:
+
     >>> boris_cleaner = BorisSourceCleaner(data_dir='/Users/simon/Downloads/boris_data', save_dir='/Users/simon/Downloads/save_dir', settings=SETTINGS)
     >>> boris_cleaner.run()
     """

@@ -63,6 +63,7 @@ def create_shap_log(rf_clf: Union[str, os.PathLike, RandomForestClassifier],
                                                                  If `save_dir` is provided, the function returns None and saves the output to CSV files in the specified directory.
 
     :example:
+
     >>> x = np.random.random((1000, 501)).astype(np.float32)
     >>> y = np.random.randint(0, 2, size=(len(x), 1)).astype(np.int32)
     >>> clf_names = [str(x) for x in range(501)]

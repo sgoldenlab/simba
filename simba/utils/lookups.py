@@ -194,6 +194,7 @@ def get_named_simba_fonts() -> Dict[str, str]:
        For all fonts installed on the host OS (rather than only those bundled with SimBA), see :func:`~simba.utils.lookups.get_fonts`.
 
     :example:
+
     >>> get_named_simba_fonts()
     >>> {'Poppins Regular': '.../simba/assets/fonts/Poppins Regular.ttf', ...}
     """
@@ -220,6 +221,7 @@ def get_simba_font_name_and_path(font: str) -> Tuple[str, str]:
     :raises StringError: If ``font`` is not a valid SimBA font name.
 
     :example:
+
     >>> get_simba_font_name_and_path(font='poppins regular')
     >>> ('Poppins Regular', '.../simba/assets/fonts/Poppins Regular.ttf')
     """
@@ -460,6 +462,7 @@ def create_color_palettes(no_animals: int, map_size: int) -> List[List[int]]:
     :return List[List[int]]:  BGR colors
 
     :example:
+
     >>> create_color_palettes(no_animals=2, map_size=2)
     >>> [[[255.0, 0.0, 255.0], [0.0, 255.0, 255.0]], [[102.0, 127.5, 0.0], [102.0, 255.0, 255.0]]]
     """
@@ -519,6 +522,7 @@ def cardinality_to_integer_lookup() -> Dict[str, int]:
        :align: center
 
     :example:
+
     >>> data = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
     >>> [cardinality_to_integer_lookup()[d] for d in data]
     >>> [0, 1, 2, 3, 4, 5, 6, 7]
@@ -540,6 +544,7 @@ def integer_to_cardinality_lookup():
        :align: center
 
     :example:
+
     >>> data = [0, 1, 2, 3, 4, 5, 6, 7]
     >>> [integer_to_cardinality_lookup()[i] for i in data]
     >>> ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
@@ -789,6 +794,7 @@ def get_fonts(sort_alphabetically: bool = False):
     :rtype: Dict[str, str]
 
     :example:
+
     >>> get_fonts(sort_alphabetically=True)
     >>> {'Arial': '/Windows/Fonts/arial.ttf', ...}
     """
@@ -964,6 +970,7 @@ def get_table(data: Dict[str, Any],
      :return str: Formatted table string ready for display or printing.
 
      :example:
+
      >>> data = {"fps": 30, "width": 1920, "height": 1080, "frame_count": 3000}
      >>> table = get_table(data=data, headers=("PARAMETER", "VALUE"))
      """
@@ -1013,6 +1020,7 @@ def get_ffmpeg_encoders(raise_error: bool = True, alphabetically_sorted: bool = 
     :rtype: List[str]
 
     :example:
+
     >>> codecs = get_ffmpeg_encoders()
     >>> print(Formats.BATCH_CODEC.value in codecs)
     """
@@ -1060,6 +1068,7 @@ def find_closest_string(target: str,
     :rtype: Optional[Tuple[str, Union[int, float]]]
 
     :example:
+
     >>> find_closest_string("cat", ["dog", "car", "bat"])
     >>> ('car', 0.33)
     >>> find_closest_string("Left_ear", ["Ear_left", "Right_ear", "Nose"])
@@ -1166,6 +1175,7 @@ def create_directionality_cords(bp_dict: dict,
     :raises InvalidInputError: If any required body-part or coordinate cannot be found in the input dictionary.
 
     :example:
+
     >>> bp_dict = {'Animal_1': {'X_bps': ['Animal_1_Nose_x', 'Animal_1_Ear_left_x', 'Animal_1_Ear_right_x'], 'Y_bps': ['Animal_1_Nose_y', 'Animal_1_Ear_left_y', 'Animal_1_Ear_right_y']}}
     >>> create_directionality_cords(bp_dict=bp_dict, left_ear_name='Ear_left', nose_name='Nose', right_ear_name='Ear_right')
     >>> {'Animal_1': {'nose': {'X_bps': 'Animal_1_Nose_x', 'Y_bps': 'Animal_1_Nose_y'}, 'ear_left': {'X_bps': 'Animal_1_Ear_left_x', 'Y_bps': 'Animal_1_Ear_left_y'}, 'ear_right': {'X_bps': 'Animal_1_Ear_right_x', 'Y_bps': 'Animal_1_Ear_right_y'}}}
@@ -1235,6 +1245,7 @@ def intermittent_palette(n: int = 10,
     :rtype: Union[List[Tuple[float, float, float]], List[Tuple[int, int, int]], List[str]]
 
     :example:
+
         >>> palette = intermittent_palette(n=6, output="hex")
         >>> palette
         >>> ['#a33f46', '#51a5df', '#b36824', '#4dbd9f', '#c749b4', '#7a9a3e']
@@ -1293,6 +1304,7 @@ def check_for_updates(time_out: int = 2):
         the local SimBA version cannot be determined.
 
     :example:
+
     >>> check_for_updates()
     >>> # Prints: "UP-TO-DATE. You have the latest SimBA version (1.0.0)."
     >>> # or: "NEW SimBA VERSION AVAILABLE. You have SimBA version 1.0.0. The latest version is 1.1.0..."
@@ -1321,6 +1333,7 @@ def get_ext_codec_map() -> Dict[str, str]:
     :rtype: Dict[str, str]
 
     :example:
+
     >>> codec_map = get_ext_codec_map()
     >>> codec = codec_map.get('webm', 'libx264')  # Returns 'libvpx-vp9' or fallback
     """
@@ -1366,6 +1379,7 @@ def get_ffmpeg_codec(file_name: Union[str, os.PathLike],
     :rtype: str
 
     :example:
+
     >>> codec = get_ffmpeg_codec(file_name='video.mp4')
     >>> codec = get_ffmpeg_codec(file_name='video.webm', fallback='libx264')
     >>> codec = get_ffmpeg_codec(file_name=r'C:/videos/my_video.avi')
@@ -1505,6 +1519,7 @@ def find_best_multi_animal_assignment_frame(h5_path: Union[str, os.PathLike],
     :rtype: Optional[int]
 
     :example:
+
     >>> frame = find_best_multi_animal_assignment_frame(
     ...     h5_path=r'G:\\projects\\edmayelle\\raw_data\\HCS17_..._el.h5',
     ...     expected_animals=5,

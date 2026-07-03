@@ -18,6 +18,7 @@ def find_path_loops(data: np.ndarray):
     :return: Dictionary with the coordinate tuple(x, y) as keys, and sequential frame numbers as values when animals visited, and re-visited the key coordinate.
 
     :example:
+
     >>> data = read_df(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/outlier_corrected_movement_location/SI_DAY3_308_CD1_PRESENT.csv', usecols=['Center_x', 'Center_y'], file_type='csv').values.astype(int)
     >>> find_path_loops(data=data)
     """

@@ -34,6 +34,7 @@ class DirectingAnimalsToBodyPartAnalyzer(ConfigReader, FeatureExtractionMixin):
        :align: center
 
     :example:
+
     >>> directing_analyzer = DirectingAnimalsToBodyPartAnalyzer(config_path='MyProjectConfig')
     >>> directing_analyzer.process_directionality()
     >>> directing_analyzer.create_directionality_dfs()

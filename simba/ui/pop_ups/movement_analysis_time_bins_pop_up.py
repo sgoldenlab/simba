@@ -22,6 +22,7 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
     Tkinter pop-up for defining parameters when computing movements in time-bins.
 
     :example:
+
     >>> _ =  MovementAnalysisTimeBinsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
     >>> _ =  MovementAnalysisTimeBinsPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
     """

@@ -52,6 +52,7 @@ class ROIFeatureCreator(ConfigReader, FeatureExtractionMixin):
 
 
     :example:
+
     >>> roi_featurizer = ROIFeatureCreator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', body_parts=['Nose_1', 'Nose_2'])
     >>> roi_featurizer.run()
     >>> roi_featurizer.save()

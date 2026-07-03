@@ -44,6 +44,7 @@ class OutlierCorrecterMovementAdvanced(ConfigReader, FeatureExtractionMixin):
     :param dict settings: The heuristic multiplier rules to use for each body part or animal.
 
     :example:
+
     >>> settings = {'Simon': 1.1, 'JJ': 1.2}
     >>> criterion_body_parts = {'Simon': ['Nose_1', 'Tail_base_1'], 'JJ': ['Nose_2', 'Tail_base_2']}
     >>> outlier_corrector = OutlierCorrecterMovementAdvanced(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', input_dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv', type='animal', agg_method='mean', criterion_body_parts=criterion_body_parts, settings=settings)

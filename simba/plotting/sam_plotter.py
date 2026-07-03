@@ -25,6 +25,7 @@ NAME = 'NAME'
 class SamVisualizer():
     """
     :example:
+
     >>> r = SamVisualizer(data_path=r"C:\troubleshooting\sam_results\10B_Mouse_5-choice_MustTouchTrainingNEWFINAL_a7_clipped_3.csv", video_path=r"D:\platea\platea_videos\videos\clipped\10B_Mouse_5-choice_MustTouchTrainingNEWFINAL_a7_clipped_3.mp4", save_dir='D:\cvat_annotations\sam_videos', color=[(255, 255, 1)])
     >>> r.run()
     """

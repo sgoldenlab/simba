@@ -25,6 +25,7 @@ def entropy_of_directional_changes(x: np.ndarray, bins: int = 16) -> float:
     :rtype: float
 
     :example:
+
     >>> x = np.random.randint(0, 500, (100, 2))
     >>> TimeseriesFeatureMixin.entropy_of_directional_changes(x, 3)
     """
@@ -62,6 +63,7 @@ def sliding_entropy_of_directional_changes(x: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(0, 100, (400, 2))
     >>> results = sliding_entropy_of_directional_changes(x=x, bins=16, window_size=5.0, sample_rate=30)
     >>> x = pd.read_csv(r"C:\troubleshooting\two_black_animals_14bp\project_folder\csv\input_csv\Together_1.csv")[['Ear_left_1_x', 'Ear_left_1_y']].values

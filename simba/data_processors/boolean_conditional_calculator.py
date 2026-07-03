@@ -37,6 +37,7 @@ class BooleanConditionalCalculator(ConfigReader):
        `Example expected detailed output table <https://github.com/sgoldenlab/simba/blob/master/misc/Detailed_conditional_aggregate_statistics_20241011123409.csv>`__.
 
     :example I:
+
     >>> rules = {'Rectangle_1 Simon in zone': 'TRUE', 'Polygon_1 JJ in zone': 'TRUE'} #  OR {'Rectangle_1 Simon in zone': True, 'Polygon_1 JJ in zone': True}
     >>> conditional_bool_rule_calculator = BooleanConditionalCalculator(rules=rules, config_path='/Users/simon/Desktop/envs/troubleshooting/two_animals_16bp_032023/project_folder/project_config.ini')
     >>> conditional_bool_rule_calculator.run()
@@ -44,6 +45,7 @@ class BooleanConditionalCalculator(ConfigReader):
 
 
     :example II:
+
     >>> rules = {'Stimulus 2 Animal_1 in zone': True, 'Stimulus 6 Animal_1 in zone': 'falsE'}
     >>> runner = BooleanConditionalCalculator(rules=rules, config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini", data_path=r'C:\troubleshooting\RAT_NOR\project_folder\csv\features_extracted')
     >>> runner.run()

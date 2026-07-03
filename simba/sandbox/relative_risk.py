@@ -17,6 +17,7 @@ def relative_risk(x: np.ndarray, y: np.ndarray) -> float:
     :return float: The relative risk between arrays x and y.
 
     :example:
+
     >>> relative_risk(x=np.array([0, 1, 1]), y=np.array([0, 1, 0]))
     >>> 2.0
     """

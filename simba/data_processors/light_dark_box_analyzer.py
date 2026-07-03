@@ -47,6 +47,7 @@ class LightDarkBoxAnalyzer():
     :param float threshold: Value between 0 and 1. If below this value, animal is in dark box. If above, animal is in light box.
 
     :example:
+
     >>> python light_dark_box_analyzer.py --data_dir 'D:\light_dark_box\project_folder\csv\input_csv' --save_path "D:\light_dark_box\project_folder\csv\results\light_dark_data.csv" --body_part nose --fps 29 --threshold 0.01
     >>> analyzer = LightDarkBoxAnalyzer(data_dir='C:\troubleshooting\two_black_animals_14bp\dlc_test', save_path="C:\troubleshooting\two_black_animals_14bp\light_dark_ex\light_dark_data.csv", body_part='Nose_1', fps=30.2)
     >>> analyzer = LightDarkBoxAnalyzer(data_dir='D:\light_dark_box\project_folder\csv\input_csv\test', save_path="C:\troubleshooting\two_black_animals_14bp\light_dark_ex\light_dark_data.csv", body_part='nose', fps=29)

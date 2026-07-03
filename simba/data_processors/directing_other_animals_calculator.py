@@ -60,6 +60,7 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
     :param Optional[str] nose_name: Name of nose body-part. If None, SimBA will attempt to auto-detect. Default: None.
 
     :example:
+
     >>> directing_analyzer = DirectingOtherAnimalsAnalyzer(config_path='MyProjectConfig')
     >>> directing_analyzer.run()
     """

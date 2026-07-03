@@ -126,6 +126,7 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
        :align: center
 
     :example:
+
     >>> plot_creator = TresholdPlotCreatorMultiprocess(config_path='/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini', frame_setting=True, video_setting=True, clf_name='Attack', style_attr={'width': 640, 'height': 480, 'font size': 10, 'line width': 6, 'color': 'magneta', 'circle size': 20}, cores=5)
     >>> plot_creator.run()
     """

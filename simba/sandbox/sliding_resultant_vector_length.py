@@ -42,6 +42,7 @@ def sliding_resultant_vector_length(x: np.ndarray,
 
 
     :example:
+
     >>> x = np.random.randint(0, 361, (5000, )).astype(np.int32)
     >>> results = sliding_resultant_vector_length(x, 1, 10)
     """

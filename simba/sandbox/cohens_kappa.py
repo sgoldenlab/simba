@@ -14,6 +14,7 @@ def cohens_kappa(sample_1: np.ndarray, sample_2: np.ndarray):
     Cohen's Kappa coefficient between classification sand ground truth taking into account agreement between classifications and ground truth occurring by chance.
 
     :example:
+
     >>> sample_1 = np.random.randint(0, 2, size=(10000,))
     >>> sample_2 = np.random.randint(0, 2, size=(10000,))
     >>> cohens_kappa(sample_1=sample_1, sample_2=sample_2))

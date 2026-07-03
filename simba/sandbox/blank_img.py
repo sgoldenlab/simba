@@ -44,6 +44,7 @@ def interpolate_color_palette(start_color: Tuple[int, int, int],
     :return: List of interpolated RGB colors.
 
     :example:
+
     >>> red, black = (255, 0, 0), (0, 0, 0)
     >>> colors = interpolate_color_palette(start_color=red, end_color=black, n = 10)
     """

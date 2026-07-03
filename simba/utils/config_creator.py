@@ -33,6 +33,7 @@ class ProjectConfigCreator(object):
        For example `project_config.ini` files, see `https://github.com/sgoldenlab/simba/tree/master/tests/data/test_projects`.
 
     :example:
+
     >>> _ = ProjectConfigCreator(project_path = 'project/path', project_name='project_name', target_list=['Attack'], pose_estimation_bp_cnt='16', body_part_config_idx=9, animal_cnt=2, file_type='csv')
 
     """

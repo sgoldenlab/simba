@@ -19,6 +19,7 @@ class DLC2LabelmePopUp(PopUpMixin):
     GUI for converting DeepLabCut (DLC) annotations to YOLO keypoint format.
 
     :example:
+
     >>> DLC2LabelmePopUp()
     """
 

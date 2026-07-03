@@ -17,6 +17,7 @@ class SelectLabellingVideoPupUp():
     Launch PopUp to select video for labelling
 
     :example:
+
     >>> SelectLabellingVideoPupUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", continuing=False)
     """
     def __init__(self,

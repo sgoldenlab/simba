@@ -48,6 +48,7 @@ class AdvancedInterpolator(ConfigReader):
     :parameter Optional[verbose] bool: If True, prints the progress. Default: True.
 
     :examples:
+
     >>> interpolator = AdvancedInterpolator(data_dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv',
     >>>                                     config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
     >>>                                     type='animal',

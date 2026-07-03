@@ -50,6 +50,7 @@ class COCOKeypoints2YoloSeg:
 
 
         :example:
+
         >>>runner = COCOKeypoints2YoloSeg(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\merged\merged_07032025.json",
         >>>                                img_dir=r"D:\cvat_annotations\frames",
         >>>                                save_dir=r"D:\cvat_annotations\yolo_07032025\bbox_seg",

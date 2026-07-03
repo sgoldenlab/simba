@@ -28,6 +28,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model>`_
 
     :example:
+
     >>> model_trainer = TrainRandomForestClassifier(config_path='MyConfigPath')
     >>> model_trainer.run()
     >>> model_trainer.save()

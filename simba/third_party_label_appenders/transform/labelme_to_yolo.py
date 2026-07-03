@@ -50,6 +50,7 @@ class LabelmeBoundingBoxes2YoloBoundingBoxes:
 
 
     :example:
+
     >>> LABELME_DIR = r'D:\platea\ts_annotations'
     >>> SAVE_DIR = r"D:\platea\yolo"
     >>> runner = LabelmeBoundingBoxes2YoloBoundingBoxes(labelme_dir=LABELME_DIR, save_dir=SAVE_DIR)

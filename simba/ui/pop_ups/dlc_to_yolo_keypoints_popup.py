@@ -26,6 +26,7 @@ class DLCYoloKeypointsPopUp(PopUpMixin):
     GUI for converting DeepLabCut (DLC) annotations to YOLOv8 keypoint format.
 
     :example:
+
     >>> DLCYoloKeypointsPopUp()
     """
     def __init__(self):

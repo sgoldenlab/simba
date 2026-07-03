@@ -36,6 +36,7 @@ class PoseConfigCreator(PlottingMixin):
     :param List[int] animal_id_int_list: Integers representing the animal ID which the body-parts belong to.
 
     :examples:
+
     >>> pose_config_creator = PoseConfigCreator(pose_name="My_test_config", no_animals=2, img_path='simba/splash_050122.png', bp_list=['Ear', 'Nose', 'Left_ear', 'Ear', 'Nose', 'Left_ear'], animal_id_int_list= [1, 1, 1, 2, 2, 2])
     >>> pose_config_creator.launch()
     """

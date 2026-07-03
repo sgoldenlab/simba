@@ -137,6 +137,7 @@ class PlotAnnotatedBouts(ConfigReader, TrainModelMixin, PlottingMixin):
     :param int core_cnt: Number of CPU cores for multiprocessing. Use ``-1`` for all available cores.
 
     :example:
+
     >>> plotter = PlotAnnotatedBouts(
     ...     config_path='project_folder/project_config.ini',
     ...     data_paths=['project_folder/csv/targets_inserted/video_1.csv'],

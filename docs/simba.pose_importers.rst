@@ -12,13 +12,6 @@ Import single DLC CSV file
    :members:
    :show-inheritance:
 
-Import multiple DLC CSV files
----------------------------------------------------------
-
-.. automodule:: simba.pose_importers.dlc_multi_animal_importer
-   :members:
-   :show-inheritance:
-
 Import MARS pose-estimation data
 -----------------------------------------
 
@@ -107,28 +100,28 @@ Pose import mixins
 Import SimBA blob tracking as pose
 -----------------------------------------
 
-.. automodule:: simba.pose_importers.simba_blob_importer.SimBABlobImporter
+.. autoclass:: simba.pose_importers.simba_blob_importer.SimBABlobImporter
    :members:
    :show-inheritance:
 
 Import FaceMap body-part tracking
 -----------------------------------------
 
-.. automodule:: simba.pose_importers.facemap_h5_importer.FaceMapImporter
+.. autoclass:: simba.pose_importers.facemap_h5_importer.FaceMapImporter
    :members:
    :show-inheritance:
 
 Import SuperAnimal-TopView Mouse body-part tracking
 -----------------------------------------
 
-.. automodule:: simba.pose_importers.superanimal_import.SuperAnimalTopViewImporter
+.. autoclass:: simba.pose_importers.superanimal_import.SuperAnimalTopViewImporter
    :members:
    :show-inheritance:
 
 Import YOLO pose-estimation tracking (unique individuals, non-track based, only)
 -----------------------------------------
 
-.. automodule:: simba.pose_importers.simba_yolo_importer.SimBAYoloImporter
+.. autoclass:: simba.pose_importers.simba_yolo_importer.SimBAYoloImporter
    :members:
    :show-inheritance:
 

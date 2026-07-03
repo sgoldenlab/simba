@@ -43,6 +43,7 @@ class ROITimebinCalculator(ConfigReader):
        `Example anticipated movement results <https://github.com/sgoldenlab/simba/blob/master/misc/Time_bins_0.5s_movement_results_20240330143150.csv>`__.
 
     :example:
+
     >>> calculator = ROITimebinCalculator(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini", bin_length=1.0, body_parts=['Nose_1'], threshold=0.00, movement=True)
     >>> calculator.run()
     >>> calculator.save()

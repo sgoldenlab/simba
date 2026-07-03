@@ -49,6 +49,7 @@ def make_path_plot(data: List[np.ndarray],
 
 
     :example:
+
     >>> x = np.random.randint(0, 500, (100, 2))
     >>> y = np.random.randint(0, 500, (100, 2))
     >>> position_data = np.random.randint(0, 500, (100, 2))

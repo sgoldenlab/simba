@@ -56,6 +56,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
     :param Optional[int] idx_column: The column in parent_frm to insert the Import pose frame into. Default: 0.
 
     :example:
+
     >>> _ = ImportPoseFrame(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
     >>> _ = ImportPoseFrame(config_path=r"C:\troubleshooting\simba_blob_project\project_folder\project_config.ini")
     """

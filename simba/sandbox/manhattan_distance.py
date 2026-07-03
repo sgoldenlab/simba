@@ -19,6 +19,7 @@ def manhattan_distance_cdist(data: np.ndarray) -> np.ndarray:
     :return np.ndarray: Pairwise Manhattan distance matrix where element (i, j) represents the distance between points i and j.
 
     :example:
+
     >>> data = np.random.randint(0, 50, (10000, 2))
     >>> manhattan_distance_cdist(data=data)
     """

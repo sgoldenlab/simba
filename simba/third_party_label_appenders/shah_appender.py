@@ -35,6 +35,7 @@ def shah_appender(labels_dir: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> LABELS_DIR = r'/Users/simon/Desktop/envs/simba/troubleshooting/shah_data'                                           #PATH TO A DIRECTORY CONTAINING .TXT FILES
     >>> FEATURES_DIR = r'/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/csv/features_extracted'       #PATH TO A DIRECTORY CONTAINING FEATURIZED POSE ESTIMATION
     >>> TARGETS_DIR = r'/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/csv/targets_inserted'          #PATH TO A DIRECTORY WHERE FEATURIZED POSE ESTIMATION AND ALIGNED ANNOTATIONS ARE TO BE SAVED

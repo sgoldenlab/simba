@@ -40,6 +40,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters>`__.
 
     :example:
+
     >>> ui = VideoInfoTable(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
     >>> ui.run()
     """

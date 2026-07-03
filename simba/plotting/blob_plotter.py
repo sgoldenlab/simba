@@ -54,6 +54,7 @@ class BlobPlotter(PlottingMixin):
      :param Optional[int] core_cnt: The number of cores to use for multiprocessing. Deafults to -1 which means all available cores.
 
      :example:
+
      >>> BlobPlotter(data_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\test\2022-06-20_NOB_DOT_4_downsampled.mp4", smoothing='Savitzky Golay', circle_size=10).run()
      """
 

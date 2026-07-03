@@ -35,6 +35,7 @@ class MitraFreezingDetector(ConfigReader):
     minimum movement threshold over a specified bout duration.
 
     :example:
+
     >>> MitraFreezingDetector(data_dir=r'D:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location', config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini")
 
     References

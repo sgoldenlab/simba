@@ -33,6 +33,7 @@ class YoloLabels2YoloProject:
     :return: None (writes files on disk). :meth:`run` also prints success via :func:`simba.utils.printing.stdout_success`.
 
     :example:
+
     >>> project = YoloLabels2YoloProject(lbl_dir=r"/path/to/labels", img_dir=r"/path/to/images", project_dir=r"/path/to/yolo_project", names=("mouse",), train_val_split=0.7)
     >>> project.run()
     """

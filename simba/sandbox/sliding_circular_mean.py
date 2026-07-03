@@ -39,6 +39,7 @@ def sliding_circular_mean(x: np.ndarray,
     :return np.ndarray: A 1D numpy array of the same length as `x`, containing the circular mean for each sliding window.  Values before the window is fully populated will be set to -1.
 
     :example:
+
     >>> x = np.random.randint(0, 361, (i, )).astype(np.int32)
     >>> results = sliding_circular_mean(x, 1, 10)
     """

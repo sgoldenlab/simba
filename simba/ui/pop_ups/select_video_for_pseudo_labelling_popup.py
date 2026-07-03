@@ -20,6 +20,7 @@ class SelectPseudoLabellingVideoPupUp(ConfigReader, PopUpMixin):
     Launch PopUp to select video for labelling
 
     :example:
+
     >>> SelectPseudoLabellingVideoPupUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
     """
     def __init__(self,

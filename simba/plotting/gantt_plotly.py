@@ -62,6 +62,7 @@ def gantt_plotly(bouts_df: pd.DataFrame,
     :rtype: np.ndarray
 
     :example:
+
     >>> FILE_PATH = r"D:\troubleshooting\mitra\project_folder\logs\all\592_MA147_CNO1_0515.csv"
     >>> data = read_df(file_path=FILE_PATH, file_type='csv')
     >>> bouts_df = detect_bouts(data_df=data, target_lst=list(data.columns), fps=30)

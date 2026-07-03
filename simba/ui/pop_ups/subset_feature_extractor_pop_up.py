@@ -37,6 +37,7 @@ FEATURE_FAMILIES = [TWO_POINT_BP_DISTANCES,
 class FeatureSubsetExtractorPopUp(PopUpMixin, ConfigReader):
     """
     :example:
+
     >>> FeatureSubsetExtractorPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
     """
 

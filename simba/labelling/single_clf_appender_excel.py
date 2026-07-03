@@ -35,6 +35,7 @@ class SingleClfAppenderExcel(ConfigReader):
     :param Union[str, os.PathLike] save_dir: Directory where labeled CSV files will be saved. If None, uses the project's targets_folder from the config.
 
     :example:
+
     >>> labeler = SingleClfAppenderExcel(config_path='MyProjectConfig', label_path='annotations.xlsx')
     >>> labeler.run()
     """

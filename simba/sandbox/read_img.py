@@ -90,6 +90,7 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
     :rtype: np.ndarray
 
     :example:
+
     >>> img = read_frm_of_video(video_path='/Users/simon/Desktop/envs/platea_featurizer/data/video/3D_Mouse_5-choice_MouseTouchBasic_s9_a4_grayscale.mp4', clahe=True)
     >>> cv2.imshow('img', img)
     >>> cv2.waitKey(5000)

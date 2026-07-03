@@ -41,6 +41,7 @@ class ROIPlot(ConfigReader, PlottingMixin):
     :param dict style_attr: User-defined visualization settings.
 
     :example:
+
     >>> settings = {'show_body_parts': True, 'show_animal_name': True}
     >>> roi_visualizer = ROIPlot(ini_path=r'MyProjectConfig', video_path="MyVideo.mp4", settings=settings)
     >>> roi_visualizer.insert_data()

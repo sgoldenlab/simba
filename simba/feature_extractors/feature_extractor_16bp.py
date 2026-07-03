@@ -34,6 +34,7 @@ class ExtractFeaturesFrom16bps(ConfigReader, FeatureExtractionMixin):
        :align: center
 
     :example:
+
     >>> feature_extractor = ExtractFeaturesFrom16bps(config_path='MyProjectConfig')
     >>> feature_extractor.run()
     """

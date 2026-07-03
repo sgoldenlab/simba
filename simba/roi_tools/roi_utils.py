@@ -479,6 +479,7 @@ def multiply_ROIs(filename: Union[str, os.PathLike],
     :return: None. The results are stored in the ``/project_folder/logs/measures\ROI_definitions.h5`` of the SimBA project
 
     :example:
+
     >>> multiply_ROIs(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", filename=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0514.mp4")
     """
 
@@ -562,6 +563,7 @@ def reset_video_ROIs(config_path: Union[str, os.PathLike],
     :return: None. The results are stored in the ``/project_folder/logs/measures\ROI_definitions.h5`` of the SimBA project
 
     :example:
+
     >>> reset_video_ROIs(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", filename=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0514.mp4")
     """
 

@@ -54,6 +54,7 @@ class SimBA2YoloSegmentation(ConfigReader):
     :return: None. Saves YOLO-formatted images and annotations to disk in the `save_dir` location.
 
     :example:
+
     >>> SAVE_DIR = r'D:\troubleshooting\mitra\mitra_yolo'
     >>> CONFIG_PATH = r"C:\troubleshooting\mitra\project_folder\project_config.ini"
     >>> runner = SimBA2Yolo(config_path=CONFIG_PATH, save_dir=SAVE_DIR, sample_size=10, verbose=True)

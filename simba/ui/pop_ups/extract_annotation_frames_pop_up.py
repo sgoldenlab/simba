@@ -23,6 +23,7 @@ ALL_VIDEOS = 'ALL VIDEOS'
 class ExtractAnnotationFramesPopUp(PopUpMixin, ConfigReader):
     """
     :example:
+
     >>> ExtractAnnotationFramesPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
     """
 

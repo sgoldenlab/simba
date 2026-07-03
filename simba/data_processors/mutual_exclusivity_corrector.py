@@ -35,6 +35,7 @@ class MutualExclusivityCorrector(ConfigReader):
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/mutual_exclusivity_heuristic_rules.md>`__.
 
     :examples:
+
     >>> rules = {1: {'rule_type': 'threshold_determinator','determinator': 'Attack', 'threshold': 0.5, 'subordinates': ['Sniffing']}, 2: {'rule_type': 'threshold_determinator', 'determinator': 'Attack', 'threshold': 0.0, 'subordinates': ['Sniffing', 'Rear']}}
     >>> exclusivity_corrector = MutualExclusivityCorrector(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', rules=rules)
     >>> exclusivity_corrector.run()

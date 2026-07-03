@@ -59,6 +59,7 @@ class Sleap2Yolo:
     :return: None. Results saved in ``save_dir``.
 
     :example:
+
     >>> DATA_DIR = r'D:\ares\data\ant\sleap_csv'
     >>> VIDEO_DIR = r'D:\ares\data\ant\sleap_video'
     >>> SAVE_DIR = r"D:\imgs\sleap_csv"

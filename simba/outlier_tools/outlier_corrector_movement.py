@@ -42,6 +42,7 @@ class OutlierCorrecterMovement(ConfigReader, FeatureExtractionMixin):
     :param str config_path: path to SimBA project config file in Configparser format
 
     :example:
+
     >>> outlier_correcter_movement = OutlierCorrecterMovement(config_path='MyProjectConfig')
     >>> outlier_correcter_movement.run()
     """

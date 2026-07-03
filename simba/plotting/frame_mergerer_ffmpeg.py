@@ -53,6 +53,7 @@ class FrameMergererFFmpeg(ConfigReader):
     :param Optional[bool] gpu: If True, use NVIDEA FFMpeg GPU codecs. Default False.
 
     :example:
+
     >>> video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled.mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled.mp4']
     >>> merger = FrameMergererFFmpeg(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', video_paths=videos, video_height=600, video_width=600, concat_type='mosaic')
     >>> merger.run()

@@ -40,6 +40,7 @@ class LitPose2YOLO:
     .. [2] Biderman et al., Lightning Pose: improved animal pose estimation via semi-supervised learning, Bayesian ensembling and cloud-native open-source tools, *Nature Methods* (2024), doi: https://doi.org/10.1038/s41592-024-02319-1
 
     :example:
+
     >>> runner = LitPose2YOLO(litpose_dir=r'Z:\home\simon\lp_300126', save_dir=r'E:\litpose_yolo\bbox', verbose=True, clahe=False, greyscale=False, sample_n=1000, padding=0.15)
     >>> runner.run()
     """

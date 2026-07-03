@@ -151,6 +151,7 @@ class SpontaneousAlternationsPlotter(ConfigReader):
     :param Optional[Union[str, os.PathLike]] data_path: Path to the file to be analyzed, e.g., CSV file in `project_folder/csv/outlier_corrected_movement_location`` directory.
 
     :example:
+
     >>> config_path = '/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini'
     >>> plotter = SpontaneousAlternationsPlotter(config_path=config_path, arm_names=['A', 'B', 'C'], center_name='Center', threshold=0.0, buffer=1, animal_area=60, data_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/csv/outlier_corrected_movement_location/F1 HAB.csv')
     >>> plotter.run()

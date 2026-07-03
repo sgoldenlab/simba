@@ -17,6 +17,7 @@ def kumar_hassebrook_similarity(x: np.ndarray, y: np.ndarray) -> float:
     :return: Kumar-Hassebrook similarity between vectors x and y.
 
     :example:
+
     >>> x, y = np.random.randint(0, 500, (1000,)), np.random.randint(0, 500, (1000,))
     >>> kumar_hassebrook_similarity(x=x, y=y)
     """
@@ -38,6 +39,7 @@ def wave_hedges_distance(x: np.ndarray, y: np.ndarray) -> float:
 
 
     :example:
+
     >>> x = np.random.randint(0, 500, (1000,))
     >>> y = np.random.randint(0, 500, (1000,))
     >>> wave_hedges_distance(x=x, y=y)
@@ -65,6 +67,7 @@ def gower_distance(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     :return np.ndarray: Gower-like distance vector with shape (m,).
 
     :example:
+
     >>> x, y = np.random.randint(0, 500, (1000, 6000)), np.random.randint(0, 500, (1000, 6000))
     >>> gower_distance(x=x, y=y)
 
@@ -95,6 +98,7 @@ def normalized_google_distance(x: np.ndarray, y: np.ndarray) -> float:
     :return float:  Normalized Google Distance between x and y.
 
     :example:
+
     >>> x, y = np.random.randint(0, 500, (1000,200)), np.random.randint(0, 500, (1000,200))
     >>> normalized_google_distance(x=y, y=x)
     """

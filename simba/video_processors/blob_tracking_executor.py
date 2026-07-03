@@ -87,6 +87,7 @@ class BlobTrackingExecutor():
     :param bool center: If True, compute center coordinates. Default: True.
 
     :example:
+
     >>> tracker = BlobTrackingExecutor(data=r"C:/troubleshooting/mitra/test/.temp/blob_definitions.pickle")
     >>> tracker.run()
     >>> tracker = BlobTrackingExecutor(data=r"C:/troubleshooting/mitra/test/.temp/blob_definitions.pickle", batch_size=5000)

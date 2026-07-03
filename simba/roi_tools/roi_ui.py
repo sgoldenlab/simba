@@ -39,6 +39,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
     :param Optional[Any] roi_table_popup: Reference to the parent ROI table popup window. If provided, :meth:`refresh_window` is called on close.
 
     :example:
+
     >>> ROI_ui(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini", video_path=r"C:\troubleshooting\mouse_open_field\project_folder\videos\Video1.mp4")
     >>> ROI_ui(config_path=r"/mnt/c/troubleshooting/mouse_open_field/project_folder/project_config.ini", video_path=r"/mnt/c/troubleshooting/mouse_open_field/project_folder/videos/Video1.mp4")
 

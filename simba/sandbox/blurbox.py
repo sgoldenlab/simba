@@ -30,6 +30,7 @@ def roi_blurbox(video_path: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> roi_blurbox(video_path='/Users/simon/Downloads/1_LH_clipped_downsampled.mp4', blur_level=0.2, invert=True)
     """
     check_ffmpeg_available(raise_error=True)

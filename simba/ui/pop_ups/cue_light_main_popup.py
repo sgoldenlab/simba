@@ -42,6 +42,7 @@ class CueLightMainPopUp(ConfigReader, PopUpMixin):
 
 
     :examples:
+
     >>> test = CueLightMainPopUp(config_path=r"C:\troubleshooting\cue_light\t1\project_folder\project_config.ini")
     """
 

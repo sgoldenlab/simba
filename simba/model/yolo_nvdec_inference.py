@@ -79,6 +79,7 @@ def read_yolo_metadata(model: Union[str, os.PathLike, YOLO]) -> dict:
     :raises InvalidInputError: If ``model`` is not a YOLO instance, not a valid path, or has an unsupported extension.
 
     :example:
+
     >>> meta = read_yolo_metadata('/models/best.engine')
     >>> meta['batch']
     192
@@ -416,6 +417,7 @@ class YoloNVDECInference(object):
     :param bool verbose: Print progress messages. Default True.
 
     :example:
+
     >>> detector = YoloNVDECInference(video_path=r'/videos', engine_path=r'/best.engine', task='detect')
     >>> detector.run()
     >>> detector.results['video_name']

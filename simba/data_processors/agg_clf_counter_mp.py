@@ -135,6 +135,7 @@ class AggregateClfCalculatorMultiprocess(ConfigReader):
     :param int core_cnt: Number of CPU cores. If -1, then all available cores.
 
     :example:
+
     >>> clf_calculator = AggregateClfCalculatorMultiprocess(
     ...     config_path="project_folder/project_config.ini",
     ...     classifiers=['Attack', 'Sniffing'],

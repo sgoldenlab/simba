@@ -24,6 +24,7 @@ class MitraStyleAnnotationAppender(ConfigReader):
        `Example expected input file <https://github.com/sgoldenlab/simba/blob/master/misc/Start-Stop Annotations.xlsx>`__.
 
     :example:
+
     >>> data_path = r"C:\annotations\Start-Stop Annotations.xlsx"
     >>> features_dir = r"C:\project_folder\features"
     >>> save_dir = r"C:\project_folder\features\targets_inserted"

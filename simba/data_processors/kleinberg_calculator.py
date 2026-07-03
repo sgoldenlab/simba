@@ -58,6 +58,7 @@ class KleinbergCalculator(ConfigReader):
     :param bool numba: If True, uses Numba JIT-accelerated burst detection for faster computation. Default: False.
 
     :example I:
+
     >>> kleinberg_calculator = KleinbergCalculator(config_path='MySimBAConfigPath', classifier_names=['Attack'], sigma=2, gamma=0.3, hierarchy=2, hierarchical_search=False)
     >>> kleinberg_calculator.run()
 

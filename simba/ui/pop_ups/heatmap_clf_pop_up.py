@@ -30,6 +30,7 @@ HEATMAP_BG_OPTIONS = ['NONE', VIDEO, VIDEO_FRM]
 class HeatmapClfPopUp(PopUpMixin, ConfigReader):
     """
     :example:
+
     >>> _ = HeatmapClfPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
     """
 

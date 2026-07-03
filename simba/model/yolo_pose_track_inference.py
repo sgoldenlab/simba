@@ -83,6 +83,7 @@ class YOLOPoseTrackInference():
     :param float iou: IoU (Intersection over Union) threshold for Non-Maximum Suppression (NMS) during tracking. Range: (0, 1]. Default: 0.5.
 
     :example:
+
         >>> keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Tail_base')
         >>> inference = YOLOPoseTrackInference(
         ...     weights_path='path/to/model.pt',
@@ -98,6 +99,7 @@ class YOLOPoseTrackInference():
         >>> inference.run()
 
     :example:
+
         >>> # Process multiple videos and return results as DataFrames
         >>> inference = YOLOPoseTrackInference(
         ...     weights_path='model.pt',

@@ -61,6 +61,7 @@ class ClusterXAICalculator():
     :param Dict[str, Any] settings: Dict holding which explainability tests to use.
 
     :Example:
+
     >>> settings = {'gini_importance': True, 'permutation_importance': True, 'shap': {'paired': True, 'sample': 100}}
     >>> calculator = ClusterXAICalculator(config_path='unsupervised/project_folder/project_config.ini', data_path='unsupervised/cluster_models/quizzical_rhodes.pickle', settings=settings)
     >>> calculator.run()

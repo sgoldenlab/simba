@@ -22,6 +22,7 @@ def hausdorff_distance(geometries: List[List[Union[Polygon, LineString]]]) -> np
     :return np.ndarray: 1D array of hausdorff distances of geometries in each list.
 
     :example:
+
     >>> x = Polygon([[0,1], [0, 2], [1,1]])
     >>> y = Polygon([[0,1], [0, 2], [0,1]])
     >>> hausdorff_distance(geometries=[[x, y]])
@@ -43,6 +44,7 @@ def multiframe_hausdorff_distance(geometries: List[Union[Polygon, LineString]],
     The Hausdorff distance measure of the similarity between sequential time-series  geometries.
 
     :example:
+
     >>> df = read_df(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/outlier_corrected_movement_location/SI_DAY3_308_CD1_PRESENT.csv', file_type='csv')
     >>> cols = [x for x in df.columns if not x.endswith('_p')]
     >>> data = df[cols].values.reshape(len(df), -1 , 2).astype(np.int)

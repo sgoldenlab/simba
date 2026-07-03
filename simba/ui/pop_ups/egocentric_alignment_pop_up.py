@@ -20,6 +20,7 @@ class EgocentricAlignPopUp(ConfigReader, PopUpMixin):
     """
 
     :example:
+
     >>> _ = EgocentricAlignPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
     """
 

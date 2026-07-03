@@ -117,6 +117,7 @@ class TrainModelMixin(object):
         :rtype: Tuple[pd.DataFrame, List[int]]
 
         :examples:
+
         >>> self.read_all_files_in_folder(file_paths=['targets_inserted/Video_1.csv', 'targets_inserted/Video_2.csv'], file_type='csv', classifier_names=['Attack'])
         """
         check_filepaths_in_iterable_exist(file_paths=file_paths, name=self.__class__.__name__)
@@ -163,6 +164,7 @@ class TrainModelMixin(object):
         :rtype: List[str]
 
         :examples:
+
         >>> self.read_in_all_model_names_to_remove(config=config, model_cnt=2, clf_name=['Attack'])
         """
 
@@ -186,6 +188,7 @@ class TrainModelMixin(object):
         :rtype: pd.DataFrame
 
         :examples:
+
         >>> self.delete_other_annotation_columns(df=df, annotations_lst=['Sniffing'])
         """
 
@@ -210,6 +213,7 @@ class TrainModelMixin(object):
         :rtype: Tuple[pd.DataFrame, pd.DataFrame]
 
         :examples:
+
         >>> self.split_df_to_x_y(df=df, clf_name='Attack')
         """
 
@@ -233,6 +237,7 @@ class TrainModelMixin(object):
         :rtype: Tuple[pd.DataFrame, pd.DataFrame]
 
         :examples:
+
         >>> self.random_undersampler(x_train=x_train, y_train=y_train, sample_ratio=1.0)
         """
 
@@ -264,6 +269,7 @@ class TrainModelMixin(object):
         :rtype: Tuple[np.ndarray, np.ndarray]
 
         :examples:
+
         >>> self.smoteen_oversampler(x_train=x_train, y_train=y_train, sample_ratio=1.0)
         """
 
@@ -285,6 +291,7 @@ class TrainModelMixin(object):
         :rtype: Tuple[np.ndarray, np.ndarray]
 
         :examples:
+
         >>> self.smote_oversampler(x_train=x_train, y_train=y_train, sample_ratio=1.0)
         """
         stdout_information(msg="Performing SMOTE oversampling...")
@@ -897,6 +904,7 @@ class TrainModelMixin(object):
         :param Optional[int] save_file_suffix: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search.
 
         :example:
+
         >>> from simba.mixins.train_model_mixin import TrainModelMixin
         >>> x_cols = list(pd.read_csv('/Users/simon/Desktop/envs/simba/simba/tests/data/sample_data/shap_test.csv', index_col=0).columns)
         >>> x = pd.DataFrame(np.random.randint(0, 500, (9000, len(x_cols))), columns=x_cols)
@@ -1132,6 +1140,7 @@ class TrainModelMixin(object):
         :rtype: List[str]
 
         :example:
+
         >>> self.get_all_clf_names(config=config, target_cnt=2)
         >>> ['Attack', 'Sniffing']
         """
@@ -1215,6 +1224,7 @@ class TrainModelMixin(object):
         :rtype: Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]
 
         :examples:
+
         >>> x = pd.DataFrame(data=[[11, 23, 12], [87, 65, 76], [23, 73, 27], [10, 29, 2], [12, 32, 42], [32, 73, 2], [21, 83, 98], [98, 1, 1]])
         >>> y =  pd.Series([0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1])
         >>> x_train, x_test, y_train, y_test = TrainModelMixin().bout_train_test_splitter(x_df=x, y_df=y, test_size=0.5)
@@ -1267,6 +1277,7 @@ class TrainModelMixin(object):
 
 
         :example:
+
         >>> data = np.random.randint(0, 1000, (1000, 5000)).astype(np.float32)
         >>> field_names = []
         >>> for i in range(data.shape[1]): field_names.append(f'Feature_{i+1}')
@@ -1319,6 +1330,7 @@ class TrainModelMixin(object):
         :rtype: List[str]
 
         :example:
+
         >>> a = np.random.randint(0, 5, (1_000_000, 100))
         >>> df = pd.DataFrame(a)
         >>> c = find_collinear_features(data=df, threshold=0.0025)
@@ -1883,6 +1895,7 @@ class TrainModelMixin(object):
         :param bool plot: If True, create SHAP aggregation and plots.
 
         :example:
+
         >>> from simba.mixins.train_model_mixin import TrainModelMixin
         >>> x_cols = list(pd.read_csv('/Users/simon/Desktop/envs/simba/simba/tests/data/sample_data/shap_test.csv', index_col=0).columns)
         >>> x = pd.DataFrame(np.random.randint(0, 500, (9000, len(x_cols))), columns=x_cols)
@@ -2350,6 +2363,7 @@ class TrainModelMixin(object):
 
 
         :examples:
+
         >>> df = pd.read_csv('/Users/simon/Desktop/envs/troubleshooting/multilabel/project_folder/csv/targets_inserted/01.YC015YC016phase45-sample_sampler.csv', index_col=0)
         >>> TrainModelMixin().random_multiclass_frm_sampler(data_df=df, target_field='syllable_class', target_var=0, sampling_ratio=0.20)
         >>> TrainModelMixin().random_multiclass_frm_sampler(data_df=df, target_field='syllable_class', target_var=0, sampling_ratio={1: 0.1, 2: 0.2, 3: 0.3})
@@ -2443,6 +2457,7 @@ class TrainModelMixin(object):
         :return (pd.DataFrame, pd.DataFrame): resampled features, and resampled associated target.
 
         :examples:
+
         >>> df = pd.read_csv('/Users/simon/Desktop/envs/troubleshooting/multilabel/project_folder/csv/targets_inserted/01.YC015YC016phase45-sample_sampler.csv', index_col=0)
         >>> undersampled_df = TrainModelMixin().random_multiclass_bout_sampler(data=df, target_field='syllable_class', target_var=0, sampling_ratio={1: 1.0, 2: 1, 3: 1}, raise_error=True)
         """
@@ -2555,6 +2570,7 @@ class TrainModelMixin(object):
         Defines a sklearn scaler object. See ``UMLOptions.SCALER_OPTIONS.value`` for accepted scalers.
 
         :example:
+
         >>> TrainModelMixin.define_scaler(scaler_name='min-max')
         """
 
@@ -2699,6 +2715,7 @@ class TrainModelMixin(object):
         :param bool plot: If True, create SHAP aggregation and plots.
 
         :example:
+
         >>> CONFIG_PATH = r"C:/troubleshooting/mitra/project_folder/project_config.ini"
         >>> RF_PATH = r"C:/troubleshooting/mitra/models/validations/straub_tail_5_new/straub_tail_5.sav"
         >>> DATA_PATH = r"C:/troubleshooting/mitra/project_folder/csv/targets_inserted/new_straub/appended/501_MA142_Gi_CNO_0514.csv"

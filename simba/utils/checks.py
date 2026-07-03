@@ -100,6 +100,7 @@ def check_int(name: str,
     :raises IntegerError: If validation fails and `raise_error` is True.
 
     :example:
+
     >>> check_int(name='My_fps', value=25, min_value=1)
     >>> check_int(name='Quality', value=50, min_value=0, max_value=100, raise_error=False)
     >>> check_int(name='Mode', value=2, accepted_vals=[1, 2, 3])
@@ -185,6 +186,7 @@ def check_str(name: str,
     :rtype: Tuple[bool, str]
 
     :examples:
+
     >>> check_str(name='split_eval', input='gini', options=['entropy', 'gini'])
     """
 
@@ -258,6 +260,7 @@ def check_float(name: str,
 
 
     :examples:
+
     >>> check_float(name='My_float', value=0.5, max_value=1.0, min_value=0.0)
     """
 
@@ -355,6 +358,7 @@ def get_fn_ext(filepath: Union[os.PathLike, str]) -> (str, str, str):
     :return str: File extension
 
     :example:
+
     >>> get_fn_ext(filepath='C:/My_videos/MyVideo.mp4')
     >>> ('My_videos', 'MyVideo', '.mp4')
     """
@@ -468,6 +472,7 @@ def check_that_column_exist(df: pd.DataFrame,
     :raises ColumnNotFoundError: The ``column_name`` does not exist within ``df``.
 
     :example:
+
     >>> df = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})
     >>> check_that_column_exist(df=df, column_name='A', file_name='test.csv')
     True
@@ -506,6 +511,7 @@ def check_if_valid_input(
     :return str: If invalid, then error msg. Else, empty str.
 
     :example:
+
     >>> check_if_valid_input(name='split_eval', input='gini', options=['entropy', 'gini'])
     >>> (True, '')
     """
@@ -575,6 +581,7 @@ def check_if_headers_in_dfs_are_unique(dfs: List[pd.DataFrame]) -> List[str]:
     :return List[str]: List of columns headers seen in multiple dataframes. Empty if None.
 
     :examples:
+
     >>> df_1, df_2 = pd.DataFrame([[1, 2]], columns=['My_column_1', 'My_column_2']), pd.DataFrame([[4, 2]], columns=['My_column_3', 'My_column_1'])
     >>> check_if_headers_in_dfs_are_unique(dfs=[df_1, df_2])
     >>> ['My_column_1']
@@ -595,6 +602,7 @@ def check_if_string_value_is_valid_video_timestamp(value: str, name: str, raise_
     :raises InvalidInputError: If the timestamp is in invalid format
 
     :example:
+
     >>> check_if_string_value_is_valid_video_timestamp(value='00:0b:10', name='My time stamp')
     >>> "InvalidInputError: My time stamp is should be in the format XX:XX:XX where X is an integer between 0-9"
     >>> check_if_string_value_is_valid_video_timestamp(value='00:00:10', name='My time stamp'
@@ -620,6 +628,7 @@ def check_that_hhmmss_start_is_before_end(
     :raises InvalidInputError: If end time is before the start time.
 
     :example:
+
     >>> check_that_hhmmss_start_is_before_end(start_time='00:00:05', end_time='00:00:01', name='My time period')
     >>> "InvalidInputError: My time period has an end-time which is before the start-time"
     >>> check_that_hhmmss_start_is_before_end(start_time='00:00:01', end_time='00:00:05')
@@ -699,6 +708,7 @@ def check_if_valid_rgb_str(
     :param bool reverse_returned: If True and return_cleaned_rgb_tuple is True, reverses to returned cleaned rgb tuple (e.g., RGB becomes BGR) before returning it.
 
     :example:
+
     >>> check_if_valid_rgb_str(input='(50, 25, 100)', return_cleaned_rgb_tuple=True, reverse_returned=True)
     >>> (100, 25, 50)
     """
@@ -760,6 +770,7 @@ def check_if_list_contains_values(
     :param bool raise_error: If True, raise error of not all values can be found in data. Else, print warning.
 
     :example:
+
     >>> check_if_list_contains_values(data=[1,2, 3, 4, 0], values=[0, 1, 6], name='My_data')
     """
 
@@ -841,6 +852,7 @@ def check_if_2d_array_has_min_unique_values(data: np.ndarray, min: int) -> bool:
     :return bool: True if the input array has at least the specified minimum number of unique rows, False otherwise.
 
     :example:
+
     >>> data = np.array([[0, 0], [0, 0], [0, 0], [0, 1]])
     >>> check_if_2d_array_has_min_unique_values(data=data, min=2)
     >>> True
@@ -869,6 +881,7 @@ def check_if_module_has_import(parsed_file: ast.Module, import_name: str) -> boo
     :param bool: True if the specified import is found in the module, False otherwise.
 
     :example:
+
     >>> parsed_file = ast.parse(Path('/simba/misc/piotr.py').read_text())
     >>> check_if_module_has_import(parsed_file=parsed_file, import_name='argparse')
     >>> True
@@ -969,6 +982,7 @@ def check_that_dir_has_list_of_filenames(
     Check that all file names in a list has an equivalent file in a specified directory. E.g., check if all files in the outlier corrected folder has an equivalent file in the featurues_extracted directory.
 
     :example:
+
     >>> file_name_lst = glob.glob('/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement' + '/*.csv')
     >>> check_that_dir_has_list_of_filenames(dir = '/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/features_extracted', file_name_lst=file_name_lst)
     """
@@ -1017,6 +1031,7 @@ def check_valid_array(data: np.ndarray,
     :rtype: Union[None, bool]
 
     :example:
+
     >>> data = np.array([[1, 2], [3, 4]])
     >>> check_valid_array(data, source="Example", accepted_ndims=(2,), accepted_sizes=[2], accepted_dtypes=[np.int64])
     True
@@ -1148,6 +1163,7 @@ def check_valid_lst(data: list,
     :return bool: True if all validation criteria are met, False otherwise.
 
     :example:
+
     >>> check_valid_lst(data=[1, 2, 'three'], valid_dtypes=(int, str), min_len=2, max_len=5)
     True
     >>> check_valid_lst(data=[1, 2, 3], valid_dtypes=(int,), exact_len=3)
@@ -1261,6 +1277,7 @@ def check_if_keys_exist_in_dict(
     :raises InvalidInputError: If any of the specified keys do not exist in the dictionary and raise_error=True.
 
     :example:
+
     >>> data = {'a': 1, 'b': 2, 'c': 3}
     >>> check_if_keys_exist_in_dict(data=data, key='a')
     True
@@ -1331,6 +1348,7 @@ def check_umap_hyperparameters(hyper_parameters: Dict[str, Any]) -> None:
     :raises InvalidInputError: If any input is invalid
 
     :example:
+
     >>> check_umap_hyperparameters(hyper_parameters={'n_neighbors': [2], 'min_distance': [0.1], 'spread': [1], 'scaler': 'MIN-MAX', 'variance': 0.2})
     """
     for key in UMAPParam.HYPERPARAMETERS.value:
@@ -1395,6 +1413,7 @@ def check_video_has_rois(roi_dict: Dict[str, pd.DataFrame],
     :raises NoROIDataError: If any videos are missing required ROIs and raise_error=True.
 
     :example:
+
     >>> roi_dict = {
     ...     'rectangles': pd.DataFrame({'Video': ['video1'], 'Name': ['ROI1']}),
     ...     'circles': pd.DataFrame({'Video': ['video1'], 'Name': ['ROI2']}),
@@ -1461,6 +1480,7 @@ def check_if_df_field_is_boolean(df: pd.DataFrame,
     :raises CountError: If invalid values are found and ``raise_error=True``.
 
     :example:
+
     >>> df = pd.DataFrame({'binary_col': [0, 1, 0, 1], 'mixed_col': [0, 1, 2, 0], 'flag': [1, 0, 1, 0]})
     >>> check_if_df_field_is_boolean(df=df, field='binary_col', bool_values=(0, 1))
     True
@@ -1522,6 +1542,7 @@ def check_valid_dataframe(
     :raises InvalidInputError: If any validation criteria are not met.
 
     :example:
+
     >>> df = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})
     >>> check_valid_dataframe(df=df, required_fields=['A', 'B'], min_axis_0=1)
     >>> check_valid_dataframe(df=df, valid_dtypes=(int,), max_axis_1=2)
@@ -1611,6 +1632,7 @@ def check_valid_boolean(value: Union[Any, List[Any]], source: Optional[str] = ''
     :raises InvalidInputError: If non-boolean values are found and raise_error=True.
 
     :example:
+
     >>> check_valid_boolean(True)
     True
     >>> check_valid_boolean([True, False, True])
@@ -1658,6 +1680,7 @@ def check_valid_tuple(x: tuple,
     :raises InvalidInputError: If any validation criteria are not met.
 
     :example:
+
     >>> check_valid_tuple(x=(1, 2, 3), accepted_lengths=(2, 3), valid_dtypes=(int,))
     >>> check_valid_tuple(x=('a', 'b'), minimum_length=2, accepted_values=['a', 'b', 'c'])
     >>> check_valid_tuple(x=(5, 10, 15), min_integer=5)
@@ -1727,6 +1750,7 @@ def check_video_and_data_frm_count_align(video: Union[str, os.PathLike, cv2.Vide
     :return None:
 
     :example:
+
     >>> data_1 = '/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/outlier_corrected_movement_location/SI_DAY3_308_CD1_PRESENT.csv'
     >>> video_1 = '/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/frames/output/ROI_analysis/SI_DAY3_308_CD1_PRESENT.mp4'
     >>> check_video_and_data_frm_count_align(video=video_1, data=data_1, raise_error=True)
@@ -1790,6 +1814,7 @@ def check_if_video_corrupted(video: Union[str, os.PathLike, cv2.VideoCapture],
     :return None:
 
     :example:
+
     >>> check_if_video_corrupted(video_path='/Users/simon/Downloads/NOR ENCODING FExMP8.mp4')
     """
     check_instance(source=f'{check_if_video_corrupted.__name__} video', instance=video, accepted_types=(str, cv2.VideoCapture))
@@ -1852,6 +1877,7 @@ def check_valid_dict(x: dict,
     :raises InvalidInputError: If any validation criteria are not met.
 
     :example:
+
     >>> check_valid_dict(x={'a': 1, 'b': 2}, valid_key_dtypes=(str,), valid_values_dtypes=(int,))
     >>> check_valid_dict(x={'key1': 10, 'key2': 20}, required_keys=('key1',), min_value=5, max_value=25)
     >>> check_valid_dict(x={'x': 1, 'y': 2}, valid_keys=('x', 'y', 'z'), min_len_keys=2)
@@ -1986,6 +2012,7 @@ def check_all_dfs_in_list_has_same_cols(dfs: List[pd.DataFrame], raise_error: bo
     :raises MissingColumnsError: If DataFrames have different column names and raise_error=True.
 
     :example:
+
     >>> df1 = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})
     >>> df2 = pd.DataFrame({'A': [5, 6], 'B': [7, 8]})
     >>> check_all_dfs_in_list_has_same_cols(dfs=[df1, df2])
@@ -2022,6 +2049,7 @@ def is_valid_video_file(file_path: Union[str, os.PathLike], raise_error: bool = 
     :raises InvalidFilepathError: If the file is not a valid video file and raise_error=True.
 
     :example:
+
     >>> is_valid_video_file('/path/to/video.mp4')
     True
     >>> is_valid_video_file('/path/to/invalid.txt', raise_error=False)
@@ -2092,6 +2120,7 @@ def is_img_bw(img: np.ndarray,
     :raises InvalidInputError: If the image is not binary black and white and raise_error=True.
 
     :example:
+
     >>> bw_img = np.array([[0, 255], [255, 0]], dtype=np.uint8)
     >>> is_img_bw(bw_img)
     True
@@ -2128,6 +2157,7 @@ def is_img_greyscale(img: np.ndarray,
     :raises InvalidInputError: If the image is not greyscale and raise_error=True.
 
     :example:
+
     >>> gray_img = np.array([[128, 200], [50, 100]], dtype=np.uint8)
     >>> is_img_greyscale(gray_img)
     True
@@ -2157,6 +2187,7 @@ def is_wsl() -> bool:
     :rtype: bool
 
     :example:
+
     >>> is_wsl()
     False  # When running on native Linux
     >>> is_wsl()
@@ -2182,6 +2213,7 @@ def is_windows_path(value):
     :rtype: bool
 
     :example:
+
     >>> is_windows_path("C:\\Users\\username\\file.txt")
     True
     >>> is_windows_path("D:\\data\\folder")
@@ -2231,6 +2263,7 @@ def check_valid_img_path(path: Union[str, os.PathLike], raise_error: bool = True
     :raises InvalidInputError: If the file is not a valid image file and raise_error=True.
 
     :example:
+
     >>> check_valid_img_path('/path/to/image.jpg')
     True
     >>> check_valid_img_path('/path/to/invalid.txt', raise_error=False)
@@ -2268,6 +2301,7 @@ def check_valid_device(device: Union[Literal['cpu'], int], raise_error: bool = T
     :raises SimBAGPUError: If the GPU device is not available or not valid and raise_error=True.
 
     :example:
+
     >>> check_valid_device('cpu')
     True
     >>> check_valid_device(0)  # GPU 0
@@ -2370,6 +2404,7 @@ def check_valid_cpu_pool(value: Any,
     :raises InvalidInputError: If value is not a valid Pool instance, if core count constraints are violated, if accepted_cores contains invalid types, or if raise_error is True.
 
     :example:
+
     >>> import multiprocessing
     >>> pool = multiprocessing.Pool(processes=4)
     >>> check_valid_cpu_pool(value=pool, source='test', max_cores=8, min_cores=2)
@@ -2458,6 +2493,7 @@ def check_valid_codec(codec: str, raise_error: bool = True, source: str = ''):
     :raises InvalidInputError: If codec is not valid and ``raise_error=True``.
 
     :example:
+
     >>> check_valid_codec(codec='libx264')
     >>> check_valid_codec(codec='h264_nvenc', source='my_function')
     >>> is_valid = check_valid_codec(codec='invalid_codec', raise_error=False)

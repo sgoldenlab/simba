@@ -51,6 +51,7 @@ class SimBABlobImporter(ConfigReader):
     :param Optional[bool] verbose: If True, prints progress messages. Default: True.
 
     :example:
+
     >>> r = SimBABlobImporter(config_path=r"C:/troubleshooting/simba_blob_project/project_folder/project_config.ini", data_path=r'C:/troubleshooting/simba_blob_project/data')
     >>> r.run()
     >>> r = SimBABlobImporter(config_path=r"C:/troubleshooting/simba_blob_project/project_folder/project_config.ini", 

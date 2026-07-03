@@ -15,6 +15,7 @@ class Labelme2ImgsPopUp(PopUpMixin):
 
     """
     :example:
+
     >>> Labelme2ImgsPopUp()
     """
     def __init__(self):

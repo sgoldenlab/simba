@@ -35,6 +35,7 @@ def count_values_in_ranges(x: np.ndarray, r: np.ndarray) -> np.ndarray:
     :return np.ndarray: 2d array of size len(x) x len(r) with the counts of values in each feature range (inclusive).
 
     :example:
+
     >>> x = np.random.randint(1, 11, (10, 10)).astype(np.int8)
     >>> r = np.array([[1, 6], [6, 11]])
     >>> r_x = count_values_in_ranges(x=x, r=r)

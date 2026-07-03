@@ -44,6 +44,7 @@ def read_bento_files(data_paths: Union[List[str], str, os.PathLike],
     :rtype: Dict[str, pd.DataFrame]
 
     :example:
+
     >>> dfs = read_bento_files(data_paths=r"C:\troubleshooting\bento_test\bento_files", error_setting='WARNING', log_setting=False, video_info_df=r"C:\troubleshooting\bento_test\project_folder\logs\video_info.csv")
     """
 
@@ -112,6 +113,7 @@ def read_boris_annotation_files(data_paths: Union[List[str], str, os.PathLike],
     :return: A dictionary where each key is a video name, and each value is a dataframe containing the compiled behavioral annotations from the corresponding BORIS file.
 
     :example:
+
     >>> data = read_boris_annotation_files(data_paths=[r"C:\troubleshooting\boris_test\project_folder\boris_files\c_oxt23_190816_132617_s_trimmcropped.csv"], error_setting='WARNING', log_setting=False, video_info_df=r"C:\troubleshooting\boris_test\project_folder\logs\video_info.csv")
     """
 

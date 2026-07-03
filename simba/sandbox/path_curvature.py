@@ -20,6 +20,7 @@ def path_curvature(x: np.ndarray, agg_type: Literal['mean', 'median', 'max'] = '
     :rtype: float
 
     :example:
+
     >>> x = np.array([[0, 0], [1, 0.1], [2, 0.2], [3, 0.3], [4, 0.4]])
     >>> low = path_curvature(x)
     >>> x = np.array([[0, 0], [1, 1], [2, 0], [3, 1], [4, 0]])
@@ -60,6 +61,7 @@ def sliding_path_curvature(x: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(0, 500, (91, 2))
     >>> sliding_path_curvature(x=x, agg_type='mean', window_size=1, sample_rate=30)
     """

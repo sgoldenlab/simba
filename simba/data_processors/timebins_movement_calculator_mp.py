@@ -129,6 +129,7 @@ class TimeBinsMovementCalculatorMultiprocess(ConfigReader, FeatureExtractionMixi
     :param int core_cnt: Number of CPU cores to use for multiprocessing. If -1, uses all available cores. If greater than available cores, uses all available cores. Must be greater than 0. Default: -1.
 
     :example:
+
     >>> calculator = TimeBinsMovementCalculatorMultiprocess(
     ...     config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
     ...     bin_length=5.0,

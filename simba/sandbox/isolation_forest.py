@@ -31,6 +31,7 @@ def isolation_forest(x: np.ndarray,
     :return:
 
     :example:
+
     >>> x, lbls = make_blobs(n_samples=10000, n_features=2, centers=10, random_state=42)
     >>> x = np.hstack((x, lbls.reshape(-1, 1)))
     >>> scores = isolation_forest(x=x, estimators=10, normalize=True)

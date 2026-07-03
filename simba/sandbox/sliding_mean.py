@@ -38,6 +38,7 @@ def sliding_mean(x: np.ndarray, time_window: float, sample_rate: int) -> np.ndar
     :return np.ndarray: A numpy array containing the sum of values within each position of the sliding window.
 
     :example:
+
     >>> x = np.random.randint(1, 11, (100, )).astype(np.float32)
     >>> time_window = 1
     >>> sample_rate = 10

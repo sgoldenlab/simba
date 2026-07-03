@@ -14,6 +14,7 @@ def linearity_index(x: np.ndarray) -> float:
     :rtype: float
 
     :example:
+
     >>> x = np.array([[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5]])
     >>> linearity_index(x=x)
     >>> x = np.random.randint(0, 100, (100, 2))

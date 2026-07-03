@@ -11,6 +11,7 @@ def clean_sleap_file_name(filename: str) -> str:
     :returns str: The cleaned filename.
 
     :example:
+
     >>> clean_sleap_file_name("projectname.v00x.00x_videoname.analysis.csv")
     >>> 'videoname.csv'
     >>> clean_sleap_file_name("projectname.v00x.00x_videoname.analysis.h5")

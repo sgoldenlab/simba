@@ -97,6 +97,7 @@ class SAM3ToYoloBBox:
     :raises SimBAPAckageVersionError: If ``ultralytics`` is not installed, or ``SAM3SemanticPredictor`` cannot be imported.
 
     :example:
+
     >>> runner = SAM3ToYoloBBox(video_data=r'/path/to/videos', sam_path=r'/path/to/sam3.pt', save_dir=r'/path/to/yolo_project', txt_prompt='mouse', n_frames=50)
     >>> runner.run()
     """

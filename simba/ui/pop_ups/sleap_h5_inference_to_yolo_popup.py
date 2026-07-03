@@ -27,6 +27,7 @@ class SLEAPH5Inference2YoloPopUp(PopUpMixin):
 
     """
     :example:
+
     >>> SLEAPH5Inference2YoloPopUp()
     """
 

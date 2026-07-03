@@ -35,6 +35,7 @@ def crossfade_two_videos(video_path_1: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> crossfade_two_videos(video_path_1='/Users/simon/Desktop/envs/simba/troubleshooting/reptile/1.mp4', video_path_2='/Users/simon/Desktop/envs/simba/troubleshooting/reptile/1.mp4', crossfade_duration=5, crossfade_method='zoomin', save_path='/Users/simon/Desktop/cross_test.mp4')
     """
 

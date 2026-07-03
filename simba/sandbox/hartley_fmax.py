@@ -13,6 +13,7 @@ def hartley_fmax(x: np.ndarray, y: np.ndarray):
     :param np.ndarray x: 1D array representing numeric data of the second group/feature.
 
     :example:
+
     >>> x = np.random.random((100,))
     >>> y = np.random.random((100,))
     >>> hartley_fmax(x=x, y=y)

@@ -34,6 +34,7 @@ class ExtractFeaturesFrom9bps(ConfigReader, FeatureExtractionMixin):
     :param str config_path: path to SimBA project config file in Configparser format
 
     :example:
+
     >>> feature_extractor = ExtractFeaturesFrom9bps(config_path='MyProjectConfig')
     >>> feature_extractor.run()
     """

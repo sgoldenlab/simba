@@ -18,6 +18,7 @@ def sliding_eta_squared(x: np.ndarray, y: np.ndarray, window_sizes: np.ndarray, 
     :return np.ndarray:
 
     :example:
+
     >>> x = np.random.randint(0, 10, (10000,))
     >>> y = np.random.randint(0, 2, (10000,))
     >>> p = sliding_eta_squared(x=x, y=y, window_sizes=np.array([1.0, 2.0]), sample_rate=10)

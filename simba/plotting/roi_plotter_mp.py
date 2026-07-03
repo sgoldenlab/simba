@@ -196,6 +196,7 @@ class ROIPlotMultiprocess(ConfigReader, PlottingMixin):
     :param bool gpu: If True, use GPU acceleration for video concatenation. Default: False.
 
     :example:
+
     >>> test = ROIPlotMultiprocess(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini',
     >>>                            video_path="/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT.mp4",
     >>>                            core_cnt=7,

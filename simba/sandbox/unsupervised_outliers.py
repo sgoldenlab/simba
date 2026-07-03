@@ -43,6 +43,7 @@ def local_outlier_factor(data: np.ndarray,
     :returns np.ndarray: Array of size data.shape[0] with local outlier scores.
 
     :example:
+
     >>> data, lbls = make_blobs(n_samples=2000, n_features=2, centers=10, random_state=42)
     >>> data = np.hstack((data, lbls.reshape(-1, 1)))
     >>> lof = local_outlier_factor(data=data, groupby_idx=2, k=100, normalize=True)
@@ -119,6 +120,7 @@ def elliptic_envelope(data: np.ndarray,
     :return np.ndarray: The Mahalanobis distances of each observation in array. Larger values indicate outliers.
 
     :example:
+
     >>> data, lbls = make_blobs(n_samples=2000, n_features=2, centers=1, random_state=42)
     >>> envelope_score = elliptic_envelope(data=data, normalize=True)
     >>> results = np.hstack((data[:, 0:2], envelope_score.reshape(lof.shape[0], 1)))

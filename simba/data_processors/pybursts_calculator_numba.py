@@ -93,6 +93,7 @@ def kleinberg_burst_detection(offsets: np.ndarray, s: float, gamma: float) -> np
        :header-rows: 1
 
     :example:
+
     >>> import numpy as np
     >>> from simba.data_processors.pybursts_calculator_numba import kleinberg_burst_detection
     >>> offsets = np.array([1.0, 1.1, 1.2, 5.0, 9.0, 9.05, 9.1])

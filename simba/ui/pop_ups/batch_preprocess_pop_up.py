@@ -14,6 +14,7 @@ from simba.video_processors.batch_process_menus import BatchProcessFrame
 class BatchPreProcessPopUp(PopUpMixin):
     """
     :example:
+
     >>> BatchPreProcessPopUp()
     """
 

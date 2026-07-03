@@ -11,6 +11,7 @@ def margalef_diversification_index(x: np.array) -> float:
     relative to the number of individuals.
 
     :example:
+
     >>> x = np.random.randint(0, 100, (100,))
     >>> margalef_diversification_index(x=x)
     """

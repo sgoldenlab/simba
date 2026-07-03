@@ -59,6 +59,7 @@ class EzPathPlot(object):
     :param bool verbose: If True, print progress per file.
 
     :example:
+
     >>> plotter = EzPathPlot(
     ...     data_path='/path/to/pose.csv',
     ...     body_part='Nose',

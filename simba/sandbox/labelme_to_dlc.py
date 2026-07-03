@@ -38,6 +38,7 @@ def labelme_to_dlc(labelme_dir: Union[str, os.PathLike],
     :return: None
 
     :example:
+
     >>> labelme_dir = r'D:\ts_annotations'
     >>> labelme_to_dlc(labelme_dir=labelme_dir)
     """

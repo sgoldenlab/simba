@@ -30,6 +30,7 @@ class GerbilFeaturizer(object):
     :param str out_path: folder path storing featurized data in multiple .parquet files.
 
     :example:
+
     >>> gerbil_featurizer = GerbilFeaturizer(in_path='_gerbil_data/pose_estimation_data', out_path='gerbil_data/featurized_data')
     >>> gerbil_featurizer.extract_features()
     >>> gerbil_featurizer.save()

@@ -64,6 +64,7 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
         - 2: Dynamic Gantt chart (updated per frame)
 
     :example:
+
     >>> # Create validation video with pose overlay and static Gantt chart
     >>> validator = ValidateModelOneVideo(
     ...     config_path=r'/path/to/project_config.ini',

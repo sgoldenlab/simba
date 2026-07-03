@@ -11,6 +11,7 @@ def menhinicks_index(x: np.array) -> float:
     It quantifies the number of categories relative to the square root of the total number of observations.
 
     :example:
+
     >>> x = np.random.randint(0, 5, (1000,))
     >>> menhinicks_index(x=x)
     """

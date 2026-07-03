@@ -76,6 +76,7 @@ class ROIClfCalculator(ConfigReader):
        'GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results`__.
 
     :example:
+
     >>> analyzer = ROIClfCalculator(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini", bp_names=('nose',), clf_names=('straub_tail',))
     >>> analyzer.run()
     >>> analyzer.save()

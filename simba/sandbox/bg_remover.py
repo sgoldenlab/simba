@@ -69,6 +69,7 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
     :return: None.
 
     :example:
+
     >>> video_bg_subtraction(video_path='/Users/simon/Downloads/1_LH_cropped.mp4', bg_start_time='00:00:00', bg_end_time='00:00:10', bg_color=(0, 106, 167), fg_color=(254, 204, 2))
     """
 

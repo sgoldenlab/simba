@@ -293,6 +293,7 @@ def _cuda_diff(x, start, end, diff):
     :param np.ndarray diff: Output array to store differences of x[start:end].
 
     :example:
+
     >>> diff = cuda.local.array(shape=512, dtype=float64)  # pre-allocated local array
     >>> cuda_diff(x, 0, 5, diff)
     """

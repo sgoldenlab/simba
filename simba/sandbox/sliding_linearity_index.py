@@ -53,6 +53,7 @@ def sliding_linearity_index_cuda(x: np.ndarray,
     :rtype: np.ndarray
 
     :example:
+
     >>> x = np.random.randint(0, 500, (100, 2)).astype(np.float32)
     >>> q = sliding_linearity_index_cuda(x=x, window_size=2, sample_rate=30)
     """

@@ -44,6 +44,7 @@ def bg_subtraction_cupy(video_path: Union[str, os.PathLike],
 
 
     :example:
+
     >>> avg_frm = create_average_frm(video_path="/mnt/c/troubleshooting/mitra/project_folder/videos/temp/temp_ex_bg_subtraction/original/844_MA131_gq_CNO_0624.mp4")
     >>> video_path = "/mnt/c/troubleshooting/mitra/project_folder/videos/temp/temp_ex_bg_subtraction/844_MA131_gq_CNO_0624_7.mp4"
     >>> bg_subtraction_cupy(video_path=video_path, avg_frm=avg_frm, batch_size=500)

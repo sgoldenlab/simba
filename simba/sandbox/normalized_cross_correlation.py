@@ -23,6 +23,7 @@ def cross_correlation_similarity(img_1: np.ndarray, img_2: np.ndarray) -> float:
     :return float: The NCC value representing the similarity between the two images. Returns 0.0 if the denominator is zero, indicating no similarity.
 
     :example:
+
     >>> img_1 = cv2.imread('/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/a.png').astype(np.uint8)
     >>> img_2 = cv2.imread('/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/f.png').astype(np.uint8)
     >>> cross_correlation_similarity(img_1=img_1, img_2=img_2)
@@ -57,6 +58,7 @@ def sliding_cross_correlation_similarity(imgs: np.ndarray,
     :return np.ndarray: A 1D array of NCC values representing the similarity between each image and the image `stride` positions before it. The length of the array is the same as the number of images.
 
     :example:
+
     >>> imgs = ImageMixin.read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/08102021_DOT_Rat11_12_frames')
     >>> imgs = {k: imgs[k] for k in sorted(imgs, key=lambda x: int(x.split('.')[0]))}
     >>> imgs = np.stack(list(imgs.values()))
@@ -104,6 +106,7 @@ def cross_correlation_matrix(imgs: np.array) -> np.array:
                       contains the cross-correlation coefficient between the i-th and j-th images.
 
     :example:
+
     >>> imgs = ImageMixin.read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/test')
     >>> imgs = ImageMixin.read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/08102021_DOT_Rat11_12_frames')
     >>> imgs = {k: imgs[k] for k in sorted(imgs, key=lambda x: int(x.split('.')[0]))}

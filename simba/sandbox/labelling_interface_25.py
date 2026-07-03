@@ -55,6 +55,7 @@ class LabellingInterface(ConfigReader):
     :param bool continuing: If True, continouing previously started annotation session.
 
     :example:
+
     >>> select_labelling_video(config_path='MyConfigPath', threshold_dict={'Attack': 0.4}, file_path='MyVideoFilePath', setting='pseudo', continuing=False)
     """
 

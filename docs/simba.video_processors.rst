@@ -44,13 +44,6 @@ Multi-cropper
    :members:
    :show-inheritance:
 
-Get pixels per millimeter - old
------------------------------------------
-
-.. automodule:: simba.video_processors.px_to_mm
-   :members:
-   :show-inheritance:
-
 Video processing tools
 ------------------------------------------------
 

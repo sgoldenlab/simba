@@ -19,6 +19,7 @@ def batch_video_to_greyscale(directory: Union[str, os.PathLike], gpu: Optional[b
     :raise FFMPEGCodecGPUError: If no GPU is found and ``gpu == True``.
 
     :example:
+
     >>> _ = batch_video_to_greyscale(directory='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test_2')
     """
     check_ffmpeg_available(raise_error=True)

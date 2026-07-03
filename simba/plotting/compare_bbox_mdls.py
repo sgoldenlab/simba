@@ -82,6 +82,7 @@ class YoloModelComparator():
     :param bool verbose: Print progress information.
 
     :example:
+
     >>> c = YoloModelComparator(
     ...     weights=[r"/mdl/train8/weights/best.pt", r"/mdl/train13/weights/best.pt"],
     ...     video_path=r"/test_videos",

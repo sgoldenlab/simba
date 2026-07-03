@@ -87,6 +87,7 @@ class YOLOSegmentationVisualizer():
     :param float shape_opacity: Alpha blending factor for filled polygon overlay (range 0.0–1.0). If `None`, solid fill is used. Defaults to 0.5.
 
     :example:
+
     >>> runner = YOLOSegmentationVisualizer(data_path=r"D:/results/video1.csv", video_path=r"D:/videos/video1.mp4", save_dir=r'D:/output', verbose=True)
     >>> runner.run()
     >>> runner = YOLOSegmentationVisualizer(data_path=r"D:/results", video_path=r"D:/videos", save_dir=r'D:/output', verbose=True)

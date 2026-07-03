@@ -35,6 +35,7 @@ def multiframe_bodypart_to_point(
        If buffer is provided, then also provide px_per_mm for accurate conversion factor between pixels and millimeters.
 
     :example:
+
     >>> data = np.random.randint(0, 100, (100, 2))
     >>> points_lst = GeometryMixin().multiframe_bodypart_to_point(data=data, buffer=10, px_per_mm=4)
     >>> data = np.random.randint(0, 100, (10, 10, 2))

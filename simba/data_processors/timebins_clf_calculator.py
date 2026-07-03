@@ -72,6 +72,7 @@ class TimeBinsClfCalculator(ConfigReader):
         `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results>`__.
 
     :example:
+
     >>> timebin_clf_analyzer = TimeBinsClfCalculator(config_path='MyConfigPath', bin_length=15, classifiers=['Attack', 'Sniffing'], event_count=True, total_event_duration=True)
     >>> timebin_clf_analyzer.run()
     >>> timebin_clf_analyzer.save()

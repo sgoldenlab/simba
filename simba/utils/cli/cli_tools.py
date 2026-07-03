@@ -186,6 +186,7 @@ def blob_tracker(config_path: Union[str, os.PathLike]) -> None:
     :rtype: None
 
     :example:
+
     >>> blob_tracker('/Users/simon/Downloads/result_bg/blob_definitions.json')
     """
 

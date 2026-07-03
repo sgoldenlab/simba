@@ -32,6 +32,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
 
     """
     :example:
+
     >>> _ = HeatmapLocationPopup(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
     >>> _ = HeatmapLocationPopup(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 

@@ -21,6 +21,7 @@ def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]],
     :return: None.
 
     :example:
+
     >>> file_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/path_plots/Trial    10.mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/path_plots/Trial    10_1.mp4']
     >>> frm_ids = [[0, 20], [20, 40]]
     >>> clip_videos_by_frame_ids(file_paths=file_paths, frm_ids=frm_ids, save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/path_plots/trial_cnt')

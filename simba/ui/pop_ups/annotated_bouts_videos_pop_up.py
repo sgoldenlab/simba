@@ -30,6 +30,7 @@ FALSE = "FALSE"
 class AnnotatedBoutsVideoPopUp(PopUpMixin, ConfigReader):
     """
     :example:
+
     >>> _ = AnnotatedBoutsVideoPopUp(config_path=r"C:\\troubleshooting\\project_folder\\project_config.ini")
     """
 

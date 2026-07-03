@@ -48,6 +48,7 @@ def is_inside_polygon(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     :return np.ndarray: An array of shape (N,) where each element is 1 if the corresponding point in `x` is inside the polygon defined by `y`, and 0 otherwise.
 
     :example:
+
     >>> x = np.random.randint(0, 200, (i, 2)).astype(np.int8)
     >>> y = np.random.randint(0, 200, (4, 2)).astype(np.int8)
     >>> results = is_inside_polygon(x=x, y=y)

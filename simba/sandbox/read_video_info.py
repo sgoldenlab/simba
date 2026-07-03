@@ -28,6 +28,7 @@ def read_video_info(video_name: str,
     :rtype: Union[Tuple[pd.DataFrame, float, float], Tuple[None, None, None]]
 
     :example:
+
     >>> video_info_df = read_video_info_csv(file_path='project_folder/logs/video_info.csv')
     >>> read_video_info(vid_info_df=vid_info_df, video_name='Together_1')
     """

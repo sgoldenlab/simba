@@ -31,6 +31,7 @@ class ROIVideoTable(ConfigReader, PopUpMixin):
     Crates a tkinter video table listing all videos in project together with buttons associated with ROI drawing, deletaing, and duplicating shapes.
 
     :example:
+
     >>> ROIVideoTable(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini")
     """
 

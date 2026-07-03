@@ -31,6 +31,7 @@ class RatSocialFeaturizer(ConfigReader,
     Featurization class for analyzing rat social behaviors.
 
     :example:
+
     >>> extractor = RatSocialFeaturizer(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/piotr/project_folder/project_config.ini')
     >>> extractor.run()
 

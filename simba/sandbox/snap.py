@@ -6,6 +6,7 @@ from simba.utils.read_write import read_df
 def snap(x: np.ndarray, sample_rate: float, pixels_per_mm: float):
     """
     :example:
+
     >>> x = read_df(file_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/FRR_gq_CNO_0625.csv', file_type='csv', usecols=['Nose_x', 'Nose_y']).values
     >>> snap(x=x, sample_rate=30, pixels_per_mm=2.15)
     """
