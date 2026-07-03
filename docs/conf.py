@@ -84,6 +84,12 @@ exclude_patterns = [
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
+# Every module is named ``simba.*``, so the Python Module Index bucketed them ALL under
+# the letter "s" (one useless collapsible group). Ignore the ``simba.`` prefix when
+# sorting so modules bucket by their real initial (bounding_box_tools -> B, utils -> U, ...),
+# giving a proper A-Z index; custom.css then flows the buckets into columns.
+modindex_common_prefix = ['simba.']
+
 html_theme = 'sphinx_rtd_theme'
 # The long Markdown tutorials have many emoji-prefixed Step headings; with the RTD
 # defaults the sidebar expanded every one into a deep, hard-to-read wall. Constrain
@@ -1112,9 +1118,12 @@ def _generate_commit_heatmap(app):
 def _generate_docs_authorship(app):
     """(Re)generate a small panel crediting authorship of the docs & tutorials on every build.
 
-    Counts documentation source files and blames the prose (``.rst`` / ``.md``) to attribute
-    authorship. Keeps the committed snapshot on any failure so the build never breaks.
+    Attributes every documentation line that survives in the current release via ``git blame``
+    HEAD: prose from ``docs/*.rst`` / ``docs/*.md`` plus the docstrings inside ``simba/*.py``
+    (isolated per file with the AST). Keeps the committed snapshot on any failure so the build
+    never breaks.
     """
+    import ast
     import subprocess
     import re
 
@@ -1122,7 +1131,6 @@ def _generate_docs_authorship(app):
     gen_dir = os.path.join(here, '_generated')
     html_path = os.path.join(gen_dir, 'docs_authorship.html')
     os.makedirs(gen_dir, exist_ok=True)
-    SINCE = '2020-12-01'
     aliases = {
         'simon nilsson': 'sronilsson', 'simon': 'sronilsson', 'sronilsson': 'sronilsson',
         'jia jie choong': 'inoejj', 'inoejj': 'inoejj',
@@ -1154,12 +1162,6 @@ def _generate_docs_authorship(app):
             return f'{n / 1e3:.1f}K'
         return str(int(n))
 
-    def _mon(s):
-        try:
-            return datetime.datetime.strptime(s, '%Y-%m-%d').strftime('%b %Y')
-        except Exception:  # noqa: BLE001
-            return s
-
     try:
         repo_root = os.path.dirname(here)
         listed = subprocess.run(['git', 'ls-files', 'docs/*.rst', 'docs/*.md', 'docs/*.ipynb'],
@@ -1169,49 +1171,94 @@ def _generate_docs_authorship(app):
         n_rst = sum(1 for f in allf if f.endswith('.rst') and '/_generated/' not in f)
         n_md = sum(1 for f in allf if f.endswith('.md'))
         n_nb = sum(1 for f in allf if f.endswith('.ipynb'))
+        prose_files = [f for f in allf
+                       if (f.endswith('.rst') and '/_generated/' not in f) or f.endswith('.md')]
+        py_files = subprocess.run(['git', 'ls-files', 'simba/*.py'], cwd=repo_root,
+                                  capture_output=True, text=True, encoding='utf-8',
+                                  errors='replace', timeout=30).stdout.split()
 
-        # Same metric as the code-contributors chart: lines changed (added + removed) since
-        # Dec 2020, restricted to the documentation/tutorial prose sources via pathspec.
-        out = subprocess.run(
-            ['git', 'log', '--no-merges', f'--since={SINCE}', '--numstat',
-             '--format=COMMIT\t%ae\t%an\t%as', '--', 'docs/*.rst', 'docs/*.md'],
-            cwd=repo_root, capture_output=True, text=True, encoding='utf-8',
-            errors='replace', timeout=90).stdout
-        loc, commits, latest, cur = {}, {}, {}, None
-        for line in out.splitlines():
-            if line.startswith('COMMIT\t'):
-                parts = line.split('\t', 3)
-                email = parts[1] if len(parts) > 1 else ''
-                name = parts[2] if len(parts) > 2 else ''
-                cdate = parts[3] if len(parts) > 3 else ''
-                cur = _login(email, name)
-                if cur is not None:
-                    commits[cur] = commits.get(cur, 0) + 1
-                    if cdate > latest.get(cur, ''):
-                        latest[cur] = cdate
+        hdr = re.compile(r'^\^?[0-9a-f]{40} \d+ (\d+)')
+
+        def _blame(path):
+            """git blame HEAD -> list of (final_lineno, login, text) for every surviving line."""
+            b = subprocess.run(['git', 'blame', '--line-porcelain', '-w', 'HEAD', '--', path],
+                               cwd=repo_root, capture_output=True, text=True,
+                               encoding='utf-8', errors='replace', timeout=60).stdout
+            out, ln, em, nm = [], None, None, None
+            for line in b.splitlines():
+                m = hdr.match(line)
+                if m:
+                    ln = int(m.group(1))
+                elif line.startswith('author-mail '):
+                    em = line[12:].strip('<> ')
+                elif line.startswith('author '):
+                    nm = line[7:]
+                elif line.startswith('\t'):
+                    out.append((ln, _login(em, nm), line[1:]))
+            return out
+
+        def _docstring_lines(source):
+            """Line numbers (1-based) that fall inside a module/class/function docstring."""
+            try:
+                tree = ast.parse(source)
+            except SyntaxError:
+                return set()
+            out = set()
+            for node in ast.walk(tree):
+                if not isinstance(node, (ast.Module, ast.ClassDef,
+                                         ast.FunctionDef, ast.AsyncFunctionDef)):
+                    continue
+                body = getattr(node, 'body', None)
+                if not body or not isinstance(body[0], ast.Expr):
+                    continue
+                val = body[0].value
+                if isinstance(val, ast.Constant) and isinstance(val.value, str):
+                    text = val.value
+                elif val.__class__.__name__ == 'Str':      # Python < 3.8
+                    text = val.s
+                else:
+                    continue
+                start = body[0].lineno
+                end = getattr(body[0], 'end_lineno', None) or (start + text.count('\n'))
+                out.update(range(start, end + 1))
+            return out
+
+        # Surviving-line ownership (git blame HEAD), the same metric the release-authorship
+        # figure on this page uses for code. Prose = every line of docs/*.rst + docs/*.md;
+        # docstrings = the triple-quoted blocks inside simba/*.py, isolated per file with the AST.
+        prose, docstr = {}, {}
+        for fp in prose_files:
+            for _ln, lg, _txt in _blame(fp):
+                if lg:
+                    prose[lg] = prose.get(lg, 0) + 1
+        for fp in py_files:
+            blamed = _blame(fp)
+            if not blamed:
                 continue
-            if cur is None or not line.strip():
-                continue
-            a, d, _rest = (line.split('\t', 2) + ['', '', ''])[:3]
-            if a.isdigit() and d.isdigit():
-                pa, pd = loc.get(cur, (0, 0))
-                loc[cur] = (pa + int(a), pd + int(d))
-        if not loc:
-            print('[docs_authorship] no doc contributions resolved (shallow clone?); keeping snapshot.')
+            top = max(ln for ln, _lg, _t in blamed)
+            src = {ln: t for ln, _lg, t in blamed}
+            source = '\n'.join(src.get(i, '') for i in range(1, top + 1))
+            owner = {ln: lg for ln, lg, _t in blamed}
+            for ln in _docstring_lines(source):
+                lg = owner.get(ln)
+                if lg:
+                    docstr[lg] = docstr.get(lg, 0) + 1
+
+        logins = set(prose) | set(docstr)
+        if not logins:
+            print('[docs_authorship] no doc lines blamed (shallow clone?); keeping snapshot.')
             return
-
-        data = sorted(((lg, loc[lg][0] + loc[lg][1], loc[lg][0], loc[lg][1],
-                        commits.get(lg, 0), latest.get(lg, '')) for lg in loc),
+        data = sorted(((lg, prose.get(lg, 0) + docstr.get(lg, 0),
+                        prose.get(lg, 0), docstr.get(lg, 0)) for lg in logins),
                       key=lambda t: t[1], reverse=True)
         maxtot = data[0][1] or 1
         stamp = datetime.datetime.now().strftime('%B %Y')
 
         rows = []
-        for i, (lg, tot, add, dele, ncom, ldate) in enumerate(data):
+        for i, (lg, tot, npr, nds) in enumerate(data):
             wpct = 0 if tot == 0 else max(0.4, tot / maxtot * 100)
             color = '#21567a' if i == 0 else '#2a7fb8'
-            locline = (f'{ncom:,} commit{"s" if ncom != 1 else ""} &middot; latest {_mon(ldate)}'
-                       if ncom else 'none since Dec 2020')
+            locline = f'{npr:,} prose &middot; {nds:,} docstring'
             rows.append(
                 f'<a class="simba-cc-row" href="https://github.com/{lg}">'
                 f'<span class="simba-cc-name">@{lg}</span>'
@@ -1221,19 +1268,156 @@ def _generate_docs_authorship(app):
                 f'<span class="simba-cc-loc">{locline}</span>'
                 f'<span class="simba-cc-card"><img src="https://github.com/{lg}.png?size=96" '
                 f'alt="@{lg}" loading="lazy"><span class="cci"><b>@{lg}</b>'
-                f'<em>{_h(tot)} doc lines changed &middot; +{add:,} / −{dele:,} &middot; '
-                f'{ncom:,} commits{f", latest {ldate}" if ldate else ""}</em></span></span></a>')
-        cap = (f'bar &amp; bold number = documentation lines changed (added + removed) since Dec 2020 '
-               f'&middot; linear scale &middot; {n_rst} pages &middot; {n_md} tutorials &middot; '
-               f'{n_nb} notebooks &middot; {stamp}')
-        html = ('<h4 class="simba-cc-h">Documentation lines changed since Dec 2020 '
-                '<span>(added + removed &middot; linear)</span></h4>\n<div class="simba-cc">\n     '
+                f'<em>{_h(tot)} documentation lines &middot; {npr:,} prose + '
+                f'{nds:,} docstring</em></span></span></a>')
+        cap = (f'bar &amp; bold number = documentation lines that survive in the current release '
+               f'(git blame HEAD) &middot; prose + Python docstrings &middot; linear scale &middot; '
+               f'{n_rst} pages &middot; {n_md} tutorials &middot; {n_nb} notebooks &middot; {stamp}')
+        html = ('<h4 class="simba-cc-h">Documentation authorship '
+                '<span>(surviving lines &middot; prose + docstrings)</span></h4>\n'
+                '<div class="simba-cc">\n     '
                 + '\n     '.join(rows)
                 + f'\n     <p class="simba-cc-cap">{cap}</p>\n   </div>\n')
         with open(html_path, 'w', encoding='utf-8') as f:
             f.write(html)
     except Exception as e:  # noqa: BLE001
         print(f'[docs_authorship] generation failed ({e!r}); keeping existing snapshot.')
+
+
+def _generate_project_stats(app):
+    """(Re)generate the "SimBA by the numbers" KPI tiles on every build.
+
+    Counts the current release straight from the working tree / git: Python lines, modules,
+    classes, functions, docstring lines, documentation sources, and project age. Self-contained
+    HTML (own scoped ``<style>``); keeps the committed snapshot on any failure so builds never break.
+    """
+    import ast
+    import subprocess
+
+    here = os.path.dirname(os.path.abspath(__file__))
+    gen_dir = os.path.join(here, '_generated')
+    html_path = os.path.join(gen_dir, 'project_stats.html')
+    os.makedirs(gen_dir, exist_ok=True)
+
+    def _h(n):
+        if n >= 1_000_000:
+            return f'{n / 1e6:.1f}M'
+        if n >= 1000:
+            return f'{n / 1e3:.1f}K'
+        return str(int(n))
+
+    try:
+        repo_root = os.path.dirname(here)
+        py_files = subprocess.run(['git', 'ls-files', 'simba/*.py'], cwd=repo_root,
+                                  capture_output=True, text=True, encoding='utf-8',
+                                  errors='replace', timeout=30).stdout.split()
+        loc = nmods = nclass = nfunc = ndoclines = 0
+        for rel in py_files:
+            try:
+                with open(os.path.join(repo_root, rel), encoding='utf-8', errors='replace') as fh:
+                    src = fh.read()
+            except OSError:
+                continue
+            nmods += 1
+            loc += len(src.splitlines())
+            try:
+                tree = ast.parse(src)
+            except SyntaxError:
+                continue
+            dls = set()
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ClassDef):
+                    nclass += 1
+                elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    nfunc += 1
+                if not isinstance(node, (ast.Module, ast.ClassDef,
+                                         ast.FunctionDef, ast.AsyncFunctionDef)):
+                    continue
+                body = getattr(node, 'body', None)
+                if not body or not isinstance(body[0], ast.Expr):
+                    continue
+                val = body[0].value
+                if isinstance(val, ast.Constant) and isinstance(val.value, str):
+                    text = val.value
+                elif val.__class__.__name__ == 'Str':      # Python < 3.8
+                    text = val.s
+                else:
+                    continue
+                start = body[0].lineno
+                end = getattr(body[0], 'end_lineno', None) or (start + text.count('\n'))
+                dls.update(range(start, end + 1))
+            ndoclines += len(dls)
+        if not loc:
+            print('[project_stats] no Python lines counted; keeping snapshot.')
+            return
+
+        listed = subprocess.run(['git', 'ls-files', 'docs/*.rst', 'docs/*.md', 'docs/*.ipynb'],
+                                cwd=repo_root, capture_output=True, text=True,
+                                encoding='utf-8', errors='replace', timeout=60).stdout
+        allf = [f for f in listed.split('\n') if f.strip() and '/_build/' not in f]
+        n_rst = sum(1 for f in allf if f.endswith('.rst') and '/_generated/' not in f)
+        n_md = sum(1 for f in allf if f.endswith('.md'))
+        n_nb = sum(1 for f in allf if f.endswith('.ipynb'))
+        n_docs = n_rst + n_md + n_nb
+
+        first = subprocess.run(['git', 'log', '--reverse', '--format=%as'], cwd=repo_root,
+                               capture_output=True, text=True, encoding='utf-8',
+                               errors='replace', timeout=60).stdout.splitlines()
+        now = datetime.datetime.now()
+        if first:
+            fd = datetime.datetime.strptime(first[0], '%Y-%m-%d')
+            since_year = fd.strftime('%Y')
+            since_sub = f'first commit {fd.strftime("%b %Y")} &middot; ~{max(1, (now - fd).days // 365)} years'
+        else:
+            since_year, since_sub = '—', ''
+
+        pct_doc = round(100 * ndoclines / loc) if loc else 0
+        # (value, label, sub, accent) — accents cycle the site's established palette
+        tiles = [
+            (_h(loc), 'lines of Python', f'across {nmods:,} modules', '#21567a'),
+            (f'{nclass:,}', 'classes', '', '#2f8f9d'),
+            (f'{nfunc:,}', 'functions &amp; methods', '', '#7c6bbd'),
+            (_h(ndoclines), 'docstring lines', f'&asymp;{pct_doc}% of all Python lines', '#cf8a2e'),
+            (f'{n_docs:,}', 'docs, tutorials &amp; notebooks',
+             f'{n_rst} pages &middot; {n_md} tutorials &middot; {n_nb} notebooks', '#21567a'),
+            (since_year, 'in active development', since_sub, '#2f8f9d'),
+        ]
+        stamp = now.strftime('%B %Y')
+        style = (
+            "<style>\n"
+            ".simba-st-h{max-width:820px;margin:40px auto 10px;font-size:21px;font-weight:800;"
+            "color:#21567a;text-align:center;line-height:1.25;}\n"
+            ".simba-st-h span{display:block;font-weight:400;color:#6b7280;font-size:13.5px;margin-top:2px;}\n"
+            ".simba-st{max-width:820px;margin:6px auto 4px;display:grid;"
+            "grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;}\n"
+            ".simba-st-tile{background:#fff;border:1px solid #e6e9ec;border-left:5px solid #21567a;"
+            "border-radius:10px;padding:16px 18px;box-shadow:0 2px 9px rgba(0,0,0,.05);"
+            "transition:transform .12s ease,box-shadow .12s ease;}\n"
+            ".simba-st-tile:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(33,86,122,.18);}\n"
+            ".simba-st-num{display:block;font-size:26px;font-weight:800;line-height:1.1;}\n"
+            ".simba-st-lab{display:block;font-size:13px;font-weight:600;color:#23272e;margin-top:3px;}\n"
+            ".simba-st-sub{display:block;font-size:11.5px;color:#6b7280;margin-top:2px;}\n"
+            ".simba-st-cap{max-width:820px;margin:10px auto 0;text-align:right;font-size:11px;"
+            "color:#6b7280;font-style:italic;}\n"
+            "</style>\n")
+        cells = []
+        for val, lab, sub, color in tiles:
+            subhtml = f'<span class="simba-st-sub">{sub}</span>' if sub else ''
+            cells.append(
+                f'<div class="simba-st-tile" style="border-left-color:{color};">'
+                f'<span class="simba-st-num" style="color:{color};">{val}</span>'
+                f'<span class="simba-st-lab">{lab}</span>{subhtml}</div>')
+        cap = (f'counted from the current release (HEAD) &middot; Python source, docstrings &amp; '
+               f'documentation sources &middot; {stamp}')
+        html = (style
+                + '<h4 class="simba-st-h">SimBA by the numbers '
+                  f'<span>(current release &middot; {stamp})</span></h4>\n'
+                + '<div class="simba-st">\n     ' + '\n     '.join(cells) + '\n   </div>\n'
+                + f'<p class="simba-st-cap">{cap}</p>\n')
+        with open(html_path, 'w', encoding='utf-8') as f:
+            f.write(html)
+    except Exception as e:  # noqa: BLE001
+        print(f'[project_stats] generation failed ({e!r}); keeping existing snapshot.')
 
 
 def _generate_code_growth(app):
@@ -1370,6 +1554,7 @@ def setup(app):
     app.connect('builder-inited', _generate_download_stats)
     app.connect('builder-inited', _generate_commit_heatmap)
     app.connect('builder-inited', _generate_docs_authorship)
+    app.connect('builder-inited', _generate_project_stats)
     app.connect('builder-inited', _generate_code_growth)
     app.connect('build-finished', _copy_images)
     app.connect('build-finished', _inject_lazy_media)

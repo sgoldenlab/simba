@@ -33,6 +33,13 @@ class CueLightMovementAnalyzer(ConfigReader):
        :width: 700
        :align: center
 
+    .. video:: _static/img/cue_light_movement_statistics.webm
+       :width: 500
+       :autoplay:
+       :loop:
+       :muted:
+       :align: center
+
     :param str config_path: path to SimBA project config file in Configparser format
     :param int pre_window: Time period (in millisecond) before the onset of each cue light to compute aggregate classification statistics within.
     :param int post_window: Time period (in millisecond) after the offset of each cue light to compute aggregate classification statistics within.

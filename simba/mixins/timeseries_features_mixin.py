@@ -220,6 +220,13 @@ class TimeseriesFeatureMixin(object):
            :width: 600
            :align: center
 
+        .. video:: _static/img/crossings.webm
+           :width: 700
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_crossings`
 
@@ -959,6 +966,13 @@ class TimeseriesFeatureMixin(object):
         therefore summarizes the *preceding* samples, not a centered window. Window sizes are given in seconds
         and converted to a number of samples with ``int(window_size_seconds * sample_rate)``.
 
+        .. video:: _static/img/sliding_descriptive_statistics.webm
+           :width: 700
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. warning::
            The first ``window_size - 1`` output values (per window size) are left at the fill value ``-1.0``,
            because a full trailing window is not yet available at the start of the array. ``-1.0`` is a
@@ -1688,6 +1702,13 @@ class TimeseriesFeatureMixin(object):
         Perform the Augmented Dickey-Fuller (ADF), Kwiatkowski-Phillips-Schmidt-Shin (KPSS), or Zivot-Andrews test on sliding windows of time series data.
         Parallel processing using all available cores is used to accelerate computation.
 
+        .. video:: _static/img/sliding_stationary.webm
+           :width: 700
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. note::
            - ADF: A high p-value suggests non-stationarity, while a low p-value indicates stationarity.
            - KPSS: A high p-value suggests stationarity, while a low p-value indicates non-stationarity.
@@ -1756,58 +1777,72 @@ class TimeseriesFeatureMixin(object):
                      unit: Literal["mm", "cm", "dm", "m"] = "mm") -> np.ndarray:
 
         r"""
-        Compute acceleration.
+        Compute framewise acceleration from a movement (framewise-distance) signal.
 
-        Computes acceleration from a sequence of body-part coordinates over time. It calculates the difference in velocity between consecutive frames and provides an array of accelerations.
+        Given a 1D array of framewise euclidean distances - the per-frame movement of a body-part, in
+        pixels - this first converts movement to speed in the requested unit per second, then returns the
+        rate of change of that speed over a rolling ``time_window``: the acceleration. Positive values
+        mean the body-part is speeding up, negative values mean it is slowing down.
 
-        The computation is based on the formula:
+        The computation is:
 
         .. math::
 
-           \text{{Acceleration}}(t) = \frac{{\text{{Norm}}(\text{{Shift}}(\text{{data}}[t], t, t-1) - \text{{data}}[t])}}{{\text{{pixels\_per\_mm}}}}
+           v(t) = \frac{\text{data}(t)\, \cdot\, \text{fps}}{\text{pixels\_per\_mm}\, \cdot\, c_{\text{unit}}}, \qquad
+           a(t) = \frac{v(t) - v(t - w)}{\text{time\_window}}
 
-        where :math:`\text{{Norm}}` calculates the Euclidean norm, :math:`\text{{Shift}}(\text{{array}}, t, t-1)` shifts the array by :math:`t-1` frames, and :math:`\text{{pixels\_per\_mm}}` is the conversion factor from pixels to millimeters.
+        where :math:`v(t)` is speed at frame :math:`t` (unit/s), :math:`w = \mathrm{round}(\text{time\_window} \cdot \text{fps})`
+        is the window length in frames, and :math:`c_{\text{unit}}` converts millimeters to the chosen unit
+        (``mm`` = 1, ``cm`` = 10, ``dm`` = 100, ``m`` = 1000). The first :math:`w` frames have no earlier
+        reference and are returned as ``0``.
 
         .. note::
-           By default, acceleration is calculated as change in velocity at millimeters/s. To change the denomitator, modify the ``time_window`` argument. To change the nominator, modify the ``unit`` argument (accepted ``mm``, cm``, ``dm``, ``mm``)
+           ``time_window`` sets both the interval over which the velocity change is measured and the value
+           the change is divided by, so the result is a true per-second rate (unit/s²) regardless of the
+           window length. Use ``unit`` to change the length unit (``mm``, ``cm``, ``dm``, ``m``).
 
         .. image:: _static/img/acceleration.png
            :alt: Acceleration
            :width: 700
            :align: center
 
-        :param np.ndarray data: 1D array of framewise euclidean distances.
+        .. video:: _static/img/acceleration.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
+        :param np.ndarray data: 1D array of framewise euclidean distances (per-frame body-part movement, in pixels).
         :param float pixels_per_mm: Pixels per millimeter of the recorded video.
         :param int fps: Frames per second (FPS) of the recorded video.
-        :param float time_window: Rolling time window in seconds. Default is 1.0 representing 1 second.
-        :param Literal['mm', 'cm', 'dm', 'm'] unit:  If acceleration should be presented as millimeter, centimeters, decimeter, or meter. Default millimeters.
-        :return: Array of accelerations corresponding to each frame.
+        :param float time_window: Rolling time window in seconds over which the velocity change is measured. Default is 1.0.
+        :param Literal['mm', 'cm', 'dm', 'm'] unit: Length unit of the result (millimeter, centimeter, decimeter, or meter). Default millimeters.
+        :return: Array of accelerations (unit/s²), one per frame; the first ``round(time_window * fps)`` entries are 0.
         :rtype: np.ndarray
 
         :example:
-        >>> data = np.array([1, 2, 3, 4, 5, 5, 5, 5, 5, 6]).astype(np.float32)
-        >>> TimeseriesFeatureMixin().acceleration(data=data, pixels_per_mm=1.0, fps=2, time_window=1.0)
-        >>> [ 0.,  0.,  0.,  0., -1., -1.,  0.,  0.,  1.,  1.]
+        >>> data = np.array([0, 1, 1, 1, 2, 2, 2, 1, 1, 0]).astype(np.float32)
+        >>> TimeseriesFeatureMixin.acceleration(data=data, pixels_per_mm=1.0, fps=2, time_window=1.0)
+        >>> [ 0.,  0.,  2.,  0.,  2.,  2.,  0., -2., -2., -2.]
         """
 
-        results, velocity = np.full((data.shape[0]), 0.0), np.full((data.shape[0]), 0.0)
-        size, pv = int(time_window * fps), None
-        data_split = np.split(data, list(range(size, data.shape[0], size)))
-        for i in range(len(data_split)):
-            wS = int(size * i)
-            wE = int(wS + size)
-            v = np.diff(np.ascontiguousarray(data_split[i]))[0] / pixels_per_mm
-            if unit == "cm":
-                v = v / 10
-            elif unit == "dm":
-                v = v / 100
-            elif unit == "m":
-                v = v / 1000
-            if i == 0:
-                results[wS:wE] = 0
-            else:
-                results[wS:wE] = v - pv
-            pv = v
+        results = np.zeros(data.shape[0], dtype=np.float64)
+        div = 1.0
+        if unit == "cm":
+            div = 10.0
+        elif unit == "dm":
+            div = 100.0
+        elif unit == "m":
+            div = 1000.0
+        shift = int(round(time_window * fps))
+        if shift < 1:
+            shift = 1
+        if data.shape[0] <= shift:
+            return results
+        speed = (data / pixels_per_mm / div) * fps
+        for t in range(shift, data.shape[0]):
+            results[t] = (speed[t] - speed[t - shift]) / time_window
         return results
 
     @staticmethod
@@ -2058,6 +2093,13 @@ class TimeseriesFeatureMixin(object):
            :width: 600
            :align: center
 
+        .. video:: _static/img/mean_squared_jerk.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         :param np.ndarray x: A 2D array where each row represents the [x, y] position at a time step.
         :param float time_step: The time difference between successive positions in seconds.
         :param float sample_rate: The rate at which the positions are sampled (samples per second).
@@ -2248,6 +2290,13 @@ class TimeseriesFeatureMixin(object):
            :width: 700
            :align: center
 
+        .. video:: _static/img/entropy_of_directional_changes.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         :param np.ndarray x: A 2D array of shape (N, 2) representing the path, where N is the number of points and each point has two spatial coordinates (e.g., x and y for 2D space). The path should be in the form of an array of consecutive (x, y) points.
         :param int bins: The number of bins to discretize the directional changes. Default is 16 bins for angles between 0 and 360 degrees. A larger number of bins will increase the precision of direction change measurement.
         :return: The entropy of the directional changes in the path. A higher value indicates more unpredictable or random direction changes, while a lower value indicates more predictable or linear movement.
@@ -2286,6 +2335,13 @@ class TimeseriesFeatureMixin(object):
 
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.entropy_of_directional_changes`
+
+        .. video:: _static/img/sliding_entropy_of_directional_changes.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
 
         :param np.ndarray x: A 2D array of shape (N, 2) representing the path, where N is the number of points and each point has two spatial coordinates (e.g., x and y for 2D space). The path should be in the form of an array of consecutive (x, y) points.
         :param int bins: The number of bins to discretize the directional changes. Default is 16 bins for angles between 0 and 360 degrees. A larger number of bins will increase the precision of direction change measurement.
@@ -2663,6 +2719,13 @@ class TimeseriesFeatureMixin(object):
         .. image:: _static/img/radial_dispersion_index.webp
            :alt: Radial dispersion index
            :width: 600
+           :align: center
+
+        .. video:: _static/img/radial_dispersion_index.webm
+           :width: 700
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :param np.ndarray x: 2-dimensional numpy array representing the input data with shape (n, m), where n is the number of frames and m is the coordinates.

@@ -21,6 +21,9 @@ The code, documentation, and support channels are written, maintained, and devel
      <a class="simba-person" href="https://github.com/sgoldenlab"><img src="https://github.com/sgoldenlab.png?size=160" alt="Sam Golden Lab" loading="lazy"><span class="simba-person-name">Sam Golden Lab</span><span class="simba-person-gh">@sgoldenlab</span></a>
    </div>
 
+.. raw:: html
+   :file: _generated/project_stats.html
+
 GitHub contributors
 ----------------------------------------------------------
 

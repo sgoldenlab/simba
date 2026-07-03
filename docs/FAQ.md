@@ -1,4 +1,4 @@
-# Friendly Asked Questions (FAQ)
+# Frequently Asked Questions (FAQ)
 
 > [!TIP]
 > Please search the [SimBA issues tracker](https://github.com/sgoldenlab/simba/issues), or search the [Gitter chat channel](https://gitter.im/SimBA-Resource/community) for more questions and answers. If that does not help, reach out to us by posting a new issue or write to us on Gitter.
@@ -8,11 +8,11 @@
 <details>
   <summary>Show solutions!</summary>
 <br/><br/>
-This error typilcally comes up when SimBA can't find the resolution and/or pixels per millimeter of your video. This data is stored in the `project_folder/logs/video_info.csv` file. If you open this CSV file, make sure that the left-most column named `Video` contains the names of your video files, do not contain any duplicate rows (where video names appear in more than one row), and that the resolution columns and pixels/mm column contains values. 
+This error typically comes up when SimBA can't find the resolution and/or pixels per millimeter of your video. This data is stored in the `project_folder/logs/video_info.csv` file. If you open this CSV file, make sure that the left-most column named `Video` contains the names of your video files, do not contain any duplicate rows (where video names appear in more than one row), and that the resolution columns and pixels/mm column contains values. 
   
 </details>
 
-## 2. When I click on a video to set its parameters (i.e., "pixel per millimeter"), or try to open a video to dray ROI regions I get an OpenCV, I get an error report with something like "cv2.Error. The function is not implemented. Rebuild the library with Windows..."
+## 2. When I click on a video to set its parameters (i.e., "pixel per millimeter"), or try to open a video to draw ROI regions, I get an OpenCV error report with something like "cv2.Error. The function is not implemented. Rebuild the library with Windows..."
 
 <details>
   <summary>Show solutions!</summary>
@@ -31,12 +31,12 @@ Then launch SimBA by typing `SimBA`, and see if that fixes the issue.
   
 </details>
 
-## 3. I get a `QHull` (e..g., QH6154 or 6013) error when extracting the features
+## 3. I get a `QHull` (e.g., QH6154 or 6013) error when extracting the features
 
 <details>
   <summary>Show solutions!</summary>
 <br/><br/>
-This error typically happens when a video tracked with DLC/DPK/SLEAP does not contain an animal. This can happen because one or all animal is missing from the video frame, or you have filtered the data prior to importing it into SimBA to remove body-parts with low detection probabilities. Because no animal is present in the video, DeepLabCut and other pose-estimation tools places all body-parts at the same co-ordinate with a low probability (no-where, or frequently at coordinate (0,0), which is the upper-left most pixel in the image). SimBA tries to use these co-ordinates to calculate metrics from the hull of the animal (e.g., the animal volume), but bacause the coordinates are in 1D rather than 2D, it produces the `QHull` error. To fix it, try to use the video pre-processing tools in SimBA to trim the videos and discard the portions where no animals are present:
+This error typically happens when a video tracked with DLC/DPK/SLEAP does not contain an animal. This can happen because one or all animal is missing from the video frame, or you have filtered the data prior to importing it into SimBA to remove body-parts with low detection probabilities. Because no animal is present in the video, DeepLabCut and other pose-estimation tools places all body-parts at the same co-ordinate with a low probability (no-where, or frequently at coordinate (0,0), which is the upper-left most pixel in the image). SimBA tries to use these co-ordinates to calculate metrics from the hull of the animal (e.g., the animal volume), but because the coordinates are in 1D rather than 2D, it produces the `QHull` error. To fix it, try to use the video pre-processing tools in SimBA to trim the videos and discard the portions where no animals are present:
 
 [Tutorial: Batch pre-process videos in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md)
 
@@ -92,7 +92,7 @@ If you are running SimBA on a computer fitted with a RTX 2080ti GPU, make sure;
 4. Tensorflow (without GPU support) is *not* installed: run pip uninstall tensorflow
 5. Protobuf 3.6.0 is installed: pip install protobuf==3.6.0
 
-If you are running SimBA on a computer fitted with a never RTX 3080TI/ 3070 GPU, and to get the packages to recognize your GPU, then have a look at [THESE INTSTRUCTIONS](https://github.com/sgoldenlab/simba/blob/master/docs/pose_on_rtx30x.md).
+If you are running SimBA on a computer fitted with a newer RTX 3080TI/ 3070 GPU, and to get the packages to recognize your GPU, then have a look at [THESE INTSTRUCTIONS](https://github.com/sgoldenlab/simba/blob/master/docs/pose_on_rtx30x.md).
 
 </details>
 
@@ -127,7 +127,7 @@ However, if the second part of your video **does** contain examples of your beha
 
 </details>
   
-## 9. When I try to execute some process in SimBA (e.g., feature extraction, or generate frames or videos etc), I get a TypeError that may look somthing like this:
+## 9. When I try to execute some process in SimBA (e.g., feature extraction, or generate frames or videos etc), I get a TypeError that may look something like this:
 ```
 TypeError("cannot convert the series to " "{0}".format(str(converter)))
 TypeError: cannot convert the series to <class 'float'>
@@ -136,18 +136,18 @@ TypeError: cannot convert the series to <class 'float'>
   <summary>Show solutions!</summary>
 <br/><br/>
 
-When you execute your process (e.g., Feature extraction), SimBA looks in the folder containing the output of the previous process (e.g., `project_filder/csv/outlier_corrected_movement_location`) and will aim to analyze all of the CSV files that this folder contains. To analyze it appropriatly (across rolling time windows etc.), SimBA also needs to know which **fps**, and **pixels per millimiter** the video file associated with this CSV file has. This fps and pixel per millimeter information is stored in your `project_folder/logs/video_info.csv` file, and SimBA will attempt to grab it for you. To do this, SimBA will take the filename of the CSV located in the `project_filder/csv/outlier_corrected_movement_location` folder, strip it of its file ending, and look in the first column of your `project_folder/logs/video_info.csv` file for a matching name. So if your first CSV file is called *Video1.csv*, SimBA will look in the first column of your `project_folder/logs/video_info.csv` for *Video1*. Here are the most common reasons for it going wrong and you see this error:
+When you execute your process (e.g., Feature extraction), SimBA looks in the folder containing the output of the previous process (e.g., `project_folder/csv/outlier_corrected_movement_location`) and will aim to analyze all of the CSV files that this folder contains. To analyze it appropriately (across rolling time windows etc.), SimBA also needs to know which **fps**, and **pixels per millimeter** the video file associated with this CSV file has. This fps and pixel per millimeter information is stored in your `project_folder/logs/video_info.csv` file, and SimBA will attempt to grab it for you. To do this, SimBA will take the filename of the CSV located in the `project_folder/csv/outlier_corrected_movement_location` folder, strip it of its file ending, and look in the first column of your `project_folder/logs/video_info.csv` file for a matching name. So if your first CSV file is called *Video1.csv*, SimBA will look in the first column of your `project_folder/logs/video_info.csv` for *Video1*. Here are the most common reasons for it going wrong and you see this error:
 
 1. There is no *Video1* in your `project_folder/logs/video_info.csv` file. You may have renamed your files somewhere along the process or introduced a typo (e.g., there is a `Video1 ` or `Video 1` or possibly `video1`, but there is **no** `Video1` which is what SimBA is looking for. 
 
 2. There are several `Video1` rows in your `project_folder/logs/video_info.csv` file. SimBA happens to find them all, can't decide which one is the correct one, and breaks. Make sure you only have one row representing each video in your project in your `project_folder/logs/video_info.csv` file. 
 
-3. Another CSV file, has somehow nestled into your `project_filder/csv/outlier_corrected_movement_location` folder along the way (and this file is neither part of the project or has been processed in the [`Video Parameters`](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-3-set-video-parameters) tool in SimBA. SimBA sees it as it is present in the `project_filder/csv/outlier_corrected_movement_location` folder, but when it looks in the `project_folder/logs/video_info.csv` file - the **fps**, and **pixels per millimiter** is missing and you get thrown this error. 
+3. Another CSV file, has somehow nestled into your `project_folder/csv/outlier_corrected_movement_location` folder along the way (and this file is neither part of the project or has been processed in the [`Video Parameters`](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-3-set-video-parameters) tool in SimBA. SimBA sees it as it is present in the `project_folder/csv/outlier_corrected_movement_location` folder, but when it looks in the `project_folder/logs/video_info.csv` file - the **fps**, and **pixels per millimeter** is missing and you get thrown this error. 
 
 </details>
   
   
-## 10. When I install or update SimBA, I see a bunch or messages in the console, in red text, telling me some error has happened, similar or the same as this:
+## 10. When I install or update SimBA, I see a bunch of messages in the console, in red text, telling me some error has happened, similar or the same as this:
 ```diff
 - ERROR: imbalanced-learn 0.7.0 has requirement scikit-learn>=0.23, but you'll have scikit-learn 0.22.2 which is incompatible.
 - ERROR: deeplabcut 2.0.9 has requirement numpy~=1.14.5, but you'll have numpy 1.18.1 which is incompatible.
@@ -161,7 +161,7 @@ These are warnings, and are not fatal. You should be able to ignore them - go ah
 </details>
 
 
-## 11. When I install or update SimBA, I see a bunch or messages in the console, telling there me about some `dependency conflicts`. The messages may look a little like this:
+## 11. When I install or update SimBA, I see a bunch of messages in the console, telling me about some `dependency conflicts`. The messages may look a little like this:
 
 <details>
   <summary>Show solutions!</summary>
@@ -185,7 +185,7 @@ here: https://github.com/sgoldenlab/simba/blob/master/docs/installation.md#pytho
   
 </details>
 
-## 12. When run my [classifier on new videos](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data), or trying to to [validate my classifier on a single video](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#optional-step-before-running-machine-model-on-new-data) my predictions seem to be generated, but then I get either an IndexError: `Index 1 is out of bounds for axis 1 of size 1`, or an error msg telling me that my classifier hasn't been generated properly:
+## 12. When I run my [classifier on new videos](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data), or trying to [validate my classifier on a single video](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#optional-step-before-running-machine-model-on-new-data) my predictions seem to be generated, but then I get either an IndexError: `Index 1 is out of bounds for axis 1 of size 1`, or an error msg telling me that my classifier hasn't been generated properly:
 
 <details>
   <summary>Show solutions!</summary>
@@ -209,7 +209,7 @@ If the files you are importing has a name akin to `CollectedData_MyName.csv` you
   
 </details>
 
-## 14. When I try to to run my classifier on new videos, I get an error message telling me about a *mismatch* error - something along the lines of: `Mismatch in the number of features in input file and what is expected from the model in file...`
+## 14. When I try to run my classifier on new videos, I get an error message telling me about a *mismatch* error - something along the lines of: `Mismatch in the number of features in input file and what is expected from the model in file...`
 
 <details>
   <summary>Show solutions!</summary>
@@ -225,7 +225,7 @@ For example, when you created the model, SimBA grabbed the files inside your `pr
 
 </details>
   
-## 15. After a Microsoft Windows 10 update, I get a GPU CUDA/cudnn error - it was working before the update and now it is complaining about about `.cv2 DLL`
+## 15. After a Microsoft Windows 10 update, I get a GPU CUDA/cudnn error - it was working before the update and now it is complaining about `.cv2 DLL`
 
 <details>
   <summary>Show solutions!</summary>
@@ -235,7 +235,7 @@ In Windows, try an go to Settings > Apps > Manage Optional Features > Add a Feat
   
 </details>
 
-## 16. I get en error message, complaining that something like `Could not find a version that satisfies the requirement tensorflow-gpu==1.14.0. No Matching distribution found for tensorflow==1.14.0.`
+## 16. I get an error message, complaining that something like `Could not find a version that satisfies the requirement tensorflow-gpu==1.14.0. No Matching distribution found for tensorflow==1.14.0.`
 
 <details>
   <summary>Show solutions!</summary>
@@ -257,7 +257,7 @@ This error may read (depending on what version of SimBA you are using):
 * `Cannot locate video MyVideo in mp4 or avi format`, or
 * `ERROR: SimBA searched your project_folder/videos directory for a video file representing the MyVideo and could not find a match. Above is a list of possible video filenames that SimBA searched for within your projects video directory without success.`
 
-Here, you have provided SimBA with a directory containing DeepLabCut tracking data, and now we need to open the video so that we can indicate which animal is which to keep downstream processing consistant across videos. For SimBA to find the video, SimBA makes three assumptions behind the hood:
+Here, you have provided SimBA with a directory containing DeepLabCut tracking data, and now we need to open the video so that we can indicate which animal is which to keep downstream processing consistent across videos. For SimBA to find the video, SimBA makes three assumptions behind the hood:
 
 1. The video file is located inside the `project_folder/videos` directory. 
 2. The video file is in `.mp4` or `.avi` format. 
@@ -266,17 +266,17 @@ Here, you have provided SimBA with a directory containing DeepLabCut tracking da
 * **My_video_007**DLC_dlcrnetms5_main_projectJul1shuffle1_100000_el.h5, or
 * **White_mice_together_no_tail_ends**DLC_resnet50_two_white_mice_052820May28shuffle1_200000_bx.h5
 
-To find the correct video name, SimBA tries to split each filename into two at a bunch of hard-coded split-points (e.g., 'DLC_resnet50', 'DLC_resnet_50', 'DLC_dlcrnetms5') and keeps the only the text prior to these split-points. It then appends the potential file extension ('.mp4', '.MP4', '.avi', '.AVI') and checks if those files are present in your `project_folder/videos` directory, one by one. If it can't find a match for any possible combination and permutation, you get this error. Likely, you may have manually renamed your pose-estimation file-names so the assumptions SimBA makes are no longer valid. 
+To find the correct video name, SimBA tries to split each filename into two at a bunch of hard-coded split-points (e.g., 'DLC_resnet50', 'DLC_resnet_50', 'DLC_dlcrnetms5') and keeps only the text prior to these split-points. It then appends the potential file extension ('.mp4', '.MP4', '.avi', '.AVI') and checks if those files are present in your `project_folder/videos` directory, one by one. If it can't find a match for any possible combination and permutation, you get this error. Likely, you may have manually renamed your pose-estimation file-names so the assumptions SimBA makes are no longer valid. 
 
 </details>
 
-## 18. I'm trying to lunch SimBA on a Mac, and I get an `ImportError` reading `ImportError: Python is not installed as a framework. The Mac OS X backend will not be able to function correctly if Python is not installed as a framework...`. Or, while trying to launch SimBA on my Mac, I get an error reading `_tkinter.TclError: expected boolean value but got ""`.
+## 18. I'm trying to launch SimBA on a Mac, and I get an `ImportError` reading `ImportError: Python is not installed as a framework. The Mac OS X backend will not be able to function correctly if Python is not installed as a framework...`. Or, while trying to launch SimBA on my Mac, I get an error reading `_tkinter.TclError: expected boolean value but got ""`.
 
 <details>
   <summary>Show solutions!</summary>
 <br/><br/>
 
-This error is caused by running the wrong version of Python. You want to make sur that the tkinter version inside your environment is no later than `8.6.10`. If you are using conda, we suggest using Python `3.6.13`. For more information, see [THIS ISSUE](https://github.com/sgoldenlab/simba/issues/143).
+This error is caused by running the wrong version of Python. You want to make sure that the tkinter version inside your environment is no later than `8.6.10`. If you are using conda, we suggest using Python `3.6.13`. For more information, see [THIS ISSUE](https://github.com/sgoldenlab/simba/issues/143).
   
 </details>
 
@@ -329,7 +329,7 @@ This error is produced when SimBA is trying to install the packages `shapeley` a
 
 (i)Install SimBA with `pip install simba-uw-tf-dev --no-deps`
 
-(ii) install the requirements manually, and then install wxpython seperately using the suggestions e.g. here: wxWidgets/Phoenix#465
+(ii) install the requirements manually, and then install wxpython separately using the suggestions e.g. here: wxWidgets/Phoenix#465
 
 </details>
 

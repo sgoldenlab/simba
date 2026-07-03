@@ -405,6 +405,58 @@ h1, h2, h3, h4, h5, h6, .rst-content .toctree-wrapper > p.caption { font-weight:
     .simba-carousel-hint { display: none; }              /* keyboard hint is irrelevant on touch */
 }
 
+/* --- Collapsible answers (FAQ "Show solutions!" <details>) --- */
+.rst-content details {
+    margin: 8px 0 26px; border: 1px solid #dfe4e9; border-radius: 10px;
+    background: #fbfcfd; overflow: hidden;
+}
+.rst-content details[open] { box-shadow: 0 2px 14px rgba(0, 0, 0, .07); }
+.rst-content details > summary {
+    list-style: none; cursor: pointer; user-select: none;
+    padding: 11px 16px 11px 42px; position: relative;
+    font-weight: 700; font-size: 14px; letter-spacing: .01em; color: #21567a;
+    background: #eef4f8; transition: background .15s ease;
+}
+.rst-content details > summary::-webkit-details-marker,
+.rst-content details > summary::marker { display: none; content: ""; }
+.rst-content details > summary:hover { background: #e2edf3; }
+.rst-content details > summary::before {                 /* chevron that rotates when open */
+    content: ""; position: absolute; left: 18px; top: 50%;
+    width: 7px; height: 7px; border-right: 2px solid #21567a; border-bottom: 2px solid #21567a;
+    transform: translateY(-65%) rotate(-45deg); transition: transform .2s ease;
+}
+.rst-content details[open] > summary::before { transform: translateY(-35%) rotate(45deg); }
+.rst-content details > summary:hover::before { border-color: #163d59; }
+.rst-content details > :not(summary) { padding-left: 18px; padding-right: 18px; }
+.rst-content details > :not(summary):last-child { padding-bottom: 14px; }
+/* the FAQ markdown puts <br/><br/> right after the summary; collapse that dead space */
+.rst-content details > summary + br { display: none; }
+
+/* FAQ: wrap each question + its collapsible answer into a clean card.
+   Scoped via :has(> details) so it only touches question sections, on any page. */
+.rst-content section:has(> details) {
+    border: 1px solid #e3e8ec; border-radius: 12px; background: #fff;
+    padding: 16px 20px 18px; margin: 14px 0; box-shadow: 0 1px 4px rgba(0, 0, 0, .05);
+    transition: box-shadow .15s ease;
+}
+.rst-content section:has(> details:hover),
+.rst-content section:has(> details[open]) { box-shadow: 0 4px 18px rgba(0, 0, 0, .09); }
+.rst-content section:has(> details) > h2 {
+    font-size: 17px; line-height: 1.5; font-weight: 700; color: #2b3a44;
+    margin: 0 0 12px; padding: 0; border: none;                   /* replace the heavy default h2 */
+}
+.rst-content section:has(> details) > h2 .headerlink { font-size: 13px; }
+.rst-content section:has(> details) > details { margin: 12px 0 0; }
+.rst-content section:has(> details) > div.highlight { margin: 10px 0; }  /* code shown in the question */
+
+/* Sidebar: keep the current page's sub-heading entries to one line, so long titles
+   (e.g. the 28 FAQ questions) don't wrap into a crowded multi-line wall. */
+.wy-menu-vertical li.toctree-l1.current li.toctree-l2 > a,
+.wy-menu-vertical li.toctree-l1.current li.toctree-l3 > a {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    padding-top: 5px; padding-bottom: 5px;
+}
+
 /* --- Content tables: zebra striping, rounded corners, lighter borders --- */
 .rst-content table.docutils {
     border: 1px solid #e3e8ec;
@@ -1110,6 +1162,81 @@ html.simba-landing .rst-content h1 { display: none !important; }
 .genindex-jumpbox {
   margin: .4em 0 1.2em;
   line-height: 2;
+}
+
+/* ------------------------------------------------------------------ *
+ * Python Module Index (py-modindex): the stock theme renders a plain,
+ * cramped single-column list of monospace module names. With
+ * modindex_common_prefix=['simba.'] the modules now bucket by their
+ * real initial, so flow those buckets into responsive columns with
+ * clear letter headers. (We show every module, so the collapse
+ * togglers are hidden.)
+ * ------------------------------------------------------------------ */
+table.modindextable { display: block !important; width: 100%; border: 0 !important; }
+table.modindextable tbody {
+  display: block !important;
+  column-width: 300px !important;   /* responsive: as many ~300px columns as fit */
+  column-gap: 30px;
+}
+table.modindextable tr {
+  display: block !important;
+  break-inside: avoid;
+  line-height: 1.5;
+  padding: 1px 0;
+}
+table.modindextable td {
+  display: inline !important;
+  border: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+table.modindextable td em { display: none; }               /* empty description cells */
+table.modindextable tr.pcap { display: none !important; }  /* &nbsp; spacer rows */
+table.modindextable img.toggler { display: none !important; }
+/* letter section header — spans all columns as a divider */
+table.modindextable tr.cap {
+  column-span: all;
+  margin: 18px 0 6px;
+}
+table.modindextable tr.cap strong {
+  display: block;
+  color: #21567a;
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  border-bottom: 2px solid #e4edf3;
+  padding-bottom: 5px;
+}
+table.modindextable code.xref {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: 12.5px;
+  color: #2a7fb8;
+  /* RTD theme sets `white-space: nowrap` on .rst-content code, so long module/class
+     names overflowed their column and bled into the neighbour — force wrapping. */
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+table.modindextable a:hover code.xref { color: #19465f; text-decoration: underline; }
+/* plain (non-link) grouping entries such as bare "simba" — dim them */
+table.modindextable td > code.xref:only-child { color: #97a0ab; }
+.modindex-jumpbox {
+  margin: .4em 0 1.2em;
+  line-height: 2;
+}
+/* running rainbow mouse above the Python Module Index (see _templates/domainindex.html) */
+.simba-modindex-hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2px auto 6px;
+}
+.simba-modindex-hero video {
+  width: min(230px, 40vw);
+  height: auto;
+  background: transparent;      /* webm carries its own alpha channel */
 }
 
 /* --- Credits people cards: nice 3D spin on click (handler in custom.js) --- */

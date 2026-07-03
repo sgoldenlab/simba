@@ -3772,6 +3772,13 @@ class GeometryMixin(object):
            :width: 500
            :align: center
 
+        .. video:: _static/img/geometry_transition_probabilities.webm
+           :width: 700
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         :param np.ndarray data: A 2D array where each row represents a point in space with two coordinates [x, y].
         :param Dict[Tuple[int, int], Polygon] grid: A dictionary mapping grid cell identifiers (tuple of int, int) to their corresponding polygon objects.
                                                     Each grid cell is represented by a tuple key (e.g., (row, col)) and its spatial boundaries as a `Polygon`. Can be computed with E.g., created by :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
@@ -3824,7 +3831,9 @@ class GeometryMixin(object):
             non_transition_grids = {k: 0 for k in non_transition_grids}
             grid_dict.update(non_transition_grids)
             transition_cnt = sum(grid_dict.values())
-            out_transition_probabilities[tuple(unique_grid)] = {k: v / transition_cnt for k, v in grid_dict.items()}
+            # A cell that is visited but never transitioned out of (e.g. the cell the track ends in) has
+            # transition_cnt == 0; guard against dividing by zero and report 0.0 probabilities for it.
+            out_transition_probabilities[tuple(unique_grid)] = {k: (v / transition_cnt if transition_cnt else 0.0) for k, v in grid_dict.items()}
             out_transition_cnts[tuple(unique_grid)] = grid_dict
         timer.stop_timer()
         if verbose:

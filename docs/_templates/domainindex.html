@@ -1,0 +1,11 @@
+{# Override of Sphinx's basic ``domainindex.html`` (used for the Python Module Index,
+   py-modindex.html). Prepend the running rainbow SimBA mouse above the index. #}
+{% extends "!domainindex.html" %}
+{% block body %}
+  <div class="simba-modindex-hero">
+    <video autoplay loop muted playsinline preload="auto" aria-label="Running SimBA mouse">
+      <source src="{{ pathto('_static/img/mouse_run_simba_rainbow_34.webm', 1) }}" type="video/webm">
+    </video>
+  </div>
+  {{ super() }}
+{% endblock %}

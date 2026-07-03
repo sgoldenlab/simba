@@ -29,6 +29,13 @@ class OutlierCorrecterMovement(ConfigReader, FeatureExtractionMixin):
        :width: 500
        :align: center
 
+    .. video:: _static/img/outlier_corrector_movement.webm
+       :width: 700
+       :autoplay:
+       :loop:
+       :muted:
+       :align: center
+
     .. note::
        `Outlier correction documentation <https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf>`__.
 
