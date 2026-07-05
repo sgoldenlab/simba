@@ -19,7 +19,7 @@
 .simba-uc-foot a{font-weight:600;}
 </style>
 <div class="simba-uc">
-  <p class="simba-uc-date">Data pulled July 04, 2026</p>
+  <p class="simba-uc-date">Data pulled July 05, 2026</p>
   <div class="simba-uc-cards">
     <div class="simba-uc-card"><span class="v">141</span><span class="l">published studies</span></div>
     <div class="simba-uc-card"><span class="v">28</span><span class="l">countries</span></div>
@@ -43,7 +43,7 @@
 <script src="_static/js/jsvectormap-world.js"></script>
 <script>
 (function(){
-  const MAP = {"US": 76, "IN": 2, "IT": 6, "CA": 11, "DE": 8, "CH": 6, "SE": 3, "IL": 3, "EC": 1, "CN": 6, "FR": 3, "AU": 4, "ES": 8, "CZ": 1, "IE": 3, "GB": 4, "MA": 2, "HK": 2, "PL": 6, "AT": 2, "BE": 3, "BR": 1, "NL": 6, "HU": 1, "PT": 1, "MX": 3, "JP": 2, "TH": 2};
+  const MAP = {"US": 76, "IN": 2, "IT": 6, "CA": 11, "DE": 8, "CH": 6, "IL": 3, "SE": 3, "EC": 1, "CN": 6, "FR": 3, "AU": 4, "ES": 8, "CZ": 1, "IE": 3, "GB": 4, "MA": 2, "HK": 2, "PL": 6, "AT": 2, "BE": 3, "BR": 1, "NL": 6, "HU": 1, "PT": 1, "MX": 3, "JP": 2, "TH": 2};
   const NAME = {"US": "United States", "CA": "Canada", "DE": "Germany", "ES": "Spain", "IT": "Italy", "CH": "Switzerland", "CN": "China", "PL": "Poland", "NL": "The Netherlands", "AU": "Australia", "GB": "United Kingdom", "IL": "Israel", "SE": "Sweden", "FR": "France", "IE": "Ireland", "BE": "Belgium", "MX": "Mexico", "IN": "India", "MA": "Marocco", "AT": "Austria", "JP": "Japan", "TH": "Thailand", "EC": "Ecuador", "CZ": "Czech Republic", "HK": "Hong Kong", "BR": "Brazil", "HU": "Hungary", "PT": "Portugal", "NO": "Norway", "FI": "Finland", "DK": "Denmark", "SG": "Singapore", "KR": "South Korea", "TW": "Taiwan", "RU": "Russia", "ZA": "South Africa", "AR": "Argentina", "CL": "Chile", "NZ": "New Zealand", "GR": "Greece", "TR": "Turkey", "IR": "Iran", "SI": "Slovenia", "RO": "Romania", "UA": "Ukraine", "ID": "Indonesia", "PH": "Philippines", "SA": "Saudi Arabia", "EG": "Egypt", "CO": "Colombia", "MD": "Moldova", "ME": "Montenegro", "LT": "Lithuania", "EE": "Estonia", "LK": "Sri Lanka", "NP": "Nepal", "LU": "Luxembourg", "AE": "UAE"};
   const el = document.getElementById("ucMap");
   if (!el || typeof jsVectorMap === "undefined") return;
@@ -72,7 +72,7 @@
   if (!window.Chart) return;
   const YR = {labels: ["2020", "2021", "2022", "2023", "2024", "2025", "2026"], vals: [1, 7, 6, 8, 29, 54, 36]};
   const CONT = {labels: ["North America", "Europe", "Asia", "Oceania", "South America", "Africa"], vals: [90, 61, 17, 4, 2, 2]};
-  const TOP = {labels: ["United States", "Canada", "Germany", "Spain", "Italy", "Switzerland", "China", "Poland", "The Netherlands", "Australia", "United Kingdom", "Sweden", "Israel", "France", "Ireland", "Belgium", "Mexico", "India", "Marocco", "Hong Kong"], vals: [76, 11, 8, 8, 6, 6, 6, 6, 6, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2]};
+  const TOP = {labels: ["United States", "Canada", "Germany", "Spain", "Italy", "Switzerland", "China", "Poland", "The Netherlands", "Australia", "United Kingdom", "Israel", "Sweden", "France", "Ireland", "Belgium", "Mexico", "India", "Marocco", "Hong Kong"], vals: [76, 11, 8, 8, 6, 6, 6, 6, 6, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2]};
   const C = (id) => document.getElementById(id);
   const GRID = "#eef2f7", INK = "#23272e", MUT = "#6b7280";
   const PAL = ["#21567a","#2a7fb8","#38a8d4","#5cc6b3","#e0a33a","#e0653a","#b9c0c9"];
