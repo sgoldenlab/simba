@@ -231,6 +231,13 @@ class FeatureExtractionMixin(object):
            Wrapper method that validates input array/dataframe shape and dtypes
            before calling :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_vectorized`.
 
+        .. video:: _static/img/three_point_angle.webm
+           :width: 700
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            For scalar (single-frame) angle computation, use :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt`.
            For the numba-accelerated vectorized implementation used internally, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_vectorized`.
@@ -325,6 +332,13 @@ class FeatureExtractionMixin(object):
            :width: 600
            :align: center
 
+        .. video:: _static/img/framewise_euclidean_distance_roi.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            For distances between two moving targets, use :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance`,
            For GPU implementation, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cupy` or :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`
@@ -363,6 +377,13 @@ class FeatureExtractionMixin(object):
         .. image:: _static/img/inside_rectangle.png
            :alt: Inside rectangle
            :width: 300
+           :align: center
+
+        .. video:: _static/img/framewise_inside_rectangle_roi.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         .. seealso::
@@ -411,6 +432,13 @@ class FeatureExtractionMixin(object):
            :width: 400
            :align: center
 
+        .. video:: _static/img/is_inside_circle.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            For GPU acceleration, see :func:`simba.data_processors.cuda.geometry.is_inside_circle`
 
@@ -442,6 +470,13 @@ class FeatureExtractionMixin(object):
         .. image:: _static/img/inside_polygon.png
            :alt: Inside polygon
            :width: 300
+           :align: center
+
+        .. video:: _static/img/framewise_inside_polygon_roi.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         .. seealso::
@@ -1152,6 +1187,13 @@ class FeatureExtractionMixin(object):
            :width: 300
            :align: center
 
+        .. video:: _static/img/keypoint_distances.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. csv-table::
            :header: EXPECTED RUNTIMES
            :file: ../../docs/tables/keypoint_distances.csv
@@ -1418,6 +1460,13 @@ class FeatureExtractionMixin(object):
         .. image:: _static/img/find_midpoints.png
            :alt: Find midpoints
            :width: 600
+           :align: center
+
+        .. video:: _static/img/find_midpoints.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         .. seealso::

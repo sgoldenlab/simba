@@ -184,14 +184,21 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
     @jit(nopython=True)
     def rolling_categorical_switches_ratio(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
-        Compute the ratio of in categorical feature switches within rolling windows.
+        Compute the ratio of categorical feature switches within rolling windows.
 
         .. attention::
-           Output for initial frames where [current_frm - window_size] < 0, are populated with ``0``.
+           Output for initial frames where [current_frm - window_size] < 0, are populated with ``-1``.
 
         .. image:: _static/img/feature_switches.png
            :alt: Feature switches
            :width: 700
+           :align: center
+
+        .. video:: _static/img/rolling_categorical_switches_ratio.webm
+           :width: 700
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :param np.ndarray data: 1d array of feature values
@@ -220,7 +227,6 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
                     if time_slice[i] != current_value:
                         unique_cnt += 1
                     current_value = time_slice[i]
-                print(unique_cnt, time_slice.shape[0])
                 results[current_frm - 1][time_window] = unique_cnt / time_slice.shape[0]
         return results
 
@@ -540,6 +546,13 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
             .. image:: _static/img/spontaneous_alternations.png
                :alt: Spontaneous alternations
                :width: 500
+               :align: center
+
+            .. video:: _static/img/spontaneous_alternations.webm
+               :width: 500
+               :autoplay:
+               :loop:
+               :muted:
                :align: center
 
         :param pd.DataFrame data: DataFrame containing shape data where each row represents a frame and each column represents a shape where 0 represents not in ROI and 1 represents inside the ROI

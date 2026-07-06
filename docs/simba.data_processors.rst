@@ -97,6 +97,13 @@ SimBA pyburst calculator
    :members:
    :undoc-members:
 
+SimBA pyburst calculator (Numba)
+--------------------------------------------------
+
+.. automodule:: simba.data_processors.pybursts_calculator_numba
+   :members:
+   :undoc-members:
+
 Severity calculator
 --------------------------------------------------
 

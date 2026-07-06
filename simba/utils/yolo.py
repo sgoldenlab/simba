@@ -382,11 +382,22 @@ def apply_fixed_bbox_size(data: pd.DataFrame,
 
 def detect_yolo_project_type(label_path: str) -> str:
     """
-    Detect YOLO project type (bbox, keypoint, or segmentation) from a single label file.
+    Detect the YOLO project type (``bbox``, ``keypoint``, or ``segmentation``) from a single label file.
 
-    - bbox: class_id + 4 values (x_center, y_center, w, h)
-    - keypoint: class_id + 4 values + N*3 keypoints (x, y, visibility)
-    - segmentation: class_id + N*2 polygon vertices (N >= 3)
+    The first non-empty annotation line is inspected and classified by the number of values following the class id:
+
+    - ``bbox``: class_id + 4 values (x_center, y_center, w, h).
+    - ``keypoint``: class_id + 4 bbox values + N*3 keypoint values (x, y, visibility), where every visibility flag is ``0``, ``1``, or ``2``.
+    - ``segmentation``: class_id + N*2 polygon vertices (N >= 3, i.e. at least 6 values).
+
+    :param str label_path: Path to a YOLO-format ``.txt`` label file. Must exist and be readable.
+    :return: The detected project type: one of ``'bbox'``, ``'keypoint'``, or ``'segmentation'``. Defaults to ``'bbox'`` when the file is empty or no line can be classified.
+    :rtype: str
+
+    :example:
+
+    >>> detect_yolo_project_type(label_path='/project/labels/frame_0001.txt')
+    >>> 'keypoint'
     """
     check_file_exist_and_readable(file_path=label_path)
 

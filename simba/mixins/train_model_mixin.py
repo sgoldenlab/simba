@@ -1514,6 +1514,20 @@ class TrainModelMixin(object):
                               data: Optional[np.ndarray] = None,
                               model_output: str = 'raw',
                               feature_perturbation: str = "tree_path_dependent") -> shap.TreeExplainer:
+        """
+        Instantiate a SHAP :class:`shap.TreeExplainer` for a fitted random forest classifier.
+
+        :param RandomForestClassifier clf: A fitted sklearn random forest classifier to explain.
+        :param Optional[np.ndarray] data: Background dataset used to estimate expected values. Required for ``feature_perturbation='interventional'``; ignored for ``'tree_path_dependent'``. Default: None.
+        :param str model_output: What the explainer attributes, e.g. ``'raw'``, ``'probability'`` or ``'log_loss'``. Default: 'raw'.
+        :param str feature_perturbation: SHAP feature-perturbation method, either ``'tree_path_dependent'`` or ``'interventional'``. Default: 'tree_path_dependent'.
+        :return: A SHAP tree explainer for the passed classifier.
+        :rtype: shap.TreeExplainer
+
+        :example:
+
+        >>> explainer = TrainModelMixin().define_tree_explainer(clf=clf)
+        """
 
         check_instance(source=f'{TrainModelMixin.define_tree_explainer.__name__} rf_clf', instance=clf, accepted_types=(RandomForestClassifier,))
         return shap.TreeExplainer(clf, data=data, model_output=model_output, feature_perturbation=feature_perturbation)
@@ -1529,6 +1543,32 @@ class TrainModelMixin(object):
                    verbose: Optional[int] = 1,
                    class_weight: Optional[dict] = None,
                    cuda: Optional[bool] = False) -> Union[RandomForestClassifier, cuRF]:
+        """
+        Instantiate an un-fitted random forest classifier object from the passed hyper-parameters.
+
+        .. note::
+           If ``cuda=True`` and the cuml library is available, a GPU-accelerated ``cuml.ensemble.RandomForestClassifier`` is returned instead (note: cuml caps ``max_depth`` at 32, so larger or ``None`` values are clamped to 32).
+
+        .. seealso::
+           To fit the returned object, see :func:`simba.mixins.train_model_mixin.TrainModelMixin.clf_fit`
+
+        :param Optional[int] n_estimators: Number of trees in the forest. Default: 2000.
+        :param Optional[int] max_depth: Maximum depth of each tree. If None, nodes expand until pure (clamped to 32 when ``cuda=True``). Default: None.
+        :param Optional[Union[str, int]] max_features: Number of features to consider at each split (e.g. ``'sqrt'``, ``'log2'``, an int, or None for all features). Default: 'sqrt'.
+        :param Optional[int] n_jobs: Number of parallel jobs used to fit and predict (sklearn only). ``-1`` uses all cores. Default: -1.
+        :param Optional[str] criterion: Split-quality function, e.g. ``'gini'`` or ``'entropy'`` (sklearn only). Default: 'gini'.
+        :param Optional[int] min_samples_leaf: Minimum number of samples required at a leaf node. Default: 1.
+        :param Optional[bool] bootstrap: If True, bootstrap samples are used when building trees. Default: True.
+        :param Optional[int] verbose: Verbosity level during fitting. Default: 1.
+        :param Optional[dict] class_weight: Weights associated with classes (sklearn only), e.g. ``{0: 1, 1: 2}``. If None, all classes are weighted equally. Default: None.
+        :param Optional[bool] cuda: If True, return a GPU-accelerated cuml random forest instead of the sklearn classifier. Requires the cuml library. Default: False.
+        :return: An un-fitted random forest classifier object (sklearn or cuml).
+        :rtype: Union[RandomForestClassifier, cuRF]
+
+        :example:
+
+        >>> clf = TrainModelMixin().clf_define(n_estimators=2000, criterion='entropy', max_features='sqrt')
+        """
 
         if not cuda:
             # NOTE: LOKY ISSUES ON WINDOWS WITH SCIKIT IF THE CORE COUNT EXCEEDS 61.
@@ -2218,7 +2258,18 @@ class TrainModelMixin(object):
     def check_validity_of_meta_files(self,
                                      data_df: pd.DataFrame,
                                      meta_file_paths: List[Union[str, os.PathLike]]):
+        """
+        Validate a collection of classifier hyper-parameter meta (config) files prior to model training.
 
+        :param pd.DataFrame data_df: Annotated feature dataframe used to sanity-check sampling ratios against the number of behavior-present and behavior-absent frames.
+        :param List[Union[str, os.PathLike]] meta_file_paths: Paths to the classifier meta (config) files to validate.
+        :return: Dictionary mapping the index of each valid meta file to its sanitized parameter dictionary.
+        :rtype: Dict[int, dict]
+
+        :example:
+
+        >>> meta_dicts = TrainModelMixin().check_validity_of_meta_files(data_df=data_df, meta_file_paths=['project_folder/configs/Attack_meta.csv'])
+        """
 
         meta_dicts, errors = {}, []
         for config_cnt, path in enumerate(meta_file_paths):
@@ -2567,7 +2618,16 @@ class TrainModelMixin(object):
     @staticmethod
     def define_scaler(scaler_name: Literal["min-max", "standard", "quantile"]) -> Union[MinMaxScaler, StandardScaler, QuantileTransformer]:
         """
-        Defines a sklearn scaler object. See ``UMLOptions.SCALER_OPTIONS.value`` for accepted scalers.
+        Instantiate an un-fitted sklearn scaler object from a scaler name.
+
+        .. seealso::
+           To fit the returned scaler, see :func:`simba.mixins.train_model_mixin.TrainModelMixin.fit_scaler`.
+           To transform data with a fitted scaler, see :func:`simba.mixins.train_model_mixin.TrainModelMixin.scaler_transform`.
+
+        :param Literal["min-max", "standard", "quantile"] scaler_name: Name of the scaler to instantiate (case-insensitive).
+        :raises InvalidInputError: If ``scaler_name`` is not one of the accepted options.
+        :return: An un-fitted sklearn scaler object.
+        :rtype: Union[MinMaxScaler, StandardScaler, QuantileTransformer]
 
         :example:
 
@@ -2587,6 +2647,24 @@ class TrainModelMixin(object):
     def fit_scaler(scaler: Union[MinMaxScaler, QuantileTransformer, StandardScaler],
                    data: Union[pd.DataFrame, np.ndarray]) -> Union[
         MinMaxScaler, QuantileTransformer, StandardScaler, object]:
+        """
+
+        Fit sklearn scaler to a 2D dataset, so it can later be used to transform data.
+
+        .. seealso::
+           To instantiate a scaler, see :func:`simba.mixins.train_model_mixin.TrainModelMixin.define_scaler`.
+           To transform data with the fitted scaler, see :func:`simba.mixins.train_model_mixin.TrainModelMixin.scaler_transform`.
+
+        :param Union[MinMaxScaler, QuantileTransformer, StandardScaler] scaler: An un-fitted sklearn scaler object.
+        :param Union[pd.DataFrame, np.ndarray] data: The 2D numeric data to fit the scaler on. DataFrames are converted to their underlying values.
+        :return: The fitted scaler object.
+        :rtype: Union[MinMaxScaler, QuantileTransformer, StandardScaler]
+
+        :example:
+
+        >>> scaler = TrainModelMixin.define_scaler(scaler_name='min-max')
+        >>> scaler = TrainModelMixin.fit_scaler(scaler=scaler, data=data)
+        """
 
         check_instance(source=f'{TrainModelMixin.fit_scaler} data', instance=data, accepted_types=(pd.DataFrame, np.ndarray))
         check_instance(source=f'{TrainModelMixin.fit_scaler} scaler', instance=scaler, accepted_types=(MinMaxScaler, QuantileTransformer, StandardScaler))
@@ -2601,10 +2679,24 @@ class TrainModelMixin(object):
             name: Optional[str] = "",
     ) -> pd.DataFrame:
         """
-        Helper to run transform dataframe using previously fitted scaler.
+        Transform a dataframe using a previously fitted sklearn scaler.
 
-        :param pd.DataFrame data: Data to transform.
-        :param scaler: fitted scaler.
+        .. seealso::
+           To instantiate a scaler, see :func:`simba.mixins.train_model_mixin.TrainModelMixin.define_scaler`.
+           To fit a scaler, see :func:`simba.mixins.train_model_mixin.TrainModelMixin.fit_scaler`.
+
+        :param pd.DataFrame data: The data to transform.
+        :param Union[MinMaxScaler, StandardScaler, QuantileTransformer] scaler: A previously fitted sklearn scaler.
+        :param Optional[str] name: Optional scaler name used in the error message when the feature count mismatches. Default: "".
+        :raises FeatureNumberMismatchError: If ``data`` has a different number of columns than the scaler was fitted on.
+        :return: The transformed data, with original column names and index preserved.
+        :rtype: pd.DataFrame
+
+        :example:
+
+        >>> scaler = TrainModelMixin.define_scaler(scaler_name='min-max')
+        >>> scaler = TrainModelMixin.fit_scaler(scaler=scaler, data=data)
+        >>> transformed = TrainModelMixin.scaler_transform(data=data, scaler=scaler)
         """
 
         check_instance(

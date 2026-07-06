@@ -512,6 +512,11 @@ class NetworkMixin(object):
         - :math:`f_{\max}` is the frequency of the most abundant category,
         - :math:`N` is the total number of observations.
 
+        .. image:: _static/img/simba.mixins.network_mixin.NetworkMixin.berger_parker.webp
+           :alt: The Berger-Parker index is the count of the single most abundant category divided by the total number of observations; it ranges from 1/k (all categories perfectly even) up to 1.0 (one category fully dominates)
+           :width: 700
+           :align: center
+
         :param np.ndarray x: One-dimensional numpy array containing the values for which the Berger-Parker index is calculated.
         :return float: Berger-Parker index value for the input array `x`
 
@@ -544,6 +549,11 @@ class NetworkMixin(object):
         where:
         - :math:`p_i` is the proportion of individuals belonging to the i-th category,
         - :math:`n` is the total number of categories.
+
+        .. image:: _static/img/simba.mixins.network_mixin.NetworkMixin.shannon_diversity_index.webp
+           :alt: The Shannon diversity index sums each category's contribution minus p_i times the natural log of p_i; it is 0 for a single category and rises with more categories and more even proportions up to a maximum of ln(k)
+           :width: 700
+           :align: center
 
         :param np.ndarray x: One-dimensional numpy array containing the categories for which the Shannon Diversity Index is calculated.
         :return float: Shannon Diversity Index value for the input array `x`
@@ -583,6 +593,11 @@ class NetworkMixin(object):
         where:
         - :math:`S` is the number of unique categories,
         - :math:`N` is the total number of individuals.
+
+        .. image:: _static/img/simba.mixins.network_mixin.NetworkMixin.margalef_diversification_index.webp
+           :alt: Margalef diversification index
+           :width: 600
+           :align: center
 
         :param np.array x: One-dimensional numpy array containing nominal values for which the Margalef Diversification Index is calculated.
         :return float: Margalef Diversification Index value for the input array `x`

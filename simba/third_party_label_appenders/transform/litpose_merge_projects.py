@@ -344,10 +344,10 @@ class LitPoseMergeProjects:
         _log(f'{len(self.other_dirs)} project(s) merged into {self.master_dir} ({time.time() - start:.1f}s)', level='COMPLETE')
 
 
-
-merger = LitPoseMergeProjects(master_dir=r'H:\sina\project_0609_5cam\project_0609_5cam',
-                              other_dirs=[r"H:\sina\project_0609_5cam_current\project_0609_5cam_current"],
-                              duplicate_method='skip',
-                              verbose=True,
-                              skip_videos=False)
-merger.run()
+#
+# merger = LitPoseMergeProjects(master_dir=r'H:\sina\project_0609_5cam\project_0609_5cam',
+#                               other_dirs=[r"H:\sina\project_0706_5cam\project_0609_5cam_0626", "Z:\home\simon\LPProjects\simon_cage_4"],
+#                               duplicate_method='skip',
+#                               verbose=True,
+#                               skip_videos=False)
+# merger.run()
