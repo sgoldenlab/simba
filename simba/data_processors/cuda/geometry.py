@@ -198,7 +198,7 @@ def _convex_hull_kernel(pts: np.ndarray, results: np.ndarray) -> np.ndarray:
     CUDA kernel for the Jarvis March algorithm.
 
     .. note::
-       `Modified from Jacob Hultman <https://github.com/jhultman/rotating-calipers>`_
+       Implements the Jarvis March (gift-wrapping) convex-hull algorithm (Jarvis, R. A., 1973, *Information Processing Letters* 2(1): 18-21).
 
     :param pts: M x N x 2 array where M is the number of frames, N is the number of body-parts, and 2 representing the x and y coordinates of the body-parts.
     :param results: M x N array where M is the number of frames, and N is the indexes of the body-parts belonging to the hull. If -1, the body-part does not belong to the hull.
@@ -264,7 +264,7 @@ def get_convex_hull(pts: np.ndarray) -> np.ndarray:
        :header-rows: 1
 
     .. note::
-       `Modified from Jacob Hultman <https://github.com/jhultman/rotating-calipers>`_
+       Implements the Jarvis March (gift-wrapping) convex-hull algorithm (Jarvis, R. A., 1973, *Information Processing Letters* 2(1): 18-21).
 
     .. seealso::
        :func:`~simba.feature_extractors.perimeter_jit.jitted_hull`.
