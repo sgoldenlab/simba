@@ -833,6 +833,13 @@ class FeatureExtractionMixin(object):
            :width: 400
            :align: center
 
+        .. video:: _static/img/jitted_line_crosses_to_nonstatic_targets.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         :param np.ndarray left_ear_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals left ear
         :param np.ndarray right_ear_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals right ear
         :param np.ndarray nose_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals nose
@@ -951,6 +958,18 @@ class FeatureExtractionMixin(object):
         .. image:: _static/img/minimum_bounding_rectangle.png
            :alt: Minimum bounding rectangle
            :width: 400
+           :align: center
+
+        .. image:: _static/img/simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.minimum_bounding_rectangle.webp
+           :alt: The minimum bounding rectangle is the smallest-area rectangle enclosing the points; it is found by testing one orientation per convex-hull edge (rotating calipers) and keeping the smallest box, which for tilted shapes is far tighter than the axis-aligned bounding box
+           :width: 700
+           :align: center
+
+        .. video:: _static/img/minimum_bounding_rectangle.webm
+           :width: 700
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         .. note::

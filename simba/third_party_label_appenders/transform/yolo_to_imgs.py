@@ -12,7 +12,24 @@ from simba.utils.read_write import read_img, recursive_file_search
 
 
 class Yolo2Imgs():
+    """
+    Overlay YOLO-format annotations (bounding boxes and, where present, pose keypoints) onto their source
+    images for visual inspection.
 
+    .. seealso::
+       To assemble a YOLO project (train/val split + ``map.yaml``) from separate label and image
+       directories, see :class:`simba.third_party_label_appenders.transform.yolo_labels_to_yolo_project.YoloLabels2YoloProject`.
+
+    :param Union[str, os.PathLike] yolo_dir: Directory holding the YOLO ``.txt`` label files and their images (searched recursively).
+    :param Union[str, os.PathLike] save_dir: Directory where the annotated images are written.
+    :param Optional[str] palette: Named SimBA color palette used for the annotation overlays. Default ``'Set1'``.
+    :param Optional[Union[float, int]] circle_size: Radius, in pixels, of drawn keypoint circles. If None, a size is derived automatically from each image's dimensions.
+
+    :example:
+
+    >>> runner = Yolo2Imgs(yolo_dir=r"/path/to/yolo_labels", save_dir=r"/path/to/annotated_imgs")
+    >>> runner.run()
+    """
 
     def __init__(self,
                  yolo_dir: Union[str, os.PathLike],

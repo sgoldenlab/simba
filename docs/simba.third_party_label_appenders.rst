@@ -299,6 +299,22 @@ Annotation conversion utilities
    :show-inheritance:
 
 
+YOLO labels -> YOLO detection project
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.yolo_labels_to_yolo_project.YoloLabels2YoloProject
+   :members:
+   :show-inheritance:
+
+
+Visualize YOLO annotations on images
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.yolo_to_imgs.Yolo2Imgs
+   :members:
+   :show-inheritance:
+
+
 
 
 

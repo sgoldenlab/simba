@@ -29,7 +29,7 @@ class LitPoseMergeProjects:
     """
     Merge one or more LitPose/DLC-style projects into a master project.
 
-    Merges videos, labeled-data images, and ``CollectedData_*.csv`` annotation files. Annotations sharing the same camera suffix (e.g. ``CollectedData_cam1``) are concatenated row-wise; duplicate image rows are handled according to ``duplicate_method``.
+    Merges videos, labeled-data images, ``CollectedData_*.csv`` annotation files, and camera ``calibrations`` files. Annotations sharing the same camera suffix (e.g. ``CollectedData_cam1``) are concatenated row-wise; duplicate image rows are handled according to ``duplicate_method``. Any files inside each project's ``calibrations`` sub-folder are copied into the master ``calibrations`` sub-folder (recursively, preserving nested sub-folders); duplicate calibration files are handled according to ``duplicate_method``.
 
     :param Union[str, os.PathLike] master_dir:              Root of the master LitPose project.
     :param List[Union[str, os.PathLike]] other_dirs:        Roots of projects to merge in.
@@ -326,6 +326,36 @@ class LitPoseMergeProjects:
                 if self.verbose:
                     _log(f'Copied new annotation file: {os.path.basename(other_csv_path)} ({len(other_df)} rows)')
 
+    def _merge_calibrations(self, other_dir: str):
+        master_calib_dir = os.path.join(self.master_dir, 'calibrations')
+        other_calib_dir = os.path.join(other_dir, 'calibrations')
+        if not os.path.isdir(other_calib_dir):
+            if self.verbose:
+                _log(f'No calibrations directory found in {other_dir}. Skipping calibration merge for this project.', level='WARNING')
+            return
+        if not os.path.isdir(master_calib_dir):
+            os.makedirs(master_calib_dir)
+        copied = 0
+        for root, _, files in os.walk(other_calib_dir):
+            rel_root = os.path.relpath(root, other_calib_dir)
+            dst_root = master_calib_dir if rel_root == '.' else os.path.join(master_calib_dir, rel_root)
+            for fname in files:
+                if ':' in fname:                                    # skip NTFS alternate-data-stream artifacts (e.g. Zone.Identifier)
+                    continue
+                rel_name = fname if rel_root == '.' else os.path.join(rel_root, fname)
+                dst = os.path.join(dst_root, fname)
+                if os.path.isfile(dst):
+                    self._handle_duplicate('calibration file', rel_name)
+                    continue
+                if not os.path.isdir(dst_root):
+                    os.makedirs(dst_root)
+                shutil.copy2(os.path.join(root, fname), dst)
+                copied += 1
+                if self.verbose:
+                    _log(f'Copied calibration file: {rel_name}')
+        if self.verbose:
+            _log(f'Copied {copied} calibration file(s) from {other_dir}')
+
     def run(self):
         import time
         start = time.time()
@@ -339,6 +369,7 @@ class LitPoseMergeProjects:
                 _log('Skipping video merge (skip_videos=True)')
             self._merge_labeled_data(other_dir)
             self._merge_annotations(other_dir)
+            self._merge_calibrations(other_dir)
             if self.verbose:
                 _log(f'Project {project_cnt + 1}/{len(self.other_dirs)} merged ({time.time() - project_start:.1f}s)', level='COMPLETE')
         _log(f'{len(self.other_dirs)} project(s) merged into {self.master_dir} ({time.time() - start:.1f}s)', level='COMPLETE')
@@ -346,7 +377,7 @@ class LitPoseMergeProjects:
 
 #
 # merger = LitPoseMergeProjects(master_dir=r'H:\sina\project_0609_5cam\project_0609_5cam',
-#                               other_dirs=[r"H:\sina\project_0706_5cam\project_0609_5cam_0626", "Z:\home\simon\LPProjects\simon_cage_4"],
+#                               other_dirs=[r"H:\sina\project_0609_5cam_0706_2\project_0609_5cam_0706", "Z:\home\simon\LPProjects\simon_cage_4"],
 #                               duplicate_method='skip',
 #                               verbose=True,
 #                               skip_videos=False)

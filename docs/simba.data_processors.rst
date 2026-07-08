@@ -83,6 +83,20 @@ Movement calculator
    :members:
    :undoc-members:
 
+Distance calculator
+--------------------------------------------------
+
+.. automodule:: simba.data_processors.distance_calculator
+   :members:
+   :undoc-members:
+
+Distance time-bins calculator
+--------------------------------------------------
+
+.. automodule:: simba.data_processors.distance_timbin_calculator
+   :members:
+   :undoc-members:
+
 Pup-retrieval calculator
 --------------------------------------------------------
 
