@@ -1264,6 +1264,12 @@ html.simba-splash-on, html.simba-splash-on body {
 }
 .wy-grid-for-nav { transition: filter .6s ease, transform .6s ease; }
 html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.02); }
+/* Mobile: holding a full-page 16px blur under the video for the whole splash is
+   a heavy GPU cost (the jank). The opaque splash hides the page anyway, so drop
+   the blur/scale on small screens — playback stays smooth, look is unchanged. */
+@media (max-width: 640px) {
+  html.simba-splash-on .wy-grid-for-nav { filter: none; transform: none; }
+}
 
 .simba-splash {
   position: fixed; inset: 0; z-index: 100000; overflow: hidden;
