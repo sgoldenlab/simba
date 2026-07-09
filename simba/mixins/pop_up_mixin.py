@@ -105,7 +105,8 @@ class PopUpMixin(object):
         """
         Creates a labelframe with checkboxes and inserts the labelframe into a window.
 
-        .. image:: _static/img/create_cb_frame.png
+        .. Image commented out until a current screenshot is added:
+           image:: _static/img/create_cb_frame.png
            :alt: Create cb frame
            :width: 200
            :align: center
@@ -166,7 +167,8 @@ class PopUpMixin(object):
         """
         Creates a labelframe with dropdowns.
 
-        .. image:: _static/img/create_dropdown_frame.png
+        .. Image commented out until a current screenshot is added:
+           image:: _static/img/create_dropdown_frame.png
            :alt: Create dropdown frame
            :width: 300
            :align: center

@@ -640,7 +640,7 @@ class TrainModelMixin(object):
            :width: 500
            :align: center
 
-        .. image:: _static/img/clf_report.webp
+        .. image:: _static/img/clf_report_2.webp
            :alt: Clf report
            :width: 500
            :align: center

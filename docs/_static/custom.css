@@ -1264,7 +1264,7 @@ html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.0
 .simba-splash {
   position: fixed; inset: 0; z-index: 100000; overflow: hidden;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: #0b3553;
+  background: #061019;   /* near-black with a faint navy tint */
   opacity: 1; transition: opacity .55s ease;
   cursor: pointer;
 }
@@ -1290,8 +1290,8 @@ html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.0
 }
 .simba-splash-underline {
   height: 5px; width: 100%; margin-top: 16px; border-radius: 4px;
-  background: linear-gradient(90deg, #1f9e89, #38d4b5);
-  box-shadow: 0 0 18px rgba(31,158,137,.7);
+  background: linear-gradient(90deg, #a8862e, #e6c95f);
+  box-shadow: 0 0 18px rgba(192,168,72,.7);
   transform: scaleX(0); transform-origin: left center;
   animation: simbaSplashUnderline .5s ease 1.0s forwards;
 }
@@ -1307,14 +1307,23 @@ html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.0
   opacity: 0; animation: simbaSplashFade .6s ease 1.2s forwards;
 }
 .simba-splash-skip {
-  margin-top: 32px; text-align: center;
-  font-family: 'Poppins', sans-serif; font-size: 18px; letter-spacing: .12em;
-  text-transform: uppercase; color: rgba(255,255,255,.5);
-  opacity: 0; animation: simbaSplashFade .8s ease 1.6s forwards;
+  order: -1;                 /* render the hint above the wordmark so it reads first */
+  margin-bottom: 30px; text-align: center;
+  font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; color: #f2e7b5;
+  padding: 10px 24px; border: 1.5px solid rgba(192,168,72,.7);
+  border-radius: 999px; background: rgba(192,168,72,.14);
+  /* fade in with the rest, then pulse a soft glow ring so the CTA keeps drawing the eye */
+  opacity: 0; animation: simbaSplashFade .8s ease 1.6s forwards,
+                         simbaSkipPulse 2.4s ease-in-out 2.6s infinite;
 }
 @keyframes simbaSplashLetter    { to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes simbaSplashUnderline { to { transform: scaleX(1); } }
 @keyframes simbaSplashFade      { to { opacity: 1; } }
+@keyframes simbaSkipPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(192,168,72,0); }
+  50%      { box-shadow: 0 0 22px 3px rgba(192,168,72,.42); }
+}
 @media (prefers-reduced-motion: reduce) {
   .simba-splash, .simba-splash-vid { animation: none; }
   .simba-splash-vid { display: none; }
@@ -1322,6 +1331,34 @@ html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.0
   .simba-splash-underline { animation: none; transform: scaleX(1); }
   .simba-splash-mouse, .simba-splash-kp, .simba-splash-cap, .simba-splash-skip { animation: none; opacity: 1; }
   html.simba-splash-on .wy-grid-for-nav { filter: none; transform: none; }
+}
+/* Short / mobile viewports: the intro stacks word + underline + mouse clip +
+ * caption + skip and is vertically centered under overflow:hidden, so a column
+ * taller than the screen shears the "SimBA" word and the skip prompt off both
+ * ends. The mouse clip (1100x686) is the tallest element and had only a width
+ * cap, so on a landscape phone it alone overflowed the height. Cap it against
+ * viewport height (width then scales with its aspect ratio) and tighten the
+ * vertical rhythm so the whole scene fits. dvh tracks the mobile URL bar; the
+ * plain vh line above it is the fallback for browsers without dvh. */
+@media (max-width: 640px), (max-height: 700px) {
+  .simba-splash-inner { max-width: 92vw; }
+  .simba-splash-word { font-size: clamp(40px, 13vw, 88px); }
+  .simba-splash-mouse {
+    width: min(680px, 84vw);
+    max-height: 40vh;
+    max-height: 40dvh;
+  }
+  /* narrow screens: dial back the wide letter-spacing so the pill and caption
+     don't grow wider than the viewport and get clipped */
+  .simba-splash-cap { margin-top: 2px; font-size: 12px; letter-spacing: .12em; }
+  .simba-splash-skip {
+    margin-bottom: 16px; font-size: 15px; padding: 8px 16px;
+    letter-spacing: .08em; max-width: 90vw;
+  }
+}
+@media (max-height: 460px) {   /* landscape phones: give the clip even less room */
+  .simba-splash-mouse { max-height: 34vh; max-height: 34dvh; }
+  .simba-splash-skip { margin-bottom: 8px; }
 }
 
 /* --- Index page: orbiting pose-estimation keypoints at the foot of the page --- */

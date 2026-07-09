@@ -43,7 +43,7 @@ class MitraFeatureExtractor(ConfigReader,
     Feature extractor used for grooming and rearing classifications. A subset is of created features are further used for straub-tail classifications.
 
 
-    .. image:: _static/GerbilFeaturizer.webp
+    .. image:: _static/img/GerbilFeaturizer.webp
        :alt: Gerbil Featurizer
        :width: 500
        :align: center
