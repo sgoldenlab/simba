@@ -1257,12 +1257,20 @@ table.modindextable td > code.xref:only-child { color: #97a0ab; }
  * a teal underline that draws in, staged tagline, and a blur-to-clear
  * reveal of the page beneath. Markup + dismissal logic in custom.js.
  * ================================================================== */
-html.simba-splash-on, html.simba-splash-on body { overflow: hidden !important; }
+/* Lock the page while the splash is up. overflow:hidden alone doesn't stop
+   touch scrolling on mobile Safari, so also kill overscroll/touch panning. */
+html.simba-splash-on, html.simba-splash-on body {
+  overflow: hidden !important; overscroll-behavior: none; touch-action: none;
+}
 .wy-grid-for-nav { transition: filter .6s ease, transform .6s ease; }
 html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.02); }
 
 .simba-splash {
   position: fixed; inset: 0; z-index: 100000; overflow: hidden;
+  /* Size to the SMALL viewport (svh excludes the mobile URL bar) so the clip
+     and wordmark always fit the visible area — nothing spills below the fold,
+     so there is nothing to scroll to. Fixed vh/100% fall back for old browsers. */
+  height: 100vh; height: 100svh;   /* width comes from inset:0 (avoids the 100vw scrollbar overflow) */
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   background: #061019;   /* near-black with a faint navy tint */
   opacity: 1; transition: opacity .55s ease;
