@@ -28,23 +28,18 @@ gtag('config', 'G-PEKR9R5J47');
   var root = document.documentElement;
   root.classList.add('simba-splash-on');
 
-  var letters = 'SimBA'.split('').map(function (ch, i) {
-    return '<span style="animation-delay:' + (0.15 + i * 0.09).toFixed(2) + 's">' + ch + '</span>';
-  }).join('');
-
   var overlay = document.createElement('div');
   overlay.className = 'simba-splash';
   overlay.setAttribute('role', 'img');
   overlay.setAttribute('aria-label', 'SimBA — Simple Behavioral Analysis');
+  // The clip is a fully branded, self-contained intro (Matrix wireframe mice +
+  // keypoint labels + baked-in "SimBA" wordmark), so it IS the splash. Scaled to
+  // "contain" so nothing is cropped; the letterbox bars blend into the dark bg.
   overlay.innerHTML =
-    '<div class="simba-splash-inner">' +
-      '<div class="simba-splash-word">' + letters + '</div>' +
-      '<div class="simba-splash-underline"></div>' +
-      '<video class="simba-splash-mouse" autoplay loop muted playsinline preload="auto">' +
-        '<source src="' + ROOT + '_static/img/mouse_run.webm" type="video/webm">' +   // mesh mouse + baked keypoints
-      '</video>' +
-      '<div class="simba-splash-cap">Simple Behavioral Analysis</div>' +
-    '</div>' +
+    '<video class="simba-splash-feature" autoplay muted playsinline preload="auto" ' +
+           'poster="' + ROOT + '_static/img/splash_matrix_trio_poster.webp">' +
+      '<source src="' + ROOT + '_static/img/splash_matrix_trio.mp4" type="video/mp4">' +
+    '</video>' +
     '<div class="simba-splash-skip">click anywhere to skip</div>';
   root.appendChild(overlay);   // body does not exist yet at parse time; documentElement is fine for position:fixed
 

@@ -1277,6 +1277,15 @@ html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.0
   position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(ellipse at center, rgba(7,39,58,.32) 0%, rgba(7,39,58,.80) 100%);
 }
+/* Full-screen branded intro clip: fills the viewport and scales to "contain"
+ * so the portrait video is never cropped; the letterbox bars fall on the dark
+ * splash background and read as seamless. */
+.simba-splash-feature {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
 .simba-splash-inner { position: relative; text-align: center; }
 .simba-splash-word {
   font-family: 'Poppins', sans-serif; font-weight: 700;
@@ -1307,15 +1316,17 @@ html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.0
   opacity: 0; animation: simbaSplashFade .6s ease 1.2s forwards;
 }
 .simba-splash-skip {
-  order: -1;                 /* render the hint above the wordmark so it reads first */
-  margin-bottom: 30px; text-align: center;
-  font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 600;
+  /* pinned to the top over the video so it reads first and never covers the
+     baked-in "SimBA" wordmark at the foot of the clip */
+  position: absolute; top: 26px; left: 50%; transform: translateX(-50%);
+  z-index: 2; white-space: nowrap; text-align: center;
+  font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600;
   letter-spacing: .14em; text-transform: uppercase; color: #f2e7b5;
-  padding: 10px 24px; border: 1.5px solid rgba(192,168,72,.7);
-  border-radius: 999px; background: rgba(192,168,72,.14);
-  /* fade in with the rest, then pulse a soft glow ring so the CTA keeps drawing the eye */
-  opacity: 0; animation: simbaSplashFade .8s ease 1.6s forwards,
-                         simbaSkipPulse 2.4s ease-in-out 2.6s infinite;
+  padding: 10px 24px; border: 1.5px solid rgba(192,168,72,.75);
+  border-radius: 999px; background: rgba(8,14,20,.55);   /* dark glass so gold text stays legible over the video */
+  /* fade in, then pulse a soft gold glow ring so the CTA keeps drawing the eye */
+  opacity: 0; animation: simbaSplashFade .8s ease 1.0s forwards,
+                         simbaSkipPulse 2.4s ease-in-out 2.2s infinite;
 }
 @keyframes simbaSplashLetter    { to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes simbaSplashUnderline { to { transform: scaleX(1); } }
@@ -1352,13 +1363,11 @@ html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.0
      don't grow wider than the viewport and get clipped */
   .simba-splash-cap { margin-top: 2px; font-size: 12px; letter-spacing: .12em; }
   .simba-splash-skip {
-    margin-bottom: 16px; font-size: 15px; padding: 8px 16px;
-    letter-spacing: .08em; max-width: 90vw;
+    font-size: 15px; padding: 8px 16px; letter-spacing: .08em; max-width: 90vw;
   }
 }
-@media (max-height: 460px) {   /* landscape phones: give the clip even less room */
-  .simba-splash-mouse { max-height: 34vh; max-height: 34dvh; }
-  .simba-splash-skip { margin-bottom: 8px; }
+@media (max-height: 460px) {   /* landscape phones: lift the skip pill closer to the top edge */
+  .simba-splash-skip { top: 14px; }
 }
 
 /* --- Index page: orbiting pose-estimation keypoints at the foot of the page --- */
