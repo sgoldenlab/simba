@@ -1319,7 +1319,8 @@ html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.0
   /* pinned to the top over the video so it reads first and never covers the
      baked-in "SimBA" wordmark at the foot of the clip */
   position: absolute; top: 26px; left: 50%; transform: translateX(-50%);
-  z-index: 2; white-space: nowrap; text-align: center;
+  z-index: 2; text-align: center;   /* wraps instead of clipping if a screen is extremely narrow */
+  box-sizing: border-box; max-width: calc(100vw - 28px);   /* never wider than the screen, at any size */
   font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600;
   letter-spacing: .14em; text-transform: uppercase; color: #f2e7b5;
   padding: 10px 24px; border: 1.5px solid rgba(192,168,72,.75);
@@ -1368,6 +1369,9 @@ html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.0
 }
 @media (max-height: 460px) {   /* landscape phones: lift the skip pill closer to the top edge */
   .simba-splash-skip { top: 14px; }
+}
+@media (max-width: 360px) {   /* narrowest phones (iPhone SE etc.): keep the pill on one line inside the screen */
+  .simba-splash-skip { top: 18px; font-size: 13px; letter-spacing: .04em; padding: 7px 14px; }
 }
 
 /* --- Index page: orbiting pose-estimation keypoints at the foot of the page --- */
