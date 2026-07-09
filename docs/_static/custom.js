@@ -35,10 +35,16 @@ gtag('config', 'G-PEKR9R5J47');
   // The clip is a fully branded, self-contained intro (Matrix wireframe mice +
   // keypoint labels + baked-in "SimBA" wordmark), so it IS the splash. Scaled to
   // "contain" so nothing is cropped; the letterbox bars blend into the dark bg.
+  // Pick the aspect that fits the device: the tall PORTRAIT clip fills a phone,
+  // while the near-square WIDE clip (with its readable feature table) suits a
+  // landscape/desktop screen. The wide clip on a phone would shrink to an
+  // unreadable band; the portrait clip on desktop just adds side bars.
+  var wide = window.innerWidth >= 768;
+  var clip = wide ? 'splash_matrix_trio_wide' : 'splash_matrix_trio';
   overlay.innerHTML =
     '<video class="simba-splash-feature" autoplay muted playsinline preload="auto" ' +
-           'poster="' + ROOT + '_static/img/splash_matrix_trio_poster.webp">' +
-      '<source src="' + ROOT + '_static/img/splash_matrix_trio.mp4" type="video/mp4">' +
+           'poster="' + ROOT + '_static/img/' + clip + '_poster.webp">' +
+      '<source src="' + ROOT + '_static/img/' + clip + '.mp4" type="video/mp4">' +
     '</video>' +
     '<div class="simba-splash-skip">click anywhere to skip</div>';
   root.appendChild(overlay);   // body does not exist yet at parse time; documentElement is fine for position:fixed
