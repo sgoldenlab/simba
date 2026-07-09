@@ -43,6 +43,17 @@ gtag('config', 'G-PEKR9R5J47');
     '<div class="simba-splash-skip">click anywhere to skip</div>';
   root.appendChild(overlay);   // body does not exist yet at parse time; documentElement is fine for position:fixed
 
+  // Pin the overlay to the ACTUAL visible height. CSS uses 100svh, but on browsers
+  // without svh (older mobile Safari/Chrome) that falls back to 100vh — the URL-bar-
+  // hidden height — making the overlay taller than the screen; object-fit:contain then
+  // centres the full clip in that oversized box, so only the middle shows ("half the
+  // video"). window.innerHeight is the real visible height on every browser, so setting
+  // it explicitly guarantees the whole clip fits the screen. Keep it in sync on
+  // resize / URL-bar show-hide / rotation.
+  function sizeOverlay() { overlay.style.height = window.innerHeight + 'px'; }
+  sizeOverlay();
+  window.addEventListener('resize', sizeOverlay);
+  window.addEventListener('orientationchange', sizeOverlay);
 
   var done = false;
 
@@ -50,6 +61,8 @@ gtag('config', 'G-PEKR9R5J47');
     if (done) return;
     done = true;
     try { sessionStorage.setItem('simbaSplashSeen', '1'); } catch (e) {}
+    window.removeEventListener('resize', sizeOverlay);
+    window.removeEventListener('orientationchange', sizeOverlay);
     overlay.classList.add('leaving');
     root.classList.remove('simba-splash-on');
     setTimeout(function () { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 600);
