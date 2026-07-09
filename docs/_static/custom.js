@@ -44,8 +44,7 @@ gtag('config', 'G-PEKR9R5J47');
   root.appendChild(overlay);   // body does not exist yet at parse time; documentElement is fine for position:fixed
 
 
-  var shownAt = (window.performance && performance.now) ? performance.now() : (+new Date());
-  var MIN_MS = 3400, MAX_MS = 5200, done = false;   // hold long enough to enjoy the assembled scene + running mouse
+  var done = false;
 
   function dismiss() {
     if (done) return;
@@ -55,13 +54,28 @@ gtag('config', 'G-PEKR9R5J47');
     root.classList.remove('simba-splash-on');
     setTimeout(function () { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 600);
   }
-  function dismissAfterMin() {
-    var elapsed = ((window.performance && performance.now) ? performance.now() : (+new Date())) - shownAt;
-    setTimeout(dismiss, Math.max(0, MIN_MS - elapsed));
-  }
 
-  window.addEventListener('load', dismissAfterMin);
-  setTimeout(dismiss, MAX_MS);                       // hard cap if load never fires
+  // Let the branded clip play once through, then dismiss; a click / keypress
+  // skips at any time. Guards cover the ways autoplay-to-end can fail:
+  //   - prefers-reduced-motion: don't play, hold the poster briefly, then leave
+  //   - autoplay blocked by the browser: the play() promise rejects -> leave soon
+  //   - clip stalls / 'ended' never fires: a safety timer past its length bails
+  var vid = overlay.querySelector('.simba-splash-feature');
+  var SAFETY_MS = 21000;   // clip runs ~18s; give headroom, then dismiss regardless
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduce) {
+    if (vid) { try { vid.removeAttribute('autoplay'); vid.pause(); } catch (e) {} }
+    setTimeout(dismiss, 2600);
+  } else if (vid) {
+    vid.addEventListener('ended', dismiss);
+    vid.addEventListener('error', dismiss);
+    var p = vid.play && vid.play();
+    if (p && p.catch) p.catch(function () { setTimeout(dismiss, 3000); });   // autoplay refused -> don't hang on a frozen frame
+    setTimeout(dismiss, SAFETY_MS);
+  } else {
+    setTimeout(dismiss, 3000);
+  }
   overlay.addEventListener('click', dismiss);        // let users skip it
   window.addEventListener('keydown', dismiss, { once: true });
 })();
