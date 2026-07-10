@@ -1531,6 +1531,44 @@ def _generate_code_growth(app):
         print(f'[code_growth] generation failed ({e!r}); keeping existing snapshot.')
 
 
+def _add_cache_busting(app, exception):
+    """Append ``?v=<content-hash>`` to the frequently-changed static assets in every
+    built HTML page, so browsers/CDNs fetch the new file whenever it changes instead
+    of serving a stale cached copy. The docs build pins an old Sphinx that does not
+    emit the automatic ``?v=`` digest, and these assets (the splash logic + theme CSS)
+    are referenced without one — a stale ``custom.css`` once left the splash video
+    unstyled on mobile. The version is a hash of the assets' contents, so it is stable
+    across rebuilds when nothing changed and only busts when a file actually changes.
+    Idempotent: the negative lookahead skips references that already carry a query.
+    """
+    if exception is not None or getattr(app.builder, 'format', '') != 'html':
+        return
+    import hashlib
+    from pathlib import Path
+    from sphinx.util import logging as _sphinx_logging
+    logger = _sphinx_logging.getLogger(__name__)
+
+    static = Path(app.outdir) / '_static'
+    targets = ['custom.js', 'custom.css', 'demo_manifest.js', 'css/simba_theme.css']
+    digest = hashlib.md5()
+    for t in targets:
+        f = static / t
+        if f.is_file():
+            digest.update(f.read_bytes())
+    ver = digest.hexdigest()[:8]
+
+    names = '|'.join(_re.escape(t) for t in targets)
+    pat = _re.compile(r'(_static/(?:' + names + r'))(?![?\w])')
+    changed = 0
+    for html in Path(app.outdir).rglob('*.html'):
+        text = html.read_text(encoding='utf-8')
+        new = pat.sub(r'\1?v=' + ver, text)
+        if new != text:
+            html.write_text(new, encoding='utf-8')
+            changed += 1
+    logger.info('cache-busting: stamped ?v=%s into %d HTML files', ver, changed)
+
+
 def setup(app):
     """Build-time hooks for the Markdown tutorials.
 
@@ -1558,5 +1596,6 @@ def setup(app):
     app.connect('builder-inited', _generate_code_growth)
     app.connect('build-finished', _copy_images)
     app.connect('build-finished', _inject_lazy_media)
+    app.connect('build-finished', _add_cache_busting)   # stamp ?v=<hash> so updated CSS/JS beats stale caches
     app.connect('doctree-read', _convert_github_alerts)
     app.connect('doctree-read', _autolink_glossary_terms)

@@ -32,6 +32,11 @@ gtag('config', 'G-PEKR9R5J47');
   overlay.className = 'simba-splash';
   overlay.setAttribute('role', 'img');
   overlay.setAttribute('aria-label', 'SimBA — Simple Behavioral Analysis');
+  // Inline the essential overlay layout too, so a stale/cached custom.css can never
+  // leave the splash unstyled (full-screen dark backdrop, centered, above content).
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:100000;overflow:hidden;' +
+    'background:#061019;display:flex;align-items:center;justify-content:center;' +
+    'opacity:1;transition:opacity .55s ease;cursor:pointer';
   // The clip is a fully branded, self-contained intro (Matrix wireframe mice +
   // keypoint labels + baked-in "SimBA" wordmark), so it IS the splash. Scaled to
   // "contain" so nothing is cropped; the letterbox bars blend into the dark bg.
@@ -41,8 +46,15 @@ gtag('config', 'G-PEKR9R5J47');
   // unreadable band; the portrait clip on desktop just adds side bars.
   var wide = window.innerWidth >= 768;
   var clip = wide ? 'splash_matrix_trio_wide' : 'splash_matrix_trio';
+  // Critical sizing is inlined (not only in custom.css) so a stale/cached CSS can
+  // never leave the video unstyled — without this it would render at natural size,
+  // anchored top-left, overflowing the screen. Inline styles ship with this script,
+  // so as long as custom.js loads, the clip is always contained within the viewport.
+  var vstyle = 'position:absolute;inset:0;width:100%;height:100%;' +
+               'max-width:100%;max-height:100%;object-fit:contain;pointer-events:none';
   overlay.innerHTML =
-    '<video class="simba-splash-feature" autoplay muted playsinline preload="auto" ' +
+    '<video class="simba-splash-feature" style="' + vstyle + '" ' +
+           'autoplay muted playsinline preload="auto" ' +
            'poster="' + ROOT + '_static/img/' + clip + '_poster.webp">' +
       '<source src="' + ROOT + '_static/img/' + clip + '.mp4" type="video/mp4">' +
     '</video>' +
@@ -70,6 +82,7 @@ gtag('config', 'G-PEKR9R5J47');
     window.removeEventListener('resize', sizeOverlay);
     window.removeEventListener('orientationchange', sizeOverlay);
     overlay.classList.add('leaving');
+    overlay.style.opacity = '0';   // fade out even if custom.css is stale/missing
     root.classList.remove('simba-splash-on');
     setTimeout(function () { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 600);
   }

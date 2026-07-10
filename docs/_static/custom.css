@@ -1260,7 +1260,7 @@ table.modindextable td > code.xref:only-child { color: #97a0ab; }
 /* Lock the page while the splash is up. overflow:hidden alone doesn't stop
    touch scrolling on mobile Safari, so also kill overscroll/touch panning. */
 html.simba-splash-on, html.simba-splash-on body {
-  overflow: hidden !important; overscroll-behavior: none; touch-action: none;
+  overflow: hidden !important; overscroll-behavior: none;
 }
 .wy-grid-for-nav { transition: filter .6s ease, transform .6s ease; }
 html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.02); }
