@@ -1531,6 +1531,38 @@ def _generate_code_growth(app):
         print(f'[code_growth] generation failed ({e!r}); keeping existing snapshot.')
 
 
+def _unwrap_numba_device_funcs(app):
+    """Make private numba ``@cuda.jit(device=True)`` helpers documentable by autodoc.
+
+    RTD builds these docs on Python 3.6 / an old Sphinx whose autodoc drops private
+    (underscore) members that are not ``inspect.isfunction`` — and a numba
+    ``CUDADispatcher`` is not. Public dispatchers still render, but the private
+    ``_cuda_*`` device primitives in :mod:`simba.data_processors.cuda.utils` (surfaced
+    on the GPU-acceleration page via ``:private-members:``) silently disappear.
+
+    Replacing each dispatcher with its underlying ``.py_func`` (a plain function
+    carrying the same signature and docstring) lets old autodoc document them. Newer
+    Sphinx already handles the dispatchers, so this is a harmless no-op there. Only the
+    module namespace used for introspection is touched; kernels compile lazily on call,
+    which never happens during a docs build.
+    """
+    import importlib
+    for modname in ('simba.data_processors.cuda.utils',):
+        try:
+            mod = importlib.import_module(modname)
+        except Exception as e:  # noqa: BLE001 - never fail the build over this
+            print(f'[numba-unwrap] skipped {modname} ({e!r})')
+            continue
+        for name in list(vars(mod)):
+            obj = vars(mod)[name]
+            pyf = getattr(obj, 'py_func', None)
+            if pyf is not None and callable(pyf) and getattr(pyf, '__module__', None) == modname:
+                try:
+                    setattr(mod, name, pyf)
+                except Exception:  # noqa: BLE001
+                    pass
+
+
 def _add_cache_busting(app, exception):
     """Append ``?v=<content-hash>`` to the frequently-changed static assets in every
     built HTML page, so browsers/CDNs fetch the new file whenever it changes instead
@@ -1588,6 +1620,7 @@ def setup(app):
             if os.path.isdir(src):
                 copy_asset(src, os.path.join(app.outdir, 'images'))
 
+    app.connect('builder-inited', _unwrap_numba_device_funcs)   # so private @cuda.jit helpers document on RTD's old autodoc
     app.connect('builder-inited', _generate_github_contributors)
     app.connect('builder-inited', _generate_download_stats)
     app.connect('builder-inited', _generate_commit_heatmap)
