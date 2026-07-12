@@ -4,6 +4,7 @@ GPU acceleration
 .. video:: _static/img/gpu_spin.webm
    :width: 700
    :autoplay:
+   :nocontrols:
    :loop:
    :muted:
    :align: center

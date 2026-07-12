@@ -116,6 +116,7 @@ CUDA/CuPy-accelerated versions of SimBA's compute-heavy routines (geometry, imag
 .. video:: _static/img/gpu_spin.webm
    :width: 700
    :autoplay:
+   :nocontrols:
    :loop:
    :muted:
    :align: center
