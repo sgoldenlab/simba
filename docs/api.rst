@@ -73,6 +73,17 @@ Parse SimBA config files and access project-specific metadata.
    simba.config_reader
 
 
+|:gear:| **Global configuration**
+--------------------------------------------------
+
+Global SimBA settings and environment variables (GPU toggles, paths, feature flags) that tune runtime behaviour across the package.
+
+.. toctree::
+   :maxdepth: 1
+
+   simba.env
+
+
 |:bulb:| **Cue-light tools**
 --------------------------------------------------
 
@@ -95,6 +106,28 @@ Transform classification, tracking, and image data.
    :maxdepth: 1
 
    simba.data_processors
+
+
+|:zap:| **GPU acceleration**
+--------------------------------------------------
+
+CUDA/CuPy-accelerated versions of SimBA's compute-heavy routines (geometry, image, statistics, circular statistics, time-series, SHAP), consolidated in one place. Run the same analyses far faster on a supported NVIDIA GPU.
+
+.. toctree::
+   :maxdepth: 2
+
+   simba.gpu_helpers
+
+
+|:jigsaw:| **Mixins (overview)**
+--------------------------------------------------
+
+Entry point to SimBA's mixin classes — the reusable method libraries (feature, geometry, statistics, plotting, image, network, timeseries, model) that the topical sections below draw on.
+
+.. toctree::
+   :maxdepth: 1
+
+   simba.mixins
 
 
 |:straight_ruler:| **Feature extraction mixins**

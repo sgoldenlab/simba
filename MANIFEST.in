@@ -1,3 +1,4 @@
+include LICENSE NOTICE
 recursive-include simba *
 prune simba/sandbox
 recursive-exclude simba/sandbox *

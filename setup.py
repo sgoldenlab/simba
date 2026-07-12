@@ -40,7 +40,7 @@ setuptools.setup(
     install_requires=requirements,
     extras_require={'arm': [arm_requirements], "gpu": [gpu_requirements]},
     license='Modified BSD 3-Clause License',
-    license_files=('LICENSE',),
+    license_files=('LICENSE', 'NOTICE'),
     packages=setuptools.find_packages(exclude=["*.tests",
                                                "*.tests.*",
                                                "tests.*",

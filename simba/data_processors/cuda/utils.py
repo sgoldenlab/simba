@@ -1,3 +1,50 @@
+"""
+Low-level CUDA/Numba GPU helpers.
+
+This module holds the small ``@cuda.jit(device=True)`` primitives (means, medians,
+standard deviation, MAD, RMS, ranges, Euclidean distance, matrix multiply/transpose,
+RGB-to-grey conversions and NaN-aware reductions) that the other
+:mod:`simba.data_processors.cuda` kernels compose, together with the public
+:func:`get_nvc_decoder` factory for GPU (NVDEC) hardware video decoding.
+
+How to use
+----------
+The ``_cuda_*`` functions are **CUDA device functions**: they execute *on* the GPU and
+can only be called from inside another CUDA kernel (a function decorated with
+``@cuda.jit``) or another device function — never directly from host/Python code.
+They operate on data already resident in GPU memory (device arrays, or thread-local
+scratch arrays), take one element/row per thread, and return plain scalars or arrays
+for further use inside the kernel. Call them as ordinary functions within a kernel;
+Numba inlines them at compile time (there is no kernel-launch overhead per call).
+
+.. code-block:: python
+
+    from numba import cuda
+    from simba.data_processors.cuda.utils import _cuda_mean, _cuda_std
+
+    @cuda.jit
+    def zscore_rows(data, out):           # data: (n_rows, row_len) device array
+        i = cuda.grid(1)
+        if i < data.shape[0]:
+            row = data[i]
+            m = _cuda_mean(row)           # device helpers, called from within the kernel
+            s = _cuda_std(row, m)
+            out[i] = (row[0] - m) / s
+
+    zscore_rows[blocks, threads](d_data, d_out)   # launch on device arrays
+
+Notes:
+
+- The reductions backed by a fixed thread-local scratch buffer
+  (:func:`_cuda_mac`, :func:`_cuda_mad`, :func:`_cuda_rms`, :func:`_cuda_abs_energy`)
+  assume inputs of **at most 512 elements**.
+- Several helpers mutate their argument in place (e.g. :func:`_cuda_bubble_sort`,
+  :func:`_cuda_median`, :func:`_cuda_subtract_2d`) — pass a copy if you need the input
+  preserved.
+- The only **host-callable** entry point is :func:`get_nvc_decoder`, which builds an
+  NVDEC hardware video decoder from ordinary Python code.
+"""
+
 import math
 import os
 from typing import Any, Dict, Tuple, Union
@@ -14,6 +61,12 @@ except ImportError:
 
 @cuda.jit(device=True)
 def _cuda_sum(x: np.ndarray):
+    """
+    Device: sum of a 1D array.
+
+    :param np.ndarray x: Input 1D array.
+    :return: Sum of all elements of ``x``.
+    """
     s = 0
     for i in range(x.shape[0]):
         s += x[i]
@@ -21,6 +74,13 @@ def _cuda_sum(x: np.ndarray):
 
 @cuda.jit(device=True)
 def _cuda_sin(x, t):
+    """
+    Device: element-wise sine of ``x`` written into ``t``.
+
+    :param np.ndarray x: Input 1D array of angles in radians.
+    :param np.ndarray t: Output 1D array (same length as ``x``) that receives the sines.
+    :return: The output array ``t``.
+    """
     for i in range(x.shape[0]):
         v = math.sin(x[i])
         t[i] = v
@@ -28,6 +88,13 @@ def _cuda_sin(x, t):
 
 @cuda.jit(device=True)
 def _cuda_cos(x, t):
+    """
+    Device: element-wise cosine of ``x`` written into ``t``.
+
+    :param np.ndarray x: Input 1D array of angles in radians.
+    :param np.ndarray t: Output 1D array (same length as ``x``) that receives the cosines.
+    :return: The output array ``t``.
+    """
     for i in range(x.shape[0]):
         v = math.cos(x[i])
         t[i] = v
@@ -35,22 +102,47 @@ def _cuda_cos(x, t):
 
 @cuda.jit(device=True)
 def _cuda_min(x: np.ndarray):
+    """
+    Device: minimum value of a 1D array.
+
+    :param np.ndarray x: Input 1D array.
+    :return: Smallest element of ``x``.
+    """
     return min(x)
 
 @cuda.jit(device=True)
 def _cuda_max(x: np.ndarray):
+    """
+    Device: maximum value of a 1D array.
+
+    :param np.ndarray x: Input 1D array.
+    :return: Largest element of ``x``.
+    """
     return max(x)
 
 @cuda.jit(device=True)
 def _cuda_standard_deviation(x):
+    """
+    Device: population standard deviation of a 1D array (divides by N).
+
+    :param np.ndarray x: Input 1D array.
+    :return: Standard deviation of ``x``.
+    """
     m = _cuda_mean(x)
     std_sum = 0
     for i in range(x.shape[0]):
-        std_sum += abs(x[i] - m)
+        std_sum += (x[i] - m) ** 2
     return math.sqrt(std_sum / x.shape[0])
 
 @cuda.jit(device=True)
 def _cuda_std(x: np.ndarray, x_hat: float):
+    """
+    Device: standard deviation of ``x`` about a precomputed mean.
+
+    :param np.ndarray x: Input 1D array.
+    :param float x_hat: Precomputed mean of ``x``.
+    :return: Standard deviation of ``x`` about ``x_hat``.
+    """
     std = 0
     for i in range(x.shape[0]):
         std += (x[i] - x_hat) ** 2
@@ -58,20 +150,49 @@ def _cuda_std(x: np.ndarray, x_hat: float):
 
 @cuda.jit(device=True)
 def _rad2deg(x):
+    """
+    Device: convert an angle from radians to degrees.
+
+    :param float x: Angle in radians.
+    :return: Angle in degrees.
+    """
     return x * (180/math.pi)
 
 @cuda.jit(device=True)
 def _deg2rad(x):
+    """
+    Device: convert an angle from degrees to radians.
+
+    :param float x: Angle in degrees.
+    :return: Angle in radians.
+    """
     return x * (math.pi/180)
 
 @cuda.jit(device=True)
 def _cross_test(x, y, x1, y1, x2, y2):
+    """
+    Device: which side of a directed segment a point lies on (2D cross-product sign).
+
+    :param float x: X-coordinate of the test point.
+    :param float y: Y-coordinate of the test point.
+    :param float x1: X-coordinate of the segment start.
+    :param float y1: Y-coordinate of the segment start.
+    :param float x2: X-coordinate of the segment end.
+    :param float y2: Y-coordinate of the segment end.
+    :return: True if the point lies to the right of the directed segment (x1,y1)->(x2,y2).
+    """
     cross = (x - x1) * (y2 - y1) - (y - y1) * (x2 - x1)
     return cross < 0
 
 
 @cuda.jit(device=True)
 def _cuda_mean(x):
+    """
+    Device: arithmetic mean of a 1D array.
+
+    :param np.ndarray x: Input 1D array.
+    :return: Mean of ``x``.
+    """
     s = 0
     for i in range(x.shape[0]):
         s += x[i]
@@ -79,6 +200,13 @@ def _cuda_mean(x):
 
 @cuda.jit(device=True)
 def _cuda_mse(img_1, img_2):
+    """
+    Device: mean squared error between two equally-shaped 2D images.
+
+    :param np.ndarray img_1: First 2D image.
+    :param np.ndarray img_2: Second 2D image (same shape as ``img_1``).
+    :return: Mean squared error between the two images.
+    """
     s = 0.0
     for i in range(img_1.shape[0]):
         for j in range(img_1.shape[1]):
@@ -89,13 +217,29 @@ def _cuda_mse(img_1, img_2):
 
 @cuda.jit(device=True)
 def _cuda_luminance_pixel_to_grey(r: int, g: int, b: int):
-    r = 0.2126* r
+    """
+    Device: Rec.709 luminance greyscale value of an RGB pixel.
+
+    :param int r: Red channel value.
+    :param int g: Green channel value.
+    :param int b: Blue channel value.
+    :return: Greyscale (Rec.709 luminance) value of the pixel.
+    """
+    r = 0.2126 * r
     g = 0.7152 * g
     b = 0.0722 * b
     return b + g + r
 
 @cuda.jit(device=True)
 def _cuda_digital_pixel_to_grey(r: int, g: int, b: int):
+    """
+    Device: Rec.601 digital greyscale value of an RGB pixel.
+
+    :param int r: Red channel value.
+    :param int g: Green channel value.
+    :param int b: Blue channel value.
+    :return: Greyscale (Rec.601 digital) value of the pixel.
+    """
     r = 0.299 * r
     g = 0.587 * g
     b = 0.114 * b
@@ -103,11 +247,25 @@ def _cuda_digital_pixel_to_grey(r: int, g: int, b: int):
 
 @cuda.jit(device=True)
 def _euclid_dist_2d(x, y):
+    """
+    Device: Euclidean distance between two 2D points.
+
+    :param np.ndarray x: First point as a length-2 array ``(x, y)``.
+    :param np.ndarray y: Second point as a length-2 array ``(x, y)``.
+    :return: Euclidean distance between the two points.
+    """
     return math.sqrt(((y[0] - x[0]) ** 2) + ((y[1] - x[1]) ** 2))
 
 @cuda.jit(device=True)
 def _cuda_matrix_multiplication(mA, mB, out):
-    """ Matrix multiplication"""
+    """
+    Device: matrix multiplication ``mA @ mB`` accumulated into ``out``.
+
+    :param np.ndarray mA: Left 2D matrix of shape (m, k).
+    :param np.ndarray mB: Right 2D matrix of shape (k, n).
+    :param np.ndarray out: Pre-zeroed output 2D matrix of shape (m, n) that receives the product.
+    :return: The output matrix ``out``.
+    """
     for i in range(mA.shape[0]):
         for j in range(mB.shape[1]):
             for k in range(mA.shape[1]):
@@ -116,7 +274,13 @@ def _cuda_matrix_multiplication(mA, mB, out):
 
 @cuda.jit(device=True)
 def _cuda_2d_transpose(x, y):
-    """ Transpose a 2d array """
+    """
+    Device: transpose a 2D array.
+
+    :param np.ndarray x: Input 2D array of shape (m, n).
+    :param np.ndarray y: Output 2D array of shape (n, m) that receives the transpose.
+    :return: The output array ``y``.
+    """
     for i in range(x.shape[0]):
         for j in range(x.shape[1]):
             y[j][i] = x[i][j]
@@ -124,7 +288,13 @@ def _cuda_2d_transpose(x, y):
 
 @cuda.jit(device=True)
 def _cuda_subtract_2d(x: np.ndarray, vals: np.ndarray) -> np.ndarray:
-    """ Subtract 1d array values for every row in a 2d array"""
+    """
+    Device: subtract a per-column 1D vector from every row of a 2D array (in place).
+
+    :param np.ndarray x: Input 2D array, modified in place.
+    :param np.ndarray vals: 1D array with one value per column of ``x``.
+    :return: The modified array ``x``.
+    """
     for i in range(x.shape[0]):
         for j in range(x.shape[1]):
             x[i][j] = x[i][j] - vals[j]
@@ -133,7 +303,13 @@ def _cuda_subtract_2d(x: np.ndarray, vals: np.ndarray) -> np.ndarray:
 
 @cuda.jit(device=True)
 def _cuda_add_2d(x: np.ndarray, vals: np.ndarray) -> np.ndarray:
-    """ Add 1d array values for every row in a 2d array"""
+    """
+    Device: add a per-column 1D vector to every row of a 2D array (in place).
+
+    :param np.ndarray x: Input 2D array, modified in place.
+    :param np.ndarray vals: 1D array with one value per column of ``x``.
+    :return: The modified array ``x``.
+    """
     for i in range(x.shape[0]):
         for j in range(x.shape[1]):
             x[i][j] = x[i][j] + vals[j]
@@ -142,16 +318,27 @@ def _cuda_add_2d(x: np.ndarray, vals: np.ndarray) -> np.ndarray:
 
 @cuda.jit(device=True)
 def _cuda_variance(x: np.ndarray):
+    """
+    Device: sample variance of a 1D array (divides by N-1).
+
+    :param np.ndarray x: Input 1D array.
+    :return: Variance of ``x``.
+    """
     mean = _cuda_mean(x)
     num = 0
     for i in range(x.shape[0]):
-        num += abs(x[i] - mean)
+        num += (x[i] - mean) ** 2
     return num / (x.shape[0] - 1)
 
 
 @cuda.jit(device=True)
 def _cuda_mac(x: np.ndarray):
-    """ mean average change in 1d array (max size 512)"""
+    """
+    Device: mean absolute change (mean of ``|x[i] - x[i-1]|``) of a 1D array.
+
+    :param np.ndarray x: Input 1D array (maximum length 512).
+    :return: Mean of the absolute first-order differences of ``x``.
+    """
     diff = cuda.local.array(shape=512, dtype=np.float64)
     for i in range(512):
         diff[i] = np.inf
@@ -190,6 +377,12 @@ def _is_cuda_available() -> Tuple[bool, Dict[int, Any]]:
 
 @cuda.jit(device=True)
 def _cuda_bubble_sort(x):
+    """
+    Device: in-place bubble sort of a 1D array (ascending).
+
+    :param np.ndarray x: Input 1D array, sorted in place.
+    :return: The sorted array ``x``.
+    """
     n = x.shape[0]
     for i in range(n - 1):
         for j in range(n - i - 1):
@@ -200,6 +393,12 @@ def _cuda_bubble_sort(x):
 
 @cuda.jit(device=True)
 def _cuda_median(x):
+    """
+    Device: median of a 1D array.
+
+    :param np.ndarray x: Input 1D array (sorted in place as a side effect).
+    :return: Median value of ``x``.
+    """
     sorted_arr = _cuda_bubble_sort(x)
     if not x.shape[0] % 2 == 0:
         return sorted_arr[int(math.floor(x.shape[0] / 2))]
@@ -210,36 +409,60 @@ def _cuda_median(x):
 
 @cuda.jit(device=True)
 def _cuda_mad(x):
+    """
+    Device: median absolute deviation (MAD) of a 1D array.
+
+    :param np.ndarray x: Input 1D array (maximum length 512).
+    :return: Median absolute deviation of ``x``.
+    """
     diff = cuda.local.array(shape=512, dtype=np.float32)
     for i in range(512):
         diff[i] = np.inf
     m = _cuda_median(x)
     for j in range(x.shape[0]):
        diff[j] = abs(x[j] - m)
-    return _cuda_median(diff[0:x.shape[0]-1])
+    return _cuda_median(diff[0:x.shape[0]])
 
 @cuda.jit(device=True)
 def _cuda_rms(x: np.ndarray):
+    """
+    Device: root-mean-square of a 1D array.
+
+    :param np.ndarray x: Input 1D array (maximum length 512).
+    :return: Root-mean-square of ``x``.
+    """
     squared = cuda.local.array(shape=512, dtype=np.float64)
     for i in range(512): squared[i] = np.inf
     for j in range(x.shape[0]):
         squared[j] = x[j] ** 2
-    m = _cuda_mean(squared[0: x.shape[0]-1])
+    m = _cuda_mean(squared[0: x.shape[0]])
     return math.sqrt(m)
 
 
 @cuda.jit(device=True)
 def _cuda_range(x: np.ndarray):
+    """
+    Device: range (max minus min) of a 1D array.
+
+    :param np.ndarray x: Input 1D array.
+    :return: Difference between the maximum and minimum of ``x``.
+    """
     return _cuda_max(x) - _cuda_min(x)
 
 @cuda.jit(device=True)
 def _cuda_abs_energy(x):
+    """
+    Device: absolute energy (sum of squared elements) of a 1D array.
+
+    :param np.ndarray x: Input 1D array (maximum length 512).
+    :return: Sum of the squared elements of ``x``.
+    """
     squared = cuda.local.array(shape=512, dtype=np.float64)
     for i in range(512): squared[i] = np.inf
     for j in range(x.shape[0]):
         squared[j] = x[j] ** 2
-    m = _cuda_sum(squared[0: x.shape[0] - 1])
-    return math.sqrt(m)
+    m = _cuda_sum(squared[0: x.shape[0]])
+    return m
 
 
 @cuda.jit(device=True)
@@ -304,7 +527,15 @@ def _cuda_diff(x, start, end, diff):
 
 @cuda.jit(device=True)
 def _cuda_are_rows_equal(x, y, idx_1, idx_2):
-    """Helper to check if two rows in two 2D arrays are equal"""
+    """
+    Device: check whether a row in one 2D array equals a row in another.
+
+    :param np.ndarray x: First 2D array.
+    :param np.ndarray y: Second 2D array (same number of columns as ``x``).
+    :param int idx_1: Row index into ``x``.
+    :param int idx_2: Row index into ``y``.
+    :return: True if row ``idx_1`` of ``x`` equals row ``idx_2`` of ``y``.
+    """
     for i in range(x.shape[1]):
         if x[idx_1, i] != y[idx_2, i]:
             return False
@@ -315,6 +546,16 @@ def get_nvc_decoder(video_path: Union[str, os.PathLike],
                     output_color_type,
                     gpu_id: int = 0,
                     use_device_memory: bool = False):
+    """
+    Create an NVDEC hardware video decoder for GPU-accelerated frame reading.
+
+    :param Union[str, os.PathLike] video_path: Path to the video file to decode.
+    :param output_color_type: PyNvVideoCodec output colour format for decoded frames.
+    :param int gpu_id: Index of the GPU to decode on. Default 0.
+    :param bool use_device_memory: If True, keep decoded frames in GPU device memory; otherwise copy to host.
+    :raises SimBAGPUError: If PyNvVideoCodec is not installed, or if no CUDA GPU is available.
+    :return: A configured ``PyNvVideoCodec.SimpleDecoder``.
+    """
 
     from simba.utils.checks import (check_file_exist_and_readable,
                                     check_instance, check_int)
@@ -328,7 +569,6 @@ def get_nvc_decoder(video_path: Union[str, os.PathLike],
     check_int(name=f'{get_nvc_decoder.__name__} gpu_id', value=gpu_id, min_value=0)
     check_instance(source=f'{get_nvc_decoder.__name__} use_device_memory', instance=use_device_memory, accepted_types=(bool,))
     return nvc.SimpleDecoder(video_path, gpu_id=gpu_id, use_device_memory=use_device_memory, output_color_type=output_color_type)
-
 
 
 

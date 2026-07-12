@@ -900,6 +900,13 @@ class TimeseriesFeatureMixin(object):
            :width: 600
            :align: center
 
+        .. video:: _static/img/sliding_line_length.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.line_length`
 
@@ -938,6 +945,13 @@ class TimeseriesFeatureMixin(object):
         .. image:: _static/img/sliding_variance.png
            :alt: Sliding variance
            :width: 600
+           :align: center
+
+        .. video:: _static/img/sliding_variance.webm
+           :width: 700
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :param data: 1d input data array.
