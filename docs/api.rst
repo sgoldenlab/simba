@@ -113,6 +113,13 @@ Transform classification, tracking, and image data.
 
 CUDA/CuPy-accelerated versions of SimBA's compute-heavy routines (geometry, image, statistics, circular statistics, time-series, SHAP), consolidated in one place. Run the same analyses far faster on a supported NVIDIA GPU.
 
+.. video:: _static/img/gpu_spin.webm
+   :width: 700
+   :autoplay:
+   :loop:
+   :muted:
+   :align: center
+
 .. toctree::
    :maxdepth: 2
 

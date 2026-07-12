@@ -1,6 +1,13 @@
 GPU acceleration
 ==============================
 
+.. video:: _static/img/gpu_spin.webm
+   :width: 700
+   :autoplay:
+   :loop:
+   :muted:
+   :align: center
+
 SimBA ships CUDA/CuPy-accelerated implementations of many of its most compute-heavy
 routines — geometry, image, statistics, circular-statistics, time-series and SHAP
 operations. On a supported NVIDIA GPU these run the same analyses as their CPU
