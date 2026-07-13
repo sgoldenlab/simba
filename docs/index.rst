@@ -169,6 +169,7 @@ ________________________________________________
 
    🧩 Related Software <simba.related_software>
    📜 License <simba.license>
+   📄 Third-Party Notices <simba.notice>
 
 .. raw:: html
 

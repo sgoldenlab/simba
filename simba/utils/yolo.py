@@ -514,7 +514,7 @@ def create_yolo_sample_visualizations(samples: List[Tuple[str, np.ndarray, str]]
         stdout_information(msg=f'{len(samples)} visualizations saved in {save_dir}', source=source)
 
 def export_yolo_model(model_path: Union[str, os.PathLike],
-                      export_format: Literal["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite", "torch"],
+                      export_format: Literal["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite", "torch", "ncnn", "mnn"],
                       imgsz: int = 256,
                       device: Union[Literal['cpu'], int] = 0,
                       int8: bool = False,
@@ -531,7 +531,9 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
     Wrapper around Ultralytics export that supports common deployment formats (including ONNX and TensorRT engine).
 
     .. note::
-       INT8 export is only valid for ``engine`` format and cannot be combined with ``half=True``.
+       INT8 export is valid for the ``engine``, ``openvino``, and ``tflite`` formats and cannot be combined with ``half=True``.
+       For ``openvino`` and ``tflite`` INT8, a calibration dataset (``data`` yaml) is required, as Ultralytics performs
+       post-training quantization using representative images.
 
     .. important::
        When exporting a **segmentation** model, the ``imgsz`` parameter is critical for mask quality. Segmentation
@@ -540,10 +542,10 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
        The default ``256`` may be too coarse for high-quality segmentation masks.
 
     :param Union[str, os.PathLike] model_path: Path to source YOLO weights (typically ``.pt``).
-    :param Literal["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite", "torch"] export_format: Target export format.
+    :param Literal["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite", "torch", "ncnn", "mnn"] export_format: Target export format. ``ncnn`` and ``mnn`` are well suited to ARM/mobile CPUs (e.g. Raspberry Pi).
     :param int imgsz: Export input image size in pixels.
     :param Union[Literal['cpu'], int] device: Export device (``'cpu'`` or CUDA index).
-    :param bool int8: If True, request INT8 TensorRT export. Requires ``export_format='engine'``.
+    :param bool int8: If True, request INT8 quantized export. Requires ``export_format`` of ``'engine'``, ``'openvino'``, or ``'tflite'``. For ``'openvino'`` and ``'tflite'``, a ``data`` calibration yaml must be supplied.
     :param int batch: Export batch/profile size (must be >= 1). For INT8, ensure calibration data size is at least this value.
     :param int workspace: TensorRT workspace budget in GB (must be >= 1).
     :param Optional[Union[str, os.PathLike]] data: Optional dataset yaml path used for export/calibration.
@@ -569,6 +571,16 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
     ...     dynamic=False,
     ...     half=False
     ... )
+
+    >>> export_yolo_model(
+    ...     model_path=r"H:\\netholabs\\openvino\\best.pt",
+    ...     export_format='openvino',
+    ...     imgsz=256,
+    ...     device='cpu',
+    ...     int8=True,
+    ...     data=r"H:\\netholabs\\openvino\\map.yaml",
+    ...     task='detect',
+    ... )
     """
 
     if YOLO is None:
@@ -585,8 +597,10 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
     if data is not None: check_file_exist_and_readable(file_path=data, raise_error=True)
     if export_format not in Options.VALID_YOLO_FORMATS.value:
         raise InvalidInputError(msg=f"Unsupported format '{export_format}'. Valid: {Options.VALID_YOLO_FORMATS.value}", source=export_yolo_model.__name__)
-    if int8 and export_format != "engine":
-        raise InvalidInputError(msg=f"INT8 export requires 'engine' format. Got '{export_format}'.", source=export_yolo_model.__name__)
+    if int8 and export_format not in ("engine", "openvino", "tflite"):
+        raise InvalidInputError(msg=f"INT8 export requires 'engine', 'openvino', or 'tflite' format. Got '{export_format}'.", source=export_yolo_model.__name__)
+    if int8 and export_format in ("openvino", "tflite") and data is None:
+        raise InvalidInputError(msg=f"INT8 '{export_format}' export requires a calibration dataset. Provide 'data' (path to a dataset .yaml) for post-training quantization.", source=export_yolo_model.__name__)
     if int8 and half:
         raise InvalidInputError(msg="Choose one precision mode: INT8 or FP16 (half).", source=export_yolo_model.__name__)
     model = YOLO(model_path) if task is None else YOLO(model_path, task=task)

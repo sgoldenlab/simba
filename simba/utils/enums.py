@@ -466,7 +466,7 @@ class Options(Enum):
                  cv2.FONT_HERSHEY_SCRIPT_SIMPLEX,
                  cv2.FONT_HERSHEY_SCRIPT_COMPLEX]
 
-    VALID_YOLO_FORMATS = ["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite", "torch"]
+    VALID_YOLO_FORMATS = ["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite", "torch", "ncnn", "mnn"]
     AXIS_ALIGNED = 'axis-aligned'
     ANIMAL_ALIGNED = 'animal-aligned'
     BBOX_OPTIONS = ['axis-aligned', 'animal-aligned']
