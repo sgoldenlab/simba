@@ -52,6 +52,7 @@ The pipeline is split into two parts:
 <p align="center">
   <img src="images/scenario1/overview.webp" width="600">
 </p>
+
 ---
 
 ## 🚀 Part 1: Create a New Project
@@ -152,10 +153,12 @@ SimBA needs the pose-estimation data (x,y coordinates of body parts) produced by
 <p align="center">
   <video src="images/scenario1/smoothing.webm" width="600" controls>Your browser does not support the video tag.</video>
 </p>
+<p align="center"><em>Smoothing example 1 — pose keypoints before vs. after smoothing.</em></p>
 
 <p align="center">
-  <video src="images/scenario1/wmoothing_2.webm" width="600" controls>Your browser does not support the video tag.</video>
+  <video src="images/scenario1/smoothing_2.webm" width="600" controls>Your browser does not support the video tag.</video>
 </p>
+<p align="center"><em>Smoothing example 2 — a second video showing the same before/after comparison.</em></p>
 
 
 > [!TIP]
@@ -189,7 +192,7 @@ Before running any analysis, you must load your project so SimBA knows which fol
 </p>
 
 > [!NOTE]
-> SimBA keeps a list of recently opened projects. You can reopen a project without browsing in two places: (i) Go to `File` and select `Open recent project...`, then choose a project from the submenu; (ii) Use the **LOAD RECENT PROJECT</kbd> section on the main window — select a project from the dropdown and click <kbd>LOAD RECENT PROJECT</kbd>.
+> SimBA keeps a list of recently opened projects. You can reopen a project without browsing in two places: (i) Go to `File` and select `Open recent project...`, then choose a project from the submenu; (ii) Use the <kbd>LOAD RECENT PROJECT</kbd> section on the main window — select a project from the dropdown and click <kbd>LOAD RECENT PROJECT</kbd>.
 
 
 
@@ -316,6 +319,10 @@ If you want to see which features SimBA computes for your setup, you can browse 
 
 The classifier needs **training labels**: for each frame (or bout), you tell SimBA whether the behavior of interest is **present** or **absent**. You provide the training labels in the **SimBA behavioral annotation GUI**, which opens from the **Label behavior** tab. The GUI shows a **video player** and a **frame viewer** that stay in sync: you move through the video, and for each frame you mark which behavior(s) are occurring. Your annotations are written into the feature-extracted CSVs and saved in **`project_folder/csv/targets_inserted/`** (one CSV per video). SimBA uses the annotated CSVs from `project_folder/csv/targets_inserted/` in Step 7 to train the classifier.
 
+<p align="center">
+  <img src="images/scenario1/lbl_behavior.webp" width="600">
+</p>
+
 **Where to find the Label behavior interface:** In the main SimBA window, click the **Label behavior** tab (alongside **Outlier correction**, **Extract features**, **Train machine model**, etc.). You will see sub-menus for different annotation modes. For this scenario use **LABEL BEHAVIOR** → **Select video (create new video annotation)**. In that mode, SimBA assumes the behavior is **absent** in every frame unless you mark it **present**; you step through the video and check the box for your behavior (e.g. BtWGaNP) when it occurs. You can label **frame by frame** or use **Frame range** to mark a start and end frame and save a bout in one go. When you leave a frame or save a range, your choices are stored; when you close the annotation window, SimBA writes the labels to the project.
 
 **What you do:** For each video you want to use for training, open the video from the **Label behavior** interface, watch or step through the video, and for each frame (or range of frames) where the behavior occurs, check the corresponding behavior box. Use the same **operational definition** for the behavior across all videos so the classifier learns a consistent pattern. When you are done with a video, close the annotation window; SimBA saves the annotated CSV to **`project_folder/csv/targets_inserted/`**. Repeat for all training videos (e.g. 19 of the 20 pilot videos if you set one aside for validation in Step 5).
@@ -403,7 +410,7 @@ Click <kbd>SETTINGS</kbd> in the **Train machine model** tab to open the setting
 | **PARTIAL DEPENDENCIES** | Plots how changing each feature (e.g. distance to another animal) affects the model’s predictions. Computationally heavy; use when you want a deeper understanding of feature effects. See [partial dependence](https://scikit-learn.org/stable/modules/partial_dependence.html). |
 | **COMPUTE SHAP SCORES** | SHAP values show *why* the model predicted each frame—which features pushed it toward “present” or “absent.” Powerful for interpreting and debugging classifiers. Slow; use a subset of frames (set the target present/absent counts below). [SHAP tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/SHAP.md). |
 | **SHAP TARGET PRESENT #** / **SHAP TARGET ABSENT #** | How many “present” and “absent” frames to include in SHAP analysis. Start small (e.g. 50 each) to keep runtimes manageable. Active when SHAP is enabled. |
-| **SHAPE SAVE CADENCE** | How often to save SHAP results (e.g. every 100 frames). Protects against losing work if the run crashes. |
+| **SHAP SAVE CADENCE** | How often to save SHAP results (e.g. every 100 frames). Protects against losing work if the run crashes. |
 | **MULTI-PROCESS SHAP VALUES** | Use multiple CPU cores to speed up SHAP. Enable if you have a multi-core machine and SHAP is too slow. |
 
 **SAVE**
