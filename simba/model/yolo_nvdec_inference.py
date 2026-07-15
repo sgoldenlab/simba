@@ -36,7 +36,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_nvidea_gpu_available, check_str,
                                 check_valid_boolean, check_valid_tuple)
 from simba.utils.data import (df_smoother, resample_geometry_vertices,
-                              savgol_smoother)
+                              resample_geometry_vertices_numba, savgol_smoother)
 from simba.utils.errors import (InvalidInputError, NoFilesFoundError,
                                 SimBAGPUError)
 from simba.utils.lookups import get_nvdec_count
@@ -62,6 +62,22 @@ SAVITZKY_GOLAY = 'savitzky-golay'
 
 
 YOLO_EXTENSIONS = ('.engine', '.pt', '.onnx', '.torchscript', '.xml', '.pb', '.tflite', '.edgetpu', '.paddle', '.ncnn', '.mnn', '.imx', '.rknn')
+
+
+def _resample_geometry_vertices_fast(vertices, vertice_cnt):
+    results = np.empty((len(vertices), vertice_cnt, 2), dtype=np.float32)
+    for idx in range(len(vertices)):
+        coords = vertices[idx]
+        closed = np.vstack([coords, coords[0:1]])
+        diffs = np.diff(closed, axis=0)
+        seg_lens = np.sqrt(diffs[:, 0] ** 2 + diffs[:, 1] ** 2)
+        distances = np.empty(len(closed), dtype=np.float64)
+        distances[0] = 0.0
+        np.cumsum(seg_lens, out=distances[1:])
+        uniform = np.linspace(0, distances[-1], vertice_cnt, endpoint=False)
+        results[idx, :, 0] = np.interp(uniform, distances, closed[:, 0])
+        results[idx, :, 1] = np.interp(uniform, distances, closed[:, 1])
+    return results
 
 
 def read_yolo_metadata(model: Union[str, os.PathLike, YOLO]) -> dict:
@@ -227,7 +243,7 @@ def _process_one_video(video_path, trt_model, batch_buf, batch_size, imsz,
 
         pred = pred_tensor[:n_frames].cpu()
         if task == SEGMENT and proto is not None:
-            proto = proto[:n_frames].cpu()
+            proto_gpu = proto[:n_frames]
         for i in range(n_frames):
             frm_idx = frame_offset + i
             det = pred[i]
@@ -239,39 +255,32 @@ def _process_one_video(video_path, trt_model, batch_buf, batch_size, imsz,
                 v_det = v_det[topk_idx]
 
             detected_class_ids = set()
-            for j in range(len(v_det)):
-                vals = v_det[j]
-                x1_lb, y1_lb, x2_lb, y2_lb, conf, cls_id = vals[:6].tolist()
-                cls_id = int(cls_id)
-                detected_class_ids.add(cls_id)
-                cls_name = class_names.get(cls_id, str(cls_id))
-                x1 = int(round((x1_lb - lb_pad_left) / lb_scale))
-                y1 = int(round((y1_lb - lb_pad_top) / lb_scale))
-                x2 = int(round((x2_lb - lb_pad_left) / lb_scale))
-                y2 = int(round((y2_lb - lb_pad_top) / lb_scale))
 
-                if task == DETECT:
-                    row = [frm_idx, cls_id, cls_name, conf] + _xyxy_to_corners(x1, y1, x2, y2)
-                    all_rows.append(row)
+            if task == SEGMENT and proto is not None and len(v_det) > 0:
+                proto_i = proto_gpu[i]
+                n_coeffs = proto_i.shape[0]
+                mask_h, mask_w = proto_i.shape[1], proto_i.shape[2]
+                scale_h, scale_w = imsz / mask_h, imsz / mask_w
+                all_coeffs = v_det[:, 6:6 + n_coeffs].to(device=proto_i.device, dtype=proto_i.dtype)
+                all_masks = torch.sigmoid((all_coeffs @ proto_i.reshape(n_coeffs, -1)).reshape(len(v_det), mask_h, mask_w))
 
-                elif task == SEGMENT and proto is not None:
-                    mask_coeffs = vals[6:]
-                    proto_i = proto[i]
-                    n_coeffs = proto_i.shape[0]
-                    mask_h, mask_w = proto_i.shape[1], proto_i.shape[2]
-                    mask_pred = (mask_coeffs[:n_coeffs] @ proto_i.reshape(n_coeffs, -1)).reshape(mask_h, mask_w)
-                    mask_pred = torch.sigmoid(mask_pred)
-                    scale_h, scale_w = imsz / mask_h, imsz / mask_w
+                seg_pts_list = []
+                seg_row_meta = []
+                for j in range(len(v_det)):
+                    vals = v_det[j]
+                    x1_lb, y1_lb, x2_lb, y2_lb, conf, cls_id = vals[:6].tolist()
+                    cls_id = int(cls_id)
+                    detected_class_ids.add(cls_id)
                     x1_m, y1_m = max(0, int(x1_lb / scale_w)), max(0, int(y1_lb / scale_h))
                     x2_m, y2_m = min(mask_w, int(x2_lb / scale_w) + 1), min(mask_h, int(y2_lb / scale_h) + 1)
                     crop_h, crop_w = y2_m - y1_m, x2_m - x1_m
                     if crop_h < 1 or crop_w < 1:
                         continue
-                    crop_pred = mask_pred[y1_m:y2_m, x1_m:x2_m]
+                    crop_pred = all_masks[j, y1_m:y2_m, x1_m:x2_m]
                     tgt_h = int(round(crop_h * scale_h))
                     tgt_w = int(round(crop_w * scale_w))
                     crop_up = F.interpolate(crop_pred.unsqueeze(0).unsqueeze(0), size=(tgt_h, tgt_w), mode='bilinear', align_corners=False)[0, 0]
-                    mask_np = (crop_up > 0.5).numpy().astype(np.uint8)
+                    mask_np = (crop_up > 0.5).cpu().numpy().astype(np.uint8)
                     contours, _ = cv2.findContours(mask_np, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
                     if contours:
                         largest = max(contours, key=cv2.contourArea)
@@ -282,8 +291,29 @@ def _process_one_video(video_path, trt_model, batch_buf, batch_size, imsz,
                         pts[:, 1] = (pts[:, 1] + y1_m * scale_h - lb_pad_top) / lb_scale
                         if segment_smoothing is not None and len(pts) >= 4:
                             pts = GeometryMixin.smooth_geometry_bspline(data=pts, smooth_factor=segment_smoothing, points=len(pts))[0]
-                        vertices = resample_geometry_vertices(vertices=pts.reshape(1, -1, 2), vertice_cnt=vertice_cnt).flatten()
-                        row = [frm_idx, cls_id] + [int(round(v)) for v in vertices.tolist()]
+                        seg_pts_list.append(pts)
+                        seg_row_meta.append((frm_idx, cls_id))
+
+                if seg_pts_list:
+                    resampled = resample_geometry_vertices_numba(vertices=seg_pts_list, vertice_cnt=vertice_cnt)
+                    for k, (fi, ci) in enumerate(seg_row_meta):
+                        verts = resampled[k].flatten()
+                        all_rows.append([fi, ci] + [int(round(v)) for v in verts.tolist()])
+                del all_masks
+            else:
+                for j in range(len(v_det)):
+                    vals = v_det[j]
+                    x1_lb, y1_lb, x2_lb, y2_lb, conf, cls_id = vals[:6].tolist()
+                    cls_id = int(cls_id)
+                    detected_class_ids.add(cls_id)
+                    cls_name = class_names.get(cls_id, str(cls_id))
+                    x1 = int(round((x1_lb - lb_pad_left) / lb_scale))
+                    y1 = int(round((y1_lb - lb_pad_top) / lb_scale))
+                    x2 = int(round((x2_lb - lb_pad_left) / lb_scale))
+                    y2 = int(round((y2_lb - lb_pad_top) / lb_scale))
+
+                    if task == DETECT:
+                        row = [frm_idx, cls_id, cls_name, conf] + _xyxy_to_corners(x1, y1, x2, y2)
                         all_rows.append(row)
 
             for cls_id, cls_name in class_names.items():

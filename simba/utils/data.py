@@ -1840,7 +1840,8 @@ def egocentric_frm_rotator(frames: np.ndarray,
     return warped_frames
 
 
-def resample_geometry_vertices(vertices: Union[List[np.ndarray], np.ndarray], vertice_cnt: int) -> np.ndarray:
+def resample_geometry_vertices(vertices: Union[List[np.ndarray], np.ndarray],
+                               vertice_cnt: int) -> np.ndarray:
     """
     Resample geometry vertices to a specified number of vertices in each polygon.
 
@@ -1879,6 +1880,108 @@ def resample_geometry_vertices(vertices: Union[List[np.ndarray], np.ndarray], ve
         except:
             pass
     return results
+
+
+@njit("(float64[:, :, :], int64[:], int64)", parallel=True)
+def _resample_geometry_vertices_numba(vertices: np.ndarray,
+                                      counts: np.ndarray,
+                                      vertice_cnt: int) -> np.ndarray:
+    """
+    Numba kernel for :func:`resample_geometry_vertices_numba`.
+
+    Operates on a padded 3D array of polygon vertices plus a per-polygon vertex count. Padding rows are ignored via ``counts`` so ragged polygons produce results identical to the unpadded input.
+
+    .. seealso::
+       This is the low-level numba kernel. Use the public wrapper :func:`simba.utils.data.resample_geometry_vertices_numba`, which performs input checks and builds the padded ``vertices`` / ``counts`` arrays.
+
+    :param np.ndarray vertices: Padded vertices, shape (N, max_n, 2), float64.
+    :param np.ndarray counts: Real vertex count per polygon, shape (N,), int64.
+    :param int vertice_cnt: Target number of vertices per resampled polygon.
+    :return: Resampled vertices, shape (N, vertice_cnt, 2), float32.
+    """
+
+    N = vertices.shape[0]
+    results = np.full((N, vertice_cnt, 2), np.nan, dtype=np.float32)
+    for idx in prange(N):
+        n = counts[idx]
+        if n < 1:
+            continue
+        coords = vertices[idx, :n, :]
+        closed = np.empty((n + 1, 2), dtype=np.float64)
+        closed[:n] = coords
+        closed[n] = coords[0]
+        distances = np.empty(n + 1, dtype=np.float64)
+        distances[0] = 0.0
+        for i in range(n):
+            dx = closed[i + 1, 0] - closed[i, 0]
+            dy = closed[i + 1, 1] - closed[i, 1]
+            distances[i + 1] = distances[i] + np.sqrt(dx * dx + dy * dy)
+        total = distances[n]
+        if total <= 0.0:
+            for k in range(vertice_cnt):
+                results[idx, k, 0] = np.float32(coords[0, 0])
+                results[idx, k, 1] = np.float32(coords[0, 1])
+            continue
+        step = total / vertice_cnt
+        uniform = np.empty(vertice_cnt, dtype=np.float64)
+        for k in range(vertice_cnt):
+            uniform[k] = k * step
+        results[idx, :, 0] = np.interp(uniform, distances, closed[:, 0]).astype(np.float32)
+        results[idx, :, 1] = np.interp(uniform, distances, closed[:, 1]).astype(np.float32)
+    return results
+
+
+def resample_geometry_vertices_numba(vertices: Union[List[np.ndarray], np.ndarray],
+                                     vertice_cnt: int) -> np.ndarray:
+    """
+    Resample geometry vertices to a specified number of vertices in each polygon.
+
+    This function takes a list or a single array of 2D coordinates representing the vertices of polygons
+    and resamples each polygon to have exactly `vertice_cnt` vertices. The resampling is done by
+    interpolating the distances between consecutive vertices and then uniformly distributing the
+    requested number of vertices along the perimeter of each polygon. Ragged input is padded to a
+    contiguous (N, max_n, 2) array and a per-polygon vertex count is passed so the numba kernel can
+    ignore the padding.
+
+    .. image:: _static/img/resample_geometry_vertices.webp
+       :alt: Resample geometry vertices
+       :width: 700
+       :align: center
+
+    .. seealso::
+       For the original non-jitted ``interp1d`` implementation, see :func:`simba.utils.data.resample_geometry_vertices`.
+       For the low-level numba kernel, see :func:`simba.utils.data._resample_geometry_vertices_numba`.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../docs/tables/resample_geometry_vertices.csv
+       :widths: 10, 90
+       :align: center
+       :header-rows: 1
+
+    :param Union[List[np.ndarray], np.ndarray] vertices: A list of 2D coordinate arrays or a single 3D array representing the vertices of polygons. Each 2D array should have shape (n, 2), where `n` is the number of vertices.
+    :param int vertice_cnt: The target number of vertices for resampling in each polygon. This value should be at least 3.
+    :return: A 3D array of shape (len(vertices), vertice_cnt, 2), where each 2D array in the result contains the resampled vertices of the corresponding polygon.
+    :rtype: np.ndarray
+    """
+
+    check_int(name=f'{resample_geometry_vertices_numba.__name__} vertice_cnt', value=vertice_cnt, min_value=3)
+    check_instance(source=f'{resample_geometry_vertices_numba.__name__} vertices', instance=vertices, accepted_types=(list, np.ndarray,))
+    if isinstance(vertices, list):
+        check_valid_lst(data=vertices, source=f'{resample_geometry_vertices_numba.__name__} vertices', valid_dtypes=(np.ndarray,))
+        for cnt, v in enumerate(vertices):
+            check_valid_array(data=v, source=f'{resample_geometry_vertices_numba.__name__} vertices {cnt}', accepted_ndims=(2,), accepted_axis_1_shape=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    else:
+        check_valid_array(data=vertices, source=f'{resample_geometry_vertices_numba.__name__} vertices', accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    N = len(vertices)
+    counts = np.array([len(v) for v in vertices], dtype=np.int64)
+    max_n = int(counts.max()) if N > 0 else 0
+    padded = np.zeros((N, max_n, 2), dtype=np.float64)
+    for idx in range(N):
+        n = counts[idx]
+        padded[idx, :n, :] = vertices[idx]
+    return _resample_geometry_vertices_numba(padded, counts, vertice_cnt)
+
 
 def fft_lowpass_filter(data: np.ndarray, cut_off: float = 0.1) -> np.ndarray:
     """
