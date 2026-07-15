@@ -1855,6 +1855,16 @@ def resample_geometry_vertices(vertices: Union[List[np.ndarray], np.ndarray],
        :width: 700
        :align: center
 
+    .. seealso::
+       For a faster numba-jitted implementation, see :func:`simba.utils.data.resample_geometry_vertices_numba`.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../docs/tables/resample_geometry_vertices_original.csv
+       :widths: 10, 90
+       :align: center
+       :header-rows: 1
+
     :param Union[List[np.ndarray], np.ndarray]: A list of 2D coordinate arrays or a single 3D array  representing the vertices of polygons. Each 2D array should have shape (n, 2), where `n` is the number of  vertices.
     :param int vertice_cnt: The target number of vertices for resampling in each polygon. This value should be at least 3.
     :return: A 3D array of shape (len(vertices), vertice_cnt, 2), where each 2D array in the result contains the resampled vertices of the corresponding polygon.
