@@ -36,7 +36,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_nvidea_gpu_available, check_str,
                                 check_valid_boolean, check_valid_tuple)
 from simba.utils.data import (df_smoother, resample_geometry_vertices,
-                              resample_geometry_vertices_numba, savgol_smoother)
+                              resample_geometry_vertices_numba,
+                              savgol_smoother)
 from simba.utils.errors import (InvalidInputError, NoFilesFoundError,
                                 SimBAGPUError)
 from simba.utils.lookups import get_nvdec_count
