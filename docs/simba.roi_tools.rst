@@ -1,6 +1,13 @@
 ROI Analysis Tools
 ==================
 
+.. video:: _static/img/arena_move.mp4
+   :width: 700
+   :autoplay:
+   :loop:
+   :muted:
+   :align: center
+
 
 .. contents:: On this page
    :local:
