@@ -48,6 +48,14 @@ Background subtraction (GPU)
    :show-inheritance:
 
 
+Pose plotting (GPU)
+------------------------------
+.. automodule:: simba.data_processors.cuda.pose_plotter_nvenc
+   :noindex:
+   :members:
+   :show-inheritance:
+
+
 Statistics (GPU)
 ------------------------------
 .. automodule:: simba.data_processors.cuda.statistics

@@ -1553,37 +1553,37 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
     video_writer = cv2.VideoWriter(save_path, fourcc, video_meta_data['fps'], (w, h))
     colors = np.array(create_color_palette(pallete_name=colors, increments=data[0].shape[0])).astype(np.int32)
     circle_size_dev = cuda.to_device(circle_size)
-    # colors_dev = cuda.to_device(colors)
-    # resolution_dev = cuda.to_device(np.array([video_meta_data['width'], video_meta_data['height']]))
-    # data = np.ascontiguousarray(data, dtype=np.int32)
-    # img_dev = cuda.device_array((batch_size, h, w, 3), dtype=np.int32)
-    # data_dev = cuda.device_array((batch_size, data.shape[1], 2), dtype=np.int32)
-    # total_timer, video_start_time = SimbaTimer(start=True), time.time()
-    # frm_reader = AsyncVideoFrameReader(video_path=video_path, batch_size=batch_size, max_que_size=3, verbose=False)
-    # frm_reader.start()
-    # for batch_cnt in range(frm_reader.batch_cnt):
-    #     start_img_idx, end_img_idx, batch_frms = get_async_frame_batch(batch_reader=frm_reader, timeout=10)
-    #     video_elapsed_time = str(round(time.time() - video_start_time, 4)) + 's'
-    #     if verbose: print(f'Processing images {start_img_idx} - {end_img_idx} (of {n}; batch count: {batch_cnt+1}/{frm_reader.batch_cnt}, video: {video_meta_data["video_name"]}, elapsed video processing time: {video_elapsed_time})...')
-    #     batch_data = data[start_img_idx:end_img_idx + 1]
-    #     batch_n = batch_frms.shape[0]
-    #     if verbose: print(f'Moving frames {start_img_idx}-{end_img_idx} to device...')
-    #     img_dev[:batch_n].copy_to_device(batch_frms[:batch_n].astype(np.int32))
-    #     data_dev[:batch_n] = cuda.to_device(batch_data[:batch_n])
-    #     del batch_frms; del batch_data
-    #     bpg = (math.ceil(batch_n / THREADS_PER_BLOCK[0]), math.ceil(batch_n / THREADS_PER_BLOCK[2]))
-    #     if verbose: print(f'Creating frames {start_img_idx}-{end_img_idx} ...')
-    #     _pose_plot_kernel[bpg, THREADS_PER_BLOCK](img_dev, data_dev, circle_size_dev, resolution_dev, colors_dev)
-    #     if verbose: print(f'Moving frames to host {start_img_idx}-{end_img_idx} ...')
-    #     batch_frms = img_dev.copy_to_host()
-    #     if verbose: print(f'Writing frames to host {start_img_idx}-{end_img_idx} ...')
-    #     for img_idx in range(0, batch_n):
-    #         video_writer.write(batch_frms[img_idx].astype(np.uint8))
-    # video_writer.release()
-    # total_timer.stop_timer()
-    # frm_reader.kill()
-    # if verbose:
-    #     stdout_success(msg=f'Pose-estimation video saved at {save_path}.', elapsed_time=total_timer.elapsed_time_str)
+    colors_dev = cuda.to_device(colors)
+    resolution_dev = cuda.to_device(np.array([video_meta_data['width'], video_meta_data['height']]))
+    data = np.ascontiguousarray(data, dtype=np.int32)
+    img_dev = cuda.device_array((batch_size, h, w, 3), dtype=np.int32)
+    data_dev = cuda.device_array((batch_size, data.shape[1], 2), dtype=np.int32)
+    total_timer, video_start_time = SimbaTimer(start=True), time.time()
+    frm_reader = AsyncVideoFrameReader(video_path=video_path, batch_size=batch_size, max_que_size=3, verbose=False)
+    frm_reader.start()
+    for batch_cnt in range(frm_reader.batch_cnt):
+        start_img_idx, end_img_idx, batch_frms = get_async_frame_batch(batch_reader=frm_reader, timeout=10)
+        video_elapsed_time = str(round(time.time() - video_start_time, 4)) + 's'
+        if verbose: print(f'Processing images {start_img_idx} - {end_img_idx} (of {n}; batch count: {batch_cnt+1}/{frm_reader.batch_cnt}, video: {video_meta_data["video_name"]}, elapsed video processing time: {video_elapsed_time})...')
+        batch_data = data[start_img_idx:end_img_idx + 1]
+        batch_n = batch_frms.shape[0]
+        if verbose: print(f'Moving frames {start_img_idx}-{end_img_idx} to device...')
+        img_dev[:batch_n].copy_to_device(batch_frms[:batch_n].astype(np.int32))
+        data_dev[:batch_n] = cuda.to_device(batch_data[:batch_n])
+        del batch_frms; del batch_data
+        bpg = (math.ceil(batch_n / THREADS_PER_BLOCK[0]), math.ceil(batch_n / THREADS_PER_BLOCK[2]))
+        if verbose: print(f'Creating frames {start_img_idx}-{end_img_idx} ...')
+        _pose_plot_kernel[bpg, THREADS_PER_BLOCK](img_dev, data_dev, circle_size_dev, resolution_dev, colors_dev)
+        if verbose: print(f'Moving frames to host {start_img_idx}-{end_img_idx} ...')
+        batch_frms = img_dev.copy_to_host()
+        if verbose: print(f'Writing frames to host {start_img_idx}-{end_img_idx} ...')
+        for img_idx in range(0, batch_n):
+            video_writer.write(batch_frms[img_idx].astype(np.uint8))
+    video_writer.release()
+    total_timer.stop_timer()
+    frm_reader.kill()
+    if verbose:
+        stdout_success(msg=f'Pose-estimation video saved at {save_path}.', elapsed_time=total_timer.elapsed_time_str)
 
 
 

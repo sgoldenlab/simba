@@ -545,16 +545,28 @@ def _cuda_are_rows_equal(x, y, idx_1, idx_2):
 def get_nvc_decoder(video_path: Union[str, os.PathLike],
                     output_color_type,
                     gpu_id: int = 0,
-                    use_device_memory: bool = False):
+                    use_device_memory: bool = False,
+                    threaded: bool = False,
+                    buffer_size: int = 16,
+                    start_frame: int = 0):
     """
     Create an NVDEC hardware video decoder for GPU-accelerated frame reading.
+
+    With ``threaded=False`` a random-access :class:`PyNvVideoCodec.SimpleDecoder` is returned
+    (index/seek per frame). With ``threaded=True`` a :class:`PyNvVideoCodec.ThreadedDecoder` is
+    returned, which decodes ``buffer_size`` frames ahead on a background thread and is streamed
+    with ``get_batch_frames(n)``; this overlaps decoding on the NVDEC engine with downstream GPU
+    compute/encode, and is the faster choice for sequential full-video passes.
 
     :param Union[str, os.PathLike] video_path: Path to the video file to decode.
     :param output_color_type: PyNvVideoCodec output colour format for decoded frames.
     :param int gpu_id: Index of the GPU to decode on. Default 0.
     :param bool use_device_memory: If True, keep decoded frames in GPU device memory; otherwise copy to host.
+    :param bool threaded: If True, return a background-decoding ``ThreadedDecoder`` (sequential streaming); if False, a random-access ``SimpleDecoder``. Default False.
+    :param int buffer_size: Number of frames the ``ThreadedDecoder`` decodes ahead (ignored when ``threaded=False``). Default 16.
+    :param int start_frame: Frame index the ``ThreadedDecoder`` starts decoding from, via seeking (ignored when ``threaded=False``). Used to split a video into chunks across multiple NVDEC engines. Default 0.
     :raises SimBAGPUError: If PyNvVideoCodec is not installed, or if no CUDA GPU is available.
-    :return: A configured ``PyNvVideoCodec.SimpleDecoder``.
+    :return: A configured ``PyNvVideoCodec.SimpleDecoder`` or ``PyNvVideoCodec.ThreadedDecoder``.
     """
 
     from simba.utils.checks import (check_file_exist_and_readable,
@@ -567,7 +579,12 @@ def get_nvc_decoder(video_path: Union[str, os.PathLike],
         raise SimBAGPUError(msg='No GPU detected.', source=get_nvc_decoder.__name__)
     check_file_exist_and_readable(file_path=video_path)
     check_int(name=f'{get_nvc_decoder.__name__} gpu_id', value=gpu_id, min_value=0)
+    check_int(name=f'{get_nvc_decoder.__name__} buffer_size', value=buffer_size, min_value=1)
+    check_int(name=f'{get_nvc_decoder.__name__} start_frame', value=start_frame, min_value=0)
     check_instance(source=f'{get_nvc_decoder.__name__} use_device_memory', instance=use_device_memory, accepted_types=(bool,))
+    check_instance(source=f'{get_nvc_decoder.__name__} threaded', instance=threaded, accepted_types=(bool,))
+    if threaded:
+        return nvc.CreateThreadedDecoder(encSource=str(video_path), bufferSize=buffer_size, gpuid=gpu_id, useDeviceMemory=use_device_memory, outputColorType=output_color_type, startFrame=start_frame)
     return nvc.SimpleDecoder(video_path, gpu_id=gpu_id, use_device_memory=use_device_memory, output_color_type=output_color_type)
 
 

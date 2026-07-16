@@ -3305,6 +3305,13 @@ class GeometryMixin(object):
            :width: 800
            :align: center
 
+        .. video:: _static/img/bucket_img_into_grid_points.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            To segment image into **hexagons**, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
            To segment image into **rectangles**, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square`

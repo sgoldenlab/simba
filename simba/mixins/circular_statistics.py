@@ -780,6 +780,13 @@ class CircularStatisticsMixin(object):
            :width: 700
            :align: center
 
+        .. video:: _static/img/circular_correlation.webm
+           :width: 700
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_correlation`
 
