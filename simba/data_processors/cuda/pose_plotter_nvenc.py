@@ -29,8 +29,7 @@ from simba.utils.enums import Formats
 from simba.utils.errors import (FrameRangeError, SimBAGPUError,
                                 SimBAPAckageVersionError)
 from simba.utils.lookups import get_nvdec_count
-from simba.utils.printing import (SimbaTimer, stdout_information,
-                                  stdout_success)
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import get_video_meta_data, read_df
 
 TPB2 = (32, 32, 1)
