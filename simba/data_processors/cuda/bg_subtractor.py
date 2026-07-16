@@ -27,10 +27,8 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_valid_rgb_tuple, check_int, check_str,
                                 check_valid_boolean)
 from simba.utils.enums import Formats
-from simba.utils.errors import (FFMPEGCodecGPUError,
-                                SimBAPAckageVersionError)
-from simba.utils.printing import (SimbaTimer, stdout_information,
-                                  stdout_success)
+from simba.utils.errors import FFMPEGCodecGPUError, SimBAPAckageVersionError
+from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
                                     is_video_color,
                                     read_img_batch_from_video_gpu)
