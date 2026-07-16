@@ -532,7 +532,7 @@ Alternatively, to romove the grid lines data from the drawing window, toggle the
 Similarly, to overlay hexagonal grid lines, which may help you draw straight, toggle the `SHOW HEXAGONAL GRID LINES:` drop-down menu to to the size (in millimeters) which you want your hexagon radii, as in the video below. You can also change their colors if it helps you see better:
 
 <p align="center">
-  <video src="images/roi_tutorial/roi_show_gridline_hexagon_fps_15.webm" width="600" controls>Your browser does not support the video tag.</video>
+  <video src="images/roi_tutorial/roi_show_gridline_hexagon.webm" width="600" controls>Your browser does not support the video tag.</video>
 </p>
 
 ### CHANGE DRAWING WINDOW SIZE

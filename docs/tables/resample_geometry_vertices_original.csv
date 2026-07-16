@@ -1,0 +1,10 @@
+POLYGONS,TIME (S)
+1000,0.0650
+5000,0.3269
+10000,0.6488
+50000,3.2733
+100000,6.5060
+500000,32.7926
+1000000,66.2979
+Intel(R) Core(TM) i9-14900KF (32 logical cores),
+"vertice_cnt=20, input polygon vertices=12",

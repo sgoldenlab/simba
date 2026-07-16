@@ -2020,9 +2020,11 @@ class GeometryMixin(object):
         """
         Determine the relative position (left vs right) of a static point with respect to multiple lines.
 
-        .. image:: _static/img/static_point_lineside.png
-           :alt: Static point lineside
-           :width: 400
+        .. video:: _static/img/static_point_lineside.webm
+           :width: 700
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         .. note::
@@ -3465,7 +3467,7 @@ class GeometryMixin(object):
            :width: 500
            :align: center
 
-        .. video:: _static/img/roi_show_gridline_hexagon_fps_15.webm
+        .. video:: _static/img/roi_show_gridline_hexagon.webm
            :width: 500
            :autoplay:
            :loop:
@@ -4036,6 +4038,13 @@ class GeometryMixin(object):
            :width: 600
            :align: center
 
+        .. video:: _static/img/locate_line_point.webm
+           :width: 600
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
 
         :param Union[LineString, np.ndarray] path: A LineString or a 2D array with keypoints across time.
         :param Union[LineString, Polygon, Point] geometry: A geometry of intrest.
@@ -4136,6 +4145,13 @@ class GeometryMixin(object):
         The Fréchet Distance measures the dissimilarity between two continuous
         curves or trajectories represented as sequences of points in a 2-dimensional
         space.
+
+        .. video:: _static/img/linear_frechet_distance.webm
+           :width: 700
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
 
         .. image:: _static/img/linear_frechet_distance.webp
            :alt: Linear frechet distance

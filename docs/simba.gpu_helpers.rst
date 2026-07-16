@@ -40,6 +40,14 @@ Image (GPU)
    :show-inheritance:
 
 
+Background subtraction (GPU)
+------------------------------
+.. automodule:: simba.data_processors.cuda.bg_subtractor
+   :noindex:
+   :members:
+   :show-inheritance:
+
+
 Statistics (GPU)
 ------------------------------
 .. automodule:: simba.data_processors.cuda.statistics
