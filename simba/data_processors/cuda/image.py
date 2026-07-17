@@ -1503,6 +1503,7 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
        :align: center
 
     .. seealso::
+       For a faster, fully on-GPU version (NVDEC decode + NVENC encode), see :class:`simba.data_processors.cuda.pose_plotter_nvenc.PosePlotterNVENC`.
        For CPU based methods, see :func:`~simba.plotting.path_plotter.PathPlotterSingleCore` and :func:`~simba.plotting.path_plotter_mp.PathPlotterMulticore`.
 
     .. csv-table::

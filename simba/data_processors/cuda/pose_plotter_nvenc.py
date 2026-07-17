@@ -88,6 +88,14 @@ class PosePlotterNVENC(object):
        :align: center
        :header-rows: 1
 
+    .. csv-table:: Multi-worker scaling (100K frames, 1280x1024, 7 body-parts, RTX PRO 6000 Blackwell)
+       :header: Workers, Time (s), FPS, Speedup
+       :widths: 20, 20, 20, 20
+       :align: center
+
+       1, 100.7, 993, 1.00x
+       4, 55.8, 1794, 1.81x
+
     :param Union[str, os.PathLike, np.ndarray] data: Path to a CSV with pose-estimation data, or a 3D array (n_frames, n_bodyparts, 2) of locations.
     :param Union[str, os.PathLike] video_path: Path to the video the ``data`` was pose-estimated on.
     :param Union[str, os.PathLike] save_path: Output video path.
@@ -246,5 +254,4 @@ class PosePlotterNVENC(object):
 #     SAVE_PATH = r"E:\troubleshooting\mitra_emergence_hour\project_folder\gpu_visualization\Box1_180mISOcontrol_Females.mp4"
 #     plotter = PosePlotterNVENC(data=DATA_PATH, video_path=VIDEO_PATH, save_path=SAVE_PATH)
 #     plotter.run()
-
 

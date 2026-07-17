@@ -221,6 +221,13 @@ Pose-estimation plotter
    :undoc-members:
    :show-inheritance:
 
+Pose-estimation plotter - GPU (NVDEC/NVENC)
+-------------------------------------------
+
+.. autoclass:: simba.data_processors.cuda.pose_plotter_nvenc.PosePlotterNVENC
+   :members:
+   :show-inheritance:
+
 Skeleton video creator
 -----------------------------------------
 
