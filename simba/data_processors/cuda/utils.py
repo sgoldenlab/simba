@@ -41,8 +41,8 @@ Notes:
 - Several helpers mutate their argument in place (e.g. :func:`_cuda_bubble_sort`,
   :func:`_cuda_median`, :func:`_cuda_subtract_2d`) — pass a copy if you need the input
   preserved.
-- The only **host-callable** entry point is :func:`get_nvc_decoder`, which builds an
-  NVDEC hardware video decoder from ordinary Python code.
+- The **host-callable** entry points are :func:`get_nvc_decoder` and :func:`get_nvc_encoder`,
+  which build NVDEC/NVENC hardware video decoder/encoder objects from ordinary Python code.
 """
 
 import math
@@ -543,7 +543,7 @@ def _cuda_are_rows_equal(x, y, idx_1, idx_2):
 
 
 def get_nvc_decoder(video_path: Union[str, os.PathLike],
-                    output_color_type,
+                    output_color_type=None,
                     gpu_id: int = 0,
                     use_device_memory: bool = False,
                     threaded: bool = False,
@@ -559,7 +559,7 @@ def get_nvc_decoder(video_path: Union[str, os.PathLike],
     compute/encode, and is the faster choice for sequential full-video passes.
 
     :param Union[str, os.PathLike] video_path: Path to the video file to decode.
-    :param output_color_type: PyNvVideoCodec output colour format for decoded frames.
+    :param PyNvVideoCodec.OutputColorType output_color_type: Colour format of the decoded frames. Pass a member of the ``PyNvVideoCodec.OutputColorType`` enum, typically ``nvc.OutputColorType.RGB`` (interleaved HWC, shape ``(H, W, 3)``) or ``nvc.OutputColorType.RGBP`` (planar CHW, shape ``(3, H, W)``). Defaults to ``None``, which is resolved to ``nvc.OutputColorType.RGB`` inside the function - the default is ``None`` rather than the enum itself because ``PyNvVideoCodec`` is an optional dependency (``nvc`` may be ``None`` at import), so the enum cannot be referenced in the signature.
     :param int gpu_id: Index of the GPU to decode on. Default 0.
     :param bool use_device_memory: If True, keep decoded frames in GPU device memory; otherwise copy to host.
     :param bool threaded: If True, return a background-decoding ``ThreadedDecoder`` (sequential streaming); if False, a random-access ``SimpleDecoder``. Default False.
@@ -567,6 +567,17 @@ def get_nvc_decoder(video_path: Union[str, os.PathLike],
     :param int start_frame: Frame index the ``ThreadedDecoder`` starts decoding from, via seeking (ignored when ``threaded=False``). Used to split a video into chunks across multiple NVDEC engines. Default 0.
     :raises SimBAGPUError: If PyNvVideoCodec is not installed, or if no CUDA GPU is available.
     :return: A configured ``PyNvVideoCodec.SimpleDecoder`` or ``PyNvVideoCodec.ThreadedDecoder``.
+
+    :example:
+    >>> import PyNvVideoCodec as nvc
+    >>> from numba import cuda
+    >>> import torch
+    >>> # Random-access decode (default RGB output), read one frame into a CUDA device array:
+    >>> decoder = get_nvc_decoder(video_path='video.mp4', use_device_memory=True)
+    >>> frame = cuda.as_cuda_array(torch.from_dlpack(decoder[0]))   # (H, W, 3) uint8 on GPU
+    >>> # Sequential streaming decode across a background thread, from frame 500:
+    >>> decoder = get_nvc_decoder(video_path='video.mp4', output_color_type=nvc.OutputColorType.RGB, use_device_memory=True, threaded=True, buffer_size=32, start_frame=500)
+    >>> batch = decoder.get_batch_frames(16)
     """
 
     from simba.utils.checks import (check_file_exist_and_readable,
@@ -577,6 +588,8 @@ def get_nvc_decoder(video_path: Union[str, os.PathLike],
         raise SimBAGPUError(msg='PyNvVideoCodec is not installed. Install it to use GPU accelerated video decoding.', source=get_nvc_decoder.__name__)
     if not _is_cuda_available()[0]:
         raise SimBAGPUError(msg='No GPU detected.', source=get_nvc_decoder.__name__)
+    if output_color_type is None:
+        output_color_type = nvc.OutputColorType.RGB
     check_file_exist_and_readable(file_path=video_path)
     check_int(name=f'{get_nvc_decoder.__name__} gpu_id', value=gpu_id, min_value=0)
     check_int(name=f'{get_nvc_decoder.__name__} buffer_size', value=buffer_size, min_value=1)
@@ -586,6 +599,44 @@ def get_nvc_decoder(video_path: Union[str, os.PathLike],
     if threaded:
         return nvc.CreateThreadedDecoder(encSource=str(video_path), bufferSize=buffer_size, gpuid=gpu_id, useDeviceMemory=use_device_memory, outputColorType=output_color_type, startFrame=start_frame)
     return nvc.SimpleDecoder(video_path, gpu_id=gpu_id, use_device_memory=use_device_memory, output_color_type=output_color_type)
+
+
+def get_nvc_encoder(width: int,
+                    height: int,
+                    codec: str = 'h264',
+                    fmt: str = 'ARGB',
+                    use_cpu_input_buffer: bool = False):
+    """
+    Create an NVENC hardware video encoder for GPU-accelerated frame encoding.
+
+    The counterpart of :func:`get_nvc_decoder`. The returned encoder's ``Encode(frame)`` takes one
+    frame (a GPU device tensor when ``use_cpu_input_buffer=False``) and returns an elementary-stream
+    bitstream chunk (empty until the encoder has buffered enough frames); call ``EndEncode()`` at the
+    end to flush the tail. The raw elementary stream is then muxed into a container with
+    ``ffmpeg -c copy``.
+
+    :param int width: Frame width in pixels.
+    :param int height: Frame height in pixels.
+    :param str codec: NVENC codec, one of 'h264', 'hevc', 'av1'. Default 'h264'.
+    :param str fmt: Input surface format the encoder expects (e.g. 'ARGB', 'NV12'). Default 'ARGB'.
+    :param bool use_cpu_input_buffer: If True, frames are supplied from host memory; if False (default), from GPU device memory.
+    :raises SimBAGPUError: If PyNvVideoCodec is not installed, or if no CUDA GPU is available.
+    :return: A configured ``PyNvVideoCodec`` encoder.
+    """
+
+    from simba.utils.checks import check_instance, check_int, check_str
+    from simba.utils.errors import SimBAGPUError
+
+    if nvc is None:
+        raise SimBAGPUError(msg='PyNvVideoCodec is not installed. Install it to use GPU accelerated video encoding.', source=get_nvc_encoder.__name__)
+    if not _is_cuda_available()[0]:
+        raise SimBAGPUError(msg='No GPU detected.', source=get_nvc_encoder.__name__)
+    check_int(name=f'{get_nvc_encoder.__name__} width', value=width, min_value=1)
+    check_int(name=f'{get_nvc_encoder.__name__} height', value=height, min_value=1)
+    check_str(name=f'{get_nvc_encoder.__name__} codec', value=codec, options=('h264', 'hevc', 'av1'))
+    check_str(name=f'{get_nvc_encoder.__name__} fmt', value=fmt)
+    check_instance(source=f'{get_nvc_encoder.__name__} use_cpu_input_buffer', instance=use_cpu_input_buffer, accepted_types=(bool,))
+    return nvc.CreateEncoder(width, height, fmt, use_cpu_input_buffer, codec=codec)
 
 
 

@@ -421,6 +421,8 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike],
 
     .. seealso::
        For multicore method, see :func:`simba.video_processors.video_processing.clahe_enhance_video_mp`.
+       For a GPU (NVDEC -> CUDA -> NVENC), colour-preserving version, see
+       :class:`~simba.data_processors.cuda.clahe_nvenc.ClaheNVENC`.
 
     .. video:: _static/img/clahe_enhance_video.webm
        :width: 800
@@ -532,6 +534,8 @@ def clahe_enhance_video_mp(file_path: Union[str, os.PathLike],
 
     .. seealso::
        For single core method, see :func:`simba.video_processors.video_processing.clahe_enhance_video`.
+       For a GPU (NVDEC -> CUDA -> NVENC), colour-preserving version, see
+       :class:`~simba.data_processors.cuda.clahe_nvenc.ClaheNVENC`.
 
     .. video:: _static/img/clahe_enhance_video.webm
        :width: 800

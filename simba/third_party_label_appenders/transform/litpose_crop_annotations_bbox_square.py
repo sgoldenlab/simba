@@ -311,8 +311,8 @@ class CropLPAnnotationsBboxSquare:
 
 
 #if __name__ == "__main__":
-# cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"H:\sina\project_0609_5cam_0710\project_0609_5cam_0710",
-#                                               save_dir=r"H:\sina\project_0609_5cam_0710\project_0609_5cam_0710_cropped",
+# cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"H:\sina\project_0609_5cam_0718\project_0609_5cam_0718",
+#                                               save_dir=r"H:\sina\project_0609_5cam_0718_cropped",
 #                                               bbox_pad_frac=0.25,
 #                                               visualize=100,
 #                                               verbose=True)

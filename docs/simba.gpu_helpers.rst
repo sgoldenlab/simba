@@ -56,6 +56,30 @@ Pose plotting (GPU)
    :show-inheritance:
 
 
+Greyscale conversion (GPU)
+------------------------------
+.. automodule:: simba.data_processors.cuda.greyscale_nvenc
+   :noindex:
+   :members:
+   :show-inheritance:
+
+
+CLAHE (GPU)
+------------------------------
+.. automodule:: simba.data_processors.cuda.clahe_nvenc
+   :noindex:
+   :members:
+   :show-inheritance:
+
+
+Egocentric rotation (GPU)
+------------------------------
+.. automodule:: simba.data_processors.cuda.egocentric_rotator_nvenc
+   :noindex:
+   :members:
+   :show-inheritance:
+
+
 Statistics (GPU)
 ------------------------------
 .. automodule:: simba.data_processors.cuda.statistics

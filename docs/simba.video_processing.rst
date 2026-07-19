@@ -125,6 +125,42 @@ Egocentrically rotate videos
 
 
 
+Egocentrically rotate videos - GPU (NVDEC/NVENC)
+
+-----------------------------------------------------------------------
+
+
+
+.. autoclass:: simba.data_processors.cuda.egocentric_rotator_nvenc.EgocentricRotatorNVENC
+   :members:
+   :show-inheritance:
+
+
+
+Greyscale videos - GPU (NVDEC/NVENC)
+
+-----------------------------------------------------------------------
+
+
+
+.. autoclass:: simba.data_processors.cuda.greyscale_nvenc.GreyscaleNVENC
+   :members:
+   :show-inheritance:
+
+
+
+CLAHE videos - GPU (NVDEC/NVENC)
+
+-----------------------------------------------------------------------
+
+
+
+.. autoclass:: simba.data_processors.cuda.clahe_nvenc.ClaheNVENC
+   :members:
+   :show-inheritance:
+
+
+
 Asynchronous frame reader
 
 ------------------------------------------------

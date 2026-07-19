@@ -2104,6 +2104,13 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
+        .. video:: _static/img/extend_line_to_bounding_box_edges.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         :param np.ndarray line_points: Coordinates of the line segment's two points. Two rows and each row represents a point (x, y).
         :param np.ndarray bounding_box: Bounding box coordinates in the format (min_x, min_y, max_x, max_y).
         :return: Intersection points where the extended line crosses the bounding box edges. The shape of the array is (2, 2), where each row represents a point (x, y).
@@ -2111,8 +2118,8 @@ class GeometryMixin(object):
 
         :example:
 
-        >>> line_points = np.array([[25, 25], [45, 25]]).astype(np.float32)
-        >>> bounding_box = np.array([0, 0, 50, 50]).astype(np.float32)
+        >>> line_points = np.array([[25, 25], [45, 25]]).astype(np.int64)
+        >>> bounding_box = np.array([0, 0, 50, 50]).astype(np.int64)
         >>> GeometryMixin().extend_line_to_bounding_box_edges(line_points, bounding_box)
         >>> [[ 0. 25.] [50. 25.]]
         """
@@ -3255,6 +3262,13 @@ class GeometryMixin(object):
         .. image:: _static/img/adjust_geometry_locations.png
            :alt: Adjust geometry locations
            :width: 600
+           :align: center
+
+        .. video:: _static/img/adjust_geometry_locations.webm
+           :width: 500
+           :autoplay:
+           :loop:
+           :muted:
            :align: center
 
         :param  List[Polygon] geometries: List of :obj:`shapely.geometry.Polygon` objects which locations are to be adjusted.

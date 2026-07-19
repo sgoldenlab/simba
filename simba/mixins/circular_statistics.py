@@ -177,6 +177,13 @@ class CircularStatisticsMixin(object):
            :width: 400
            :align: center
 
+        .. video:: _static/img/circular_mean.webm
+           :width: 450
+           :autoplay:
+           :loop:
+           :muted:
+           :align: center
+
         .. seealso::
            :func:`simba.data_processors.cuda.circular_statistics.sliding_circular_mean`,
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_mean`

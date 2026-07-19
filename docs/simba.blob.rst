@@ -65,6 +65,16 @@ GPU-accelerated background subtraction using CUDA for faster processing on NVIDI
 
 .. autofunction:: simba.data_processors.cuda.image.bg_subtraction_cuda
 
+Background Subtraction: GPU (NVDEC/NVENC)
+-----------------------------------------------------------------------
+
+Fully on-GPU background subtraction (NVDEC decode -> CUDA kernel -> NVENC encode), with a
+threaded ffmpeg/cv2 fallback when PyNvVideoCodec is unavailable.
+
+.. autoclass:: simba.data_processors.cuda.bg_subtractor.BackgroundSubtractorCUDA
+   :members:
+   :show-inheritance:
+
 
 Compute Average Frame
 -----------------------------------------------------------------------

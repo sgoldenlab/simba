@@ -84,6 +84,7 @@ class EgocentricVideoRotator():
        :align: center
 
     .. seealso::
+       For a GPU (NVDEC -> CUDA -> NVENC) version, see :class:`~simba.data_processors.cuda.egocentric_rotator_nvenc.EgocentricRotatorNVENC`.
        To perform joint egocentric alignment of both pose and video, or pose only, use :func:`~simba.data_processors.egocentric_aligner.EgocentricalAligner`.
        To produce rotation vectors, use :func:`~simba.utils.data.egocentrically_align_pose_numba` or :func:`~simba.utils.data.egocentrically_align_pose`.
 
