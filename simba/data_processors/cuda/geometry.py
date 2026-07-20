@@ -8,6 +8,7 @@ from numba import cuda, njit
 
 from simba.utils.checks import check_float, check_valid_array
 from simba.utils.enums import Formats
+from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer
 
 try:
@@ -634,3 +635,87 @@ def directionality_to_nonstatic_target(left_ear: np.ndarray,
 
 
 
+
+@cuda.jit()
+def _min_rotated_rect_kernel(pts, n_pts, results):
+    """One thread per shape. ``pts`` (n_shapes, max_pts, 2), ``n_pts`` (n_shapes,) valid-point counts,
+    ``results`` (n_shapes, 4, 2) OBB corners: (minu,minv),(maxu,minv),(maxu,maxv),(minu,maxv)."""
+    i = cuda.grid(1)
+    if i >= pts.shape[0]:
+        return
+    m = n_pts[i]
+    if m < 2:
+        return
+    best_area = 1e18
+    best_ux = 1.0; best_uy = 0.0
+    best_minu = 0.0; best_maxu = 0.0; best_minv = 0.0; best_maxv = 0.0
+    for a in range(m):
+        for b in range(a + 1, m):
+            ex = pts[i, b, 0] - pts[i, a, 0]
+            ey = pts[i, b, 1] - pts[i, a, 1]
+            L = math.sqrt(ex * ex + ey * ey)
+            if L < 1e-9:
+                continue
+            ux = ex / L; uy = ey / L
+            minu = 1e18; maxu = -1e18; minv = 1e18; maxv = -1e18
+            for k in range(m):
+                px = pts[i, k, 0]; py = pts[i, k, 1]
+                pu = px * ux + py * uy          # projection on edge axis
+                pv = -px * uy + py * ux         # projection on perpendicular axis
+                if pu < minu: minu = pu
+                if pu > maxu: maxu = pu
+                if pv < minv: minv = pv
+                if pv > maxv: maxv = pv
+            area = (maxu - minu) * (maxv - minv)
+            if area < best_area:
+                best_area = area
+                best_ux = ux; best_uy = uy
+                best_minu = minu; best_maxu = maxu; best_minv = minv; best_maxv = maxv
+    if best_area >= 1e18:
+        return
+    cu0 = best_minu; cu1 = best_maxu; cv0 = best_minv; cv1 = best_maxv
+    ux = best_ux; uy = best_uy
+    results[i, 0, 0] = cu0 * ux - cv0 * uy; results[i, 0, 1] = cu0 * uy + cv0 * ux
+    results[i, 1, 0] = cu1 * ux - cv0 * uy; results[i, 1, 1] = cu1 * uy + cv0 * ux
+    results[i, 2, 0] = cu1 * ux - cv1 * uy; results[i, 2, 1] = cu1 * uy + cv1 * ux
+    results[i, 3, 0] = cu0 * ux - cv1 * uy; results[i, 3, 1] = cu0 * uy + cv1 * ux
+
+
+def minimum_rotated_rectangle_cuda(data: np.ndarray, n_pts: Optional[np.ndarray] = None) -> np.ndarray:
+    """
+    Compute the minimum rotated rectangle (oriented bounding box, OBB) of each point set in a batch, on the GPU.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/minimum_rotated_rectangle_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    :param np.ndarray data: 3D array ``(n_shapes, n_points, 2)`` of 2D (x, y) points. Usually ``n_shapes`` is the number of video frames and ``n_points`` the number of body-parts, i.e. a pose dataframe reshaped to ``(len(df), n_bodyparts, 2)``. One rectangle is computed per shape (per frame).
+    :param Optional[np.ndarray] n_pts: Only for ragged/padded input. A ``(n_shapes,)`` array giving how many of the ``n_points`` are actually valid in each shape (the rest being padding). Leave ``None`` (default) for normal fixed-body-part data - then all ``n_points`` are used for every shape.
+    :return: ``(n_shapes, 4, 2)`` int32 array of the four OBB corner (x, y) coordinates per shape, rounded to whole pixels (matching the CPU ``minimum_rotated_rectangle(..., return_type='array')``).
+    :rtype: np.ndarray
+
+    :example:
+    >>> df = read_df(file_path='.../Box1.csv')
+    >>> bp_cols = [x for x in df.columns if not x.endswith('_p')]
+    >>> data = df[bp_cols].values.reshape(len(df), len(bp_cols) // 2, 2)   # (n_frames, n_bodyparts, 2)
+    >>> rects = minimum_rotated_rectangle_cuda(data=data)                  # (n_frames, 4, 2) int32
+    """
+    check_valid_array(data=data, source=f'{minimum_rotated_rectangle_cuda.__name__} data', accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    if data.shape[2] != 2:
+        raise InvalidInputError(msg=f'data must be (n_shapes, n_points, 2); got last dim {data.shape[2]}', source=minimum_rotated_rectangle_cuda.__name__)
+    data = np.ascontiguousarray(data).astype(np.float32)
+    n, m, _ = data.shape
+    if n_pts is None:
+        n_pts = np.full(n, m, dtype=np.int32)
+    n_pts = np.ascontiguousarray(n_pts).astype(np.int32)
+    bpg = (n + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
+    pts_dev = cuda.to_device(data)
+    npts_dev = cuda.to_device(n_pts)
+    results = cuda.device_array((n, 4, 2), dtype=np.float32)
+    results.copy_to_device(np.zeros((n, 4, 2), dtype=np.float32))
+    _min_rotated_rect_kernel[bpg, THREADS_PER_BLOCK](pts_dev, npts_dev, results)
+    return np.round(results.copy_to_host()).astype(np.int32)

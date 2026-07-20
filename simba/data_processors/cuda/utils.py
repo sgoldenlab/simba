@@ -542,6 +542,30 @@ def _cuda_are_rows_equal(x, y, idx_1, idx_2):
     return True
 
 
+@cuda.jit(device=True)
+def _cuda_point_to_segment_dist(px, py, ax, ay, bx, by):
+    """
+    Device: shortest Euclidean distance from point (px, py) to the line segment (ax, ay)-(bx, by).
+
+    Used e.g. to rasterise polygon/line outlines on the GPU (a pixel is "on" an outline of thickness
+    ``t`` when this distance is <= ``t / 2``).
+
+    :return: Distance from the point to the nearest location on the segment.
+    """
+    abx, aby = bx - ax, by - ay
+    denom = abx * abx + aby * aby
+    if denom == 0.0:
+        dx, dy = px - ax, py - ay
+        return math.sqrt(dx * dx + dy * dy)
+    t = ((px - ax) * abx + (py - ay) * aby) / denom
+    if t < 0.0:
+        t = 0.0
+    elif t > 1.0:
+        t = 1.0
+    dx, dy = px - (ax + t * abx), py - (ay + t * aby)
+    return math.sqrt(dx * dx + dy * dy)
+
+
 def get_nvc_decoder(video_path: Union[str, os.PathLike],
                     output_color_type=None,
                     gpu_id: int = 0,

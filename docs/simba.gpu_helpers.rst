@@ -80,6 +80,14 @@ Egocentric rotation (GPU)
    :show-inheritance:
 
 
+Geometry overlay (GPU)
+------------------------------
+.. automodule:: simba.data_processors.cuda.geometry_plotter_nvenc
+   :noindex:
+   :members:
+   :show-inheritance:
+
+
 Statistics (GPU)
 ------------------------------
 .. automodule:: simba.data_processors.cuda.statistics

@@ -133,6 +133,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
     A class for creating overlay geometry visualization videos based on provided geometries and video name.
 
     .. seealso::
+       For a GPU (NVDEC -> CUDA -> NVENC) version, see :class:`~simba.data_processors.cuda.geometry_plotter_nvenc.GeometryPlotterNVENC`.
        To quickly create static geometries on a white background (useful for troubleshooting unexpected geometries), see :func:`simba.mixins.geometry_mixin.GeometryMixin.view_shapes`
        and :func:`simba.mixins.geometry_mixin.GeometryMixin.geometry_video`
 

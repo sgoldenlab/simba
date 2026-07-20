@@ -277,6 +277,13 @@ Geometry plotter (generic)
    :members:
    :show-inheritance:
 
+Geometry plotter - GPU (NVDEC/NVENC)
+---------------------------------------------------------------
+
+.. autoclass:: simba.data_processors.cuda.geometry_plotter_nvenc.GeometryPlotterNVENC
+   :members:
+   :show-inheritance:
+
 
 Spontaneous alternation plotter
 ---------------------------------------------------------------
