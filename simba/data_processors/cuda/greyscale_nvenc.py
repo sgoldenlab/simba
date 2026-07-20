@@ -30,8 +30,9 @@ except Exception:
 from simba.data_processors.cuda.utils import (_cuda_luminance_pixel_to_grey,
                                               get_nvc_decoder, get_nvc_encoder)
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists, check_nvidea_gpu_available,
-                                check_str, check_valid_boolean, is_video_color)
+                                check_if_dir_exists,
+                                check_nvidea_gpu_available, check_str,
+                                check_valid_boolean, is_video_color)
 from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
