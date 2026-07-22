@@ -9,12 +9,14 @@ from simba.data_processors.cuda.utils import (_cuda_diff, _cuda_mean,
                                               _cuda_nanvariance, _cuda_std,
                                               _euclid_dist_2d,
                                               _is_cuda_available)
-from simba.utils.checks import check_float, check_int, check_valid_array
+from simba.utils.checks import (check_float, check_int, check_valid_array,
+                                check_valid_boolean)
 from simba.utils.enums import Formats
 from simba.utils.errors import SimBAGPUError
 
 THREADS_PER_BLOCK = 1024
 MAX_HJORTH_WINDOW = 512
+MAX_GRID_Y = 65535   # CUDA grid y-dimension limit (windows are launched on grid-y)
 
 @cuda.jit(device=True)
 def _count_at_threshold(x: np.ndarray, inverse: int, threshold: float):
@@ -350,3 +352,89 @@ def sliding_hjort_parameters_gpu(data: np.ndarray, window_sizes: np.ndarray, sam
     bpg = (grid_x, grid_y)
     _sliding_hjort_parameters_kernel[bpg, THREADS_PER_BLOCK](data_dev, window_sizes_dev, results_dev)
     return results_dev.copy_to_host()
+
+@cuda.jit()
+def _sliding_xcorr_kernel(x, y, window_sizes, lag, normalize, results):
+    """One thread per (storage-row ri, window wi). Window ends at frame ri (x[ri-W+1 : ri+1]);
+    the y-window is shifted back by ``lag`` frames."""
+    ri, wi = cuda.grid(2)
+    N = x.shape[0]
+    if ri >= N or wi >= window_sizes.shape[0]:
+        return
+    W = window_sizes[wi]
+    if W < 1 or ri < W - 1:
+        return
+    l1 = ri - W + 1
+    l2 = l1 - lag
+    if l2 < 0:
+        l2 = 0
+    sx = 0.0; sxx = 0.0; sy = 0.0; syy = 0.0; sxy = 0.0
+    for k in range(W):
+        xv = x[l1 + k]
+        yv = y[l2 + k]
+        sx += xv; sxx += xv * xv
+        sy += yv; syy += yv * yv
+        sxy += xv * yv
+    if normalize:
+        mx = sx / W; my = sy / W
+        varx = sxx / W - mx * mx
+        vary = syy / W - my * my
+        stdx = math.sqrt(varx) if varx > 0.0 else 0.0
+        stdy = math.sqrt(vary) if vary > 0.0 else 0.0
+        denom = stdx * W * stdy
+        results[ri, wi] = 0.0 if denom == 0.0 else (sxy - W * mx * my) / denom
+    else:
+        results[ri, wi] = sxy
+
+
+def sliding_two_signal_crosscorrelation_cuda(x: np.ndarray, y: np.ndarray, windows: np.ndarray,
+                                             sample_rate: float, normalize: bool = True, lag: float = 0.0) -> np.ndarray:
+    """
+    Compute the lagged cross-correlation between two signals over each sliding window (for every window length
+    and frame) - an x-window against a ``lag``-shifted y-window - on the GPU.
+
+    .. note::
+       Matches the CPU function to float precision. With ``normalize=True`` each window is z-normalized before
+       correlating. Frames before the first full window are 0.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_two_signal_crosscorrelation_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numba) version: :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_two_signal_crosscorrelation`.
+
+    :param np.ndarray x: First 1D signal.
+    :param np.ndarray y: Second 1D signal (same length as ``x``).
+    :param np.ndarray windows: 1D array of window lengths in seconds.
+    :param float sample_rate: Sampling rate (Hz / FPS).
+    :param bool normalize: If True, z-normalize each window before correlating (normalized cross-correlation). Default True.
+    :param float lag: Time lag (seconds) applied to ``y``. 0.0 = no lag. Default 0.0.
+    :return: 2D float32 array (len(x), len(windows)); rows before the first full window are 0.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> sliding_two_signal_crosscorrelation_cuda(x, y, windows=np.array([1.0, 1.2]), sample_rate=10, normalize=True, lag=0.0)
+    """
+    check_valid_array(data=x, source=f'{sliding_two_signal_crosscorrelation_cuda.__name__} x', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=y, source=f'{sliding_two_signal_crosscorrelation_cuda.__name__} y', accepted_ndims=(1,), accepted_shapes=[(x.shape[0],)], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=windows, source=f'{sliding_two_signal_crosscorrelation_cuda.__name__} windows', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_boolean(value=[normalize], source=f'{sliding_two_signal_crosscorrelation_cuda.__name__} normalize')
+    n, nw = x.shape[0], windows.shape[0]
+    if nw > MAX_GRID_Y:
+        raise SimBAGPUError(msg=f'{sliding_two_signal_crosscorrelation_cuda.__name__} supports at most {MAX_GRID_Y} windows (CUDA grid limit); got {nw}.', source=sliding_two_signal_crosscorrelation_cuda.__name__)
+    window_sizes = (np.asarray(windows) * sample_rate).astype(np.int32)
+    lag_frm = int(sample_rate * lag)
+    x_dev = cuda.to_device(np.ascontiguousarray(x).astype(np.float32))
+    y_dev = cuda.to_device(np.ascontiguousarray(y).astype(np.float32))
+    ws_dev = cuda.to_device(window_sizes)
+    results = cuda.to_device(np.zeros((n, nw), dtype=np.float32))
+    tpb = (128, 1)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(nw / tpb[1]))
+    _sliding_xcorr_kernel[bpg, tpb](x_dev, y_dev, ws_dev, lag_frm, normalize, results)
+    return results.copy_to_host()

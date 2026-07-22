@@ -1,0 +1,9 @@
+N PAIRS,INPUT,MEAN (S),SD (S),PAIRS/S
+**10k**,tiny,0.0012,0.0001,**8.6m**
+**100k**,4mb,0.0060,0.0004,**16.7m**
+**1m**,0.2gb,0.0520,0.0003,**19.2m**
+**10m**,1.6gb,0.5440,0.0068,**18.4m**
+**50m**,8gb,3.2388,0.6321,**15.4m**
+NVIDIA GeForce RTX 4070 (12GB),,,
+6-vertex polygon pairs; mean +/- SD of 3 runs,,,
+50m~8GB input is the in-VRAM ceiling (100m spills to paging),,,

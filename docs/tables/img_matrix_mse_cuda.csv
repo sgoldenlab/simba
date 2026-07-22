@@ -1,0 +1,11 @@
+N IMAGES (128x128),OUTPUT,MEAN (S),SD (S),PAIRS/S
+**100**,40kb,0.0052,0.0001,**1.9m**
+**500**,1mb,0.0345,0.0018,**7.3m**
+**1k**,4mb,0.1107,0.0022,**9.0m**
+**2k**,16mb,0.3489,0.0030,**11.5m**
+**5k**,100mb,2.0593,0.0073,**12.1m**
+**10k**,0.4gb,8.0415,0.0936,**12.4m**
+**20k**,1.6gb,31.6372,0.1203,**12.6m**
+NVIDIA GeForce RTX 4070 (12GB),,,,
+128x128 greyscale; mean +/- SD of 3 runs; ~15x vs CPU jit,,,,
+compute-bound O(n^2 * pixels): time grows n^2 (memory allows more but 20k already ~32s),,,,

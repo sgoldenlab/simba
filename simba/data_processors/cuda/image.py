@@ -1675,3 +1675,215 @@ if __name__ == "__main__":
 # get_video_meta_data(VIDEO_PATH)
 # #
 # bg_subtraction_cuda(video_path=VIDEO_PATH, avg_frm=avg_frm, save_path=SAVE_PATH, threshold=70)
+
+
+@cuda.jit()
+def _xcorr_kernel(flat, means, css, results):
+    """One thread per (i, j) image pair. ``flat`` (n, P) float32; ``means``/``css`` per image (n,)."""
+    i, j = cuda.grid(2)
+    n, P = flat.shape[0], flat.shape[1]
+    if i >= n or j >= n or j < i:
+        return
+    if i == j:
+        results[i, j] = 1.0
+        return
+    dot = 0.0
+    for p in range(P):
+        dot += flat[i, p] * flat[j, p]
+    num = dot - P * means[i] * means[j]
+    den = math.sqrt(css[i] * css[j])
+    val = 0.0 if den == 0.0 else num / den
+    results[i, j] = val
+    results[j, i] = val
+
+
+def cross_correlation_matrix_cuda(imgs: np.ndarray) -> np.ndarray:
+    """
+    Compute the normalized cross-correlation (NCC, in [-1, 1]) between every pair of images in a stack, on the GPU.
+
+    .. note::
+       Matches the CPU function to ~1e-6, and (unlike the CPU version, which is uint8-only) accepts any numeric
+       dtype. Output is a dense (n_images, n_images) float32 matrix, so memory scales with n^2 (independent of
+       image size); large image counts are bounded by GPU memory.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/cross_correlation_matrix_cuda.csv
+       :widths: 20, 20, 20, 20, 20
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numba) version: :func:`simba.mixins.image_mixin.ImageMixin.cross_correlation_matrix`.
+
+    :param np.ndarray imgs: 3D array (n_images, H, W) - greyscale image stack.
+    :return: (n, n) float32 cross-correlation matrix; [i, j] is the NCC between image i and image j.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> m = cross_correlation_matrix_cuda(imgs)   # imgs: (n, H, W) greyscale
+    """
+    check_valid_array(data=imgs, source=f'{cross_correlation_matrix_cuda.__name__} imgs', accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    n = imgs.shape[0]
+    flat = np.ascontiguousarray(imgs.reshape(n, -1)).astype(np.float32)
+    P = flat.shape[1]
+    means = flat.mean(axis=1).astype(np.float32)
+    css = (np.einsum('ij,ij->i', flat, flat) - P * means.astype(np.float64) ** 2).astype(np.float32)
+    flat_dev = cuda.to_device(flat)
+    means_dev = cuda.to_device(means)
+    css_dev = cuda.to_device(css)
+    results = cuda.device_array((n, n), dtype=np.float32)
+    tpb = (16, 16)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(n / tpb[1]))
+    _xcorr_kernel[bpg, tpb](flat_dev, means_dev, css_dev, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _img_mse_kernel(flat, denom, results):
+    """One thread per (i, j) image pair. ``flat`` (n, P) float32; ``denom`` = H*W."""
+    i, j = cuda.grid(2)
+    n, P = flat.shape[0], flat.shape[1]
+    if i >= n or j >= n or j < i:
+        return
+    if i == j:
+        results[i, j] = 0.0
+        return
+    s = 0.0
+    for p in range(P):
+        d = flat[i, p] - flat[j, p]
+        s += d * d
+    val = s / denom
+    results[i, j] = val
+    results[j, i] = val
+
+
+def img_matrix_mse_cuda(imgs: np.ndarray) -> np.ndarray:
+    """
+    Compute the pairwise mean-squared-error (MSE) between every pair of images in a stack, on the GPU.
+
+    .. note::
+       Matches the CPU function, including its cast to **int32** (the MSE is truncated to a whole number).
+       The op count is O(n^2 * pixels) so runtime grows with n^2 (compute-bound); the output is a dense
+       (n_images, n_images) matrix so memory also scales with n^2.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/img_matrix_mse_cuda.csv
+       :widths: 20, 20, 20, 20, 20
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numba) version: :func:`simba.mixins.image_mixin.ImageMixin.img_matrix_mse`.
+
+    :param np.ndarray imgs: 3D array (n_images, H, W) - stack of same-shaped images.
+    :return: (n, n) int32 MSE matrix; [i, j] is the MSE between image i and image j.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> m = img_matrix_mse_cuda(imgs)   # imgs: (n, H, W)
+    """
+    check_valid_array(data=imgs, source=f'{img_matrix_mse_cuda.__name__} imgs', accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    n, h, w = imgs.shape
+    flat = np.ascontiguousarray(imgs.reshape(n, -1)).astype(np.float32)
+    flat_dev = cuda.to_device(flat)
+    results = cuda.device_array((n, n), dtype=np.float32)
+    tpb = (16, 16)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(n / tpb[1]))
+    _img_mse_kernel[bpg, tpb](flat_dev, float(h * w), results)
+    return results.copy_to_host().astype(np.int32)
+
+
+_SSIM_WIN = 7
+_SSIM_PAD = 3
+_SSIM_NP = 49.0
+_SSIM_COV = _SSIM_NP / (_SSIM_NP - 1.0)
+
+
+@cuda.jit()
+def _ssim_kernel(imgs, H, W, C1, C2, results):
+    """One thread per (i, j) image pair. ``imgs`` (n, H*W) float32 flattened stack. Windowed SSIM (skimage-matching)."""
+    i, j = cuda.grid(2)
+    n = imgs.shape[0]
+    if i >= n or j >= n or j < i:
+        return
+    if i == j:
+        results[i, j] = 1.0
+        return
+    ssum = 0.0
+    cnt = 0
+    yy = _SSIM_PAD
+    while yy <= H - _SSIM_PAD - 1:
+        xx = _SSIM_PAD
+        while xx <= W - _SSIM_PAD - 1:
+            sX = 0.0; sY = 0.0; sXX = 0.0; sYY = 0.0; sXY = 0.0
+            for wy in range(-_SSIM_PAD, _SSIM_PAD + 1):
+                row = (yy + wy) * W
+                for wx in range(-_SSIM_PAD, _SSIM_PAD + 1):
+                    idx = row + (xx + wx)
+                    a = imgs[i, idx]; b = imgs[j, idx]
+                    sX += a; sY += b; sXX += a * a; sYY += b * b; sXY += a * b
+            ux = sX / _SSIM_NP; uy = sY / _SSIM_NP
+            vx = _SSIM_COV * (sXX / _SSIM_NP - ux * ux)
+            vy = _SSIM_COV * (sYY / _SSIM_NP - uy * uy)
+            vxy = _SSIM_COV * (sXY / _SSIM_NP - ux * uy)
+            A1 = 2.0 * ux * uy + C1; A2 = 2.0 * vxy + C2
+            B1 = ux * ux + uy * uy + C1; B2 = vx + vy + C2
+            ssum += (A1 * A2) / (B1 * B2)
+            cnt += 1
+            xx += 1
+        yy += 1
+    val = 1.0 if cnt == 0 else ssum / cnt
+    results[i, j] = val
+    results[j, i] = val
+
+
+def structural_similarity_matrix_cuda(imgs: np.ndarray,
+                                      data_range: float = 255.0) -> np.ndarray:
+    """
+    Compute the windowed structural-similarity index (SSIM) between every pair of images in a stack, on the GPU.
+
+    .. note::
+       Matches skimage's mean-SSIM exactly (7x7 window). Compute-bound - the op count is O(n^2 * pixels * 49) so
+       runtime grows with n^2 and image size; the output is a dense (n_images, n_images) matrix so memory also
+       scales with n^2.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/structural_similarity_matrix_cuda.csv
+       :widths: 20, 20, 20, 20, 20
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (skimage) version: :func:`simba.mixins.image_mixin.ImageMixin.structural_similarity_matrix`.
+
+    :param np.ndarray imgs: 3D array (n_images, H, W) - greyscale image stack (H, W >= 7).
+    :param float data_range: Value range of the images (255 for uint8; pass 1.0 for float images in [0, 1]). Sets C1=(0.01*range)^2, C2=(0.03*range)^2. Default 255.
+    :return: (n, n) float32 SSIM matrix; [i, j] is the mean SSIM between image i and image j.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> m = structural_similarity_matrix_cuda(imgs)   # imgs: (n, H, W) greyscale uint8
+    """
+    check_valid_array(data=imgs, source=f'{structural_similarity_matrix_cuda.__name__} imgs', accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{structural_similarity_matrix_cuda.__name__} data_range', value=data_range, min_value=10e-6)
+    n, h, w = imgs.shape
+    if h < _SSIM_WIN or w < _SSIM_WIN:
+        raise InvalidInputError(msg=f'images must be at least {_SSIM_WIN}x{_SSIM_WIN}; got {h}x{w}', source=structural_similarity_matrix_cuda.__name__)
+    flat = np.ascontiguousarray(imgs.reshape(n, -1)).astype(np.float32)
+    flat_dev = cuda.to_device(flat)
+    results = cuda.device_array((n, n), dtype=np.float32)
+    C1 = (0.01 * data_range) ** 2
+    C2 = (0.03 * data_range) ** 2
+    tpb = (16, 16)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(n / tpb[1]))
+    _ssim_kernel[bpg, tpb](flat_dev, h, w, C1, C2, results)
+    return results.copy_to_host()

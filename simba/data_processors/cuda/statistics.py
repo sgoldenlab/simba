@@ -47,6 +47,9 @@ from simba.utils.checks import (check_float, check_int, check_str,
                                 check_valid_array, check_valid_tuple)
 from simba.utils.data import bucket_data
 from simba.utils.enums import Formats
+from simba.utils.errors import SimBAGPUError
+
+MAX_GRID_Y = 65535   # CUDA grid y-dimension limit (windows are launched on grid-y)
 
 THREADS_PER_BLOCK = 256
 
@@ -1033,3 +1036,374 @@ def sokal_sneath_gpu(x: np.ndarray, y: np.ndarray, w: Optional[np.ndarray] = Non
     a, b, c = result[0], result[1], result[2]
     denom = a + 2 * (b + c)
     return a / denom if denom != 0.0 else 1.0
+
+@cuda.jit()
+def _sliding_autocorr_kernel(data, window_frms, max_lag_frms, results):
+    """One thread per window (indexed by its right/last frame)."""
+    right = cuda.grid(1)
+    n = data.shape[0]
+    if right >= n or right < window_frms - 1:
+        return
+    left = right - window_frms + 1
+    N = max_lag_frms
+    if N < 2:
+        results[right] = 0.0
+        return
+    sc = 0.0; sy = 0.0; scy = 0.0; scc = 0.0
+    for shift in range(N):
+        if shift == 0:
+            c = 1.0
+        else:
+            L = window_frms - shift
+            if L < 2:
+                c = 1.0
+            else:
+                mx = 0.0; mz = 0.0
+                for k in range(L):
+                    mx += data[left + k]
+                    mz += data[left + shift + k]
+                mx /= L; mz /= L
+                sxz = 0.0; sxx = 0.0; szz = 0.0
+                for k in range(L):
+                    dx = data[left + k] - mx
+                    dz = data[left + shift + k] - mz
+                    sxz += dx * dz; sxx += dx * dx; szz += dz * dz
+                denom = math.sqrt(sxx * szz)
+                if denom < 1e-12:
+                    c = 1.0
+                else:
+                    c = sxz / denom
+        y = float(shift)
+        sc += c; sy += y; scy += c * y; scc += c * c
+    d = N * scc - sc * sc
+    if -1e-12 < d < 1e-12:
+        results[right] = 0.0
+    else:
+        results[right] = (N * scy - sc * sy) / d
+
+
+def sliding_autocorrelation_cuda(data: np.ndarray,
+                                 max_lag: float,
+                                 time_window: float,
+                                 fps: float) -> np.ndarray:
+    """
+    Compute, for each sliding window, how quickly the signal's self-correlation decays with lag (the slope of
+    autocorrelation vs lag), on the GPU.
+
+    .. note::
+       Matches the CPU function to ~1e-3 (the CPU casts to float32 internally). Frames before the first full
+       window are ``-1``.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_autocorrelation_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numba) version: :func:`simba.mixins.statistics_mixin.Statistics.sliding_autocorrelation`.
+
+    :param np.ndarray data: 1D array of feature values.
+    :param float max_lag: Maximum lag in seconds for the autocorrelation.
+    :param float time_window: Sliding window length in seconds.
+    :param float fps: Frames per second (converts the second-valued parameters to frames).
+    :return: 1D float32 array (len == data) of the sliding autocorrelation slope per window; entries before the first full window are -1.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> data = np.array([0,1,2,3,4,5,6,7,8,1,10,11,12,13,14]).astype(np.float32)
+    >>> sliding_autocorrelation_cuda(data=data, max_lag=0.5, time_window=1.0, fps=10)
+    """
+    check_valid_array(data=data, source=f'{sliding_autocorrelation_cuda.__name__} data', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_autocorrelation_cuda.__name__} max_lag', value=max_lag, min_value=0.0)
+    check_float(name=f'{sliding_autocorrelation_cuda.__name__} time_window', value=time_window, min_value=0.0)
+    check_float(name=f'{sliding_autocorrelation_cuda.__name__} fps', value=fps, min_value=10e-6)
+    max_frm_lag, window_frms = int(max_lag * fps), int(time_window * fps)
+    n = data.shape[0]
+    data = np.ascontiguousarray(data).astype(np.float32)
+    data_dev = cuda.to_device(data)
+    results = cuda.to_device(np.full(n, -1.0, dtype=np.float32))
+    bpg = (n + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
+    _sliding_autocorr_kernel[bpg, THREADS_PER_BLOCK](data_dev, window_frms, max_frm_lag, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _sliding_pearsons_kernel(s1, s2, window_sizes, results):
+    """One thread per (frame idx, time-window wi). ``results`` (N, n_windows)."""
+    idx, wi = cuda.grid(2)
+    n = s1.shape[0]
+    if idx >= n or wi >= window_sizes.shape[0]:
+        return
+    w = window_sizes[wi]
+    if w < 1 or idx < w - 1:
+        return
+    left = idx - w + 1
+    m1 = 0.0; m2 = 0.0
+    for k in range(left, idx + 1):
+        m1 += s1[k]; m2 += s2[k]
+    m1 /= w; m2 /= w
+    num = 0.0; d1 = 0.0; d2 = 0.0
+    for k in range(left, idx + 1):
+        a = s1[k] - m1; b = s2[k] - m2
+        num += a * b; d1 += a * a; d2 += b * b
+    denom = math.sqrt(d1 * d2)
+    if denom != 0.0:
+        results[idx, wi] = num / denom
+
+
+def sliding_pearsons_r_cuda(sample_1: np.ndarray,
+                            sample_2: np.ndarray,
+                            time_windows: np.ndarray,
+                            fps: float) -> np.ndarray:
+    """
+    Compute Pearson's R between two signals over each sliding window (for every window length and frame), on the GPU.
+
+    .. note::
+       Matches the CPU function to ~1e-7. Incomplete windows and zero-denominator windows are -1.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_pearsons_r_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numba) version: :func:`simba.mixins.statistics_mixin.Statistics.sliding_pearsons_r`.
+
+    :param np.ndarray sample_1: First 1D signal.
+    :param np.ndarray sample_2: Second 1D signal (same length as ``sample_1``).
+    :param np.ndarray time_windows: 1D array of window lengths in seconds.
+    :param float fps: Frames per second (converts window lengths in seconds to frames). May be fractional (e.g. 29.97).
+    :return: 2D float32 array (len(sample_1), len(time_windows)) of Pearson's R per window; incomplete/zero-denominator windows are -1.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> s1 = np.random.randint(0, 50, (10)).astype(np.float32)
+    >>> s2 = np.random.randint(0, 50, (10)).astype(np.float32)
+    >>> sliding_pearsons_r_cuda(sample_1=s1, sample_2=s2, time_windows=np.array([0.5]), fps=10)
+    """
+    check_valid_array(data=sample_1, source=f'{sliding_pearsons_r_cuda.__name__} sample_1', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=sample_2, source=f'{sliding_pearsons_r_cuda.__name__} sample_2', accepted_ndims=(1,), accepted_shapes=[(sample_1.shape[0],)], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=time_windows, source=f'{sliding_pearsons_r_cuda.__name__} time_windows', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_pearsons_r_cuda.__name__} fps', value=fps, min_value=10e-6)
+    n, nw = sample_1.shape[0], time_windows.shape[0]
+    if nw > MAX_GRID_Y:
+        raise SimBAGPUError(msg=f'{sliding_pearsons_r_cuda.__name__} supports at most {MAX_GRID_Y} time_windows (CUDA grid limit); got {nw}.', source=sliding_pearsons_r_cuda.__name__)
+    window_sizes = (np.asarray(time_windows) * fps).astype(np.int32)
+    s1 = cuda.to_device(np.ascontiguousarray(sample_1).astype(np.float32))
+    s2 = cuda.to_device(np.ascontiguousarray(sample_2).astype(np.float32))
+    ws_dev = cuda.to_device(window_sizes)
+    results = cuda.to_device(np.full((n, nw), -1.0, dtype=np.float32))
+    tpb = (128, 1)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(nw / tpb[1]))
+    _sliding_pearsons_kernel[bpg, tpb](s1, s2, ws_dev, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _sliding_kendall_kernel(s1, s2, window_sizes, results):
+    """One thread per (storage-row r, time-window wi). Window = s[r-W : r] (ends at frame r-1, stored at row r)."""
+    r, wi = cuda.grid(2)
+    n = s1.shape[0]
+    if r >= n or wi >= window_sizes.shape[0]:
+        return
+    w = window_sizes[wi]
+    if w < 1 or r < w:
+        return
+    left = r - w
+    conc = 0
+    disc = 0
+    for p in range(left, r):
+        s1p = s1[p]; s2p = s2[p]
+        for q in range(p + 1, r):
+            if s1p <= s1[q]:
+                s1i = s1p; s2j = s2[q]
+            else:
+                s1i = s1[q]; s2j = s2p
+            if s2j > s1i:
+                conc += 1
+            elif s2j < s1i:
+                disc += 1
+    d = conc + disc
+    if d == 0:
+        results[r, wi] = -1.0
+    else:
+        results[r, wi] = (conc - disc) / d
+
+
+def sliding_kendall_tau_cuda(sample_1: np.ndarray,
+                             sample_2: np.ndarray,
+                             time_windows: np.ndarray,
+                             fps: float) -> np.ndarray:
+    """
+    Compute Kendall's Tau rank correlation between two signals over each sliding window (for every window length
+    and frame), on the GPU.
+
+    .. note::
+       Matches the CPU function. Incomplete windows are 0; zero-denominator windows are -1.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_kendall_tau_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numba) version: :func:`simba.mixins.statistics_mixin.Statistics.sliding_kendall_tau`.
+
+    :param np.ndarray sample_1: First 1D signal.
+    :param np.ndarray sample_2: Second 1D signal (same length as ``sample_1``).
+    :param np.ndarray time_windows: 1D array of window lengths in seconds.
+    :param float fps: Frames per second.
+    :return: 2D float32 array (len(sample_1), len(time_windows)); 0 for incomplete windows, -1 for zero-denominator windows.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> s1 = np.random.rand(20).astype(np.float32); s2 = np.random.rand(20).astype(np.float32)
+    >>> sliding_kendall_tau_cuda(sample_1=s1, sample_2=s2, time_windows=np.array([0.5]), fps=10)
+    """
+    check_valid_array(data=sample_1, source=f'{sliding_kendall_tau_cuda.__name__} sample_1', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=sample_2, source=f'{sliding_kendall_tau_cuda.__name__} sample_2', accepted_ndims=(1,), accepted_shapes=[(sample_1.shape[0],)], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=time_windows, source=f'{sliding_kendall_tau_cuda.__name__} time_windows', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_kendall_tau_cuda.__name__} fps', value=fps, min_value=10e-6)
+    n, nw = sample_1.shape[0], time_windows.shape[0]
+    if nw > MAX_GRID_Y:
+        raise SimBAGPUError(msg=f'{sliding_kendall_tau_cuda.__name__} supports at most {MAX_GRID_Y} time_windows (CUDA grid limit); got {nw}.', source=sliding_kendall_tau_cuda.__name__)
+    window_sizes = (np.asarray(time_windows) * fps).astype(np.int32)
+    s1 = cuda.to_device(np.ascontiguousarray(sample_1).astype(np.float32))
+    s2 = cuda.to_device(np.ascontiguousarray(sample_2).astype(np.float32))
+    ws_dev = cuda.to_device(window_sizes)
+    results = cuda.to_device(np.full((n, nw), 0.0, dtype=np.float32))
+    tpb = (128, 1)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(nw / tpb[1]))
+    _sliding_kendall_kernel[bpg, tpb](s1, s2, ws_dev, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _mahalanobis_kernel(data, w, q, results):
+    """One thread per (i, j). results[i,j] = sqrt(q[i] + q[j] - 2 * dot(data[i], w[j]))."""
+    i, j = cuda.grid(2)
+    n, d = data.shape[0], data.shape[1]
+    if i >= n or j >= n:
+        return
+    dot = 0.0
+    for a in range(d):
+        dot += data[i, a] * w[j, a]
+    s = q[i] + q[j] - 2.0 * dot
+    if s < 0.0:
+        s = 0.0
+    results[i, j] = math.sqrt(s)
+
+
+def mahalanobis_distance_cdist_cuda(data: np.ndarray) -> np.ndarray:
+    """
+    Compute the pairwise Mahalanobis distance between all observations (rows) of ``data`` - the distance between
+    each pair, scaled by the feature covariance - on the GPU.
+
+    .. note::
+       Matches the CPU/scipy result to ~1e-6. The output is a dense (n, n) float32 matrix, so memory scales with
+       n^2 (n=20,000 is ~1.6 GB; ~50,000 is the ~10 GB in-VRAM ceiling on a 12 GB card) - bounded by GPU memory,
+       not compute. Requires a non-singular covariance matrix (raises if features are collinear or n < n_features).
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/mahalanobis_distance_cdist_cuda.csv
+       :widths: 20, 20, 20, 20, 20
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numba) version: :func:`simba.mixins.statistics_mixin.Statistics.mahalanobis_distance_cdist`.
+
+    :param np.ndarray data: 2D array (n_observations, n_features).
+    :return: (n, n) float32 pairwise Mahalanobis distance matrix.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> data = np.random.randint(0, 50, (1000, 200)).astype(np.float32)
+    >>> d = mahalanobis_distance_cdist_cuda(data=data)
+    """
+    check_valid_array(data=data, source=f'{mahalanobis_distance_cdist_cuda.__name__} data', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    x = np.ascontiguousarray(data).astype(np.float64)
+    m = np.linalg.inv(np.cov(x, rowvar=False))
+    w = x @ m
+    q = np.einsum('ij,ij->i', x, w)
+    n = x.shape[0]
+    data_dev = cuda.to_device(x)
+    w_dev = cuda.to_device(np.ascontiguousarray(w))
+    q_dev = cuda.to_device(np.ascontiguousarray(q))
+    results = cuda.device_array((n, n), dtype=np.float32)
+    tpb = (16, 16)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(n / tpb[1]))
+    _mahalanobis_kernel[bpg, tpb](data_dev, w_dev, q_dev, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _manhattan_kernel(data, results):
+    """One thread per (i, j). results[i,j] = sum_a |data[i,a] - data[j,a]|."""
+    i, j = cuda.grid(2)
+    n, d = data.shape[0], data.shape[1]
+    if i >= n or j >= n:
+        return
+    s = 0.0
+    for a in range(d):
+        diff = data[i, a] - data[j, a]
+        if diff < 0.0:
+            diff = -diff
+        s += diff
+    results[i, j] = s
+
+
+def manhattan_distance_cdist_cuda(data: np.ndarray) -> np.ndarray:
+    """
+    Compute the pairwise Manhattan (L1) distance between all observations (rows) of ``data`` - the sum of
+    absolute feature differences between each pair - on the GPU.
+
+    .. note::
+       The output is a dense (n, n) float32 matrix, so memory scales with n^2 (n=50,000 ~ 10 GB, the in-VRAM
+       ceiling on a 12 GB card). Unlike the CPU version - which builds a full (N, N, D) intermediate and raises
+       MemoryError for large inputs (e.g. ~74 GB at n=10,000, d=200) - this only allocates the n x n output, so
+       it handles sizes the CPU cannot.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/manhattan_distance_cdist_cuda.csv
+       :widths: 20, 20, 20, 20, 20
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numpy) version: :func:`simba.mixins.statistics_mixin.Statistics.manhattan_distance_cdist`.
+
+    :param np.ndarray data: 2D array (n_observations, n_features).
+    :return: (n, n) float32 pairwise Manhattan (L1) distance matrix.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> data = np.random.randint(0, 50, (10000, 2)).astype(np.float32)
+    >>> d = manhattan_distance_cdist_cuda(data=data)
+    """
+    check_valid_array(data=data, source=f'{manhattan_distance_cdist_cuda.__name__} data', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    n = data.shape[0]
+    data_dev = cuda.to_device(np.ascontiguousarray(data).astype(np.float32))
+    results = cuda.device_array((n, n), dtype=np.float32)
+    tpb = (16, 16)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(n / tpb[1]))
+    _manhattan_kernel[bpg, tpb](data_dev, results)
+    return results.copy_to_host()

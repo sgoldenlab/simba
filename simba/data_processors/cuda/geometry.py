@@ -6,7 +6,8 @@ from typing import Optional
 import numpy as np
 from numba import cuda, njit
 
-from simba.utils.checks import check_float, check_valid_array
+from simba.data_processors.cuda.utils import _cuda_point_to_segment_dist
+from simba.utils.checks import check_float, check_str, check_valid_array
 from simba.utils.enums import Formats
 from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer
@@ -637,13 +638,13 @@ def directionality_to_nonstatic_target(left_ear: np.ndarray,
 
 
 @cuda.jit()
-def _min_rotated_rect_kernel(pts, n_pts, results):
-    """One thread per shape. ``pts`` (n_shapes, max_pts, 2), ``n_pts`` (n_shapes,) valid-point counts,
+def _min_rotated_rect_kernel(pts, results):
+    """One thread per shape. ``pts`` (n_shapes, n_points, 2),
     ``results`` (n_shapes, 4, 2) OBB corners: (minu,minv),(maxu,minv),(maxu,maxv),(minu,maxv)."""
     i = cuda.grid(1)
     if i >= pts.shape[0]:
         return
-    m = n_pts[i]
+    m = pts.shape[1]
     if m < 2:
         return
     best_area = 1e18
@@ -660,8 +661,8 @@ def _min_rotated_rect_kernel(pts, n_pts, results):
             minu = 1e18; maxu = -1e18; minv = 1e18; maxv = -1e18
             for k in range(m):
                 px = pts[i, k, 0]; py = pts[i, k, 1]
-                pu = px * ux + py * uy          # projection on edge axis
-                pv = -px * uy + py * ux         # projection on perpendicular axis
+                pu = px * ux + py * uy
+                pv = -px * uy + py * ux
                 if pu < minu: minu = pu
                 if pu > maxu: maxu = pu
                 if pv < minv: minv = pv
@@ -681,7 +682,7 @@ def _min_rotated_rect_kernel(pts, n_pts, results):
     results[i, 3, 0] = cu0 * ux - cv1 * uy; results[i, 3, 1] = cu0 * uy + cv1 * ux
 
 
-def minimum_rotated_rectangle_cuda(data: np.ndarray, n_pts: Optional[np.ndarray] = None) -> np.ndarray:
+def minimum_rotated_rectangle_cuda(data: np.ndarray) -> np.ndarray:
     """
     Compute the minimum rotated rectangle (oriented bounding box, OBB) of each point set in a batch, on the GPU.
 
@@ -693,12 +694,12 @@ def minimum_rotated_rectangle_cuda(data: np.ndarray, n_pts: Optional[np.ndarray]
        :class: simba-table
        :header-rows: 1
 
-    :param np.ndarray data: 3D array ``(n_shapes, n_points, 2)`` of 2D (x, y) points. Usually ``n_shapes`` is the number of video frames and ``n_points`` the number of body-parts, i.e. a pose dataframe reshaped to ``(len(df), n_bodyparts, 2)``. One rectangle is computed per shape (per frame).
-    :param Optional[np.ndarray] n_pts: Only for ragged/padded input. A ``(n_shapes,)`` array giving how many of the ``n_points`` are actually valid in each shape (the rest being padding). Leave ``None`` (default) for normal fixed-body-part data - then all ``n_points`` are used for every shape.
+    :param np.ndarray data: 3D array ``(n_shapes, n_points, 2)`` of 2D (x, y) points. ``n_shapes`` is the number of shapes (usually video frames) and ``n_points`` the number of points per shape (usually body-parts); i.e. a pose dataframe reshaped to ``(len(df), n_bodyparts, 2)``. All ``n_points`` points are used for every shape - one rectangle is computed per shape (per frame).
     :return: ``(n_shapes, 4, 2)`` int32 array of the four OBB corner (x, y) coordinates per shape, rounded to whole pixels (matching the CPU ``minimum_rotated_rectangle(..., return_type='array')``).
     :rtype: np.ndarray
 
     :example:
+
     >>> df = read_df(file_path='.../Box1.csv')
     >>> bp_cols = [x for x in df.columns if not x.endswith('_p')]
     >>> data = df[bp_cols].values.reshape(len(df), len(bp_cols) // 2, 2)   # (n_frames, n_bodyparts, 2)
@@ -708,14 +709,223 @@ def minimum_rotated_rectangle_cuda(data: np.ndarray, n_pts: Optional[np.ndarray]
     if data.shape[2] != 2:
         raise InvalidInputError(msg=f'data must be (n_shapes, n_points, 2); got last dim {data.shape[2]}', source=minimum_rotated_rectangle_cuda.__name__)
     data = np.ascontiguousarray(data).astype(np.float32)
-    n, m, _ = data.shape
-    if n_pts is None:
-        n_pts = np.full(n, m, dtype=np.int32)
-    n_pts = np.ascontiguousarray(n_pts).astype(np.int32)
+    n = data.shape[0]
     bpg = (n + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
     pts_dev = cuda.to_device(data)
-    npts_dev = cuda.to_device(n_pts)
     results = cuda.device_array((n, 4, 2), dtype=np.float32)
     results.copy_to_device(np.zeros((n, 4, 2), dtype=np.float32))
-    _min_rotated_rect_kernel[bpg, THREADS_PER_BLOCK](pts_dev, npts_dev, results)
+    _min_rotated_rect_kernel[bpg, THREADS_PER_BLOCK](pts_dev, results)
     return np.round(results.copy_to_host()).astype(np.int32)
+
+
+@cuda.jit(device=True)
+def _cuda_point_in_poly_dev(px, py, verts, nv):
+    """Device: ray-cast point-in-polygon over the first ``nv`` rows of ``verts`` (nv, 2)."""
+    inside = False
+    j = nv - 1
+    for i in range(nv):
+        xi = verts[i, 0]; yi = verts[i, 1]
+        xj = verts[j, 0]; yj = verts[j, 1]
+        if ((yi > py) != (yj > py)) and (px < (xj - xi) * (py - yi) / (yj - yi) + xi):
+            inside = not inside
+        j = i
+    return inside
+
+
+@cuda.jit(device=True)
+def _cuda_segs_intersect(ax, ay, bx, by, cx, cy, dx, dy):
+    """Device: True if segment AB properly crosses segment CD (orientation test)."""
+    d1 = (by - ay) * (cx - bx) - (bx - ax) * (cy - by)
+    d2 = (by - ay) * (dx - bx) - (bx - ax) * (dy - by)
+    d3 = (dy - cy) * (ax - dx) - (dx - cx) * (ay - dy)
+    d4 = (dy - cy) * (bx - dx) - (dx - cx) * (by - dy)
+    if ((d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0)) and ((d3 > 0 and d4 < 0) or (d3 < 0 and d4 > 0)):
+        return True
+    return False
+
+
+@cuda.jit()
+def _shape_distance_kernel(va, ca, vb, cb, results):
+    """One thread per pair i. va/vb (n, maxv, 2) vertices; ca/cb (n,) vertex counts."""
+    i = cuda.grid(1)
+    n = va.shape[0]
+    if i >= n:
+        return
+    na = ca[i]; nb = cb[i]
+    if na < 2 or nb < 2:
+        results[i] = -1.0
+        return
+    for p in range(na):
+        p2 = p + 1 if p + 1 < na else 0
+        for q in range(nb):
+            q2 = q + 1 if q + 1 < nb else 0
+            if _cuda_segs_intersect(va[i, p, 0], va[i, p, 1], va[i, p2, 0], va[i, p2, 1],
+                                    vb[i, q, 0], vb[i, q, 1], vb[i, q2, 0], vb[i, q2, 1]):
+                results[i] = 0.0
+                return
+    if _cuda_point_in_poly_dev(va[i, 0, 0], va[i, 0, 1], vb[i], nb):
+        results[i] = 0.0
+        return
+    if _cuda_point_in_poly_dev(vb[i, 0, 0], vb[i, 0, 1], va[i], na):
+        results[i] = 0.0
+        return
+    best = 1e18
+    for p in range(na):
+        px = va[i, p, 0]; py = va[i, p, 1]
+        for q in range(nb):
+            q2 = q + 1 if q + 1 < nb else 0
+            d = _cuda_point_to_segment_dist(px, py, vb[i, q, 0], vb[i, q, 1], vb[i, q2, 0], vb[i, q2, 1])
+            if d < best:
+                best = d
+    for q in range(nb):
+        px = vb[i, q, 0]; py = vb[i, q, 1]
+        for p in range(na):
+            p2 = p + 1 if p + 1 < na else 0
+            d = _cuda_point_to_segment_dist(px, py, va[i, p, 0], va[i, p, 1], va[i, p2, 0], va[i, p2, 1])
+            if d < best:
+                best = d
+    results[i] = best
+
+
+def shape_distance_cuda(verts_a: np.ndarray,
+                        verts_b: np.ndarray,
+                        counts_a: Optional[np.ndarray] = None,
+                        counts_b: Optional[np.ndarray] = None,
+                        pixels_per_mm: float = 1.0,
+                        unit: str = 'mm') -> np.ndarray:
+    """
+    Compute the minimum distance between the boundaries of each pair of polygons (0 if the shapes overlap or
+    touch), batched on the GPU.
+
+    .. note::
+       Matches shapely to sub-pixel accuracy (limited by integer-vertex rounding of the input).
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/shape_distance_cuda.csv
+       :widths: 20, 20, 20, 20, 20
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (shapely) version: :func:`simba.mixins.geometry_mixin.GeometryMixin.shape_distance`.
+
+    :param np.ndarray verts_a: (n_pairs, max_verts, 2) vertices of the first polygon in each pair.
+    :param np.ndarray verts_b: (n_pairs, max_verts, 2) vertices of the second polygon in each pair.
+    :param Optional[np.ndarray] counts_a: Only for ragged input - a (n_pairs,) array of the valid vertex count per first polygon when polygons of *different* vertex counts are packed into ``max_verts`` by padding. Leave ``None`` (default) to use all ``max_verts`` vertices.
+    :param Optional[np.ndarray] counts_b: As ``counts_a``, for the second polygon. Default ``None``.
+    :param float pixels_per_mm: Pixel-to-mm conversion. Default 1.0.
+    :param str unit: One of 'mm', 'cm', 'dm', 'm'. Default 'mm'.
+    :return: (n_pairs,) float32 distances in ``unit`` (0 where shapes overlap/touch).
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> d = shape_distance_cuda(verts_a, verts_b, pixels_per_mm=1.0)                    # equal-sized polygons
+    >>> d = shape_distance_cuda(verts_a, verts_b, counts_a=ca, counts_b=cb)             # ragged (padded) polygons
+    """
+
+    check_valid_array(data=verts_a, source=f'{shape_distance_cuda.__name__} verts_a', accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=verts_b, source=f'{shape_distance_cuda.__name__} verts_b', accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{shape_distance_cuda.__name__} pixels_per_mm', value=pixels_per_mm, min_value=10e-6)
+    check_str(name=f'{shape_distance_cuda.__name__} unit', value=unit, options=('mm', 'cm', 'dm', 'm'))
+    n = verts_a.shape[0]
+    if counts_a is None:
+        counts_a = np.full(n, verts_a.shape[1], dtype=np.int32)
+    if counts_b is None:
+        counts_b = np.full(n, verts_b.shape[1], dtype=np.int32)
+    va = cuda.to_device(np.ascontiguousarray(verts_a).astype(np.float32))
+    vb = cuda.to_device(np.ascontiguousarray(verts_b).astype(np.float32))
+    ca = cuda.to_device(np.ascontiguousarray(counts_a).astype(np.int32))
+    cb = cuda.to_device(np.ascontiguousarray(counts_b).astype(np.int32))
+    results = cuda.device_array(n, dtype=np.float32)
+    bpg = (n + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
+    _shape_distance_kernel[bpg, THREADS_PER_BLOCK](va, ca, vb, cb, results)
+    out = results.copy_to_host() / pixels_per_mm
+    scale = {'mm': 1, 'cm': 10, 'dm': 100, 'm': 1000}[unit]
+    return out / scale
+
+
+@cuda.jit(device=True)
+def _directed_hausdorff(src, ns, dst, nd):
+    """Device: max over ``src`` vertices of (min distance from vertex to ``dst``'s edges)."""
+    worst = 0.0
+    for p in range(ns):
+        px = src[p, 0]; py = src[p, 1]
+        best = 1e18
+        for q in range(nd):
+            q2 = q + 1 if q + 1 < nd else 0
+            d = _cuda_point_to_segment_dist(px, py, dst[q, 0], dst[q, 1], dst[q2, 0], dst[q2, 1])
+            if d < best:
+                best = d
+        if best > worst:
+            worst = best
+    return worst
+
+
+@cuda.jit()
+def _hausdorff_kernel(va, ca, vb, cb, results):
+    """One thread per pair i. va/vb (n, maxv, 2) vertices; ca/cb (n,) counts."""
+    i = cuda.grid(1)
+    n = va.shape[0]
+    if i >= n:
+        return
+    na = ca[i]; nb = cb[i]
+    if na < 2 or nb < 2:
+        results[i] = -1.0
+        return
+    d1 = _directed_hausdorff(va[i], na, vb[i], nb)
+    d2 = _directed_hausdorff(vb[i], nb, va[i], na)
+    results[i] = d1 if d1 > d2 else d2
+
+
+def hausdorff_distance_cuda(verts_a: np.ndarray,
+                            verts_b: np.ndarray,
+                            counts_a: Optional[np.ndarray] = None,
+                            counts_b: Optional[np.ndarray] = None) -> np.ndarray:
+    """
+    Compute the discrete Hausdorff distance between each pair of polygons (how much one shape's outline differs
+    from the other's - larger means less similar), batched on the GPU.
+
+    .. note::
+       Matches shapely to sub-pixel accuracy (float round-off).
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/hausdorff_distance_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (shapely) version: :func:`simba.mixins.geometry_mixin.GeometryMixin.hausdorff_distance`.
+
+    :param np.ndarray verts_a: (n_pairs, max_verts, 2) vertices of the first polygon in each pair.
+    :param np.ndarray verts_b: (n_pairs, max_verts, 2) vertices of the second polygon in each pair.
+    :param Optional[np.ndarray] counts_a: Only for ragged input - a (n_pairs,) array of the valid vertex count per first polygon when polygons of *different* vertex counts are packed into ``max_verts`` by padding. Leave ``None`` (default) to use all ``max_verts`` vertices.
+    :param Optional[np.ndarray] counts_b: As ``counts_a``, for the second polygon. Default ``None``.
+    :return: (n_pairs,) float32 discrete Hausdorff distance per pair.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> d = hausdorff_distance_cuda(verts_a, verts_b)                          # equal-sized polygons
+    >>> d = hausdorff_distance_cuda(verts_a, verts_b, counts_a=ca, counts_b=cb)   # ragged (padded) polygons
+    """
+    check_valid_array(data=verts_a, source=f'{hausdorff_distance_cuda.__name__} verts_a', accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=verts_b, source=f'{hausdorff_distance_cuda.__name__} verts_b', accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    n = verts_a.shape[0]
+    if counts_a is None:
+        counts_a = np.full(n, verts_a.shape[1], dtype=np.int32)
+    if counts_b is None:
+        counts_b = np.full(n, verts_b.shape[1], dtype=np.int32)
+    va = cuda.to_device(np.ascontiguousarray(verts_a).astype(np.float32))
+    vb = cuda.to_device(np.ascontiguousarray(verts_b).astype(np.float32))
+    ca = cuda.to_device(np.ascontiguousarray(counts_a).astype(np.int32))
+    cb = cuda.to_device(np.ascontiguousarray(counts_b).astype(np.int32))
+    results = cuda.device_array(n, dtype=np.float32)
+    bpg = (n + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
+    _hausdorff_kernel[bpg, THREADS_PER_BLOCK](va, ca, vb, cb, results)
+    return results.copy_to_host()

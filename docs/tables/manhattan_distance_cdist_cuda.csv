@@ -1,0 +1,12 @@
+N OBS (d=200),OUTPUT,MEAN (S),SD (S),PAIRS/S
+**1k**,4mb,0.0038,0.0003,**264.6m**
+**2k**,16mb,0.0124,0.0003,**323.6m**
+**5k**,100mb,0.0675,0.0016,**370.4m**
+**10k**,0.4gb,0.2544,0.0018,**393.0m**
+**20k**,1.6gb,0.9951,0.0097,**402.0m**
+**30k**,3.6gb,2.3614,0.0786,**381.1m**
+**40k**,6.4gb,4.1067,0.0470,**389.6m**
+**50k**,10gb,7.3517,0.1918,**340.1m**
+NVIDIA GeForce RTX 4070 (12GB),,,,
+d=200 features; mean +/- SD of 3 runs,,,,
+output is dense n x n float32 -> memory scales n^2 (50k~10GB in-VRAM ceiling; CPU OOMs ~74GB at n=10k),,,,

@@ -271,6 +271,13 @@ Define regions-of-interest — rectangles, circles, and polygons — and analyze
 
 Compute statistical features from tracking and classification data — descriptive statistics, distribution comparisons, distance metrics, and drift/change detection — over sliding or static time windows. Underpins much of SimBA's feature extraction, and many methods have GPU-accelerated counterparts for large datasets.
 
+.. video:: _static/img/abacus_spin.mp4
+   :width: 700
+   :autoplay:
+   :loop:
+   :muted:
+   :align: center
+
 .. toctree::
    :maxdepth: 4
 
@@ -292,6 +299,14 @@ Import behavioral annotations produced by external tools (e.g. BORIS, Ethovision
 --------------------------------------------------
 
 Analyze the temporal structure of tracking and feature signals using sliding-window methods — complexity and entropy measures, autocorrelation, and windowed descriptive statistics — to capture how behavior evolves over time. GPU-accelerated variants are available for the heavier computations.
+
+.. video:: _static/img/whiteboard_simba.webm
+   :width: 700
+   :autoplay:
+   :nocontrols:
+   :loop:
+   :muted:
+   :align: center
 
 .. toctree::
    :maxdepth: 5

@@ -1,0 +1,9 @@
+N IMAGES (128x128),OUTPUT,MEAN (S),SD (S),PAIRS/S
+**50**,10kb,0.4511,0.010,**5.5k**
+**100**,40kb,0.5689,0.012,**17.6k**
+**300**,0.4mb,2.1454,0.030,**42.0k**
+**600**,1.4mb,7.4050,0.090,**48.6k**
+**1k**,4mb,24.496,3.429,**40.8k**
+NVIDIA GeForce RTX 4070 (12GB),,,,
+128x128 greyscale; mean +/- SD of 3 runs; exact match to skimage,,,,
+~6-13x vs CPU skimage (grows with n); compute-bound O(n^2 * pixels * 49),,,,

@@ -1,0 +1,8 @@
+N PAIRS,INPUT,MEAN (S),PAIRS/S
+**10k**,tiny,0.0043,**2.3m**
+**100k**,4mb,0.0159,**6.3m**
+**1m**,0.3gb,0.1237,**8.1m**
+**10m**,2.6gb,1.2261,**8.2m**
+NVIDIA GeForce RTX 4070 (12GB),,,
+16-vertex polygon pairs; mean of 3 runs; exact vs shapely; ~88x vs shapely loop,,,
+input arrays are the memory constraint (~30-40M in-VRAM ceiling; larger spills to paging),,,
