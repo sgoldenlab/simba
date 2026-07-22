@@ -1,0 +1,10 @@
+N FRAMES (bp=1),MEAN (S),SD (S),FRAMES/S
+**1k**,0.0006,0.0001,**1.7m**
+**10k**,0.0008,0.0001,**13.2m**
+**100k**,0.0026,0.0000,**38.5m**
+**1m**,0.0202,0.0004,**49.5m**
+**10m**,0.1999,0.0031,**50.0m**
+**100m**,2.0137,0.1378,**49.7m**
+NVIDIA GeForce RTX 4070 (12GB),,,
+1 body-part; window=1.0s / fps=30; mean +/- SD of 3 runs,,,
+memory + runtime scale with n_bodyparts; ~300m frames ceiling at bp=1 (500m OOMs); ~1920x vs CPU at 1m bp=8,,,

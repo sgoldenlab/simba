@@ -1,0 +1,9 @@
+N OBS (d=300),INPUT,MEAN (S),SD (S),ROWS/S
+**1k**,2mb,0.0028,0.0008,**359k**
+**10k**,24mb,0.0111,0.0006,**904k**
+**100k**,240mb,0.1074,0.0044,**931k**
+**1m**,2.4gb,1.5552,0.1293,**643k**
+**2m**,4.8gb,2.9174,0.4774,**686k**
+NVIDIA GeForce RTX 4070 (12GB),,,,
+d=300 features; mean +/- SD of 3 runs; float32,,,,
+input (x + y) ~ 2 * n * d * 4 bytes must fit in VRAM (~4m rows at d=300 ceiling); large-n is transfer-bound,,,,

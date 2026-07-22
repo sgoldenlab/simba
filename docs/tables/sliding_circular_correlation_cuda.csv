@@ -1,0 +1,11 @@
+N FRAMES,MEAN (S),SD (S),FRAMES/S
+**1k**,0.0010,0.0002,**1.0m**
+**10k**,0.0009,0.0001,**11.5m**
+**100k**,0.0020,0.0001,**49.3m**
+**1m**,0.0179,0.0002,**55.8m**
+**10m**,0.1698,0.0026,**58.9m**
+**100m**,1.5195,0.1653,**65.8m**
+**500m**,7.4178,0.6019,**67.4m**
+NVIDIA GeForce RTX 4070,,,
+1 window=1.0s / fps=30; mean +/- SD of 3 runs; float32,,,
+angular inputs in degrees; ~112x vs CPU numba at 1m frames,,,

@@ -704,6 +704,9 @@ def minimum_rotated_rectangle_cuda(data: np.ndarray) -> np.ndarray:
     >>> bp_cols = [x for x in df.columns if not x.endswith('_p')]
     >>> data = df[bp_cols].values.reshape(len(df), len(bp_cols) // 2, 2)   # (n_frames, n_bodyparts, 2)
     >>> rects = minimum_rotated_rectangle_cuda(data=data)                  # (n_frames, 4, 2) int32
+
+    .. seealso::
+       For the CPU counterpart, see :func:`simba.mixins.geometry_mixin.GeometryMixin.minimum_rotated_rectangle`.
     """
     check_valid_array(data=data, source=f'{minimum_rotated_rectangle_cuda.__name__} data', accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
     if data.shape[2] != 2:

@@ -16,10 +16,14 @@ try:
 except:
     import numpy as cp
 
+from simba.data_processors.cuda.utils import _cuda_bubble_sort
 from simba.utils.checks import check_float, check_int, check_valid_array
 from simba.utils.enums import Formats
+from simba.utils.errors import SimBAGPUError
 
 THREADS_PER_BLOCK = 1024
+MAX_GRID_Y = 65535
+MAX_WIN = 512        # per-thread sort-buffer cap (sliding_kuipers_two_sample_test)
 
 @cuda.jit()
 def _cuda_direction_from_two_bps(x, y, results):
@@ -761,6 +765,190 @@ def rotational_direction(data: np.ndarray, stride: Optional[int] = 1) -> np.ndar
     bpg = (data.shape[0] + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
     _rotational_direction[bpg, THREADS_PER_BLOCK](data_dev, stride_dev, results_dev)
     return results_dev.copy_to_host()
+
+
+@cuda.jit()
+def _sliding_circular_corr_kernel(s1, s2, window_sizes, results):
+    """One thread per (frame idx, time-window wi). ``results`` (N, n_windows) = |circular cross-correlation| per window."""
+    idx, wi = cuda.grid(2)
+    n = s1.shape[0]
+    if idx >= n or wi >= window_sizes.shape[0]:
+        return
+    w = window_sizes[wi]
+    if w < 1 or idx < w - 1:
+        return
+    left = idx - w + 1
+    ss1 = 0.0; sc1 = 0.0; ss2 = 0.0; sc2 = 0.0
+    for k in range(left, idx + 1):
+        ss1 += math.sin(s1[k]); sc1 += math.cos(s1[k])
+        ss2 += math.sin(s2[k]); sc2 += math.cos(s2[k])
+    m1 = math.atan2(ss1, sc1)
+    m2 = math.atan2(ss2, sc2)
+    num = 0.0; d1 = 0.0; d2 = 0.0
+    for k in range(left, idx + 1):
+        a = math.sin(s1[k] - m1); b = math.sin(s2[k] - m2)
+        num += a * b; d1 += a * a; d2 += b * b
+    denom = math.sqrt(d1 * d2)
+    if denom != 0.0:
+        val = num / denom
+        if val < 0.0:
+            val = -val
+        results[idx, wi] = val
+
+
+def sliding_circular_correlation_cuda(sample_1: np.ndarray,
+                                      sample_2: np.ndarray,
+                                      time_windows: np.ndarray,
+                                      fps: float) -> np.ndarray:
+    """
+    Compute the circular correlation coefficient between two angular signals over each sliding window
+    (for every window length and frame), on the GPU.
+
+    .. note::
+       Angular inputs are in degrees. The result at each frame is the absolute circular cross-correlation of
+       the window ending at that frame; incomplete windows (before the first full window) and zero-denominator
+       windows are 0.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_circular_correlation_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numba) version: :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_correlation`.
+
+    :param np.ndarray sample_1: First 1D angular signal in degrees.
+    :param np.ndarray sample_2: Second 1D angular signal in degrees (same length as ``sample_1``).
+    :param np.ndarray time_windows: 1D array of window lengths in seconds.
+    :param float fps: Frames per second (converts window lengths in seconds to frames). May be fractional (e.g. 29.97).
+    :return: 2D float32 array (len(sample_1), len(time_windows)) of circular correlation per window.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> s1 = np.random.randint(0, 361, (200,)).astype(np.float32)
+    >>> s2 = np.random.randint(0, 361, (200,)).astype(np.float32)
+    >>> sliding_circular_correlation_cuda(sample_1=s1, sample_2=s2, time_windows=np.array([0.5, 1.0]), fps=10.0)
+    """
+    check_valid_array(data=sample_1, source=f'{sliding_circular_correlation_cuda.__name__} sample_1', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=sample_2, source=f'{sliding_circular_correlation_cuda.__name__} sample_2', accepted_ndims=(1,), accepted_shapes=[(sample_1.shape[0],)], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=time_windows, source=f'{sliding_circular_correlation_cuda.__name__} time_windows', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_circular_correlation_cuda.__name__} fps', value=fps, min_value=10e-6)
+    n, nw = sample_1.shape[0], time_windows.shape[0]
+    if nw > MAX_GRID_Y:
+        raise SimBAGPUError(msg=f'{sliding_circular_correlation_cuda.__name__} supports at most {MAX_GRID_Y} time_windows (CUDA grid limit); got {nw}.', source=sliding_circular_correlation_cuda.__name__)
+    window_sizes = (np.asarray(time_windows) * fps).astype(np.int32)
+    s1 = cuda.to_device(np.deg2rad(np.ascontiguousarray(sample_1).astype(np.float32)))
+    s2 = cuda.to_device(np.deg2rad(np.ascontiguousarray(sample_2).astype(np.float32)))
+    ws_dev = cuda.to_device(window_sizes)
+    results = cuda.to_device(np.zeros((n, nw), dtype=np.float32))
+    tpb = (128, 1)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(nw / tpb[1]))
+    _sliding_circular_corr_kernel[bpg, tpb](s1, s2, ws_dev, results)
+    return results.copy_to_host()
+
+
+@cuda.jit(device=True)
+def _cuda_bisect_left(arr, n, val):
+    """Device: count of arr[0:n] strictly less than val (== np.searchsorted(side='left')). arr must be sorted."""
+    lo = 0; hi = n
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if arr[mid] < val:
+            lo = mid + 1
+        else:
+            hi = mid
+    return lo
+
+
+@cuda.jit()
+def _sliding_kuipers_kernel(s1, s2, window_sizes, results):
+    """One thread per (frame idx, window wi). Kuiper's V for window s[idx-w:idx], stored at row idx."""
+    idx, wi = cuda.grid(2)
+    n = s1.shape[0]
+    if idx >= n or wi >= window_sizes.shape[0]:
+        return
+    w = window_sizes[wi]
+    if w < 1 or idx < w:
+        return
+    buf1 = cuda.local.array(shape=512, dtype=np.float32)
+    buf2 = cuda.local.array(shape=512, dtype=np.float32)
+    left = idx - w
+    for i in range(w):
+        buf1[i] = s1[left + i]
+        buf2[i] = s2[left + i]
+    _cuda_bubble_sort(buf1[:w])
+    _cuda_bubble_sort(buf2[:w])
+    max1 = -1.0e30
+    for j in range(w):
+        v = _cuda_bisect_left(buf2, w, buf1[j]) / w - j / w
+        if v > max1:
+            max1 = v
+    max2 = -1.0e30
+    for j in range(w):
+        v = _cuda_bisect_left(buf1, w, buf2[j]) / w - j / w
+        if v > max2:
+            max2 = v
+    results[idx, wi] = max1 + max2
+
+
+def sliding_kuipers_two_sample_test_cuda(sample_1: np.ndarray,
+                                         sample_2: np.ndarray,
+                                         time_windows: np.ndarray,
+                                         fps: float) -> np.ndarray:
+    """
+    Compute Kuiper's two-sample test statistic between two circular signals over sliding windows, on the GPU.
+
+    .. note::
+       Each window length (``int(time_window * fps)``) must be <= 512 (per-thread sort buffers). Following the CPU
+       version, the statistic for window ``sample[i-w:i]`` is stored at row ``i``, and rows before the first full
+       window are -1. Output is (n_frames, n_time_windows) float64. Runtime grows with window length (per-thread sort).
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_kuipers_two_sample_test_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numba) version: :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_kuipers_two_sample_test`.
+
+    :param np.ndarray sample_1: First 1D circular signal in degrees.
+    :param np.ndarray sample_2: Second 1D circular signal in degrees (same length as ``sample_1``).
+    :param np.ndarray time_windows: 1D array of window sizes in seconds.
+    :param float fps: Sampling rate of the signal (may be fractional).
+    :return: (n_frames, n_time_windows) float64 array of Kuiper's V statistics.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> s1 = np.random.randint(0, 360, (5000,)).astype(np.float32)
+    >>> s2 = np.random.randint(0, 360, (5000,)).astype(np.float32)
+    >>> sliding_kuipers_two_sample_test_cuda(sample_1=s1, sample_2=s2, time_windows=np.array([0.5, 1.0]), fps=30.0)
+    """
+    check_valid_array(data=sample_1, source=f'{sliding_kuipers_two_sample_test_cuda.__name__} sample_1', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=sample_2, source=f'{sliding_kuipers_two_sample_test_cuda.__name__} sample_2', accepted_ndims=(1,), accepted_shapes=[(sample_1.shape[0],)], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=time_windows, source=f'{sliding_kuipers_two_sample_test_cuda.__name__} time_windows', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_kuipers_two_sample_test_cuda.__name__} fps', value=fps, min_value=10e-6)
+    n, nw = sample_1.shape[0], time_windows.shape[0]
+    if nw > MAX_GRID_Y:
+        raise SimBAGPUError(msg=f'{sliding_kuipers_two_sample_test_cuda.__name__} supports at most {MAX_GRID_Y} time_windows (CUDA grid limit); got {nw}.', source=sliding_kuipers_two_sample_test_cuda.__name__)
+    window_sizes = (np.asarray(time_windows) * fps).astype(np.int32)
+    if window_sizes.max() > MAX_WIN:
+        raise SimBAGPUError(msg=f'{sliding_kuipers_two_sample_test_cuda.__name__} max window ({int(window_sizes.max())} frames) exceeds the max of {MAX_WIN}; reduce time_windows or fps.', source=sliding_kuipers_two_sample_test_cuda.__name__)
+    s1 = cuda.to_device(np.deg2rad(np.ascontiguousarray(sample_1).astype(np.float32)))
+    s2 = cuda.to_device(np.deg2rad(np.ascontiguousarray(sample_2).astype(np.float32)))
+    ws_dev = cuda.to_device(window_sizes)
+    results = cuda.to_device(np.full((n, nw), -1.0, dtype=np.float64))
+    tpb = (128, 1)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(nw / tpb[1]))
+    _sliding_kuipers_kernel[bpg, tpb](s1, s2, ws_dev, results)
+    return results.copy_to_host()
 
 
 

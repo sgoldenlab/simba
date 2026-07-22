@@ -41,7 +41,9 @@ try:
 except:
     from sklearn.cluster import KMeans
 
-from simba.data_processors.cuda.utils import _cuda_are_rows_equal
+from simba.data_processors.cuda.utils import (_cuda_are_rows_equal,
+                                              _cuda_bubble_sort, _cuda_mad,
+                                              _cuda_median)
 from simba.mixins.statistics_mixin import Statistics
 from simba.utils.checks import (check_float, check_int, check_str,
                                 check_valid_array, check_valid_tuple)
@@ -50,6 +52,7 @@ from simba.utils.enums import Formats
 from simba.utils.errors import SimBAGPUError
 
 MAX_GRID_Y = 65535   # CUDA grid y-dimension limit (windows are launched on grid-y)
+MAX_WIN = 512        # per-thread sort-buffer cap (sliding_iqr)
 
 THREADS_PER_BLOCK = 256
 
@@ -1406,4 +1409,215 @@ def manhattan_distance_cdist_cuda(data: np.ndarray) -> np.ndarray:
     tpb = (16, 16)
     bpg = (math.ceil(n / tpb[0]), math.ceil(n / tpb[1]))
     _manhattan_kernel[bpg, tpb](data_dev, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _gower_kernel(x, y, ranges, results):
+    """One thread per row i. results[i] = mean_j( |x[i,j] - y[i,j]| / ranges[j] ) over columns with ranges[j] != 0."""
+    i = cuda.grid(1)
+    n, d = x.shape[0], x.shape[1]
+    if i >= n:
+        return
+    s = 0.0
+    for j in range(d):
+        r = ranges[j]
+        if r != 0.0:
+            diff = x[i, j] - y[i, j]
+            if diff < 0.0:
+                diff = -diff
+            s += diff / r
+    results[i] = s / d
+
+
+def gower_distance_cuda(x: np.ndarray,
+                        y: np.ndarray) -> np.ndarray:
+    """
+    Compute the Gower-like distance between corresponding rows of two numerical matrices, on the GPU.
+
+    Each row of ``x`` is compared to the row at the same index in ``y`` via the mean of per-feature absolute
+    differences normalized by that feature's range (computed across the rows of ``x``); features with zero
+    range are skipped.
+
+    .. note::
+       Binding memory is the input, not the output: ``x`` and ``y`` are each (n, d) float32, so ~2 * n * d * 4
+       bytes must fit in VRAM (n ~ 4,000,000 at d=300 on a 12 GB card). The output is only an (n,) vector.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/gower_distance_cuda.csv
+       :widths: 20, 20, 20, 20, 20
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU version: :func:`simba.mixins.statistics_mixin.Statistics.gower_distance`.
+
+    :param np.ndarray x: 2D array (n_observations, n_features).
+    :param np.ndarray y: 2D array with the same shape as ``x``.
+    :return: (n_observations,) float32 vector of row-wise Gower distances.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> x = np.random.randint(0, 500, (1000, 6000)).astype(np.float32)
+    >>> y = np.random.randint(0, 500, (1000, 6000)).astype(np.float32)
+    >>> d = gower_distance_cuda(x=x, y=y)
+    """
+    check_valid_array(data=x, source=f'{gower_distance_cuda.__name__} x', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=y, source=f'{gower_distance_cuda.__name__} y', accepted_ndims=(2,), accepted_shapes=[x.shape], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    x = np.ascontiguousarray(x).astype(np.float32)
+    y = np.ascontiguousarray(y).astype(np.float32)
+    ranges = (np.max(x, axis=0) - np.min(x, axis=0)).astype(np.float32)
+    n = x.shape[0]
+    x_dev = cuda.to_device(x)
+    y_dev = cuda.to_device(y)
+    ranges_dev = cuda.to_device(ranges)
+    results = cuda.device_array(n, dtype=np.float32)
+    bpg = math.ceil(n / THREADS_PER_BLOCK)
+    _gower_kernel[bpg, THREADS_PER_BLOCK](x_dev, y_dev, ranges_dev, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _sliding_iqr_kernel(x, frm_win, results):
+    """One thread per output frame r. Sorts the window ending at r and returns sorted[3n//4] - sorted[n//4]."""
+    r = cuda.grid(1)
+    n = x.shape[0]
+    if r >= n or r < frm_win - 1:
+        return
+    buf = cuda.local.array(shape=512, dtype=np.float32)
+    left = r - frm_win + 1
+    for i in range(frm_win):
+        buf[i] = x[left + i]
+    _cuda_bubble_sort(buf[:frm_win])
+    lower = frm_win // 4
+    upper = (3 * frm_win) // 4
+    results[r] = buf[upper] - buf[lower]
+
+
+def sliding_iqr_cuda(x: np.ndarray, window_size: float, sample_rate: float) -> np.ndarray:
+    """
+    Compute the sliding interquartile range (IQR) of a 1D feature array, on the GPU.
+
+    .. note::
+       The window length (``int(window_size * sample_rate)``, min 1) must be <= 512 (per-thread sort buffer).
+       Frames before the first full window are -1. Matches the CPU quartile convention exactly (integer indices
+       sorted[n//4] and sorted[3n//4], no interpolation). Runtime grows with the window length (per-thread sort).
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_iqr_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU version: :func:`simba.mixins.statistics_mixin.Statistics.sliding_iqr`.
+
+    :param np.ndarray x: 1D array of feature values.
+    :param float window_size: Sliding-window size in seconds.
+    :param float sample_rate: Sampling rate in samples per second (e.g. fps). May be fractional.
+    :return: (len(x),) float32 array of sliding IQR values.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> data = np.random.randint(0, 50, (90,)).astype(np.float32)
+    >>> sliding_iqr_cuda(x=data, window_size=0.5, sample_rate=10.0)
+    """
+    check_valid_array(data=x, source=f'{sliding_iqr_cuda.__name__} x', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_iqr_cuda.__name__} window_size', value=window_size, min_value=10e-6)
+    check_float(name=f'{sliding_iqr_cuda.__name__} sample_rate', value=sample_rate, min_value=10e-6)
+    frm_win = max(1, int(window_size * sample_rate))
+    if frm_win > MAX_WIN:
+        raise SimBAGPUError(msg=f'{sliding_iqr_cuda.__name__} window ({frm_win} frames) exceeds the max of {MAX_WIN}; reduce window_size or sample_rate.', source=sliding_iqr_cuda.__name__)
+    n = x.shape[0]
+    x_dev = cuda.to_device(np.ascontiguousarray(x).astype(np.float32))
+    results = cuda.to_device(np.full((n,), -1.0, dtype=np.float32))
+    bpg = math.ceil(n / THREADS_PER_BLOCK)
+    _sliding_iqr_kernel[bpg, THREADS_PER_BLOCK](x_dev, frm_win, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _sliding_mad_median_kernel(x, window_sizes, k, results):
+    """One thread per (frame idx, window wi). Counts outliers where |v - median| > k * MAD within the window."""
+    idx, wi = cuda.grid(2)
+    n = x.shape[0]
+    if idx >= n or wi >= window_sizes.shape[0]:
+        return
+    w = window_sizes[wi]
+    if w < 1 or idx < w - 1:
+        return
+    buf = cuda.local.array(shape=512, dtype=np.float32)
+    left = idx - w + 1
+    for i in range(w):
+        buf[i] = x[left + i]
+    median = _cuda_median(buf[:w])
+    mad = _cuda_mad(buf[:w])
+    threshold = k * mad
+    count = 0
+    for i in range(w):
+        d = buf[i] - median
+        if d < 0.0:
+            d = -d
+        if d > threshold:
+            count += 1
+    results[idx, wi] = count
+
+
+def sliding_mad_median_rule_cuda(data: np.ndarray, k: int, time_windows: np.ndarray, fps: float) -> np.ndarray:
+    """
+    Count outliers in sliding time-windows using the MAD-Median rule, on the GPU.
+
+    A value is an outlier when its absolute deviation from the window median exceeds ``k`` times the window's
+    median absolute deviation (MAD).
+
+    .. note::
+       Each window length (``int(fps * time_window)``) must be <= 512 (per-thread sort buffer). Frames before the
+       first full window are -1. Output is (n_frames, n_time_windows) int32. Runtime grows with window length
+       (per-thread sort).
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_mad_median_rule_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU version: :func:`simba.mixins.statistics_mixin.Statistics.sliding_mad_median_rule`.
+
+    :param np.ndarray data: 1D numerical feature array.
+    :param int k: Outlier threshold as a multiple of the window MAD.
+    :param np.ndarray time_windows: 1D array of window sizes in seconds.
+    :param float fps: Sampling rate of the signal (may be fractional).
+    :return: (n_frames, n_time_windows) int32 array of per-window outlier counts.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> data = np.random.randint(0, 50, (50000,)).astype(np.float32)
+    >>> sliding_mad_median_rule_cuda(data=data, k=2, time_windows=np.array([20.0]), fps=1.0)
+    """
+    check_valid_array(data=data, source=f'{sliding_mad_median_rule_cuda.__name__} data', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=time_windows, source=f'{sliding_mad_median_rule_cuda.__name__} time_windows', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_int(name=f'{sliding_mad_median_rule_cuda.__name__} k', value=k, min_value=1)
+    check_float(name=f'{sliding_mad_median_rule_cuda.__name__} fps', value=fps, min_value=10e-6)
+    n, nw = data.shape[0], time_windows.shape[0]
+    if nw > MAX_GRID_Y:
+        raise SimBAGPUError(msg=f'{sliding_mad_median_rule_cuda.__name__} supports at most {MAX_GRID_Y} time_windows (CUDA grid limit); got {nw}.', source=sliding_mad_median_rule_cuda.__name__)
+    window_sizes = (np.asarray(time_windows) * fps).astype(np.int32)
+    if window_sizes.max() > MAX_WIN:
+        raise SimBAGPUError(msg=f'{sliding_mad_median_rule_cuda.__name__} max window ({int(window_sizes.max())} frames) exceeds the max of {MAX_WIN}; reduce time_windows or fps.', source=sliding_mad_median_rule_cuda.__name__)
+    x_dev = cuda.to_device(np.ascontiguousarray(data).astype(np.float32))
+    ws_dev = cuda.to_device(window_sizes)
+    results = cuda.to_device(np.full((n, nw), -1, dtype=np.int32))
+    tpb = (128, 1)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(nw / tpb[1]))
+    _sliding_mad_median_kernel[bpg, tpb](x_dev, ws_dev, int(k), results)
     return results.copy_to_host()

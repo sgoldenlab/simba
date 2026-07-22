@@ -111,6 +111,13 @@ Time-series statistics (GPU)
    :show-inheritance:
 
 
+Feature extraction (GPU)
+------------------------------
+.. automodule:: simba.data_processors.cuda.feature_extraction_supplement
+   :members:
+   :show-inheritance:
+
+
 SHAP explanations (GPU)
 ------------------------------
 .. automodule:: simba.data_processors.cuda.create_shap_log

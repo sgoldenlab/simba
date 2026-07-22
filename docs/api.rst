@@ -198,6 +198,14 @@ Entry point to SimBA's mixin classes — the reusable method libraries (feature,
 
 Create, train, evaluate, and apply SimBA's behavior classifiers (random-forest based). Configure hyperparameters, run cross-validation, generate evaluation metrics and plots such as feature importances and learning curves, and batch-apply trained models to new videos to produce per-frame behavior probabilities.
 
+.. video:: _static/img/forest_mouse_loop.mp4
+   :width: 700
+   :autoplay:
+   :nocontrols:
+   :loop:
+   :muted:
+   :align: center
+
 .. toctree::
    :maxdepth: 4
 
@@ -256,6 +264,7 @@ Define regions-of-interest — rectangles, circles, and polygons — and analyze
 .. video:: _static/img/arena_move.mp4
    :width: 700
    :autoplay:
+   :nocontrols:
    :loop:
    :muted:
    :align: center
@@ -274,6 +283,7 @@ Compute statistical features from tracking and classification data — descripti
 .. video:: _static/img/abacus_spin.mp4
    :width: 700
    :autoplay:
+   :nocontrols:
    :loop:
    :muted:
    :align: center

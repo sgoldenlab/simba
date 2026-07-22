@@ -1,0 +1,11 @@
+N FRAMES (win=30),MEAN (S),SD (S),FRAMES/S
+**1k**,0.0010,0.0002,**1.0m**
+**10k**,0.0012,0.0000,**8.3m**
+**100k**,0.0035,0.0002,**28.4m**
+**1m**,0.0266,0.0012,**37.7m**
+**10m**,0.2450,0.0065,**40.8m**
+**100m**,2.3284,0.0407,**42.9m**
+**500m**,12.0618,0.6098,**41.5m**
+NVIDIA GeForce RTX 4070,,,
+window=30 frames (1.0s / 30fps); 1 time-window; mean +/- SD of 3 runs,,,
+two per-window sorts + searchsorted CDFs; runtime grows with window (max 512); ~86x vs CPU at 1m,,,
