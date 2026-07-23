@@ -239,6 +239,14 @@ Heuristic filtering of implausible body-part tracking. Location- and movement-ba
 
 Visualize behavioral data and pose-tracking outputs — Gantt plots, path, distance and velocity plots, heatmaps, classification-probability charts, and data overlays rendered onto the original video. Produces both static figures and frame-by-frame videos, with multiprocessing support for large batches.
 
+.. video:: _static/img/simba_monitor.webm
+   :width: 700
+   :autoplay:
+   :nocontrols:
+   :loop:
+   :muted:
+   :align: center
+
 .. toctree::
    :maxdepth: 5
 
@@ -361,6 +369,14 @@ Helper methods used throughout the package — logging, CLI execution, input and
 --------------------------------------------------
 
 Video processing tools built on OpenCV and FFmpeg — clip, crop, concatenate, downsample, re-encode, rotate, and greyscale videos, and compute average/background frames. Covers the common pre-processing steps needed to get raw recordings ready for tracking and analysis, with multiprocessing support for batch jobs.
+
+.. video:: _static/img/betamax_simba_reveal.webm
+   :width: 500
+   :autoplay:
+   :nocontrols:
+   :loop:
+   :muted:
+   :align: center
 
 .. toctree::
    :maxdepth: 5

@@ -1,0 +1,10 @@
+N OBS (m=100),INPUT,MEAN (S),SD (S),OBS/S
+**1k**,1mb,0.0010,0.0001,**1.0m**
+**10k**,8mb,0.0057,0.0001,**1.8m**
+**100k**,80mb,0.0501,0.0005,**2.0m**
+**1m**,800mb,0.4967,0.0093,**2.0m**
+**5m**,4.0gb,2.8186,0.3193,**1.8m**
+**10m**,8.0gb,5.8539,0.1886,**1.7m**
+NVIDIA GeForce RTX 4070 (12GB),,,
+m=100 features; mean +/- SD of 3 runs; float64,,,
+input (n x m) float64 binds memory (~12m obs at m=100 ceiling); ~283x vs CPU at 1m m=100,,,

@@ -1621,3 +1621,277 @@ def sliding_mad_median_rule_cuda(data: np.ndarray, k: int, time_windows: np.ndar
     bpg = (math.ceil(n / tpb[0]), math.ceil(nw / tpb[1]))
     _sliding_mad_median_kernel[bpg, tpb](x_dev, ws_dev, int(k), results)
     return results.copy_to_host()
+
+
+@cuda.jit()
+def _bray_curtis_kernel(x, w, has_w, results):
+    """One thread per (i, j). results[i,j] = (sum|xi-xj| / sum|xi+xj|) * w[min,max] (0 if denominator 0)."""
+    i, j = cuda.grid(2)
+    n, fdim = x.shape[0], x.shape[1]
+    if i >= n or j >= n:
+        return
+    num = 0.0; den = 0.0
+    for k in range(fdim):
+        a = x[i, k]; b = x[j, k]
+        num += math.fabs(a - b)
+        den += math.fabs(a + b)
+    if den == 0.0:
+        val = 0.0
+    else:
+        val = num / den
+        if has_w:
+            if i <= j:
+                val *= w[i, j]
+            else:
+                val *= w[j, i]
+    results[i, j] = val
+
+
+def bray_curtis_dissimilarity_cuda(x: np.ndarray, w: Optional[np.ndarray] = None) -> np.ndarray:
+    """
+    Compute the pairwise Bray-Curtis dissimilarity matrix between all rows of a 2D array, on the GPU.
+
+    Dissimilarity is 0 for identical observations and 1 for completely dissimilar ones.
+
+    .. note::
+       Output is a dense (n, n) float32 matrix, so memory scales with n^2 (n=50,000 ~ 10 GB, the in-VRAM ceiling
+       on a 12 GB card). Matches the CPU version exactly (float32 output). An optional weight matrix is applied
+       from its upper triangle (mirrored to the lower), matching the CPU convention.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/bray_curtis_dissimilarity_cuda.csv
+       :widths: 20, 20, 20, 20, 20
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numba) version: :func:`simba.mixins.statistics_mixin.Statistics.bray_curtis_dissimilarity`.
+
+    :param np.ndarray x: 2D array (n_observations, n_features) of (likely normalized) feature values.
+    :param Optional[np.ndarray] w: Optional (n, n) weight matrix. Default None (all pairs weighted equally).
+    :return: (n, n) float32 Bray-Curtis dissimilarity matrix.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> x = np.array([[1, 1, 1, 1, 1], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [1, 1, 1, 1, 1]]).astype(np.float32)
+    >>> bray_curtis_dissimilarity_cuda(x=x)
+    """
+    check_valid_array(data=x, source=f'{bray_curtis_dissimilarity_cuda.__name__} x', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    n = x.shape[0]
+    has_w = w is not None
+    if has_w:
+        check_valid_array(data=w, source=f'{bray_curtis_dissimilarity_cuda.__name__} w', accepted_ndims=(2,), accepted_shapes=[(n, n)], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        w_dev = cuda.to_device(np.ascontiguousarray(w).astype(np.float64))
+    else:
+        w_dev = cuda.to_device(np.zeros((1, 1), dtype=np.float64))
+    x_dev = cuda.to_device(np.ascontiguousarray(x).astype(np.float32))
+    results = cuda.device_array((n, n), dtype=np.float32)
+    tpb = (16, 16)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(n / tpb[1]))
+    _bray_curtis_kernel[bpg, tpb](x_dev, w_dev, has_w, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _cov_matrix_kernel(data, means, results):
+    """One thread per (i, j) feature pair. results[i,j] = sum_k (x[k,i]-mean_i)(x[k,j]-mean_j) / (n-1)."""
+    i, j = cuda.grid(2)
+    n, m = data.shape[0], data.shape[1]
+    if i >= m or j >= m:
+        return
+    mi = means[i]; mj = means[j]
+    s = 0.0
+    for k in range(n):
+        s += (data[k, i] - mi) * (data[k, j] - mj)
+    results[i, j] = s / (n - 1)
+
+
+def cov_matrix_cuda(data: np.ndarray) -> np.ndarray:
+    """
+    Compute the covariance matrix of a 2D array (observations x features), on the GPU.
+
+    .. note::
+       Output is the (m, m) sample covariance matrix (``n - 1`` denominator). One thread per feature pair, so
+       parallelism scales with m^2 (small m under-uses the GPU); input memory scales with n * m. Computed in
+       float64 - matches the CPU version to ~1e-16.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/cov_matrix_cuda.csv
+       :widths: 20, 20, 20, 20, 20
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numba) version: :func:`simba.mixins.statistics_mixin.Statistics.cov_matrix`.
+
+    :param np.ndarray data: 2D array (n_observations, n_features).
+    :return: (n_features, n_features) float64 covariance matrix.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> data = np.random.randint(0, 2, (200, 40)).astype(np.float32)
+    >>> cov_matrix_cuda(data=data)
+    """
+    check_valid_array(data=data, source=f'{cov_matrix_cuda.__name__} data', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    x = np.ascontiguousarray(data).astype(np.float64)
+    means = np.sum(x, axis=0) / x.shape[0]
+    m = x.shape[1]
+    data_dev = cuda.to_device(x)
+    means_dev = cuda.to_device(np.ascontiguousarray(means))
+    results = cuda.device_array((m, m), dtype=np.float64)
+    tpb = (16, 16)
+    bpg = (math.ceil(m / tpb[0]), math.ceil(m / tpb[1]))
+    _cov_matrix_kernel[bpg, tpb](data_dev, means_dev, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _sliding_z_scores_kernel(data, window_sizes, results):
+    """One thread per (frame idx, window wi). z-score of data[idx] within the LAST window covering it (matches CPU overwrite)."""
+    idx, wi = cuda.grid(2)
+    n = data.shape[0]
+    if idx >= n or wi >= window_sizes.shape[0]:
+        return
+    w = window_sizes[wi]
+    if w < 1 or w > n:
+        return
+    rl = idx + w - 1
+    if rl > n - 1:
+        rl = n - 1
+    left = rl - w + 1
+    m = 0.0
+    for k in range(left, rl + 1):
+        m += data[k]
+    m /= w
+    v = 0.0
+    for k in range(left, rl + 1):
+        d = data[k] - m
+        v += d * d
+    s = math.sqrt(v / w)
+    results[idx, wi] = (data[idx] - m) / s
+
+
+def sliding_z_scores_cuda(data: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
+    """
+    Compute sliding Z-scores of a 1D signal over one or more time windows, on the GPU.
+
+    Each value's Z-score is measured against the mean/std of the trailing window it belongs to (matching the CPU
+    overwrite semantics: the last window covering a frame determines its value).
+
+    .. note::
+       Output is (n_frames, n_time_windows) float64. Windows larger than the data length yield 0. Constant windows
+       (std 0) yield inf/nan, as in the CPU/NumPy version.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_z_scores_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numpy) version: :func:`simba.mixins.statistics_mixin.Statistics.sliding_z_scores`.
+
+    :param np.ndarray data: 1D signal.
+    :param np.ndarray time_windows: 1D array of window sizes in seconds.
+    :param float fps: Samples per second (may be fractional).
+    :return: (n_frames, n_time_windows) float64 array of sliding Z-scores.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> data = np.random.randint(0, 100, (1000,)).astype(np.float32)
+    >>> sliding_z_scores_cuda(data=data, time_windows=np.array([1.0, 2.5]), fps=10.0)
+    """
+    check_valid_array(data=data, source=f'{sliding_z_scores_cuda.__name__} data', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=time_windows, source=f'{sliding_z_scores_cuda.__name__} time_windows', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_z_scores_cuda.__name__} fps', value=fps, min_value=10e-6)
+    n, nw = data.shape[0], time_windows.shape[0]
+    if nw > MAX_GRID_Y:
+        raise SimBAGPUError(msg=f'{sliding_z_scores_cuda.__name__} supports at most {MAX_GRID_Y} time_windows (CUDA grid limit); got {nw}.', source=sliding_z_scores_cuda.__name__)
+    ws = (np.asarray(time_windows) * fps).astype(np.int32)
+    data_dev = cuda.to_device(np.ascontiguousarray(data).astype(np.float64))
+    ws_dev = cuda.to_device(ws)
+    results = cuda.to_device(np.full((n, nw), 0.0, dtype=np.float64))
+    tpb = (128, 1)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(nw / tpb[1]))
+    _sliding_z_scores_kernel[bpg, tpb](data_dev, ws_dev, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _sliding_skew_kernel(data, window_sizes, results):
+    """One thread per (frame idx, window wi). results[idx,wi] = skewness of the window ending at idx."""
+    idx, wi = cuda.grid(2)
+    n = data.shape[0]
+    if idx >= n or wi >= window_sizes.shape[0]:
+        return
+    w = window_sizes[wi]
+    if w < 1 or idx < w - 1:
+        return
+    left = idx - w + 1
+    m = 0.0
+    for k in range(left, idx + 1):
+        m += data[k]
+    m /= w
+    s2 = 0.0
+    s3 = 0.0
+    for k in range(left, idx + 1):
+        d = data[k] - m
+        s2 += d * d
+        s3 += d * d * d
+    std = math.sqrt(s2 / w)
+    results[idx, wi] = (s3 / w) / (std * std * std)
+
+
+def sliding_skew_cuda(data: np.ndarray, time_windows: np.ndarray, sample_rate: float) -> np.ndarray:
+    """
+    Compute the sliding skewness of a 1D signal over one or more time windows, on the GPU.
+
+    .. note::
+       Output is (n_frames, n_time_windows) float64; frames before the first full window are 0. Uses population
+       standard deviation (ddof=0). Constant windows (std 0) yield inf/nan, as in the CPU/NumPy version.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_skew_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numpy) version: :func:`simba.mixins.statistics_mixin.Statistics.sliding_skew`.
+
+    :param np.ndarray data: 1D signal.
+    :param np.ndarray time_windows: 1D array of window sizes in seconds.
+    :param float sample_rate: Samples per second (may be fractional).
+    :return: (n_frames, n_time_windows) float64 array of sliding skewness values.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> data = np.random.randint(0, 100, (10,)).astype(np.float32)
+    >>> sliding_skew_cuda(data=data, time_windows=np.array([1.0, 2.0]), sample_rate=2.0)
+    """
+    check_valid_array(data=data, source=f'{sliding_skew_cuda.__name__} data', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=time_windows, source=f'{sliding_skew_cuda.__name__} time_windows', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_skew_cuda.__name__} sample_rate', value=sample_rate, min_value=10e-6)
+    n, nw = data.shape[0], time_windows.shape[0]
+    if nw > MAX_GRID_Y:
+        raise SimBAGPUError(msg=f'{sliding_skew_cuda.__name__} supports at most {MAX_GRID_Y} time_windows (CUDA grid limit); got {nw}.', source=sliding_skew_cuda.__name__)
+    ws = (np.asarray(time_windows) * sample_rate).astype(np.int32)
+    data_dev = cuda.to_device(np.ascontiguousarray(data).astype(np.float64))
+    ws_dev = cuda.to_device(ws)
+    results = cuda.to_device(np.full((n, nw), 0.0, dtype=np.float64))
+    tpb = (128, 1)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(nw / tpb[1]))
+    _sliding_skew_kernel[bpg, tpb](data_dev, ws_dev, results)
+    return results.copy_to_host()

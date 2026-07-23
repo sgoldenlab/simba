@@ -113,6 +113,13 @@ Time-series statistics (GPU)
 
 Feature extraction (GPU)
 ------------------------------
+.. automodule:: simba.data_processors.cuda.feature_extraction
+   :members:
+   :show-inheritance:
+
+
+Feature extraction supplement (GPU)
+------------------------------------
 .. automodule:: simba.data_processors.cuda.feature_extraction_supplement
    :members:
    :show-inheritance:

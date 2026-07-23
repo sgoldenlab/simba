@@ -1,0 +1,10 @@
+N FRAMES (win=30),MEAN (S),SD (S),FRAMES/S
+**1k**,0.0007,0.0001,**1.3m**
+**10k**,0.0008,0.0001,**13.1m**
+**100k**,0.0018,0.0002,**54.7m**
+**1m**,0.0118,0.0005,**84.8m**
+**10m**,0.1068,0.0031,**93.6m**
+**100m**,1.0409,0.0109,**96.1m**
+NVIDIA GeForce RTX 4070 (12GB),,,
+window=30 frames (1.0s / 30fps); mean +/- SD of 3 runs,,,
+x (n x 2) + mass (n) float64 bind memory (~300m ceiling); ~45x vs CPU at 1m,,,

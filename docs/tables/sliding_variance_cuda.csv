@@ -1,0 +1,11 @@
+N FRAMES (win=30),MEAN (S),SD (S),FRAMES/S
+**1k**,0.0006,0.0001,**1.7m**
+**10k**,0.0006,0.0001,**16.8m**
+**100k**,0.0008,0.0001,**123.0m**
+**1m**,0.0056,0.0005,**177.5m**
+**10m**,0.0467,0.0002,**214.1m**
+**100m**,0.4975,0.0520,**201.0m**
+**500m**,2.3287,0.0759,**214.7m**
+NVIDIA GeForce RTX 4070,,,
+window=30 frames (1.0s / 30fps); 1 window; mean +/- SD of 3 runs; float32,,,
+population variance (ddof=0); ~8x vs CPU numba np.var at 1m (CPU already fast),,,

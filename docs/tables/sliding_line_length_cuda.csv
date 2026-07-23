@@ -1,0 +1,11 @@
+N FRAMES (win=30),MEAN (S),SD (S),FRAMES/S
+**1k**,0.0006,0.0001,**1.6m**
+**10k**,0.0006,0.0001,**16.9m**
+**100k**,0.0008,0.0001,**121.5m**
+**1m**,0.0055,0.0001,**183.0m**
+**10m**,0.0481,0.0007,**208.0m**
+**100m**,0.4797,0.0099,**208.5m**
+**500m**,2.3279,0.0296,**214.8m**
+NVIDIA GeForce RTX 4070,,,
+window=30 frames (1.0s / 30fps); 1 window; mean +/- SD of 3 runs; float32,,,
+sum of |consecutive diffs| per window; ~35x vs CPU numba at 1m,,,

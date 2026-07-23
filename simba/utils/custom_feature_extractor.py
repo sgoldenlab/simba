@@ -53,6 +53,13 @@ class CustomFeatureExtractor(ConfigReader):
         and does not use argparse, see `this file <https://github.com/lapphe/AMBER-pipeline/blob/main/SimBA_AMBER_project/AMBER_2_0__feature_extraction/amber_feature_extraction_20230815.py>`_. More examples can be found in `this github documentation <https://github.com/sgoldenlab/simba/blob/master/docs/extractFeatures.md>`_.
         We can give prompt help with troubleshooting through Gitter or GitHb.
 
+    :references:
+       .. [1] Lapp, Hannah E., Melissa G. Salazar, and Frances A. Champagne. “Automated Maternal Behavior during Early Life in Rodents (AMBER) Pipeline.” Scientific Reports 13, no. 1 (October 2023): 18277. https://doi.org/10.1038/s41598-023-45495-4. Example of a SimBA custom feature extraction class used to score home-cage dam/pup behavior; see `the AMBER feature extractor <https://github.com/lapphe/AMBER-pipeline/blob/main/SimBA_AMBER_project/AMBER_2_0__feature_extraction/amber_feature_extraction_20230815.py>`_.
+       .. [2] Newton, Kyle C., Dovi Kacev, Simon R. O. Nilsson, Allison L. Saettele, Sam A. Golden, and Lavinia Sheets. “Lateral Line Ablation by Ototoxic Compounds Results in Distinct Rheotaxis Profiles in Larval Zebrafish.” Communications Biology 6, no. 1 (January 2023): 84. https://doi.org/10.1038/s42003-023-04449-2. Example of custom feature extraction applied to (non-shape-shifting) larval zebrafish; see `the fish feature extractor <https://github.com/sgoldenlab/simba/blob/master/simba/feature_extractors/misc/fish_feature_extractor_2023_version_5.py>`_.
+       .. [3] Popik, Piotr, Ewelina Cyrano, Diana Piotrowska, Malgorzata Holuj, Joanna Golebiowska, Natalia Malikowska-Racia, Agnieszka Potasiewicz, and Agnieszka Nikiforuk. “Effects of Ketamine on Rat Social Behavior as Analyzed by DeepLabCut and SimBA Deep Learning Algorithms.” Frontiers in Pharmacology 14 (January 2024): 1329424. https://doi.org/10.3389/fphar.2023.1329424. Example of custom feature extraction used to score rat social behavior.
+       .. [4] Mitelut, Catalin, Marielisa Diez Castro, Ralph E. Peterson, Maria Gonçalves, Jennifer Li, Madeline Gamer, Simon R. O. Nilsson, Talmo D. Pereira, and Dan H. Sanes. “Continuous Monitoring and Machine Vision Reveals That Developing Gerbils Exhibit Structured Social Behaviors Prior to the Emergence of Autonomy.” PLOS Biology 23, no. 9 (September 2025): e3003348. https://doi.org/10.1371/journal.pbio.3003348. Example of custom pose-estimation feature extraction and behavior classification applied to developing gerbils.
+       .. [5] Padmanaban, Naresh, Rianna Ambosie, Stefan Choy, Shoshanah Marcus, Simon R. O. Nilsson, Alex C. Keene, Johanna E. Kowalko, and Erik R. Duboué. “Automated Behavioral Profiling Using Neural Networks Reveals Differences in Stress-Like Behavior Between Cave and Surface-Dwelling Astyanax mexicanus.” Journal of Experimental Zoology Part B: Molecular and Developmental Evolution 344, no. 6 (2025): 352–362. https://doi.org/10.1002/jez.b.23311. Example of custom feature extraction and behavior classification applied to cave- and surface-dwelling fish.
+
     :example:
 
     >>> test = CustomFeatureExtractor(extractor_file_path='/simba/misc/piotr.py', config_path='/Users/simon/Desktop/envs/troubleshooting/piotr/project_folder/train-20231108-sh9-frames-with-p-lt-2_plus3-&3_best-f1.ini')
@@ -61,6 +68,9 @@ class CustomFeatureExtractor(ConfigReader):
     >>> test.run()
     >>> test = CustomFeatureExtractor(extractor_file_path='/Users/simon/Desktop/envs/simba/simba/simba/feature_extractors/amber_feature_extractor.py', config_path='/Users/simon/Desktop/envs/simba/troubleshooting/Amber_test/project_folder/project_config.ini')
     >>> test.run()
+
+
+
     """
 
     def __init__(self,

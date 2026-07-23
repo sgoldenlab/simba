@@ -1,0 +1,10 @@
+N FRAMES (win=30),MEAN (S),SD (S),FRAMES/S
+**1k**,0.0005,0.0001,**2.1m**
+**10k**,0.0005,0.0001,**18.7m**
+**100k**,0.0020,0.0000,**49.0m**
+**1m**,0.0157,0.0003,**63.9m**
+**10m**,0.1489,0.0058,**67.2m**
+**100m**,1.7953,0.0981,**55.7m**
+NVIDIA GeForce RTX 4070 (12GB),,,
+window=30 frames (1.0s / 30fps); 2D path; mean +/- SD of 3 runs,,,
+acceleration array (n x 2) float64 binds memory (~300m ceiling; 500m OOMs); ~250x vs CPU at 1m,,,

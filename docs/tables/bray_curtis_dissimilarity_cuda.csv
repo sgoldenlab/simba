@@ -1,0 +1,12 @@
+N OBS (F=30),OUTPUT,MEAN (S),SD (S),PAIRS/S
+**1k**,4mb,0.0022,0.0001,**446.2m**
+**2k**,16mb,0.0065,0.0002,**618.4m**
+**5k**,100mb,0.0381,0.0014,**656.8m**
+**10k**,400mb,0.1382,0.0052,**723.7m**
+**20k**,1.6gb,0.5582,0.0208,**716.6m**
+**30k**,3.6gb,1.3267,0.0921,**678.4m**
+**40k**,6.4gb,2.3235,0.1108,**688.6m**
+**50k**,10.0gb,3.9855,0.0328,**627.3m**
+NVIDIA GeForce RTX 4070 (12GB),,,,
+F=30 features; mean +/- SD of 3 runs; unweighted,,,,
+dense (n x n) float32 output -> memory scales n^2 (50k~10GB ceiling); ~11x vs CPU numba at 8k,,,,

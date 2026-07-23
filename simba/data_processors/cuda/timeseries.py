@@ -1,22 +1,24 @@
 import math
 from time import perf_counter
-from typing import Optional
+from typing import Literal, Optional
 
 import numpy as np
 from numba import cuda, float64
 
 from simba.data_processors.cuda.utils import (_cuda_diff, _cuda_mean,
-                                              _cuda_nanvariance, _cuda_std,
-                                              _euclid_dist_2d,
+                                              _cuda_median, _cuda_nanvariance,
+                                              _cuda_std, _euclid_dist_2d,
                                               _is_cuda_available)
-from simba.utils.checks import (check_float, check_int, check_valid_array,
-                                check_valid_boolean)
+from simba.utils.checks import (check_float, check_int, check_str,
+                                check_valid_array, check_valid_boolean)
 from simba.utils.enums import Formats
 from simba.utils.errors import SimBAGPUError
 
 THREADS_PER_BLOCK = 1024
 MAX_HJORTH_WINDOW = 512
 MAX_GRID_Y = 65535   # CUDA grid y-dimension limit (windows are launched on grid-y)
+MAX_WIN = 512        # per-thread sort-buffer cap (sliding_path_curvature median)
+_NAN = np.float32(np.nan)
 
 @cuda.jit(device=True)
 def _count_at_threshold(x: np.ndarray, inverse: int, threshold: float):
@@ -437,4 +439,521 @@ def sliding_two_signal_crosscorrelation_cuda(x: np.ndarray, y: np.ndarray, windo
     tpb = (128, 1)
     bpg = (math.ceil(n / tpb[0]), math.ceil(nw / tpb[1]))
     _sliding_xcorr_kernel[bpg, tpb](x_dev, y_dev, ws_dev, lag_frm, normalize, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _sliding_line_length_kernel(data, window_sizes, results):
+    """One thread per (frame idx, window wi). results[idx,wi] = sum of |consecutive diffs| in the window ending at idx."""
+    idx, wi = cuda.grid(2)
+    n = data.shape[0]
+    if idx >= n or wi >= window_sizes.shape[0]:
+        return
+    w = window_sizes[wi]
+    if w < 1 or idx < w - 1:
+        return
+    left = idx - w + 1
+    s = 0.0
+    for k in range(left, idx):
+        d = data[k + 1] - data[k]
+        if d < 0.0:
+            d = -d
+        s += d
+    results[idx, wi] = s
+
+
+def sliding_line_length_cuda(data: np.ndarray, window_sizes: np.ndarray, sample_rate: float) -> np.ndarray:
+    """
+    Compute the sliding line length (sum of absolute consecutive differences) of a 1D signal, on the GPU.
+
+    .. note::
+       Output is (n_frames, n_window_sizes) float32; frames before the first full window are -1. Matches the CPU
+       version exactly (float64 accumulation).
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_line_length_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numba) version: :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_line_length`.
+
+    :param np.ndarray data: 1D signal.
+    :param np.ndarray window_sizes: 1D array of window sizes in seconds.
+    :param float sample_rate: Samples per second (may be fractional).
+    :return: (n_frames, n_window_sizes) float32 array of sliding line-length values.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> data = np.array([1, 4, 2, 3, 5, 6, 8, 7, 9, 10]).astype(np.float32)
+    >>> sliding_line_length_cuda(data=data, window_sizes=np.array([1.0]), sample_rate=2.0)
+    """
+    check_valid_array(data=data, source=f'{sliding_line_length_cuda.__name__} data', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=window_sizes, source=f'{sliding_line_length_cuda.__name__} window_sizes', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_line_length_cuda.__name__} sample_rate', value=sample_rate, min_value=10e-6)
+    n, nw = data.shape[0], window_sizes.shape[0]
+    if nw > MAX_GRID_Y:
+        raise SimBAGPUError(msg=f'{sliding_line_length_cuda.__name__} supports at most {MAX_GRID_Y} window_sizes (CUDA grid limit); got {nw}.', source=sliding_line_length_cuda.__name__)
+    ws = (np.asarray(window_sizes) * sample_rate).astype(np.int32)
+    data_dev = cuda.to_device(np.ascontiguousarray(data).astype(np.float64))
+    ws_dev = cuda.to_device(ws)
+    results = cuda.to_device(np.full((n, nw), -1.0, dtype=np.float32))
+    tpb = (128, 1)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(nw / tpb[1]))
+    _sliding_line_length_kernel[bpg, tpb](data_dev, ws_dev, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _sliding_msj_kernel(A, n_full, frame_step, results):
+    """One thread per output row r. Mean squared jerk = mean over the window of sum_m (A[i+1,m]-A[i,m])^2."""
+    r = cuda.grid(1)
+    n = results.shape[0]
+    m = A.shape[1]
+    if r >= n or r < frame_step:
+        return
+    left = r - frame_step
+    a_end = r if r < n_full else n_full
+    njerk = (a_end - left) - 1
+    if njerk <= 0:
+        results[r] = 0.0
+        return
+    s = 0.0
+    for i in range(left, a_end - 1):
+        for c in range(m):
+            d = A[i + 1, c] - A[i, c]
+            s += d * d
+    results[r] = s / njerk
+
+
+def sliding_mean_squared_jerk_cuda(x: np.ndarray, window_size: float, sample_rate: float) -> np.ndarray:
+    """
+    Compute the sliding mean squared jerk (rate of change of acceleration) of a 2D path, on the GPU.
+
+    Jerk is the derivative of acceleration; high values indicate abrupt motion changes.
+
+    .. note::
+       Output is a 1D float64 array of length n_frames; frames before the first full window are -1. Matches the CPU
+       version to floating-point summation order (~1e-9).
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_mean_squared_jerk_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numba) version: :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_mean_squared_jerk`.
+
+    :param np.ndarray x: 2D array (n_frames, n_dims) of positions.
+    :param float window_size: Sliding-window size in seconds.
+    :param float sample_rate: Samples per second (may be fractional).
+    :return: (n_frames,) float64 array of mean squared jerk per window.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> x = np.random.randint(0, 500, (5000, 2)).astype(np.float32)
+    >>> sliding_mean_squared_jerk_cuda(x=x, window_size=1.0, sample_rate=30.0)
+    """
+    check_valid_array(data=x, source=f'{sliding_mean_squared_jerk_cuda.__name__} x', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_mean_squared_jerk_cuda.__name__} window_size', value=window_size, min_value=10e-6)
+    check_float(name=f'{sliding_mean_squared_jerk_cuda.__name__} sample_rate', value=sample_rate, min_value=10e-6)
+    n = x.shape[0]
+    frame_step = int(max(1.0, window_size * sample_rate))
+    A = np.diff(np.diff(np.ascontiguousarray(x).astype(np.float64), axis=0), axis=0)
+    n_full = A.shape[0]
+    A_dev = cuda.to_device(np.ascontiguousarray(A))
+    results = cuda.to_device(np.full(n, -1.0, dtype=np.float64))
+    bpg = math.ceil(n / THREADS_PER_BLOCK)
+    _sliding_msj_kernel[bpg, THREADS_PER_BLOCK](A_dev, n_full, frame_step, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _sliding_path_curvature_kernel(x, frame_step, agg, results):
+    """One thread per output row. Aggregated (0=mean,1=median,2=max) path curvature over the window ending at the row."""
+    o = cuda.grid(1)
+    n = results.shape[0]
+    if o >= n or o < frame_step - 1:
+        return
+    left = o + 1 - frame_step
+    buf = cuda.local.array(shape=512, dtype=np.float64)
+    cnt = 0
+    s = 0.0
+    mx = -1.0e30
+    for k in range(frame_step - 2):
+        x0 = x[left + k, 0]; x1 = x[left + k + 1, 0]; x2 = x[left + k + 2, 0]
+        y0 = x[left + k, 1]; y1 = x[left + k + 1, 1]; y2 = x[left + k + 2, 1]
+        xp = x1 - x0
+        yp = y1 - y0
+        xpp = (x2 - x1) - (x1 - x0)
+        ypp = (y2 - y1) - (y1 - y0)
+        den = (xp * xp + yp * yp) ** 1.5
+        if den != 0.0:
+            c = math.fabs(xp * ypp - yp * xpp) / den
+            s += c
+            if c > mx:
+                mx = c
+            if agg == 1:
+                buf[cnt] = c
+            cnt += 1
+    if cnt == 0:
+        results[o] = _NAN
+        return
+    if agg == 0:
+        results[o] = s / cnt
+    elif agg == 2:
+        results[o] = mx
+    else:
+        results[o] = _cuda_median(buf[:cnt])
+
+
+def sliding_path_curvature_cuda(x: np.ndarray,
+                                agg_type: Literal['mean', 'median', 'max'],
+                                window_size: float,
+                                sample_rate: float) -> np.ndarray:
+    """
+    Compute the aggregated path curvature over sliding windows of a 2D path, on the GPU.
+
+    Higher values indicate sharper/more frequent directional changes within the window.
+
+    .. note::
+       Output is a 1D float32 array of length n_frames; frames before the first full window are NaN, and windows
+       whose curvature is undefined everywhere (zero velocity) are NaN. For ``agg_type='median'`` the window must
+       be <= 514 frames (per-thread sort buffer). Matches the CPU version.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_path_curvature_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU version: :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_path_curvature`.
+
+    :param np.ndarray x: 2D array (n_frames, 2) of path (x, y) coordinates.
+    :param Literal['mean','median','max'] agg_type: Aggregation of curvature within each window.
+    :param float window_size: Window size in seconds.
+    :param float sample_rate: Samples per second (may be fractional).
+    :return: (n_frames,) float32 array of aggregated curvature per window.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> x = np.random.randint(0, 500, (91, 2)).astype(np.float32)
+    >>> sliding_path_curvature_cuda(x=x, agg_type='mean', window_size=1.0, sample_rate=30.0)
+    """
+    check_valid_array(data=x, source=f'{sliding_path_curvature_cuda.__name__} x', accepted_ndims=(2,), accepted_axis_1_shape=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_str(name=f'{sliding_path_curvature_cuda.__name__} agg_type', value=agg_type, options=('mean', 'median', 'max'))
+    check_float(name=f'{sliding_path_curvature_cuda.__name__} window_size', value=window_size, min_value=10e-6)
+    check_float(name=f'{sliding_path_curvature_cuda.__name__} sample_rate', value=sample_rate, min_value=10e-6)
+    n = x.shape[0]
+    frame_step = int(max(1.0, window_size * sample_rate))
+    agg = {'mean': 0, 'median': 1, 'max': 2}[agg_type]
+    if agg == 1 and (frame_step - 2) > MAX_WIN:
+        raise SimBAGPUError(msg=f"{sliding_path_curvature_cuda.__name__} agg_type='median' supports windows up to {MAX_WIN + 2} frames; got {frame_step}.", source=sliding_path_curvature_cuda.__name__)
+    x_dev = cuda.to_device(np.ascontiguousarray(x).astype(np.float64))
+    results = cuda.to_device(np.full(n, np.nan, dtype=np.float32))
+    bpg = math.ceil(n / THREADS_PER_BLOCK)
+    _sliding_path_curvature_kernel[bpg, THREADS_PER_BLOCK](x_dev, frame_step, agg, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _sliding_aspect_ratio_kernel(x, window_frm, px_per_mm, results):
+    """One thread per output row. Bounding-box (w/h)*px_per_mm over the window ending at the row; -1 if degenerate."""
+    o = cuda.grid(1)
+    n = results.shape[0]
+    if o >= n or o < window_frm - 1:
+        return
+    left = o + 1 - window_frm
+    xmin = x[left, 0]; xmax = x[left, 0]
+    ymin = x[left, 1]; ymax = x[left, 1]
+    for k in range(left + 1, o + 1):
+        vx = x[k, 0]; vy = x[k, 1]
+        if vx < xmin:
+            xmin = vx
+        if vx > xmax:
+            xmax = vx
+        if vy < ymin:
+            ymin = vy
+        if vy > ymax:
+            ymax = vy
+    w = xmax - xmin
+    h = ymax - ymin
+    if w == 0.0 or h == 0.0:
+        results[o] = -1.0
+    else:
+        results[o] = (w / h) * px_per_mm
+
+
+def sliding_path_aspect_ratio_cuda(x: np.ndarray,
+                                   window_size: float,
+                                   sample_rate: float,
+                                   px_per_mm: float) -> np.ndarray:
+    """
+    Compute the sliding bounding-box aspect ratio (width/height) of a 2D path, on the GPU.
+
+    .. note::
+       Output is a 1D float32 array of length n_frames; frames before the first full window are NaN, and windows
+       with zero width or height are -1. Matches the CPU version (float64 division).
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_path_aspect_ratio_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU version: :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_path_aspect_ratio`.
+
+    :param np.ndarray x: 2D array (n_frames, 2) of path (x, y) coordinates.
+    :param float window_size: Window size in seconds (converted to frames via ``ceil(window_size * sample_rate)``).
+    :param float sample_rate: Samples per second (may be fractional).
+    :param float px_per_mm: Pixels-per-millimeter conversion factor.
+    :return: (n_frames,) float32 array of aspect ratios per window.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> x = np.random.randint(0, 500, (10, 2)).astype(np.float32)
+    >>> sliding_path_aspect_ratio_cuda(x=x, window_size=1.0, sample_rate=2.0, px_per_mm=1.0)
+    """
+    check_valid_array(data=x, source=f'{sliding_path_aspect_ratio_cuda.__name__} x', accepted_ndims=(2,), accepted_axis_1_shape=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_path_aspect_ratio_cuda.__name__} window_size', value=window_size, min_value=10e-6)
+    check_float(name=f'{sliding_path_aspect_ratio_cuda.__name__} sample_rate', value=sample_rate, min_value=10e-6)
+    check_float(name=f'{sliding_path_aspect_ratio_cuda.__name__} px_per_mm', value=px_per_mm, min_value=10e-6)
+    n = x.shape[0]
+    window_frm = int(math.ceil(window_size * sample_rate))
+    x_dev = cuda.to_device(np.ascontiguousarray(x).astype(np.float64))
+    results = cuda.to_device(np.full(n, np.nan, dtype=np.float32))
+    bpg = math.ceil(n / THREADS_PER_BLOCK)
+    _sliding_aspect_ratio_kernel[bpg, THREADS_PER_BLOCK](x_dev, window_frm, float(px_per_mm), results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _sliding_ake_kernel(x, mass, window_frm, inv_dt2, results):
+    """One thread per output row. 0.5 * mean(mass) * mean(speed^2) over the window ending at the row."""
+    o = cuda.grid(1)
+    n = results.shape[0]
+    if o >= n or o < window_frm - 1:
+        return
+    left = o + 1 - window_frm
+    msum = 0.0
+    for k in range(left, o + 1):
+        msum += mass[k]
+    mass_mean = msum / window_frm
+    ndiff = window_frm - 1
+    if ndiff <= 0:
+        results[o] = _NAN
+        return
+    ssq = 0.0
+    for k in range(left, o):
+        dx = x[k + 1, 0] - x[k, 0]
+        dy = x[k + 1, 1] - x[k, 1]
+        ssq += dx * dx + dy * dy
+    mean_speed_sq = (ssq * inv_dt2) / ndiff
+    results[o] = 0.5 * mass_mean * mean_speed_sq
+
+
+def sliding_avg_kinetic_energy_cuda(x: np.ndarray, mass: np.ndarray, sample_rate: float, time_window: float) -> np.ndarray:
+    """
+    Compute the sliding average kinetic energy of a moving 2D point over time windows, on the GPU.
+
+    Kinetic energy is ``0.5 * mean(mass) * mean(speed^2)`` within each window, where ``speed = |delta position| * sample_rate``.
+
+    .. note::
+       Output is a 1D float32 array of length n_frames; frames before the first full window are -1. The window
+       length is ``ceil(sample_rate * time_window)``. Matches the CPU version (float64 computation).
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_avg_kinetic_energy_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU version: :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_avg_kinetic_energy`.
+
+    :param np.ndarray x: 2D array (n_frames, 2) of point (x, y) coordinates.
+    :param np.ndarray mass: 1D array (n_frames,) of per-frame mass (e.g. hull area).
+    :param float sample_rate: Samples per second (may be fractional).
+    :param float time_window: Window size in seconds.
+    :return: (n_frames,) float32 array of average kinetic energy per window.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> x = np.random.randint(0, 500, (5000, 2)).astype(np.float32)
+    >>> mass = np.random.randint(10, 100, (5000,)).astype(np.float32)
+    >>> sliding_avg_kinetic_energy_cuda(x=x, mass=mass, sample_rate=30.0, time_window=1.0)
+    """
+    check_valid_array(data=x, source=f'{sliding_avg_kinetic_energy_cuda.__name__} x', accepted_ndims=(2,), accepted_axis_1_shape=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=mass, source=f'{sliding_avg_kinetic_energy_cuda.__name__} mass', accepted_ndims=(1,), accepted_shapes=[(x.shape[0],)], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_avg_kinetic_energy_cuda.__name__} sample_rate', value=sample_rate, min_value=10e-6)
+    check_float(name=f'{sliding_avg_kinetic_energy_cuda.__name__} time_window', value=time_window, min_value=10e-6)
+    n = x.shape[0]
+    window_frm = int(math.ceil(sample_rate * time_window))
+    inv_dt2 = float(sample_rate) * float(sample_rate)
+    x_dev = cuda.to_device(np.ascontiguousarray(x).astype(np.float64))
+    mass_dev = cuda.to_device(np.ascontiguousarray(mass).astype(np.float64))
+    results = cuda.to_device(np.full(n, -1.0, dtype=np.float32))
+    bpg = math.ceil(n / THREADS_PER_BLOCK)
+    _sliding_ake_kernel[bpg, THREADS_PER_BLOCK](x_dev, mass_dev, window_frm, inv_dt2, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _sliding_momentum_kernel(x, mass, window_frm, inv_dt, results):
+    """One thread per output row. mean(mass) * mean(speed) over the window ending at the row."""
+    o = cuda.grid(1)
+    n = results.shape[0]
+    if o >= n or o < window_frm - 1:
+        return
+    left = o + 1 - window_frm
+    msum = 0.0
+    for k in range(left, o + 1):
+        msum += mass[k]
+    mass_mean = msum / window_frm
+    ndiff = window_frm - 1
+    if ndiff <= 0:
+        results[o] = _NAN
+        return
+    dsum = 0.0
+    for k in range(left, o):
+        dx = x[k + 1, 0] - x[k, 0]
+        dy = x[k + 1, 1] - x[k, 1]
+        dsum += math.sqrt(dx * dx + dy * dy)
+    speed = (dsum * inv_dt) / ndiff
+    results[o] = mass_mean * speed
+
+
+def sliding_momentum_magnitude_cuda(x: np.ndarray, mass: np.ndarray, sample_rate: float, time_window: float) -> np.ndarray:
+    """
+    Compute the sliding momentum magnitude of a moving 2D point over time windows, on the GPU.
+
+    Momentum magnitude is ``mean(mass) * mean(speed)`` within each window, where ``speed = |delta position| * sample_rate``.
+
+    .. note::
+       Output is a 1D float32 array of length n_frames; frames before the first full window are -1. The window
+       length is ``ceil(sample_rate * time_window)``. Matches the CPU version (float64 computation).
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_momentum_magnitude_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU version: :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_momentum_magnitude`.
+
+    :param np.ndarray x: 2D array (n_frames, 2) of point (x, y) coordinates.
+    :param np.ndarray mass: 1D array (n_frames,) of per-frame mass.
+    :param float sample_rate: Samples per second (may be fractional).
+    :param float time_window: Window size in seconds.
+    :return: (n_frames,) float32 array of momentum magnitude per window.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> x = np.random.randint(0, 500, (5000, 2)).astype(np.float32)
+    >>> mass = np.random.randint(10, 100, (5000,)).astype(np.float32)
+    >>> sliding_momentum_magnitude_cuda(x=x, mass=mass, sample_rate=30.0, time_window=1.0)
+    """
+    check_valid_array(data=x, source=f'{sliding_momentum_magnitude_cuda.__name__} x', accepted_ndims=(2,), accepted_axis_1_shape=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=mass, source=f'{sliding_momentum_magnitude_cuda.__name__} mass', accepted_ndims=(1,), accepted_shapes=[(x.shape[0],)], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_momentum_magnitude_cuda.__name__} sample_rate', value=sample_rate, min_value=10e-6)
+    check_float(name=f'{sliding_momentum_magnitude_cuda.__name__} time_window', value=time_window, min_value=10e-6)
+    n = x.shape[0]
+    window_frm = int(math.ceil(sample_rate * time_window))
+    inv_dt = float(sample_rate)
+    x_dev = cuda.to_device(np.ascontiguousarray(x).astype(np.float64))
+    mass_dev = cuda.to_device(np.ascontiguousarray(mass).astype(np.float64))
+    results = cuda.to_device(np.full(n, -1.0, dtype=np.float32))
+    bpg = math.ceil(n / THREADS_PER_BLOCK)
+    _sliding_momentum_kernel[bpg, THREADS_PER_BLOCK](x_dev, mass_dev, window_frm, inv_dt, results)
+    return results.copy_to_host()
+
+
+@cuda.jit()
+def _sliding_variance_kernel(data, window_sizes, results):
+    """One thread per (frame idx, window wi). results[idx,wi] = population variance of the window ending at idx."""
+    idx, wi = cuda.grid(2)
+    n = data.shape[0]
+    if idx >= n or wi >= window_sizes.shape[0]:
+        return
+    w = window_sizes[wi]
+    if w < 1 or idx < w - 1:
+        return
+    left = idx - w + 1
+    m = 0.0
+    for k in range(left, idx + 1):
+        m += data[k]
+    m /= w
+    s = 0.0
+    for k in range(left, idx + 1):
+        d = data[k] - m
+        s += d * d
+    results[idx, wi] = s / w
+
+
+def sliding_variance_cuda(data: np.ndarray, window_sizes: np.ndarray, sample_rate: float) -> np.ndarray:
+    """
+    Compute the sliding population variance of a 1D signal over one or more window sizes, on the GPU.
+
+    .. note::
+       Output is (n_frames, n_window_sizes) float32; frames before the first full window are -1. Population
+       variance (ddof=0), matching ``np.var``.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_variance_cuda.csv
+       :widths: 25, 25, 25, 25
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       CPU (numba) version: :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_variance`.
+
+    :param np.ndarray data: 1D signal.
+    :param np.ndarray window_sizes: 1D array of window sizes in seconds.
+    :param float sample_rate: Samples per second (may be fractional).
+    :return: (n_frames, n_window_sizes) float32 array of sliding variance values.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> data = np.array([1, 2, 3, 1, 2, 9, 17, 2, 10, 4]).astype(np.float32)
+    >>> sliding_variance_cuda(data=data, window_sizes=np.array([0.5]), sample_rate=10.0)
+    """
+    check_valid_array(data=data, source=f'{sliding_variance_cuda.__name__} data', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=window_sizes, source=f'{sliding_variance_cuda.__name__} window_sizes', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_variance_cuda.__name__} sample_rate', value=sample_rate, min_value=10e-6)
+    n, nw = data.shape[0], window_sizes.shape[0]
+    if nw > MAX_GRID_Y:
+        raise SimBAGPUError(msg=f'{sliding_variance_cuda.__name__} supports at most {MAX_GRID_Y} window_sizes (CUDA grid limit); got {nw}.', source=sliding_variance_cuda.__name__)
+    ws = (np.asarray(window_sizes) * sample_rate).astype(np.int32)
+    data_dev = cuda.to_device(np.ascontiguousarray(data).astype(np.float64))
+    ws_dev = cuda.to_device(ws)
+    results = cuda.to_device(np.full((n, nw), -1.0, dtype=np.float32))
+    tpb = (128, 1)
+    bpg = (math.ceil(n / tpb[0]), math.ceil(nw / tpb[1]))
+    _sliding_variance_kernel[bpg, tpb](data_dev, ws_dev, results)
     return results.copy_to_host()

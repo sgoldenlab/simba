@@ -1,0 +1,11 @@
+N FRAMES (m=8),OUTPUT,MEAN (S),SD (S),FRAMES/S
+**1k**,1mb,0.0005,0.0000,**2.1m**
+**10k**,5mb,0.0021,0.0001,**4.7m**
+**100k**,51mb,0.0150,0.0002,**6.7m**
+**1m**,512mb,0.1709,0.0022,**5.9m**
+**5m**,2.6gb,0.9366,0.0223,**5.3m**
+**10m**,5.1gb,2.0684,0.2112,**4.8m**
+**15m**,7.7gb,2.9917,0.1970,**5.0m**
+NVIDIA GeForce RTX 4070 (12GB),,,,
+m=8 points; mean +/- SD of 3 runs; float64 output,,,,
+dense (n x m x m) float64 output binds memory (n x m^2); ~15m frames at m=8 ceiling; ~53x vs CPU at 1m,,,,
