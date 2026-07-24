@@ -144,15 +144,14 @@ Global SimBA settings and environment variables — GPU toggles, default paths, 
 |:zap:| **GPU acceleration**
 --------------------------------------------------
 
-CUDA/CuPy-accelerated versions of SimBA's compute-heavy routines — geometry, image, background subtraction, statistics, circular statistics, time-series, and SHAP — consolidated in one place. On a supported NVIDIA GPU they produce the same results as their CPU counterparts but run orders of magnitude faster on large datasets, with per-function expected-runtime tables to help you gauge the speed-up.
+.. raw:: html
 
-.. video:: _static/img/gpu_spin.webm
-   :width: 700
-   :autoplay:
-   :nocontrols:
-   :loop:
-   :muted:
-   :align: center
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/gpu_spin.webm" type="video/webm">
+   </video>
+
+CUDA/CuPy-accelerated versions of SimBA's compute-heavy routines — geometry, image, background subtraction, statistics, circular statistics, time-series, and SHAP — consolidated in one place. On a supported NVIDIA GPU they produce the same results as their CPU counterparts but run orders of magnitude faster on large datasets, with per-function expected-runtime tables to help you gauge the speed-up.
 
 .. toctree::
    :maxdepth: 2
@@ -196,15 +195,14 @@ Entry point to SimBA's mixin classes — the reusable method libraries (feature,
 |:robot_face:| **Model tools**
 --------------------------------------------------
 
-Create, train, evaluate, and apply SimBA's behavior classifiers (random-forest based). Configure hyperparameters, run cross-validation, generate evaluation metrics and plots such as feature importances and learning curves, and batch-apply trained models to new videos to produce per-frame behavior probabilities.
+.. raw:: html
 
-.. video:: _static/img/forest_mouse_loop.mp4
-   :width: 700
-   :autoplay:
-   :nocontrols:
-   :loop:
-   :muted:
-   :align: center
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/forest_mouse_loop.mp4" type="video/mp4">
+   </video>
+
+Create, train, evaluate, and apply SimBA's behavior classifiers (random-forest based). Configure hyperparameters, run cross-validation, generate evaluation metrics and plots such as feature importances and learning curves, and batch-apply trained models to new videos to produce per-frame behavior probabilities.
 
 .. toctree::
    :maxdepth: 4
@@ -237,15 +235,14 @@ Heuristic filtering of implausible body-part tracking. Location- and movement-ba
 |:art:| **Plotting and visualization tools**
 --------------------------------------------------
 
-Visualize behavioral data and pose-tracking outputs — Gantt plots, path, distance and velocity plots, heatmaps, classification-probability charts, and data overlays rendered onto the original video. Produces both static figures and frame-by-frame videos, with multiprocessing support for large batches.
+.. raw:: html
 
-.. video:: _static/img/simba_monitor.webm
-   :width: 700
-   :autoplay:
-   :nocontrols:
-   :loop:
-   :muted:
-   :align: center
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/simba_monitor.webm" type="video/webm">
+   </video>
+
+Visualize behavioral data and pose-tracking outputs — Gantt plots, path, distance and velocity plots, heatmaps, classification-probability charts, and data overlays rendered onto the original video. Produces both static figures and frame-by-frame videos, with multiprocessing support for large batches.
 
 .. toctree::
    :maxdepth: 5
@@ -267,15 +264,14 @@ Parse, load, and standardize pose-estimation output from common trackers (e.g. D
 |:world_map:| **ROI tools**
 --------------------------------------------------
 
-Define regions-of-interest — rectangles, circles, and polygons — and analyze tracking in relation to them. Compute zone entries and exits, time and distance spent in each region, distance to ROI boundaries, and whether animals are oriented toward a region, with visualization tools for the results.
+.. raw:: html
 
-.. video:: _static/img/arena_move.mp4
-   :width: 700
-   :autoplay:
-   :nocontrols:
-   :loop:
-   :muted:
-   :align: center
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/arena_move.mp4" type="video/mp4">
+   </video>
+
+Define regions-of-interest — rectangles, circles, and polygons — and analyze tracking in relation to them. Compute zone entries and exits, time and distance spent in each region, distance to ROI boundaries, and whether animals are oriented toward a region, with visualization tools for the results.
 
 .. toctree::
    :maxdepth: 3
@@ -286,15 +282,14 @@ Define regions-of-interest — rectangles, circles, and polygons — and analyze
 |:bar_chart:| **Statistics transformations**
 --------------------------------------------------
 
-Compute statistical features from tracking and classification data — descriptive statistics, distribution comparisons, distance metrics, and drift/change detection — over sliding or static time windows. Underpins much of SimBA's feature extraction, and many methods have GPU-accelerated counterparts for large datasets.
+.. raw:: html
 
-.. video:: _static/img/abacus_spin.mp4
-   :width: 700
-   :autoplay:
-   :nocontrols:
-   :loop:
-   :muted:
-   :align: center
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/abacus_spin.mp4" type="video/mp4">
+   </video>
+
+Compute statistical features from tracking and classification data — descriptive statistics, distribution comparisons, distance metrics, and drift/change detection — over sliding or static time windows. Underpins much of SimBA's feature extraction, and many methods have GPU-accelerated counterparts for large datasets.
 
 .. toctree::
    :maxdepth: 4
@@ -316,15 +311,14 @@ Import behavioral annotations produced by external tools (e.g. BORIS, Ethovision
 |:clock1:| **Time-series transformations**
 --------------------------------------------------
 
-Analyze the temporal structure of tracking and feature signals using sliding-window methods — complexity and entropy measures, autocorrelation, and windowed descriptive statistics — to capture how behavior evolves over time. GPU-accelerated variants are available for the heavier computations.
+.. raw:: html
 
-.. video:: _static/img/whiteboard_simba.webm
-   :width: 700
-   :autoplay:
-   :nocontrols:
-   :loop:
-   :muted:
-   :align: center
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/whiteboard_simba.webm" type="video/webm">
+   </video>
+
+Analyze the temporal structure of tracking and feature signals using sliding-window methods — complexity and entropy measures, autocorrelation, and windowed descriptive statistics — to capture how behavior evolves over time. GPU-accelerated variants are available for the heavier computations.
 
 .. toctree::
    :maxdepth: 5
@@ -368,15 +362,14 @@ Helper methods used throughout the package — logging, CLI execution, input and
 |:video_camera:| **Video processing tools**
 --------------------------------------------------
 
-Video processing tools built on OpenCV and FFmpeg — clip, crop, concatenate, downsample, re-encode, rotate, and greyscale videos, and compute average/background frames. Covers the common pre-processing steps needed to get raw recordings ready for tracking and analysis, with multiprocessing support for batch jobs.
+.. raw:: html
 
-.. video:: _static/img/betamax_simba_reveal.webm
-   :width: 500
-   :autoplay:
-   :nocontrols:
-   :loop:
-   :muted:
-   :align: center
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/betamax_simba_reveal.webm" type="video/webm">
+   </video>
+
+Video processing tools built on OpenCV and FFmpeg — clip, crop, concatenate, downsample, re-encode, rotate, and greyscale videos, and compute average/background frames. Covers the common pre-processing steps needed to get raw recordings ready for tracking and analysis, with multiprocessing support for batch jobs.
 
 .. toctree::
    :maxdepth: 5

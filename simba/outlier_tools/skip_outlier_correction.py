@@ -1,6 +1,7 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import os
+import numpy as np
 from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
@@ -48,5 +49,5 @@ class OutlierCorrectionSkipper(ConfigReader):
         self.timer.stop_timer()
         stdout_success(msg=f"Skipped outlier correction for {len(self.input_csv_paths)} files", elapsed_time=self.timer.elapsed_time_str)
 
-# test = OutlierCorrectionSkipper(config_path=r"E:\troubleshooting\mitra_emergence\project_folder\project_config.ini")
+# test = OutlierCorrectionSkipper(config_path=r"I:\mitra\nick_ressler\project_folder\project_config.ini")
 # test.run()
