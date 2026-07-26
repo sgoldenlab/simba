@@ -1,0 +1,2719 @@
+{
+ "Amherst College": [
+  {
+   "place_id": 350997634,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 19964376,
+   "lat": "42.3703768",
+   "lon": "-72.5160692",
+   "class": "amenity",
+   "type": "college",
+   "place_rank": 30,
+   "importance": 0.5635474151870188,
+   "addresstype": "amenity",
+   "name": "Amherst College",
+   "display_name": "Amherst College, Fayerweather Road, Amherst Center, Amherst, Hampshire County, Massachusetts, 01002, United States",
+   "boundingbox": [
+    "42.3650668",
+    "42.3784011",
+    "-72.5288050",
+    "-72.5104916"
+   ]
+  }
+ ],
+ "Aquatic Technology Promotion Station of Xiangshan County": [],
+ "Arctic University of Norway": [
+  {
+   "place_id": 273523820,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 25444601,
+   "lat": "69.6819069",
+   "lon": "18.9724906",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.4659500514924121,
+   "addresstype": "amenity",
+   "name": "Universitetet i Tromsø - Norges arktiske universitet",
+   "display_name": "Universitetet i Tromsø - Norges arktiske universitet, Erling Kjeldsens veg, Lysaker, Guleng, Tromsø, Troms, 9010, Norge",
+   "boundingbox": [
+    "69.6761899",
+    "69.6874814",
+    "18.9646476",
+    "18.9832538"
+   ]
+  }
+ ],
+ "Biobizkaia Health Research Institute": [],
+ "Boston University Medical Center": [],
+ "CIBERsam-ISCiii": [],
+ "CaaMTech": [],
+ "Cadi Ayyad University": [
+  {
+   "place_id": 297966504,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 127127607,
+   "lat": "31.6660558",
+   "lon": "-8.0005263",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 6.850919356064725e-05,
+   "addresstype": "amenity",
+   "name": "Cité universitaire Cadi Ayyad",
+   "display_name": "Cité universitaire Cadi Ayyad, Rue Al Antaqui, Badii City ⵍⴱⴰⴷⵉⵄ, Arrondissement de Gueliz مقاطعة كليز, Marrakech ⵎⵕⵕⴰⴽⵯⵛ مراكش, Pachalik de Marrakech, Préfecture de Marrakech عمالة مراكش, Marrakech-Safi ⵎⵕⵕⴰⴽⵛ-ⴰⵙⴼⵉ مراكش-أسفي, 40080, Maroc ⵍⵎⵖⵔⵉⴱ المغرب",
+   "boundingbox": [
+    "31.6638096",
+    "31.6679863",
+    "-8.0035120",
+    "-7.9987303"
+   ]
+  }
+ ],
+ "Canadian Institute for Advanced Research (CIFAR)": [],
+ "Carnegie Mellon University": [
+  {
+   "place_id": 349602703,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 2279034,
+   "lat": "40.4439193",
+   "lon": "-79.9428267",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6170397702119578,
+   "addresstype": "amenity",
+   "name": "Carnegie Mellon University",
+   "display_name": "Carnegie Mellon University, Forbes Avenue, North Oakland, Pittsburgh, Allegheny County, Pennsylvania, 15213, United States",
+   "boundingbox": [
+    "40.4403409",
+    "40.4487517",
+    "-79.9518983",
+    "-79.9375428"
+   ]
+  }
+ ],
+ "Centros de Integración Juvenil": [
+  {
+   "place_id": 310121660,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "node",
+   "osm_id": 5091083049,
+   "lat": "16.8727373",
+   "lon": "-99.8975511",
+   "class": "healthcare",
+   "type": "rehabilitation",
+   "place_rank": 30,
+   "importance": 6.551689936670508e-05,
+   "addresstype": "healthcare",
+   "name": "Centros de Integración Juvenil",
+   "display_name": "Centros de Integración Juvenil, Río Coyuca, Progreso, Acapulco, Acapulco de Juárez, Guerrero, 39300, México",
+   "boundingbox": [
+    "16.8726873",
+    "16.8727873",
+    "-99.8976011",
+    "-99.8975011"
+   ]
+  }
+ ],
+ "Charles University": [
+  {
+   "place_id": 133117197,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 1005059178,
+   "lat": "50.0888947",
+   "lon": "14.4162757",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5505890772360014,
+   "addresstype": "amenity",
+   "name": "Filozofická fakulta Univerzity Karlovy",
+   "display_name": "Filozofická fakulta Univerzity Karlovy, Kaprova, Josefov, obvod Praha 1, Praha, 116 93, Česko",
+   "boundingbox": [
+    "50.0885151",
+    "50.0892632",
+    "14.4157153",
+    "14.4168359"
+   ]
+  }
+ ],
+ "Children’s Hospital of Philadelphia": [
+  {
+   "place_id": 345966038,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 50033035,
+   "lat": "39.9476976",
+   "lon": "-75.1949802",
+   "class": "amenity",
+   "type": "hospital",
+   "place_rank": 30,
+   "importance": 0.3915604223356184,
+   "addresstype": "amenity",
+   "name": "Children's Hospital of Philadelphia",
+   "display_name": "Children's Hospital of Philadelphia, 3401, Civic Center Boulevard, University City, West Philadelphia, Philadelphia, Philadelphia County, Pennsylvania, 19104, United States",
+   "boundingbox": [
+    "39.9457560",
+    "39.9494434",
+    "-75.1964975",
+    "-75.1928893"
+   ]
+  }
+ ],
+ "Christian-Albrechts-Universität zu Kiel": [
+  {
+   "place_id": 149194923,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 1664397,
+   "lat": "54.3458218",
+   "lon": "10.1130730",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5972578877744925,
+   "addresstype": "amenity",
+   "name": "Christian-Albrechts-Universität zu Kiel",
+   "display_name": "Christian-Albrechts-Universität zu Kiel, Langenbeckstraße, Philosophenviertel, Schreventeich, Kiel, Schleswig-Holstein, 24116, Deutschland",
+   "boundingbox": [
+    "54.3142776",
+    "54.3499968",
+    "10.1030413",
+    "10.1531053"
+   ]
+  }
+ ],
+ "City University of Hong Kong": [
+  {
+   "place_id": 234301058,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 2817891,
+   "lat": "22.3400205",
+   "lon": "114.1697162",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5193534403561814,
+   "addresstype": "amenity",
+   "name": "香港城市大學 City University of Hong Kong",
+   "display_name": "香港城市大學 City University of Hong Kong, 晴碧花園 Sunshine Grove, 圓洲角 Yuen Chau Kok, 沙田區 Sha Tin District, 新界 New Territories, 香港 Hong Kong, 中国",
+   "boundingbox": [
+    "22.3347495",
+    "22.4334184",
+    "114.1643686",
+    "114.2425239"
+   ]
+  }
+ ],
+ "Columbia University": [
+  {
+   "place_id": 358354943,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 732228095,
+   "lat": "40.8077507",
+   "lon": "-73.9624901",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.7386072323684951,
+   "addresstype": "amenity",
+   "name": "Columbia University",
+   "display_name": "Columbia University, West 121st Street, Morningside Heights, Manhattan Community Board 9, Manhattan, New York County, New York, 10027, United States",
+   "boundingbox": [
+    "40.8031566",
+    "40.8124865",
+    "-73.9676058",
+    "-73.9572548"
+   ]
+  }
+ ],
+ "Columbia University Irving Medical Center": [
+  {
+   "place_id": 359389998,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 137285662,
+   "lat": "40.8419836",
+   "lon": "-73.9436897",
+   "class": "amenity",
+   "type": "hospital",
+   "place_rank": 30,
+   "importance": 0.36517188513067234,
+   "addresstype": "amenity",
+   "name": "Columbia University Irving Medical Center",
+   "display_name": "Columbia University Irving Medical Center, 630, West 168th Street, Washington Heights, Manhattan Community Board 12, Manhattan, New York County, New York, 10031, United States",
+   "boundingbox": [
+    "40.8387383",
+    "40.8452588",
+    "-73.9454363",
+    "-73.9385647"
+   ]
+  }
+ ],
+ "Concordia University": [
+  {
+   "place_id": 365470577,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 468560154,
+   "lat": "45.4582595",
+   "lon": "-73.6393547",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5513161110585167,
+   "addresstype": "amenity",
+   "name": "Université Concordia",
+   "display_name": "Université Concordia, 7141, Rue Sherbrooke Ouest, Côte-des-Neiges–Notre-Dame-de-Grâce, Montréal, Agglomération de Montréal, Montréal (région administrative), Québec, H4B 1R6, Canada",
+   "boundingbox": [
+    "45.4562792",
+    "45.4603227",
+    "-73.6437558",
+    "-73.6341924"
+   ]
+  }
+ ],
+ "Cornell University": [
+  {
+   "place_id": 353511622,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 11625564,
+   "lat": "42.4529160",
+   "lon": "-76.4800635",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6889672694572714,
+   "addresstype": "amenity",
+   "name": "Cornell University",
+   "display_name": "Cornell University, City of Ithaca, Town of Dryden, Tompkins County, New York, 14850, United States",
+   "boundingbox": [
+    "42.4144313",
+    "42.5035705",
+    "-76.4929817",
+    "-76.2240372"
+   ]
+  }
+ ],
+ "DLH Corporation": [
+  {
+   "place_id": 213665177,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "node",
+   "osm_id": 9094200557,
+   "lat": "33.9967209",
+   "lon": "74.7904646",
+   "class": "office",
+   "type": "government",
+   "place_rank": 30,
+   "importance": 6.226672770270875e-05,
+   "addresstype": "office",
+   "name": "Jammu and Kashmir State Induastrial Development Corporation Ltd Rangreth",
+   "display_name": "Jammu and Kashmir State Induastrial Development Corporation Ltd Rangreth, Rangreth Old Airport Road, Rangreth, Badgam tehsil, Budgam, Jammu and Kashmir, 191132, India",
+   "boundingbox": [
+    "33.9966709",
+    "33.9967709",
+    "74.7904146",
+    "74.7905146"
+   ]
+  }
+ ],
+ "Dalhousie University": [
+  {
+   "place_id": 287423554,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 17335000,
+   "lat": "44.6362010",
+   "lon": "-63.5919961",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 6.857480735480305e-05,
+   "addresstype": "amenity",
+   "name": "Dalhousie University",
+   "display_name": "Dalhousie University, Payzant Avenue, South End, Halifax, Halifax Regional Municipality, Halifax County, Nova Scotia, B3H 2B2, Canada",
+   "boundingbox": [
+    "44.6332542",
+    "44.6436576",
+    "-63.5977931",
+    "-63.5714386"
+   ]
+  }
+ ],
+ "Deakin University": [
+  {
+   "place_id": 21303731,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 180360037,
+   "lat": "-37.8475136",
+   "lon": "145.1149474",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.10540294855860563,
+   "addresstype": "amenity",
+   "name": "Deakin University",
+   "display_name": "Deakin University, 221, Burwood Highway, Bennettswood, Burwood, Melbourne, Victoria, 3125, Australia",
+   "boundingbox": [
+    "-37.8499492",
+    "-37.8453974",
+    "145.1128309",
+    "145.1168918"
+   ]
+  }
+ ],
+ "Duke University": [
+  {
+   "place_id": 347382843,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 7407432,
+   "lat": "36.0001557",
+   "lon": "-78.9442297",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6492557919424237,
+   "addresstype": "amenity",
+   "name": "Duke University",
+   "display_name": "Duke University, Jackson Street, Burch Avenue, Durham, Durham County, North Carolina, 27708, United States",
+   "boundingbox": [
+    "35.9915823",
+    "36.0098486",
+    "-78.9531253",
+    "-78.9122428"
+   ]
+  }
+ ],
+ "ELTE Eötvös Loránd University": [
+  {
+   "place_id": 66645223,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 144657678,
+   "lat": "47.4934799",
+   "lon": "19.0618993",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6437509632474634,
+   "addresstype": "amenity",
+   "name": "Eötvös Loránd Tudományegyetem Bölcsészettudományi Kar",
+   "display_name": "Eötvös Loránd Tudományegyetem Bölcsészettudományi Kar, 4-8, Múzeum körút, Pest, Belváros, V. kerület, Budapest, Közép-Magyarország, 1088, Magyarország",
+   "boundingbox": [
+    "47.4924010",
+    "47.4946001",
+    "19.0606253",
+    "19.0633400"
+   ]
+  }
+ ],
+ "EMBL Rome": [
+  {
+   "place_id": 80175426,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 9902070,
+   "lat": "42.0841515",
+   "lon": "12.5934734",
+   "class": "building",
+   "type": "yes",
+   "place_rank": 30,
+   "importance": 6.067368581669364e-05,
+   "addresstype": "building",
+   "name": "EMBL Monterotondo",
+   "display_name": "EMBL Monterotondo, 32, Via Ercole Ramarini, Monterotondo, Roma Capitale, Lazio, 00015, Italia",
+   "boundingbox": [
+    "42.0837424",
+    "42.0845502",
+    "12.5927819",
+    "12.5941073"
+   ]
+  }
+ ],
+ "Emory University": [
+  {
+   "place_id": 338842596,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 14642692,
+   "lat": "33.8004547",
+   "lon": "-84.3172378",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5807233308732825,
+   "addresstype": "amenity",
+   "name": "Emory University",
+   "display_name": "Emory University, 201, Peavine Creek Drive, Atlanta, DeKalb County, Georgia, 30322, United States",
+   "boundingbox": [
+    "33.7882279",
+    "33.8073912",
+    "-84.3357520",
+    "-84.3064751"
+   ]
+  }
+ ],
+ "Federal University of Paraíba": [],
+ "Florey Institute": [
+  {
+   "place_id": 276602319,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "node",
+   "osm_id": 11272808297,
+   "lat": "53.3816847",
+   "lon": "-1.4884714",
+   "class": "office",
+   "type": "research",
+   "place_rank": 30,
+   "importance": 7.319523918512272e-05,
+   "addresstype": "office",
+   "name": "The Florey Institute for Host-Pathogen Interactions",
+   "display_name": "The Florey Institute for Host-Pathogen Interactions, Western Bank, Saint George's Quarter, Netherthorpe, Sheffield, South Yorkshire, England, S10 2TN, United Kingdom",
+   "boundingbox": [
+    "53.3816347",
+    "53.3817347",
+    "-1.4885214",
+    "-1.4884214"
+   ]
+  }
+ ],
+ "Florida Atlantic University": [
+  {
+   "place_id": 304861656,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 611610759,
+   "lat": "26.1194058",
+   "lon": "-80.1416800",
+   "class": "building",
+   "type": "yes",
+   "place_rank": 30,
+   "importance": 6.85915922788894e-05,
+   "addresstype": "building",
+   "name": "Florida Atlantic University",
+   "display_name": "Florida Atlantic University, 111, East Las Olas Boulevard, Fort Lauderdale, Broward County, Florida, 33301, United States",
+   "boundingbox": [
+    "26.1192247",
+    "26.1195935",
+    "-80.1419195",
+    "-80.1414411"
+   ]
+  }
+ ],
+ "Fujita Health University": [
+  {
+   "place_id": 264128992,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 20212403,
+   "lat": "35.0708533",
+   "lon": "137.0004253",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.41312073637402513,
+   "addresstype": "amenity",
+   "name": "藤田医科大学",
+   "display_name": "藤田医科大学, 大根若王子線, 二村台三丁目, 間米町, 豊明市, 愛知県, 470-1101, 日本",
+   "boundingbox": [
+    "35.0673169",
+    "35.0753561",
+    "136.9984191",
+    "137.0070285"
+   ]
+  }
+ ],
+ "George Washington University": [
+  {
+   "place_id": 348190700,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 4639481,
+   "lat": "38.8998650",
+   "lon": "-77.0474485",
+   "class": "place",
+   "type": "neighbourhood",
+   "place_rank": 24,
+   "importance": 0.0800849294270237,
+   "addresstype": "neighbourhood",
+   "name": "George Washington University",
+   "display_name": "George Washington University, Ward 2, Washington, District of Columbia, 20037, United States",
+   "boundingbox": [
+    "38.8974092",
+    "38.9023658",
+    "-77.0513780",
+    "-77.0435304"
+   ]
+  }
+ ],
+ "Georgetown University Medical Center": [],
+ "Georgia State University": [
+  {
+   "place_id": 342365675,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 586614408,
+   "lat": "33.7535889",
+   "lon": "-84.3854209",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5150198958483858,
+   "addresstype": "amenity",
+   "name": "Georgia State University",
+   "display_name": "Georgia State University, 33, Gilmer Street Southeast, Five Points, Old Fourth Ward, Atlanta, Fulton County, Georgia, 30303, United States",
+   "boundingbox": [
+    "33.7498445",
+    "33.7573224",
+    "-84.3906681",
+    "-84.3822597"
+   ]
+  }
+ ],
+ "Gifu University": [
+  {
+   "place_id": 263093382,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 159506018,
+   "lat": "35.4644408",
+   "lon": "136.7380014",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.4822251132095625,
+   "addresstype": "amenity",
+   "name": "国立大学法人 岐阜大学",
+   "display_name": "国立大学法人 岐阜大学, 岐阜美山線, 大学西一丁目, 古市場老ノ上, 岐阜市, 岐阜県, 501-1112, 日本",
+   "boundingbox": [
+    "35.4600636",
+    "35.4701618",
+    "136.7323261",
+    "136.7424530"
+   ]
+  }
+ ],
+ "HUN-REN Biological Research Centre": [],
+ "Harvard Medical School": [
+  {
+   "place_id": 361944139,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 18139248,
+   "lat": "42.3369167",
+   "lon": "-71.1038922",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5790690403415918,
+   "addresstype": "amenity",
+   "name": "Harvard Medical School",
+   "display_name": "Harvard Medical School, 25, Shattuck Street, Longwood, Boston, Suffolk County, Massachusetts, 02115, United States",
+   "boundingbox": [
+    "42.3346005",
+    "42.3391784",
+    "-71.1054237",
+    "-71.1005262"
+   ]
+  }
+ ],
+ "Harvard Stem Cell Institute": [],
+ "Heidelberg University": [
+  {
+   "place_id": 124760775,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 17808273,
+   "lat": "49.4186003",
+   "lon": "8.6692402",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6691946423321676,
+   "addresstype": "amenity",
+   "name": "Universität Heidelberg",
+   "display_name": "Universität Heidelberg, Ziegelhäuser Landstraße, Neuenheim, Heidelberg, Baden-Württemberg, 69120, Deutschland",
+   "boundingbox": [
+    "49.3970639",
+    "49.4256056",
+    "8.6607752",
+    "8.7269848"
+   ]
+  }
+ ],
+ "Hiroshima University": [
+  {
+   "place_id": 267893603,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 13235606,
+   "lat": "34.4016381",
+   "lon": "132.7207209",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5469669040234669,
+   "addresstype": "amenity",
+   "name": "広島大学",
+   "display_name": "広島大学, 下見学生街1号線, 西条下見六丁目, 西条町下見, 西条下見, 東広島市, 広島県, 739-0047, 日本",
+   "boundingbox": [
+    "34.3920219",
+    "34.4111510",
+    "132.7085049",
+    "132.7330470"
+   ]
+  }
+ ],
+ "Hospital General Dr. Manuel Gea González": [],
+ "Hospital for Sick Children": [
+  {
+   "place_id": 352765735,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 712078929,
+   "lat": "43.6572672",
+   "lon": "-79.3875622",
+   "class": "amenity",
+   "type": "hospital",
+   "place_rank": 30,
+   "importance": 0.3841981265934431,
+   "addresstype": "amenity",
+   "name": "Hospital for Sick Children",
+   "display_name": "Hospital for Sick Children, 555, University Avenue, Yonge-Bay Corridor, Downtown, Toronto, Golden Horseshoe, Ontario, M5G 1X5, Canada",
+   "boundingbox": [
+    "43.6564656",
+    "43.6580515",
+    "-79.3891485",
+    "-79.3859987"
+   ]
+  }
+ ],
+ "Howard Hughes Medical Institute": [
+  {
+   "place_id": 347666350,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 1061526741,
+   "lat": "38.9984790",
+   "lon": "-77.0795529",
+   "class": "amenity",
+   "type": "research_institute",
+   "place_rank": 30,
+   "importance": 6.485313191419879e-05,
+   "addresstype": "amenity",
+   "name": "Howard Hughes Medical Institute",
+   "display_name": "Howard Hughes Medical Institute, 4000, Jones Bridge Road, Chevy Chase Park, Chevy Chase, Montgomery County, Maryland, 20815, United States",
+   "boundingbox": [
+    "38.9962395",
+    "38.9999875",
+    "-77.0820882",
+    "-77.0771734"
+   ]
+  }
+ ],
+ "Hungarian Centre of Excellence for Molecular Medicine": [],
+ "IRCCS Humanitas Research Hospital": [],
+ "Icahn School of Medicine": [
+  {
+   "place_id": 360713748,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 266941945,
+   "lat": "40.7897930",
+   "lon": "-73.9532536",
+   "class": "building",
+   "type": "hospital",
+   "place_rank": 30,
+   "importance": 0.4363721193397938,
+   "addresstype": "building",
+   "name": "Icahn School of Medicine at Mount Sinai",
+   "display_name": "Icahn School of Medicine at Mount Sinai, 1184, 5th Avenue, Manhattan Community Board 11, Manhattan, New York County, New York, 10029, United States",
+   "boundingbox": [
+    "40.7894347",
+    "40.7901506",
+    "-73.9536830",
+    "-73.9528244"
+   ]
+  }
+ ],
+ "Indian Institute of Technology Madras": [
+  {
+   "place_id": 249845070,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 24730814,
+   "lat": "12.9941561",
+   "lon": "80.2366826",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.45670105723186827,
+   "addresstype": "amenity",
+   "name": "Indian Institute of Technology - Madras",
+   "display_name": "Indian Institute of Technology - Madras, Adayar, CMWSSB Division 174, Ward 174, Zone 13 Adyar, Chennai Corporation, Chennai, Tamil Nadu, 600036, India",
+   "boundingbox": [
+    "12.9826663",
+    "13.0067032",
+    "80.2231655",
+    "80.2436005"
+   ]
+  }
+ ],
+ "Inscopix": [],
+ "Institute of Physiology of the Czech Academy of Sciences": [],
+ "Instituto de Salud Carlos III": [
+  {
+   "place_id": 294846782,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 830423694,
+   "lat": "40.4759705",
+   "lon": "-3.6938552",
+   "class": "amenity",
+   "type": "research_institute",
+   "place_rank": 30,
+   "importance": 8.580834668493199e-05,
+   "addresstype": "amenity",
+   "name": "Instituto de Salud Carlos III (Campus de Chamartín)",
+   "display_name": "Instituto de Salud Carlos III (Campus de Chamartín), Avenida de Monforte de Lemos, La Paz, Fuencarral, Fuencarral-El Pardo, Madrid, Comunidad de Madrid, 28029, España",
+   "boundingbox": [
+    "40.4745714",
+    "40.4775143",
+    "-3.6979063",
+    "-3.6896575"
+   ]
+  }
+ ],
+ "Johannes Gutenberg University": [
+  {
+   "place_id": 125094646,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 8061090,
+   "lat": "49.9920396",
+   "lon": "8.2371107",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5773038451160918,
+   "addresstype": "amenity",
+   "name": "Johannes Gutenberg-Universität Mainz",
+   "display_name": "Johannes Gutenberg-Universität Mainz, Römerwall, Oberstadt, Mainz, Rheinland-Pfalz, 55131, Deutschland",
+   "boundingbox": [
+    "49.9869668",
+    "50.0010998",
+    "8.2277509",
+    "8.2565774"
+   ]
+  }
+ ],
+ "Karolinska Institutet": [
+  {
+   "place_id": 166061510,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "node",
+   "osm_id": 208474091,
+   "lat": "59.3515453",
+   "lon": "18.0310658",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5425400752183612,
+   "addresstype": "amenity",
+   "name": "Karolinska Institutet",
+   "display_name": "Karolinska Institutet, Visionsgatan, Solna Kyrkby, Haga, Solna, Solna kommun, Stockholms län, 171 76, Sverige",
+   "boundingbox": [
+    "59.3514953",
+    "59.3515953",
+    "18.0310158",
+    "18.0311158"
+   ]
+  }
+ ],
+ "Kindai University": [
+  {
+   "place_id": 268045261,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 13854100,
+   "lat": "34.6517298",
+   "lon": "135.5913154",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5382351060302868,
+   "addresstype": "amenity",
+   "name": "近畿大学 東大阪キャンパス",
+   "display_name": "近畿大学 東大阪キャンパス, 近大前商店街, 小若江四丁目, 東大阪市, 大阪府, 577-0818, 日本",
+   "boundingbox": [
+    "34.6486556",
+    "34.6541796",
+    "135.5859688",
+    "135.5943440"
+   ]
+  }
+ ],
+ "Kobe University": [
+  {
+   "place_id": 267532422,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 195588893,
+   "lat": "34.6637570",
+   "lon": "135.0291256",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.45725063137282856,
+   "addresstype": "amenity",
+   "name": "神戸学院大学",
+   "display_name": "神戸学院大学, 東細谷１１号線, 伊川谷町有瀬, 西区, 神戸市, 兵庫県, 655-0041, 日本",
+   "boundingbox": [
+    "34.6614963",
+    "34.6661931",
+    "135.0267408",
+    "135.0328643"
+   ]
+  }
+ ],
+ "Lehigh University": [
+  {
+   "place_id": 358117788,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "node",
+   "osm_id": 357294840,
+   "lat": "40.6068028",
+   "lon": "-75.3782488",
+   "class": "amenity",
+   "type": "school",
+   "place_rank": 30,
+   "importance": 6.404898146024289e-05,
+   "addresstype": "amenity",
+   "name": "Lehigh University",
+   "display_name": "Lehigh University, Library Drive, South Bethlehem, Bethlehem, Northampton County, Pennsylvania, 18015, United States",
+   "boundingbox": [
+    "40.6067528",
+    "40.6068528",
+    "-75.3782988",
+    "-75.3781988"
+   ]
+  }
+ ],
+ "Linköping University": [
+  {
+   "place_id": 161995113,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 59638201,
+   "lat": "58.3977911",
+   "lon": "15.5754544",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5011693049839369,
+   "addresstype": "amenity",
+   "name": "Linköpings universitet",
+   "display_name": "Linköpings universitet, Johannes Magnus väg, Västra Valla, Linköpings domkyrkodistrikt, Linköping, Linköpings kommun, Östergötlands län, 583 26, Sverige",
+   "boundingbox": [
+    "58.3914618",
+    "58.4038502",
+    "15.5707381",
+    "15.5816681"
+   ]
+  }
+ ],
+ "MCCI Corporation": [],
+ "Macquarie University": [
+  {
+   "place_id": 23794973,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 207693612,
+   "lat": "-33.7741970",
+   "lon": "151.1127138",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5194711232883782,
+   "addresstype": "amenity",
+   "name": "Macquarie University",
+   "display_name": "Macquarie University, Waterloo Road, Macquarie Park, Sydney, New South Wales, 2113, Australia",
+   "boundingbox": [
+    "-33.7812113",
+    "-33.7674824",
+    "151.1052677",
+    "151.1203710"
+   ]
+  }
+ ],
+ "Mahidol University": [
+  {
+   "place_id": 258538358,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 168814194,
+   "lat": "13.7946521",
+   "lon": "100.3218583",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.44563783957007347,
+   "addresstype": "amenity",
+   "name": "มหาวิทยาลัยมหิดล",
+   "display_name": "มหาวิทยาลัยมหิดล, 999, นฐ.4006, เทศบาลตำบลศาลายา, คลองโยง, อำเภอพุทธมณฑล, จังหวัดนครปฐม, 73170, ประเทศไทย",
+   "boundingbox": [
+    "13.7876379",
+    "13.8013920",
+    "100.3163403",
+    "100.3273267"
+   ]
+  }
+ ],
+ "Massachusetts General Hospital": [
+  {
+   "place_id": 361145331,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 117853077,
+   "lat": "42.3628605",
+   "lon": "-71.0687530",
+   "class": "amenity",
+   "type": "hospital",
+   "place_rank": 30,
+   "importance": 0.517659110869493,
+   "addresstype": "amenity",
+   "name": "Massachusetts General Hospital",
+   "display_name": "Massachusetts General Hospital, 55, Fruit Street, West End, Boston, Suffolk County, Massachusetts, 02114, United States",
+   "boundingbox": [
+    "42.3612432",
+    "42.3642121",
+    "-71.0706432",
+    "-71.0670374"
+   ]
+  }
+ ],
+ "McGill University": [
+  {
+   "place_id": 364574643,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 13870975,
+   "lat": "45.4318428",
+   "lon": "-73.9452864",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6398396474863458,
+   "addresstype": "amenity",
+   "name": "Université McGill",
+   "display_name": "Université McGill, 21111, Chemin Lakeshore, Sainte-Anne-de-Bellevue, Agglomération de Montréal, Montréal (région administrative), Québec, H9X 3V9, Canada",
+   "boundingbox": [
+    "45.4023280",
+    "45.4423607",
+    "-73.9634853",
+    "-73.9252321"
+   ]
+  }
+ ],
+ "McLean Hospital": [
+  {
+   "place_id": 361553324,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 495950127,
+   "lat": "42.3932639",
+   "lon": "-71.1902429",
+   "class": "amenity",
+   "type": "hospital",
+   "place_rank": 30,
+   "importance": 0.38780733368428255,
+   "addresstype": "amenity",
+   "name": "McLean Hospital",
+   "display_name": "McLean Hospital, 115, Mill Street, Kendall Gardens, Belmont, Middlesex County, Massachusetts, 02478, United States",
+   "boundingbox": [
+    "42.3896368",
+    "42.3969018",
+    "-71.1943478",
+    "-71.1862686"
+   ]
+  }
+ ],
+ "Medical College of Wisconsin": [
+  {
+   "place_id": 372744783,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 662209318,
+   "lat": "43.0438671",
+   "lon": "-88.0224532",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.40647197265303264,
+   "addresstype": "amenity",
+   "name": "Medical College of Wisconsin",
+   "display_name": "Medical College of Wisconsin, 8701, West Watertown Plank Road, Milwaukee, Milwaukee County, Wisconsin, 53226, United States",
+   "boundingbox": [
+    "43.0429982",
+    "43.0447192",
+    "-88.0233546",
+    "-88.0210182"
+   ]
+  }
+ ],
+ "Medical Research Council Harwell": [],
+ "Michigan State University": [
+  {
+   "place_id": 372165749,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 13708038,
+   "lat": "42.7023794",
+   "lon": "-84.4803869",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.624699825904956,
+   "addresstype": "amenity",
+   "name": "Michigan State University",
+   "display_name": "Michigan State University, 426, Auditorium Road, North Neighborhood, East Lansing, Ingham County, Michigan, 48824, United States",
+   "boundingbox": [
+    "42.6694615",
+    "42.7354147",
+    "-84.5093894",
+    "-84.4619293"
+   ]
+  }
+ ],
+ "Monash University": [
+  {
+   "place_id": 22271020,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 27552390,
+   "lat": "-37.7839745",
+   "lon": "144.9586743",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.2548773901198179,
+   "addresstype": "amenity",
+   "name": "Monash University",
+   "display_name": "Monash University, Mile Lane, Parkville, Melbourne, Victoria, 3052, Australia",
+   "boundingbox": [
+    "-37.7845590",
+    "-37.7833935",
+    "144.9581507",
+    "144.9592019"
+   ]
+  }
+ ],
+ "Nagoya University": [
+  {
+   "place_id": 266006628,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 144866408,
+   "lat": "35.1533087",
+   "lon": "136.9677806",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5676960517441635,
+   "addresstype": "amenity",
+   "name": "名古屋大学",
+   "display_name": "名古屋大学, 東山元町第21号線, 東山元町三丁目, 唐山町, 千種区, 名古屋市, 愛知県, 464-8601, 日本",
+   "boundingbox": [
+    "35.1480567",
+    "35.1585867",
+    "136.9607185",
+    "136.9742933"
+   ]
+  }
+ ],
+ "Nanjing Medical University": [
+  {
+   "place_id": 225354645,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 1396182720,
+   "lat": "31.9858050",
+   "lon": "118.7030460",
+   "class": "amenity",
+   "type": "hospital",
+   "place_rank": 30,
+   "importance": 7.320592050045041e-05,
+   "addresstype": "amenity",
+   "name": "南京大学医学院附属南京国际医院",
+   "display_name": "南京大学医学院附属南京国际医院, 宜悦街, 双闸街道, 建邺区, 南京市, 江苏省, 210019, 中国",
+   "boundingbox": [
+    "31.9850779",
+    "31.9864282",
+    "118.7022049",
+    "118.7037843"
+   ]
+  }
+ ],
+ "Nanjing University of Chinese Medicine": [
+  {
+   "place_id": 220545039,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 1411419657,
+   "lat": "32.1030022",
+   "lon": "118.9388674",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 7.320592050045041e-05,
+   "addresstype": "amenity",
+   "name": "南京中医药大学仙林校区",
+   "display_name": "南京中医药大学仙林校区, 仙林大道, 仙林街道, 栖霞区, 南京市, 江苏省, 210023, 中国",
+   "boundingbox": [
+    "32.0974723",
+    "32.1084960",
+    "118.9343648",
+    "118.9478530"
+   ]
+  }
+ ],
+ "National Research Council of Italy": [],
+ "Nencki Institute of Experimental Biology of the Polish Academy of Sciences": [],
+ "Netholabs": [],
+ "New York State Psychiatric Institute": [
+  {
+   "place_id": 359764898,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 275038485,
+   "lat": "40.8424727",
+   "lon": "-73.9446016",
+   "class": "building",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 9.175936522464359e-05,
+   "addresstype": "building",
+   "name": "New York State Psychiatric Institute - Herbert Pardes Building",
+   "display_name": "New York State Psychiatric Institute - Herbert Pardes Building, 1051, Riverside Drive, Washington Heights, Manhattan Community Board 12, Manhattan, New York County, New York, 10032, United States",
+   "boundingbox": [
+    "40.8417883",
+    "40.8432677",
+    "-73.9448970",
+    "-73.9441826"
+   ]
+  }
+ ],
+ "Ningbo Institute of Oceanography": [],
+ "Ningbo University": [
+  {
+   "place_id": 224222778,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 232142836,
+   "lat": "29.9091815",
+   "lon": "121.6334863",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.4330260991602173,
+   "addresstype": "amenity",
+   "name": "宁波大学",
+   "display_name": "宁波大学, 风华路, 双桥社区, 孔浦街道, 江北区, 宁波市, 浙江省, 中国",
+   "boundingbox": [
+    "29.9039383",
+    "29.9144557",
+    "121.6229399",
+    "121.6437225"
+   ]
+  }
+ ],
+ "Northwestern University": [
+  {
+   "place_id": 371068465,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 2105485,
+   "lat": "42.0557157",
+   "lon": "-87.6752945",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6519823793529599,
+   "addresstype": "amenity",
+   "name": "Northwestern University",
+   "display_name": "Northwestern University, 633, Clark Street, Evanston, Evanston Township, Cook County, Illinois, 60208, United States",
+   "boundingbox": [
+    "42.0468992",
+    "42.0687508",
+    "-87.6947200",
+    "-87.6692517"
+   ]
+  }
+ ],
+ "Northwestern University Feinberg School of Medicine": [
+  {
+   "place_id": 371590793,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "node",
+   "osm_id": 12312622414,
+   "lat": "41.8961124",
+   "lon": "-87.6172378",
+   "class": "amenity",
+   "type": "college",
+   "place_rank": 30,
+   "importance": 0.38936877137464093,
+   "addresstype": "amenity",
+   "name": "Northwestern University Feinberg School of Medicine",
+   "display_name": "Northwestern University Feinberg School of Medicine, 420, East Superior Street, Magnificent Mile, Gold Coast, Near North Side, Chicago, North Chicago Township, Cook County, Illinois, 60611, United States",
+   "boundingbox": [
+    "41.8960624",
+    "41.8961624",
+    "-87.6172878",
+    "-87.6171878"
+   ]
+  }
+ ],
+ "Osaka University": [
+  {
+   "place_id": 266599893,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 1133488291,
+   "lat": "34.5111993",
+   "lon": "135.6314480",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.4967973618467907,
+   "addresstype": "amenity",
+   "name": "大阪芸術大学",
+   "display_name": "大阪芸術大学, 東山, 河南町, 南河内郡, 大阪府, 585-8555, 日本",
+   "boundingbox": [
+    "34.5081436",
+    "34.5142636",
+    "135.6285167",
+    "135.6366438"
+   ]
+  }
+ ],
+ "Peking University School of Life Sciences": [],
+ "Penn State University": [
+  {
+   "place_id": 349026682,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 14073946,
+   "lat": "40.8128971",
+   "lon": "-77.8710571",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6217236770535184,
+   "addresstype": "amenity",
+   "name": "Penn State University",
+   "display_name": "Penn State University, 201, Martin Street, Ferguson Township, Centre County, Pennsylvania, 16802, United States",
+   "boundingbox": [
+    "40.7798241",
+    "40.8253481",
+    "-77.8918409",
+    "-77.8293611"
+   ]
+  }
+ ],
+ "Philipps-University Marburg": [
+  {
+   "place_id": 138897540,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 30475590,
+   "lat": "50.8124763",
+   "lon": "8.7722345",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.628166714530059,
+   "addresstype": "amenity",
+   "name": "Philipps-Universität Marburg",
+   "display_name": "Philipps-Universität Marburg, 10, Biegenstraße, Biegenviertel, Campusviertel, Marburg, Landkreis Marburg-Biedenkopf, Hessen, 35037, Deutschland",
+   "boundingbox": [
+    "50.8095360",
+    "50.8153731",
+    "8.7696339",
+    "8.7762961"
+   ]
+  }
+ ],
+ "Polish Academy of Sciences": [
+  {
+   "place_id": 177606701,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "node",
+   "osm_id": 7914309326,
+   "lat": "52.2377936",
+   "lon": "21.0181978",
+   "class": "office",
+   "type": "research",
+   "place_rank": 30,
+   "importance": 0.6227470257238991,
+   "addresstype": "office",
+   "name": "Polska Akademia Nauk",
+   "display_name": "Polska Akademia Nauk, 72, Nowy Świat, Centrum, Śródmieście Północne, Śródmieście, Warszawa, województwo mazowieckie, 00-330, Polska",
+   "boundingbox": [
+    "52.2377436",
+    "52.2378436",
+    "21.0181478",
+    "21.0182478"
+   ]
+  }
+ ],
+ "Pontificia Universidad Católica del Ecuador": [
+  {
+   "place_id": 2851227,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 31135308,
+   "lat": "-0.2100419",
+   "lon": "-78.4917316",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.41155130284769104,
+   "addresstype": "amenity",
+   "name": "Pontificia Universidad Católica del Ecuador (PUCE)",
+   "display_name": "Pontificia Universidad Católica del Ecuador (PUCE), Avenida 12 de Octubre, Mariscal Sucre, Quito, Pichincha, 170413, Ecuador",
+   "boundingbox": [
+    "-0.2114791",
+    "-0.2082467",
+    "-78.4935366",
+    "-78.4890909"
+   ]
+  }
+ ],
+ "Qingdao University": [
+  {
+   "place_id": 224369547,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 8245047,
+   "lat": "35.9816964",
+   "lon": "120.1623183",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.3863874290870923,
+   "addresstype": "amenity",
+   "name": "青岛滨海学院",
+   "display_name": "青岛滨海学院, 425, 嘉陵江西路, 长江路街道, 青岛西海岸新区, 黄岛区, 青岛市, 山东省, 266500, 中国",
+   "boundingbox": [
+    "35.9774545",
+    "35.9852541",
+    "120.1563419",
+    "120.1663806"
+   ]
+  }
+ ],
+ "Roche": [
+  {
+   "place_id": 89657685,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 78825,
+   "lat": "45.5867000",
+   "lon": "5.1628600",
+   "class": "boundary",
+   "type": "administrative",
+   "place_rank": 16,
+   "importance": 0.5716186820954935,
+   "addresstype": "village",
+   "name": "Roche",
+   "display_name": "Roche, La Tour-du-Pin, Isère, Auvergne-Rhône-Alpes, France métropolitaine, 38090, France",
+   "boundingbox": [
+    "45.5500110",
+    "45.6060936",
+    "5.1242826",
+    "5.1871310"
+   ]
+  }
+ ],
+ "Rosalind Franklin University": [
+  {
+   "place_id": 370528304,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 5981177,
+   "lat": "42.3021840",
+   "lon": "-87.8585209",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.34397419227863374,
+   "addresstype": "amenity",
+   "name": "Rosalind Franklin University of Medicine and Science",
+   "display_name": "Rosalind Franklin University of Medicine and Science, 3333, Green Bay Road, North Chicago, Lake County, Illinois, 60064, United States",
+   "boundingbox": [
+    "42.2949012",
+    "42.3064382",
+    "-87.8612952",
+    "-87.8529917"
+   ]
+  }
+ ],
+ "Royal Hospital for Women": [
+  {
+   "place_id": 281304200,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 1179437,
+   "lat": "51.5053214",
+   "lon": "-0.1129233",
+   "class": "building",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.2024340213354661,
+   "addresstype": "building",
+   "name": "Conway Hall",
+   "display_name": "Conway Hall, 160, Stamford Street, South Bank, Waterloo, London Borough of Lambeth, Greater London, England, SE1 9NH, United Kingdom",
+   "boundingbox": [
+    "51.5051679",
+    "51.5056300",
+    "-0.1134571",
+    "-0.1127070"
+   ]
+  }
+ ],
+ "SMART Biomedical Microsystems Laborator Université de Sherbrooke": [],
+ "Shinshu University": [
+  {
+   "place_id": 262373698,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "node",
+   "osm_id": 5209321402,
+   "lat": "36.7115728",
+   "lon": "138.4935692",
+   "class": "highway",
+   "type": "bus_stop",
+   "place_rank": 30,
+   "importance": 5.187685969324815e-05,
+   "addresstype": "highway",
+   "name": "Shinshu University",
+   "display_name": "Shinshu University, 国道292号, 蓮池, 平穏, 山ノ内町, 下高井郡, 長野県, 日本",
+   "boundingbox": [
+    "36.7115228",
+    "36.7116228",
+    "138.4935192",
+    "138.4936192"
+   ]
+  }
+ ],
+ "Southeast University": [
+  {
+   "place_id": 224837593,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 171389014,
+   "lat": "31.8891787",
+   "lon": "118.8156070",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.49349060598450745,
+   "addresstype": "amenity",
+   "name": "东南大学(九龙湖校区)",
+   "display_name": "东南大学(九龙湖校区), 中央大道, 秣陵街道, 江宁区, 南京市, 江苏省, 211102, 中国",
+   "boundingbox": [
+    "31.8820845",
+    "31.8962152",
+    "118.8058588",
+    "118.8252942"
+   ]
+  }
+ ],
+ "Southern Illinois University-Carbondale": [
+  {
+   "place_id": 337241336,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 12300999,
+   "lat": "37.7083423",
+   "lon": "-89.2275556",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.4834592678373481,
+   "addresstype": "amenity",
+   "name": "Southern Illinois University Carbondale",
+   "display_name": "Southern Illinois University Carbondale, 1263, Lincoln Drive, Lake Shore Drive Area, Carbondale, Jackson County, Illinois, 62901, United States",
+   "boundingbox": [
+    "37.6336529",
+    "37.7211430",
+    "-89.2682341",
+    "-89.1705450"
+   ]
+  }
+ ],
+ "Srinakharinwirot University": [
+  {
+   "place_id": 257655575,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 329745926,
+   "lat": "13.7448618",
+   "lon": "100.5647517",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.42587119354013725,
+   "addresstype": "amenity",
+   "name": "มหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร",
+   "display_name": "มหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร, ถนนอโศกมนตรี, แขวงคลองเตยเหนือ, เขตวัฒนา, กรุงเทพมหานคร, 10110, ประเทศไทย",
+   "boundingbox": [
+    "13.7422138",
+    "13.7475523",
+    "100.5625722",
+    "100.5672913"
+   ]
+  }
+ ],
+ "Stanford University": [
+  {
+   "place_id": 321589191,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 29268613,
+   "lat": "37.4313138",
+   "lon": "-122.1693654",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.7228063974255421,
+   "addresstype": "amenity",
+   "name": "Stanford University",
+   "display_name": "Stanford University, 450, Jane Stanford Way, Stanford, Santa Clara County, California, 94305, United States",
+   "boundingbox": [
+    "37.4189865",
+    "37.4433992",
+    "-122.1860658",
+    "-122.1520382"
+   ]
+  }
+ ],
+ "Sydney Children's Hospital Randwick": [
+  {
+   "place_id": 23512125,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 1024120595,
+   "lat": "-33.9176741",
+   "lon": "151.2383822",
+   "class": "amenity",
+   "type": "hospital",
+   "place_rank": 30,
+   "importance": 0.26244239079806453,
+   "addresstype": "amenity",
+   "name": "Sydney Children's Hospital",
+   "display_name": "Sydney Children's Hospital, High Street, Randwick, Eastern Suburbs, Sydney, New South Wales, 2031, Australia",
+   "boundingbox": [
+    "-33.9182022",
+    "-33.9168299",
+    "151.2378493",
+    "151.2391918"
+   ]
+  }
+ ],
+ "TU Dresden": [
+  {
+   "place_id": 131849811,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 3614878,
+   "lat": "51.0282765",
+   "lon": "13.7359828",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.575239346948254,
+   "addresstype": "amenity",
+   "name": "Technische Universität Dresden",
+   "display_name": "Technische Universität Dresden, Theisewitz, Kreischa, Sächsische Schweiz-Osterzgebirge, Sachsen, 01069, Deutschland",
+   "boundingbox": [
+    "50.8582111",
+    "51.0569432",
+    "13.5801349",
+    "13.9250039"
+   ]
+  }
+ ],
+ "Technische Universität Darmstadt": [
+  {
+   "place_id": 124798838,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 11380923,
+   "lat": "49.8611518",
+   "lon": "8.6819440",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5548760261586357,
+   "addresstype": "amenity",
+   "name": "Technische Universität Darmstadt",
+   "display_name": "Technische Universität Darmstadt, Seiterswiesenweg, Edelsteinviertel, Komponistenviertel, Darmstadt-Ost, Darmstadt, Hessen, 64287, Deutschland",
+   "boundingbox": [
+    "49.8588335",
+    "49.8796933",
+    "8.5887213",
+    "8.6856057"
+   ]
+  }
+ ],
+ "Texas A&M University": [
+  {
+   "place_id": 318569057,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 8556620,
+   "lat": "30.6108618",
+   "lon": "-96.3520606",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.7480661695057289,
+   "addresstype": "amenity",
+   "name": "Texas A&M University",
+   "display_name": "Texas A&M University, 400, Bizzell Street, College Station, Brazos County, Texas, 77843, United States",
+   "boundingbox": [
+    "30.5586550",
+    "30.6332765",
+    "-96.3832965",
+    "-96.3237716"
+   ]
+  }
+ ],
+ "The Second Affiliated Hospital of Nanjing Medical University": [],
+ "Universidade de Lisboa": [
+  {
+   "place_id": 296981801,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 460999059,
+   "lat": "38.7527961",
+   "lon": "-9.1570276",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5652174876571561,
+   "addresstype": "amenity",
+   "name": "Universidade de Lisboa - Cidade Universitária",
+   "display_name": "Universidade de Lisboa - Cidade Universitária, Avenida General Norton de Matos/2ª Circular, Campo Grande, Alvalade, Lisboa, 1600-404, Portugal",
+   "boundingbox": [
+    "38.7473016",
+    "38.7584087",
+    "-9.1602133",
+    "-9.1520777"
+   ]
+  }
+ ],
+ "Universitat Jaume I": [
+  {
+   "place_id": 293866445,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 46835092,
+   "lat": "39.9943120",
+   "lon": "-0.0713962",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.4576144686094317,
+   "addresstype": "amenity",
+   "name": "Universitat Jaume I",
+   "display_name": "Universitat Jaume I, Avinguda de Vicent Sos Baynat, Grup Roser, Castelló de la Plana / Castellón de la Plana, la Plana Alta, Castelló / Castellón, Comunitat Valenciana, 12071, España",
+   "boundingbox": [
+    "39.9898735",
+    "39.9980040",
+    "-0.0804438",
+    "-0.0628379"
+   ]
+  }
+ ],
+ "University College Cork": [
+  {
+   "place_id": 285035537,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 92914852,
+   "lat": "51.8947012",
+   "lon": "-8.4903105",
+   "class": "tourism",
+   "type": "museum",
+   "place_rank": 30,
+   "importance": 0.36160342477182406,
+   "addresstype": "tourism",
+   "name": "Glucksman Gallery",
+   "display_name": "Glucksman Gallery, Western Road, Gurteenaspig, Gillabbey B, Cork, County Cork, Munster, T12 V1WH, Éire / Ireland",
+   "boundingbox": [
+    "51.8945241",
+    "51.8949154",
+    "-8.4905934",
+    "-8.4899547"
+   ]
+  }
+ ],
+ "University College London": [
+  {
+   "place_id": 280011527,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 11373735,
+   "lat": "51.5242030",
+   "lon": "-0.1330007",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6572576527041583,
+   "addresstype": "amenity",
+   "name": "University College London",
+   "display_name": "University College London, Hallam Street, East Marylebone, Marylebone, City of Westminster, Greater London, England, W1W 6JJ, United Kingdom",
+   "boundingbox": [
+    "51.5194095",
+    "51.5309664",
+    "-0.1434184",
+    "-0.1140049"
+   ]
+  }
+ ],
+ "University Miguel Hernández": [
+  {
+   "place_id": 294630704,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 123244005,
+   "lat": "38.2769777",
+   "lon": "-0.6899447",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.4050032141000227,
+   "addresstype": "amenity",
+   "name": "Universitat Miguel Hernández d'Elx (UMH)",
+   "display_name": "Universitat Miguel Hernández d'Elx (UMH), CV-850, Elx / Elche, el Baix Vinalopó, Alacant / Alicante, Comunitat Valenciana, 03202, España",
+   "boundingbox": [
+    "38.2727127",
+    "38.2814665",
+    "-0.6964589",
+    "-0.6806044"
+   ]
+  }
+ ],
+ "University of Amsterdam": [
+  {
+   "place_id": 156690197,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 311971362,
+   "lat": "52.3681334",
+   "lon": "4.8898042",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6188228249110513,
+   "addresstype": "amenity",
+   "name": "Universiteit van Amsterdam",
+   "display_name": "Universiteit van Amsterdam, Heiligewegsluis, Centrum, Amsterdam, Noord-Holland, Nederland, 1017 AW, Nederland",
+   "boundingbox": [
+    "52.3675573",
+    "52.3687290",
+    "4.8889964",
+    "4.8905896"
+   ]
+  }
+ ],
+ "University of Arizona": [
+  {
+   "place_id": 333512712,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 6044244,
+   "lat": "32.2356985",
+   "lon": "-110.9517440",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6437439121563555,
+   "addresstype": "amenity",
+   "name": "University of Arizona",
+   "display_name": "University of Arizona, East 8th Street, Pie Allen, Tucson, Pima County, Arizona, 85721, United States",
+   "boundingbox": [
+    "32.2142324",
+    "32.2436496",
+    "-110.9777572",
+    "-110.9352623"
+   ]
+  }
+ ],
+ "University of Bonn": [
+  {
+   "place_id": 115204749,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "node",
+   "osm_id": 2113115094,
+   "lat": "50.7338124",
+   "lon": "7.1022465",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6540901760340185,
+   "addresstype": "amenity",
+   "name": "Rheinische Friedrich-Wilhelms-Universität Bonn",
+   "display_name": "Rheinische Friedrich-Wilhelms-Universität Bonn, Arkadenhof, Bonn-Zentrum, Stadtbezirk Bonn, Bonn, Nordrhein-Westfalen, 53113, Deutschland",
+   "boundingbox": [
+    "50.7337624",
+    "50.7338624",
+    "7.1021965",
+    "7.1022965"
+   ]
+  }
+ ],
+ "University of British Columbia": [
+  {
+   "place_id": 377271524,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 11678160,
+   "lat": "49.2578915",
+   "lon": "-123.2429755",
+   "class": "boundary",
+   "type": "administrative",
+   "place_rank": 20,
+   "importance": 0.6222838486029556,
+   "addresstype": "suburb",
+   "name": "University of British Columbia",
+   "display_name": "University of British Columbia, Electoral Area A, Metro Vancouver Regional District, British Columbia, Canada",
+   "boundingbox": [
+    "49.2431313",
+    "49.2730071",
+    "-123.2622125",
+    "-123.2273623"
+   ]
+  }
+ ],
+ "University of Cagliari": [],
+ "University of Calgary": [
+  {
+   "place_id": 377244810,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 4814074,
+   "lat": "51.0750540",
+   "lon": "-114.1388050",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5584082671765302,
+   "addresstype": "amenity",
+   "name": "University of Calgary",
+   "display_name": "University of Calgary, 2500, University Drive NW, University of Calgary, Calgary, Alberta, T2N 1N4, Canada",
+   "boundingbox": [
+    "51.0665854",
+    "51.0833939",
+    "-114.1519450",
+    "-114.1201822"
+   ]
+  }
+ ],
+ "University of California San Diego": [
+  {
+   "place_id": 318264603,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 25822522,
+   "lat": "32.8792438",
+   "lon": "-117.2311247",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.607871577126012,
+   "addresstype": "amenity",
+   "name": "University of California, San Diego",
+   "display_name": "University of California, San Diego, 9500, Gilman Drive, University City, San Diego, San Diego County, California, 92093, United States",
+   "boundingbox": [
+    "32.8635576",
+    "32.8941294",
+    "-117.2547461",
+    "-117.2183739"
+   ]
+  }
+ ],
+ "University of Cambridge": [
+  {
+   "place_id": 158327134,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 171633815,
+   "lat": "52.1890916",
+   "lon": "0.1212977",
+   "class": "building",
+   "type": "house",
+   "place_rank": 30,
+   "importance": 7.42771038375985e-05,
+   "addresstype": "building",
+   "name": "Q025-7 Trumpington Road, Cambridge",
+   "display_name": "Q025-7 Trumpington Road, Cambridge, 7, Trumpington Road, Trumpington, Cambridge, Cambridgeshire, Cambridgeshire and Peterborough, England, CB2 8AJ, United Kingdom",
+   "boundingbox": [
+    "52.1889908",
+    "52.1891855",
+    "0.1211616",
+    "0.1214187"
+   ]
+  }
+ ],
+ "University of Geneva": [
+  {
+   "place_id": 363689360,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 657108972,
+   "lat": "44.2276965",
+   "lon": "-76.4985204",
+   "class": "building",
+   "type": "detached",
+   "place_rank": 30,
+   "importance": 6.506218051418352e-05,
+   "addresstype": "building",
+   "name": "Geneva House",
+   "display_name": "Geneva House, 182, Frontenac Street, University District, Kingston, Eastern Ontario, Ontario, K7L 3S7, Canada",
+   "boundingbox": [
+    "44.2276580",
+    "44.2277450",
+    "-76.4986050",
+    "-76.4984370"
+   ]
+  }
+ ],
+ "University of Haifa": [
+  {
+   "place_id": 210832464,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 55001924,
+   "lat": "32.7609456",
+   "lon": "35.0204641",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5710862357956348,
+   "addresstype": "amenity",
+   "name": "אוניברסיטת חיפה",
+   "display_name": "אוניברסיטת חיפה, אבא חושי, אוניברסיטת חיפה, רובע רמות הכרמל, חיפה, נפת חיפה, מחוז חיפה, 3498838, ישראל",
+   "boundingbox": [
+    "32.7572864",
+    "32.7648787",
+    "35.0155885",
+    "35.0249465"
+   ]
+  }
+ ],
+ "University of Hong Kong": [
+  {
+   "place_id": 147798905,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "node",
+   "osm_id": 310303445,
+   "lat": "54.0855168",
+   "lon": "13.3892808",
+   "class": "amenity",
+   "type": "fast_food",
+   "place_rank": 30,
+   "importance": 6.65758754863358e-05,
+   "addresstype": "amenity",
+   "name": "Hong-Kong",
+   "display_name": "Hong-Kong, 81, Feldstraße, Südliche Mühlenvorstadt, Greifswald, Vorpommern-Greifswald, Mecklenburg-Vorpommern, 17489, Deutschland",
+   "boundingbox": [
+    "54.0854668",
+    "54.0855668",
+    "13.3892308",
+    "13.3893308"
+   ]
+  }
+ ],
+ "University of Illinois at Chicago": [
+  {
+   "place_id": 373581895,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 1083639401,
+   "lat": "41.8675665",
+   "lon": "-87.6524237",
+   "class": "landuse",
+   "type": "industrial",
+   "place_rank": 24,
+   "importance": 0.08008515373464557,
+   "addresstype": "industrial",
+   "name": "University of Illinois Cogen Facility",
+   "display_name": "University of Illinois Cogen Facility, Little Italy, Near West Side, Chicago, West Chicago Township, Cook County, Illinois, United States",
+   "boundingbox": [
+    "41.8672808",
+    "41.8679278",
+    "-87.6526282",
+    "-87.6522122"
+   ]
+  }
+ ],
+ "University of Massachusetts Dartmouth": [
+  {
+   "place_id": 419454792,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 20800037,
+   "lat": "41.6225037",
+   "lon": "-71.0073448",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.41395049179757576,
+   "addresstype": "amenity",
+   "name": "University of Massachusetts Dartmouth",
+   "display_name": "University of Massachusetts Dartmouth, Strawberry Lane, Dartmouth, Bristol County, Massachusetts, 02747, United States",
+   "boundingbox": [
+    "41.6100557",
+    "41.6626407",
+    "-71.0191904",
+    "-70.9869624"
+   ]
+  }
+ ],
+ "University of Melbourne": [
+  {
+   "place_id": 22561082,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 1104080556,
+   "lat": "-37.8241371",
+   "lon": "144.9170886",
+   "class": "landuse",
+   "type": "construction",
+   "place_rank": 24,
+   "importance": 0.08008045242999921,
+   "addresstype": "construction",
+   "name": "University of Melbourne (Future Fishermans Bend Campus)",
+   "display_name": "University of Melbourne (Future Fishermans Bend Campus), Port Melbourne, Melbourne, Victoria, 3207, Australia",
+   "boundingbox": [
+    "-37.8252686",
+    "-37.8233186",
+    "144.9150882",
+    "144.9190862"
+   ]
+  }
+ ],
+ "University of Milan": [
+  {
+   "place_id": 76172820,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 211714714,
+   "lat": "45.4757322",
+   "lon": "9.2282917",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 8.390707255660361e-05,
+   "addresstype": "amenity",
+   "name": "Università degli Studi di Milano",
+   "display_name": "Università degli Studi di Milano, Piazzale Paolo Gorini, Città Studi, Municipio 3, Milano, Rodano, Milano, Lombardia, 20133, Italia",
+   "boundingbox": [
+    "45.4743337",
+    "45.4767918",
+    "9.2267130",
+    "9.2298872"
+   ]
+  }
+ ],
+ "University of Nebraska": [
+  {
+   "place_id": 348707195,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 1008555388,
+   "lat": "38.9383480",
+   "lon": "-77.0856075",
+   "class": "highway",
+   "type": "primary",
+   "place_rank": 26,
+   "importance": 0.05341826276035703,
+   "addresstype": "road",
+   "name": "Nebraska Avenue Northwest",
+   "display_name": "Nebraska Avenue Northwest, American University Park, Ward 3, Washington, District of Columbia, 20016, United States",
+   "boundingbox": [
+    "38.9382734",
+    "38.9384258",
+    "-77.0857425",
+    "-77.0854743"
+   ]
+  }
+ ],
+ "University of North Carolina": [
+  {
+   "place_id": 422872791,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "node",
+   "osm_id": 14016809202,
+   "lat": "32.8723967",
+   "lon": "-117.2121107",
+   "class": "shop",
+   "type": "clothes",
+   "place_rank": 30,
+   "importance": 7.728007934686836e-05,
+   "addresstype": "shop",
+   "name": "Carolina Herrera",
+   "display_name": "Carolina Herrera, 4489, La Jolla Village Drive, Golden Triangle, University City, San Diego, San Diego County, California, 92122, United States",
+   "boundingbox": [
+    "32.8723467",
+    "32.8724467",
+    "-117.2121607",
+    "-117.2120607"
+   ]
+  }
+ ],
+ "University of Oxford": [
+  {
+   "place_id": 317238527,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 13308090,
+   "lat": "33.6505419",
+   "lon": "-117.8270531",
+   "class": "highway",
+   "type": "residential",
+   "place_rank": 26,
+   "importance": 0.05339957045853357,
+   "addresstype": "road",
+   "name": "Oxford",
+   "display_name": "Oxford, University Town Center, Irvine, Orange County, California, 92612, United States",
+   "boundingbox": [
+    "33.6500506",
+    "33.6523376",
+    "-117.8292451",
+    "-117.8265982"
+   ]
+  }
+ ],
+ "University of Pennsylvania": [
+  {
+   "place_id": 343428465,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 2594845,
+   "lat": "39.9522148",
+   "lon": "-75.1955729",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6819006016522263,
+   "addresstype": "amenity",
+   "name": "University of Pennsylvania",
+   "display_name": "University of Pennsylvania, 1, Schuylkill Expressway, University City, West Philadelphia, Philadelphia, Philadelphia County, Pennsylvania, 19104, United States",
+   "boundingbox": [
+    "39.9398131",
+    "39.9555813",
+    "-75.2044407",
+    "-75.1827768"
+   ]
+  }
+ ],
+ "University of Pennsylvania School of Veterinary Medicine": [
+  {
+   "place_id": 344854148,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "node",
+   "osm_id": 7009010681,
+   "lat": "39.9508966",
+   "lon": "-75.2000490",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 8.138017853051068e-05,
+   "addresstype": "amenity",
+   "name": "University of Pennsylvania School of Veterinary Medicine",
+   "display_name": "University of Pennsylvania School of Veterinary Medicine, Spruce Street, West Philadelphia, Philadelphia, Philadelphia County, Pennsylvania, 19104, United States",
+   "boundingbox": [
+    "39.9508466",
+    "39.9509466",
+    "-75.2000990",
+    "-75.1999990"
+   ]
+  }
+ ],
+ "University of Saskatchewan": [
+  {
+   "place_id": 375547140,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 13754325,
+   "lat": "52.1344194",
+   "lon": "-106.6277843",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5366082614652522,
+   "addresstype": "amenity",
+   "name": "University of Saskatchewan",
+   "display_name": "University of Saskatchewan, Circle Drive, College Park, Saskatoon, Saskatchewan, S7H 3E8, Canada",
+   "boundingbox": [
+    "52.1218581",
+    "52.1471306",
+    "-106.6475152",
+    "-106.6047927"
+   ]
+  }
+ ],
+ "University of South Florida": [
+  {
+   "place_id": 302574460,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 31675479,
+   "lat": "28.0599999",
+   "lon": "-82.4138362",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5475055438111135,
+   "addresstype": "amenity",
+   "name": "University of South Florida",
+   "display_name": "University of South Florida, 4202, East Fowler Avenue, Tampa, Hillsborough County, Florida, 33620, United States",
+   "boundingbox": [
+    "28.0545068",
+    "28.0690377",
+    "-82.4258585",
+    "-82.4018080"
+   ]
+  }
+ ],
+ "University of South Florida Health": [],
+ "University of Tennessee": [
+  {
+   "place_id": 341730593,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 376167113,
+   "lat": "35.9516352",
+   "lon": "-83.9308819",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5996652262586456,
+   "addresstype": "amenity",
+   "name": "University of Tennessee, Knoxville",
+   "display_name": "University of Tennessee, Knoxville, Jacob Drive, Fort Sanders, Knoxville, Knox County, East Tennessee, Tennessee, 37996, United States",
+   "boundingbox": [
+    "35.9431583",
+    "35.9603217",
+    "-83.9435582",
+    "-83.9217511"
+   ]
+  }
+ ],
+ "University of Texas": [
+  {
+   "place_id": 317442268,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 120361011,
+   "lat": "32.7547461",
+   "lon": "-117.1388100",
+   "class": "highway",
+   "type": "secondary",
+   "place_rank": 26,
+   "importance": 0.05341061341268021,
+   "addresstype": "road",
+   "name": "Texas Street",
+   "display_name": "Texas Street, University Heights, North Park, San Diego, San Diego County, California, 92163, United States",
+   "boundingbox": [
+    "32.7542897",
+    "32.7552024",
+    "-117.1388146",
+    "-117.1388056"
+   ]
+  }
+ ],
+ "University of Texas at Austin": [
+  {
+   "place_id": 315232702,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 1701848,
+   "lat": "30.2851494",
+   "lon": "-97.7339352",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6542164953583288,
+   "addresstype": "amenity",
+   "name": "University of Texas at Austin",
+   "display_name": "University of Texas at Austin, 1, Allandale, Austin, Travis County, Texas, 78712, United States",
+   "boundingbox": [
+    "30.2749856",
+    "30.3973516",
+    "-97.7856260",
+    "-97.7219658"
+   ]
+  }
+ ],
+ "University of Toronto": [
+  {
+   "place_id": 352304995,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "node",
+   "osm_id": 13356537973,
+   "lat": "43.6608141",
+   "lon": "-79.3960322",
+   "class": "office",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 8.130235751883753e-05,
+   "addresstype": "office",
+   "name": "University of Toronto",
+   "display_name": "University of Toronto, King's College Circle, University, Downtown, Toronto, Golden Horseshoe, Ontario, M5S 2E6, Canada",
+   "boundingbox": [
+    "43.6607641",
+    "43.6608641",
+    "-79.3960822",
+    "-79.3959822"
+   ]
+  }
+ ],
+ "University of Tsukuba": [
+  {
+   "place_id": 262151159,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 183555029,
+   "lat": "36.1070526",
+   "lon": "140.1006602",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5977792153180383,
+   "addresstype": "amenity",
+   "name": "筑波大学",
+   "display_name": "筑波大学, けやき通り, 天王台一丁目, 東平塚, つくば市, 茨城県, 305-8377, 日本",
+   "boundingbox": [
+    "36.0904091",
+    "36.1232946",
+    "140.0903705",
+    "140.1100882"
+   ]
+  }
+ ],
+ "University of Veterinary Medicine Vienna": [
+  {
+   "place_id": 186085161,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 26641949,
+   "lat": "48.2548154",
+   "lon": "16.4304238",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.37797476194049984,
+   "addresstype": "amenity",
+   "name": "Veterinärmedizinische Universität",
+   "display_name": "Veterinärmedizinische Universität, Linsbauerweg, Katastralgemeinde Kagran, Donaustadt, Wien, 1220, Österreich",
+   "boundingbox": [
+    "48.2514226",
+    "48.2583092",
+    "16.4278725",
+    "16.4344869"
+   ]
+  }
+ ],
+ "University of Warsaw": [
+  {
+   "place_id": 177432342,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 13489015,
+   "lat": "52.2216394",
+   "lon": "21.0073770",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5690225158729048,
+   "addresstype": "amenity",
+   "name": "Politechnika Warszawska",
+   "display_name": "Politechnika Warszawska, 1, Plac Politechniki, Koszyki, Śródmieście Południowe, Śródmieście, Warszawa, województwo mazowieckie, 00-661, Polska",
+   "boundingbox": [
+    "52.2174638",
+    "52.2229095",
+    "21.0050882",
+    "21.0133281"
+   ]
+  }
+ ],
+ "University of Wisconsin-Madison": [
+  {
+   "place_id": 373096334,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 7144092,
+   "lat": "43.0802745",
+   "lon": "-89.4309587",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6496016792270294,
+   "addresstype": "amenity",
+   "name": "University of Wisconsin-Madison",
+   "display_name": "University of Wisconsin-Madison, Speedway Road, Regent, Madison, Dane County, Wisconsin, 53726, United States",
+   "boundingbox": [
+    "43.0678110",
+    "43.0927578",
+    "-89.4459740",
+    "-89.3941037"
+   ]
+  }
+ ],
+ "University of the Basque Country": [
+  {
+   "place_id": 293028941,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 140595757,
+   "lat": "43.3092116",
+   "lon": "-2.0107957",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 7.18188754100407e-05,
+   "addresstype": "amenity",
+   "name": "Euskal Herriko Unibertsitatea, Ibaeta Campusa",
+   "display_name": "Euskal Herriko Unibertsitatea, Ibaeta Campusa, Resurrección María de Azkue kalea, Bentaberri, Antigua, Mendebaldea, Donostia / San Sebastián, Gipuzkoa, Euskadi, 20008, España",
+   "boundingbox": [
+    "43.3046386",
+    "43.3138049",
+    "-2.0140170",
+    "-2.0073526"
+   ]
+  }
+ ],
+ "Université Côte d’Azur": [
+  {
+   "place_id": 82216882,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 257231875,
+   "lat": "43.7170132",
+   "lon": "7.2675774",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.3047903492217065,
+   "addresstype": "amenity",
+   "name": "Parc Valrose - Université Côte d'Azur - Faculté des Sciences",
+   "display_name": "Parc Valrose - Université Côte d'Azur - Faculté des Sciences, 81, Avenue Valrose, Valrose, Saint-Maurice, Nice, Alpes-Maritimes, Provence-Alpes-Côte d'Azur, France métropolitaine, 06108, France",
+   "boundingbox": [
+    "43.7147439",
+    "43.7192752",
+    "7.2655204",
+    "7.2700730"
+   ]
+  }
+ ],
+ "Université Laval": [
+  {
+   "place_id": 423232519,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 21100815,
+   "lat": "46.7811677",
+   "lon": "-71.2741361",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5877939656799301,
+   "addresstype": "amenity",
+   "name": "Université Laval",
+   "display_name": "Université Laval, 2325, Rue de l'Université, Cité-Universitaire, Sainte-Foy–Sillery–Cap-Rouge, Québec, Agglomération de Québec, Capitale-Nationale, Québec, G1V 0A6, Canada",
+   "boundingbox": [
+    "46.7741997",
+    "46.7891059",
+    "-71.2892314",
+    "-71.2629920"
+   ]
+  }
+ ],
+ "Université de Bordeaux": [
+  {
+   "place_id": 291403903,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 44128045,
+   "lat": "44.8096516",
+   "lon": "-0.5974013",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5387626910597624,
+   "addresstype": "amenity",
+   "name": "Université de Bordeaux - Domaine du Haut-Carré",
+   "display_name": "Université de Bordeaux - Domaine du Haut-Carré, Rue du Clos du Haut Carré, Talence, Bordeaux, Gironde, Nouvelle-Aquitaine, France métropolitaine, 33400, France",
+   "boundingbox": [
+    "44.8082719",
+    "44.8110483",
+    "-0.6002514",
+    "-0.5945139"
+   ]
+  }
+ ],
+ "VA Boston": [
+  {
+   "place_id": 342798989,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 18376633,
+   "lat": "37.6033025",
+   "lon": "-75.8484003",
+   "class": "boundary",
+   "type": "census",
+   "place_rank": 25,
+   "importance": 0.3544115905399448,
+   "addresstype": "census",
+   "name": "Boston",
+   "display_name": "Boston, Accomack County, Virginia, United States",
+   "boundingbox": [
+    "37.5849390",
+    "37.6217250",
+    "-75.8638910",
+    "-75.8209850"
+   ]
+  }
+ ],
+ "Vanderbilt University": [
+  {
+   "place_id": 337541295,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 131042264,
+   "lat": "36.1438011",
+   "lon": "-86.8028189",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6054114328458443,
+   "addresstype": "amenity",
+   "name": "Vanderbilt University",
+   "display_name": "Vanderbilt University, 2201, West End Avenue, Nashville, Davidson County, Middle Tennessee, Tennessee, 37235, United States",
+   "boundingbox": [
+    "36.1368766",
+    "36.1506416",
+    "-86.8143808",
+    "-86.7945139"
+   ]
+  }
+ ],
+ "Washington State University": [
+  {
+   "place_id": 328356569,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 6954348,
+   "lat": "46.7337716",
+   "lon": "-117.1498035",
+   "class": "boundary",
+   "type": "administrative",
+   "place_rank": 20,
+   "importance": 0.5630174171680373,
+   "addresstype": "suburb",
+   "name": "Washington State University",
+   "display_name": "Washington State University, 150, Ward 3, Pullman, Whitman County, Washington, 99164, United States",
+   "boundingbox": [
+    "46.7214770",
+    "46.7460466",
+    "-117.1731913",
+    "-117.1172283"
+   ]
+  }
+ ],
+ "Wayne State University": [
+  {
+   "place_id": 365421924,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 11041461,
+   "lat": "42.3571895",
+   "lon": "-83.0709436",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5575856257845926,
+   "addresstype": "amenity",
+   "name": "Wayne State University",
+   "display_name": "Wayne State University, 656, West Kirby Street, Midtown, Detroit, Wayne County, Michigan, 48202, United States",
+   "boundingbox": [
+    "42.3513617",
+    "42.3664210",
+    "-83.0825342",
+    "-83.0620453"
+   ]
+  }
+ ],
+ "Weizmann Institute of Science": [
+  {
+   "place_id": 47897921,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 555836234,
+   "lat": "31.9078499",
+   "lon": "34.8133409",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5369332771901176,
+   "addresstype": "amenity",
+   "name": "מכון ויצמן למדע",
+   "display_name": "מכון ויצמן למדע, פרופ׳ א.ד. ברגמן, פארק ת.מ.ר, רחובות, נפת רחובות, מחוז המרכז, 7670609, ישראל",
+   "boundingbox": [
+    "31.9029081",
+    "31.9128495",
+    "34.8057444",
+    "34.8228411"
+   ]
+  }
+ ],
+ "Yale School of Medicine": [
+  {
+   "place_id": 356276452,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 442490018,
+   "lat": "41.3351751",
+   "lon": "-72.9186845",
+   "class": "amenity",
+   "type": "school",
+   "place_rank": 30,
+   "importance": 6.999847409776482e-05,
+   "addresstype": "amenity",
+   "name": "Yale School of Medicine (Cedarhurst School)",
+   "display_name": "Yale School of Medicine (Cedarhurst School), 871, Prospect Street, Prospect Hill Historic District, Whitneyville, Hamden, South Central Connecticut Planning Region, Connecticut, 06517, United States",
+   "boundingbox": [
+    "41.3346990",
+    "41.3356822",
+    "-72.9195096",
+    "-72.9178467"
+   ]
+  }
+ ]
+}

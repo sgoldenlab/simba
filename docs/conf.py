@@ -888,7 +888,7 @@ def _generate_download_stats(app):
             '  </div>\n'
             '  <p class="simba-dl-more"><a href="https://sronilsson.github.io/download_stats/" target="_blank" rel="noopener">'
             '\U0001F4CA  Full interactive download dashboard &rarr;</a></p>\n'
-            f'  <p class="simba-dl-foot">Source: PyPI downloads via Google BigQuery &middot; updated {stamp}</p>\n'
+            f'  <p class="simba-dl-foot">Sources: download metrics from PyPI via Google BigQuery &middot; published studies / validations (below) compiled from a <a href="https://docs.google.com/spreadsheets/d/169enc3Am2KQKifxj1F9KEKKLbftpMhBlw49zjl-egsY/edit" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">community-maintained Google Sheet</a> &middot; updated {stamp}</p>\n'
             '  <p class="simba-dl-foot">Citation counts from <a href="https://openalex.org" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">OpenAlex</a>'
             ' &middot; SimBA journal (10.1038/s41593-024-01649-9) + preprint (10.1101/2020.04.19.049452) DOIs &middot; current year to date'
             ' &middot; RCR from <a href="https://icite.od.nih.gov" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">NIH iCite</a></p>\n'

@@ -54,6 +54,14 @@ See tutorial: `Anchored ROI (bounding box) tutorial <https://github.com/sgoldenl
 |:repeat:| **Circular transformations**
 --------------------------------------------------
 
+.. raw:: html
+
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/compass_simba_spin.webm" type="video/webm">
+     <source src="_static/img/compass_simba_spin.mp4" type="video/mp4">
+   </video>
+
 Statistical operations for circular data such as head direction and heading angle, where values wrap around 360°. Wraparound-aware and multi-animal capable, these methods derive base angles from body-part triplets and compute quantities like mean resultant vector length, angular difference, directional dispersion, and the Rayleigh test — in both sliding-window and whole-session forms. GPU-accelerated variants are available for large datasets.
 
 .. toctree::
@@ -253,10 +261,17 @@ Visualize behavioral data and pose-tracking outputs — Gantt plots, path, dista
 |:package:| **Pose-estimation import tools**
 --------------------------------------------------
 
+.. raw:: html
+
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/blackkp_idle_spin_alpha.webm" type="video/webm">
+   </video>
+
 Parse, load, and standardize pose-estimation output from common trackers (e.g. DeepLabCut, SLEAP, DeepPoseKit, MARS) across H5, CSV, and JSON formats. Handles single- and multi-animal data and can interpolate and smooth tracking on import, producing the consistent internal format the rest of SimBA expects.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    simba.pose_importers
 
@@ -303,7 +318,7 @@ Compute statistical features from tracking and classification data — descripti
 Import behavioral annotations produced by external tools (e.g. BORIS, Ethovision, Observer, DeepEthogram, SOLOMON) and align them, frame by frame, to SimBA's pose-estimation and feature data. Lets you reuse existing human or third-party labels as classifier training targets without re-annotating.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    simba.third_party_label_appenders
 
@@ -351,7 +366,23 @@ SimBA's graphical interface components — the Tkinter windows, pop-ups, and men
 |:gear:| **Utilities**
 --------------------------------------------------
 
+.. raw:: html
+
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/toolbox_simba_reveal.webm" type="video/webm">
+     <source src="_static/img/toolbox_simba_reveal.mp4" type="video/mp4">
+   </video>
+
 Helper methods used throughout the package — logging, CLI execution, input and argument validation, warnings, timing, and reading/writing project files. The shared plumbing that keeps SimBA's error messages, checks, and file handling consistent across every module.
+
+.. seealso::
+
+   Further utility modules are documented alongside the features they support:
+   :doc:`YOLO utilities <simba.yolo>` (dataset conversion and training/inference helpers),
+   :doc:`CUDA / GPU utilities <simba.gpu_helpers>` (low-level device primitives and the
+   NVDEC video-decoder factory), and the
+   :doc:`custom feature extractor <simba.feature_extractors>`.
 
 .. toctree::
    :maxdepth: 1

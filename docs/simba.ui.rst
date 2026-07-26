@@ -37,6 +37,14 @@ SimBA tkinter methods
    :undoc-members:
    :show-inheritance:
 
+SimBA UI utilities
+----------------------------------
+
+.. automodule:: simba.ui.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 SimBA create user-defined pose config UI
 --------------------------------------------
 
