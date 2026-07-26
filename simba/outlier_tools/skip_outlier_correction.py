@@ -1,8 +1,9 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import os
-import numpy as np
 from typing import Union
+
+import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import check_if_filepath_list_is_empty
