@@ -355,10 +355,17 @@ Discover behavioral structure without labels. Combines dimensionality reduction 
 |:desktop_computer:| **User Interface (UI) tools**
 --------------------------------------------------
 
+.. raw:: html
+
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/monitor_simba_splash.webm" type="video/webm">
+   </video>
+
 SimBA's graphical interface components — the Tkinter windows, pop-ups, and menus that drive project creation, configuration, and each step of the analysis workflow. The entry point for users who prefer clicking through SimBA rather than scripting it.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    simba.ui
 
