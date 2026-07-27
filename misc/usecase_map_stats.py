@@ -278,6 +278,7 @@ def _render(total, n_countries, n_continents, n_species, n_journals, years,
 .simba-uc-card .l{{display:block;font-size:10.5px;color:#6b7280;margin-top:4px;}}
 .simba-uc-card .ic{{display:block;width:22px;height:22px;margin:0 auto 7px;color:#21567a;opacity:.85;}}
 .simba-uc-h3{{font-size:15px;color:#23272e;font-weight:700;margin:24px 0 10px;}}
+.simba-uc-cap{{font-size:11.5px;color:#8b95a1;margin:-4px 0 10px;line-height:1.35;}}
 .simba-uc-map{{position:relative;height:520px;background:radial-gradient(120% 120% at 50% 0%,#f4f9fd,#e8f1f8);border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);padding:10px;box-sizing:border-box;}}
 .simba-uc-legend{{display:flex;align-items:center;gap:8px;justify-content:flex-end;font-size:11px;color:#6b7280;margin:8px 4px 0;}}
 .simba-uc-legend i{{width:140px;height:10px;border-radius:5px;display:inline-block;background:linear-gradient(90deg,#e8f4fb,#7fc1e3,#2a7fb8,#143a5e);}}
@@ -300,20 +301,25 @@ def _render(total, n_countries, n_continents, n_species, n_journals, years,
     <div class="simba-uc-card">{ic['institutions']}<span class="v">{n_institutions}</span><span class="l">institutions</span></div>
   </div>
   <h3 class="simba-uc-h3">Studies by country</h3>
+  <p class="simba-uc-cap">Darker = more studies. Each study is counted once per country; multi-country studies count in each. Hover a country for its total.</p>
   <div class="simba-uc-map" id="ucMapCountries"></div>
   <div class="simba-uc-legend"><span style="color:#9aa0a8">fewer</span><i></i><span>more</span><span class="sw" style="background:#dce4ee;margin-left:6px"></span><span>none</span></div>
   <h3 class="simba-uc-h3">Institutions &amp; locations</h3>
+  <p class="simba-uc-cap">One pin per institution; size &amp; colour scale with the number of studies. Hover a pin for its study list.</p>
   <div class="simba-uc-map" id="ucMapPins"></div>
   <div class="simba-uc-legend"><span style="color:#9aa0a8">studies per institution:</span>{dots_html}</div>
   <div class="simba-uc-grid">
-    <div><h3 class="simba-uc-h3">Studies per year</h3><div class="simba-uc-panel"><canvas id="ucYears"></canvas></div></div>
-    <div><h3 class="simba-uc-h3">By continent</h3><div class="simba-uc-panel"><canvas id="ucCont"></canvas></div></div>
+    <div><h3 class="simba-uc-h3">Studies per year</h3><p class="simba-uc-cap">Publications by calendar year; the current year is to-date.</p><div class="simba-uc-panel"><canvas id="ucYears"></canvas></div></div>
+    <div><h3 class="simba-uc-h3">By continent</h3><p class="simba-uc-cap">Studies grouped by the continent of each contributing country.</p><div class="simba-uc-panel"><canvas id="ucCont"></canvas></div></div>
   </div>
   <h3 class="simba-uc-h3">Studies by species</h3>
+  <p class="simba-uc-cap">Animal model studied (top 10 by study count).</p>
   <div class="simba-uc-panel" style="height:320px"><canvas id="ucSpecies"></canvas></div>
   <h3 class="simba-uc-h3">Top countries</h3>
+  <p class="simba-uc-cap">Most studies by country (top 20).</p>
   <div class="simba-uc-panel" style="height:420px"><canvas id="ucCountries"></canvas></div>
   <h3 class="simba-uc-h3">Top institutions</h3>
+  <p class="simba-uc-cap">Most studies by institution (top 20); each counted once per study it contributed to.</p>
   <div class="simba-uc-panel" style="height:560px"><canvas id="ucInst"></canvas></div>
   <p class="simba-uc-foot"><a href="https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">Full list of studies (spreadsheet) &rarr;</a> &middot; one entry per study &middot; multi-country studies counted in each country</p>
 </div>

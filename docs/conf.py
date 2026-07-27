@@ -104,6 +104,7 @@ html_theme_options = {
 }
 html_static_path = ['_static']
 html_show_sphinx = False          # drop the "Built with Sphinx using a theme provided by Read the Docs." footer credit
+html_last_updated_fmt = "%b %d, %Y"  # render "Last updated on <date>." in the footer (see _templates/footer.html)
 
 # Markdown tutorials are published at the repo-root depth their relative paths assume
 # (e.g. Scenario1.md -> /Scenario1.html). Redirect the legacy rST URLs so existing

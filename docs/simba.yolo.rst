@@ -9,6 +9,14 @@ YOLO methods
 Methods for training YOLO models, creating training and validation datasets, and
 converting behavioral neuroscience specific datasets to YOLO datasets.
 
+.. video:: _static/img/yolo_mouse_detect.webm
+   :width: 720
+   :autoplay:
+   :nocontrols:
+   :loop:
+   :muted:
+   :align: center
+
 Utilities
 -----------------------------------------------------------------------
 

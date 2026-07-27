@@ -411,6 +411,13 @@ Video processing tools built on OpenCV and FFmpeg — clip, crop, concatenate, d
 👁️ **YOLO Methods**
 -----------------------
 
+.. raw:: html
+
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/yolo_mouse_detect.webm" type="video/webm">
+   </video>
+
 Methods for training YOLO models, creating training and validation datasets, and converting behavioral neuroscience-specific datasets to YOLO datasets.
 
 Uses the `Ultralytics <https://github.com/ultralytics/ultralytics>`_ package.

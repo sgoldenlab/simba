@@ -1,15 +1,16 @@
 {% extends "!footer.html" %}
 
-{# Override the copyright line so "sronilsson" links to the author's site.
-   The theme HTML-escapes the `copyright` string, so a link can't live in
-   conf.py's copyright value — it has to go in the template. The year is still
-   taken from conf.py (copyright = "<year>, sronilsson"). Build/revision/
-   last-updated spans are preserved from the stock theme. #}
+{# Copyright line (year from conf.py) + Contact link + GitHub link. Links can't
+   live in conf.py's `copyright` value (the theme HTML-escapes it), so they go
+   here. Build/revision/last-updated spans are preserved from the stock theme
+   (last_updated is enabled via html_last_updated_fmt in conf.py). #}
 {% block contentinfo %}
     <p>
     {%- if show_copyright %}
       &#169; Copyright {{ copyright.split(',')[0] }}, <a href="https://sronilsson.netlify.app/">sronilsson</a>.
     {%- endif %}
+    <span class="simba-contact">&middot; Contact: <a href="https://sronilsson.netlify.app/">sronilsson</a>.</span>
+    <span class="simba-gh">&middot; <a href="https://github.com/sgoldenlab/simba">SimBA on GitHub</a>.</span>
 
     {%- if build_id and build_url %}
       <span class="build">
