@@ -223,12 +223,22 @@ def main():
     if unmapped_inst:
         print("Institutions without coords (add to institution_coords.py):", dict(unmapped_inst))
 
+    # Corpus stats mined LOCALLY from the paper PDFs (misc/extract_corpus_stats.py) and
+    # committed as misc/corpus_stats.json, so this CI/RTD render never touches the PDFs.
+    corpus = None
+    cpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "corpus_stats.json")
+    try:
+        with open(cpath, encoding="utf-8") as cf:
+            corpus = json.load(cf)
+    except Exception as e:
+        print(f"[usecase] corpus_stats.json not loaded ({e!r}); corpus panels skipped.")
+
     pull_date = date.today().strftime("%B %d, %Y")
     html = _render(total, n_countries, n_continents, n_species, n_journals,
                    years, country_map, yr_labels, yr_counts, cont_labels,
                    cont_vals, top_labels, top_vals, ISO_NAME, pull_date,
                    n_institutions, markers, mark_tips, inst_labels, inst_vals,
-                   sp_labels, sp_vals, inst_colors, legend_dots)
+                   sp_labels, sp_vals, inst_colors, legend_dots, corpus)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(html)
@@ -237,13 +247,54 @@ def main():
           f"{n_institutions} institutions pinned")
 
 
+def _build_corpus(c):
+    """Build a single concept word cloud from corpus_stats.json -- an impressionistic
+    'what SimBA has been used for' (methods, behaviours, brain regions, models, compounds).
+    Returns (panels_html, ""). Empty strings if no corpus data."""
+    # hide generic ML/plumbing terms -- the cloud is about what SimBA studies, not the algorithms
+    EXCLUDE = {"machine learning", "pose estimation", "random forest", "cnn / resnet", "unsupervised",
+               "svm", "xgboost", "transformer", "umap", "t-sne", "hdbscan", "bounding box", "keypoint tracking"}
+    wc = [(w, n) for (w, n) in (c or {}).get("wordcloud", []) if w.lower() not in EXCLUDE]
+    if not wc:
+        return "", ""
+    import hashlib
+    # magma ramp (dark -> hot); skip the pale yellow top so words stay legible on white
+    MAGMA = ["#160b39", "#3b0f70", "#641a80", "#8c2981", "#b73779",
+             "#de4968", "#f7705c", "#fb8761"]
+    fs = [n for _, n in wc]; lo, hi = min(fs), max(fs)
+    def hsh(w):
+        return int(hashlib.md5(w.encode()).hexdigest(), 16)
+    def norm(n):
+        return (((n - lo) / (hi - lo)) ** 0.6) if hi > lo else 0.5
+    def sz(n):
+        return round(11 + 26 * norm(n), 1)
+    def col(n):                                    # colour by prevalence (magma heatmap)
+        return MAGMA[min(len(MAGMA) - 1, int(norm(n) * len(MAGMA)))]
+    # deterministic scramble (stable across rebuilds) so big/small words mix spatially,
+    # with a small per-word vertical jitter for an organic cloud feel
+    order = sorted(wc, key=lambda kv: hsh(kv[0]))
+    spans = " ".join(
+        f'<span style="font-size:{sz(n)}px;color:{col(n)};margin:1px 4px;'
+        f'position:relative;top:{hsh(w) % 5 - 2}px;display:inline-block;font-weight:600;'
+        f'opacity:.92;line-height:1" title="mentioned in {n} of {c.get("n_pdfs", "?")} papers">{esc(w)}</span>'
+        for (w, n) in order)
+    panels = (f'<h3 class="simba-uc-h3">What SimBA has been used for</h3>'
+              f'<p class="simba-uc-cap">Concepts appearing across the full text of {c.get("n_pdfs", "?")} '
+              f'downloaded studies &mdash; methods, behaviours, brain regions, models and compounds. '
+              f'Larger = mentioned in more papers. Keyword-based overview (indicative, not exhaustive). '
+              f'Updated {c.get("generated", "")}.</p>'
+              f'<div class="uc-cloud">{spans}</div>')
+    return panels, ""
+
+
 def _render(total, n_countries, n_continents, n_species, n_journals, years,
             country_map, yr_labels, yr_counts, cont_labels, cont_vals,
             top_labels, top_vals, iso_name, pull_date,
             n_institutions, markers, mark_tips, inst_labels, inst_vals,
-            sp_labels, sp_vals, inst_colors, legend_dots):
+            sp_labels, sp_vals, inst_colors, legend_dots, corpus):
     yr_range = f"{years[0]}–{years[-1]}" if years else ""
     j = json.dumps
+    corpus_panels, corpus_script = _build_corpus(corpus)
     # Tabler-style line icons (stroke=currentColor) for the stat cards
     _svg = ('<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
             'stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{}</svg>')
@@ -290,6 +341,7 @@ def _render(total, n_countries, n_continents, n_species, n_journals, years,
 .simba-uc-foot{{text-align:center;font-size:14.5px;color:#4b5563;margin:18px 4px 0;}}
 .simba-uc-foot a{{font-weight:600;}}
 .jvm-tooltip{{background-color:#1f2937 !important;border-radius:9px !important;padding:9px 11px !important;max-width:300px !important;box-shadow:0 8px 24px rgba(15,23,42,.32) !important;}}
+.uc-cloud{{max-width:900px;margin:6px auto 4px;text-align:center;padding:14px 12px;background:transparent;border:1px solid #111;border-radius:10px;line-height:1.05;}}
 </style>
 <div class="simba-uc">
   <p class="simba-uc-date">Data pulled {pull_date}</p>
@@ -321,6 +373,7 @@ def _render(total, n_countries, n_continents, n_species, n_journals, years,
   <h3 class="simba-uc-h3">Top institutions</h3>
   <p class="simba-uc-cap">Most studies by institution (top 20); each counted once per study it contributed to.</p>
   <div class="simba-uc-panel" style="height:560px"><canvas id="ucInst"></canvas></div>
+  {corpus_panels}
   <p class="simba-uc-foot"><a href="https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">Full list of studies (spreadsheet) &rarr;</a> &middot; one entry per study &middot; multi-country studies counted in each country</p>
 </div>
 <script>window.__odef2 = window.define; try {{ window.define = undefined; }} catch (e) {{}}</script>
@@ -434,6 +487,7 @@ def _render(total, n_countries, n_continents, n_species, n_journals, years,
   }});
 }})();
 </script>
+{corpus_script}
 <script>try {{ window.define = window.__odef2; }} catch (e) {{}}</script>
 """
 
