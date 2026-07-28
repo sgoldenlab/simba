@@ -155,6 +155,7 @@ ________________________________________________
    glossary
    qr_gallery
    download_stats
+   published_studies
 
 .. toctree::
    :maxdepth: 2
