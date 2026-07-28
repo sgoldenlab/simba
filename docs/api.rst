@@ -97,6 +97,13 @@ See tutorial: `Cue-light tutorial <https://github.com/sgoldenlab/simba/blob/mast
 |:wrench:| **Data processing tools**
 --------------------------------------------------
 
+.. raw:: html
+
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:300px; max-width:42%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/rack_flicker.webm" type="video/webm">
+   </video>
+
 Transform classification, tracking, and image data after feature extraction or model inference. Includes interpolation and smoothing of pose data, aggregation of classifier results, and specialized calculators such as Kleinberg burst detection, the forward spike-time tiling coefficient (FSTTC), and movement and severity scoring.
 
 .. toctree::
