@@ -100,7 +100,7 @@ See tutorial: `Cue-light tutorial <https://github.com/sgoldenlab/simba/blob/mast
 Transform classification, tracking, and image data after feature extraction or model inference. Includes interpolation and smoothing of pose data, aggregation of classifier results, and specialized calculators such as Kleinberg burst detection, the forward spike-time tiling coefficient (FSTTC), and movement and severity scoring.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    simba.data_processors
 
@@ -129,6 +129,14 @@ Pre-configured "out-of-the-box" feature extraction modules for common pose-estim
 
 |:triangular_ruler:| **Geometry transformations**
 --------------------------------------------------
+
+.. raw:: html
+
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/rings_mouse_jump.webm" type="video/webm">
+     <source src="_static/img/rings_mouse_jump.mp4" type="video/mp4">
+   </video>
 
 Transform pose-estimated body-part coordinates into geometric shapes — bounding boxes, polygons, circles, and lines — and compute spatial relationships between them. Supports buffering, unions and intersections, point-in-shape tests, inter-shape distances, overlap, and directionality. Built on Shapely, with GPU-accelerated variants for many of the heavier operations.
 
