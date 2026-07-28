@@ -4,8 +4,14 @@
 done
 Writing evaluated template result to C:\projects\simba\simba\docs\_build\html\_static\nbsphinx-code-cells.css
 [autosummary] generating autosummary for: 404.rst, FAQ.md, FSTTC.md, Multi_animal_pose.md, Pose_config.md, SHAP.md, Scenario1.md, Scenario2.md, Scenario3.md, Scenario4.md, ..., tutorials_rst\boris.rst, tutorials_rst\roi_features.rst, tutorials_rst\roi_new.rst, tutorials_rst\standard_label.rst, validation_tutorial.md, visualization_gallery.rst, walkthroughs.rst, yolo_inference.md, yolo_pose_plot.md, yolo_train.md
+warning||GPU tools not detected, reverting to CPU: ("module 'cupy_backends' has no attribute 'cuda'",)
+warning||GPU tools not detected, reverting to CPU: ("No module named 'cuml'",)
 error||SIMBA MISSING PROJECT CONFIG ENTRY ERROR: SimBA could not find an entry for option project_path under section General settings in the project_config.ini. Please specify the settings in the settings menu and make sure the path to your project config is correct
 [91mWARNING: Failed to import simba.pose_processors.reverse_pose.
 Possible hints:
-* AttributeError: module 'simba.pose_processors' has no attribute 'reverse_pose'
-* MissingProjectConfigEntryError: SIMBA MISSING PROJECT CONFIG ENTRY ERROR: SimBA could not find an entry for option project_path under section General settings in the project_config.ini. Please specify the settings in the settings menu and make sure the path to your project config is correct[39;49;00m
+* MissingProjectConfigEntryError: SIMBA MISSING PROJECT CONFIG ENTRY ERROR: SimBA could not find an entry for option project_path under section General settings in the project_config.ini. Please specify the settings in the settings menu and make sure the path to your project config is correct
+* AttributeError: module 'simba.pose_processors' has no attribute 'reverse_pose'[39;49;00m
+[08:11:52] SIMBA WARNING: GPUToolsWarning: GPU tools not detected, reverting to CPU: ("module 'cupy_backends' has no attribute 'cuda'",) 	warning
+[08:11:52] SIMBA WARNING: GPUToolsWarning: GPU tools not detected, reverting to CPU: ("No module named 'cuml'",) 	warning
+[08:12:12] SIMBA MISSING PROJECT CONFIG ENTRY ERROR: SimBA could not find an entry for option project_path under section General settings in the project_config.ini. Please specify the settings in the settings menu and make sure the path to your project config is correct	error
+[01mmyst v4.0.1:[39;49;00m MdParserConfig(commonmark_only=False, gfm_only=False, enable_extensions={'html_image', 'deflist', 'colon_fence'}, disable_syntax=[], all_links_external=False, links_external_new_tab=False, url_schemes=('http', 'https'), ref_domains=None, fence_as_directive=set(), number_code_blocks=[], title_to_header=False, heading_anchors=3, heading_slug_func=None, html_meta={}, footnote_sort=True, footnote_transition=True, words_per_minute=200, substitutions={}, linkify_fuzzy_links=True, dmath_allow_labels=True, dmath_allow_space=True, dmath_allow_digits=True, dmath_double_inline=False, update_mathjax=True, mathjax_classes='tex2jax_process|mathjax_process|math|output_area', enable_checkboxes=False, suppress_warnings=[], highlight_code_blocks=True)
