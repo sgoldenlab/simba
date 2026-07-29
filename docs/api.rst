@@ -185,6 +185,13 @@ CUDA/CuPy-accelerated versions of SimBA's compute-heavy routines — geometry, i
 |:frame_with_picture:| **Image transformations**
 --------------------------------------------------
 
+.. raw:: html
+
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:300px; max-width:42%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/frame_portrait_black_kp.webm" type="video/webm">
+   </video>
+
 Manipulate video frames and extract visual information from tracking data — crop, slice, rotate, and greyscale frames, isolate regions around body parts, and compute pixel-based features. Includes methods for comparing image features across time (e.g. frame-to-frame change), with both CPU and GPU implementations.
 
 .. toctree::
@@ -195,6 +202,13 @@ Manipulate video frames and extract visual information from tracking data — cr
 
 |:label:| **Labeling tools**
 --------------------------------------------------
+
+.. raw:: html
+
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/tag_simba.webm" type="video/webm">
+   </video>
 
 Interactive tools for annotating behavioral events frame by frame. Create and edit the ground-truth labels used to train classifiers, review and correct model predictions directly on the video, and manage annotations across a project's videos.
 
