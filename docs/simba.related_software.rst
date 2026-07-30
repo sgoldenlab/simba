@@ -44,6 +44,12 @@ Pose estimation
    * - `YOLO (Ultralytics) <https://github.com/ultralytics/ultralytics>`__
      - Open source
      - Real-time keypoint/pose estimation (SimBA-supported); also object detection and segmentation
+   * - `SuperAnimal / DLC Model Zoo <https://deeplabcut.github.io/DeepLabCut/docs/ModelZoo.html>`__
+     - Open source
+     - Pretrained cross-species DeepLabCut models, usable without new labelling
+   * - `DeepGraphPose <https://github.com/paninski-lab/deepgraphpose>`__
+     - Open source
+     - Pose estimation using graph-based spatiotemporal priors
 
 3D pose estimation
 ------------------
@@ -64,6 +70,9 @@ Pose estimation
    * - `DANNCE <https://github.com/spoonsso/dannce>`__
      - Open source
      - 3D landmark detection from multi-view video
+   * - `OpenMonkeyStudio <https://github.com/OpenMonkeyStudio>`__
+     - Open source
+     - Markerless 3D pose estimation for freely moving macaques
 
 Tracking and identity
 ---------------------
@@ -102,6 +111,24 @@ Tracking and identity
    * - `C-Trax <https://ctrax.sourceforge.net/>`__
      - Open source
      - Tracking of walking flies in groups
+   * - `AnimalTA <https://vchiara.eu/index.php/animalta>`__
+     - Open source
+     - GUI tracking of multiple animals across varied setups
+   * - `BioTracker <https://github.com/BioroboticsLab/biotracker_core>`__
+     - Open source
+     - Modular video-tracking framework
+   * - `FlyTracker <https://github.com/kristinbranson/FlyTracker>`__
+     - Open source
+     - Tracking and feature extraction for interacting flies
+   * - `FicTrac <https://github.com/rjdmoore/fictrac>`__
+     - Open source
+     - Spherical-treadmill path tracking for tethered insects
+   * - `ZebraZoom <https://zebrazoom.org/>`__
+     - Open source
+     - Zebrafish larva and adult behaviour tracking
+   * - `Stytra <https://github.com/portugueslab/stytra>`__
+     - Open source
+     - Zebrafish tracking with closed-loop stimulus control
 
 Supervised behavior classification
 -----------------------------------
@@ -131,6 +158,18 @@ Supervised behavior classification
    * - `SIPEC <https://github.com/damaggu/SIPEC>`__
      - Open source
      - End-to-end deep-learning behavioral analysis pipeline
+   * - `DeepAction <https://github.com/carlwharris/DeepAction>`__
+     - Open source
+     - Video-based behaviour classification with confidence-based review
+   * - `DLC2Action <https://github.com/amathislab/DLC2action>`__
+     - Open source
+     - Deep-learning behaviour segmentation from pose
+   * - `OpenLabCluster <https://github.com/shlizee/OpenLabCluster>`__
+     - Open source
+     - Active-learning clustering and classification from keypoints
+   * - `CBAS <https://github.com/jones-lab-tamu/CBAS>`__
+     - Open source
+     - Circadian behavioural analysis suite for long recordings
 
 Unsupervised behavior discovery
 -------------------------------
@@ -142,10 +181,10 @@ Unsupervised behavior discovery
    * - Software
      - Type
      - Description
-   * - `B-SOID <https://github.com/YttriLab/B-SOID>`__
+   * - `B-SOiD <https://github.com/YttriLab/B-SOID>`__
      - Open source
      - Unsupervised behavior discovery from pose
-   * - `A-SOID <https://github.com/YttriLab/A-SOID>`__
+   * - `A-SOiD <https://github.com/YttriLab/A-SOID>`__
      - Open source
      - Active-learning behavior classification from pose
    * - `Keypoint-MoSeq <https://github.com/dattalab/keypoint-moseq>`__
@@ -170,6 +209,9 @@ Unsupervised behavior discovery
 Object detection
 ----------------
 
+YOLO (Ultralytics) also belongs here; it is listed under `Pose estimation`_ because
+that is the capability SimBA supports directly.
+
 .. list-table::
    :header-rows: 1
    :widths: 22 14 64
@@ -177,15 +219,96 @@ Object detection
    * - Software
      - Type
      - Description
-   * - `YOLO (Ultralytics) <https://github.com/ultralytics/ultralytics>`__
-     - Open source
-     - Real-time object detection, segmentation, and pose framework
    * - `Detectron2 <https://github.com/facebookresearch/detectron2>`__
      - Open source
      - Object detection and instance segmentation library
    * - `Segment Anything (SAM 2) <https://github.com/facebookresearch/sam2>`__
      - Open source
      - Promptable image and video segmentation
+
+Vocalisation and audio
+----------------------
+
+Behavioural video is frequently paired with ultrasonic vocalisation (USV) recording;
+these tools cover the audio half of that pipeline.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 14 64
+
+   * - Software
+     - Type
+     - Description
+   * - `DeepSqueak <https://github.com/DrCoffey/DeepSqueak>`__
+     - Open source
+     - Deep-learning detection and classification of USVs
+   * - `DAS (Deep Audio Segmenter) <https://github.com/janclemenslab/das>`__
+     - Open source
+     - Deep-learning annotation of acoustic signals
+   * - `USVSEG <https://github.com/rtachi-lab/usvseg>`__
+     - Open source
+     - Segmentation of rodent ultrasonic vocalisations
+   * - `MUPET <https://github.com/mvansegbroeck-zz/mupet>`__
+     - Open source
+     - Mouse ultrasonic profile extraction and syllable clustering
+   * - `VocalMat <https://github.com/ahof1704/VocalMat>`__
+     - Open source
+     - Detection and classification of mouse vocalisations
+   * - `AVA <https://github.com/pearsonlab/autoencoded-vocal-analysis>`__
+     - Open source
+     - Unsupervised latent-space analysis of vocal repertoires
+   * - `Avisoft SASLab <https://avisoft.com/>`__
+     - Commercial
+     - Bioacoustic recording and sound analysis
+
+Neural data alignment
+---------------------
+
+Not behaviour tools themselves, but the packages SimBA output is most often aligned
+against when behaviour is paired with neural recording.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 14 64
+
+   * - Software
+     - Type
+     - Description
+   * - `GuPPy <https://github.com/LernerLab/GuPPy>`__
+     - Open source
+     - Fiber photometry analysis in Python
+   * - `pMAT <https://github.com/djamesbarker/pMAT>`__
+     - Open source
+     - Photometry modular analysis tool
+   * - `CaImAn <https://github.com/flatironinstitute/CaImAn>`__
+     - Open source
+     - Calcium imaging motion correction and source extraction
+   * - `suite2p <https://github.com/MouseLand/suite2p>`__
+     - Open source
+     - Calcium imaging processing and cell detection
+   * - `Minian <https://github.com/miniscope/minian>`__
+     - Open source
+     - Miniscope calcium imaging analysis pipeline
+
+Data standards and interoperability
+-----------------------------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 14 64
+
+   * - Software
+     - Type
+     - Description
+   * - `movement <https://github.com/neuroinformatics-unit/movement>`__
+     - Open source
+     - Analysis of pose tracks from DeepLabCut, SLEAP, and others
+   * - `NWB <https://nwb.org/>`__
+     - Open source
+     - Neurodata Without Borders standard for neurophysiology data
+   * - `ndx-pose <https://github.com/rly/ndx-pose>`__
+     - Open source
+     - NWB extension for storing pose-estimation data
 
 Analysis and real-time pipelines
 --------------------------------
@@ -244,6 +367,9 @@ Manual annotation
    * - `ELAN <https://archive.mpi.nl/tla/elan>`__
      - Open source
      - Time-aligned annotation of video and audio
+   * - `BENTO <https://github.com/neuroethology/bentoMAT>`__
+     - Open source
+     - Synchronised annotation of behaviour, pose, and neural traces
 
 Commercial platforms
 --------------------
@@ -261,3 +387,27 @@ Commercial platforms
    * - `CatWalk XT <https://www.noldus.com/catwalk>`__
      - Commercial
      - Gait analysis platform
+   * - `ANY-maze <https://www.any-maze.com/>`__
+     - Commercial
+     - Video tracking and automated behavioural testing (Stoelting)
+   * - `CleverSys (TopScan, HomeCageScan) <https://cleversysinc.com/>`__
+     - Commercial
+     - Automated behaviour recognition and home-cage scoring
+   * - `Noldus PhenoTyper <https://noldus.com/phenotyper>`__
+     - Commercial
+     - Instrumented home-cage observation
+   * - `Noldus DanioVision <https://noldus.com/daniovision>`__
+     - Commercial
+     - Zebrafish larva activity tracking
+   * - `ViewPoint (ZebraLab) <https://www.viewpoint.fr/>`__
+     - Commercial
+     - Zebrafish and rodent behaviour tracking
+   * - `Panlab SMART <https://www.panlab.com/en/>`__
+     - Commercial
+     - Video tracking for rodent behavioural tests
+   * - `TSE Systems <https://www.tse-systems.com/>`__
+     - Commercial
+     - Behavioural phenotyping and metabolic systems
+   * - `DigiGait <https://mousespecifics.com/digigait/>`__
+     - Commercial
+     - Treadmill-based gait analysis
