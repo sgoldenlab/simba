@@ -1,6 +1,13 @@
 🧑‍🏫 Tutorials
 =============
 
+.. raw:: html
+
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:400px; max-width:46%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/book_simba.webm" type="video/webm">
+   </video>
+
 For up-to-date and additional tutorials, see markdown content on the `SimBA GitHub repository <https://github.com/sgoldenlab/simba/>`_
 
 .. toctree::

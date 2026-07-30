@@ -1,6 +1,13 @@
 🎨 Visualization gallery
 ========================
 
+.. raw:: html
+
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:300px; max-width:42%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/frame_portrait_black_kp.webm" type="video/webm">
+   </video>
+
 A tour of what SimBA can render — plotting outputs and the video/image
 processing tools. Each tile links to the code that produces it, where you'll
 find the full API, options and a playable demo.

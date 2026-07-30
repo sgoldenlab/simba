@@ -1,22 +1,180 @@
 {
- "generated": "July 28, 2026",
- "n_pdfs": 167,
+ "generated": "July 30, 2026",
+ "n_pdfs": 168,
+ "behaviours_automated": [
+  [
+   "Locomotion / distance travelled",
+   40,
+   "Locomotion / motor"
+  ],
+  [
+   "Zone / ROI occupancy",
+   33,
+   "Exploration"
+  ],
+  [
+   "Social interaction / approach",
+   28,
+   "Social"
+  ],
+  [
+   "Anogenital / body sniffing",
+   27,
+   "Social"
+  ],
+  [
+   "Grooming",
+   27,
+   "Self-directed"
+  ],
+  [
+   "Attack / fighting / biting",
+   26,
+   "Aggression"
+  ],
+  [
+   "Rearing",
+   24,
+   "Self-directed"
+  ],
+  [
+   "Freezing",
+   14,
+   "Fear / defence"
+  ],
+  [
+   "Avoidance / escape / flight",
+   13,
+   "Fear / defence"
+  ],
+  [
+   "Operant / self-administration",
+   9,
+   "Feeding / reward"
+  ],
+  [
+   "Feeding / licking / drinking",
+   9,
+   "Feeding / reward"
+  ],
+  [
+   "Defensive posture / risk assessment",
+   9,
+   "Fear / defence"
+  ],
+  [
+   "Mating / mounting",
+   8,
+   "Social"
+  ],
+  [
+   "Pup retrieval / maternal care",
+   8,
+   "Social"
+  ],
+  [
+   "Climbing / jumping",
+   7,
+   "Locomotion / motor"
+  ],
+  [
+   "Object exploration / novel object",
+   7,
+   "Exploration"
+  ],
+  [
+   "Immobility / motionless",
+   7,
+   "Locomotion / motor"
+  ],
+  [
+   "Tail rattling / dominance display",
+   6,
+   "Aggression"
+  ],
+  [
+   "Following / chasing / pursuit",
+   6,
+   "Social"
+  ],
+  [
+   "Head-twitch response",
+   6,
+   "Self-directed"
+  ],
+  [
+   "Darting",
+   5,
+   "Fear / defence"
+  ],
+  [
+   "Stereotypy (circling / pacing / Straub tail)",
+   5,
+   "Self-directed"
+  ],
+  [
+   "Digging / burrowing",
+   4,
+   "Self-directed"
+  ],
+  [
+   "Swimming / rheotaxis / hovering",
+   4,
+   "Locomotion / motor"
+  ],
+  [
+   "Gait / balance beam",
+   4,
+   "Locomotion / motor"
+  ],
+  [
+   "Foraging / food handling",
+   3,
+   "Feeding / reward"
+  ],
+  [
+   "Maze arm entries / spatial task",
+   3,
+   "Exploration"
+  ],
+  [
+   "Cleaning interaction / jolts (fish)",
+   2,
+   "Feeding / reward"
+  ],
+  [
+   "Wheel running",
+   1,
+   "Locomotion / motor"
+  ],
+  [
+   "Hind-limb clasping",
+   1,
+   "Self-directed"
+  ],
+  [
+   "Whisking / head scanning",
+   1,
+   "Exploration"
+  ]
+ ],
+ "n_behaviour_studies": 133,
  "behaviors": [
   [
    "Social interaction",
-   123
+   124
   ],
   [
    "Aggression / attack",
-   114
+   115
   ],
   [
    "Locomotion / open field",
-   111
+   112
   ],
   [
    "Feeding / consumption",
-   84
+   85
   ],
   [
    "Grooming",
@@ -28,7 +186,7 @@
   ],
   [
    "Gait / balance",
-   67
+   68
   ],
   [
    "Rearing",
@@ -36,7 +194,7 @@
   ],
   [
    "Sniffing",
-   53
+   54
   ],
   [
    "Freezing",
@@ -44,7 +202,7 @@
   ],
   [
    "Pup retrieval / maternal",
-   49
+   50
   ],
   [
    "Immobility (FST/TST)",
@@ -120,7 +278,7 @@
  "methods": [
   [
    "DeepLabCut",
-   147
+   148
   ],
   [
    "Electrophysiology",
@@ -129,6 +287,10 @@
   [
    "Optogenetics",
    45
+  ],
+  [
+   "Viral tracing (AAV)",
+   40
   ],
   [
    "Transcriptomics",
@@ -144,7 +306,15 @@
   ],
   [
    "SLEAP",
-   32
+   33
+  ],
+  [
+   "c-Fos mapping",
+   31
+  ],
+  [
+   "Immunohistochemistry",
+   31
   ],
   [
    "Fiber photometry",
@@ -159,8 +329,76 @@
    20
   ],
   [
+   "AnyMaze",
+   18
+  ],
+  [
+   "Ultrasonic vocalisation",
+   16
+  ],
+  [
+   "B-SOiD",
+   16
+  ],
+  [
    "SHAP explainability",
    15
+  ],
+  [
+   "Keypoint-MoSeq",
+   14
+  ],
+  [
+   "Microdialysis",
+   13
+  ],
+  [
+   "EEG / LFP recording",
+   12
+  ],
+  [
+   "qPCR",
+   10
+  ],
+  [
+   "A-SOiD",
+   9
+  ],
+  [
+   "VAME",
+   8
+  ],
+  [
+   "Western blot",
+   7
+  ],
+  [
+   "UMAP / t-SNE",
+   6
+  ],
+  [
+   "TopScan / CleverSys",
+   6
+  ],
+  [
+   "Telemetry",
+   4
+  ],
+  [
+   "XGBoost",
+   2
+  ],
+  [
+   "Lightning Pose",
+   2
+  ],
+  [
+   "DANNCE",
+   2
+  ],
+  [
+   "ezTrack",
+   1
   ]
  ],
  "diseases": [
@@ -189,38 +427,960 @@
    42
   ],
   [
+   "Schizophrenia",
+   36
+  ],
+  [
+   "Fear conditioning",
+   33
+  ],
+  [
+   "Ageing",
+   30
+  ],
+  [
    "Epilepsy / seizure",
    25
+  ],
+  [
+   "Early-life stress",
+   23
+  ],
+  [
+   "Sleep / circadian",
+   23
   ],
   [
    "Parkinson's",
    22
   ],
   [
+   "Social defeat",
+   22
+  ],
+  [
    "Alzheimer's / dementia",
+   21
+  ],
+  [
+   "PTSD",
    20
+  ],
+  [
+   "Neuroinflammation",
+   18
+  ],
+  [
+   "Obesity / diet",
+   16
+  ],
+  [
+   "Stroke / ischemia",
+   15
+  ],
+  [
+   "Prenatal exposure",
+   14
+  ],
+  [
+   "Neuropathic pain",
+   8
+  ],
+  [
+   "Huntington's",
+   7
+  ],
+  [
+   "ADHD",
+   6
+  ],
+  [
+   "Rett syndrome",
+   4
+  ],
+  [
+   "Traumatic brain injury",
+   4
+  ],
+  [
+   "Fragile X",
+   2
   ]
  ],
+ "papers": [
+  "somatostatin neurons in the medial amygdala orchestrate flexible sex specific social behavior in male mice aroa maas ojeda universitat jaume i https orcid org 0000 0001 5680 4444 mohamed aly zahran universitat jaume i https orcid org 0000 0002 6537 7496 jos hidalgo corts universitat jaume i https orcid org 0000 0001 7721 8890 francisco e olucha bordonau universitat jaume i https orcid org 0000 0003 0342 993x esther castillo gmez universitat jaume i https orcid org 0000 0002 7566 0340 research article keywords sociability aggression mating medial amygdala posted date july 7th 2025 doi https doi org 10 21203 rs 3 rs 7046653 v1 license this work is licensed under a creative commons attribution ",
+  "animal behaviour 221 2025 123085 contents lists available at sciencedirect animal behaviour journal homepage www elsevier com locate anbehav investigating the use of odour and colour foraging cues by rosy faced lovebirds using deep learning based analysis winson king wai tsang a emily shui kei poon a chris newman b christina d buesching c simon yung wa sin a a school of biological sciences the university of hong kong hong kong china b wildlife conservation research unit department of biology university of oxford the recanati kaplan centre tubney u k c department of biology irving k barber faculty of sciences the university of british columbia okanagan kelowna bc canada article info article h",
+  "brain research 1887 2026 150382 contents lists available at sciencedirect brain research journal homepage www elsevier com locate brainres research paper galectin 3 in microglia mediates neuroinflammation induced cognitive dysfunction via selective elimination of excitatory synapses in hippocampal ca1 hai peng wu a 1 xiao yi hu a 1 kai liu a qiu li he a shu yao zhu a jin yun shi b jian jun yang c di fan a mu huo ji a a department of anesthesiology the second affiliated hospital of nanjing medical university nanjing china b department of anesthesiology affiliated hospital of integrated traditional chinese and western medicine nanjing university of chinese medicine nanjing 210028 china c depar",
+  "hormones and behavior 165 2024 105630 contents lists available at sciencedirect hormones and behavior journal homepage www elsevier com locate yhbeh postnatal rearing environment alters pup cues for caregiver offspring interactions hannah e lapp melissa salazar frances a champagne department of psychology university of texas at austin 108 e dean keaton st austin tx 78712 united states of america article info keywords maternal behavior temperature testosterone limited bedding environment stress development abstract maternal behavior experienced in early life provides essential scaffolding to infant psychobiology with life long effects on neurobiological and behavioral outcomes however infants",
+  "neuropharmacology 292 2026 110924 contents lists available at sciencedirect neuropharmacology journal homepage www elsevier com locate neuropharm aggression after intermittent ethanol intoxication in mice sex differences and modulation via medial amygdala relaxin 3 rxfp3 signaling mohamed aly zahran a aroa man as ojeda a 1 monica navarro sanchez a andrew l gundlach b c francisco e olucha bordonau a d esther castillo gomez a d a department of medicine school of medical sciences universitat jaume i 12071 castello de la plana spain b the florey the university of melbourne victoria 3010 australia c florey department of neuroscience and mental health and department of anatomy and physiology the u",
+  "journal pre proof methods for measuring neural activity during voluntary wheel runningabbreviated title wheel running neural activity ayland c letsinger bryan n ochoa jessica j wu kayen u tang diane youngstrom shaohua wang matt bridge guohong cui jerrel l yakel pii doi reference s0165 0270 26 00169 x https doi org 10 1016 j jneumeth 2026 110839 nsm110839 to appear in journal of neuroscience methods received date 10 april 2026 revised date 3 june 2026 accepted date 23 june 2026 please cite this article as ayland c letsinger bryan n ochoa jessica j wu kayen u tang diane youngstrom shaohua wang matt bridge guohong cui and jerrel l yakel methods for measuring neural activity during voluntary whe",
+  "progress in neuropsychopharmacology biological psychiatry 140 2025 111418 contents lists available at sciencedirect progress in neuropsychopharmacology biological psychiatry journal homepage www elsevier com locate pnp gpr55 in the bed nucleus of stria terminalis modulates anxiety like behavior amphetamine self administration and inflammatory response rodolfo sanchez zavaleta a b andrea herrera sols c lorena alline becerril melendez a aline ostos valverde a m migliaro a alejandra e ruiz contreras d monica mendez daz e miguel perez de la mora f oscar e prospero garca a a laboratorio de cannabinoides departamento de fisiologa facultad de medicina unam mexico b division of research and translat",
+  "progress in neuropsychopharmacology biological psychiatry 144 2026 111586 contents lists available at sciencedirect progress in neuropsychopharmacology biological psychiatry journal homepage www elsevier com locate pnp differential effects of chronic restraint stress on two active avoidance tasks in rats alba lopez moraga a b 1 mirte de ceuninck a b 1 yana van der heyden a laura vercammen b c rupert palme d bram vervliet b c tom beckers a b laura luyten a b a centre for the psychology of learning and experimental psychopathology faculty of psychology and educational sciences ku leuven leuven belgium b leuven brain institute ku leuven leuven belgium c laboratory of biological psychology facul",
+  "journal pre proofs comparative analysis of boris ethovision deeplabcut and simba for quantifying autism spectrum disorder like behaviors in the valproic acid mouse model zineb bouargane francisco e olucha bordonau mohammed bennis saadia ba m hamed fatima zahra lamghari moubarrad pii doi reference s0304 3940 26 00040 6 https doi org 10 1016 j neulet 2026 138542 nsl 138542 to appear in neuroscience letters received date revised date accepted date 16 december 2025 2 february 2026 9 february 2026 please cite this article as z bouargane f e olucha bordonau m bennis s ba m hamed f z lamgharimoubarrad comparative analysis of boris ethovision deeplabcut and simba for quantifying autism spectrum diso",
+  "neuroscience 562 2024 7589 contents lists available at sciencedirect neuroscience journal homepage www elsevier com locate nsc s mecamylamine increases the firing rate of serotonin neurons and diminishes depressive like behaviors in an animal model of stress a mondragon garca a b e ramrez sanchez a d francia ramrez a o hernandez gonzalez a y rojano posada a s ortega tinoco a j gardun o a l verdugo daz a s hernandez lopez a a departamento de fisiologa facultad de medicina universidad nacional autonoma de mexico unam po box 70250 ciudad de mexico 04510 mexico b posgrado en ciencias biologicas universidad nacional autonoma de mexico mexico article info keywords 5 ht neurons s mecamylamine gluta",
+  "neuroscience 577 2025 343356 contents lists available at sciencedirect neuroscience journal homepage www elsevier com locate nsc yolov11 based quantification and temporal analysis of repetitive behaviors in deer mice farhan augustine a b shawn m doss b ryan m lee a harvey s singer b c a university of maryland baltimore county department of biological sciences baltimore md usa b johns hopkins university school of medicine department of neurology baltimore md usa c kennedy krieger institute baltimore md usa article info keywords deer mice automated behavior analysis yolov11 repetitive behaviors machine learning abstract detailed temporal dynamics of deer mouse peromyscus maniculatus bairdii be",
+  "behavioural processes 230 2025 105230 contents lists available at sciencedirect behavioural processes journal homepage www elsevier com locate behavproc review article understanding and appreciating behavioral complexity of zebrafish novel tank assays nikita i golushko a b daniil matrynov a b david s galstyan a b kirill v apukhtin c murilo s de abreu d longen yang e f adam michael stewart e allan v kalueff f g a institute of experimental medicine almazov national medical research centre ministry of healthcare of russian federation st petersburg russia b institute of translational biomedicine st petersburg state university st petersburg russia c neurobiology program sirius university of scien",
+  "neurobiology of learning and memory 213 2024 107952 contents lists available at sciencedirect neurobiology of learning and memory journal homepage www elsevier com locate ynlme neural correlates of learning and memory are altered by early life stress jeniffer sanguino gomez stefan huijgens maxine den hartog inim j m schenk wenya kluck tamara d versluis harm j krugers brain plasticity group sils cns university of amsterdam amsterdam the netherlands article info keywords early life stress fear memory arc c fos glucocorticoid receptor abstract the ability to learn and remember which is fundamental for behavioral adaptation is susceptible to stressful experiences during the early postnatal perio",
+  "neurobiology of stress 31 2024 100636 contents lists available at sciencedirect neurobiology of stress journal homepage www elsevier com locate ynstr early life stress impairs acquisition and retrieval of fear memories sex effects corticosterone modulation and partial prevention by targeting glucocorticoid receptors at adolescent age jeniffer sanguino gomez harm j krugers brain plasticity group sils cns university of amsterdam amsterdam the netherlands article info keywords early life stress fear memory corticosterone glucocorticoid antagonist abstract the early postnatal period is a sensitive time window that is characterized by several neurodevelopmental processes that define neuronal arch",
+  "ll open access protocol protocol for the integration of fiber photometry and social behavior in rodent models fiber photometry offers insight into cell type specific activity underlying social interactions we provide a protocol for the integration of fiber photometry recordings into the analysis of social behavior in rodent models this includes considerations during surgery notes on synchronizing fiber photometry with behavioral recordings advice on using multi animal behavioral tracking software and scripts for the analysis of fiber photometry recordings publisher s note undertaking any experimental protocol requires adherence to local institutional guidelines for laboratory safety and ethi",
+  "research paper acta neurobiol exp 2025 85 187195 doi 10 55782 0vv4n928 the role of prefrontal somatostatin interneurons in emotional contagion tomasz nikolaev1 emilia goszczynska2 natalia roszkowska1 ewelina knapska1 ksenia meyza1 1 laboratory of emotions neurobiology nencki institute of experimental biology polish academy of sciences warsaw poland 2 max planck research school for neuroscience gottingen germany email k meyza nencki edu pl the role of prefrontal somatostatin interneurons in emotion recognition is well characterized here for the first time we investigated the role of these neurons during remote transfer of emotional information in the safe environment of the home cage to do th",
+  "qiu wen deep learning based analysis reveals a social behavior deficit in mice exposed prenatally to nicotine background and aimsrecently more attention has been paid to the hypothesis that exposure to nicotine during pregnancy is associated with an increased risk of fetal neurodevelopmental disorders such as attention deficit hyperactivity disorder adhd and autism spectrum disorder asd prenatal nicotine exposure pne has been shown to cause behavioral changes in rodents but the phenotype is variable between reports the evaluation of animal behavior may be another reason for the inconsistency in these results the recently developed machine learning algorithms for analyzing animal behavior vid",
+  "biorxiv preprint doi https doi org 10 1101 2020 04 19 049452 this version posted april 21 2020 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nd 4 0 international license 04 19 2020 biorxiv simple behavioral analysis simba an open source toolkit for computer classification of complex social behaviors in experimental animals simon ro nilsson1 3 nastacia l goodwin1 2 jia jie choong1 sophia hwang1 hayden r wright4 zane c norville6 xiaoyu tong7 dayu lin7 brandon s bentzley6 neir eshel6 ryan j mclaughlin4 5 sam a golden1 2 3 1 university of ",
+  "biorxiv preprint doi https doi org 10 1101 2021 02 08 430180 this version posted september 29 2021 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license modeling features of addiction with an oral oxycodone self administration paradigm caitlin a murphy1 yu hsuan chang1 rajesh pareta1 jun nan li1 richard a slivicki tom earnest1 jessica tooley1 kavitha abiraman1 yvan m vachez1 robert w gereau iv1 3 4 bryan a copits1 3 alexxai v kravitz1 2 3 4 meaghan c creed1 2 3 4 1 washington university pain center dept of anest",
+  "biorxiv preprint doi https doi org 10 1101 2021 06 30 450543 this version posted june 30 2021 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license optogenetic stimulation of medial amygdala gaba neurons with kinetically different channelrhodopsin variants yield opposite behavioral outcomes aiste baleisyte1 ralf schneggenburger1 olexiy kochubey1 1 laboratory of synaptic mechanisms brain mind institute school of life science cole polytechnique fdrale de lausanne epfl 1015 lausanne switzerland corresponding author",
+  "biorxiv preprint doi https doi org 10 1101 2022 04 27 489805 this version posted april 29 2022 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license floral humidity as a signal not a cue in a nocturnal pollination system ajinkya dahake1 piyush jain2 caleb vogt1 william kandalaft1 abraham stroock3 robert a raguso1 1department of neurobiology and behavior cornell university ithaca ny 14853 usa 2sibley school of mechanical and aerospace engineering cornell university ithaca ny 14853 usa 3smith school of chemical an",
+  "biorxiv preprint doi https doi org 10 1101 2022 08 19 504565 this version posted august 22 2022 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license sex dependent role of hypocretin orexin neurons in social behavior author names and affiliations matthew dawson1 5 6 dylan j terstege3 4 5 naila jamani1 5 6 dmitrii pavlov1 5 6 mio tsutsui1 5 6 raluca bugescu7 jonathan r epp3 4 5 gina m leinninger7 derya sargin1 2 5 6 department of psychology1 department of physiology pharmacology2 department of cell biology and an",
+  "biorxiv preprint doi https doi org 10 1101 2022 11 08 515650 this version posted september 25 2024 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by nc nd 4 0 international license title valence dependent synaptic plasticity drives approach and avoidance behavior in social context authors pedro espinosa 1 benoit girard 1 mattia lucchini 1 federica campanelli 1 valentina tiriticco 1 lucy mohrhauer 1 and camilla bellone 1 affiliations 1 university of geneva department of fundamental neuroscience cmu 1 rue michel servet 1211 geneva switzerla",
+  "biorxiv preprint doi https doi org 10 1101 2022 11 08 515650 this version posted september 25 2024 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license title valence dependent synaptic plasticity drives approach and avoidance behavior in social context authors pedro espinosa 1 benoit girard 1 mattia lucchini 1 federica campanelli 1 valentina tiriticco 1 lucy mohrhauer 1 and camilla bellone 1 affiliations 1 university of geneva department of fundamental neuroscience cmu 1 rue michel servet 1211 geneva switzerlan",
+  "biorxiv preprint doi https doi org 10 1101 2022 12 07 519272 this version posted june 17 2024 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license 1 a widespread oscillatory network encodes an aggressive internal state 2 yael s grossman2 austin talbot2 7 neil m gallagher2 3 gwenalle e thomas3 alexandra j 3 fink6 kathryn k walder christensen2 scott j russo6 david e carlson5 8 kafui 4 dzirasa1 2 3 4 9 5 6 1howard hughes medical institute chevy chase maryland 20815 usa 2dept of psychiatry 7 and behavioral sciences",
+  "biorxiv preprint doi https doi org 10 1101 2023 04 10 535848 this version posted january 14 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by 4 0 international license sex differences in bnst signaling and bnst crf in fear processing implications for unpredictable threat in sustained fear olivia j hon sofia neira meghan e flanigan alison v roland christina m caira tori sides shannon d ambrosio sophia lee yolanda simpson michelle buccini samantha machinski waylin yu kristen m boyt thomas l kash biorxiv preprint doi https doi org 10 110",
+  "biorxiv preprint doi https doi org 10 1101 2023 09 08 556711 this version posted december 2 2024 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by 4 0 international license 11 29 2024 kentaro ishii 1 post ejaculatory inhibition of female sexual drive via heterogeneous 2 neuronal ensembles in the medial preoptic area 3 4 kentaro k ishii1 2 koichi hashikawa1 2 jane chea1 2 shihan yin1 2 rebecca erin fox1 2 suyang kan1 2 meha shah1 2 charles zhou1 2 5 jovana navarrete1 4 alexandria d murry1 4 eric r szelenyi1 4 sam a golden1 4 garret d stube",
+  "biorxiv preprint doi https doi org 10 1101 2023 11 10 566632 this version posted april 23 2024 the copyright holder for this preprint which was not certified by peer review is the author funder all rights reserved no reuse allowed without permission title a behavioral roadmap for the development of agency in the rodent authors mitelut c diez castro m peterson re gonalves m li j gamer mm nilsson sro pereira td sanes dh equal contribution first author co last authors e mail mitelutco gmail com keywords development of agency behavior development rodent development abbreviated title agency development in the gerbil number of pages 47 number of main figures 6 competing interests none materials co",
+  "biorxiv preprint doi https doi org 10 1101 2024 08 28 610149 this version posted august 29 2024 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license region specific nucleus accumbens dopamine signals encode distinct aspects of avoidance learning gabriela c lopez1 2 louis d van camp1 ryan f kovaleski1 michael d schaid1 oscar andrs moreno ramos2 3 rajeshwar awatramani2 3 julia m cox1 and talia n lerner1 2 1 department of neuroscience northwestern university feinberg school of medicine chicago il 60611 usa 2 north",
+  "biorxiv preprint doi https doi org 10 1101 2024 10 17 618811 this version posted october 18 2024 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license 1 generalization and extinction of platform mediated avoidance in male and female 2 rats 3 alba lpez moraga laura luyten tom beckers 4 corresponding and co last authors 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 1 biorxiv preprint doi https doi org 10 1101 2024 10 17 618811 this version posted october 18 2024 the copyright holder for this preprint which was not ce",
+  "biorxiv preprint doi https doi org 10 1101 2024 11 07 622413 this version posted november 7 2024 the copyright holder for this preprint which was not certified by peer review is the author funder all rights reserved no reuse allowed without permission opposing effects of rewarding and aversive stimuli on d1 and d2 types of dopamine sensitive neurons in the central amygdala lukasz bijoch 1 pawel szczypkowski 2 justyna winiewska 1 monika pawlowska 2 karolina hajdukiewicz 1 radek lapkiewicz 2 anna beroun 1 affiliations 1 nencki embl center of excellence for neural plasticity and brain disorders braincity laboratory of neuronal plasticity nencki institute of experimental biology of the polish ac",
+  "biorxiv preprint doi https doi org 10 1101 2024 11 25 625294 this version posted november 25 2024 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license a survey of hypothalamic phenotypes identifies molecular and behavioral consequences of myt1l haploinsufficiency in male and female mice susan e maloney1 2 katherine b mccullough2 3 sneha m chaturvedi2 3 din selmanovic2 3 rebecca chase2 3 jiayang chen2 3 doris wu2 3 jorge l granadillo4 kristen l kroll2 5 joseph d dougherty1 2 3 affiliations 1department of psychia",
+  "biorxiv preprint doi https doi org 10 1101 2024 12 26 630112 this version posted may 25 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by nc 4 0 international license precisiontrack a platform for automated long term social behavior analysis in naturalized environments vincent coulombe1 3 4 mohamad sadegh monfared1 3 4 khadijeh aghel1 quentin leboulleux1 modesto r peralta iii1 blanchet fg5 6 7 benoit gosselin1 3 4 benoit labont1 2 1 cervo brain research centre universit laval qubec qc canada 2 department of psychiatry and neuroscienc",
+  "biorxiv preprint doi https doi org 10 1101 2025 01 10 632469 this version posted january 11 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc 4 0 international license influence of solvent sex and age on pharmacokinetic and acute behavioral effects of vaporized cannabis extract in mice westbrook s r 1 jensen a l 1 copeland solorzano v 1 buursma j 1 freeby g 1 von melville t 1 edwards t 1 hayashi k 3 4 mclaughlin r j 1 2 4 delevich k m 1 4 1departments of integrative physiology and neuroscience1 and psychology2 washington state univ",
+  "biorxiv preprint doi https doi org 10 1101 2025 01 30 635725 this version posted february 5 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nd 4 0 international license 1 automated behavioral profiling using neural networks reveals differences in 2 stress like behavior between cave and surface dwelling astyanax mexicanus 3 4 naresh padmanaban1 rianna ambosie2 stefan choy2 shoshanah marcus1 simon 5 r o nilsson3 alex c keene4 johanna e kowalko2 and erik r dubou1 6 7 1 wilkes honors college florida atlantic university 5353 parkside dri",
+  "biorxiv preprint doi https doi org 10 1101 2025 02 28 640742 this version posted march 2 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license 1 differential effects of chronic restraint stress 2 on two active avoidance tasks in rats 3 lpez moraga a1 2 de ceuninck m 1 2 van der heyden y 1 vercammen l 2 3 4 palme r 4 vervliet b 2 3 beckers t 1 2 luyten l1 2 5 1 centre for the psychology of learning and experimental psychopathology faculty of psychology 6 and educational sciences ku leuven leuven belgium 7 2 ",
+  "biorxiv preprint doi https doi org 10 1101 2025 03 28 646066 this version posted april 3 2025 the copyright holder for this preprint which was not certified by peer review is the author funder all rights reserved no reuse allowed without permission 1 brainwide genetic capture for conscious state transitions 2 3 authors 4 hallie lazaro1 2 kevin n schneider1 2 3 michelle jin4 5 6 asad beck7 daniel r rijsketic8 9 5 alexandria d murry1 2 3 jovana navarrete1 3 10 cole c shin1 2 ainsley c barrow1 2 ian 6 campuzano1 2 minke h c nota1 2 nick ressler1 3 ella apley1 2 jason zhang1 2 glorianna 7 gutierrez7 eric r szelenyi1 3 simon ro nilsson11 christine a denny4 12 michael r 8 bruchas1 2 13 boris d hei",
+  "biorxiv preprint doi https doi org 10 1101 2025 04 28 650242 this version posted may 1 2025 the copyright holder for this preprint which was not certified by peer review is the author funder this article is a us government work it is not subject to copyright under 17 usc 105 and is also made available for use under a cc0 license rapid open source and automated quantification of the head twitch response in c57bl 6j mice using deeplabcut and simple behavioral analysis alexander d maitland1 nicholas r gonzalez1 donna walther1 francisco pereira2 michael h baumann1 and grant c glatfelter1 1designer drug research unit national institute on drug abuse intramural research program baltimore maryland ",
+  "biorxiv preprint doi https doi org 10 1101 2025 05 10 653260 this version posted may 15 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by 4 0 international license tracking conditioned fear in pair housed mice using deep learning and real time cue delivery hannah c smith1 zhe yu1 patrick yazigi1 benjamin turley2 adam swiercz3 jeanie park4 and paul j marvar1 1departments of neuroscience and pharmacology physiology george washington university washington dc 20052 2school of medicine georgetown university washington dc 20057 3national in",
+  "biorxiv preprint doi https doi org 10 1101 2025 05 16 654482 this version posted may 19 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by 4 0 international license 1 2 3 4 5 6 7 8 9 10 11 the effects of arabian jasmine on zebrafish behavior depends on strain sex 12 and personality 13 14 tripatchara atiratana1 2 aliyah r goldson2 siritron samosorn3 neha rajput2 15 nalena praphairaksit1 justin w kenney2 16 1department of biology faculty of science srinakharinwirot university bangkok 17 thailand 10110 18 2department of biological science",
+  "biorxiv preprint doi https doi org 10 1101 2025 05 24 655898 this version posted may 28 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license younger is better but only for males social behavioral development following juvenile traumatic brain injury to the prefrontal cortex authors sophia shonka and michael j hylin department of psychology southern illinois university carbondale carbondale il corresponding author mhylin siu edu running title social development deficits following juvenile tbi keywords juven",
+  "biorxiv preprint doi https doi org 10 1101 2025 06 05 657686 this version posted june 8 2025 the copyright holder for this preprint which was not certified by peer review is the author funder this article is a us government work it is not subject to copyright under 17 usc 105 and is also made available for use under a cc0 license an amygdalopontine pathway promotes motor programs of ingestion danielle s lafferty 1 jeremiah isaac 1 joelyz s wolcott 1 amy phan 1 lily reck 1 andrew lutas1 2 1diabetes endocrinology and obesity branch national institute of diabetes and digestive and kidney diseases national institutes of health bethesda md 20892 usa 2lead contact these authors contributed equally",
+  "biorxiv preprint doi https doi org 10 1101 2025 06 26 661592 this version posted june 29 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by 4 0 international license 1 2 long term effects of adolescent 5f mdmb pica intravenous self3 administration neurobehavioral consequences and medial prefrontal cortex 4 dysfunction in adult mice 5 6 francesca caria1 avraham libster2 shane desfor2 francesca telese2 gaetano di 7 chiara1 3 maria antonietta de luca1 8 9 10 1 department of biomedical sciences university of cagliari italy 11 2 department ",
+  "biorxiv preprint doi https doi org 10 1101 2025 06 26 661851 this version posted june 28 2025 the copyright holder for this preprint which was not certified by peer review is the author funder all rights reserved no reuse allowed without permission sodium butyrate rescues neurodevelopmental deficits following perinatal methadone exposure isobel a r williams bpsychsc hons 1 josie van dorst phd 2 sarah jane leigh phd 1 sarah j baracz phd 1 abigail marus badvsci hons 1 delyse mccaffrey bsc hons 3 4 adam walker phd 3 4 5 chee y ooi phd 2 meredith c ward phd 6 7 ju lee oei mbbs 6 7 kelly j clemens phd 1 1 school of psychology faculty of science university of new south wales 2 department of gastro",
+  "biorxiv preprint doi https doi org 10 1101 2025 07 06 663398 this version posted july 7 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license psilocybin has no immediate or persistent analgesic effect in acute and chronic mouse pain models nicholas s gregory1 tyler e girard1 akila ram1 austen b casey1 robert c malenka2 vivianne l tawfik1 boris d heifets1 2 1department of anesthesiology perioperative and pain medicine stanford university school of medicine stanford ca 94305 2department of psychiatry and beha",
+  "biorxiv preprint doi https doi org 10 1101 2025 07 07 663556 this version posted july 10 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license 1 automated profiling of social behaviors to assess the genetic basis of evolution of aggressive 2 behaviors in a mexicanus 3 4 renee mapa stefan choy mia lapko alli kimmel isabel carino bazan johanna e kowalko 5 6 department of biological sciences lehigh university bethlehem pa 7 biorxiv preprint doi https doi org 10 1101 2025 07 07 663556 this version posted july 1",
+  "biorxiv preprint doi https doi org 10 1101 2025 07 08 663626 this version posted july 11 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc 4 0 international license 1 interspecific variation in cleaning behaviour and honesty among cleaner wrasses 2 3 daniele romeo1 maddalena ranucci1 2 melanie court2 beatriz p pereira2 jos ricardo paula2 3 4 celia schunter1 5 1swire institute of marine science school of biological sciences the university of hong kong 6 pokfulam rd hong kong sar 7 2mare marine and environmental sciences centre arnet",
+  "biorxiv preprint doi https doi org 10 1101 2025 07 30 667616 this version posted august 1 2025 the copyright holder for this preprint which was not certified by peer review is the author funder all rights reserved no reuse allowed without permission research article sex specific vulnerability to behavioural and morphological alterations in a mouse model of parkinson s disease overexpressing mutant a53t alphasynuclein zubelzu m1 2 bidgood r1 murueta goyena a2 3 ruiz ortega ja1 2 lafuente jv2 3 and morera herreras t1 2 1department of pharmacology faculty of medicine and nursery university of the basque country ehu leioa spain 2neurodegenerative diseases group biobizkaia health research institu",
+  "biorxiv preprint doi https doi org 10 1101 2025 09 01 673507 this version posted september 2 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by 4 0 international license coping strategy dynamics and resilience profiles after early life stress revealed by behavioral sequencing jeniffer sanguino gmez1 umut gl2 harm j krugers1 and antonio lozano3 4 1 brain plasticity group sils cns university of amsterdam amsterdam the netherlands 2 donders institute for brain cognition and behaviour nijmegen the netherlands 3 bioengineering institute uni",
+  "biorxiv preprint doi https doi org 10 1101 2025 09 11 675563 this version posted september 11 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license a low cost and open source olfactometer to precisely deliver single odours and odour mixtures connor doyle1 jieni wang1 2 elisa galliano1 chloe guillaume1 1 department of physiology development and neuroscience university of cambridge united kingdom 2 department of engineering university of cambridge cambridge united kingdom correspondence to be addressed to eli",
+  "biorxiv preprint doi https doi org 10 1101 2025 09 12 675815 this version posted september 17 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc 4 0 international license manuscript title reducing ventral hippocampal ca1 subiculum hyperexcitability restores social memory and alleviates anxiety related behavior in a mouse model of temporal lobe epilepsy anthoni goodman1 emily schellinger1 julia kahn1 2 hajime takano1 2 douglas coulter1 2 srdjan joksimovic1 2 1 division of neurology department of pediatrics children s hospital of phil",
+  "biorxiv preprint doi https doi org 10 1101 2025 09 27 678941 this version posted september 28 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license dlc2action a deep learning based toolbox for automated behavior segmentation elizaveta kozlova1 2 andy bonnetto1 2 and alexander mathis1 1brain mind institute school of life sciences cole polytechnique fdrale de lausanne epfl lausanne switzerland 2these authors contributed equally to this work current address for l k adaptyvbio in lausanne ch alexander mathis ep",
+  "biorxiv preprint doi https doi org 10 1101 2025 10 27 684580 this version posted october 27 2025 the copyright holder for this preprint which was not certified by peer review is the author funder all rights reserved no reuse allowed without permission the intermediate ca1 and ca3 subfields of the hippocampus differen ally encode social recogni on benjamin dykstra1 2 paul kim2 aidan lin2 gordon j berman2 and malavika murugan2 author affilia ons 1 emory neuroscience graduate program emory university atlanta ga 30322 usa 2 department of biology emory university atlanta ga 30322 usa corresponding authors malavika murugan gordon berman corresponding authors email mmurug5 emory edu gordon berman e",
+  "biorxiv preprint doi https doi org 10 1101 2025 10 31 685692 this version posted october 31 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by 4 0 international license 1 zmynd11 restrains kmt2a to enable a neuronal developmental program 2 alexander w greben1 2 xiaoli s wu1 josephine e robb1 ian r vogel1 lisa traunmller1 3 sebastian krttner3 kara a fulton1 migue van louis darcera1 eric c griffith1 michael e 4 greenberg1 5 6 author affiliations 7 1 department of neurobiology harvard medical school boston ma usa 8 2 program in neuroscien",
+  "biorxiv preprint doi https doi org 10 1101 2025 11 26 690732 this version posted november 27 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license serotonin modulates nucleus accumbens circuits to suppress aggression zihui zhang gavin c touponse pia j alderman teema yassine matthew b pomrenze troy w harris amei n shank robert c malenka neir eshel nancy pritzker laboratory department of psychiatry and behavioral sciences stanford university school of medicine stanford ca usa corresponding authors email malen",
+  "biorxiv preprint doi https doi org 10 64898 2025 12 13 694102 this version posted december 16 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license pharmacological inhibition of fkbp51 mitigates early life adversity induced social deficits joeri bordes1 2 xiuqi ji3 serena gasperoni3 choham sudre chinsky3 daniela harbich1 cornelia flachskamm1 paula fontanet3 sowmya narayan1 manfred uhr4 christian namendorf4 alon chen5 felix hausch6 juan pablo lopez3 mathias v schmidt1 affiliations 1 research group neurobiolo",
+  "biorxiv preprint doi https doi org 10 64898 2025 12 19 695484 this version posted december 22 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by 4 0 international license selective dysregulation of serotonin dynamics in the anterior cingulate cortex and central amygdala following binge alcohol consumption jobe l ritchie1 maya r eberle1 alison roland1 lisa taxier1 madison campeau1 brianna george1 lili kooyman1 thomas l kash1 2 1bowles center for alcohol studies university of north carolina at chapel hill chapel hill nc usa 2department o",
+  "biorxiv preprint doi https doi org 10 64898 2025 12 31 697215 this version posted january 2 2026 the copyright holder for this preprint which was not certified by peer review is the author funder all rights reserved no reuse allowed without permission adult zebrafish engage in path integration like behavior when exploring a novel environment bhavjeet sanghera1 2 philip shraybman1 and jagmeet s kanwal1 1department of neurology georgetown university medical center washington dc 20057 2university of miami coral gables fl these authors contributed equally to this study running title path integration in zebrafish correspondence author and address jagmeet s kanwal department of neurology georgetow",
+  "biorxiv preprint doi https doi org 10 64898 2026 02 16 706076 this version posted february 17 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by 4 0 international license excitatory and inhibitory neurons in the dorsal periaqueductal gray encode decisions to assess and escape natural threats irene p ayuso jimeno1 2 sofia torchia1 valeria mussetto1 taddeo salemi1 cornelius t gross 1 1epigenetics neurobiology unit european molecular biology laboratory embl embl rome via ramarini 32 00015 monterotondo rm italy 2joint phd degree program eu",
+  "biorxiv preprint doi https doi org 10 64898 2026 02 17 706393 this version posted february 18 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license fleeing is believing adaptive behavior under social threat as an inference process hridai s khurana1 2 valeria mussetto1 cornelius t gross1 rory j bufacchi1 1 epigenetics neurobiology unit embl rome european molecular biology laboratory via ramarini 32 00015 monterotondo rm italy 2 department of biotechnology indian institute of technology madras chennai 600036 ",
+  "biorxiv preprint doi https doi org 10 64898 2026 02 24 706573 this version posted february 25 2026 the copyright holder for this preprint which was not certified by peer review is the author funder all rights reserved no reuse allowed without permission 1 using machine learning to automate the analysis of an olfactory habituation2 dishabituation task in mice 3 short title automated analysis of an olfactory task 4 5 s boyanova1 m h correa1 r s bains2 f k wiseman1 6 7 1 uk dementia research institute at university college london 8 2 mary lyon centre medical research council harwell oxfordshire ox11 0rd uk 9 corresponding author email s boyanova ucl ac uk orcid 0000 0003 3321 3160 10 11 co auth",
+  "biorxiv preprint doi https doi org 10 64898 2026 02 25 707643 this version posted february 26 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by 4 0 international license 1 title vectr clasp an open machine learning and vector based framework for 2 objective quantification of motor dysfunction during hind limb clasping in cdkl53 deficient mice 4 5 running title automated and geometric quantification of clasping behaviour in mice 6 7 authors jordan higgins1 2 samuel egan1 2 keelin harrison1 2 bilal el mansoury1 2 8 david c henshall1 2 ",
+  "biorxiv preprint doi https doi org 10 64898 2026 03 26 714605 this version posted march 30 2026 the copyright holder for this preprint which was not certified by peer review is the author funder all rights reserved no reuse allowed without permission circuit selective cognitive vulnerability to environmental stress multi domain assessment of space radiation in both sexes reveals countermeasure trade offs sheridan a o connor 1 2 3 pragatee narain 1 amishi mahajan 1 4 grace l bancroft 1 4 harley a haas 1 4 elise wallen friedman 1 4 shubha vasisht 1 4 hajime takano 5 frederico c kiffer 1 amelia j eisch 1 6 8 sanghee yun1 7 8 equal contribution corresponding author 1department of anesthesiology ",
+  "biorxiv preprint doi https doi org 10 64898 2026 04 01 715990 this version posted april 6 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by nc nd 4 0 international license 1 the long noncoding rna dory is required for female but not male spatial 2 learning and memory 3 seonghee jung1 mitchell j cummins1 2 saba altaf2 rowan j heggen2 anne poljak3 fabien 4 delerue1 lars m ittner1 and john s mattick2 5 1dementia research centre macquarie medical school faculty of medicine health and 6 human sciences macquarie university sydney nsw 2019 ",
+  "biorxiv preprint doi https doi org 10 64898 2026 04 16 718915 this version posted april 21 2026 the copyright holder for this preprint which was not certified by peer review is the author funder all rights reserved no reuse allowed without permission serotonergic polypharmacology of 2 halogenated tryptamines jeanine yacoub1 7 elena bray1 jude bayyat2 3 grant c glatfelter4 alex leake2 3 emilia m buitrago2 3 hubert nguyen2 3 alexander d maitland4 john partilla4 john l mckee5 natalie g cavalco5 serena s schalk5 josie c lammers5 michael h baumann4 john d mccorvy5 6 james w leahy3 7 danielle gulick2 3 christopher g witowski1 and jacqueline l von salm1 1psilera inc tampa fl 2byrd alzheimer s insti",
+  "biorxiv preprint doi https doi org 10 64898 2026 05 15 725233 this version posted may 19 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by nc nd 4 0 international license subcortical recruitment dissociates isoflurane emergence from distinct wakeful states in mice authors neiswanger c1 2 macmillen lk 1 3 murry ad1 2 3 szelenyi er3 4 navarrete j1 3 5 nota mhc1 2 lazaro h1 2 5 shin cc1 2 6 zhang j1 2 apley ea1 2 zhang y1 3 5 diaz c1 2 schneider kn1 2 3 goodwin nl1 3 jin m7 nilsson sro4 ishii kk1 2 stuber gd1 2 8 bruchas mr1 2 8 golden ",
+  "biorxiv preprint doi https doi org 10 64898 2026 05 31 729133 this version posted june 2 2026 the copyright holder for this preprint which was not certified by peer review is the author funder all rights reserved no reuse allowed without permission a critical role for the murine anterior insula in male social avoidance after early life maltreatment 1 matthew g kearney1 4 zoe beatty1 miranda mayeaux2 3 ziyi zephyr wang1 oluwarotimi 2 folorunso1 celia middleton1 emily l newman1 william a carlezon jr 1 james mcnally3 4 3 kerry j ressler1 4 erin e hisey1 2 3 4 1 division of depression and anxiety mclean hospital belmont massachusetts 02478 5 2 va boston west roxbury massachusetts 02132 6 3 depar",
+  "biorxiv preprint doi https doi org 10 64898 2026 06 04 729974 this version posted june 9 2026 the copyright holder for this preprint which was not certified by peer review is the author funder all rights reserved no reuse allowed without permission title whole brain analyses identify anterior cingulate opioid signaling as a critical mediator of placebo analgesia in neuropathic pain authors simran k rehal1 damien c boorman2 chulmin cho2 seyed asaad karimi2 maryam i fazili1 cesar ao coelho4 jacob burek2 farhada khaled2 shivani r gami2 paul w frankland3 4 5 6 loren j martin1 2 3 affiliations 1department of cell and systems biology university of toronto toronto ontario m5s 3g5 canada 2department",
+  "biorxiv preprint doi https doi org 10 64898 2026 07 20 739643 this version posted july 24 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by 4 0 international license comparison of multiple video tracking based behavioral summary approaches for compound discrimination 1 marti ritter1 2 serena deiana2 alina ritter2 carsten t wotjak2 michael brecht1 amarender r 2 bogadhi2 3 1department of biology faculty of life sciences humboldt university berlin germany 4 2neuroscience and mental health discovery research boehringer ingelheim pharma g",
+  "self supervised pretraining of vision transformers for animal behavioral analysis and neural encoding arxiv 2507 09513v1 q bio nc 13 jul 2025 yanchen wang columbia university new york yw4503 columbia edu han yu columbia university new york hy2562 columbia edu ari blau columbia university new york bsb2144 columbia edu yizi zhang columbia university new york yz4123 columbia edu the international brain laboratory the international brain laboratory liam paninski columbia university new york lmp2107 columbia edu cole hurwitz columbia university new york ch3676 columbia edu matthew r whiteway columbia university new york m whiteway columbia edu abstract the brain can only be fully understood throu",
+  "4036 the journal of neuroscience may 5 2021 41 18 40364059 systems circuits dissociable roles of pallidal neuron subtypes in regulating motor patterns qiaoling cui 1p arin pamukcu 1p suraj cherian 1p isaac y m chang 1p brianna l berceau 1 harry s xenias 1 matthew h higgs 2 shivakumar rajamanickam 3 4 yi chen 5 xixun du 1 yu zhang 1 hayley mcmorrow 1 zachary a abecassis 1 simina m boca 6 nicholas j justice 3 4 charles j wilson 2 and c savio chan1 1department of physiology feinberg school of medicine northwestern university chicago 60611 illinois 2department of biology university of texas at san antonio san antonio 78249 texas 3center for metabolic and degenerative disease institute of molecul",
+  "physiol res 75 149 166 2026 https doi org 10 33549 physiolres 935715 task specific effects of mglu2 3 receptor agonist ly379268 on mk 801 induced behavioral and neural dysfunctions in rats karolina hruza1 2 daniela cernotova1 2 kristyna maleninska1 3 jan svoboda1 david levcik1 ales stuchlik1 1laboratory of the neurophysiology of memory institute of physiology of the czech academy of sciences prague czech republic 2third faculty of medicine charles university prague czech republic 3national institute of mental health klecany czech republic received october 6 2025 accepted december 12 2025 summary nmda receptor hypofunction can lead to behavioral and cognitive disturbances including hyperlocom",
+  "reviewed preprint v2 february 14 2025 revised by authors reviewed preprint v1 november 14 2023 neuroscience post ejaculatory inhibition of female sexual drive via heterogeneous neuronal ensembles in the medial preoptic area kentaro k ishii koichi hashikawa jane chea shihan yin rebecca erin fox suyang kan meha shah charles zhou jovana navarrete alexandria d murry eric r szelenyi sam a golden garret d stuber center for the neurobiology of addiction pain and emotion university of washington seattle united states department of anesthesiology and pain medicine university of washington seattle united states department of biological structure university of washington seattle united states departmen",
+  "decoding self paced activity in mice with actionformer kevin thandiackal1 b francesca tozzi2 eoin c o connor2 and yan ping zhang1 1 data and analytics roche pharma research and early development roche innovation center basel f hoffmann la roche ltd basel switzerland kevin thandiackal roche com 2 neuroscience and rare diseases discovery and translational area roche pharma research and early development roche innovation center basel f hoffmann la roche ltd basel switzerland abstract the locomotor activity lma test is widely used to study spontaneous activity in rodents and the effects of drug treatments however standard automated metrics such as distance traveled often fail to capture the true",
+  "applying machine learning tools for automated behaviour classification in invasive lionfish and comparison with human observations amirreza khodaparast kelidbari mcgill university https orcid org 0009 0002 2991 0860 katelyn moffat concordia university iris george concordia university nicola smith concordia university research article keywords lionfish behaviour classification pose estimation machine learning deeplabcut simba posted date july 28th 2025 doi https doi org 10 21203 rs 3 rs 7153188 v1 license this work is licensed under a creative commons attribution 4 0 international license read full license page 1 23 abstract modern neuroscience and ecology are increasingly adopting machine le",
+  "pubs acs org chemneuro this article is licensed under cc by nc nd 4 0 research article serotonin transporter blockade reduces the psychedelic like effects of 4methoxy n methyl n isopropyltryptamine and related analogs grant c glatfelter serena s schalk donna walther alexander d maitland nicholas r gonzalez john s partilla nicholas a anas andrew r chadeayne marilyn naeem david r manke john d mccorvy and michael h baumann cite this acs chem neurosci 2026 17 2348 2363 read online downloaded from http pubs acs org acncdm article pdf 17 12 2348 66258062 acschemneuro 6c00083 pdf by guest on 28 july 2026 access metrics more article recommendations si supporting information abstract tryptamine psych",
+  "http pubs acs org journal acsodf this article is licensed under cc by nc nd 4 0 article synthesis and biological evaluation of 4bromo n ndimethyltryptamine 4 br dmt a synthetic building block for future analog development elena bray grant c glatfelter alexander d maitland nicholas r gonzalez donna walther jeanine yacoub michael h baumann and jacqueline l von salm cite this acs omega 2026 11 39102 39113 read online downloaded from http pubs acs org acsodf article pdf 11 26 39102 65212116 acsomega 6c02996 pdf by guest on 28 july 2026 access metrics more article recommendations si supporting information abstract the ongoing psychedelic renaissance has prompted a renewed search for novel drugs b",
+  "",
+  "addiction biology original article open access fentanyl methamphetamine and polysubstance use differentially affect locomotor sensitisation and social behaviour in rats psychedelic treatment reverses social deficits leah m salinsky2 3 kyra c diaz1 2 joshua l fox1 2 shawn m panh1 2 3 susan m ferguson1 2 3 1center for the neurobiology of addiction pain and emotion university of washington seattle usa 2addictions drug alcohol institute school of medicine university of washington seattle usa 3department of psychiatry behavioral sciences school of medicine university of washington seattle usa correspondence susan m ferguson smfergus uw edu received 30 july 2025 revised 21 january 2026 accepted 13",
+  "",
+  "",
+  "article a machine learning framework integrating deeplabcut and simba for quantifying aggressive behavior in swimming crab portunus trituberculatus chuanlong ding 1 yuanyuan fu 1 2 zhiqiang zhou 3 ting chen 3 4 wuqiang xia 3 4 weijiang huang 3 bincai zhou 3 jiameng chen 3 cheng zheng 3 4 chunlin wang 1 4 changkao mu 1 4 changjun liu 3 4 and lei liu 1 4 1 school of marine sciences ningbo university ningbo 315832 china 13870316091 163 com c d 2 ningbo institute of oceanography ningbo 315832 china 3 aquatic technology promotion station of xiangshan county ningbo 315709 china 4 experimental base of xiangshan ningbo university aquatic seed industry innovation research institute ningbo 315709 chin",
+  "journal of experimental zoology part a ecological and integrative physiology research article automated profiling of social behaviors to assess the genetic basis of evolution of aggressive behaviors in astyanax mexicanus renee mapa stefan choy solomia lapko allison kimmel isabel carino bazan johanna e kowalko department of biological sciences lehigh university bethlehem pennsylvania usa correspondence johanna e kowalko jok421 lehigh edu received 27 june 2025 revised 20 february 2026 accepted 3 march 2026 funding national institutes of health grant award number r35gm138345 abstract across the animal kingdom social behaviors such as aggression are critical for survival and reproductive success",
+  "methamphetamine fentanyl polysubstance administration produces social deficits and corticolimbic stress reward circuit adaptations leah m salinsky university of washington joshua l fox university of washington kyra c diaz university of washington bradley c timmons university of washington susan m ferguson university of washington research article keywords methamphetamine fentanyl polysubstance use psilocybin social preference crhr1 oprm1 medial prefrontal cortex nucleus accumbens addiction posted date april 23rd 2026 doi https doi org 10 21203 rs 3 rs 9306429 v1 license this work is licensed under a creative commons attribution 4 0 international license read full license additional declarati",
+  "open access published dec 20 2025 station holding during rheotaxis a sensitive assay of lateral line function in larval zebrafish sophie cohen bodns1 elayna i malak1 2 josef g trapani2 matt gaidica3 valentin a militchin1 kyle c newton4 and lavinia sheets1 5 1department of otolaryngology washington university school of medicine st louis mo usa 2department of biology amherst college amherst ma usa 3department of neuroscience neurotech hub washington university school of medicine st louis mo usa 4department of biological sciences florida atlantic university boca raton florida usa 5department of developmental biology washington university school of medicine st louis mo usa for correspondence she",
+  "article tarp2 derived peptide enhances early phase long term potentiation and impairs memory retention in male rats dominik mtys 1 2 3 vanda tukacs 1 3 vilmos tth 4 pter baracskay 1 stefnia krisztina pap 1 2 pl strner 5 6 trn minh hin 5 6 va hunyadi gulys 7 zsuzsanna darula 7 8 andrs perczel 5 6 katalin adrienna kkesi 1 2 3 and gbor juhsz 1 3 1 laboratory of proteomics institute of biology elte etvs lornd university pzmny pter stny 1 c h 1117 budapest hungary kakekesi ttk elte hu k a k gjuhasz100 gmail com g j 2 department of physiology and neurobiology institute of biology elte etvs lornd university pzmny pter stny 1 c h 1117 budapest hungary 3 innoscience hungary ltd btori t 9 h 3143 mtran",
+  "cells article deep learning based analysis reveals a social behavior deficit in mice exposed prenatally to nicotine mengyun zhou 1 wen qiu 1 nobuhiko ohashi 1 lihao sun 1 marie louis wronski 1 2 3 emi kouyama suzuki 1 yoshinori shirai 1 toru yanagawa 4 takuma mori 1 5 and katsuhiko tabuchi 1 5 1 department of molecular and cellular physiology shinshu university school of medicine matsumoto 390 8621 japan 20hm124d shinshu u ac jp m z qw66662024 126 com w q nobuhiko24 shinshu u ac jp n o 22hm124a shinshu u ac jp l s marie louis wronski uniklinikum dresden de m l w emi suzuki shinshu u ac jp e k s yoshirai shinshu u ac jp y s 2 neuroendocrine unit department of medicine massachusetts general ho",
+  "applying machine learning tools for automated behaviour classification in invasive lionfish and comparison with human observations amirreza khodaparast kelidbari mcgill university https orcid org 0009 0002 2991 0860 katelyn moffat concordia university iris george concordia university nicola smith concordia university research article keywords lionfish behaviour classification pose estimation machine learning deeplabcut simba posted date july 28th 2025 doi https doi org 10 21203 rs 3 rs 7153188 v1 license this work is licensed under a creative commons attribution 4 0 international license read full license version of record a version of this preprint was published at marine biology on februar",
+  "applying machine learning tools for automated behaviour classification in invasive lionfish and comparison with human observations amirreza khodaparast kelidbari mcgill university https orcid org 0009 0002 2991 0860 katelyn moffat concordia university iris george concordia university nicola smith concordia university research article keywords lionfish behaviour classification pose estimation machine learning deeplabcut simba posted date july 28th 2025 doi https doi org 10 21203 rs 3 rs 7153188 v1 license this work is licensed under a creative commons attribution 4 0 international license read full license version of record a version of this preprint was published at marine biology on februar",
+  "research article sex differences in bnst signaling and bnst crf in fear processing olivia j hon1 sofia neira1 meghan e flanigan1 alison v roland1 christina m caira1 tori sides1 shannon l d ambrosio1 sophia i lee1 yolanda simpson1 michelle c buccini1 samantha machinski1 waylin yu2 kristen m boyt1 thomas l kash1 3 1bowles center for alcohol studies university of north carolina school of medicine chapel hill united states 2inscopix mountain view united states 3department of pharmacology university of north carolina school of medicine chapel hill united states elife assessment this valuable study advances understanding of how corticotrophin releasing factor in the bed nucleus of the stria termin",
+  "research article methods new tools novel tools and methods analysis of operant self administration behaviors with supervised machine learning protocol for video acquisition and pose estimation analysis using deeplabcut and simple behavioral analysis leo f pereira sanabria 1 luciano s voutour 1 victoria j kaufman 1 christopher a reeves 1 aneesh s bal 1 fidel maureira 2 and amy a arguello1 1department of psychology michigan state university east lansing michigan 48823 and 2department of earth and environmental sciences michigan state university east lansing michigan 48823 abstract the use of supervised machine learning to approximate poses in video recordings allows for rapid and efficient ana",
+  "research article new research cognition and behavior high thc cannabis smoke impairs incidental memory capacity in spontaneous tests of novelty preference for objects and odors in male rats ilne l barnard 1 p timothy j onofrychuk 1 p aaron d toderash 4 vyom n patel 4 aiden e glass 1 jesse c adrian 1 robert b laprairie 2 3 and john g howland1 https doi org 10 1523 eneuro 0115 23 2023 1department of anatomy physiology and pharmacology university of saskatchewan saskatoon saskatchewan s7n5e5 canada 2college of pharmacy and nutrition university of saskatchewan saskatoon saskatchewan s7n5e5 canada 3department of pharmacology college of medicine dalhousie university halifax nova scotia b3h 4r2 can",
+  "research article new research cognition and behavior attack repertoires in outbred male cd1 mice are associated with nucleus accumbens neuroligin 2 https doi org 10 1523 eneuro 0471 25 2026 received 18 december 2025 revised 7 april 2026 accepted 10 april 2026 copyright 2026 goodwin et al this is an open access article distributed under the terms of the creative commons attribution 4 0 international license which permits unrestricted use distribution and reproduction in any medium provided that the original work is properly attributed this early release article has been peer reviewed and accepted but has not been through the composition and copyediting processes the final version may differ s",
+  "european journal of neuroscience research report open access synaptic plasticity of d1 and d2 types of neurons in the central amygdala after sucrose and cocaine exposure lukasz bijoch justyna winiewska anna beroun nencki embl center of excellence for neural plasticity and brain disorders braincity laboratory of neuronal plasticity nencki institute of experimental biology of the polish academy of sciences warsaw poland correspondence lukasz bijoch l bijoch nencki edu pl anna beroun a beroun nencki edu pl received 7 march 2025 revised 11 september 2025 accepted 5 october 2025 associate editor maxime assous funding this work was supported by national science centre poland grant numbers 2020 37 ",
+  "european journal of neuroscience technical note open access forestwalk a machine learning workflow brings new insights into posture and balance in rodent beam walking francesca tozzi1 yan ping zhang2 ramanathan narayanan1 damian roqueiro1 eoin c o connor1 1neuroscience and rare diseases discovery and translational area roche pharma research and early development roche innovation center basel f hoffmann l a roche ltd basel switzerland 2data and analytics roche pharma research and early development roche innovation center basel f hoffmann l a roche ltd basel switzerland correspondence eoin c o connor eoin oconnor roche com received 24 july 2024 revised 11 february 2025 accepted 14 february 202",
+  "type original research published 03 march 2023 doi 10 3389 fnbeh 2023 1139254 open access edited by raffaele d isa san raffaele scientific institute irccs italy reviewed by stefan brudzynski brock university canada simone macri national institute of health iss italy correspondence carmen winters carmen winters kuleuven be carmenwinters hotmail com specialty section this article was submitted to individual and social behaviors a section of the journal frontiers in behavioral neuroscience received 06 january 2023 accepted 16 february 2023 published 03 march 2023 citation winters c gorssen w whr m and d hooge r 2023 bambi a new method for automated assessment of bidirectional early life interac",
+  "type original research published 29 january 2024 doi10 3389 fnbeh 2024 1340357 open access edited by silvia mandillo national research council cnr italy reviewed by eric allen yttri carnegie mellon university united states maurizio casarrubea university of palermo italy correspondence christopher fields christopher fields yale edu these authors have contributed equally to this work received 17 november 2023 accepted 10 january 2024 published 29 january 2024 citation correia k walker r pittenger c and fields c 2024 a comparison of machine learning methods for quantifying self grooming behavior in mice front behav neurosci 18 1340357 doi 10 3389 fnbeh 2024 1340357 copyright 2024 correia walker",
+  "type original research published 01 august 2024 doi 10 3389 fnbeh 2024 1440601 open access edited by mario trevio university of guadalajara mexico reviewed by hadley c bergstrom vassar college united states claudio acuna heidelberg university hospital germany correspondence estelle barbier estelle barbier liu se these authors have contributed equally to this work and share first authorship received 29 may 2024 accepted 15 july 2024 published 01 august 2024 citation chanthongdee k fuentealba y wahlestedt t foulhac l kardash t coppola a heilig m and barbier e 2024 comprehensive ethological analysis of fear expression in rats using deeplabcut and simba machine learning model front behav neurosc",
+  "type original research published 22 october 2025 doi 10 3389 fnbeh 2025 1636674 open access edited by dayan kessler knox university of delaware united states reviewed by arun asok alien therapeutics inc united states negin mohammadmirzaei tufts university united states correspondence jee hyun kim jee kim deakin edu au drjeehyunkim gmail com christina j perry christina perry mq edu au received 28 may 2025 accepted 30 september 2025 published 22 october 2025 citation perry cj john r trinh hb richards bk drummond kd park chj and kim jh 2025 adolescent male and female rats show enhanced latent inhibition of conditioned fear compared to adult rats front behav neurosci 19 1636674 doi 10 3389 fnbeh",
+  "type original research published 18 november 2025 doi 10 3389 fncel 2025 1648536 open access edited by magdalena pereyra institut de l audition institut pasteur france reviewed by helen e scharfman nathan s kline institute for psychiatric research united states ernesto griego albert einstein college of medicine united states correspondence flvio freitas barbosa barbosa flaviof gmail com received 17 june 2025 accepted 27 october 2025 published 18 november 2025 citation araujo apc parente js coutinho slo castelo branco r meurer ysr and barbosa ff 2025 between similarity and difference network dynamics of the hippocampalparahippocampal circuitry in pattern separation of male wistar rats front c",
+  "type original research published 12 june 2026 doi 10 3389 fncir 2026 1812938 open access edited by atsushi noritake university of toyama japan reviewed by shinsuke suzuki hitotsubashi university japan duda kvitsiani southern illinois university carbondale united states correspondence rory j bufacchi rory bufacchi embl it received 17 february 2026 revised 12 may 2026 accepted 13 may 2026 published 12 june 2026 citation khurana hs mussetto v ferrarese l gross ct and bufacchi rj 2026 fleeing is believing adaptive behavior under social threat as an inference process front neural circuits 20 1812938 doi 10 3389 fncir 2026 1812938 copyright 2026 khurana mussetto ferrarese gross and bufacchi this i",
+  "type original research published 31 october 2025 doi 10 3389 fnsys 2025 1630654 open access edited by konstantinos slavakis institute of science tokyo japan reviewed by shuzo sakata university of strathclyde united kingdom eric allen yttri carnegie mellon university united states correspondence jingyuan li jingyli6 uw edu received 18 may 2025 accepted 14 august 2025 published 31 october 2025 citation li j keselman m and shlizerman e 2025 openlabcluster active learning based clustering and classification of animal behaviors based on kinematic body keypoints front syst neurosci 19 1630654 doi 10 3389 fnsys 2025 1630654 copyright 2025 li keselman and shlizerman this is an open access article di",
+  "type methods published 10 january 2024 doi 10 3389 fphar 2023 1329424 open access edited by karolina pytka jagiellonian university medical college poland reviewed by hiroyuki arakawa university of michigan united states dinghong zhang university of california san diego united states correspondence piotr popik nfpopik cyf kr edu pl received 28 october 2023 accepted 13 december 2023 published 10 january 2024 citation popik p cyrano e piotrowska d holuj m golebiowska j malikowska racia n potasiewicz a and nikiforuk a 2024 effects of ketamine on rat social behavior as analyzed by deeplabcut and simba deep learning algorithms front pharmacol 14 1329424 doi 10 3389 fphar 2023 1329424 copyright 202",
+  "from encounter to memory molecular dynamics of heterospecifc recognition in cleaner wrasse celia schunter celiaschunter gmail com university of hong kong https orcid org 0000 0003 3620 2731 daniele romeo romeodan connect hku hk university of hong kong https orcid org 0009 0008 5392 0456 article keywords individual recognition heterospeci c recognition cleaner wrasse neurogenomic epigenetics doi https doi org license this work is licensed under a creative commons attribution 4 0 international license read full license additional declarations there is no competing interest 1 from encounter to memory molecular dynamics of heterospecifc 2 recognition in cleaner wrasse 3 daniele romeo1 celia schu",
+  "galactic cosmic radiation produces sex specific circuit selective cognitive vulnerability countermeasure trade offs revealed by multidomain assessment sheridan a o connor university of pennsylvania pragatee narain the children s hospital of philadelphia research institute amishi mahajan the children s hospital of philadelphia research institute grace l bancroft the children s hospital of philadelphia research institute harley a haas the children s hospital of philadelphia research institute elise wallen friedman the children s hospital of philadelphia research institute shubha vasisht the children s hospital of philadelphia research institute hajime takano the children s hospital of philadel",
+  "received 18 january 2023 doi 10 1111 gbb 12853 revised 25 may 2023 accepted 15 june 2023 original article extensive characterization of a williams syndrome murine model shows gtf2ird1 mediated rescue of select sensorimotor tasks but no effect on enhanced social behavior kayla r nygaard 1 2 susan e maloney 2 3 raylynn g swift 1 2 katherine b mccullough 1 2 rachael e wagner 2 stuart b fass 1 2 krassimira garbett4 karoly mirnics 5 jeremy veenstra vanderweele 6 joseph d dougherty 1 2 3 1department of genetics washington university school of medicine st louis missouri usa 2department of psychiatry washington university school of medicine st louis missouri usa 3intellectual developmental disabilit",
+  "nature neuroscience technical report https doi org 10 1038 s41593 024 01649 9 simple behavioral analysis simba as a platform for explainable machine learning in behavioral neuroscience received 26 june 2023 accepted 12 april 2024 published online xx xx xxxx check for updates nastacia l goodwin 1 2 3 jia j choong1 4 sophia hwang1 kayla pitts 1 liana bloom1 aasiya islam 1 yizhe y zhang1 2 3 eric r szelenyi 1 3 xiaoyu tong 5 emily l newman 6 klaus miczek7 hayden r wright8 9 ryan j mclaughlin8 9 zane c norville10 neir eshel 11 mitra heshmati 1 2 3 12 simon r o nilsson 1 13 sam a golden 1 2 3 13 the study of complex behaviors is often challenging when using manual annotation due to the absence of",
+  "nature neuroscience technical report https doi org 10 1038 s41593 024 01649 9 simple behavioral analysis simba as a platform for explainable machine learning in behavioral neuroscience received 26 june 2023 accepted 12 april 2024 published online 22 may 2024 check for updates nastacia l goodwin 1 2 3 jia j choong1 4 sophia hwang1 kayla pitts 1 liana bloom1 aasiya islam 1 yizhe y zhang1 2 3 eric r szelenyi 1 3 xiaoyu tong 5 emily l newman 6 klaus miczek7 hayden r wright8 9 ryan j mclaughlin8 9 zane c norville10 neir eshel 11 mitra heshmati 1 2 3 12 simon r o nilsson 1 13 sam a golden 1 2 3 13 the study of complex behaviors is often challenging when using manual annotation due to the absence o",
+  "journal of experimental zoology part b molecular and developmental evolution research article automated behavioral profiling using neural networks reveals differences in stress like behavior between cave and surface dwelling astyanax mexicanus naresh padmanaban1 rianna ambosie2 stefan choy2 shoshanah marcus1 simon r o nilsson3 alex c keene4 johanna e kowalko2 erik r dubou1 1wilkes honors college florida atlantic university jupiter florida usa 2department of biological sciences lehigh university allentown pennsylvania usa 3platea biosciences seattle washington usa 4texas a m university college station texas usa correspondence erik r dubou eduboue fau edu received 7 february 2025 revised 10 ju",
+  "received 24 september 2021 revised 12 november 2021 accepted 15 december 2021 doi 10 1111 jne 13083 original article knockdown of sexually differentiated vasopressin expression in the bed nucleus of the stria terminalis reduces social and sexual behaviour in male but not female mice nicole rigney adam zbib geert j de vries aras petrulis center for behavioral neuroscience neuroscience institute georgia state university atlanta georgia usa correspondence nicole rigney center for behavioral neuroscience neuroscience institute georgia state university atlanta ga usa email nrigney1 student gsu edu funding information this work was supported by the national institutes of health r01 mh121603 to ap ",
+  "journal of neuroscience research research article open access sex and strain differences in analgesic and hyperlocomotor effects of morphine and opioid receptor expression in mice damien c boorman1 simran k rehal2 maryam fazili1 loren j martin1 2 1department of psychology the university of toronto mississauga mississauga ontario canada 2department of cell and systems biology university of toronto toronto ontario canada correspondence loren j martin lj martin utoronto ca received 2 january 2025 revised 5 march 2025 accepted 1 april 2025 edited by lawrence s sherman and tuan trang reviewed by william birdsong anna taylor and kim juhani blomqvist funding this work was supported by natural scien",
+  "research article continuous monitoring and machine vision reveals that developing gerbils exhibit structured social behaviors prior to the emergence of autonomy catalinmitelut 1 2 marielisadiez castro2 ralph e peterson2 mariagonalves2 jenniferli2 madelinegamer2 simon ronilsson2 talmo d pereira3 dan h sanes2 1 netholabs london united kingdom 2 center for neural science department of biology and department of psychology new york university new york new york united states of america 3 salk institute for biological studies la jolla california united states of america these authors contributed equally to this work tdp and dhs are co last authors on this work mitelutco gmail com abstract open acce",
+  "plos computational biology software tiba a web application for the visual analysis of temporal occurrences interactions and transitions of animal behavior a1111111111 a1111111111 a1111111111 a1111111111 a1111111111 nicolai kraus1 michael aichemid1 karsten klein1 etienne lein2 alex jordan2 falk schreiber1 3 1 department of computer and information science university of konstanz konstanz germany 2 behavioural evolution research group max planck institute of animal behavior konstanz germany 3 faculty of information technology monash university melbourne australia michael aichem uni konstanz de abstract open access citation kraus n aichem m klein k lein e jordan a schreiber f 2024 tiba a web app",
+  "plos one research article postnatal maternal care moderates the effects of prenatal bisphenol exposure on offspring neurodevelopmental behavioral and transcriptomic outcomes a1111111111 a1111111111 a1111111111 a1111111111 a1111111111 samantha c laubyid1 2 hannah e lapp1 melissa salazar1 sofiia semyrenko1 danyal chauhan1 amy e margolis3 frances a champagneid1 2 1 department of psychology college of liberal arts university of texas at austin austin texas united states of america 2 center for molecular carcinogenesis and toxicology university of texas at austin austin texas united states of america 3 department of psychiatry columbia university irving medical center new york city new york unite",
+  "plos one research article postnatal maternal care moderates the effects of prenatal bisphenol exposure on offspring neurodevelopmental behavioral and transcriptomic outcomes a1111111111 a1111111111 a1111111111 a1111111111 a1111111111 samantha c laubyid1 2 hannah e lapp1 melissa salazar1 sofiia semyrenko1 danyal chauhan1 amy e margolis3 frances a champagneid1 2 1 department of psychology college of liberal arts university of texas at austin austin texas united states of america 2 center for molecular carcinogenesis and toxicology university of texas at austin austin texas united states of america 3 department of psychiatry columbia university irving medical center new york city new york unite",
+  "plos one research article deep learning algorithms reveal increased social activity in rats at the onset of the dark phase of the light dark cycle piotr popikid ewelina cyrano joanna golebiowska natalia malikowska racia agnieszka potasiewicz agnieszka nikiforuk a1111111111 a1111111111 a1111111111 a1111111111 a1111111111 behavioral neuroscience and drug development maj institute of pharmacology polish academy of sciences krakow poland nfpopik cyf kr edu pl abstract open access citation popik p cyrano e golebiowska j malikowska racia n potasiewicz a nikiforuk a 2024 deep learning algorithms reveal increased social activity in rats at the onset of the dark phase of the light dark cycle plos one",
+  "plos one research article deep learning algorithms reveal increased social activity in rats at the onset of the dark phase of the light dark cycle piotr popikid ewelina cyrano joanna golebiowska natalia malikowska racia agnieszka potasiewicz agnieszka nikiforuk a1111111111 a1111111111 a1111111111 a1111111111 a1111111111 behavioral neuroscience and drug development maj institute of pharmacology polish academy of sciences krakow poland nfpopik cyf kr edu pl abstract open access citation popik p cyrano e golebiowska j malikowska racia n potasiewicz a nikiforuk a 2024 deep learning algorithms reveal increased social activity in rats at the onset of the dark phase of the light dark cycle plos one",
+  "plos one research article deep learning algorithms reveal increased social activity in rats at the onset of the dark phase of the light dark cycle piotr popikid ewelina cyrano joanna golebiowska natalia malikowska racia agnieszka potasiewicz agnieszka nikiforuk a1111111111 a1111111111 a1111111111 a1111111111 a1111111111 behavioral neuroscience and drug development maj institute of pharmacology polish academy of sciences krakow poland nfpopik cyf kr edu pl abstract open access citation popik p cyrano e golebiowska j malikowska racia n potasiewicz a nikiforuk a 2024 deep learning algorithms reveal increased social activity in rats at the onset of the dark phase of the light dark cycle plos one",
+  "heliyon 10 2024 e36352 contents lists available at sciencedirect heliyon journal homepage www cell com heliyon research article deep learning based scoring method of the three chamber social behaviour test in a mouse model of alcohol intoxication a comparative analysis of deeplabcut commercial automatic tracking and manual scoring mohamed aly zahran a aroa manas ojeda a monica navarro sanchez a esther castillo gomez a b 1 francisco e olucha bordonau a b 1 a unitat predepartamental de medicina facultat de ci encies de la salut universitat jaume i castellon de la plana spain b cibersam isciii spain article info keywords sociability deeplabcut novelty artificial intelligence 3 chambers memory a",
+  "contact free measurement of behavioural readouts in the lizard anolis carolinensis n rhrdanz1 a menon1 and p wulff1 1 institute of physiology christian albrechts universitt zu kiel kiel germany n roehrdanz physiologie unikiel de abstract the green anole lizard anolis carolinensis is an interesting model organism to study in cognitive neuroscience it shows a brain of reduced complexity compared to mammals some brain structures like the hippocampus are already present in the lizards brain while other brain structures like the neocortex seem to be missing in this study we aimed to establish a contact free method to measure different behavioural readouts in the lizards respiratory rate head dire",
+  "supplementary material behavioral model training and coding to code the play behavior observations social preference social memory and resident intruder behaviors the deeplabcut program 2 3 0 behavioral observation research interactive software boris 7 13 and the simulated behavioral analysis simba 1 55 program were used deeplabcut first body parts were tracked using deeplabcut 1 2 videos of the three chamber task social preference and memory were captured from above the rat and apparatus eight body parts were labeled for social preference and social memory including left ear right ear nose middle of back left side right side tail base and tail tip videos of the play behavior observations an",
+  "article hypocretin orexin neurons encode social discrimination and exhibit a sex dependent necessity for social interaction graphical abstract authors matthew dawson dylan j terstege naila jamani jonathan r epp gina m leinninger derya sargin correspondence derya sargin ucalgary ca in brief dawson et al show that hypocretin neurons regulate social interaction hypocretin neuron activity levels differ based on the nature of social encounters and correlate with social engagement reduced hypocretin activity or signaling disrupts social interaction only in males highlighting the sexually dimorphic role of this neuron population in social behavior highlights d hypocretin neurons respond to social i",
+  "biorxiv preprint doi https doi org 10 1101 2023 12 04 569809 this version posted december 6 2023 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nd 4 0 international license impact of 9 tetrahydrocannabinol and oxycodone co administration on measures of antinociception dependence circadian activity and reward in mice richard a slivicki1 justin g wang1 2 vy trinh tran nhat1 alexxai v kravitz1 3 4 meaghan c creed1 4 and robert w gereau iv1 4 5 1washington university pain center and department of anesthesiology 2neuroscience graduate progra",
+  "biorxiv preprint doi https doi org 10 1101 2025 04 28 650242 this version posted july 16 2025 the copyright holder for this preprint which was not certified by peer review is the author funder this article is a us government work it is not subject to copyright under 17 usc 105 and is also made available for use under a cc0 license rapid open source and automated quantification of the head twitch response in c57bl 6j mice using deeplabcut and simple behavioral analysis alexander d maitland1 nicholas r gonzalez1 donna walther1 francisco pereira2 michael h baumann1 and grant c glatfelter1 1designer drug research unit national institute on drug abuse intramural research program baltimore marylan",
+  "topic drug discovery and development abstract id 168992 board number 081 rapid open source and automated quantification of the mouse head twitch response using deeplabcut and simba abstract id 168992 alexander d maitland 1 grant c glatfelter 1 nicholas r gonzalez 1 donna walther 1 francisco pereira 2 michael h baumann 1 1 national institute on drug abuse intramural research program 2 national institute of mental health intramural research program psychedelic drugs induce the head twitch response htr in mice which is a behavioral proxy for hallucinogenic effects in humans existing methods for detecting htrs require time consuming visual scoring or invasive magnetometer based approaches here w",
+  "abstracts neuroscience 580 2025 s72s102 ps052 phytochemical aspect safety and antihyperglycemic effect of the aqueous extract of carum carvi l from the bni mellal khnifra region wafaa bendaoud mohamed bouhrim fatiha chigr biological engineering laboratory faculty of sciences and techniques sultan moulay slimane university beni mellal morocco carum carvi l is a biennial plant from the apiaceae family and its seeds have been used since antiquity for the treatment of diabetes in traditional healing systems across vast geographical areas including the bni mellal khnifra region the objective of this study is to analyze the phytochemistry of the aqueous extract of carum carvi l seeds from this reg",
+  "report region specific nucleus accumbens dopamine signals encode distinct aspects of avoidance learning graphical abstract authors gabriela c lopez louis d van camp ryan f kovaleski michael d schaid venus n sherathiya julia m cox talia n lerner correspondence talia lerner northwestern edu in brief lopez et al show that nac core and vmshell dopamine signals display distinct dynamics during active avoidance learning and in response to inescapable shocks these data provide avenues to understand how heterogeneous dopamine subpopulations work together to represent aversive stimuli and allow animals to learn to avoid danger in their environment highlights core and vmshell dopamine display distinct",
+  "article gut microbiota regulates stress responsivity via the circadian system graphical abstract authors gabriel s s tofani sarah jane leigh cassandra e gheorghe paromita sen gerard clarke john f cryan correspondence j cryan ucc ie in brief gut microbes are known to modulate stress responsivity and behavior tofani et al demonstrate that such modulations occur via the circadian system the oscillations in gut microbiota composition regulate the diurnal rhythmicity of hypothalamic pituitaryadrenal hpa axis function which leads to altered stress responsivity across the day highlights d gut microbiota regulates diurnal rhythms of corticosterone d microbial depletion leads to disruption in rhythmi",
+  "iscience article social hierarchy shapes behavioral and transcriptional responses to chronic stress and ketamine in male mice graphical abstract authors serena gasperoni xiuqi ji choham sudre chinsky paula fontanet alon chen juan pablo lopez correspondence jpablo lopez ki se in brief natural sciences biological sciences neuroscience behavioral neuroscience molecular neuroscience highlights stress induced behavioral changes vary across the circadian cycle dominant mice exhibit greater vulnerability to chronic stress a single dose of ketamine reverses stress induced abnormalities in dominant mice ketamine induces transcriptional changes in the mpfc of dominant mice gasperoni et al 2026 iscienc",
+  "pubs acs org ptsci article rapid open source and automated quantification of the head twitch response in c57bl 6j mice using deeplabcut and simple behavioral analysis published as part of acs pharmacology translational science special issue psychedelics and entactogens alexander d maitland nicholas r gonzalez donna walther francisco pereira michael h baumann and grant c glatfelter cite this acs pharmacol transl sci 2025 8 2694 2709 read online access metrics more article recommendations si supporting information downloaded via univ of washington on february 19 2026 at 16 02 34 utc see https pubs acs org sharingguidelines for options on how to legitimately share published articles abstract se",
+  "biorxiv preprint doi https doi org 10 64898 2026 07 16 738888 this version posted july 21 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by nd 4 0 international license rapidly decreasing phasic dopamine responses precede a hedonic switch during satiation of sodium appetite paula bazzino1 2 dionne cr russchen3 alexandra t keinath2 mitchell f roitman2 james e mccutcheon3 these authors contributed equally corresponding author 1 graduate program in neuroscience university of illinois at chicago chicago il 60607 united states 2 departmen",
+  "32 2026 manned spaceflight vol 32 2026 doi10 3724 zrht 1674 5825 2026049 12 12 1 1 1 12 1 1000942 101408 yolov11nseg yolov8 yolov11 sam2 yolov11n seg nvidia v100 13 2 ms 30 fps v19tp31 a 1674 5825 2026 03 0382 12 research on animal behavior detection system for space science experiments fu yanan1 2 guo rui1 2 xu jinzhong1 li ye1 yan zhen1 wang hongfei1 2 1 technology and engineering center for space utilization chinese academy of sciences beijing 100094 china 2 school of space exploration university of chinese academy of sciences beijing 101408 china abstract during in orbit missions a large volume of animal observation videos is continuously generated under space microgravity conditions onc",
+  "j neurophysiol 133 582597 2025 first published january 7 2025 doi 10 1152 jn 00215 2024 research article neuroscience of disease repeated social stress increases posterior medial amygdala neuronal activity in stress susceptible adult male rats alexandra c ritger 1 3 maxine k loh 2 3 courtney p stickling 2 3 mallika padival 2 3 nicole c ferrara 2 3 and j amiel rosenkranz2 3 1department of foundational sciences and humanities discipline of neuroscience rosalind franklin university north chicago illinois united states 2department of foundational sciences and humanities discipline of cellular molecular pharmacology rosalind franklin university north chicago illinois united states and 3center for",
+  "marine biology 2026 173 50 https doi org 10 1007 s00227 025 04777 3 method applying machine learning tools for automated behaviour classification in invasive lionfish and comparison with human observations amirreza khodaparast kelidbari1 2 katelyn t moffat1 iris m george1 nicola s smith1 received 22 july 2025 accepted 26 november 2025 the author s under exclusive licence to springer verlag gmbh germany part of springer nature 2026 abstract modern neuroscience and ecology are increasingly adopting machine learning ml methods to automate the tracking and classification of animal behaviour these techniques are particularly valuable for quantifying fitness related behaviours such as hunting in i",
+  "coral reefs https doi org 10 1007 s00338 026 02906 y research interspecific variation in cleaning and cheating behaviours among coral reef cleaner fishes daniele romeo1 maddalena ranucci1 2 melanie court2 beatriz p pereira2 jos ricardo paula2 3 celia schunter1 received 6 march 2026 accepted 1 june 2026 the author s 2026 abstract mutualism is an interspecific interaction in which both partners gain a net fitness benefit however mutualisms are vulnerable to conflict because one partner may increase its benefits at the other s expense cheating in coral reef cleaning mutualisms cleaner fishes may cheat by feeding on client mucus rather than ectoparasites imposing costs on clients and potentially",
+  "animal cognition 2023 26 589598 https doi org 10 1007 s10071 022 01691 9 original paper color is necessary for face discrimination in the northern paper wasp polistes fuscatus christopher m jernigan1 jay a stafstrom1 natalie c zaba1 caleb c vogt1 michael j sheehan1 received 13 april 2022 revised 2 september 2022 accepted 19 september 2022 published online 16 october 2022 the author s under exclusive licence to springer verlag gmbh germany part of springer nature 2022 abstract visual individual recognition requires animals to distinguish among conspecifics based on appearance though visual individual recognition has been reported in a range of taxa including primates birds and insects the fea",
+  "cellular and molecular neurobiology 2026 46 70 https doi org 10 1007 s10571 026 01707 9 original research sex dependent dynamics of behavioural and neuropathological changes in an a53t alpha synuclein mouse model of parkinson s disease maider zubelzu1 2 raphaelle bidgood1 ane murueta goyena2 3 jos ngel ruiz ortega1 2 jos vicente lafuente2 3 teresa morera herreras1 2 received 21 december 2025 accepted 23 february 2026 the author s 2026 abstract parkinson s disease pd is characterised by progressive dopaminergic neurodegeneration alpha synuclein syn aggregation and neuroinflammation clinical and experimental studies suggest that sex influences disease onset progression and treatment response y",
+  "mccullough et al journal of neurodevelopmental disorders 2024 16 16 https doi org 10 1186 s11689 024 09534 z journal of neurodevelopmental disorders research open access characterization of early markers of disease in the mouse model of mucopolysaccharidosis iiib katherine b mccullough1 2 amanda titus1 kate reardon1 sara conyers1 joseph d dougherty1 2 3 xia ge4 joel r garbow3 4 patricia dickson3 5 carla m yuede1 3 6 7 and susan e maloney1 2 3 abstract background mucopolysaccharidosis mps iiib also known as sanfilippo syndrome b is a devastating childhood disease unfortunately there are currently no available treatments for mps iiib patients yet animal models of lysosomal storage diseases hav",
+  "www nature com mp molecular psychiatry 1234567890 article open impaired emotion recognition in cntnap2 deficient mice is associated with hyper synchronous prefrontal cortex neuronal activity alok nath mohapatra 1 2 renad jabarin1 2 natali ray1 shai netser1 and shlomo wagner 1 the author s 2024 individuals diagnosed with autism spectrum disorder asd show difficulty in recognizing emotions in others a process termed emotion recognition while human fmri studies linked multiple brain areas to emotion recognition the specific mechanisms underlying impaired emotion recognition in asd are not clear here we employed an emotional state preference esp task to show that cntnap2 knockout ko mice an esta",
+  "www nature com npp 1234567890 article serotonin modulates an inhibitory input to the central amygdala from the ventral periaqueductal gray olivia j hon1 jeffrey f diberto1 christopher m mazzone1 jonathan sugam1 daniel w bloodgood1 j andrew hardaway1 mariya husain1 alexis kendra1 nora m mccall1 alberto j lopez1 thomas l kash1 2 and emily g lowery gionta1 this is a u s government work and not under copyright protection in the us foreign copyright protection may apply 2022 fear is an adaptive state that drives defensive behavioral responses to specific and imminent threats the central nucleus of the amygdala cea is a critical site of adaptations that are required for the acquisition and express",
+  "1234567890 article https doi org 10 1038 s41467 021 22138 8 open wireless battery free fully implantable multimodal recording and neuromodulation tools for songbirds jokubas ausra 1 stephanie j munger2 amirhossein azami1 alex burton1 roberto peralta 3 julie e miller 2 4 philipp gutruf 1 5 wireless battery free and fully implantable tools for the interrogation of the central and peripheral nervous system have quantitatively expanded the capabilities to study mechanistic and circuit level behavior in freely moving rodents the light weight and small footprint of such devices enables full subdermal implantation that results in the capability to perform studies with minimal impact on subject beha",
+  "article https doi org 10 1038 s41467 022 35353 8 a signal like role for floral humidity in a nocturnal pollination system 1234567890 1234567890 received 17 april 2022 accepted 29 november 2022 check for updates ajinkya dahake 1 piyush jain2 caleb c vogt 1 william kandalaft 1 abraham d stroock3 robert a raguso1 previous studies have considered floral humidity to be an inadvertent consequence of nectar evaporation which could be exploited as a cue by nectarseeking pollinators by contrast our interdisciplinary study of a nightblooming flower datura wrightii and its hawkmoth pollinator manduca sexta reveals that floral relative humidity acts as a mutually beneficial signal in this system the dis",
+  "article in press nature communications article in press https doi org 10 1038 s41467 026 68763 z no evidence of immediate or persistent analgesic effect from a single dose of psilocybin in three mouse models of pain received 10 november 2025 accepted 15 january 2026 cite this article as gregory n s girard t e ram a et al no evidence of immediate or persistent analgesic nicholas s gregory tyler e girard akila ram austen b casey robert c malenka s vivianne l tawfik boris d heifets e s we are providing an unedited version of this manuscript to give early access to its r findings before final publication the manuscript will undergo further editing please p note there may be errors present which ",
+  "article in press nature communications article in press https doi org 10 1038 s41467 026 69254 x serotonin modulates nucleus accumbens circuits to suppress aggression in mice received 8 april 2025 zihui zhang gavin c touponse pia j alderman teema yassine matthew b pomrenze accepted 27 january 2026 troy w harris amei n shank robert c malenka neir eshel cite this article as zhang z touponse g c alderman p j et al serotonin modulates nucleus accumbens circuits to suppress aggression in mice nat commun 2026 https doi org 10 1038 s41467 026 69254 x s we are providing an unedited version of this manuscript to give early access to its s findings before final publication the manuscript will undergo ",
+  "article experience dependent dopamine modulation of male aggression https doi org 10 1038 s41586 024 08459 w received 20 january 2024 accepted 27 november 2024 published online 22 january 2025 check for updates bing dai1 bingqin zheng1 xiuzhi dai1 xiaoyang cui1 luping yin1 jing cai1 yizhou zhuo2 3 4 nicolas x tritsch1 5 9 larry s zweifel6 7 yulong li2 3 4 dayu lin1 5 8 numerous studies support the role of dopamine in modulating aggression1 2 but the exact neural mechanisms remain elusive here we show that dopaminergic cells in the ventral tegmental area vta can bidirectionally modulate aggression in male mice in an experience dependent manner although vta dopaminergic cells strongly influenc",
+  "nature methods article https doi org 10 1038 s41592 024 02200 1 a soid an active learning platform for expert guided data efficient discovery of behavior received 4 november 2022 accepted 29 january 2024 published online 21 february 2024 check for updates jens f tillmann 1 4 alexander i hsu 2 4 martin k schwarz 1 eric a yttri 2 3 to identify and extract naturalistic behavior two methods have become popular supervised and unsupervised each approach carries its own strengths and weaknesses for example user bias training cost complexity and action discovery which the user must consider in their decision here an active learning platform a soid blends these strengths and in doing so overcomes sev",
+  "articles https doi org 10 1038 s41593 020 0675 x posterior amygdala regulates sexual and aggressive behaviors in male mice takashi yamaguchi 1 dongyu wei1 soomin c song1 byungkook lim 2 nicolas x tritsch 1 and dayu lin 1 3 4 sexual and aggressive behaviors are fundamental to animal survival and reproduction the medial preoptic nucleus mpn and ventrolateral part of the ventromedial hypothalamus vmhvl are essential regions for male sexual and aggressive behaviors respectively while key inhibitory inputs to the vmhvl and mpn have been identified the extrahypothalamic excitatory inputs essential for social behaviors remain elusive here we identify estrogen receptor alpha esr1 expressing cells in",
+  "nature neuroscience article https doi org 10 1038 s41593 026 02292 2 individual differences in prosocial learning are represented in the hippocampal dorsal ca1 received 8 august 2024 accepted 3 april 2026 published online 12 may 2026 check for updates filippo la greca1 elisa zianni1 5 ilaria cerchiaro1 5 michela gusmini1 5 giulia coccia1 alexandre carrea1 silvia pelucchi1 carlo castoldi 2 3 4 davide maggioni1 elena marcello 1 bianca ambrogina silva2 3 4 fabrizio gardoni 1 monica diluca1 diego scheggia 1 animals can learn about danger by observing conspecifics but whether and how they acquire behaviors through positive affective states of others is not understood here we show that by observin",
+  "www nature com scientificreports open automated procedure to assess pup retrieval in laboratory mice carmen winters1 2 wim gorssen3 victoria a ossoriosalazar1 simon nilsson4 sam golden 4 rudi d hooge1 all mammalian mothers form some sort of caring bond with their infants that is crucial to the development of their offspring the pup retrieval test prt is the leading procedure to assess pupdirected maternal care in laboratory rodents used in a wide range of basic and preclinical research applications most prt protocols require manual scoring which is prone to bias and spatial and temporal inaccuracies this study proposes a novel procedure using machine learning algorithms to enable reliable as",
+  "www nature com scientificreports open automated maternal behavior during early life in rodents amber pipeline hannah e lapp melissa g salazar frances a champagne mother infant interactions during the early postnatal period are critical for infant survival and the scaffolding of infant development rodent models are used extensively to understand how these early social experiences influence neurobiology across the lifespan however methods for measuring postnatal dam pup interactions typically involve time consuming manual scoring vary widely between research groups and produce low density data that limits downstream analytical applications to address these methodological issues we developed th",
+  "www nature com scientificreports open automated procedure to detect subtle motor alterations in the balance beam test in a mouse model of early parkinson s disease raphalle bidgood1 3 maider zubelzu1 2 3 jose angel ruizortega1 2 teresa moreraherreras 1 2 parkinson s disease pd is the most common motor neurodegenerative disorder characterised by aggregated synuclein syn constituting lewy bodies we aimed to investigate temporal changes in motor impairments in a pd mouse model induced by overexpression of syn with the conventional manual analysis of the balance beam test and a novel approach using machine learning algorithms to automate behavioural analysis we combined automated animal tracking",
+  "www nature com scientificreports open induction of territorial dominance and subordination behaviors in laboratory mice dorian battivelli lucas boldrini mohit jaiswal pradnya patil sofia torchia elizabeth engelen luca spagnoletti sarah kaspar cornelius t gross territorial behaviors comprise a set of coordinated actions and response patterns found across animal species that promote the exclusive access to resources house mice are highly territorial with a subset of males consistently attacking and chasing competing males to expel them from their territories and performing urine marking behaviors to signal the extent of their territories natural variation in territorial behaviors within a mous",
+  "www nature com scientificreports open recovery of centralities in medial prefrontal and sensory related cortices associated with social behavior improvements in an autism mouse model hiroki ueno1 17 yusuke iyanaga1 17 katsuyuki kunida2 3 yuta hara4 hiroki miura1 yuka nakai1 masato tanuma1 misuzu hayashida1 rei yokoyama1 5 jin ohkubo1 kaoru seiriki1 atsuko hayata takano1 6 tomoka ao1 7 shun yamaguchi8 9 shiho kitaoka10 tomoyuki furuyashiki11 yukio ago5 takanobu nakazawa1 12 kazuhiro takuma6 7 junichiro yoshimoto2 3 hitoshi hashimoto1 7 13 14 15 atsushi kasai1 16 anti epileptics and diuretics used for unapproved purposes have been reported to ameliorate social deficits in individuals with auti",
+  "www nature com scientificreports open generalization and extinction of platform mediated avoidance in male and female rats alba lpez moraga1 2 laura luyten1 2 3 tom beckers1 2 3 understanding anxiety related disorders can be advanced by studying the fear learning mechanisms implicated in the transition from adaptive to maladaptive fear individuals with anxiety disorders often show impaired fear extinction pervasive avoidance and overgeneralization of fear while these characteristics are usually studied in isolation their interactions are less understood we modified the platform mediated avoidance task to chart avoidance generalization and extinction in male and female rats male rats acquired",
+  "labanimal comment https doi org 10 1038 s41684 026 01694 w thinking outside the boxes analyzing the current landscape of popular behavioral tests for adult zebrafish allan v kalueff adam michael stewart murilo s de abreu matthew o parker check for updates zebrafish are commonly tested in various behavioral assays to better understand such practices we surveyed active global zebrafish neuroscience labs asking to rank such assays based on their perceived utility overreliance on few well established assays and their inconsistent nomenclature call for further innovation and standardizing of adult zebrafish neurobehavioral testing zebrafish danio rerio have rapidly become a widely used model orga",
+  "communications biology article in press https doi org 10 1038 s42003 026 10690 2 temporal transcriptomic and chromatin dynamics underlying class level recognition in cleaner wrasse received 8 december 2025 daniele romeo celia schunter accepted 6 july 2026 cite this article as romeo d schunter c temporal transcriptomic and chromatin dynamics underlying class level recognition in cleaner wrasse commun biol 2026 https doi org 10 1038 s42003 026 10690 2 we are providing an unedited version of this manuscript to give early access to its s findings before final publication the manuscript will undergo further editing please s note there may be errors present which affect the content and all legal d",
+  "pharmacological reports 2025 77 135144 https doi org 10 1007 s43440 024 00679 1 research assessing the effects of 5 ht2a and 5 ht5a receptor antagonists on doi induced head twitch response in male rats using marker less deep learning algorithms ewelina cyrano1 piotr popik1 received 11 october 2024 revised 15 november 2024 accepted 16 november 2024 published online 27 november 2024 the author s 2024 abstract background serotonergic psychedelics which display a high affinity and specificity for 5 ht2a receptors like 2 5 dimethoxy 4 iodoamphetamine doi reliably induce a head twitch response in rodents characterized by paroxysmal highfrequency head rotations traditionally this behavior is manual",
+  "pharmacological reports https doi org 10 1007 s43440 024 00679 1 research assessing the effects of 5 ht2a and 5 ht5a receptor antagonists on doi induced head twitch response in male rats using marker less deep learning algorithms ewelina cyrano1 piotr popik1 received 11 october 2024 revised 15 november 2024 accepted 16 november 2024 the author s 2024 abstract background serotonergic psychedelics which display a high affinity and specificity for 5 ht2a receptors like 2 5 dimethoxy 4 iodoamphetamine doi reliably induce a head twitch response in rodents characterized by paroxysmal highfrequency head rotations traditionally this behavior is manually counted by a trained observer although automat",
+  "1234567890 www nature com dpn primer open keeping it simple a simple behavioral analysis simba primer nastacia l goodwin 1 2 and sam a golden 1 2 3 the author s 2024 npp digital psychiatry and neuroscience https doi org 10 1038 s44277 024 00014 9 neuroscience is approaching a critical juncture transitioning from subjective behavioral observation to objective behavioral definition this is now possible due to analytical tools using machineguided solutions for animal markerless key point pose tracking see table 1 for specialized terminology definitions and behavioral detection however it is often challenging for behaviorists to adopt these approaches due to a lack of specialized computational k",
+  "neurobiology of stress 31 2024 100636 contents lists available at sciencedirect neurobiology of stress journal homepage www elsevier com locate ynstr early life stress impairs acquisition and retrieval of fear memories sex effects corticosterone modulation and partial prevention by targeting glucocorticoid receptors at adolescent age jeniffer sanguino gomez harm j krugers brain plasticity group sils cns university of amsterdam amsterdam the netherlands article info keywords early life stress fear memory corticosterone glucocorticoid antagonist abstract the early postnatal period is a sensitive time window that is characterized by several neurodevelopmental processes that define neuronal arch",
+  "neurobiology of stress 21 2022 100501 contents lists available at sciencedirect neurobiology of stress journal homepage www elsevier com locate ynstr prebiotic supplementation modulates selective effects of stress on behavior and brain metabolome in aged mice joana s cruz pereira a b gerard m moloney a b thomaz f s bastiaanssen b serena boscaini b gabriel tofani a b julia borras bisa a b marcel van de wouw a b patrick fitzgerald a b timothy g dinan a c gerard clarke b c john f cryan a b a department of anatomy and neuroscience university college cork cork ireland b apc microbiome ireland university college cork cork ireland c department of psychiatry and neurobehavioral science university co",
+  "j neurophysiol 133 502512 2025 first published december 31 2024 doi 10 1152 jn 00507 2024 research article higher neural functions and behavior machine learning and confirmatory factor analysis show that buprenorphine alters motor and anxiety like behaviors in male female and obese c57bl 6j mice ohm sharma 1 michael mykins 2 rebecca e bergee 3 joshua m price 3 michael a o neil 3 nicole mickels 4 megan von hagen 1 james o connor 5 helen a baghdoyan 1 and ralph lydic1 1neuroscience program in psychology the university of tennessee knoxville tennessee united states 2department of biochemistry cellular and molecular biology the university of tennessee knoxville tennessee united states 3office of",
+  "",
+  "brain and behavior method using machine learning to automate the analysis of an olfactory habituation dishabituation task in mice s boyanova1 m h correa1 r s bains2 f k wiseman1 1uk dementia research institute at university college london london uk 2mary lyon centre medical research council harwell oxfordshire uk correspondence s boyanova s boyanova ucl ac uk received 23 december 2025 revised 26 april 2026 accepted 2 july 2026 keywords automation mouse behaviour olfaction abstract introduction improving the efficiency and accuracy of annotation and extraction of performance data from mouse behavioral tasks will improve both the throughput and scientific value of preclinical research methods ",
+  "valence dependent synaptic plasticity drives approach and avoidance behavior in social context camilla bellone geneva university https orcid org 0000 0002 6774 6275 pedro espinosa university of geneva https orcid org 0000 0002 2202 8982 benoit girard the university of geneva https orcid org 0000 0002 3914 6483 lorena jourdain university of geneva mattia lucchini university of geneva federica campanelli university of geneva valentina tiriticco university of geneva article keywords posted date july 28th 2025 doi https doi org 10 21203 rs 3 rs 6992977 v1 license this work is licensed under a creative commons attribution 4 0 international license read full license additional declarations there i",
+  "cannabis and cannabinoid research volume 10 number 6 2025 mary ann liebert inc doi 10 1177 25785125251372062 original research influence of carrier oil sex and age on pharmacokinetic and acute behavioral effects of vaporized cannabis extract in mice sara r westbrook 1 allison l jensen 1 vanessa copeland solorzano 1 jacob buursma 1 gillian freeby 1 taytum von melville 1 tyler edwards 1 carrie cuttler 2 kanako hayashi 3 4 ryan mclaughlin 1 2 4 and kristen m delevich1 4 abstract the legalization of cannabis in several states across the united states has increased the need to better understand its effects on the body brain and behavior particularly in different populations previous rodent studie",
+  "received 28 august 2024 accepted 10 january 2025 doi 10 1111 2041 210x 14502 research article yolo b ehaviour a simple flexible framework to automatically quantify animal behaviours from videos alex hoi hang chan1 2 3 prasetia putra1 4 harald schupp1 4 johanna kchling1 4 jana straheim1 4 britta renner1 4 julia schroeder5 william d pearse5 6 shinichi nakagawa7 terry burke8 michael griesser1 2 3 9 10 andrea meltzer1 2 3 10 saverio lubrano1 2 3 10 fumihiro kano1 2 3 1centre for the advanced study of collective behaviour university of konstanz konstanz germany 2department of collective behavior max planck institute of animal behavior konstanz germany 3department of biology university of konstanz",
+  "3966 the journal of neuroscience may 5 2021 41 18 39663987 systems circuits striatal direct pathway targets npas11 pallidal neurons qiaoling cui 1 xixun du 1 2 isaac y m chang 1 arin pamukcu 1 varoth lilascharoen 3 brianna l berceau 1 daniela garca 1 darius hong 1 uree chon 4 ahana narayanan 1 yongsoo kim 4 byung kook lim 3 and c savio chan1 1department of physiology feinberg school of medicine northwestern university chicago illinois 60611 2department of physiology school of basic medicine qingdao university qingdao china 266071 3neurobiology section biological sciences division university of california san diego la jolla california 92093 and 4department of neural and behavioral sciences co"
+ ],
+ "examples": {
+  "behaviours_automated": {
+   "Locomotion / distance travelled": [
+    61,
+    92,
+    109,
+    81
+   ],
+   "Zone / ROI occupancy": [
+    126,
+    60,
+    118,
+    26
+   ],
+   "Social interaction / approach": [
+    86,
+    81,
+    134,
+    39
+   ],
+   "Anogenital / body sniffing": [
+    60,
+    152,
+    32,
+    54
+   ],
+   "Grooming": [
+    0,
+    73,
+    150,
+    10
+   ],
+   "Attack / fighting / biting": [
+    39,
+    102,
+    130,
+    92
+   ],
+   "Rearing": [
+    68,
+    18,
+    0,
+    71
+   ],
+   "Freezing": [
+    29,
+    13,
+    12,
+    28
+   ],
+   "Avoidance / escape / flight": [
+    102,
+    29,
+    126,
+    132
+   ],
+   "Operant / self-administration": [
+    17,
+    147,
+    56,
+    90
+   ],
+   "Feeding / licking / drinking": [
+    102,
+    30,
+    41,
+    8
+   ],
+   "Defensive posture / risk assessment": [
+    161,
+    96,
+    97,
+    92
+   ],
+   "Mating / mounting": [
+    51,
+    26,
+    81,
+    106
+   ],
+   "Pup retrieval / maternal care": [
+    102,
+    156,
+    148,
+    37
+   ],
+   "Climbing / jumping": [
+    18,
+    122,
+    68,
+    0
+   ],
+   "Object exploration / novel object": [
+    99,
+    2,
+    62,
+    61
+   ],
+   "Immobility / motionless": [
+    37,
+    47,
+    70,
+    74
+   ],
+   "Tail rattling / dominance display": [
+    106,
+    51,
+    0,
+    102
+   ],
+   "Following / chasing / pursuit": [
+    102,
+    45,
+    17,
+    106
+   ],
+   "Head-twitch response": [
+    75,
+    37,
+    76,
+    124
+   ],
+   "Darting": [
+    29,
+    7,
+    37,
+    161
+   ],
+   "Stereotypy (circling / pacing / Straub tail)": [
+    18,
+    90,
+    73,
+    45
+   ],
+   "Digging / burrowing": [
+    148,
+    0,
+    44,
+    15
+   ],
+   "Swimming / rheotaxis / hovering": [
+    74,
+    39,
+    84,
+    34
+   ],
+   "Gait / balance beam": [
+    47,
+    94,
+    61,
+    150
+   ],
+   "Foraging / food handling": [
+    74,
+    1,
+    134
+   ],
+   "Maze arm entries / spatial task": [
+    97,
+    2,
+    51
+   ],
+   "Cleaning interaction / jolts (fish)": [
+    134,
+    46
+   ],
+   "Wheel running": [
+    5
+   ],
+   "Hind-limb clasping": [
+    61
+   ],
+   "Whisking / head scanning": [
+    97
+   ]
+  },
+  "behaviors": {
+   "Social interaction": [
+    145,
+    34,
+    117,
+    88
+   ],
+   "Aggression / attack": [
+    129,
+    151,
+    40,
+    102
+   ],
+   "Locomotion / open field": [
+    123,
+    116,
+    9,
+    166
+   ],
+   "Feeding / consumption": [
+    20,
+    93,
+    115,
+    132
+   ],
+   "Grooming": [
+    0,
+    66,
+    73,
+    44
+   ],
+   "Avoidance": [
+    130,
+    7,
+    26,
+    13
+   ],
+   "Gait / balance": [
+    72,
+    151,
+    116,
+    36
+   ],
+   "Rearing": [
+    1,
+    129,
+    104,
+    26
+   ],
+   "Sniffing": [
+    21,
+    50,
+    31,
+    49
+   ],
+   "Freezing": [
+    19,
+    29,
+    65,
+    51
+   ],
+   "Pup retrieval / maternal": [
+    144,
+    72,
+    12,
+    43
+   ],
+   "Immobility (FST/TST)": [
+    64,
+    76,
+    146,
+    97
+   ],
+   "Mating / sexual": [
+    115,
+    32,
+    48,
+    11
+   ],
+   "Head-twitch (HTR)": [
+    156,
+    37,
+    75,
+    64
+   ]
+  },
+  "regions": {
+   "Prefrontal cortex": [
+    153,
+    127,
+    49,
+    23
+   ],
+   "Hippocampus": [
+    105,
+    63,
+    159,
+    21
+   ],
+   "Amygdala": [
+    42,
+    30,
+    49,
+    98
+   ],
+   "Hypothalamus": [
+    59,
+    89,
+    143,
+    114
+   ],
+   "Striatum": [
+    5,
+    26,
+    92,
+    7
+   ],
+   "Nucleus accumbens": [
+    6,
+    72,
+    30,
+    121
+   ],
+   "VTA": [
+    22,
+    140,
+    72,
+    26
+   ],
+   "Thalamus": [
+    97,
+    10,
+    40,
+    164
+   ],
+   "Cerebellum": [
+    93,
+    66,
+    111,
+    137
+   ],
+   "BNST": [
+    65,
+    21,
+    111,
+    56
+   ],
+   "Habenula": [
+    99,
+    144,
+    146,
+    143
+   ],
+   "Insula": [
+    67,
+    56,
+    121,
+    11
+   ],
+   "Cingulate cortex": [
+    40,
+    67,
+    83,
+    65
+   ],
+   "Periaqueductal gray": [
+    100,
+    139,
+    56,
+    97
+   ]
+  },
+  "methods": {
+   "DeepLabCut": [
+    26,
+    148,
+    147,
+    156
+   ],
+   "Electrophysiology": [
+    106,
+    66,
+    144,
+    13
+   ],
+   "Optogenetics": [
+    140,
+    107,
+    70,
+    15
+   ],
+   "Viral tracing (AAV)": [
+    66,
+    137,
+    70,
+    25
+   ],
+   "Transcriptomics": [
+    159,
+    139,
+    44,
+    109
+   ],
+   "BORIS annotation": [
+    71,
+    44,
+    72,
+    52
+   ],
+   "EthoVision": [
+    167,
+    53,
+    122,
+    107
+   ],
+   "SLEAP": [
+    131,
+    10,
+    28,
+    126
+   ],
+   "c-Fos mapping": [
+    98,
+    146,
+    160,
+    93
+   ],
+   "Immunohistochemistry": [
+    144,
+    19,
+    21,
+    146
+   ],
+   "Fiber photometry": [
+    57,
+    147,
+    15,
+    143
+   ],
+   "Chemogenetics (DREADD)": [
+    67,
+    32,
+    26,
+    146
+   ],
+   "Calcium imaging": [
+    141,
+    26,
+    22,
+    69
+   ],
+   "AnyMaze": [
+    68,
+    9,
+    21,
+    147
+   ],
+   "Ultrasonic vocalisation": [
+    38,
+    105,
+    109,
+    7
+   ],
+   "B-SOiD": [
+    118,
+    68,
+    133,
+    10
+   ],
+   "SHAP explainability": [
+    37,
+    5,
+    92,
+    129
+   ],
+   "Keypoint-MoSeq": [
+    94,
+    96,
+    55,
+    100
+   ],
+   "Microdialysis": [
+    139,
+    117,
+    54,
+    146
+   ],
+   "EEG / LFP recording": [
+    2,
+    50,
+    94,
+    122
+   ],
+   "qPCR": [
+    127,
+    121,
+    21,
+    163
+   ],
+   "A-SOiD": [
+    51,
+    129,
+    68,
+    123
+   ],
+   "VAME": [
+    101,
+    10,
+    107,
+    106
+   ],
+   "Western blot": [
+    85,
+    53,
+    6,
+    2
+   ],
+   "UMAP / t-SNE": [
+    26,
+    72,
+    145,
+    70
+   ],
+   "TopScan / CleverSys": [
+    75,
+    38,
+    123,
+    37
+   ],
+   "Telemetry": [
+    117,
+    38,
+    116,
+    115
+   ],
+   "XGBoost": [
+    48,
+    120
+   ],
+   "Lightning Pose": [
+    163,
+    69
+   ],
+   "DANNCE": [
+    107,
+    106
+   ],
+   "ezTrack": [
+    148
+   ]
+  },
+  "diseases": {
+   "Addiction / substance use": [
+    117,
+    85,
+    59,
+    123
+   ],
+   "Anxiety": [
+    6,
+    0,
+    159,
+    75
+   ],
+   "Stress / depression": [
+    56,
+    42,
+    83,
+    85
+   ],
+   "Pain / analgesia": [
+    92,
+    122,
+    21,
+    47
+   ],
+   "Psychedelics": [
+    153,
+    65,
+    37,
+    44
+   ],
+   "Autism (ASD)": [
+    61,
+    155,
+    86,
+    54
+   ],
+   "Schizophrenia": [
+    42,
+    132,
+    144,
+    164
+   ],
+   "Fear conditioning": [
+    159,
+    38,
+    93,
+    29
+   ],
+   "Ageing": [
+    153,
+    163,
+    94,
+    63
+   ],
+   "Epilepsy / seizure": [
+    121,
+    68,
+    11,
+    94
+   ],
+   "Early-life stress": [
+    0,
+    12,
+    34,
+    148
+   ],
+   "Sleep / circadian": [
+    161,
+    111,
+    117,
+    38
+   ],
+   "Parkinson's": [
+    104,
+    167,
+    47,
+    43
+   ],
+   "Social defeat": [
+    96,
+    23,
+    58,
+    17
+   ],
+   "Alzheimer's / dementia": [
+    2,
+    48,
+    160,
+    151
+   ],
+   "PTSD": [
+    28,
+    59,
+    38,
+    89
+   ],
+   "Neuroinflammation": [
+    8,
+    2,
+    127,
+    62
+   ],
+   "Obesity / diet": [
+    19,
+    160,
+    127,
+    121
+   ],
+   "Stroke / ischemia": [
+    86,
+    67,
+    101,
+    40
+   ],
+   "Prenatal exposure": [
+    16,
+    152,
+    161,
+    86
+   ],
+   "Neuropathic pain": [
+    110,
+    161,
+    122,
+    142
+   ],
+   "Huntington's": [
+    96,
+    47,
+    94,
+    104
+   ],
+   "ADHD": [
+    71,
+    16,
+    53,
+    61
+   ],
+   "Rett syndrome": [
+    148,
+    31,
+    61,
+    94
+   ],
+   "Traumatic brain injury": [
+    120,
+    94,
+    43,
+    40
+   ],
+   "Fragile X": [
+    49,
+    31
+   ]
+  }
+ },
  "wordcloud": [
   [
    "DeepLabCut",
-   147
+   148
   ],
   [
    "Pose estimation",
-   146
+   147
   ],
   [
    "Machine learning",
-   128
+   129
   ],
   [
    "Locomotion",
-   92
+   93
   ],
   [
    "C57BL/6",
-   92
+   93
   ],
   [
    "Anxiety",
@@ -272,7 +1432,7 @@
   ],
   [
    "Random forest",
-   64
+   65
   ],
   [
    "Open field",
@@ -283,11 +1443,11 @@
    61
   ],
   [
-   "Hypothalamus",
-   59
+   "CNN / ResNet",
+   60
   ],
   [
-   "CNN / ResNet",
+   "Hypothalamus",
    59
   ],
   [
@@ -300,14 +1460,14 @@
   ],
   [
    "Feeding",
+   55
+  ],
+  [
+   "Sniffing",
    54
   ],
   [
    "Electrophysiology",
-   53
-  ],
-  [
-   "Sniffing",
    53
   ],
   [
@@ -331,19 +1491,19 @@
    44
   ],
   [
+   "Keypoint tracking",
+   44
+  ],
+  [
    "Optogenetics",
    43
   ],
   [
-   "Keypoint tracking",
+   "Transgenic",
    43
   ],
   [
    "Autism",
-   42
-  ],
-  [
-   "Transgenic",
    42
   ],
   [
@@ -395,11 +1555,15 @@
    33
   ],
   [
+   "SLEAP",
+   33
+  ],
+  [
    "GABA",
    32
   ],
   [
-   "SLEAP",
+   "Primate",
    32
   ],
   [
@@ -408,10 +1572,6 @@
   ],
   [
    "c-Fos",
-   31
-  ],
-  [
-   "Primate",
    31
   ],
   [
@@ -455,16 +1615,16 @@
    29
   ],
   [
+   "Licking",
+   29
+  ],
+  [
    "Extinction",
    29
   ],
   [
    "Ketamine",
    29
-  ],
-  [
-   "Licking",
-   28
   ],
   [
    "DREADD",
@@ -495,6 +1655,10 @@
    26
   ],
   [
+   "Nesting",
+   25
+  ],
+  [
    "Epilepsy",
    25
   ],
@@ -504,14 +1668,6 @@
   ],
   [
    "BNST",
-   24
-  ],
-  [
-   "Y-maze",
-   24
-  ],
-  [
-   "Nesting",
    24
   ],
   [
@@ -539,6 +1695,10 @@
    22
   ],
   [
+   "Three-chamber",
+   21
+  ],
+  [
    "CRF",
    21
   ],
@@ -555,7 +1715,7 @@
    21
   ],
   [
-   "Three-chamber",
+   "Alzheimer's",
    20
   ],
   [
@@ -579,7 +1739,7 @@
    19
   ],
   [
-   "Alzheimer's",
+   "Object recognition",
    19
   ],
   [
@@ -600,10 +1760,6 @@
   ],
   [
    "AnyMaze",
-   18
-  ],
-  [
-   "Object recognition",
    18
   ],
   [
@@ -659,6 +1815,10 @@
    16
   ],
   [
+   "Startle",
+   16
+  ],
+  [
    "Clozapine",
    15
   ],
@@ -688,10 +1848,6 @@
   ],
   [
    "Endocannabinoid",
-   15
-  ],
-  [
-   "Startle",
    15
   ],
   [
@@ -851,8 +2007,16 @@
    7
   ],
   [
+   "Gait",
+   7
+  ],
+  [
    "Huntington's",
    7
+  ],
+  [
+   "Y-maze",
+   6
   ],
   [
    "Two-photon",
@@ -872,10 +2036,6 @@
   ],
   [
    "TopScan / CleverSys",
-   6
-  ],
-  [
-   "Gait",
    6
   ],
   [
