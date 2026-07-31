@@ -93,7 +93,7 @@ Notes on development
 
    <div class="simba-orbit-foot">
      <video autoplay loop muted playsinline preload="auto"
-            aria-label="Running SimBA mouse">
-       <source src="_static/img/mouse_run_simba_rainbow_34.webm" type="video/webm">
+            aria-label="Beating SimBA heart">
+       <source src="_static/img/heart_simba.webm" type="video/webm">
      </video>
    </div>
