@@ -29,12 +29,12 @@ except:
     OutputColorType = None
 from ultralytics import YOLO
 
-from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
                                 check_nvidea_gpu_available, check_str,
-                                check_valid_boolean, check_valid_tuple)
+                                check_valid_boolean, check_valid_tuple,
+                                is_torch_cuda_available)
 from simba.utils.data import (df_smoother, resample_geometry_vertices,
                               resample_geometry_vertices_numba,
                               savgol_smoother)
@@ -519,7 +519,7 @@ class YoloNVDECInference(object):
         if max_workers is not None:
             check_int(name=f'{self.__class__.__name__} max_workers', value=max_workers, min_value=1, max_value=find_core_cnt()[0])
         else:
-            _, gpu_info = _is_cuda_available()
+            _, gpu_info = is_torch_cuda_available()
             max_workers = 0
             for gid in gpu_ids:
                 gpu_name = gpu_info[gid]['model'] if gpu_info and gid in gpu_info else None

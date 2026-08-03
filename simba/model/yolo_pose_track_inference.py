@@ -19,11 +19,11 @@ except:
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
                                 check_valid_boolean, check_valid_lst,
-                                check_valid_tuple, get_fn_ext)
+                                check_valid_tuple, get_fn_ext,
+                                is_torch_cuda_available)
 from simba.utils.enums import Options
 from simba.utils.errors import (CountError, InvalidFilepathError,
                                 InvalidFileTypeError, SimBAGPUError)
@@ -139,7 +139,7 @@ class YOLOPoseTrackInference():
 
         _ = get_pkg_version(pkg='ultralytics', raise_error=True)
         _ = get_pkg_version(pkg='torch', raise_error=True)
-        gpu_available, gpus = _is_cuda_available()
+        gpu_available, gpus = is_torch_cuda_available()
         if not gpu_available:
             raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
         else:

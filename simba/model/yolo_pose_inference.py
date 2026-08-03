@@ -24,11 +24,11 @@ import pandas as pd
 
 warnings.filterwarnings("ignore")
 
-from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_instance, check_int,
                                 check_valid_boolean, check_valid_lst,
-                                check_valid_tuple, get_fn_ext)
+                                check_valid_tuple, get_fn_ext,
+                                is_torch_cuda_available)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import (CountError, InvalidFilepathError,
                                 InvalidFileTypeError, SimBAGPUError,
@@ -107,6 +107,7 @@ class YOLOPoseInference():
                  box_threshold: float = 0.5,
                  bbox_size: Optional[Tuple[int, int]] = None,
                  max_tracks: Optional[int] = None,
+                 max_per_class: Optional[int] = None,
                  interpolate: bool = False,
                  smoothing: Optional[int] = None,
                  imgsz: int = 640,
@@ -116,7 +117,7 @@ class YOLOPoseInference():
                  randomize_order: bool = False,
                  recursive: bool = False):
 
-        gpu_available, gpus = _is_cuda_available()
+        gpu_available, gpus = is_torch_cuda_available()
         if not gpu_available:
             raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
         else:

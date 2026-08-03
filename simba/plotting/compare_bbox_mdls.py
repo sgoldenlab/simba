@@ -16,7 +16,6 @@ try:
 except ModuleNotFoundError:
     YOLO = None
 
-from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.model.yolo_inference import YoloInference
 from simba.plotting.yolo_visualize import COLOR_BY_OPTIONS, YOLOVisualizer
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
@@ -24,7 +23,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_int, check_str,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_boolean, check_valid_lst)
+                                check_valid_boolean, check_valid_lst,
+                                is_torch_cuda_available)
 from simba.utils.data import get_cpu_pool, terminate_cpu_pool
 from simba.utils.enums import Options
 from simba.utils.errors import (InvalidInputError, InvalidVideoFileError,
@@ -119,7 +119,7 @@ class YoloModelComparator():
                  time_window: Optional[Dict[str, str]] = None,
                  verbose: bool = True):
 
-        if not _is_cuda_available()[0]:
+        if not is_torch_cuda_available()[0]:
             raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
         if YOLO is None:
             raise SimBAPAckageVersionError(msg='ultralytics.YOLO package not detected.', source=self.__class__.__name__)

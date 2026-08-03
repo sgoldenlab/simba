@@ -19,13 +19,13 @@ except ModuleNotFoundError:
 import numpy as np
 import pandas as pd
 
-from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.third_party_label_appenders.converters import \
     yolo_obb_data_to_bounding_box
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_instance, check_int,
                                 check_str, check_valid_boolean,
-                                check_valid_lst, check_valid_tuple, get_fn_ext)
+                                check_valid_lst, check_valid_tuple,
+                                get_fn_ext, is_torch_cuda_available)
 from simba.utils.data import df_smoother, savgol_smoother
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import (InvalidVideoFileError, SimBAGPUError,
@@ -131,7 +131,7 @@ class YoloInference():
                  bbox_size: Optional[Tuple[int, int]] = None,
                  stream: Optional[bool] = True) -> Union[None, Dict[str, pd.DataFrame]]:
 
-        if not _is_cuda_available()[0]:
+        if not is_torch_cuda_available()[0]:
             raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
         if YOLO is None:
             raise SimBAPAckageVersionError(msg='ultralytics.YOLO package not detected.', source=self.__class__.__name__)

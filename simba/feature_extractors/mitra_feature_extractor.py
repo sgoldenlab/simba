@@ -21,15 +21,15 @@ from simba.utils.read_write import (SimbaTimer, get_fn_ext, read_df,
                                     stdout_information, stdout_success,
                                     write_df)
 
-NOSE = 'nose'
-LEFT_SIDE = 'lat_left'
-RIGHT_SIDE = 'lat_right'
-LEFT_EAR = 'left_ear'
-RIGHT_EAR = 'right_ear'
-CENTER = 'center'
-TAIL_BASE = 'tail_base'
-TAIL_CENTER = 'tail_center'
-TAIL_TIP = 'tail_end'
+NOSE = 'Nose'
+LEFT_SIDE = 'Left_Side'
+RIGHT_SIDE = 'Right_Side'
+LEFT_EAR = 'Left_Ear'
+RIGHT_EAR = 'Right_Ear'
+CENTER = 'Center'
+TAIL_BASE = 'Tail_Base'
+TAIL_CENTER = 'Tail_Center'
+TAIL_TIP = 'Tail_End'
 
 REQUIRED_BODYPARTS = (NOSE, LEFT_SIDE, RIGHT_SIDE, LEFT_EAR, RIGHT_EAR, CENTER, TAIL_BASE, TAIL_CENTER, TAIL_TIP)
 
@@ -243,6 +243,10 @@ class MitraFeatureExtractor(ConfigReader,
 
 # feature_extractor = MitraFeatureExtractor(config_path=r"H:\projects\jason_zhang\jason_project\project_folder\project_config.ini")
 # feature_extractor.run()
+
+# feature_extractor = MitraFeatureExtractor(config_path=r"I:\mitra\nick_ressler\project_folder\project_config.ini")
+# feature_extractor.run()
+
 
 
 

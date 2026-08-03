@@ -57,8 +57,6 @@ try:
 except ImportError:
     nvc = None
 
-
-
 @cuda.jit(device=True)
 def _cuda_sum(x: np.ndarray):
     """
@@ -355,13 +353,20 @@ def _cuda_mac(x: np.ndarray):
 
 def _is_cuda_available() -> Tuple[bool, Dict[int, Any]]:
     """
-    Check if GPU available. If True, returns the GPUs, the model, physical slots and compute capabilitie(s).
+    Check if GPU available **to numba**. If True, returns the GPUs, the model, physical slots and compute capabilitie(s).
+
+    Use this check for code paths that run ``numba`` CUDA kernels. ``numba.cuda.is_available()`` requires both the
+    NVIDIA driver *and* ``libNVVM`` (numba's JIT compiler backend, shipped with the CUDA toolkit), so it returns False
+    on machines where the GPU is otherwise usable - do not use it to gate ``torch`` code paths.
+
+    .. seealso::
+       For the ``torch`` equivalent, required by YOLO and SAM, see :func:`~simba.utils.checks.is_torch_cuda_available`.
 
     :return: Two-part tuple with first value indicating with the GPU is available (bool) and the second value denoting GPU attributes (dict).
     :rtype: Tuple[bool, Dict[int, Any]]
     """
-    is_available = cuda.is_available()
-    devices = None
+
+    is_available, devices = cuda.is_available(), None
     if is_available:
         devices = {}
         for gpu_cnt, gpu in enumerate(cuda.gpus):
@@ -372,8 +377,6 @@ def _is_cuda_available() -> Tuple[bool, Dict[int, Any]]:
                                 'PCI_bus_id': gpu.PCI_BUS_ID}
 
     return is_available, devices
-
-
 
 @cuda.jit(device=True)
 def _cuda_bubble_sort(x):

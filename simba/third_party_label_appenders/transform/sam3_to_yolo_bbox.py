@@ -36,14 +36,14 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_nvidea_gpu_available, check_str,
                                 check_valid_boolean, check_valid_lst,
                                 check_valid_tuple)
-from simba.utils.errors import NoFilesFoundError, SimBAPAckageVersionError
+from simba.utils.errors import (InvalidInputError, NoFilesFoundError,
+                                SimBAPAckageVersionError)
 from simba.utils.printing import (SimbaTimer, stdout_information,
                                   stdout_success, stdout_warning)
 from simba.utils.read_write import (create_directory,
                                     find_all_videos_in_directory, get_fn_ext,
                                     get_pkg_version, get_video_meta_data,
                                     read_frm_of_video, recursive_file_search)
-from simba.utils.yolo import create_yolo_sample_visualizations
 
 
 class SAM3ToYoloBBox:
@@ -83,17 +83,19 @@ class SAM3ToYoloBBox:
     :param bool recursive: If True and ``video_data`` is a directory, search it and all subdirectories for videos. Ignored if ``video_data`` is a file path or a list. Default False.
     :param Optional[int] seed: Random seed for reproducible frame sampling.
     :param Optional[int] max_detections: Maximum number of detections to keep per frame (sorted by confidence descending). If None, all detections above ``conf`` are kept. Default None.
-    :param Optional[Tuple[int, int]] min_size: If provided, a ``(height, width)`` tuple in pixels. Only bounding boxes at or above this size (measured on the raw SAM3 detection, before ``buffer_pct`` expansion and image clipping) are retained; smaller boxes are discarded. If None, no size filtering is applied. Default None.
-    :param bool visualize: If True, saves annotated images with bounding-box overlays to a ``visualizations`` subfolder inside ``save_dir``. Useful for verifying SAM3 annotation quality. Default False.
+    :param Optional[Tuple[int, int]] min_size: If provided, a ``(height, width)`` tuple in pixels. Only bounding boxes at or above this size (measured on the raw SAM3 detection, before ``buffer_pct`` expansion and image clipping) are retained; smaller boxes are discarded. If None, no lower size bound is applied. Default None.
+    :param Optional[Tuple[int, int]] max_size: If provided, a ``(height, width)`` tuple in pixels. Only bounding boxes at or below this size (measured on the raw SAM3 detection, before ``buffer_pct`` expansion and image clipping) are retained; larger boxes are discarded. Useful for rejecting detections that span most of the frame, e.g. when the text prompt latches onto the arena rather than the animal. Can be combined with ``min_size`` to keep boxes within a size band. If None, no upper size bound is applied. Default None.
+    :param bool visualize: If True, saves annotated images with bounding-box overlays to a ``visualizations`` subfolder inside ``save_dir``. Overlays are drawn by the same renderer as ``preview``, so a saved visualization is identical to the previewed frame except that it is drawn on the image actually written to ``images/`` (i.e. after ``greyscale`` / ``clahe``). Boxes are read back from the written label file, so these images also verify what is on disk. Useful for verifying SAM3 annotation quality. Default False.
     :param Optional[int] min_frame_gap: Minimum number of frames between sampled frames. Enforces temporal diversity so samples are spread across the video rather than clustered. If ``None``, frames are sampled purely at random. Default ``None``.
     :param bool shuffle_videos: If True, randomize the order in which videos are processed. Default False.
     :param float io_timeout: Seconds to keep retrying file I/O (read/write) when the operation fails (e.g. temporary drive disconnect). Default 30.0.
-    :param bool preview: If True, opens a ``cv2`` window displaying each evaluated frame at its original resolution with any detected bounding boxes drawn. Frames with no detection are labelled ``NO DETECTION``. Press ``q`` to abort. Useful for spotting false negatives. Default False.
+    :param bool preview: If True, opens a ``cv2`` window displaying each evaluated frame at its original resolution with any detected bounding boxes drawn. Frames with no detection are labelled ``NO DETECTION``. Press ``q`` to abort. Useful for spotting false negatives. See ``visualize`` to save these same annotated frames to disk. Default False.
     :param Optional[Tuple[str, ...]] skip_substr: If provided, any video whose filename contains one of these substrings (case-insensitive) is skipped. Default None.
     :param Optional[Tuple[int, int]] video_size: If provided, a ``(height, width)`` tuple. Only videos matching this exact resolution are kept; all others are skipped. Default None.
     :param bool verbose: If True, print progress updates. Default True.
 
     :raises SimBAGPUError: If no NVIDIA GPU is detected (via ``nvidia-smi``).
+    :raises InvalidInputError: If ``max_size`` is smaller than ``min_size`` in either dimension.
     :raises SimBAPAckageVersionError: If ``ultralytics`` is not installed, or ``SAM3SemanticPredictor`` cannot be imported.
 
     :example:
@@ -118,6 +120,7 @@ class SAM3ToYoloBBox:
                  consecutive_miss_limit: int = 100,
                  max_detections: Optional[int] = None,
                  min_size: Optional[Tuple[int, int]] = None,
+                 max_size: Optional[Tuple[int, int]] = None,
                  recursive: bool = False,
                  seed: Optional[int] = None,
                  visualize: bool = False,
@@ -152,7 +155,7 @@ class SAM3ToYoloBBox:
         check_int(name=f'{self.__class__.__name__} n_frames', value=n_frames, min_value=1)
         check_valid_tuple(x=names, source=f'{self.__class__.__name__} names', minimum_length=1, valid_dtypes=(str,))
         check_float(name=f'{self.__class__.__name__} train_val_split', value=train_val_split, min_value=0.1, max_value=0.9)
-        check_float(name=f'{self.__class__.__name__} conf', value=conf, min_value=0.01, max_value=1.0)
+        check_float(name=f'{self.__class__.__name__} conf', value=conf, min_value=0.0001, max_value=1.0)
         check_int(name=f'{self.__class__.__name__} imgsz', value=sam_imgsz, min_value=32)
         check_valid_boolean(value=greyscale, source=f'{self.__class__.__name__} greyscale')
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose')
@@ -168,6 +171,12 @@ class SAM3ToYoloBBox:
             check_valid_tuple(x=min_size, source=f'{self.__class__.__name__} min_size', accepted_lengths=(2,), valid_dtypes=(int,))
             check_int(name=f'{self.__class__.__name__} min_size height', value=min_size[0], min_value=1)
             check_int(name=f'{self.__class__.__name__} min_size width', value=min_size[1], min_value=1)
+        if max_size is not None:
+            check_valid_tuple(x=max_size, source=f'{self.__class__.__name__} max_size', accepted_lengths=(2,), valid_dtypes=(int,))
+            check_int(name=f'{self.__class__.__name__} max_size height', value=max_size[0], min_value=1)
+            check_int(name=f'{self.__class__.__name__} max_size width', value=max_size[1], min_value=1)
+            if min_size is not None and (max_size[0] < min_size[0] or max_size[1] < min_size[1]):
+                raise InvalidInputError(msg=f'max_size {max_size} cannot be smaller than min_size {min_size} in either dimension, no box could satisfy both.', source=self.__class__.__name__)
         if seed is not None: check_int(name=f'{self.__class__.__name__} seed', value=seed)
         check_valid_boolean(value=preview, source=f'{self.__class__.__name__} preview')
         if skip_substr is not None:
@@ -175,7 +184,7 @@ class SAM3ToYoloBBox:
         if video_size is not None:
             check_valid_tuple(x=video_size, source=f'{self.__class__.__name__} video_size', minimum_length=2, valid_dtypes=(int,))
         self.preview = preview
-        self.min_size = min_size
+        self.min_size, self.max_size = min_size, max_size
         self.skip_substr = skip_substr
         self.video_size = video_size
         self.video_data, self.sam_path, self.save_dir, self.txt_prompt = video_data, sam_path, save_dir, txt_prompt
@@ -233,43 +242,28 @@ class SAM3ToYoloBBox:
         with open(path, 'w') as f:
             f.write(content)
 
-    def _preview_frame(self, frame: np.ndarray, result, img_w: int, img_h: int, video_name: str, frame_idx: int) -> bool:
-        """Show a preview window with detections drawn at original resolution. Auto-advances. Returns False if user pressed 'q' to quit."""
-        vis = frame.copy()
-        has_det = result is not None and result.boxes is not None and len(result.boxes) > 0
-        drawn = 0
-        if has_det:
-            box_indices = sorted(range(len(result.boxes)), key=lambda i: float(result.boxes.conf[i].cpu()), reverse=True)
-            for i in box_indices:
-                if float(result.boxes.conf[i].cpu()) < self.conf:
-                    continue
-                if self.max_detections is not None and drawn >= self.max_detections:
-                    break
-                xyxy = result.boxes.xyxy[i].cpu().numpy()
-                bx1, by1, bx2, by2 = float(xyxy[0]), float(xyxy[1]), float(xyxy[2]), float(xyxy[3])
-                if self.min_size is not None and ((by2 - by1) < self.min_size[0] or (bx2 - bx1) < self.min_size[1]):
-                    continue
-                if self.buffer_pct > 0:
-                    bw, bh = bx2 - bx1, by2 - by1
-                    bx1 -= bw * self.buffer_pct
-                    by1 -= bh * self.buffer_pct
-                    bx2 += bw * self.buffer_pct
-                    by2 += bh * self.buffer_pct
-                x1 = int(max(0.0, min(float(img_w), bx1)))
-                y1 = int(max(0.0, min(float(img_h), by1)))
-                x2 = int(max(0.0, min(float(img_w), bx2)))
-                y2 = int(max(0.0, min(float(img_h), by2)))
-                cv2.rectangle(vis, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                conf_val = float(result.boxes.conf[i].cpu())
-                cv2.putText(vis, f'{conf_val:.2f}', (x1, max(y1 - 5, 12)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-                drawn += 1
-        if drawn == 0:
+    def _annotate_frame(self, img: np.ndarray, label_str: str, video_name: str, frame_idx: int, confs: Optional[List[float]] = None) -> np.ndarray:
+        """Draw the YOLO boxes in ``label_str`` onto ``img`` at its original resolution. Shared by ``preview`` and ``visualize`` so both render identical annotations. Greyscale images are promoted to BGR so the overlays stay colored."""
+        vis = img.copy() if img.ndim > 2 else cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+        img_h, img_w = vis.shape[:2]
+        lines = [l for l in label_str.strip().split('\n') if len(l.split()) >= 5] if label_str else []
+        for line_cnt, line in enumerate(lines):
+            parts = line.split()
+            xc, yc, w, h = float(parts[1]), float(parts[2]), float(parts[3]), float(parts[4])
+            x1, y1 = int((xc - w / 2) * img_w), int((yc - h / 2) * img_h)
+            x2, y2 = int((xc + w / 2) * img_w), int((yc + h / 2) * img_h)
+            cv2.rectangle(vis, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            if confs is not None and line_cnt < len(confs):
+                cv2.putText(vis, f'{confs[line_cnt]:.2f}', (x1, max(y1 - 5, 12)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+        if len(lines) == 0:
             cv2.putText(vis, 'NO DETECTION', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
-        title = f'{video_name} | frm {frame_idx}'
-        cv2.putText(vis, title, (10, img_h - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1)
-        cv2.imshow('SAM3 Preview', vis)
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord('q'):
+        cv2.putText(vis, f'{video_name} | frm {frame_idx}', (10, img_h - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1)
+        return vis
+
+    def _preview_frame(self, frame: np.ndarray, label_str: str, video_name: str, frame_idx: int, confs: Optional[List[float]] = None) -> bool:
+        """Show a preview window with detections drawn at original resolution. Auto-advances. Returns False if user pressed 'q' to quit."""
+        cv2.imshow('SAM3 Preview', self._annotate_frame(img=frame, label_str=label_str, video_name=video_name, frame_idx=frame_idx, confs=confs))
+        if (cv2.waitKey(1) & 0xFF) == ord('q'):
             cv2.destroyAllWindows()
             return False
         return True
@@ -350,24 +344,26 @@ class SAM3ToYoloBBox:
                 if r.boxes is None or len(r.boxes) == 0:
                     consecutive_misses += 1
                     if self.preview:
-                        if not self._preview_frame(frame, r, img_w, img_h, video_name, frame_idx):
+                        if not self._preview_frame(frame=frame, label_str='', video_name=video_name, frame_idx=frame_idx):
                             break
                     if self.verbose:
                         stdout_information(msg=f'Video {video_cnt}/{total_videos} ({video_name}), frame idx {frame_idx}: no detection found (consecutive misses: {consecutive_misses}/{self.consecutive_miss_limit})')
                     continue
 
-                label_str = self._boxes_to_yolo_label(r, img_w, img_h)
+                boxes = self._retained_boxes(result=r, img_w=img_w, img_h=img_h)
+                label_str = self._boxes_to_yolo_label(boxes=boxes, img_w=img_w, img_h=img_h)
+                confs = [b[-1] for b in boxes]
                 if not label_str:
                     consecutive_misses += 1
                     if self.preview:
-                        if not self._preview_frame(frame, None, img_w, img_h, video_name, frame_idx):
+                        if not self._preview_frame(frame=frame, label_str='', video_name=video_name, frame_idx=frame_idx):
                             break
                     if self.verbose:
                         stdout_information(msg=f'Video {video_cnt}/{total_videos} ({video_name}), frame idx {frame_idx}: detections below conf threshold (consecutive misses: {consecutive_misses}/{self.consecutive_miss_limit})')
                     continue
 
                 if self.preview:
-                    if not self._preview_frame(frame, r, img_w, img_h, video_name, frame_idx):
+                    if not self._preview_frame(frame=frame, label_str=label_str, video_name=video_name, frame_idx=frame_idx, confs=confs):
                         break
                 consecutive_misses = 0
                 try:
@@ -389,7 +385,8 @@ class SAM3ToYoloBBox:
                 self._io_with_retry(self._write_label, os.path.join(lbl_dir, f'{sample_name}.txt'), label_str)
 
                 if self.visualize:
-                    create_yolo_sample_visualizations(samples=[(sample_name, img_out, label_str)], save_dir=vis_dir, names=self.names, verbose=False, source=self.__class__.__name__, draw_labels=False)
+                    vis_img = self._annotate_frame(img=img_out, label_str=label_str, video_name=video_name, frame_idx=frame_idx, confs=confs)
+                    self._io_with_retry(cv2.imwrite, os.path.join(vis_dir, f'{sample_name}.png'), vis_img)
 
                 used_indices.append(frame_idx)
                 valid_cnt += 1
@@ -407,14 +404,18 @@ class SAM3ToYoloBBox:
         timer.stop_timer()
         stdout_success(msg=f'YOLO bbox detection project created at {self.save_dir}. ' f'{train_cnt} train, {val_cnt} val samples.', source=self.__class__.__name__, elapsed_time=timer.elapsed_time_str)
 
-    def _boxes_to_yolo_label(self, result, img_w: int, img_h: int) -> str:
+    def _retained_boxes(self, result, img_w: int, img_h: int) -> List[Tuple[int, float, float, float, float, float]]:
+        """The boxes surviving ``conf``, ``max_detections``, ``min_size`` and ``max_size``, expanded by ``buffer_pct`` and clipped to the frame, as ``(class_id, x1, y1, x2, y2, confidence)`` sorted by confidence descending."""
+        if result is None or result.boxes is None or len(result.boxes) == 0:
+            return []
         box_indices = list(range(len(result.boxes)))
         box_indices.sort(key=lambda i: float(result.boxes.conf[i].cpu()), reverse=True)
-        lines = []
+        boxes = []
         for box_idx in box_indices:
-            if float(result.boxes.conf[box_idx].cpu()) < self.conf:
+            conf = float(result.boxes.conf[box_idx].cpu())
+            if conf < self.conf:
                 continue
-            if self.max_detections is not None and len(lines) >= self.max_detections:
+            if self.max_detections is not None and len(boxes) >= self.max_detections:
                 break
 
             cls_id = 0
@@ -426,6 +427,8 @@ class SAM3ToYoloBBox:
             x1, y1, x2, y2 = float(xyxy[0]), float(xyxy[1]), float(xyxy[2]), float(xyxy[3])
             if self.min_size is not None and ((y2 - y1) < self.min_size[0] or (x2 - x1) < self.min_size[1]):
                 continue
+            if self.max_size is not None and ((y2 - y1) > self.max_size[0] or (x2 - x1) > self.max_size[1]):
+                continue
             if self.buffer_pct > 0:
                 bw, bh = x2 - x1, y2 - y1
                 x1 -= bw * self.buffer_pct
@@ -436,6 +439,14 @@ class SAM3ToYoloBBox:
             y1 = max(0.0, min(float(img_h), y1))
             x2 = max(0.0, min(float(img_w), x2))
             y2 = max(0.0, min(float(img_h), y2))
+            boxes.append((cls_id, x1, y1, x2, y2, conf))
+
+        return boxes
+
+    @staticmethod
+    def _boxes_to_yolo_label(boxes: List[Tuple[int, float, float, float, float, float]], img_w: int, img_h: int) -> str:
+        lines = []
+        for cls_id, x1, y1, x2, y2, _ in boxes:
             x_center = ((x1 + x2) / 2.0) / img_w
             y_center = ((y1 + y2) / 2.0) / img_h
             w = (x2 - x1) / img_w
@@ -463,6 +474,32 @@ class SAM3ToYoloBBox:
 #                         visualize=False,
 #                         preview=True)
 # runner.run()
+
+
+# runner = SAM3ToYoloBBox(video_data=[r"G:\netholabs\batch_0731\6.01.023\2026_07_31\2026_07_31_12_58_00_000\right"],
+#                         sam_path=r'D:\sam3\sam3.pt',
+#                         save_dir=r'G:\netholabs\batch_0731\dome_test',
+#                         txt_prompt='dome housing',
+#                         n_frames=10,
+#                         verbose=True,
+#                         conf=0.001,
+#                         max_detections=2,
+#                         buffer_pct=0.15,
+#                         recursive=True,
+#                         consecutive_miss_limit=25,
+#                         skip_substr=('mosaic',),
+#                         video_size=(896, 2016),
+#                         min_size=(75, 75),
+#                         max_size=(400, 400),
+#                         shuffle_videos=True,
+#                         visualize=True,
+#                         preview=True)
+# runner.run()
+
+
+
+
+
 
 
 #NEXCT F:\netholabs\tars_0506

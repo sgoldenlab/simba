@@ -27,7 +27,6 @@ import pandas as pd
 import trafaret as t
 from shapely.geometry import Polygon
 
-from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.enums import Formats, Keys, Options, UMAPParam
 from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 CorruptedFileError, CountError,
@@ -40,7 +39,6 @@ from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 SimBAGPUError, StringError)
 from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning,
                                   InvalidValueWarning, NoDataFoundWarning)
-
 
 def check_file_exist_and_readable(file_path: Union[str, os.PathLike],
                                   raise_error: bool = True) -> bool:
@@ -2326,7 +2324,7 @@ def check_valid_device(device: Union[Literal['cpu'], int], raise_error: bool = T
             raise InvalidInputError(msg=msg, source=source)
         return False
 
-    gpu_available, gpus = _is_cuda_available()
+    gpu_available, gpus = is_torch_cuda_available()
     if not gpu_available:
         if raise_error:
             raise SimBAGPUError(msg=f'No GPU detected but device {device} passed', source=source)
@@ -2336,6 +2334,8 @@ def check_valid_device(device: Union[Literal['cpu'], int], raise_error: bool = T
         if raise_error:
             raise SimBAGPUError(msg=f'Unaccepted GPU device {device} passed. Accepted: {list(gpus.keys())}', source=source)
         return False
+    return True
+
 
 def is_lxc_container() -> bool:
     """
@@ -2506,5 +2506,48 @@ def check_valid_codec(codec: str, raise_error: bool = True, source: str = ''):
         else:
             return False
     return True
+
+
+def is_torch_cuda_available() -> Tuple[bool, Union[Dict[int, Any], None]]:
+    """
+    Helper to check if a GPU is available **to PyTorch**. If True, returns the GPUs, the model and compute capabilitie(s).
+
+    .. note::
+       Use this check for code paths that run on ``torch`` - e.g., YOLO fitting and inference, and SAM inference. A
+       machine can have a perfectly visible NVIDIA GPU (as reported by ``nvidia-smi``) while ``numba`` reports it as
+       unavailable, as ``numba`` additionally requires ``libNVVM`` from the CUDA toolkit which ``torch`` neither needs
+       nor ships. Gating ``torch`` code on the ``numba`` check therefore rejects usable GPUs.
+       See GitHub issue 525 for origin - https://github.com/sgoldenlab/simba/issues/525
+
+    .. note::
+       ``torch`` is imported inside the function, not at module scope. ``simba.__init__`` imports this module, so a
+       module-level ``import torch`` would load torch on *every* SimBA import - which aborts the process with
+       ``OMP: Error #15`` in environments holding more than one ``libiomp5md.dll``. Callers that use torch set
+       ``KMP_DUPLICATE_LIB_OK`` at their own module top, so deferring the import lets that guard take effect first.
+
+    .. seealso::
+       For the ``numba`` equivalent, required by the CUDA kernels in :mod:`simba.data_processors.cuda`, see :func:`~simba.data_processors.cuda.utils._is_cuda_available`.
+       To check for an NVIDIA GPU through ``nvidia-smi``, which evidences a driver only and not that any framework can use it, see :func:`~simba.utils.checks.check_nvidea_gpu_available`.
+
+    :return: Two-part tuple with first value indicating if a GPU is available to torch (bool) and the second value denoting GPU attributes (dict), or None if unavailable.
+    :rtype: Tuple[bool, Union[Dict[int, Any], None]]
+
+    :example:
+
+    >>> is_torch_cuda_available()
+    (True, {0: {'model': 'NVIDIA GeForce RTX 4070', 'compute_capability': 8.9, 'id': 0}})
+    """
+
+    try:
+        import torch
+    except ImportError:
+        torch = None
+    if torch is None or not torch.cuda.is_available():
+        return False, None
+    return True, {i: {'model': torch.cuda.get_device_name(i),
+                      'compute_capability': float('{}.{}'.format(*torch.cuda.get_device_capability(i))),
+                      'id': i}
+                  for i in range(torch.cuda.device_count())}
+
 
 

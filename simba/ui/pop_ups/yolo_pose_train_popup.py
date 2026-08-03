@@ -5,14 +5,13 @@ import tempfile
 from tkinter import *
 from tkinter import messagebox
 
-from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.third_party_label_appenders.transform.utils import \
     check_valid_yolo_map
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
                                         FolderSelect, SimBADropDown)
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists)
+                                check_if_dir_exists, is_torch_cuda_available)
 from simba.utils.enums import Options, PackageNames
 from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
 from simba.utils.read_write import find_core_cnt, get_pkg_version, str_2_bool
@@ -27,9 +26,10 @@ BATCH_SIZE_OPTIONS =  [2, 4, 8, 16, 32, 64, 128]
 devices = ['CPU']
 FORMAT_OPTIONS =  Options.VALID_YOLO_FORMATS.value
 FORMAT_OPTIONS.insert(0, 'None')
+
 class YOLOPoseTrainPopUP(PopUpMixin):
     def __init__(self):
-        gpu_available, gpus = _is_cuda_available()
+        gpu_available, gpus = is_torch_cuda_available()
         if not gpu_available:
             raise SimBAGPUError(msg=f'Cannot train YOLO pose-estimation model. No NVIDA GPUs detected on machine', source=self.__class__.__name__)
         ultralytics_version = get_pkg_version(pkg=PackageNames.ULTRALYTICS.value)
@@ -38,7 +38,7 @@ class YOLOPoseTrainPopUP(PopUpMixin):
 
         PopUpMixin.__init__(self, title="TRAIN YOLO POSE ESTIMATION MODEL", icon='ultralytics_2')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
-        devices.extend([f'{x} : {y["model"]}' for x, y in gpus.items()])
+        device_options = devices + [f'{x} : {y["model"]}' for x, y in (gpus or {}).items()]
         self.yolo_map_path = FileSelect(parent=settings_frm, fileDescription='YOLO MAP FILE (YAML):', lblwidth=35, entry_width=45, file_types=[("YOLO MODEL FILE", ".yaml")], lbl_icon='file', tooltip_key='yolo_map_path')
         self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=45, lbl_icon='save', tooltip_key='SAVE_DIR')
         self.weights_path = FileSelect(parent=settings_frm, fileDescription='INITIAL WEIGHT FILE (E.G., .PT):', lblwidth=35, entry_width=45, lbl_icon='file', tooltip_key='yolo_initial_weights_path')
@@ -51,7 +51,7 @@ class YOLOPoseTrainPopUP(PopUpMixin):
         self.format_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=FORMAT_OPTIONS, label="FORMAT:", label_width=35, dropdown_width=40, value='None', img='file_type', tooltip_key='format_dropdown')
         self.img_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=IMG_SIZE_OPTIONS, label="IMAGE SIZE:", label_width=35, dropdown_width=40, value=640, img='resize', tooltip_key='img_size_dropdown')
         self.patience_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=PATIENCE_OPTIONS, label="PATIENCE:", label_width=35, dropdown_width=40, value=100, img='timer', tooltip_key='patience_dropdown')
-        self.devices_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=devices, label="DEVICE:", label_width=35, dropdown_width=40, value=devices[1], img='gpu_3', tooltip_key='devices_dropdown')
+        self.devices_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=device_options, label="DEVICE:", label_width=35, dropdown_width=40, value=device_options[1] if len(device_options) > 1 else device_options[0], img='gpu_3', tooltip_key='devices_dropdown')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.yolo_map_path.grid(row=0, column=0, sticky=NW)

@@ -21,13 +21,12 @@ except ModuleNotFoundError:
     YOLO = None
     torch = None
 
-from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_img,
                                 check_instance, check_int, check_str,
                                 check_valid_array, check_valid_boolean,
                                 check_valid_device, check_valid_lst,
-                                check_valid_tuple)
+                                check_valid_tuple, is_torch_cuda_available)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import (InvalidFileTypeError, InvalidInputError,
                                 SimBAGPUError, SimBAPAckageVersionError)
@@ -70,7 +69,7 @@ def fit_yolo(weights_path: Union[str, os.PathLike],
     >>> fit_yolo(initial_weights=r"C:/troubleshooting/coco_data/weights/yolov8n-obb.pt", data=r"C:/troubleshooting/coco_data/model.yaml", save_path=r"C:/troubleshooting/coco_data/mdl", batch=16)
     """
 
-    if not _is_cuda_available()[0]:
+    if not is_torch_cuda_available()[0]:
         raise SimBAGPUError(msg='No GPU detected.', source=fit_yolo.__name__)
     check_file_exist_and_readable(file_path=weights_path)
     check_file_exist_and_readable(file_path=model_yaml)

@@ -166,12 +166,37 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
         self.timer.stop_timer()
         stdout_success(msg=f"Machine predictions complete for {len(self.feature_file_paths)} file(s). Files saved in {self.save_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
+
+
+# test = InferenceBatch(config_path=r"H:\projects\jason_zhang\jason_project\project_folder\project_config.ini",
+#                       save_dir=r'H:\projects\jason_zhang\jason_project\project_folder\csv\REARING\200_0.23_smoothing_500ms\csvs',
+#                       model_dict={'REARING': {'model_path': r"H:\projects\jason_zhang\jason_project\models\REARING.sav", 'minimum_bout_length': 200, 'threshold': 0.23}},
+#                       save_agg_stats=r'H:\projects\jason_zhang\jason_project\project_folder\csv\REARING\200_0.23_smoothing_500ms\csvs')
+# test.run()
+
+
+
 # if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 #     parser = argparse.ArgumentParser(description="Perform classifications according to rules defined in SimBA project_config.ini.")
 #     parser.add_argument('--config_path', type=str, required=True, help='Path to SimBA Project config.')
 #     args = parser.parse_args()
 #     runner = InferenceBatch(config_path=args.config_path)
 #     runner.run()
+
+
+# test = InferenceBatch(config_path=r"I:\mitra\nick_ressler\project_folder\project_config.ini",
+#                       save_dir=r'I:\mitra\nick_ressler\grooming_results',
+#                       model_dict={'GROOMING': {'model_path': r"I:\mitra\mdls\GROOMING.sav", 'minimum_bout_length': 500, 'threshold': 0.275}},
+#                       save_agg_stats=r'I:\mitra\nick_ressler\grooming_results')
+# test.run()
+
+# test = InferenceBatch(config_path=r"I:\mitra\nick_ressler\project_folder\project_config.ini",
+#                       save_dir=r'I:\mitra\nick_ressler\rearing_results',
+#                       model_dict={'REARING': {'model_path': r"I:\mitra\mdls\REARING.sav", 'minimum_bout_length': 200, 'threshold': 0.23}},
+#                       save_agg_stats=r'I:\mitra\nick_ressler\rearing_results')
+# test.run()
+
+
 
 
 #

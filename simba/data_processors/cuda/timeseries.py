@@ -272,7 +272,7 @@ def sliding_linearity_index_cuda(x: np.ndarray,
     x = np.ascontiguousarray(x)
     time_window_frames = np.array([max(1.0, np.ceil(window_size * sample_rate))])
     if not _is_cuda_available()[0]:
-        SimBAGPUError(msg='No GPU found', source=sliding_linearity_index_cuda.__name__)
+        raise SimBAGPUError(msg='No GPU found', source=sliding_linearity_index_cuda.__name__)
     x_dev = cuda.to_device(x)
     time_window_frames_dev = cuda.to_device(time_window_frames)
     bpg = (x.shape[0] + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK

@@ -5,7 +5,6 @@ from tkinter import *
 import numpy as np
 
 import simba
-from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.model.yolo_pose_inference import YOLOPoseInference
 from simba.model.yolo_pose_track_inference import YOLOPoseTrackInference
@@ -13,7 +12,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
                                         FolderSelect, SimbaButton,
                                         SimBADropDown)
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists)
+                                check_if_dir_exists, is_torch_cuda_available)
 from simba.utils.enums import Options, PackageNames, Paths
 from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
 from simba.utils.read_write import (find_core_cnt,
@@ -41,7 +40,7 @@ ASSETS_DIR = os.path.join(simba_dir, 'assets')
 class YOLOPoseInferencePopUP(PopUpMixin):
 
     def __init__(self):
-        gpu_available, gpus = _is_cuda_available()
+        gpu_available, gpus = is_torch_cuda_available()
         if not gpu_available:
            raise SimBAGPUError(msg=f'Cannot train YOLO pose-estimation model. No NVIDA GPUs detected on machine',
                                source=self.__class__.__name__)
@@ -51,8 +50,7 @@ class YOLOPoseInferencePopUP(PopUpMixin):
 
         seven_bp_path = os.path.join(YOLO_SCHEMATICS_DIR, 'yolo_7bps.csv')
         PopUpMixin.__init__(self, title="PREDICT USING YOLO POSE ESTIMATION MODEL", icon='ultralytics_2', size=(1100, 700))
-        devices.extend([f'{x} : {y["model"]}' for x, y in gpus.items()])
-        #devices.extend(['TEST'])
+        device_options = devices + [f'{x} : {y["model"]}' for x, y in (gpus or {}).items()]
 
         paths_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MODEL & DATA PATHS", icon_name='browse')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
@@ -68,7 +66,7 @@ class YOLOPoseInferencePopUP(PopUpMixin):
         self.workers_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=CORE_CNT_OPTIONS, label="CPU WORKERS:", label_width=35, dropdown_width=40, value=int(math.ceil((max(CORE_CNT_OPTIONS)/2))), tooltip_key='workers_dropdown', img='cpu_small')
         self.format_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=YOLO_FORMATS, label="FORMAT:", label_width=35, dropdown_width=40, value='None', tooltip_key='format_dropdown', img='system')
         self.img_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=IMG_SIZE_OPTIONS, label="IMAGE SIZE:", label_width=35, dropdown_width=40, value=256, tooltip_key='img_size_dropdown', img='monitor')
-        self.devices_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=devices, label="DEVICE:", label_width=35, dropdown_width=40, value=devices[1], tooltip_key='devices_dropdown', img='gpu_3')
+        self.devices_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=device_options, label="DEVICE:", label_width=35, dropdown_width=40, value=device_options[1] if len(device_options) > 1 else device_options[0], tooltip_key='devices_dropdown', img='gpu_3')
         self.interpolate_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="INTERPOLATE:",  label_width=35, dropdown_width=40, value='TRUE', tooltip_key='interpolate_dropdown', img='line_chart_blue')
         self.stream_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="STREAM:", label_width=35, dropdown_width=40, value='TRUE', tooltip_key='stream_dropdown', img='stream')
         self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTIONS, label="THRESHOLD:", label_width=35, dropdown_width=40, value=0.1, tooltip_key='threshold_dropdown', img='threshold')

@@ -17,11 +17,10 @@ try:
 except ModuleNotFoundError:
     YOLO = None
 
-from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_int, check_str,
                                 check_valid_boolean, check_valid_device,
-                                check_valid_url)
+                                check_valid_url, is_torch_cuda_available)
 from simba.utils.enums import Options
 from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
 from simba.utils.printing import stdout_information
@@ -98,7 +97,7 @@ class FitYolo():
                  device_id: Optional[int] = None):
 
         os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-        gpu_available, gpus = _is_cuda_available()
+        gpu_available, gpus = is_torch_cuda_available()
         if not gpu_available:
             raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
         if device_id is not None:

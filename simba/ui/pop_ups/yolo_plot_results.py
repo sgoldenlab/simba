@@ -2,7 +2,6 @@ from tkinter import *
 
 import numpy as np
 
-from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.yolo_pose_track_visualizer import YOLOPoseTrackVisualizer
 from simba.plotting.yolo_pose_visualizer import YOLOPoseVisualizer
