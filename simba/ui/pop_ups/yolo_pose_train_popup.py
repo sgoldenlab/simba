@@ -4,6 +4,7 @@ import sys
 import tempfile
 from tkinter import *
 from tkinter import messagebox
+from typing import Optional
 
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.third_party_label_appenders.transform.utils import \
@@ -24,8 +25,20 @@ _max_workers = min(find_core_cnt()[0], 8) if sys.platform == 'win32' else find_c
 CORE_CNT_OPTIONS = list(range(1, _max_workers + 1))
 BATCH_SIZE_OPTIONS =  [2, 4, 8, 16, 32, 64, 128]
 devices = ['CPU']
+# How long the training subprocess is watched for immediate death before it is assumed to be running
+STARTUP_POLL_INTERVAL_MS = 1000
+STARTUP_POLL_ATTEMPTS = 60
+CONSOLE_TITLE = 'SimBA - YOLO POSE MODEL TRAINING'
 FORMAT_OPTIONS =  Options.VALID_YOLO_FORMATS.value
 FORMAT_OPTIONS.insert(0, 'None')
+
+
+def _bat_echo_txt(txt: str) -> str:
+    """Escape text so it survives ``echo`` inside a Windows batch file, e.g. paths holding ``&`` or ``%``."""
+    for char in ('^', '&', '|', '<', '>', '(', ')'):
+        txt = txt.replace(char, f'^{char}')
+    return txt.replace('%', '%%')
+
 
 class YOLOPoseTrainPopUP(PopUpMixin):
     def __init__(self):
@@ -80,7 +93,7 @@ class YOLOPoseTrainPopUP(PopUpMixin):
         workers = int(self.workers_dropdown.get_value())
         batch_size = int(self.batch_dropdown.get_value())
         device = self.devices_dropdown.get_value()
-        device_str = 'cpu' if device == 'CPU' else device.split(':', 1)[0]
+        device_str = 'cpu' if device == 'CPU' else device.split(':', 1)[0].strip()
         format_val = None if self.format_dropdown.get_value() == 'None' else self.format_dropdown.get_value()
         imgsz = int(self.img_size_dropdown.get_value())
         patience = int(self.patience_dropdown.get_value())
@@ -111,25 +124,74 @@ class YOLOPoseTrainPopUP(PopUpMixin):
         creationflags = subprocess.CREATE_NEW_CONSOLE if sys.platform == 'win32' else 0
         env = os.environ.copy()
         env['MPLBACKEND'] = 'Agg'
+        status_path = None
         try:
             if sys.platform == 'win32':
-                cmd_line = subprocess.list2cmdline(cmd)
-                with tempfile.NamedTemporaryFile(mode='w', suffix='.bat', delete=False, newline='') as f:
-                    f.write('@echo off\n' + cmd_line + '\npause\n')
-                    bat_path = f.name
-                subprocess.Popen([bat_path], creationflags=creationflags, env=env)
+                tmp_dir = tempfile.mkdtemp(prefix='simba_yolo_train_')
+                bat_path = os.path.join(tmp_dir, 'yolo_train.bat')
+                status_path = os.path.join(tmp_dir, 'exit_code.txt')
+                # A banner is printed before the python call: importing torch and ultralytics takes ~15s during
+                # which the console is otherwise entirely silent and looks like nothing is happening.
+                # The console window is kept open with `pause` so training output stays readable, which means the
+                # shell outlives the python process - the exit code is written to file so it can be polled below.
+                with open(bat_path, 'w', newline='') as f:
+                    f.write('@echo off\n'
+                            f'title {CONSOLE_TITLE}\n'
+                            f'echo {"=" * 76}\n'
+                            f'echo   {CONSOLE_TITLE}\n'
+                            f'echo {"=" * 76}\n'
+                            'echo.\n'
+                            'echo   Loading python, pytorch and ultralytics ...\n'
+                            'echo   This takes ~15-30s, no output is printed until it completes.\n'
+                            'echo   Do NOT close this window - training runs inside it.\n'
+                            'echo.\n'
+                            f'echo   YOLO MAP:  {_bat_echo_txt(yolo_map_path)}\n'
+                            f'echo   SAVE DIR:  {_bat_echo_txt(save_dir)}\n'
+                            f'echo   DEVICE:    {_bat_echo_txt(device_str)}  ^|  EPOCHS: {epochs}  ^|  BATCH: {batch_size}  ^|  IMG SIZE: {imgsz}\n'
+                            f'echo {"=" * 76}\n'
+                            'echo.\n'
+                            f'{subprocess.list2cmdline(cmd)}\n'
+                            'set EC=%ERRORLEVEL%\n'
+                            f'>"{status_path}" echo %EC%\n'
+                            'echo.\n'
+                            'if not "%EC%"=="0" echo   *** TRAINING EXITED WITH ERROR CODE %EC% - see the messages above. ***\n'
+                            'if "%EC%"=="0" echo   *** TRAINING PROCESS ENDED. ***\n'
+                            'echo.\n'
+                            'pause\n')
+                proc = subprocess.Popen([bat_path], creationflags=creationflags, env=env)
             else:
-                subprocess.Popen(cmd, creationflags=creationflags, env=env)
+                proc = subprocess.Popen(cmd, creationflags=creationflags, env=env)
         except Exception as e:
             messagebox.showerror('YOLO training', f'Failed to start training process: {e}')
             return
+        self.main_frm.after(STARTUP_POLL_INTERVAL_MS, lambda: self._check_startup(proc=proc, status_path=status_path, attempts_left=STARTUP_POLL_ATTEMPTS))
         msg = (
             'YOLO training has been started in a separate process to avoid memory issues.\n\n'
             'On Windows a new console window will show training progress. '
             'On other platforms, check the terminal from which SimBA was launched.\n\n'
+            'If the training process terminates within the first '
+            f'{int(STARTUP_POLL_INTERVAL_MS * STARTUP_POLL_ATTEMPTS / 1000)}s, an error will be reported here.\n\n'
             f'Results will be saved to:\n{save_dir}'
         )
         messagebox.showinfo('YOLO training started', msg)
+
+    def _check_startup(self, proc: subprocess.Popen, status_path: Optional[str], attempts_left: int) -> None:
+        """Poll the training subprocess and report an error if it terminates during the start-up window."""
+        exit_code = None
+        if status_path is None:
+            exit_code = proc.poll()
+        elif os.path.isfile(status_path):
+            try:
+                with open(status_path, 'r') as f:
+                    exit_code_str = f.read().strip()
+                exit_code = int(exit_code_str) if exit_code_str.lstrip('-').isdigit() else 'unknown'
+            except OSError:
+                exit_code = None
+        if exit_code is not None:
+            messagebox.showerror('YOLO training failed', f'The YOLO training process terminated immediately (exit code {exit_code}).\n\n'
+                                                         'No model has been trained. See the training console window for the error message.')
+        elif attempts_left > 1:
+            self.main_frm.after(STARTUP_POLL_INTERVAL_MS, lambda: self._check_startup(proc=proc, status_path=status_path, attempts_left=attempts_left - 1))
 
 
 #@YOLOPoseTrainPopUP()

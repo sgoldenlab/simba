@@ -165,36 +165,42 @@ class FitYolo():
                         cache=self.cache)
 
 
-# if __name__ == "__main__" and not hasattr(sys, 'ps1'):
-#     parser = argparse.ArgumentParser(description="Fit YOLO model using ultralytics package.")
-#     parser.add_argument('--weights_path', type=str, default=None, help='Path to the trained YOLO model weights (e.g., yolo11n-pose.pt). Omit to download default starter weights.')
-#     parser.add_argument('--model_yaml', type=str, required=True, help='Path to map.yaml (model structure and label definitions)')
-#     parser.add_argument('--save_path', type=str, required=True, help='Directory where trained model and logs will be saved')
-#     parser.add_argument('--epochs', type=int, default=25, help='Number of epochs to train the model. Default is 25')
-#     parser.add_argument('--batch', type=int, default=16, help='Batch size for training. Default is 16')
-#     parser.add_argument('--plots', type=lambda x: str(x).lower() == 'true', default=True, help='Whether to plot training results. Use "True" or "False". Default is True')
-#     parser.add_argument('--imgsz', type=int, default=640, help='Image size for training. Default is 640')
-#     parser.add_argument('--format', type=str, default=None,  help=f'Format of the YOLO model. Must be one of: {", ".join(Options.VALID_YOLO_FORMATS.value)}')
-#     parser.add_argument('--device', type=str, default='0', help='Device to train on. Use "cpu" or GPU index (e.g., "0"). Default is "0"')
-#     parser.add_argument('--verbose', type=lambda x: str(x).lower() == 'true', default=True, help='Print verbose messages. Use "True" or "False". Default is True')
-#     parser.add_argument('--workers', type=int, default=8, help='Number of data loader workers. Default is 8. Use -1 for max cores')
-#     parser.add_argument('--patience', type=int, default=100, help='Number of epochs to wait without improvement in validation metrics before early stopping the training. Default is 100')
-#
-#     args = parser.parse_args()
-#
-#     yolo_fitter = FitYolo(weights_path=args.weights_path,
-#                           model_yaml=args.model_yaml,
-#                           save_path=args.save_path,
-#                           epochs=args.epochs,
-#                           batch=args.batch,
-#                           plots=args.plots,
-#                           imgsz=args.imgsz,
-#                           format=args.format,
-#                           device=int(args.device) if args.device != 'cpu' else 'cpu',
-#                           verbose=args.verbose,
-#                           workers=args.workers,
-#                           patience=args.patience)
-#     yolo_fitter.run()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Fit YOLO model using ultralytics package.")
+    parser.add_argument('--weights_path', type=str, default=None, help='Path to the trained YOLO model weights (e.g., yolo11n-pose.pt). Omit to download default starter weights.')
+    parser.add_argument('--model_yaml', type=str, required=True, help='Path to map.yaml (model structure and label definitions)')
+    parser.add_argument('--save_path', type=str, required=True, help='Directory where trained model and logs will be saved')
+    parser.add_argument('--epochs', type=int, default=25, help='Number of epochs to train the model. Default is 25')
+    parser.add_argument('--batch', type=int, default=16, help='Batch size for training. Default is 16')
+    parser.add_argument('--plots', type=lambda x: str(x).lower() == 'true', default=True, help='Whether to plot training results. Use "True" or "False". Default is True')
+    parser.add_argument('--imgsz', type=int, default=640, help='Image size for training. Default is 640')
+    parser.add_argument('--format', type=str, default=None,  help=f'Format of the YOLO model. Must be one of: {", ".join(Options.VALID_YOLO_FORMATS.value)}')
+    parser.add_argument('--device', type=str, default='0', help='Device to train on. Use "cpu" or GPU index (e.g., "0"). Default is "0"')
+    parser.add_argument('--verbose', type=lambda x: str(x).lower() == 'true', default=True, help='Print verbose messages. Use "True" or "False". Default is True')
+    parser.add_argument('--workers', type=int, default=8, help='Number of data loader workers. Default is 8. Use -1 for max cores')
+    parser.add_argument('--patience', type=int, default=100, help='Number of epochs to wait without improvement in validation metrics before early stopping the training. Default is 100')
+    parser.add_argument('--cache', type=str, default='False', help='Image caching strategy. Use "True" (RAM), "disk", or "False". Default is "False"')
+    args = parser.parse_args()
+
+    device = args.device.strip()
+    device = 'cpu' if device.lower() == 'cpu' else int(device)
+    cache = args.cache.strip()
+    cache = 'disk' if cache.lower() == 'disk' else str(cache).lower() == 'true'
+
+    yolo_fitter = FitYolo(weights_path=args.weights_path,
+                          model_yaml=args.model_yaml,
+                          save_path=args.save_path,
+                          epochs=args.epochs,
+                          batch=args.batch,
+                          plots=args.plots,
+                          imgsz=args.imgsz,
+                          format=args.format,
+                          device=device,
+                          verbose=args.verbose,
+                          workers=args.workers,
+                          patience=args.patience,
+                          cache=cache)
+    yolo_fitter.run()
 
 
 
@@ -237,10 +243,10 @@ class FitYolo():
 #                  model_yaml=r"D:\maplight_tg2576_yolo\yolo_mdl\map.yaml",
 #                  save_path=r"D:\maplight_tg2576_yolo\yolo_mdl\mdl",
 #                  epochs=1500,
-#                  batch=22,
+#                  batch=2,
 #                  format=None,
 #                  device=0,
-#                  imgsz=640)
+#                  imgsz=240)
 # fitter.run()
 
 
