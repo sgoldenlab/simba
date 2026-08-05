@@ -40,6 +40,7 @@ from simba.utils.errors import (ArrayError, ColumnNotFoundError,
 from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning,
                                   InvalidValueWarning, NoDataFoundWarning)
 
+
 def check_file_exist_and_readable(file_path: Union[str, os.PathLike],
                                   raise_error: bool = True) -> bool:
     """
