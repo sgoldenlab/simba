@@ -139,6 +139,14 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
         stdout_success(msg=f"{len(list(self.data_and_videos_lk.keys()))} file(s) imported to the SimBA project {self.input_csv_dir}", source=self.__class__.__name__)
 
 
+# test = SLEAPImporterCSV(config_path=r"G:\projects\cl05e_sleap\project_folder\project_config.ini",
+#                  data_folder=r'G:\projects\cl05e_sleap\raw_sleap\problematic',
+#                  id_lst=['Animal_1', 'Animal_2'],
+#                  interpolation_settings=None,
+#                  smoothing_settings = None)
+# test.run()
+
+
 
 # test = SLEAPImporterCSV(config_path=r"D:\troubleshooting\two_animals_sleap\project_folder\project_config.ini",
 #                  data_folder=r'D:\troubleshooting\two_animals_sleap\import_data',
