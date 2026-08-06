@@ -6,6 +6,7 @@ from tkinter import *
 from tkinter import messagebox
 from typing import Optional
 
+import simba
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.third_party_label_appenders.transform.utils import \
     check_valid_yolo_map
@@ -124,6 +125,18 @@ class YOLOPoseTrainPopUP(PopUpMixin):
         creationflags = subprocess.CREATE_NEW_CONSOLE if sys.platform == 'win32' else 0
         env = os.environ.copy()
         env['MPLBACKEND'] = 'Agg'
+        # `python -m` puts the working directory first on sys.path, ahead of site-packages, so any directory named
+        # `simba` in it shadows the real package - which imports as an empty namespace and fails on `simba.model`.
+        # The child is therefore run in the save directory (which also catches any starter weights download) with
+        # the parent of the running simba package on PYTHONPATH, so it loads the same simba as this GUI.
+        simba_dir = os.path.dirname(os.path.abspath(simba.__file__))
+        simba_pkg_parent = os.path.dirname(simba_dir)
+        env['PYTHONPATH'] = os.pathsep.join([simba_pkg_parent] + ([env['PYTHONPATH']] if env.get('PYTHONPATH') else []))
+        fit_module_path = os.path.join(simba_dir, 'model', 'yolo_fit.py')
+        if not os.path.isfile(fit_module_path):
+            messagebox.showerror('YOLO training', f'Cannot start training: the simba.model.yolo_fit module is missing from the SimBA installation at {simba_dir}.\n\n'
+                                                  'Re-install SimBA in this environment.')
+            return
         status_path = None
         try:
             if sys.platform == 'win32':
@@ -147,6 +160,8 @@ class YOLOPoseTrainPopUP(PopUpMixin):
                             'echo.\n'
                             f'echo   YOLO MAP:  {_bat_echo_txt(yolo_map_path)}\n'
                             f'echo   SAVE DIR:  {_bat_echo_txt(save_dir)}\n'
+                            f'echo   SIMBA:     {_bat_echo_txt(os.path.dirname(os.path.abspath(simba.__file__)))}\n'
+                            f'echo   PYTHON:    {_bat_echo_txt(sys.executable)}\n'
                             f'echo   DEVICE:    {_bat_echo_txt(device_str)}  ^|  EPOCHS: {epochs}  ^|  BATCH: {batch_size}  ^|  IMG SIZE: {imgsz}\n'
                             f'echo {"=" * 76}\n'
                             'echo.\n'
@@ -158,9 +173,9 @@ class YOLOPoseTrainPopUP(PopUpMixin):
                             'if "%EC%"=="0" echo   *** TRAINING PROCESS ENDED. ***\n'
                             'echo.\n'
                             'pause\n')
-                proc = subprocess.Popen([bat_path], creationflags=creationflags, env=env)
+                proc = subprocess.Popen([bat_path], creationflags=creationflags, env=env, cwd=save_dir)
             else:
-                proc = subprocess.Popen(cmd, creationflags=creationflags, env=env)
+                proc = subprocess.Popen(cmd, creationflags=creationflags, env=env, cwd=save_dir)
         except Exception as e:
             messagebox.showerror('YOLO training', f'Failed to start training process: {e}')
             return
