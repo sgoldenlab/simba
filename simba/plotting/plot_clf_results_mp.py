@@ -545,33 +545,58 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
 #                                                  show_gantt=2)
 #     clf_plotter.run()
 
-if __name__ == "__main__":
-    clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"I:\mitra\nick_ressler\project_folder\project_config.ini",
-                                                 video_paths=[r"I:\mitra\nick_ressler\project_folder\videos\2025-10-15 13-28-41_box1.mp4",
-                                                              r"I:\mitra\nick_ressler\project_folder\videos\2025-10-22 12-01-34_box2.mp4",
-                                                              r"I:\mitra\nick_ressler\project_folder\videos\2025-10-15 13-28-41_box2.mp4",
-                                                              r"I:\mitra\nick_ressler\project_folder\videos\2025-10-22 12-01-34_box4.mp4",
-                                                              r"I:\mitra\nick_ressler\project_folder\videos\2025-10-15 12-27-07_box2.mp4"],
-                                                 data_dir=r"I:\mitra\nick_ressler\rearing_results",
-                                                 save_dir=r'I:\mitra\nick_ressler\rearing_results\videos',
-                                                 clf_names=('REARING',),
-                                                 video_setting=True,
-                                                 frame_setting=False,
-                                                 rotate=False,
-                                                 show_confidence=True,
-                                                 core_cnt=6,
-                                                 show_pose=True,
-                                                 animal_names=False,
-                                                 font='poppins regular',
-                                                 print_timer=HHMMSSSSSS,
-                                                 overwrite=False,
-                                                 time_slice=None, # {START_TIME: '00:00:00', END_TIME: '00:00:10'}, #{START_TIME: '00:00:00', END_TIME: '00:01:00'}, #,{START_TIME: '00:00:00', END_TIME: '00:01:00'}
-                                                 bbox=None, #'animal-aligned'
-                                                 text_opacity=0.6,
-                                                 show_gantt=2)
-    clf_plotter.run()
+# if __name__ == "__main__":
+#     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"I:\mitra\nick_ressler\project_folder\project_config.ini",
+#                                                  video_paths=[r"I:\mitra\nick_ressler\project_folder\videos\2025-10-24 15-58-13_box2.mp4",
+#                                                               r"I:\mitra\nick_ressler\project_folder\videos\2025-10-23 16-42-38_box2.mp4",
+#                                                               r"I:\mitra\nick_ressler\project_folder\videos\2025-10-15 13-28-41_box4.mp4",
+#                                                               r"I:\mitra\nick_ressler\project_folder\videos\2025-10-21 09-50-03_box2.mp4",
+#                                                               r"I:\mitra\nick_ressler\project_folder\videos\2025-10-15 13-28-41_box1.mp4"],
+#                                                  data_dir=r"I:\mitra\nick_ressler\project_folder\logs\freezing_data_time_3s_3mm_20260807153129\data_results",
+#                                                  save_dir=r'I:\mitra\nick_ressler\project_folder\logs\freezing_data_time_3s_3mm_20260807153129\videos',
+#                                                  clf_names=('FREEZING',),
+#                                                  video_setting=True,
+#                                                  frame_setting=False,
+#                                                  rotate=False,
+#                                                  show_confidence=True,
+#                                                  core_cnt=6,
+#                                                  show_pose=True,
+#                                                  animal_names=False,
+#                                                  font='poppins regular',
+#                                                  print_timer=HHMMSSSSSS,
+#                                                  overwrite=False,
+#                                                  time_slice=None, # {START_TIME: '00:00:00', END_TIME: '00:00:10'}, #{START_TIME: '00:00:00', END_TIME: '00:01:00'}, #,{START_TIME: '00:00:00', END_TIME: '00:01:00'}
+#                                                  bbox=None, #'animal-aligned'
+#                                                  text_opacity=0.6,
+#                                                  show_gantt=2)
+#     clf_plotter.run()
 
 
+# if __name__ == "__main__":
+#     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"I:\mitra\nick_ressler\project_folder\project_config.ini",
+#                                                  video_paths=[r"I:\mitra\nick_ressler\project_folder\videos\2025-10-15 12-27-07_box2.mp4",
+#                                                               r"I:\mitra\nick_ressler\project_folder\videos\2025-10-15 13-02-24_box1.mp4",
+#                                                               r"I:\mitra\nick_ressler\project_folder\videos\2025-11-05 14-56-27_box1.mp4",
+#                                                               r"I:\mitra\nick_ressler\project_folder\videos\2025-10-28 10-16-18_box3.mp4",
+#                                                               r"I:\mitra\nick_ressler\project_folder\videos\2025-10-15 12-27-07_box3.mp4"],
+#                                                  data_dir=r"I:\mitra\nick_ressler\project_folder\logs\circling_data_10s_340d_60mm_20260807162609\data_results",
+#                                                  save_dir=r'I:\mitra\nick_ressler\project_folder\logs\circling_data_10s_340d_60mm_20260807162609\videos',
+#                                                  clf_names=('CIRCLING',),
+#                                                  video_setting=True,
+#                                                  frame_setting=False,
+#                                                  rotate=False,
+#                                                  show_confidence=True,
+#                                                  core_cnt=6,
+#                                                  show_pose=True,
+#                                                  animal_names=False,
+#                                                  font='poppins regular',
+#                                                  print_timer=HHMMSSSSSS,
+#                                                  overwrite=False,
+#                                                  time_slice=None, # {START_TIME: '00:00:00', END_TIME: '00:00:10'}, #{START_TIME: '00:00:00', END_TIME: '00:01:00'}, #,{START_TIME: '00:00:00', END_TIME: '00:01:00'}
+#                                                  bbox=None, #'animal-aligned'
+#                                                  text_opacity=0.6,
+#                                                  show_gantt=2)
+#     clf_plotter.run()
 
 
 # if __name__ == "__main__":

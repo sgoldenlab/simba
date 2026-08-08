@@ -43,16 +43,18 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
-    check_file_exist_and_readable, check_float, check_int, check_str,
-    check_that_column_exist, check_valid_boolean, check_valid_lst)
+    check_file_exist_and_readable, check_float, check_if_dir_exists,
+    check_int, check_str, check_that_column_exist, check_valid_boolean,
+    check_valid_lst)
 from simba.utils.data import (create_color_palette, detect_bouts, get_cpu_pool,
                               terminate_cpu_pool)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.lookups import get_fonts
+from simba.utils.lookups import get_fonts, get_named_simba_fonts
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
                                     get_fn_ext, read_df, seconds_to_timestamp)
 
 HEIGHT = "height"
@@ -141,7 +143,7 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
        :align: center
 
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
-    :param Optional[Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]]] data_paths: File path, list of file paths, or ``None`` (all machine result files in project).
+    :param Optional[Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]]] data_paths: File path, directory path (all files of the project ``file_type`` in that directory), list of file paths, or ``None`` (all machine result files in project).
     :param bool frame_setting: If ``True``, creates individual frame images. Default: ``False``.
     :param bool video_setting: If ``True``, creates dynamic Gantt videos. Default: ``False``.
     :param bool last_frm_setting: If ``True``, creates a final static Gantt image. Default: ``True``.
@@ -150,12 +152,13 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
     :param int height: Height of output images/videos in pixels. Default: 480.
     :param int font_size: Font size for behavior labels. Default: 8.
     :param int font_rotation: Rotation angle for y-axis labels in degrees (0-180). Default: 45.
-    :param Optional[str] font: Matplotlib font name. If ``None``, default font is used.
+    :param Optional[str] font: Font name: either a SimBA-bundled font (as listed by :func:`~simba.utils.lookups.get_named_simba_fonts`, e.g. 'Poppins Regular') or an OS-installed font (as listed by :func:`~simba.utils.lookups.get_fonts`). If ``None``, default font is used.
     :param float bar_opacity: Opacity of Gantt bars in range (0, 1]. Default: ``0.85``.
     :param str palette: Color palette name for behaviors. Default: 'Set1'.
     :param Optional[int] core_cnt: Number of CPU cores to use. If -1, uses all available cores. Default: -1.
     :param bool hhmmss: If ``True``, x-axis labels are formatted as ``HH:MM:SS``. If ``False``, seconds are used. Default: ``False``.
     :param Optional[List[str]] clf_names: Optional subset of classifiers to include. If ``None``, uses all project classifiers.
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory in which to store the gantt frames, videos, and/or final images. Created if it does not exist. If ``None``, defaults to the project's ``gantt_plot_dir``. Default ``None``.
 
     :example:
 
@@ -179,7 +182,8 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
                  palette: str = 'Set1',
                  core_cnt: int = -1,
                  hhmmss: bool = False,
-                 clf_names: Optional[List[str]] = None):
+                 clf_names: Optional[List[str]] = None,
+                 save_dir: Optional[Union[str, os.PathLike]] = None):
 
         check_file_exist_and_readable(file_path=config_path)
         if (not frame_setting) and (not video_setting) and (not last_frm_setting):
@@ -198,11 +202,14 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
         self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
         self.width, self.height, self.font_size, self.font_rotation, self.hhmmss = width, height, font_size, font_rotation, hhmmss
         if font is not None:
-            check_str(name=f'{self.__class__.__name__} font', value=font, options=list(get_fonts().keys()), raise_error=True)
+            check_str(name=f'{self.__class__.__name__} font', value=font, options=list({**get_fonts(), **get_named_simba_fonts()}.keys()), raise_error=True)
         ConfigReader.__init__(self, config_path=config_path, create_logger=False)
         if isinstance(data_paths, list):
             check_valid_lst(data=data_paths, source=f'{self.__class__.__name__} data_paths', valid_dtypes=(str,), min_len=1)
-        elif isinstance(data_paths, str):
+        elif isinstance(data_paths, (str, os.PathLike)) and os.path.isdir(data_paths):
+            check_if_dir_exists(in_dir=data_paths, source=f'{self.__class__.__name__} data_paths')
+            data_paths = find_files_of_filetypes_in_directory(directory=data_paths, extensions=[f'.{self.file_type}'], raise_warning=False, raise_error=True)
+        elif isinstance(data_paths, (str, os.PathLike)):
             check_file_exist_and_readable(file_path=data_paths)
             data_paths = [data_paths]
         else:
@@ -212,12 +219,17 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
             check_valid_lst(data=clf_names, source=f'{self.__class__.__name__} clf_names', valid_dtypes=(str,), valid_values=self.clf_names, min_len=1, raise_error=True)
             self.clf_names = clf_names
         PlottingMixin.__init__(self)
-        self.clr_lst = create_color_palette(pallete_name=palette, increments=len(self.body_parts_lst) + 1, as_int=True, as_rgb_ratio=True)
+        self.clr_lst = create_color_palette(pallete_name=palette, increments=len(self.clf_names), as_int=True, as_rgb_ratio=True)
         self.frame_setting, self.video_setting, self.data_paths, self.last_frm_setting, self.font, self.bar_opacity = frame_setting, video_setting,data_paths, last_frm_setting, font, bar_opacity
         self.last_frm_ext, self.last_frame_as_svg = 'svg' if last_frame_as_svg else 'png', last_frame_as_svg
-        if not os.path.exists(self.gantt_plot_dir): os.makedirs(self.gantt_plot_dir)
+        if save_dir is not None:
+            check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir', create_if_not_exist=True, raise_error=True)
+            self.save_dir = save_dir
+        else:
+            self.save_dir = self.gantt_plot_dir
+        if not os.path.exists(self.save_dir): os.makedirs(self.save_dir)
         if platform.system() == "Darwin": multiprocessing.set_start_method("spawn", force=True)
-        stdout_information(msg=f"Processing {len(self.data_paths)} video(s)...")
+        stdout_information(msg=f"Processing {len(self.data_paths)} video(s) for {len(self.clf_names)} classifier(s) ...")
 
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
@@ -233,13 +245,13 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
             stdout_information(msg=f"Processing video {self.video_name}, Frame count: {len(self.data_df)} (Video {(file_cnt + 1)}/{len(self.data_paths)})...")
             self.video_info_settings, _, self.fps = self.read_video_info(video_name=self.video_name)
             self.bouts_df = detect_bouts(data_df=self.data_df, target_lst=list(self.clf_names), fps=int(self.fps))
-            self.temp_folder = os.path.join(self.gantt_plot_dir, self.video_name, "temp")
-            self.save_frame_folder_dir = os.path.join(self.gantt_plot_dir, self.video_name)
+            self.temp_folder = os.path.join(self.save_dir, self.video_name, "temp")
+            self.save_frame_folder_dir = os.path.join(self.save_dir, self.video_name)
             if self.frame_setting:
                 create_directory(paths=self.save_frame_folder_dir, overwrite=True)
             if self.video_setting:
                 create_directory(paths=self.temp_folder)
-                self.save_video_path = os.path.join(self.gantt_plot_dir, f"{self.video_name}.mp4")
+                self.save_video_path = os.path.join(self.save_dir, f"{self.video_name}.mp4")
 
             if self.last_frm_setting:
                 self.make_gantt_plot(x_length=len(self.data_df),
@@ -254,7 +266,7 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
                                      bar_opacity=self.bar_opacity,
                                      font=self.font,
                                      as_svg=self.last_frame_as_svg,
-                                     save_path=os.path.join(self.gantt_plot_dir, f"{self.video_name}_final_image.{self.last_frm_ext}"),
+                                     save_path=os.path.join(self.save_dir, f"{self.video_name}_final_image.{self.last_frm_ext}"),
                                      palette=self.clr_lst,
                                      hhmmss=self.hhmmss)
 
@@ -290,7 +302,23 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
 
         terminate_cpu_pool(pool=self.pool, force=False, source=self.__class__.__name__)
         self.timer.stop_timer()
-        stdout_success(msg=f"Gantt visualizations for {len(self.data_paths)} videos created in {self.gantt_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str)
+        stdout_success(msg=f"Gantt visualizations for {len(self.data_paths)} videos created in {self.save_dir} directory", elapsed_time=self.timer.elapsed_time_str)
+
+# if __name__ == "__main__":
+#     test = GanttCreatorMultiprocess(config_path=r"I:\mitra\nick_ressler\project_folder\project_config.ini",
+#                                     clf_names=['REARING'],
+#                                     save_dir=r'I:\mitra\nick_ressler\minke_nick_grooming_rearing_0802\rearing_results\gannt',
+#                                     frame_setting=False,
+#                                     video_setting=False,
+#                                     last_frm_setting=True,
+#                                     last_frame_as_svg=True,
+#                                     width=640,
+#                                     font="DynaPuff",
+#                                     height= 480,
+#                                     font_size=10,
+#                                     font_rotation= 45,
+#                                     hhmmss=True)
+#     test.run()
 
 
 # if __name__ == "__main__":

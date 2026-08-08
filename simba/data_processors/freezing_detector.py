@@ -4,6 +4,7 @@ from typing import Optional, Union
 import numpy as np
 import pandas as pd
 from numba import typed
+from copy import deepcopy
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
@@ -135,6 +136,7 @@ class FreezingDetector(ConfigReader):
             save_file_path = os.path.join(self.save_dir, f'{video_name}.csv')
             df = read_df(file_path=file_path, file_type='csv').reset_index(drop=True)
             _, px_per_mm, fps = read_video_info(vid_info_df=self.video_info_df, video_name=video_name)
+            original_cols = deepcopy(list(df.columns))
             df.columns = [str(x).lower() for x in df.columns]
             check_valid_dataframe(df=df, valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=self.required_field)
             nose_shifted = FeatureExtractionMixin.create_shifted_df(df[self.nose_heads])
@@ -153,6 +155,7 @@ class FreezingDetector(ConfigReader):
             mean_movement = np.mean(movement, axis=1)
             mm_s = TimeseriesFeatureMixin.sliding_descriptive_statistics(data=mean_movement.astype(np.float32), window_sizes=np.array([1], dtype=np.float64), sample_rate=int(fps), statistics=typed.List(["sum"]))[0].flatten()
             freezing_idx = np.argwhere(mm_s <= self.movement_threshold).astype(np.int32).flatten()
+            df.columns = original_cols
             df[f'Probability_{FREEZING}'] = 0
             df[FREEZING] = 0
             df.loc[freezing_idx, FREEZING] = 1
@@ -172,6 +175,18 @@ class FreezingDetector(ConfigReader):
             agg_results.loc[len(agg_results)] = [video_name, len(freezing_idx), round(len(freezing_idx) / fps, 4), len(bouts), round((len(freezing_idx) / len(df)) * 100, 4), len(df), round(len(df)/fps, 2) ]
         agg_results.to_csv(agg_results_path)
         self.timer.stop_timer(); stdout_success(msg=f'Results saved in {self.save_dir} directory.', elapsed_time=self.timer.elapsed_time_str)
+
+
+# FreezingDetector(
+#     data_dir=r'I:\mitra\nick_ressler\project_folder\csv\outlier_corrected_movement_location',
+#     config_path=r"I:\mitra\nick_ressler\project_folder\project_config.ini",
+#     time_window=3,
+#     movement_threshold=3,
+#     shortest_bout=100
+# ).run()
+
+
+
 
 #
 # FreezingDetector(

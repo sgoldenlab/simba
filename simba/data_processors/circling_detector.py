@@ -4,6 +4,7 @@ from typing import Optional, Union
 import numpy as np
 import pandas as pd
 from numba import typed
+from copy import deepcopy
 
 from simba.mixins.circular_statistics import CircularStatisticsMixin
 from simba.mixins.config_reader import ConfigReader
@@ -111,6 +112,7 @@ class CirclingDetector(ConfigReader):
             save_file_path = os.path.join(self.save_dir, f'{video_name}.csv')
             df = read_df(file_path=file_path, file_type='csv').reset_index(drop=True)
             _, px_per_mm, fps = read_video_info(video_info_df=self.video_info_df, video_name=video_name)
+            original_cols = deepcopy(list(df.columns))
             df.columns = [str(x).lower() for x in df.columns]
             check_valid_dataframe(df=df, valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=self.required_field)
 
@@ -129,6 +131,7 @@ class CirclingDetector(ConfigReader):
             circling_idx = np.argwhere(sliding_circular_range >= self.circular_range_threshold).astype(np.int32).flatten()
             movement_idx = np.argwhere(movement_sum >= self.movement_threshold).astype(np.int32).flatten()
             circling_idx = [x for x in movement_idx if x in circling_idx]
+            df.columns = original_cols
             df[f'Probability_{CIRCLING}'] = 0
             df[CIRCLING] = 0
             df.loc[circling_idx, CIRCLING] = 1
@@ -152,6 +155,10 @@ class CirclingDetector(ConfigReader):
         agg_results.to_csv(agg_results_path)
         stdout_success(msg=f'Results saved in {self.save_dir} directory.')
 
+
+
+detector = CirclingDetector(config_path=r"I:\mitra\nick_ressler\project_folder\project_config.ini")
+detector.run()
 
 # detector = CirclingDetector(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini")
 # detector.run()

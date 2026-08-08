@@ -17,7 +17,8 @@ from simba.utils.checks import (
 from simba.utils.data import create_color_palette, detect_bouts
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.lookups import get_fonts, get_named_colors
+from simba.utils.lookups import (get_fonts, get_named_colors,
+                                 get_named_simba_fonts)
 from simba.utils.printing import stdout_information, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df, seconds_to_timestamp
 
@@ -51,7 +52,7 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
     :param int height: Height of output images/videos in pixels. Default: 480.
     :param int font_size: Font size for behavior labels. Default: 8.
     :param int font_rotation: Rotation angle for y-axis labels in degrees (0-180). Default: 45.
-    :param Optional[str] font: Matplotlib font name. If ``None``, default font is used.
+    :param Optional[str] font: Font name: either a SimBA-bundled font (as listed by :func:`~simba.utils.lookups.get_named_simba_fonts`, e.g. 'Poppins Regular') or an OS-installed font (as listed by :func:`~simba.utils.lookups.get_fonts`). If ``None``, default font is used.
     :param str palette: Color palette name for behaviors. Default: 'Set1'.
     :param bool frame_setting: If ``True``, creates individual frame images. Default: ``False``.
     :param bool video_setting: If ``True``, creates dynamic Gantt videos. Default: ``False``.
@@ -104,15 +105,15 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
         self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
-        self.clr_lst = create_color_palette(pallete_name=palette, increments=len(self.body_parts_lst)+1, as_int=True, as_rgb_ratio=True)
         if not os.path.exists(self.gantt_plot_dir): os.makedirs(self.gantt_plot_dir)
         self.frame_setting, self.video_setting, self.last_frm_setting = frame_setting, video_setting, last_frm_setting
         self.width, self.height, self.font_size, self.font_rotation = width, height, font_size, font_rotation
         if font is not None:
-            check_str(name=f'{self.__class__.__name__} font', value=font, options=list(get_fonts().keys()), raise_error=True)
+            check_str(name=f'{self.__class__.__name__} font', value=font, options=list({**get_fonts(), **get_named_simba_fonts()}.keys()), raise_error=True)
         if clf_names is not None:
             check_valid_lst(data=clf_names, source=f'{self.__class__.__name__} clf_names', valid_dtypes=(str,), valid_values=self.clf_names, min_len=1, raise_error=True)
             self.clf_names = clf_names
+        self.clr_lst = create_color_palette(pallete_name=palette, increments=len(self.clf_names), as_int=True, as_rgb_ratio=True)
         self.data_paths, self.hhmmss, self.font = data_paths, hhmmss, font
         self.last_frm_ext, self.last_frame_as_svg = 'svg' if last_frame_as_svg else 'png', last_frame_as_svg
         self.colours = get_named_colors()

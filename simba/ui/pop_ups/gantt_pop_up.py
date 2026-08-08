@@ -13,7 +13,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton,
 from simba.utils.checks import check_if_filepath_list_is_empty
 from simba.utils.enums import Formats, Links, Options
 from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.lookups import get_fonts
+from simba.utils.lookups import get_fonts, get_named_simba_fonts
 from simba.utils.read_write import find_files_of_filetypes_in_directory
 
 OPACITY_OPTIONS = [round(x, 2) for x in __import__('numpy').arange(0.05, 1.05, 0.05)]
@@ -32,9 +32,9 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         check_if_filepath_list_is_empty(filepaths=self.machine_results_paths,error_msg=f"SIMBA ERROR: Zero files found in the {self.machine_results_dir} directory. Create classification results before visualizing gantt charts",)
         palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
         self.data_paths = find_files_of_filetypes_in_directory(directory=self.machine_results_dir, extensions=[f'.{self.file_type}'], as_dict=True)
-        max_file_name_len, fonts = max(len(k) for k in self.data_paths) + 5, list(get_fonts(sort_alphabetically=True).keys())
-        fonts.insert(0, 'AUTO')
-        default_font = 'Arial' if 'Arial' in fonts else 'AUTO'
+        max_file_name_len, simba_fonts = max(len(k) for k in self.data_paths) + 5, sorted(get_named_simba_fonts().keys())
+        fonts = ['AUTO'] + simba_fonts + [f for f in get_fonts(sort_alphabetically=True).keys() if f not in simba_fonts]
+        default_font = next((f for f in ('Poppins Regular', 'Arial') if f in fonts), 'AUTO')
         PopUpMixin.__init__(self, config_path=config_path, title="VISUALIZE GANTT PLOTS", icon='gantt_small')
 
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name='settings', icon_link=Links.GANTT_PLOTS.value, relief='solid', padx=5, pady=5)
@@ -62,7 +62,7 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         last_frame_as_svg_cb, self.last_frame_as_svg_var = SimbaCheckbox(parent=self.settings_frm, txt='LAST FRAME AS SVG', txt_img='svg', val=False, tooltip_key='LAST_FRAME_AS_SVG')
 
         self.run_single_video_frm= CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name='video', icon_link=Links.GANTT_PLOTS.value, relief='solid', padx=5, pady=5)
-        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="VIDEO", txt_clr="blue", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.__create_gantt_plots, cmd_kwargs={'multiple': False})
+        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="RUN VIDEO", txt_clr="blue", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.__create_gantt_plots, cmd_kwargs={'multiple': False})
         self.single_video_dropdown = SimBADropDown(parent=self.run_single_video_frm, dropdown_options=list(self.data_paths.keys()), label='VIDEO', label_width=20, dropdown_width=max_file_name_len, value=list(self.data_paths.keys())[0], tooltip_key='GANTT_SINGLE_VIDEO')
 
         self.run_multiple_videos = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEO(S)", icon_name='stack', icon_link=Links.GANTT_PLOTS.value, relief='solid', padx=5, pady=5)
