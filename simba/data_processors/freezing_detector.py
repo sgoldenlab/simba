@@ -1,10 +1,10 @@
 import os
+from copy import deepcopy
 from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
 from numba import typed
-from copy import deepcopy
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
