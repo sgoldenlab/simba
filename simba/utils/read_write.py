@@ -841,6 +841,7 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
                       opacity: Optional[float] = None,
                       size: Optional[Tuple[int, int]] = None,
                       keep_aspect_ratio: bool = False,
+                      interpolation: Optional[int] = cv2.INTER_LINEAR,
                       greyscale: Optional[bool] = False,
                       black_and_white: Optional[bool] = False,
                       clahe: Optional[Union[Tuple[int, int, int], bool]] = False,
@@ -860,6 +861,7 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
     :param Optional[float] opacity: Value between 0 and 100 or None. If float value, returns image with opacity. 100 fully opaque. 0.0 fully transparent.
     :param Optional[Tuple[int, int]] size: If tuple (width, height), resizes the image. If None, returns original image size. When used with keep_aspect_ratio=True, the image is resized to fit within the target size while maintaining aspect ratio.
     :param bool keep_aspect_ratio: If True and size is provided, resizes the image to fit within the target size while maintaining aspect ratio. If False, resizes to exact size (may distort aspect ratio). Default False.
+    :param Optional[int] interpolation: OpenCV interpolation flag used when ``size`` is passed. Ignored if ``size`` is None. Default ``cv2.INTER_LINEAR``. Pick it to match the direction of the resize: use ``cv2.INTER_AREA`` when DOWN-scaling, since ``cv2.INTER_LINEAR`` samples a fixed 2x2 neighbourhood regardless of the scale factor and therefore aliases badly on large reductions (measurably worse below ~0.5x, where it discards most source pixels). Use ``cv2.INTER_CUBIC`` or ``cv2.INTER_LANCZOS4`` when UP-scaling for slightly sharper edges. ``cv2.INTER_NEAREST`` preserves exact pixel values - correct for label/mask images, but blocky and least accurate on natural video.
     :param Optional[bool] greyscale: If True, returns the greyscale image. Default False.
     :param Optional[bool] black_and_white: If True, returns black and white image at threshold 127. Default False.
     :param Optional[Union[Tuple[int, int, int], bool]] clahe: CLAHE settings. If ``True``, uses default CLAHE (clipLimit=2, tileGridSize=(16, 16)). If a 3-tuple, interpreted as ``(clip_limit, tile_x, tile_y)``. If ``False``/``None``, CLAHE is not applied.
@@ -884,7 +886,6 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
         if not use_ffmpeg:
             video_meta_data = get_video_meta_data(video_path=video_path)
         else:
-            print('s')
             video_meta_data = get_video_info_ffmpeg(video_path=video_path)
     else:
         video_meta_data = {"frame_count": int(video_path.get(cv2.CAP_PROP_FRAME_COUNT)),
@@ -936,13 +937,13 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
         opacity_image = np.ones((h, w, clr), dtype=np.uint8) * int(255 * opacity)
         img = cv2.addWeighted( img.astype(np.uint8), 1 - opacity, opacity_image.astype(np.uint8), opacity, 0)
     if size is not None and not keep_aspect_ratio:
-        img = cv2.resize(img, size, interpolation=cv2.INTER_LINEAR)
+        img = cv2.resize(img, size, interpolation=interpolation)
     elif size is not None and keep_aspect_ratio:
         target_w, target_h = size
         h, w = img.shape[:2]
         scale = min(target_w / w, target_h / h)
         new_w, new_h = int(w * scale), int(h * scale)
-        img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+        img = cv2.resize(img, (new_w, new_h), interpolation=interpolation)
     if greyscale or black_and_white:
         if len(img.shape) > 2:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)

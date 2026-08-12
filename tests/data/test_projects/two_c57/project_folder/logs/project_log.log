@@ -9,3 +9,6 @@
 2026-05-21T11:28:28Z|ROIFeatureCreator||CLASS_INIT||append_data: False, data_path: C:\projects\simba\simba\tests\data\test_projects\two_c57\project_folder\csv\outlier_corrected_movement_location\Together_1.csv, body_parts: ['Nose_1', 'Nose_2'], config_path: C:\projects\simba\simba\tests\data\test_projects\two_c57\project_folder\project_config.ini
 2026-05-21T11:28:28Z|.stdout_success||complete||ROI features analysed for 1 videos
 2026-05-21T11:28:28Z|ROIFeatureCreator||CLASS_INIT||append_data: False, data_path: None, body_parts: ['Nose'], config_path: C:\projects\simba\simba\tests\data\test_projects\mouse_open_field\project_folder\project_config.ini
+2026-08-11T08:42:16Z|read_df.InvalidFileTypeError||error||SIMBA INVALID FILE TYPE ERROR: tests/data/test_projects/two_c57/project_folder/csv/input_csv/Together_1.csv is not a valid CSV file
+2026-08-11T16:52:01Z|Importer.FrameRangeWarning||warning||Cannot proceed to frame 300: the last frame that can be displayed for video vid_224x220 is 299 (300 frames of pose data, 300 frames of video).
+2026-08-11T16:58:23Z|Importer.InvalidInputError||error||SIMBA VALUE ERROR: The animal most proximal to click number 0 is animal named simon. The animal most proximal to click number 1 is also animal simon. Please indicate which animal is which using a video frame where the animals are clearly separated

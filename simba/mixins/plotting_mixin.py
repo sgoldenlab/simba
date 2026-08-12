@@ -2259,8 +2259,8 @@ class PlottingMixin(object):
         :param font_thickness: The thickness of the text strokes. It is an integer specifying the number of pixels for the thickness. Used only by the cv2 path (ignored when ``font_path`` is passed).
         :param font: The font type used to render the text. It corresponds to one of the predefined OpenCV Hershey font types (0-7). Ignored when ``font_path`` is passed.
         :param font_path: Optional path to a TrueType/OpenType (.ttf/.otf) font file. If passed, it takes precedence over ``font`` and the text is rendered with PIL using this font (e.g. for custom fonts such as Poppins). If None, the cv2 Hershey ``font`` is used.
-        :param text_color: The color of the text in RGB format. By default, the text color is white.
-        :param text_color_bg: The background color for the text in RGB format. By default, the background color is black.
+        :param text_color: The color of the text in **BGR** format (OpenCV convention, i.e. the same channel order as ``cv2.putText``), NOT RGB. E.g. ``(255, 255, 0)`` is cyan and ``(0, 255, 255)`` is yellow. Applies to both the cv2 and the ``font_path`` (PIL) paths - the PIL path converts to RGB internally. By default, the text color is white.
+        :param text_color_bg: The background color for the text in **BGR** format, as with ``text_color``. By default, the background color is black.
         :param text_bg_alpha: The transparency level of the background rectangle. A value between 0 and 1, where 0 is fully transparent  and 1 is fully opaque.
         :return:  The image with the overlaid text and background rectangle.
         """

@@ -34,8 +34,8 @@ from simba.utils.errors import (BodypartColumnNotFoundError, DataHeaderError,
                                 NoFilesFoundError, NoROIDataError,
                                 NotDirectoryError, ParametersFileError,
                                 PermissionError, SimBAPAckageVersionError)
-from simba.utils.lookups import (create_color_palettes, get_color_dict,
-                                 get_emojis, get_log_config)
+from simba.utils.data import create_color_palettes
+from simba.utils.lookups import (get_color_dict, get_emojis, get_log_config)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_core_cnt, get_all_clf_names,
                                     get_fn_ext, read_config_file, read_df,
