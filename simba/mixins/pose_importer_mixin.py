@@ -18,9 +18,11 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.enums import ConfigKey
 from simba.utils.errors import (CountError, IntegerError, InvalidInputError,
                                 NoDataError, NoFilesFoundError)
-from simba.utils.read_write import get_fn_ext, seconds_to_timestamp, read_frm_of_video
+from simba.utils.lookups import (get_img_resize_info, get_monitor_info,
+                                 get_simba_font_name_and_path)
+from simba.utils.read_write import (get_fn_ext, read_frm_of_video,
+                                    seconds_to_timestamp)
 from simba.utils.warnings import FrameRangeWarning
-from simba.utils.lookups import get_img_resize_info,get_monitor_info, get_simba_font_name_and_path
 
 MAX_ID_UI_DISPLAY_RATIO = (0.5, 0.5)  # W, H
 MIN_ID_UI_DISPLAY_RATIO = (0.3, 0.3)  # W, H
