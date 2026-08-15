@@ -25,6 +25,11 @@ from simba.utils.lookups import get_img_resize_info,get_monitor_info, get_simba_
 MAX_ID_UI_DISPLAY_RATIO = (0.5, 0.5)  # W, H
 MIN_ID_UI_DISPLAY_RATIO = (0.3, 0.3)  # W, H
 
+# FRAMES ADVANCED PER "x" PRESS IN THE "DEFINE ANIMAL IDS" UI. THE LAST STEP IS SHORTENED TO LAND ON THE FINAL
+# USABLE FRAME, AFTER WHICH THE NEXT PRESS WRAPS BACK TO FRAME 0. SMALLER = FINER SEARCH, MORE KEYPRESSES TO
+# CYCLE A LONG VIDEO. NOTE THIS IS A FRAME COUNT, SO THE TIME IT REPRESENTS DEPENDS ON THE VIDEO FPS.
+ID_UI_FRM_STEP = 50
+
 # HEIGHT OF THE INSTRUCTION SIDE-PANEL, AS A FRACTION OF THE DISPLAYED FRAME HEIGHT. THE PANEL IS CONCATENATED
 # BELOW THE FRAME, SO THE WINDOW IS ALWAYS (1 + THIS) x THE FRAME HEIGHT - BOTH THE PANEL AND THE WINDOW SIZE
 # ARE DERIVED FROM IT SO THEY CANNOT DRIFT APART. LOWER IT TO GIVE MORE OF THE WINDOW TO THE VIDEO.
@@ -33,7 +38,7 @@ ID_UI_PANEL_RATIO = 1 / 3
 # EVERY STRING PRINTED IN THE "DEFINE ANIMAL IDS" SIDE-PANELS. THE FONT SCALE IS FITTED TO THE LONGEST OF THESE,
 # SO KEEPING THEM HERE - RATHER THAN AS LITERALS AT THE PUTTEXT CALLS - IS WHAT STOPS THE FITTED AND PRINTED
 # STRINGS FROM DRIFTING APART. SHORTER STRINGS = LARGER FONT.
-ID_UI_TXT = {"ASSIGN_Q": "Assign identities from this frame?",
+ID_UI_TXT = {"ASSIGN_Q": "Assign identities from frame {} / {}?",
              "NEW_FRM": 'Press "x" to display new, random, frame',
              "ASSIGN": 'Press "c" to assign identities on this frame',
              "CLICK_ON": "Left mouse click on:",
@@ -79,7 +84,9 @@ class PoseImporterMixin(object):
             else:
                 start_frame = initial_frame_no
         self.video_info, self.data_df, self.frame_no, self.add_spacer = (video_info, data_df, start_frame, 2)
-        self.frm_no_timestamp = seconds_to_timestamp(seconds=self.frame_no/self.video_info['fps'], hh_mm_ss_sss=True)
+        # OFFSET APPLIED WHEN "x" WRAPS PAST THE LAST FRAME. WITHOUT IT, EVERY LAP WOULD SHOW THE SAME FRAMES THE
+        # USER HAS ALREADY REJECTED. HALF A STEP MEANS LAP 1 IS 0, 50, 100 ... AND LAP 2 IS 25, 75, 125 ...
+        self.frm_wrap_offset = 0
         self.animal_bp_dict, self.cap = animal_bp_dict, cv2.VideoCapture(video_path)
         _, self.video_name, _ = get_fn_ext(video_path)
         self.monitor_info, (self.display_w, self.display_h) = get_monitor_info()
@@ -89,12 +96,12 @@ class PoseImporterMixin(object):
 
     def get_video_scalers(self, video_info: dict):
         self.scalers = {}
-        #w, h = int(video_info["width"]), int(video_info["height"])
         self.scalers["circle"] = PlottingMixin().get_optimal_circle_size(frame_size=(self.display_img_w, self.display_img_h), circle_frame_ratio=100)
-        panel_txt = list(ID_UI_TXT.values()) + list(self.animal_bp_dict.keys())
+        # ASSIGN_Q is a format template, so the fit needs the WIDEST string it can ever produce for this
+        # video (the largest frame index in both slots) - not the raw "{} / {}" template, which is shorter.
+        panel_txt = list(ID_UI_TXT.values()) + list(self.animal_bp_dict.keys()) + [ID_UI_TXT["ASSIGN_Q"].format(self._max_id_ui_frm_idx(), self._max_id_ui_frm_idx())]
         self.scalers["font"], _, _ = PlottingMixin.get_optimal_font_size_ttf(text=panel_txt, font_path=self.font_path, accepted_px_width=self.display_img_w, accepted_px_height=int(self.display_img_h / 6))
         self.scalers["space"] = PlottingMixin.get_optimal_font_spacing_ttf(font_path=self.font_path, size_px=self.scalers["font"], text=panel_txt)
-        #self.scalers["font"], _, self.scalers["space"] = PlottingMixin().get_optimal_font_scales(text=panel_txt, accepted_px_width=self.display_img_w, accepted_px_height=int(self.display_img_h/6))
         self.scalers["panel_h"] = max(int(self.display_img_h * ID_UI_PANEL_RATIO), int(self.scalers["space"] * (self.add_spacer * 3 + 1)))
 
     def find_data_files(self, dir: Union[str, os.PathLike], extensions: List[str]) -> List[str]:
@@ -190,12 +197,13 @@ class PoseImporterMixin(object):
     def insert_animal_names(self):
         for animal_cnt, animal_data in self.id_cords.items():
             self.new_frame = PlottingMixin().put_text(img=self.new_frame, text=animal_data["name"], pos=animal_data["cord"], font_size=self.scalers["font"], font_path=self.font_path, text_color=(255, 255, 0))
-            #cv2.putText(self.new_frame, animal_data["name"], animal_data["cord"], cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 2)
 
     def _set_multianimal_window_id_title(self,
                                          window_name: str):
         self.frm_no_timestamp = seconds_to_timestamp(seconds=self.frame_no / self.video_info['fps'], hh_mm_ss_sss=True)
-        title = f'{window_name} | {self.video_name} | frame {self.frame_no} / {len(self.data_df) - 1} | {self.frm_no_timestamp}'
+        # the total is the last DISPLAYABLE frame, not len(data_df) - 1: pose data can be longer than the video,
+        # and quoting an index the UI can never reach would contradict the frame counter printed on the panel.
+        title = f'{window_name} | {self.video_name} | frame {self.frame_no} / {self._max_id_ui_frm_idx()} | {self.frm_no_timestamp}'
         try:
             cv2.setWindowTitle(window_name, title)
         except cv2.error:
@@ -208,6 +216,19 @@ class PoseImporterMixin(object):
         ``KeyError``) and the video is seeked (returning no frame), so the shorter of the two governs.
         """
         return min(len(self.data_df), int(self.video_info["frame_count"])) - 1
+
+    def _next_id_ui_frm_no(self) -> int:
+        """
+        Frame index to display on the next ``"x"`` press: step forward by :data:`ID_UI_FRM_STEP`, shortening the
+        final step so the last usable frame is reachable, then wrap around to the start. Each wrap advances
+        :attr:`frm_wrap_offset` by half a step, so a second lap shows frames BETWEEN those of the first rather
+        than repeating the ones the user has already rejected.
+        """
+        max_frm_idx = self._max_id_ui_frm_idx()
+        if self.frame_no >= max_frm_idx:
+            self.frm_wrap_offset = (self.frm_wrap_offset + ID_UI_FRM_STEP // 2) % ID_UI_FRM_STEP
+            return min(self.frm_wrap_offset, max_frm_idx)
+        return min(self.frame_no + ID_UI_FRM_STEP, max_frm_idx)
 
     def multianimal_identification(self):
         # NOTE: the window is deliberately NOT destroyed here, nor before re-entering this method or
@@ -228,29 +249,22 @@ class PoseImporterMixin(object):
                 #self.img_bp_cords[animal_name].append(tuple(self.data_df.loc[self.frame_no, [x_name, y_name]].values.astype(np.int32)))
         self.insert_all_bodyparts_into_img(img=self.img_overlay, body_parts=self.img_bp_cords)
         side_img = np.ones((self.scalers["panel_h"], self.display_img_w, 3), dtype=np.uint8)
-        #side_img = np.ones((int(self.video_info["height"] / 2), self.video_info["width"], 3))
-        #cv2.putText(side_img, f"Current video: {self.video_name}", (10, self.scalers["space"]), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 2)
-        side_img = PlottingMixin().put_text(img=side_img, text=ID_UI_TXT['ASSIGN_Q'], pos=(10, int(self.scalers["space"] * self.add_spacer)), font_size=self.scalers["font"], font_path=self.font_path, text_color=(255, 255, 255))
+        side_img = PlottingMixin().put_text(img=side_img, text=ID_UI_TXT['ASSIGN_Q'].format(self.frame_no, self._max_id_ui_frm_idx()), pos=(10, int(self.scalers["space"] * self.add_spacer)), font_size=self.scalers["font"], font_path=self.font_path, text_color=(255, 255, 255))
         side_img = PlottingMixin().put_text(img=side_img, text=ID_UI_TXT['NEW_FRM'], pos=(10, int(self.scalers["space"] * (self.add_spacer * 2))), font_size=self.scalers["font"], font_path=self.font_path, text_color=(255, 255, 0))
         side_img = PlottingMixin().put_text(img=side_img, text=ID_UI_TXT['ASSIGN'], pos=(10, int(self.scalers["space"] * (self.add_spacer * 3))), font_size=self.scalers["font"], font_path=self.font_path, text_color=(0, 255, 0))
-        #cv2.putText(side_img, ID_UI_TXT['ASSIGN_Q'], (10, int(self.scalers["space"] * self.add_spacer)), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 2)
-        #cv2.putText(side_img, ID_UI_TXT['NEW_FRM'], (10, int(self.scalers["space"] * (self.add_spacer * 2))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 0), 2)
-        #cv2.putText(side_img, ID_UI_TXT['ASSIGN'], (10, int(self.scalers["space"] * (self.add_spacer * 3))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (0, 255, 0), 2)
         self.img_concat = np.uint8(np.concatenate((self.img_overlay, side_img), axis=0))
         cv2.imshow("Define animal IDs", self.img_concat)
         cv2.resizeWindow("Define animal IDs", self.display_img_w, self.display_img_h + self.scalers["panel_h"])
-        #cv2.resizeWindow("Define animal IDs", self.video_info["width"], self.video_info["height"])
         keyboard_choice = False
         while not keyboard_choice:
             k = cv2.waitKey(20)
             if (k == ord("x")) or (k == ord("X")):
-                if self.frame_no + 50 > self._max_id_ui_frm_idx():
-                    FrameRangeWarning(msg=f"Cannot proceed to frame {self.frame_no+50}: the last frame that can be displayed for video {self.video_name} is {self._max_id_ui_frm_idx()} ({len(self.data_df)} frames of pose data, {int(self.video_info['frame_count'])} frames of video).", source=self.__class__.__name__)
-                else:
-                    cv2.waitKey(1)
-                    self.frame_no += 50
-                    self.multianimal_identification()
-                    break
+                cv2.waitKey(1)
+                # step forward 50 frames, take a short final hop to the last usable frame, then wrap to 0 -
+                # the user must be able to come back round to a frame where the animals are separated.
+                self.frame_no = self._next_id_ui_frm_no()
+                self.multianimal_identification()
+                break
             elif (k == ord("c")) or (k == ord("C")):
                 cv2.waitKey(1)
                 self.choose_animal_ui()
@@ -264,18 +278,13 @@ class PoseImporterMixin(object):
             cv2.namedWindow("Define animal IDs", cv2.WINDOW_NORMAL)
             self._set_multianimal_window_id_title(window_name="Define animal IDs")
             self.side_img = np.ones((self.scalers["panel_h"], self.display_img_w, 3), dtype=np.uint8)
-            #self.side_img = np.ones((int(self.video_info["height"] / 2), self.video_info["width"], 3))
             self.side_img = PlottingMixin().put_text(img=self.side_img, text=ID_UI_TXT['CLICK_ON'], pos=(10, int(self.scalers["space"] * self.add_spacer)), font_size=self.scalers["font"], font_path=self.font_path, text_color=(0, 255, 0))
             self.side_img = PlottingMixin().put_text(img=self.side_img, text=animal, pos=(10, int(self.scalers["space"] * (self.add_spacer * 2))), font_size=self.scalers["font"], font_path=self.font_path, text_color=(255, 255, 0))
-            #cv2.putText(self.side_img, ID_UI_TXT['CLICK_ON'], (10, int(self.scalers["space"] * self.add_spacer)), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 3)
-            #cv2.putText(self.side_img, animal, (10, int(self.scalers["space"] * (self.add_spacer * 2))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 0), 3)
             for id in self.id_cords.keys():
                 self.new_overlay = PlottingMixin().put_text(img=self.new_overlay, text=self.id_cords[id]["name"], pos=self.id_cords[id]["cord"], font_size=self.scalers["font"], font_path=self.font_path, text_color=(255, 255, 255))
-                #cv2.putText(self.new_overlay, self.id_cords[id]["name"], self.id_cords[id]["cord"], cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255),  3)
             self.new_overlay = np.uint8(np.concatenate((self.new_overlay, self.side_img), axis=0))
             cv2.imshow("Define animal IDs", self.new_overlay)
             cv2.resizeWindow("Define animal IDs", self.display_img_w, self.display_img_h + self.scalers["panel_h"])
-            #cv2.resizeWindow("Define animal IDs", self.video_info["width"], self.video_info["height"])
             while cnt not in self.id_cords.keys():
                 cv2.setMouseCallback("Define animal IDs", self.get_x_y_loc_of_mouse_click)
                 cv2.waitKey(200)
@@ -285,17 +294,11 @@ class PoseImporterMixin(object):
         cv2.destroyAllWindows()
         cv2.namedWindow("Define animal IDs", cv2.WINDOW_NORMAL)
         cv2.resizeWindow("Define animal IDs", self.display_img_w, self.display_img_h + self.scalers["panel_h"])
-        #cv2.resizeWindow("Define animal IDs", self.video_info["width"], self.video_info["height"])
         self.new_frame = deepcopy(self.img)
         self.side_img = np.ones((self.scalers["panel_h"], self.display_img_w, 3), dtype=np.uint8)
-        #self.side_img = np.ones((int(self.video_info["height"] / 2), self.video_info["width"], 3))
-        #cv2.putText(self.side_img, f"Current video: {self.video_name}", (10, self.scalers["space"]), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 3)
         self.side_img = PlottingMixin().put_text(img=self.side_img, text=ID_UI_TXT['HAPPY_Q'], pos=(10, int(self.scalers["space"] * self.add_spacer)), font_size=self.scalers["font"], font_path=self.font_path, text_color=(255, 255, 255))
         self.side_img = PlottingMixin().put_text(img=self.side_img, text=ID_UI_TXT['CONTINUE'], pos=(10, int(self.scalers["space"] * (self.add_spacer * 2))), font_size=self.scalers["font"], font_path=self.font_path, text_color=(255, 255, 0))
         self.side_img = PlottingMixin().put_text(img=self.side_img, text=ID_UI_TXT['RESTART'], pos=(10, int(self.scalers["space"] * (self.add_spacer * 3))), font_size=self.scalers["font"], font_path=self.font_path, text_color=(0, 255, 255))
-        #cv2.putText(self.side_img, ID_UI_TXT['HAPPY_Q'], (10, int(self.scalers["space"] * self.add_spacer)), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 2)
-        #cv2.putText(self.side_img, ID_UI_TXT['CONTINUE'], (10, int(self.scalers["space"] * (self.add_spacer * 2))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 0), 2)
-        #cv2.putText(self.side_img, ID_UI_TXT['RESTART'], (10, int(self.scalers["space"] * (self.add_spacer * 3))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (0, 255, 255), 2,)
         self.insert_all_bodyparts_into_img(img=self.new_frame, body_parts=self.img_bp_cords)
         self.insert_animal_names()
         self.img_concat = np.uint8(np.concatenate((self.new_frame, self.side_img), axis=0))
@@ -305,14 +308,12 @@ class PoseImporterMixin(object):
         while not keyboard_choice:
             k = cv2.waitKey(20)
             if (k == ord("x")) or (k == ord("X")):
-                if self.frame_no + 50 > self._max_id_ui_frm_idx():
-                    FrameRangeWarning(msg=f"Cannot proceed to frame {self.frame_no+50}: the last frame that can be displayed for video {self.video_name} is {self._max_id_ui_frm_idx()} ({len(self.data_df)} frames of pose data, {int(self.video_info['frame_count'])} frames of video).", source=self.__class__.__name__)
-                else:
-                    cv2.destroyWindow("Define animal IDs")
-                    cv2.waitKey(1)
-                    self.frame_no += 50
-                    self.multianimal_identification()
-                    break
+                cv2.destroyWindow("Define animal IDs")
+                cv2.waitKey(1)
+                # as in multianimal_identification: advance, hop to the last usable frame, then wrap to 0.
+                self.frame_no = self._next_id_ui_frm_no()
+                self.multianimal_identification()
+                break
             elif (k == ord("c")) or (k == ord("C")):
                 cv2.destroyAllWindows()
                 cv2.waitKey(1)

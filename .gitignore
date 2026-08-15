@@ -43,3 +43,10 @@ docs/_build
 # Claude Code
 simba/.claude/
 .claude/
+
+# runtime logs written by SimBA into project folders (incl. test fixtures)
+**/logs/project_log.log
+
+# macOS finder metadata
+.DS_Store
+**/.DS_Store
