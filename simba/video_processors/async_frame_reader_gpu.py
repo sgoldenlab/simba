@@ -3,7 +3,7 @@ import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 import queue
 import threading
-from typing import Generator, Optional, Union
+from typing import Generator, Union
 
 import cv2
 import numpy as np
@@ -61,7 +61,7 @@ class NvDecReader:
                  max_batches_pending: int = 3,
                  n_decoders: int = 1,
                  use_device_memory: bool = False,
-                 output_color_type: Optional[nvc.OutputColorType] = None,
+                 output_color_type=None,   # PyNvVideoCodec enum: nvc may be None at import, so it cannot be annotated here
                  bgr: bool = True):
 
         if nvc is None:

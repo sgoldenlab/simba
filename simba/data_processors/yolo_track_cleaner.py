@@ -14,7 +14,9 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, recursive_file_search)
 
-warnings.simplefilter(action='ignore', category=pd.errors.SettingWithCopyWarning)
+_SETTING_WITH_COPY_WARNING = getattr(pd.errors, 'SettingWithCopyWarning', None)   # absent in pandas < 1.0
+if _SETTING_WITH_COPY_WARNING is not None:
+    warnings.simplefilter(action='ignore', category=_SETTING_WITH_COPY_WARNING)
 
 FRAME = 'FRAME'
 CLASS_ID = 'CLASS_ID'

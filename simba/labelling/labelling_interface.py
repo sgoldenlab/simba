@@ -30,7 +30,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_dataframe, check_valid_dict)
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Options, TagNames
 from simba.utils.errors import FrameRangeError, NoDataError, NoFilesFoundError
-from simba.utils.lookups import (get_current_time, get_display_resolution,
+from simba.utils.lookups import (get_current_time,
                                  get_labelling_img_kbd_bindings,
                                  get_labelling_video_kbd_bindings)
 from simba.utils.printing import log_event, stdout_success
@@ -40,9 +40,6 @@ from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
 
 PLAY_VIDEO_SCRIPT_PATH = os.path.join(os.path.dirname(simba.__file__), "labelling/play_annotation_video.py")
 PADDING = 5
-
-DISPLAY_RESOLUTION = get_display_resolution()
-MAX_FRAME_SIZE = (int(DISPLAY_RESOLUTION[0] * 0.5), int(DISPLAY_RESOLUTION[1] * 0.05))
 
 
 class LabellingInterface(ConfigReader):

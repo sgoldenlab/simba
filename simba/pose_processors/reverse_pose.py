@@ -137,7 +137,7 @@ class Reverse2AnimalTracking(ConfigReader):
             )
 
 
-test = Reverse2AnimalTracking(
-    config_path="/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini"
-)
-test.reverse_tracking()
+# test = Reverse2AnimalTracking(
+#     config_path="/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini"
+# )
+# test.reverse_tracking()

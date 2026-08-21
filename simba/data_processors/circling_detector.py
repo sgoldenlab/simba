@@ -157,8 +157,8 @@ class CirclingDetector(ConfigReader):
 
 
 
-detector = CirclingDetector(config_path=r"I:\mitra\nick_ressler\project_folder\project_config.ini")
-detector.run()
+# detector = CirclingDetector(config_path=r"I:\mitra\nick_ressler\project_folder\project_config.ini")
+# detector.run()
 
 # detector = CirclingDetector(config_path=r"F:\troubleshooting\sam\sam\project_folder\project_config.ini")
 # detector.run()

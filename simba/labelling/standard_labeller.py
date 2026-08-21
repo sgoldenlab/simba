@@ -34,7 +34,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_int,
 from simba.utils.enums import Formats, TagNames, TextOptions
 from simba.utils.errors import (FrameRangeError, NoDataError,
                                 NoFilesFoundError, SimbaError)
-from simba.utils.lookups import (get_current_time, get_display_resolution,
+from simba.utils.lookups import (get_current_time,
                                  get_img_resize_info,
                                  get_labelling_img_kbd_bindings,
                                  get_labelling_video_kbd_bindings)
@@ -48,7 +48,6 @@ from simba.utils.warnings import DataHeaderWarning, FrameRangeWarning
 PLAY_VIDEO_SCRIPT_PATH = os.path.join(os.path.dirname(simba.__file__), "labelling/play_annotation_video.py")
 PADDING = 5
 
-DISPLAY_RESOLUTION = get_display_resolution()
 MAX_FRAME_RATI0 = (0.6, 0.6) # W * H RATIO OF IMAGE FRAME ONLY
 DEFAULT_IMG_GREYSCALE = 'FALSE'
 DEFAULT_SAVE_VERBOSITY = 'TRUE'

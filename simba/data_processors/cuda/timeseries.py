@@ -1,6 +1,11 @@
 import math
 from time import perf_counter
-from typing import Literal, Optional
+from typing import Optional
+
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 
 import numpy as np
 from numba import cuda, float64
