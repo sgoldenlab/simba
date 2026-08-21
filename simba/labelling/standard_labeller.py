@@ -34,8 +34,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_int,
 from simba.utils.enums import Formats, TagNames, TextOptions
 from simba.utils.errors import (FrameRangeError, NoDataError,
                                 NoFilesFoundError, SimbaError)
-from simba.utils.lookups import (get_current_time,
-                                 get_img_resize_info,
+from simba.utils.lookups import (get_current_time, get_img_resize_info,
                                  get_labelling_img_kbd_bindings,
                                  get_labelling_video_kbd_bindings)
 from simba.utils.printing import log_event, stdout_success
