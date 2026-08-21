@@ -115,4 +115,22 @@ SimBA pop-up mixin
 
 .. automodule:: simba.mixins.pop_up_mixin
    :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Main GUI application
+--------------------------------------------
+
+.. automodule:: simba.SimBA
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Project tree-view widget
+--------------------------------------------
+
+.. automodule:: simba.ui.get_tree_view
+   :members:
+   :undoc-members:
    :show-inheritance:

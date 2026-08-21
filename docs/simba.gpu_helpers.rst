@@ -29,6 +29,7 @@ Geometry (GPU)
 .. automodule:: simba.data_processors.cuda.geometry
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -37,6 +38,7 @@ Image (GPU)
 .. automodule:: simba.data_processors.cuda.image
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -45,6 +47,7 @@ Background subtraction (GPU)
 .. automodule:: simba.data_processors.cuda.bg_subtractor
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -53,6 +56,7 @@ Pose plotting (GPU)
 .. automodule:: simba.data_processors.cuda.pose_plotter_nvenc
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -61,6 +65,7 @@ Greyscale conversion (GPU)
 .. automodule:: simba.data_processors.cuda.greyscale_nvenc
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -69,6 +74,7 @@ CLAHE (GPU)
 .. automodule:: simba.data_processors.cuda.clahe_nvenc
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -77,6 +83,7 @@ Egocentric rotation (GPU)
 .. automodule:: simba.data_processors.cuda.egocentric_rotator_nvenc
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -85,6 +92,7 @@ Geometry overlay (GPU)
 .. automodule:: simba.data_processors.cuda.geometry_plotter_nvenc
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -93,6 +101,7 @@ Statistics (GPU)
 .. automodule:: simba.data_processors.cuda.statistics
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -101,6 +110,7 @@ Circular statistics (GPU)
 .. automodule:: simba.data_processors.cuda.circular_statistics
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -108,6 +118,7 @@ Time-series statistics (GPU)
 ------------------------------
 .. automodule:: simba.data_processors.cuda.timeseries
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -115,6 +126,7 @@ Feature extraction (GPU)
 ------------------------------
 .. automodule:: simba.data_processors.cuda.feature_extraction
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -122,6 +134,7 @@ Feature extraction supplement (GPU)
 ------------------------------------
 .. automodule:: simba.data_processors.cuda.feature_extraction_supplement
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -130,6 +143,7 @@ SHAP explanations (GPU)
 .. automodule:: simba.data_processors.cuda.create_shap_log
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -138,6 +152,7 @@ Data transformations (GPU)
 .. automodule:: simba.data_processors.cuda.data
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -148,5 +163,6 @@ kernels compose, plus the public NVDEC video-decoder factory.
 
 .. automodule:: simba.data_processors.cuda.utils
    :members:
+   :undoc-members:
    :private-members:
    :show-inheritance:

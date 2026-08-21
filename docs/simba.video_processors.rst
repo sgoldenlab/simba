@@ -6,6 +6,7 @@ Batch process
 
 .. automodule:: simba.video_processors.batch_process_create_ffmpeg_commands
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -14,6 +15,7 @@ Get pixels per millimeter
 
 .. automodule:: simba.video_processors.calculate_px_dist
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Extract frames
@@ -21,6 +23,7 @@ Extract frames
 
 .. automodule:: simba.video_processors.extract_frames
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Videos to frames
@@ -28,6 +31,7 @@ Videos to frames
 
 .. automodule:: simba.video_processors.videos_to_frames
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Extract .SEQ frames
@@ -35,6 +39,7 @@ Extract .SEQ frames
 
 .. automodule:: simba.video_processors.extract_seqframes
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Multi-cropper
@@ -42,6 +47,7 @@ Multi-cropper
 
 .. automodule:: simba.video_processors.multi_cropper
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Video processing tools
@@ -49,6 +55,7 @@ Video processing tools
 
 .. automodule:: simba.video_processors.video_processing
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Crop ROI selector (rectangles)
@@ -56,6 +63,7 @@ Crop ROI selector (rectangles)
 
 .. automodule:: simba.video_processors.roi_selector
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -64,6 +72,7 @@ Crop ROI selector (circles)
 
 .. automodule:: simba.video_processors.roi_selector_circle
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Crop ROI selector (polygons)
@@ -79,6 +88,7 @@ Interactive CLAHE interface
 
 .. automodule:: simba.video_processors.clahe_ui
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -87,6 +97,7 @@ Interactive brightness / contrast interface
 
 .. automodule:: simba.video_processors.brightness_contrast_ui
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Asynchronous frame reader (GPU)
@@ -94,4 +105,5 @@ Asynchronous frame reader (GPU)
 
 .. automodule:: simba.video_processors.async_frame_reader_gpu
    :members:
+   :undoc-members:
    :show-inheritance:

@@ -39,3 +39,12 @@ page as the map; follow a link for the full method reference.
 .. seealso::
    GPU-accelerated versions of several of these (geometry, image, statistics,
    circular statistics, time-series) are collected under :doc:`GPU acceleration <simba.gpu_helpers>`.
+
+
+Abstract base classes
+--------------------------------------------
+
+.. automodule:: simba.mixins.abstract_classes
+   :members:
+   :undoc-members:
+   :show-inheritance:

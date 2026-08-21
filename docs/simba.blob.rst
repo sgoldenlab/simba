@@ -15,6 +15,7 @@ The main class for executing blob tracking workflows.
 
 .. autoclass:: simba.video_processors.blob_tracking_executor.BlobTrackingExecutor
    :members:
+   :undoc-members:
    :show-inheritance:
 
 User Interfaces
@@ -24,10 +25,12 @@ GUI tools for configuring and running blob tracking.
 
 .. autoclass:: simba.ui.blob_tracker_ui.BlobTrackingUI
    :members:
+   :undoc-members:
    :show-inheritance:
 
 .. autoclass:: simba.ui.blob_quick_check_interface.BlobQuickChecker
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Blob Detection Functions
@@ -73,6 +76,7 @@ threaded ffmpeg/cv2 fallback when PyNvVideoCodec is unavailable.
 
 .. autoclass:: simba.data_processors.cuda.bg_subtractor.BackgroundSubtractorCUDA
    :members:
+   :undoc-members:
    :show-inheritance:
 
 
@@ -105,6 +109,7 @@ Import blob tracking data into SimBA projects.
 
 .. autoclass:: simba.pose_importers.simba_blob_importer.SimBABlobImporter
    :members:
+   :undoc-members:
    :show-inheritance:
    :noindex:
 
@@ -115,15 +120,18 @@ Tools for visualizing blob tracking results.
 
 .. autoclass:: simba.plotting.blob_plotter.BlobPlotter
    :members:
+   :undoc-members:
    :show-inheritance:
    :noindex:
 
 .. autoclass:: simba.plotting.blob_visualizer.BlobVisualizer
    :members:
+   :undoc-members:
    :show-inheritance:
    :noindex:
 
 .. autoclass:: simba.plotting.geometry_plotter.GeometryPlotter
    :members:
+   :undoc-members:
    :show-inheritance:
    :noindex:

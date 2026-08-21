@@ -47,6 +47,7 @@ Interactive CLAHE
 .. automodule:: simba.video_processors.clahe_ui
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Interactive brightness / contrast
@@ -55,6 +56,7 @@ Interactive brightness / contrast
 .. automodule:: simba.video_processors.brightness_contrast_ui
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Batch video process executor
@@ -63,6 +65,7 @@ Batch video process executor
 .. automodule:: simba.video_processors.batch_process_create_ffmpeg_commands
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Egocentrically rotate videos
@@ -70,6 +73,7 @@ Egocentrically rotate videos
 
 .. automodule:: simba.video_processors.egocentric_video_rotator
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Egocentrically rotate videos - GPU (NVDEC/NVENC)
@@ -77,6 +81,7 @@ Egocentrically rotate videos - GPU (NVDEC/NVENC)
 
 .. autoclass:: simba.data_processors.cuda.egocentric_rotator_nvenc.EgocentricRotatorNVENC
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Greyscale videos - GPU (NVDEC/NVENC)
@@ -84,6 +89,7 @@ Greyscale videos - GPU (NVDEC/NVENC)
 
 .. autoclass:: simba.data_processors.cuda.greyscale_nvenc.GreyscaleNVENC
    :members:
+   :undoc-members:
    :show-inheritance:
 
 CLAHE videos - GPU (NVDEC/NVENC)
@@ -91,6 +97,7 @@ CLAHE videos - GPU (NVDEC/NVENC)
 
 .. autoclass:: simba.data_processors.cuda.clahe_nvenc.ClaheNVENC
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Asynchronous frame reader
@@ -98,6 +105,7 @@ Asynchronous frame reader
 
 .. automodule:: simba.video_processors.async_frame_reader
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Asynchronous frame reader (GPU)
@@ -106,6 +114,7 @@ Asynchronous frame reader (GPU)
 .. automodule:: simba.video_processors.async_frame_reader_gpu
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Save videos as frame images
@@ -114,4 +123,5 @@ Save videos as frame images
 .. automodule:: simba.video_processors.videos_to_frames
    :noindex:
    :members:
+   :undoc-members:
    :show-inheritance:

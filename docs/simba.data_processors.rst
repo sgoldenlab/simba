@@ -270,3 +270,11 @@ Light-dark box analysis
    :undoc-members:
    :show-inheritance:
 
+
+Ataxia detector
+--------------------------------------------
+
+.. automodule:: simba.data_processors.ataxia_detector
+   :members:
+   :undoc-members:
+   :show-inheritance:

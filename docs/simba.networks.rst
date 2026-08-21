@@ -10,4 +10,5 @@ Network (Graph) methods
 
 .. automodule:: simba.mixins.network_mixin
    :members:
+   :undoc-members:
    :show-inheritance:

@@ -16,6 +16,18 @@ Descriptive statistics
 
 .. automethod:: simba.mixins.statistics_mixin.Statistics.symmetry_index
 
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sliding_cumulative_mean
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sliding_z_scores
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sliding_skew
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sliding_kurtosis
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sliding_iqr
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.cov_matrix
+
 Effect sizes & association
 ------------------------------------------
 
@@ -26,6 +38,43 @@ Effect sizes & association
 .. automethod:: simba.mixins.statistics_mixin.Statistics.relative_risk
 
 .. automethod:: simba.mixins.statistics_mixin.Statistics.youden_j
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.cohens_d
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.rolling_cohens_d
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.cohens_h
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.cohens_kappa
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sliding_eta_squared
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sliding_relative_risk
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.phi_coefficient
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sliding_phi_coefficient
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.concordance_ratio
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.yule_coef
+
+Correlation
+------------------------------------------
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.pearsons_r
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sliding_pearsons_r
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.spearman_rank_correlation
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sliding_spearman_rank_correlation
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.kendall_tau
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sliding_kendall_tau
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sliding_autocorrelation
 
 Hypothesis tests
 ------------------------------------------
@@ -52,6 +101,36 @@ Hypothesis tests
 
 .. automethod:: simba.mixins.statistics_mixin.Statistics.windowed_frequentist_distribution_tests
 
+.. automethod:: simba.mixins.statistics_mixin.Statistics.independent_samples_t
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.rolling_independent_sample_t
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sliding_independent_samples_t
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.one_way_anova
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.rolling_one_way_anova
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.kruskal_wallis
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.mann_whitney
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.rolling_mann_whitney
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.two_sample_ks
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.rolling_two_sample_ks
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.levenes
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.rolling_levenes
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.rolling_barletts_test
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.brunner_munzel
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.chi_square
+
 Distribution distances & drift
 ------------------------------------------
 
@@ -75,6 +154,8 @@ Distribution distances & drift
 
 .. automethod:: simba.mixins.statistics_mixin.Statistics.total_variation_distance
 
+.. automethod:: simba.mixins.statistics_mixin.Statistics.circular_euclidean_kantorovich
+
 Vector similarity & distance metrics
 ------------------------------------------
 
@@ -91,6 +172,20 @@ Vector similarity & distance metrics
 .. automethod:: simba.mixins.statistics_mixin.Statistics.normalized_google_distance
 
 .. automethod:: simba.mixins.statistics_mixin.Statistics.wave_hedges_distance
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.mahalanobis_distance_cdist
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.czebyshev_distance
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sliding_czebyshev_distance
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.hamming_distance
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.bray_curtis_dissimilarity
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sokal_sneath
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sokal_michener
 
 Cluster-validity indices
 ------------------------------------------
@@ -133,6 +228,10 @@ Cluster-validity indices
 
 .. automethod:: simba.mixins.statistics_mixin.Statistics.xie_beni
 
+.. automethod:: simba.mixins.statistics_mixin.Statistics.calinski_harabasz
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.kmeans_1d
+
 Clustering agreement
 ------------------------------------------
 
@@ -154,6 +253,10 @@ Outlier detection
 .. automethod:: simba.mixins.statistics_mixin.Statistics.isolation_forest
 
 .. automethod:: simba.mixins.statistics_mixin.Statistics.local_outlier_factor
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.mad_median_rule
+
+.. automethod:: simba.mixins.statistics_mixin.Statistics.sliding_mad_median_rule
 
 Body-part movement & geometry
 ------------------------------------------

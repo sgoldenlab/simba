@@ -85,6 +85,7 @@ Regression - metrics
 
 .. automodule:: simba.model.regression.metrics
    :members:
+   :undoc-members:
    :show-inheritance:
 
 Regression - fit and transform
@@ -92,6 +93,7 @@ Regression - fit and transform
 
 .. automodule:: simba.model.regression.model
    :members:
+   :undoc-members:
    :show-inheritance:
 
 SAM2 segmentation inference
@@ -115,3 +117,11 @@ YOLO bounding-box inference
    :members:
    :undoc-members:
 
+
+Multi-label random forest trainer
+--------------------------------------------
+
+.. automodule:: simba.model.train_multilabel_rf
+   :members:
+   :undoc-members:
+   :show-inheritance:

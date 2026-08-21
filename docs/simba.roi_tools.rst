@@ -18,6 +18,7 @@ ROI Analyzer
 
 .. autoclass:: simba.roi_tools.ROI_analyzer.ROIAnalyzer
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Classification Calculator - Single Core
@@ -25,6 +26,7 @@ ROI Classification Calculator - Single Core
 
 .. autoclass:: simba.roi_tools.roi_clf_calculator.ROIClfCalculator
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Classification Calculator - Multiprocess
@@ -32,6 +34,7 @@ ROI Classification Calculator - Multiprocess
 
 .. autoclass:: simba.roi_tools.roi_clf_calculator_mp.ROIClfCalculatorMultiprocess
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Movement Analyzer - Single Core
@@ -39,6 +42,7 @@ ROI Movement Analyzer - Single Core
 
 .. autoclass:: simba.roi_tools.roi_aggregate_statistics_analyzer.ROIAggregateStatisticsAnalyzer
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Movement Analyzer - Multiprocess
@@ -46,6 +50,7 @@ ROI Movement Analyzer - Multiprocess
 
 .. autoclass:: simba.roi_tools.roi_aggregate_stats_mp.ROIAggregateStatisticsAnalyzerMultiprocess
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Feature Analyzer
@@ -53,6 +58,7 @@ ROI Feature Analyzer
 
 .. automodule:: simba.roi_tools.ROI_feature_analyzer
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Directing Analyzer
@@ -60,6 +66,7 @@ ROI Directing Analyzer
 
 .. automodule:: simba.roi_tools.ROI_directing_analyzer
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Time-Bin Calculator
@@ -67,6 +74,7 @@ ROI Time-Bin Calculator
 
 .. autoclass:: simba.roi_tools.roi_time_bins_analyzer.ROITimebinAnalyzer
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Time-Bin Calculator (Legacy)
@@ -74,6 +82,7 @@ ROI Time-Bin Calculator (Legacy)
 
 .. autoclass:: simba.roi_tools.ROI_time_bin_calculator.ROITimebinCalculator
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Size Standardizer
@@ -81,6 +90,7 @@ ROI Size Standardizer
 
 .. autoclass:: simba.roi_tools.ROI_size_standardizer.ROISizeStandardizer
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Visualization
@@ -91,6 +101,7 @@ ROI Plotter - Single Core
 
 .. autoclass:: simba.plotting.roi_plotter.ROIPlotter
    :members:
+   :undoc-members:
    :show-inheritance:
    :noindex:
 
@@ -99,6 +110,7 @@ ROI Plotter - Multiprocess
 
 .. autoclass:: simba.plotting.roi_plotter_mp.ROIPlotMultiprocess
    :members:
+   :undoc-members:
    :show-inheritance:
    :noindex:
 
@@ -107,6 +119,7 @@ ROI Feature Visualizer - Single Core
 
 .. autoclass:: simba.plotting.ROI_feature_visualizer.ROIfeatureVisualizer
    :members:
+   :undoc-members:
    :show-inheritance:
    :noindex:
 
@@ -115,6 +128,7 @@ ROI Feature Visualizer - Multiprocess
 
 .. autoclass:: simba.plotting.ROI_feature_visualizer_mp.ROIfeatureVisualizerMultiprocess
    :members:
+   :undoc-members:
    :show-inheritance:
    :noindex:
 
@@ -123,6 +137,7 @@ ROI Directing Visualizer
 
 .. autoclass:: simba.plotting.roi_directing_visualizer.DirectingROIVisualizer
    :members:
+   :undoc-members:
    :show-inheritance:
    :noindex:
 
@@ -134,6 +149,7 @@ ROI GUI
 
 .. autoclass:: simba.roi_tools.roi_ui.ROI_ui
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI GUI Mixin
@@ -141,6 +157,7 @@ ROI GUI Mixin
 
 .. automodule:: simba.roi_tools.roi_ui_mixin
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Ruler
@@ -148,6 +165,7 @@ ROI Ruler
 
 .. autoclass:: simba.roi_tools.roi_ruler.ROIRuler
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI GUI Utils
@@ -166,6 +184,7 @@ ROI Circle Selector
 
 .. automodule:: simba.roi_tools.roi_selector_circle_tkinter
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Polygon Selector
@@ -173,6 +192,7 @@ ROI Polygon Selector
 
 .. automodule:: simba.roi_tools.roi_selector_polygon_tkinter
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Rectangle Selector (Tkinter)
@@ -180,6 +200,7 @@ ROI Rectangle Selector (Tkinter)
 
 .. autoclass:: simba.roi_tools.roi_selector_rectangle_tkinter.ROISelector
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Interactive Bufferer
@@ -187,6 +208,7 @@ ROI Interactive Bufferer
 
 .. autoclass:: simba.roi_tools.interactive_roi_bufferer.InteractiveROIBufferer
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Interactive Modifiers
@@ -197,6 +219,7 @@ ROI Interactive Modifier UI (Tkinter)
 
 .. autoclass:: simba.roi_tools.interactive_roi_modifier_tkinter.InteractiveROIModifier
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Interactive Modifier UI - Legacy (OpenCV)
@@ -204,6 +227,7 @@ ROI Interactive Modifier UI - Legacy (OpenCV)
 
 .. autoclass:: simba.roi_tools.interactive_modifier_ui.InteractiveROIModifier
    :members:
+   :undoc-members:
    :show-inheritance:
 
 ROI Data Import/Export
@@ -214,4 +238,5 @@ ROI CSV Importer
 
 .. autoclass:: simba.roi_tools.import_roi_csvs.ROIDefinitionsCSVImporter
    :members:
+   :undoc-members:
    :show-inheritance:

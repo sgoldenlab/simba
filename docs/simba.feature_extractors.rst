@@ -166,4 +166,10 @@ Custom feature extractor
    :undoc-members:
 
 
+Wing-wave feature extraction wrapper
+--------------------------------------------
 
+.. automodule:: simba.feature_extractors.wingwave_extractor
+   :members:
+   :undoc-members:
+   :show-inheritance:
