@@ -27,8 +27,8 @@ import pandas as pd
 import psutil
 import pyglet
 from matplotlib import cm
-from numba import jit, prange
 from matplotlib.colors import hsv_to_rgb, rgb2hex
+from numba import jit, prange
 from tabulate import tabulate
 
 import simba
