@@ -6,7 +6,6 @@ Time-series transformations
    :depth: 1
 
 Time-series statistics mixin
-
 ----------------------------------------------
 
 
@@ -20,7 +19,6 @@ Time-series statistics mixin
 
 
 Time-series statistics GPU methods
-
 ----------------------------------------------
 
 

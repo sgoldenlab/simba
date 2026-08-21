@@ -27,6 +27,7 @@ import pandas as pd
 import psutil
 import pyglet
 from matplotlib import cm
+from numba import jit, prange
 from matplotlib.colors import hsv_to_rgb, rgb2hex
 from tabulate import tabulate
 
@@ -35,6 +36,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_rgb_tuple,
                                 check_instance, check_int, check_str,
+                                check_valid_boolean, check_valid_dataframe,
                                 check_valid_dict, check_valid_tuple)
 from simba.utils.enums import (OS, UML, Defaults, FontPaths, Formats, Keys,
                                Methods, Options, Paths)
@@ -1491,6 +1493,10 @@ def find_best_multi_animal_assignment_frame(h5_path: Union[str, os.PathLike],
     :class:`simba.pose_importers.superanimal_import.SuperAnimalTopViewImporter` (or any
     other multi-animal importer that exposes the same parameter).
 
+    .. seealso::
+       For in-memory, SimBA-format dataframes - which additionally rank candidate frames by how far apart the
+       animals are - see :func:`~simba.utils.lookups.find_best_multi_animal_assignment_frame_df`.
+
     .. note::
        The function expects a modern DLC PyTorch / multi-animal pandas H5 layout with
        at least an ``individuals`` column level. Single-animal files and legacy DLC
@@ -1527,6 +1533,7 @@ def find_best_multi_animal_assignment_frame(h5_path: Union[str, os.PathLike],
     >>> # frame == 3313 (middle of the longest 5-mice run)
 
     :example require >= 10 body-parts per animal for higher-quality assignment frames:
+
     >>> frame = find_best_multi_animal_assignment_frame(
     ...     h5_path=..., expected_animals=5, min_bodyparts_per_animal=10)
     """
@@ -1588,3 +1595,200 @@ def find_best_multi_animal_assignment_frame(h5_path: Union[str, os.PathLike],
         if run_len > longest_len:
             longest_start, longest_end, longest_len = run_start, run_end, run_len
     return int((longest_start + longest_end) // 2)
+
+
+@jit(nopython=True, parallel=True, cache=True)
+def _bp_detections_and_distances(x: np.ndarray, y: np.ndarray, p: np.ndarray, p_threshold: float) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Framewise body-part detection counts, and the closest-point distance between the two nearest animals.
+
+    A body-part counts as detected when its x and y are finite, are not both exactly zero, and - when
+    ``p_threshold`` is above zero - its probability meets that threshold. Per frame, the distance between every
+    detected body-part of one animal and every detected body-part of each other animal is measured and the
+    smallest kept, i.e. how close the two nearest animals come to touching.
+
+    Both outputs come from one pass, so the definition of "detected" cannot drift between the counts used to
+    accept a frame and the distances used to rank it.
+
+    :param np.ndarray x: Body-part x-coordinates of shape ``(frames, animals, body-parts)``. Animals with fewer
+        body-parts than the widest animal should be zero-padded, which the detection rule then excludes.
+    :param np.ndarray y: Body-part y-coordinates, same shape as ``x``.
+    :param np.ndarray p: Body-part probabilities, same shape as ``x``. Never indexed when ``p_threshold`` is
+        ``0.0``, so callers ignoring probability may pass an empty array rather than materialising one.
+    :param float p_threshold: Minimum probability for a body-part to count as detected. ``0.0`` ignores ``p``.
+    :return: Tuple of detected body-part counts of shape ``(frames, animals)``, and the smallest inter-animal body-part distance per frame of shape ``(frames,)`` - the latter ``-1.0`` on frames where no two animals both have a detected body-part.
+    :rtype: Tuple[np.ndarray, np.ndarray]
+    """
+
+    n_frm, n_animals, n_bp = x.shape
+    bp_cnts = np.zeros((n_frm, n_animals), dtype=np.int64)
+    distances = np.full(n_frm, -1.0, dtype=np.float64)
+    for frm_idx in prange(n_frm):
+        detected = np.zeros((n_animals, n_bp), dtype=np.bool_)
+        for animal_idx in range(n_animals):
+            for bp_idx in range(n_bp):
+                x_val, y_val = x[frm_idx, animal_idx, bp_idx], y[frm_idx, animal_idx, bp_idx]
+                if not np.isfinite(x_val) or not np.isfinite(y_val):
+                    continue
+                # THE IMPORTERS ZERO-FILL DROPPED DETECTIONS, AND RAGGED-BODY-PART PADDING IS LEFT AT ZERO TOO, SO
+                # AN EXACT (0, 0) IS A MISSING POINT RATHER THAN A POINT AT THE FRAME ORIGIN.
+                if x_val == 0.0 and y_val == 0.0:
+                    continue
+                # SHORT-CIRCUITED, SO p IS NEVER INDEXED WHEN PROBABILITY IS IGNORED AND MAY THEN BE EMPTY.
+                if p_threshold > 0.0 and (not np.isfinite(p[frm_idx, animal_idx, bp_idx]) or p[frm_idx, animal_idx, bp_idx] < p_threshold):
+                    continue
+                detected[animal_idx, bp_idx] = True
+                bp_cnts[frm_idx, animal_idx] += 1
+        # SQUARED DISTANCES ARE COMPARED INSIDE THE LOOP AND THE ROOT IS TAKEN ONCE PER FRAME - THE SQUARE ROOT IS
+        # MONOTONIC, SO IT CANNOT CHANGE WHICH PAIR IS CLOSEST, AND THIS IS THE INNERMOST HOT PATH.
+        closest = np.inf
+        for animal_1 in range(n_animals - 1):
+            for animal_2 in range(animal_1 + 1, n_animals):
+                for bp_1 in range(n_bp):
+                    if not detected[animal_1, bp_1]:
+                        continue
+                    for bp_2 in range(n_bp):
+                        if not detected[animal_2, bp_2]:
+                            continue
+                        dx = x[frm_idx, animal_1, bp_1] - x[frm_idx, animal_2, bp_2]
+                        dy = y[frm_idx, animal_1, bp_1] - y[frm_idx, animal_2, bp_2]
+                        distance = dx * dx + dy * dy
+                        if distance < closest:
+                            closest = distance
+        if closest < np.inf:
+            distances[frm_idx] = np.sqrt(closest)
+    return bp_cnts, distances
+
+
+def find_best_multi_animal_assignment_frame_df(data_df: pd.DataFrame,
+                                               animal_bp_dict: Dict[str, Dict[str, Any]],
+                                               min_bodyparts_per_animal: Optional[int] = None,
+                                               p_threshold: float = 0.0,
+                                               strategy: Literal['separation', 'longest_run_middle', 'first'] = 'separation',
+                                               max_frames_to_scan: Optional[int] = 10000,
+                                               max_frame_idx: Optional[int] = None,
+                                               verbose: bool = True) -> Optional[int]:
+    """
+    Find the frame best suited for the SimBA multi-animal identity-assignment UI in a pose-estimation dataframe.
+
+    Candidate frames have at least ``min_bodyparts_per_animal`` body-parts detected for every animal, and ``strategy`` picks among them. Feed the result to :meth:`~simba.mixins.pose_importer_mixin.PoseImporterMixin.initialize_multi_animal_ui` as ``initial_frame_no``.
+
+    .. seealso::
+       For DeepLabCut multi-animal H5 files on disk, see :func:`~simba.utils.lookups.find_best_multi_animal_assignment_frame`. For ``animal_bp_dict``, see :meth:`~simba.mixins.config_reader.ConfigReader.create_body_part_dictionary`. For the detection rule and distance measure, see :func:`~simba.utils.lookups._bp_detections_and_distances`.
+
+    :param pd.DataFrame data_df: Pose data, one row per frame, flat SimBA body-part columns.
+    :param Dict[str, Dict[str, Any]] animal_bp_dict: Animal name to ``X_bps``/``Y_bps``/``P_bps`` column lookup, two animals or more.
+    :param Optional[int] min_bodyparts_per_animal: Body-parts required per animal. ``None`` tries 75%, 50%, 25% then 1, taking the first that yields a candidate.
+    :param float p_threshold: Minimum body-part probability. ``0.0`` (default) ignores probability.
+    :param Literal['separation', 'longest_run_middle', 'first'] strategy: ``'separation'`` (default) maximises the closest approach between any two animals' body-parts - a frame where the animals are piled together cannot be clicked apart. ``'longest_run_middle'`` takes the middle of the longest candidate run, ``'first'`` the first candidate.
+    :param Optional[int] max_frames_to_scan: Frame cap, sampled at a constant stride across the whole video rather than truncated to the head. ``None`` scans every frame.
+    :param Optional[int] max_frame_idx: Highest index that may be returned - pass ``frame_count - 1`` when the pose data outruns the video.
+    :param bool verbose: If True, print which frame was selected and why.
+    :return: Frame index, or ``None`` if no frame has all animals detected at any threshold.
+    :rtype: Optional[int]
+
+    :example:
+
+    >>> df = read_df(file_path='tests/data/test_projects/two_c57/project_folder/csv/outlier_corrected_movement_location/Together_1.csv', file_type='csv')
+    >>> bp_dict = {'Animal_1': {'X_bps': ['Nose_1_x', 'Tail_base_1_x'], 'Y_bps': ['Nose_1_y', 'Tail_base_1_y']},
+    ...            'Animal_2': {'X_bps': ['Nose_2_x', 'Tail_base_2_x'], 'Y_bps': ['Nose_2_y', 'Tail_base_2_y']}}
+    >>> find_best_multi_animal_assignment_frame_df(data_df=df, animal_bp_dict=bp_dict)
+    >>> 888
+
+    :example require both animals fully tracked with confident detections (``P_bps`` needed for ``p_threshold``):
+
+    >>> bp_dict = {a: dict(bps, P_bps=[c.replace('_x', '_p') for c in bps['X_bps']]) for a, bps in bp_dict.items()}
+    >>> find_best_multi_animal_assignment_frame_df(data_df=df, animal_bp_dict=bp_dict, min_bodyparts_per_animal=2, p_threshold=0.5)
+    >>> 888
+    """
+
+    fn_name = find_best_multi_animal_assignment_frame_df.__name__
+    check_valid_dict(x=animal_bp_dict, valid_key_dtypes=(str,), valid_values_dtypes=(dict,), min_len_keys=2, source=f'{fn_name} animal_bp_dict')
+    check_str(name=f'{fn_name} strategy', value=strategy, options=('separation', 'longest_run_middle', 'first'))
+    check_float(name=f'{fn_name} p_threshold', value=p_threshold, min_value=0.0, max_value=1.0)
+    p_threshold = float(p_threshold)
+    check_valid_boolean(value=verbose, source=f'{fn_name} verbose')
+    if min_bodyparts_per_animal is not None:
+        check_int(name=f'{fn_name} min_bodyparts_per_animal', value=min_bodyparts_per_animal, min_value=1)
+    if max_frames_to_scan is not None:
+        check_int(name=f'{fn_name} max_frames_to_scan', value=max_frames_to_scan, min_value=1)
+    if max_frame_idx is not None:
+        check_int(name=f'{fn_name} max_frame_idx', value=max_frame_idx, min_value=0)
+
+    animal_names, required_fields = list(animal_bp_dict.keys()), []
+    for animal_name, animal_bps in animal_bp_dict.items():
+        for bp_key in ('X_bps', 'Y_bps'):
+            if bp_key not in animal_bps.keys():
+                raise InvalidInputError(msg=f'Animal {animal_name} in animal_bp_dict has no "{bp_key}" key.', source=fn_name)
+        if len(animal_bps['X_bps']) != len(animal_bps['Y_bps']) or len(animal_bps['X_bps']) == 0:
+            raise InvalidInputError(msg=f'Animal {animal_name} has {len(animal_bps["X_bps"])} X body-part column(s) and {len(animal_bps["Y_bps"])} Y body-part column(s); the counts have to match and cannot be zero.', source=fn_name)
+        required_fields.extend(list(animal_bps['X_bps']) + list(animal_bps['Y_bps']))
+        if p_threshold > 0.0:
+            if 'P_bps' not in animal_bps.keys() or len(animal_bps['P_bps']) != len(animal_bps['X_bps']):
+                raise InvalidInputError(msg=f'p_threshold is {p_threshold} but animal {animal_name} in animal_bp_dict has no matching "P_bps" columns.', source=fn_name)
+            required_fields.extend(list(animal_bps['P_bps']))
+    check_valid_dataframe(df=data_df, source=f'{fn_name} data_df', min_axis_0=1, required_fields=required_fields, allow_duplicate_col_names=False)
+    non_numeric = [f'{c} ({t})' for c, t in data_df.dtypes[required_fields].items() if not pd.api.types.is_numeric_dtype(t)]
+    if len(non_numeric) > 0:
+        raise InvalidInputError(msg=f'The body-part column(s) {non_numeric} of data_df are not numeric.', source=fn_name)
+    if not pd.api.types.is_integer_dtype(data_df.index):
+        raise InvalidInputError(msg=f'data_df has a {data_df.index.dtype} index; an integer index is required so that the returned frame can be looked up in the assignment UI.', source=fn_name)
+    if not data_df.index.is_unique:
+        raise InvalidInputError(msg=f'data_df has {int(data_df.index.duplicated().sum())} duplicated index label(s); frame indices have to be unique.', source=fn_name)
+
+    frm_cnt = len(data_df) if max_frame_idx is None else min(len(data_df), max_frame_idx + 1)
+    if frm_cnt < 1:
+        NoDataFoundWarning(msg=f'Cannot search for a multi-animal assignment frame: max_frame_idx is {max_frame_idx}, which leaves no frames to scan.', source=fn_name)
+        return None
+    stride = 1 if (max_frames_to_scan is None or frm_cnt <= max_frames_to_scan) else int(np.ceil(frm_cnt / max_frames_to_scan))
+    sample_idx = np.arange(0, frm_cnt, stride)
+    sample_df = data_df if sample_idx.size == len(data_df) else data_df.iloc[sample_idx]
+
+    max_bp_per_animal = max([len(animal_bp_dict[a]['X_bps']) for a in animal_names])
+    x = np.zeros((sample_idx.size, len(animal_names), max_bp_per_animal), dtype=np.float32)
+    y = np.zeros_like(x)
+    p = np.zeros_like(x) if p_threshold > 0.0 else np.zeros((0, 0, 0), dtype=np.float32)
+    for animal_cnt, animal_name in enumerate(animal_names):
+        animal_bps = animal_bp_dict[animal_name]
+        bp_slice = slice(0, len(animal_bps['X_bps']))
+        x[:, animal_cnt, bp_slice] = sample_df[list(animal_bps['X_bps'])].to_numpy(dtype=np.float32)
+        y[:, animal_cnt, bp_slice] = sample_df[list(animal_bps['Y_bps'])].to_numpy(dtype=np.float32)
+        if p_threshold > 0.0:
+            p[:, animal_cnt, bp_slice] = sample_df[list(animal_bps['P_bps'])].to_numpy(dtype=np.float32)
+    bp_cnts, separations = _bp_detections_and_distances(x, y, p, p_threshold)
+
+    bp_per_animal = min([len(animal_bp_dict[a]['X_bps']) for a in animal_names])
+    if min_bodyparts_per_animal is None:
+        thresholds = list(dict.fromkeys([max(1, int(round(bp_per_animal * f))) for f in (0.75, 0.50, 0.25)] + [1]))
+    else:
+        thresholds = [min(min_bodyparts_per_animal, bp_per_animal)]
+    hits, matched_threshold = None, None
+    for threshold in thresholds:
+        candidate_idx = np.flatnonzero((bp_cnts >= threshold).all(axis=1))
+        if candidate_idx.size > 0:
+            hits, matched_threshold = candidate_idx, threshold
+            break
+
+    if matched_threshold is None:
+        max_animals = int((bp_cnts >= thresholds[-1]).sum(axis=1).max())
+        NoDataFoundWarning(msg=f'No frame has all {len(animal_names)} animals detected simultaneously (at most {max_animals} animal(s) detected on any of the {sample_idx.size} frame(s) scanned). The multi-animal assignment UI cannot be pointed at a recommended frame.', source=fn_name)
+        return None
+
+    if strategy == 'first':
+        best_hit = hits[0]
+    elif strategy == 'longest_run_middle':
+        runs = np.split(hits, np.flatnonzero(np.diff(hits) != 1) + 1)
+        longest_run = max(runs, key=len)
+        best_hit = longest_run[len(longest_run) // 2]
+    else:
+        separation = separations[hits]
+        best_hits = np.flatnonzero(separation == separation.max())
+        best_hit = hits[best_hits[len(best_hits) // 2]]
+
+    frm_idx = int(data_df.index[int(sample_idx[best_hit])])
+    if verbose:
+        msg = f'Multi-animal assignment frame {frm_idx} selected: all {len(animal_names)} animals have >= {int(bp_cnts[best_hit].min())}/{bp_per_animal} body-parts detected (threshold {matched_threshold})'
+        if strategy == 'separation':
+            msg = f'{msg}, with the animals {separations[best_hit]:.0f}px apart at their closest - the largest such gap on any of the {hits.size} candidate frame(s)'
+        stdout_information(msg=f'{msg} ({sample_idx.size} of {len(data_df)} frame(s) scanned, stride {stride}).', source=fn_name)
+    return frm_idx

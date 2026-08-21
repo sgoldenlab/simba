@@ -129,7 +129,7 @@ Core low-level feature methods — distances, angles, velocities, areas, and bod
 Pre-configured "out-of-the-box" feature extraction modules for common pose-estimation schemas, spanning a range of single- and multi-animal body-part layouts. Each wrapper turns raw tracking coordinates into the tabular feature set that SimBA classifiers are trained and run on, so most users never have to write feature code by hand.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    simba.feature_extractors
 
@@ -159,7 +159,7 @@ Transform pose-estimated body-part coordinates into geometric shapes — boundin
 Global SimBA settings and environment variables — GPU toggles, default paths, and feature flags — that tune runtime behaviour across the package. Set these once to change how modules execute (for example, enabling numba eager compilation or GPU code paths) without editing individual scripts.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    simba.env
 
@@ -421,7 +421,7 @@ Helper methods used throughout the package — logging, CLI execution, input and
    :doc:`custom feature extractor <simba.feature_extractors>`.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    simba.utils
 
