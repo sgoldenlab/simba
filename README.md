@@ -20,7 +20,7 @@ SimBA is a toolkit for creating supervised machine-learning classifiers of anima
 **Pre-print: [Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/landing_1.gif" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/landing_1.webp" />
 </p>
 
 ## Quickstart
@@ -57,6 +57,10 @@ See **[Scenario 1](docs/Scenario1.md)** for a worked example that takes raw trac
     - *Classifier:* annotated prediction videos, Gantt charts, classifier heatmaps, probability plots (incl. interactive grapher), SHAP summary plots.
     - *Movement & directionality:* distance plots, velocity/data line plots, directionality overlays (animal→animal, →body-part, →ROI).
     - *Assay-specific:* cue-light, light/dark box, spontaneous-alternation, circular/polar plots.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/simba_splash.webp" width="900" alt="SimBA capabilities: 85 methods" />
+</p>
 
 ##  Documentation: Scenario tutorials
 
