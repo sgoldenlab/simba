@@ -60,10 +60,8 @@ See **[Scenario 1](docs/Scenario1.md)** for a worked example that takes raw trac
 
 <p align="center">
 <a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html"><img src="images/simba_splash.webp" width="900" alt="SimBA capabilities: 85 methods" /></a>
-</p>
-
-<p align="center">
-<a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html"><img src="https://img.shields.io/badge/MORE_INFORMATION_AT-readthedocs-8CA1AF?style=for-the-badge&logo=readthedocs&logoColor=white" alt="More information at Read the Docs" /></a>
+<br>
+<a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html"><img src="https://img.shields.io/badge/MORE_INFORMATION_AT-readthedocs-21567a?style=for-the-badge&logo=readthedocs&logoColor=white" alt="More information at Read the Docs" /></a>
 </p>
 
 ##  Documentation: Scenario tutorials
