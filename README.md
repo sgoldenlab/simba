@@ -59,7 +59,11 @@ See **[Scenario 1](docs/Scenario1.md)** for a worked example that takes raw trac
     - *Assay-specific:* cue-light, light/dark box, spontaneous-alternation, circular/polar plots.
 
 <p align="center">
-<img src="images/simba_splash.webp" width="900" alt="SimBA capabilities: 85 methods" />
+<a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html"><img src="images/simba_splash.webp" width="900" alt="SimBA capabilities: 85 methods" /></a>
+</p>
+
+<p align="center">
+<a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html"><b>MORE INFORMATION</b></a>
 </p>
 
 ##  Documentation: Scenario tutorials
