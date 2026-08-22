@@ -63,7 +63,7 @@ See **[Scenario 1](docs/Scenario1.md)** for a worked example that takes raw trac
 </p>
 
 <p align="center">
-<a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html"><b>MORE INFORMATION</b></a>
+<a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html"><img src="https://img.shields.io/badge/MORE_INFORMATION_AT-readthedocs-8CA1AF?style=for-the-badge&logo=readthedocs&logoColor=white" alt="More information at Read the Docs" /></a>
 </p>
 
 ##  Documentation: Scenario tutorials
