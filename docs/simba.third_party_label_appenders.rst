@@ -362,6 +362,15 @@ Visualize YOLO annotations on images
    :show-inheritance:
 
 
+YOLO bounding box annotations -> Labelme annotations
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.yolo_to_labelme.Yolo2Labelme
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
 
 
 

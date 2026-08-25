@@ -203,6 +203,16 @@ Labelme annotations -> YOLO bounding box annotations
    :noindex:
 
 
+YOLO bounding box annotations -> Labelme annotations
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.yolo_to_labelme.Yolo2Labelme
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :noindex:
+
+
 Labelme points -> YOLO keypoints annotations
 ---------------------------------------
 

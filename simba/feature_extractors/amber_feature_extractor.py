@@ -105,6 +105,11 @@ class AmberFeatureExtractor(ConfigReader, FeatureExtractionMixin):
        :width: 400
        :align: center
 
+    ..  youtube:: yBS2_9it__I
+       :width: 640
+       :height: 480
+       :align: center
+
     :example:
 
     >>> AmberFeatureExtractor(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

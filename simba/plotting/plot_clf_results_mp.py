@@ -216,9 +216,44 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
        :muted:
        :align: center
 
+    .. video:: _static/img/cui_et_al.webm
+       :width: 720
+       :autoplay:
+       :loop:
+       :muted:
+       :align: center
+
+    .. video:: _static/img/howland_et_al.webm
+       :width: 900
+       :autoplay:
+       :loop:
+       :muted:
+       :align: center
+
     ..  youtube:: Frq6mMcaHBc
        :width: 640
        :height: 480
+       :align: center
+
+    .. video:: _static/img/zhou_et_al_2.webm
+       :width: 900
+       :autoplay:
+       :loop:
+       :muted:
+       :align: center
+
+    .. video:: _static/img/zhou_et_al.webm
+       :width: 1400
+       :autoplay:
+       :loop:
+       :muted:
+       :align: center
+
+    .. video:: _static/img/newton_et_al.webm
+       :width: 1200
+       :autoplay:
+       :loop:
+       :muted:
        :align: center
 
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file in Configparser format.

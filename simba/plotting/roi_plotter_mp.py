@@ -170,6 +170,13 @@ class ROIPlotMultiprocess(ConfigReader, PlottingMixin):
        :muted:
        :align: center
 
+    .. video:: _static/img/aly_zahran_et_al.webm
+       :width: 1000
+       :autoplay:
+       :loop:
+       :muted:
+       :align: center
+
     .. video:: _static/img/outside_roi_example.mp4
        :width: 800
        :autoplay:

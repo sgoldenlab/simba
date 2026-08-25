@@ -2272,13 +2272,15 @@ def check_valid_img_path(path: Union[str, os.PathLike], raise_error: bool = True
     """
     check_file_exist_and_readable(path)
     try:
-        _ = cv2.imread(path)
+        img = cv2.imread(path)
     except Exception as e:
+        print(e.args)
+        img = None
+    if img is None:
+        # cv2.imread returns None rather than raising for a non-image or corrupted file.
         if raise_error:
-            print(e.args)
             raise InvalidInputError(msg=f'{path} could not be read as a valid image file', source=check_valid_img_path.__name__)
-        else:
-            return False
+        return False
     return True
 
 

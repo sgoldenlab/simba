@@ -809,6 +809,26 @@ def get_fonts(sort_alphabetically: bool = False):
         font_dict = dict(sorted(font_dict.items(), key=lambda x: [int(t) if t.isdigit() else t.lower() for t in re.split(r'(\d+)', x[0])]))
     return font_dict
 
+def get_font_dropdown_options() -> List[str]:
+    """
+    Returns the font names to present in a SimBA font dropdown: the fonts bundled with SimBA sorted first,
+    followed by the OS-installed fonts that do not share a name with a bundled one.
+
+    .. seealso::
+       :func:`~simba.utils.lookups.get_named_simba_fonts` for the bundled fonts, :func:`~simba.utils.lookups.get_fonts`
+       for the OS-installed fonts.
+
+    :return: Font names, bundled SimBA fonts first.
+    :rtype: List[str]
+
+    :example:
+
+    >>> get_font_dropdown_options()
+    >>> ['Aldrich', 'BioRhyme', ..., 'Walter Turncoat', 'Agency FB', 'Alef', ...]
+    """
+    simba_fonts = sorted(get_named_simba_fonts().keys())
+    return simba_fonts + [f for f in get_fonts(sort_alphabetically=True).keys() if f not in simba_fonts]
+
 def get_log_config():
     return {
         "version": 1,

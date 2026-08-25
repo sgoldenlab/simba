@@ -36,7 +36,7 @@ from simba.utils.checks import (check_ffmpeg_available,
 from simba.utils.data import (convert_roi_definitions, get_cpu_pool,
                               terminate_cpu_pool)
 from simba.utils.enums import (Dtypes, Formats, Keys, Links, Options, Paths,
-                               TkBinds)
+                               TextOptions, TkBinds)
 from simba.utils.errors import (CountError, DuplicationError,
                                 FFMPEGCodecGPUError, FrameRangeError,
                                 InvalidInputError, MixedMosaicError,
@@ -44,7 +44,7 @@ from simba.utils.errors import (CountError, DuplicationError,
                                 NoFilesFoundError, NotDirectoryError,
                                 ResolutionError)
 from simba.utils.lookups import (get_color_dict, get_ffmpeg_crossfade_methods,
-                                 get_fonts, get_monitor_info,
+                                 get_font_dropdown_options, get_monitor_info,
                                  percent_to_crf_lookup, quality_pct_to_crf)
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (
@@ -337,7 +337,6 @@ class SuperImposeFrameCountPopUp(PopUpMixin):
         super().__init__(title="SUPERIMPOSE FRAME COUNT", icon='number_black')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         color_dict = list(get_color_dict().keys())
-        font_dict = get_fonts()
 
         self.LOCS = {'TOP LEFT': 'top_left', 'TOP MIDDLE': 'top_middle', 'TOP RIGHT': 'top_right', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM MIDDLE': 'bottom_middle', 'BOTTOM RIGHT': 'bottom_right'}
         gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
@@ -345,7 +344,7 @@ class SuperImposeFrameCountPopUp(PopUpMixin):
         self.font_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=list(range(1, 101, 2)), label="FONT SIZE:", label_width=25, value=20, img='font_size', tooltip_key='SUPERIMPOSE_FRAME_COUNT_FONT_SIZE')
         self.font_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=color_dict, label="FONT COLOR:", label_width=25, value='Black', img='text_color', tooltip_key='SUPERIMPOSE_FRAME_COUNT_FONT_COLOR')
         self.font_bg_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=color_dict, label="FONT BACKGROUND COLOR:", label_width=25, value='White', img='fill', tooltip_key='SUPERIMPOSE_FRAME_COUNT_FONT_BACKGROUND_COLOR')
-        self.font_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=list(font_dict.keys()), label="FONT:", label_width=25, value='Arial', img='font', tooltip_key='SUPERIMPOSE_FRAME_COUNT_FONT')
+        self.font_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=get_font_dropdown_options(), label="FONT:", label_width=25, value=TextOptions.DEFAULT_FONT.value, img='font', tooltip_key='SUPERIMPOSE_FRAME_COUNT_FONT')
         self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY: ", label_width=25, dropdown_width=35, value=60, img='pct_2', tooltip_key='OUTPUT_VIDEO_QUALITY')
         self.loc_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.LOCS.keys()), label="FRAME COUNT POSITION: ", label_width=25, dropdown_width=35, value='BOTTOM MIDDLE', img='location', tooltip_key='LOCATION_FRAME_COUNT')
 
@@ -2696,11 +2695,10 @@ class SuperimposeTimerPopUp(PopUpMixin):
         self.LOCATIONS = {'TOP LEFT': 'top_left', 'TOP RIGHT': 'top_right', 'TOP MIDDLE': 'top_middle', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM RIGHT': 'bottom_right', 'BOTTOM MIDDLE': 'bottom_middle'}
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.color_dict = get_color_dict()
-        self.font_dict = get_fonts()
         gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
 
         self.location_dropdown = SimBADropDown(parent=settings_frm, label="TIMER LOCATION:", dropdown_options=list(self.LOCATIONS.keys()), label_width=30, dropdown_width=35, value='TOP LEFT', img='location')
-        self.font_dropdown = SimBADropDown(parent=settings_frm, label="TIMER FONT:", dropdown_options=list(self.font_dict.keys()), label_width=30, dropdown_width=35, value='Arial', img='font')
+        self.font_dropdown = SimBADropDown(parent=settings_frm, label="TIMER FONT:", dropdown_options=get_font_dropdown_options(), label_width=30, dropdown_width=35, value=TextOptions.DEFAULT_FONT.value, img='font')
         self.font_size_dropdown = SimBADropDown(parent=settings_frm, label="FONT SIZE:", dropdown_options=list(range(20, 100, 5)), label_width=30, dropdown_width=35, value=20, img='font_size')
         self.font_color_dropdown = SimBADropDown(parent=settings_frm, label="FONT COLOR:", dropdown_options=list(self.color_dict.keys()), label_width=30, dropdown_width=35, value='White', img='font_size')
         self.font_border_dropdown = SimBADropDown(parent=settings_frm, label="FONT BORDER COLOR:", dropdown_options=list(self.color_dict.keys()), label_width=30, dropdown_width=35, value='Black', img='text_color')
@@ -2876,11 +2874,10 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
         self.LOCATIONS = {'TOP LEFT': 'top_left', 'TOP RIGHT': 'top_right', 'TOP MIDDLE': 'top_middle', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM RIGHT': 'bottom_right', 'BOTTOM MIDDLE': 'bottom_middle'}
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.color_dict = get_color_dict()
-        self.font_dict = get_fonts()
         self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
 
         self.location_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.LOCATIONS.keys()), label_width=25, value='TOP LEFT', label="VIDEO NAME TEXT LOCATION:", img='location', tooltip_key='SUPERIMPOSE_VIDEO_NAME_TEXT_LOCATION')
-        self.font_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.font_dict.keys()), label_width=25, value='Arial', label="FONT:", img='font', tooltip_key='SUPERIMPOSE_VIDEO_NAME_FONT')
+        self.font_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=get_font_dropdown_options(), label_width=25, value=TextOptions.DEFAULT_FONT.value, label="FONT:", img='font', tooltip_key='SUPERIMPOSE_VIDEO_NAME_FONT')
 
         self.font_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(5, 105, 5)), label_width=25, value=20, label="FONT SIZE:", img='font_size', tooltip_key='SUPERIMPOSE_VIDEO_NAME_FONT_SIZE')
         self.font_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='White', label="FONT COLOR:", img='color_wheel', tooltip_key='SUPERIMPOSE_VIDEO_NAME_FONT_COLOR')
@@ -2954,12 +2951,11 @@ class SuperimposeTextPopUp(PopUpMixin):
         self.LOCATIONS = {'TOP LEFT': 'top_left', 'TOP RIGHT': 'top_right', 'TOP MIDDLE': 'top_middle', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM RIGHT': 'bottom_right', 'BOTTOM MIDDLE': 'bottom_middle'}
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.color_dict = get_color_dict()
-        self.font_dict = get_fonts()
         self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
 
         self.location_dropdown = SimBADropDown(parent=settings_frm, label="TEXT LOCATION:", dropdown_options=list(self.LOCATIONS.keys()), label_width=25, value='TOP LEFT', img='location', tooltip_key='SUPERIMPOSE_TEXT_LOCATION')
         self.text_eb = Entry_Box(parent=settings_frm, labelwidth=25, entry_box_width=50, fileDescription='TEXT:', img='text', tooltip_key='SUPERIMPOSE_TEXT_VALUE')
-        self.font_dropdown = SimBADropDown(parent=settings_frm, label="FONT:", dropdown_options=list(self.font_dict.keys()), label_width=25, value='Arial', img='font', tooltip_key='SUPERIMPOSE_TEXT_FONT')
+        self.font_dropdown = SimBADropDown(parent=settings_frm, label="FONT:", dropdown_options=get_font_dropdown_options(), label_width=25, value=TextOptions.DEFAULT_FONT.value, img='font', tooltip_key='SUPERIMPOSE_TEXT_FONT')
         self.font_size_dropdown = SimBADropDown(parent=settings_frm, label="FONT SIZE:", dropdown_options=list(range(5, 105, 5)), label_width=25, value=20, img='font_size', tooltip_key='SUPERIMPOSE_TEXT_FONT_SIZE')
         self.font_color_dropdown = SimBADropDown(parent=settings_frm, label="FONT COLOR:", dropdown_options=list(self.color_dict.keys()), label_width=25, value='White', img='text_color', tooltip_key='SUPERIMPOSE_TEXT_FONT_COLOR')
         self.font_border_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='Black', label="FONT BORDER COLOR:", img='line', tooltip_key='SUPERIMPOSE_TEXT_FONT_BORDER_COLOR')

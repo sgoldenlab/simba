@@ -56,8 +56,9 @@ from simba.utils.errors import (CountError, DirectoryExistError,
 from simba.utils.lookups import (get_current_time, get_ffmpeg_codec,
                                  get_ffmpeg_crossfade_methods,
                                  get_ffmpeg_encoders, get_fonts,
-                                 get_named_colors, percent_to_crf_lookup,
-                                 percent_to_qv_lk, quality_pct_to_crf,
+                                 get_named_colors, get_named_simba_fonts,
+                                 percent_to_crf_lookup, percent_to_qv_lk,
+                                 quality_pct_to_crf,
                                  video_quality_to_preset_lookup)
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (
@@ -1025,6 +1026,20 @@ def batch_video_to_greyscale(path: Union[str, os.PathLike, List[Union[str, os.Pa
     stdout_success(msg=f"{len(video_paths)} video(s) converted to grayscale!", elapsed_time=timer.elapsed_time_str, source=batch_video_to_greyscale.__name__)
 
 
+def _ffmpeg_fontfile(font_path: Union[str, os.PathLike]) -> str:
+    """
+    Helper to quote and escape a font file path for use in the ffmpeg ``drawtext`` ``fontfile`` option.
+
+    ``drawtext`` splits its options on ``:``, so Windows drive letters are escaped, and the value is
+    single-quoted so that paths holding spaces (e.g. ``Poppins Regular.ttf``) survive the filter parser.
+
+    :param Union[str, os.PathLike] font_path: Path to a ``.ttf`` / ``.otf`` font file.
+    :return: The path, quoted and escaped, ready to be inserted after ``fontfile=``.
+    :rtype: str
+    """
+    return "'{}'".format(str(font_path).replace('\\', '/').replace(':', '\\:'))
+
+
 def superimpose_frame_count(file_path: Union[str, os.PathLike],
                             gpu: Optional[bool] = False,
                             recursive: Optional[bool] = False,
@@ -1084,12 +1099,12 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
     check_valid_boolean(value=recursive, source=f'{superimpose_frame_count.__name__} recursive', raise_error=True)
     font_color = ''.join(filter(str.isalnum, font_color)).lower()
     bg_color = ''.join(filter(str.isalnum, bg_color)).lower()
-    font_dict = get_fonts()
+    font_dict = {**get_fonts(), **get_named_simba_fonts()}
     if save_path is not None:
         check_str(name=f'{superimpose_frame_count.__name__} save_path', value=save_path, raise_error=True)
     check_str(name='font', value=font, options=tuple(font_dict.keys()))
     check_str(name='loc', value=loc, options=('top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right'))
-    font_path = font_dict[font]
+    font_path = _ffmpeg_fontfile(font_dict[font])
     if os.path.isfile(file_path):
         check_file_exist_and_readable(file_path=file_path)
         file_paths = [file_path]
@@ -1118,30 +1133,30 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
             save_name = save_path
         if gpu:
             if loc == 'top_left':
-                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=10:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile={font_path}:text=%{{n}}:x=10:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'top_middle':
-                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=(w-tw)/2:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile={font_path}:text=%{{n}}:x=(w-tw)/2:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'top_right':
-                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=w-tw-10:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile={font_path}:text=%{{n}}:x=w-tw-10:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'bottom_left':
-                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=10:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile={font_path}:text=%{{n}}:x=10:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'bottom_right':
-                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=w-tw-10:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile={font_path}:text=%{{n}}:x=w-tw-10:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
             else:
-                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile={font_path}:text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
         else:
             if loc == 'top_left':
-                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=10: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile={font_path}: text='%{{frame_num}}': start_number=0: x=10: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'top_middle':
-                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=(w-tw)/2: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile={font_path}: text='%{{frame_num}}': start_number=0: x=(w-tw)/2: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'top_right':
-                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=w-tw-10: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile={font_path}: text='%{{frame_num}}': start_number=0: x=w-tw-10: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'bottom_left':
-                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=10: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile={font_path}: text='%{{frame_num}}': start_number=0: x=10: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'bottom_right':
-                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=w-tw-10: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile={font_path}: text='%{{frame_num}}': start_number=0: x=w-tw-10: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
             else:
-                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=(w-tw)/2: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile={font_path}: text='%{{frame_num}}': start_number=0: x=(w-tw)/2: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         timer.stop_timer()
         if verbose: stdout_success(msg=f"Superimposed video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str)
@@ -3961,9 +3976,9 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
     quality = 23 if not check_int(name=f'{superimpose_elapsed_time.__name__} quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     font_color = ''.join(filter(str.isalnum, font_color)).lower()
     font_border_color = ''.join(filter(str.isalnum, font_border_color)).lower()
-    font_dict = get_fonts()
+    font_dict = {**get_fonts(), **get_named_simba_fonts()}
     check_str(name='font', value=font, options=tuple(font_dict.keys()))
-    font_path = font_dict[font]
+    font_path = _ffmpeg_fontfile(font_dict[font])
     time_format_map = {
         'MM:SS': '%{pts\\:mks}',
         'HH:MM:SS': '%{pts\\:hms}',
@@ -4003,10 +4018,7 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
         print(f'Superimposing time {video_name} (Video {file_cnt + 1}/{len(video_paths)})...')
         save_path = os.path.join(save_dir, f'{video_name}_time_superimposed{ext}')
 
-        # Escape Windows path for FFmpeg compatibility
-        font_path_escaped = font_path.replace('\\', '/') if os.name == 'nt' else font_path
-
-        vf_filter = f"drawtext=fontfile={font_path_escaped}:text='{time_text}':{pos}:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}"
+        vf_filter = f"drawtext=fontfile={font_path}:text='{time_text}':{pos}:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}"
 
         if not gpu:
             cmd = f'ffmpeg -i "{video_path}" -vf "{vf_filter}" -c:a copy -crf {quality} "{save_path}" -loglevel error -stats -hide_banner -y'
@@ -4711,9 +4723,9 @@ def superimpose_video_names(video_path: Union[str, os.PathLike],
     check_str(name=f'{superimpose_video_names.__name__} position', value=position, options=POSITIONS)
     check_int(name=f'{superimpose_video_names.__name__} font_size', value=font_size, min_value=1)
     check_int(name=f'{superimpose_video_names.__name__} font_border_width', value=font_border_width, min_value=1)
-    font_dict = get_fonts()
+    font_dict = {**get_fonts(), **get_named_simba_fonts()}
     check_str(name='font', value=font, options=tuple(font_dict.keys()))
-    font_path = font_dict[font]
+    font_path = _ffmpeg_fontfile(font_dict[font])
     font_color = ''.join(filter(str.isalnum, font_color)).lower()
     font_border_color = ''.join(filter(str.isalnum, font_border_color)).lower()
     quality = 23 if not check_int(name=f'{superimpose_video_names.__name__} quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
@@ -4814,9 +4826,9 @@ def superimpose_freetext(video_path: Union[str, os.PathLike],
     if len(cleaned_text) == 0:
         raise InvalidInputError(msg=f'The text "{text}" only contains characters that are illegal in ffmpeg drawtext and cannot be superimposed.', source=superimpose_freetext.__name__)
     text = cleaned_text
-    font_dict = get_fonts()
+    font_dict = {**get_fonts(), **get_named_simba_fonts()}
     check_str(name='font', value=font, options=tuple(font_dict.keys()))
-    font_path = font_dict[font]
+    font_path = _ffmpeg_fontfile(font_dict[font])
     font_color = ''.join(filter(str.isalnum, font_color)).lower()
     font_border_color = ''.join(filter(str.isalnum, font_border_color)).lower()
     quality = 23 if not check_int(name=f'{superimpose_freetext.__name__} quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)

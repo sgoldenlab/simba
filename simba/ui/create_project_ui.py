@@ -19,7 +19,8 @@ from simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up import \
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         FolderSelect, SimbaButton,
                                         SimBADropDown, hxtScrollbar)
-from simba.utils.checks import check_if_dir_exists, check_str
+from simba.utils.checks import (check_if_dir_exists, check_str,
+                                check_valid_img_path)
 from simba.utils.config_creator import ProjectConfigCreator
 from simba.utils.enums import Formats, Keys, Links, Methods, Options, Paths
 from simba.utils.errors import DuplicationError, MissingProjectConfigEntryError
@@ -27,6 +28,10 @@ from simba.utils.lookups import (get_body_part_configurations,
                                  get_bp_config_codes, get_icons_paths)
 from simba.video_processors.video_processing import \
     extract_frames_from_all_videos_in_directory
+
+
+SCHEMATIC_DISPLAY_SIZE = (275, 550)
+"""Logical size the pose-configuration schematics are displayed at, in px."""
 
 
 class ProjectCreatorPopUp():
@@ -88,7 +93,7 @@ class ProjectCreatorPopUp():
                                      and x not in self.multi_tracking_options
                                      and x not in self.three_dim_tracking_options]
         for k in self.bp_lu.keys():
-            self.bp_lu[k]["img"] = ImageTk.PhotoImage(file=os.path.join(os.path.dirname("__file__"), self.bp_lu[k]["img_path"]))
+            self.bp_lu[k]["img"] = self._read_schematic_img(img_path=self.bp_lu[k]["img_path"])
 
         self.classical_tracking_option_dict = {k: self.bp_lu[k] for k in self.classical_tracking_options}
         self.multi_tracking_option_dict = {k: self.bp_lu[k] for k in self.multi_tracking_options}
@@ -138,6 +143,23 @@ class ProjectCreatorPopUp():
             self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=self.three_dim_tracking_options, label='BODY-PART CONFIGURATION: ', label_width=35, dropdown_width=35, value=self.three_dim_tracking_options[0], command=self.update_img, img='pose_2', tooltip_key='CREATE_PROJECT_BP_CONFIG')
             self.selected_tracking_dropdown.grid(row=1, column=0, sticky=NW)
         self.update_img(self.selected_tracking_dropdown.getChoices())
+
+    def _read_schematic_img(self, img_path: str) -> ImageTk.PhotoImage:
+        """
+        Read a pose-configuration schematic, fitted to ``SCHEMATIC_DISPLAY_SIZE`` scaled by the
+        display DPI. Schematics authored at 2x are downsampled here rather than being shown at
+        half their intended size; schematics already at or below the box are left untouched, so
+        legacy images render exactly as before.
+        """
+        check_valid_img_path(path=img_path)
+        img = PIL.Image.open(img_path)
+        try:
+            ui_scale = max(1.0, self.main_frm.winfo_fpixels("1i") / 96.0)
+        except Exception:
+            ui_scale = 1.0
+        box = (int(SCHEMATIC_DISPLAY_SIZE[0] * ui_scale), int(SCHEMATIC_DISPLAY_SIZE[1] * ui_scale))
+        img.thumbnail(box, PIL.Image.LANCZOS)
+        return ImageTk.PhotoImage(image=img)
 
     def update_img(self, selected_value):
         if selected_value != Methods.CREATE_POSE_CONFIG.value:

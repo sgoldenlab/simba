@@ -24,6 +24,13 @@ class UserDefinedFeatureExtractor(ConfigReader, FeatureExtractionMixin):
     .. note::
        `Feature extraction tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features>`__.
 
+    .. video:: _static/img/higgins_et_al.webm
+       :width: 1000
+       :autoplay:
+       :loop:
+       :muted:
+       :align: center
+
     :param str config_path: path to SimBA project config file in Configparser format
 
     :example:
