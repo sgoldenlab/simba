@@ -1,26 +1,31 @@
 __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import os
+from copy import deepcopy
 from tkinter import *
-from typing import List, Union, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
 import pandas as pd
 from PIL import Image as Img
 from PIL import ImageTk
-from copy import deepcopy
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import check_file_exist_and_readable, check_valid_array, check_valid_boolean, check_valid_dataframe, check_valid_tuple
-from simba.utils.enums import Formats
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        SimbaButton, SimBADropDown, SimBALabel,
+                                        SimBAScaleBar)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_valid_array, check_valid_boolean,
+                                check_valid_dataframe, check_valid_tuple)
+from simba.utils.enums import Formats, TextOptions
 from simba.utils.errors import ColumnNotFoundError, InvalidInputError
-from simba.utils.lookups import get_icons_paths, get_simba_font_name_and_path, get_color_dict
-from simba.utils.enums import TextOptions
-from simba.utils.read_write import get_video_meta_data, read_frm_of_video, str_2_bool
+from simba.utils.lookups import (get_color_dict, get_icons_paths,
+                                 get_simba_font_name_and_path)
+from simba.utils.read_write import (get_video_meta_data, read_frm_of_video,
+                                    str_2_bool)
 from simba.utils.warnings import FrameRangeWarning
-from simba.ui.tkinter_functions import SimBALabel, SimBAScaleBar, SimbaButton, Entry_Box, CreateLabelFrameWithIcon, SimBADropDown
 
 PADDING = 5
 MAX_SIZE = (1080, 650)
