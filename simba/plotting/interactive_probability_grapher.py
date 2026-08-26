@@ -15,8 +15,16 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_valid_boolean, check_valid_dataframe)
 from simba.utils.enums import OS, Formats, Paths
 from simba.utils.errors import ColumnNotFoundError, InvalidInputError
+from simba.utils.lookups import get_monitor_info
 from simba.utils.read_write import get_fn_ext, get_video_meta_data, read_df
 from simba.utils.warnings import FrameRangeWarning
+
+WINDOW_PADDING = 10
+PLOT_DPI = 100
+MIN_PLOT_W = 500
+MAX_PLOT_W = 1200
+PLOT_H = 600
+VIDEO_IMG_SCREEN_RATIO = (0.45, 0.7)
 
 ICON_WINDOWS = os.path.join(os.path.dirname(simba.__file__), Paths.LOGO_ICON_WINDOWS_PATH.value)
 ICON_DARWIN = os.path.join(os.path.dirname(simba.__file__), Paths.LOGO_ICON_DARWIN_PATH.value)
@@ -89,7 +97,9 @@ class InteractiveProbabilityGrapher(ConfigReader):
         if self.video_meta_data['frame_count'] != len(self.data_df):
             FrameRangeWarning(msg=f'The video {current_video_file_path} contains {self.video_meta_data["frame_count"]} frames, while the data file {self.data_path} contains {len(self.data_df)} frames.', source=self.__class__.__name__)
 
-        self.video_frm = InteractiveVideoPlotterWindow(video_path=current_video_file_path, p_arr=self.p_arr, data_df=self.data_df, config_path=self.config_path, show_names= True if self.animal_cnt >1 else False)
+        _, (self.screen_w, self.screen_h) = get_monitor_info()
+        max_img_size = (int(self.screen_w * VIDEO_IMG_SCREEN_RATIO[0]), int(self.screen_h * VIDEO_IMG_SCREEN_RATIO[1]))
+        self.video_frm = InteractiveVideoPlotterWindow(video_path=current_video_file_path, p_arr=self.p_arr, data_df=self.data_df, config_path=self.config_path, show_names= True if self.animal_cnt >1 else False, max_img_size=max_img_size, data_path=self.data_path)
         self.video_frm.main_frm.protocol("WM_DELETE_WINDOW", self._close_windows)
 
     @staticmethod
@@ -119,7 +129,11 @@ class InteractiveProbabilityGrapher(ConfigReader):
         plt.rcParams['keymap.back'] = [k for k in plt.rcParams['keymap.back'] if k != 'left']
         plt.rcParams['keymap.forward'] = [k for k in plt.rcParams['keymap.forward'] if k != 'right']
 
-        fig, ax = plt.subplots(figsize=(12, 6), dpi=100)
+        self.video_frm.main_frm.update_idletasks()
+        video_w = self.video_frm.main_frm.winfo_width()
+        plot_w = min(MAX_PLOT_W, max(MIN_PLOT_W, self.screen_w - video_w - (WINDOW_PADDING * 2)))
+        plot_h = min(PLOT_H, int(self.screen_h * 0.75))
+        fig, ax = plt.subplots(figsize=(plot_w / PLOT_DPI, plot_h / PLOT_DPI), dpi=PLOT_DPI)
         fig.patch.set_facecolor('white')
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
@@ -159,6 +173,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
         fig.canvas.mpl_connect("button_press_event", lambda event: self.__click_event(event))  # ADD THIS - it's missing!
         fig.canvas.mpl_connect("key_press_event", self.__key_press_event)
         plt.show(block=False)
+        self._place_windows_side_by_side(fig=fig)
         fig.canvas.get_tk_widget().focus_force()
 
         while plt.fignum_exists(fig.number):
@@ -185,6 +200,25 @@ class InteractiveProbabilityGrapher(ConfigReader):
             plt.pause(self.play_speed)
 
         self.video_frm.main_frm.destroy()
+
+    def _place_windows_side_by_side(self, fig) -> None:
+        """Place the video window at the top-left of the display, and the probability plot window immediately to the right of it."""
+        plot_frm = fig.canvas.manager.window
+        if not hasattr(plot_frm, 'wm_geometry'):
+            return
+        self.video_frm.main_frm.update_idletasks()
+        plot_frm.update_idletasks()
+        video_w = self.video_frm.main_frm.winfo_width()
+        plot_w = plot_frm.winfo_width()
+        if plot_w <= 1:
+            plot_w = int(fig.get_size_inches()[0] * fig.dpi)
+        plot_x = min(video_w + WINDOW_PADDING, max(0, self.screen_w - plot_w))
+        self.video_frm.main_frm.wm_geometry('+0+0')
+        plot_frm.wm_geometry(f'+{plot_x}+0')
+        self.video_frm.main_frm.update()   # NOTE: full update (not update_idletasks) - the window manager requires processed events for the new positions to stick.
+        plot_frm.update()
+        self.video_frm.main_frm.lift()
+        plot_frm.lift()
 
     def _close_windows(self):
         try:
