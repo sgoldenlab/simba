@@ -1115,7 +1115,7 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
             self.icons_dict[file_name]["img"] = ImageTk.PhotoImage(Image.open(file_path))
             self.icons_dict[file_name]["btn"] = SimBARadioButton(parent=self.join_type_frm, txt=self.CONCAT_TYPES_2[file_name], variable=self.join_type_var, img=self.icons_dict[file_name]["img"], value=self.CONCAT_TYPES_2[file_name], compound='bottom', font=Formats.FONT_REGULAR_BOLD.value)
             self.icons_dict[file_name]["btn"].grid(row=0, column=file_cnt, sticky=NW)
-        self.join_type_var.set(value="mosaic")
+        self.join_type_var.set(value=self.CONCAT_TYPES_2["mosaic"])
         self.resolution_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="RESOLUTION", icon_name='monitor', icon_link=Links.CONCAT_VIDEOS.value, pady=5, padx=5, tooltip_key='CONCAT_RES_HEADER')
         self.resolution_width = SimBADropDown(parent=self.resolution_frm, dropdown_options=self.RESOLUTIONS, label='WIDTH:', label_width=30, dropdown_width=25, value="480", img='width', tooltip_key="CONCAT_WIDTH")
         self.resolution_height = SimBADropDown(parent=self.resolution_frm, dropdown_options=self.RESOLUTIONS, label='HEIGHT:', label_width=30, dropdown_width=25, value="640", img='height', tooltip_key="CONCAT_HEIGHT")
@@ -1138,10 +1138,10 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
         for cnt, (video_name, video_data) in enumerate(self.videos_dict.items()):
             _ = get_video_meta_data(video_path=video_data.file_path)
             file_paths.append(video_data.file_path)
-        if (len(file_paths) < 3) & (self.join_type_var.get() == "mixed_mosaic"):
+        if (len(file_paths) < 3) & (self.join_type_var.get() == self.CONCAT_TYPES_2["mixed_mosaic"]):
             raise MixedMosaicError(msg="If using the mixed mosaic join type, please use at least 3 videos.", source=self.__class__.__name__ )
-        if (len(file_paths) < 3) & (self.join_type_var.get() == "mosaic"):
-            self.join_type_var.set(value="vertical")
+        if (len(file_paths) < 3) & (self.join_type_var.get() == self.CONCAT_TYPES_2["mosaic"]):
+            self.join_type_var.set(value=self.CONCAT_TYPES_2["vertical"])
         gpu = str_2_bool(self.gpu_dropdown.get_value())
         quality = int(self.quality_dropdown.get_value())
         quality_crf = quality_pct_to_crf(pct=quality)

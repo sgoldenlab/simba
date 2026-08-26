@@ -88,7 +88,8 @@ class InteractiveProbabilityGrapher(ConfigReader):
         self.play_speed = self.video_meta_data['fps'] / 1000
         if self.video_meta_data['frame_count'] != len(self.data_df):
             FrameRangeWarning(msg=f'The video {current_video_file_path} contains {self.video_meta_data["frame_count"]} frames, while the data file {self.data_path} contains {len(self.data_df)} frames.', source=self.__class__.__name__)
-        self.video_frm = InteractiveVideoPlotterWindow(video_path=current_video_file_path, p_arr=self.p_arr)
+
+        self.video_frm = InteractiveVideoPlotterWindow(video_path=current_video_file_path, p_arr=self.p_arr, data_df=self.data_df, config_path=self.config_path, show_names= True if self.animal_cnt >1 else False)
         self.video_frm.main_frm.protocol("WM_DELETE_WINDOW", self._close_windows)
 
     @staticmethod
@@ -113,7 +114,10 @@ class InteractiveProbabilityGrapher(ConfigReader):
         prob_val_txt = round(float(self.p_arr[0][0]), 8)
         probability_txt = (f"Selected frame: {str(0)}, {self.clf_name} probability: {prob_val_txt}")
         plt_title = f"Click on the points of the graph to display the corresponding video frame. \n {probability_txt}"
-        current_x_cord, prior_x_cord = None, None
+        current_x_cord, prior_x_cord = 0, None
+
+        plt.rcParams['keymap.back'] = [k for k in plt.rcParams['keymap.back'] if k != 'left']
+        plt.rcParams['keymap.forward'] = [k for k in plt.rcParams['keymap.forward'] if k != 'right']
 
         fig, ax = plt.subplots(figsize=(12, 6), dpi=100)
         fig.patch.set_facecolor('white')
@@ -155,6 +159,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
         fig.canvas.mpl_connect("button_press_event", lambda event: self.__click_event(event))  # ADD THIS - it's missing!
         fig.canvas.mpl_connect("key_press_event", self.__key_press_event)
         plt.show(block=False)
+        fig.canvas.get_tk_widget().focus_force()
 
         while plt.fignum_exists(fig.number):
             if current_x_cord != prior_x_cord and current_x_cord <= self.p_arr.shape[0]:
@@ -188,10 +193,10 @@ class InteractiveProbabilityGrapher(ConfigReader):
             pass
         plt.close('all')
 
-#
-# test = InteractiveProbabilityGrapher(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                                      file_path=r"C:\troubleshooting\mitra\project_folder\csv\features_extracted\501_MA142_Gi_CNO_0521.csv",
-#                                      model_path=r"C:\troubleshooting\mitra\models\generated_models\straub_tail.sav")
+
+# test = InteractiveProbabilityGrapher(config_path=r"D:\troubleshooting\multi_animal_dlc_two_c57\project_folder\project_config.ini",
+#                                      file_path=r"D:\troubleshooting\multi_animal_dlc_two_c57\project_folder\csv\features_extracted\Together_1.csv", #r"D:\troubleshooting\mitra\project_folder\csv\features_extracted\501_MA142_Gi_CNO_0521.csv",
+#                                      model_path=r"D:\troubleshooting\multi_animal_dlc_two_c57\models\generated_models\Attack.sav")
 # test.run()
 
 
