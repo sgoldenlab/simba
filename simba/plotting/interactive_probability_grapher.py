@@ -25,6 +25,7 @@ MIN_PLOT_W = 500
 MAX_PLOT_W = 1200
 PLOT_H = 600
 VIDEO_IMG_SCREEN_RATIO = (0.45, 0.7)
+VIDEO_WINDOW_CHROME_H = 220   # NOTE: approximate height of the video window navigation buttons and title bar, plus room for the taskbar - keeps the window on-screen on small displays.
 
 ICON_WINDOWS = os.path.join(os.path.dirname(simba.__file__), Paths.LOGO_ICON_WINDOWS_PATH.value)
 ICON_DARWIN = os.path.join(os.path.dirname(simba.__file__), Paths.LOGO_ICON_DARWIN_PATH.value)
@@ -98,7 +99,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
             FrameRangeWarning(msg=f'The video {current_video_file_path} contains {self.video_meta_data["frame_count"]} frames, while the data file {self.data_path} contains {len(self.data_df)} frames.', source=self.__class__.__name__)
 
         _, (self.screen_w, self.screen_h) = get_monitor_info()
-        max_img_size = (int(self.screen_w * VIDEO_IMG_SCREEN_RATIO[0]), int(self.screen_h * VIDEO_IMG_SCREEN_RATIO[1]))
+        max_img_size = (int(self.screen_w * VIDEO_IMG_SCREEN_RATIO[0]), min(int(self.screen_h * VIDEO_IMG_SCREEN_RATIO[1]), self.screen_h - VIDEO_WINDOW_CHROME_H))
         self.video_frm = InteractiveVideoPlotterWindow(video_path=current_video_file_path, p_arr=self.p_arr, data_df=self.data_df, config_path=self.config_path, show_names= True if self.animal_cnt >1 else False, max_img_size=max_img_size, data_path=self.data_path)
         self.video_frm.main_frm.protocol("WM_DELETE_WINDOW", self._close_windows)
 
