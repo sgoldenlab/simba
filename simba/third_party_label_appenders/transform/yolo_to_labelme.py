@@ -12,8 +12,8 @@ import yaml
 
 from simba.third_party_label_appenders.transform.utils import arr_to_b64
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists, check_instance,
-                                check_str, check_valid_boolean)
+                                check_if_dir_exists, check_instance, check_str,
+                                check_valid_boolean)
 from simba.utils.enums import Options
 from simba.utils.errors import InvalidInputError, NoDataError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success

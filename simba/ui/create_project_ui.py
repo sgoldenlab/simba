@@ -29,7 +29,6 @@ from simba.utils.lookups import (get_body_part_configurations,
 from simba.video_processors.video_processing import \
     extract_frames_from_all_videos_in_directory
 
-
 SCHEMATIC_DISPLAY_SIZE = (275, 550)
 """Logical size the pose-configuration schematics are displayed at, in px."""
 
