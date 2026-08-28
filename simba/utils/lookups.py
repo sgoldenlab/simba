@@ -37,7 +37,8 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_if_dir_exists, check_if_valid_rgb_tuple,
                                 check_instance, check_int, check_str,
                                 check_valid_boolean, check_valid_dataframe,
-                                check_valid_dict, check_valid_tuple)
+                                check_valid_dict, check_valid_lst,
+                                check_valid_tuple)
 from simba.utils.enums import (OS, UML, Defaults, FontPaths, Formats, Keys,
                                Methods, Options, Paths)
 from simba.utils.errors import (FFMPEGNotFoundError, InvalidInputError,
@@ -1178,6 +1179,82 @@ def find_closest_string(target: str,
     
     return closest, distance
 
+
+def find_closest_file(file_path: Union[str, os.PathLike],
+                      directory: Optional[Union[str, os.PathLike]] = None,
+                      extensions: Optional[Union[List[str], Tuple[str], str]] = None,
+                      max_depth: int = 1,
+                      case_sensitive: bool = False,
+                      token_based: bool = False) -> Optional[Tuple[str, Union[int, float]]]:
+    """
+    Find the file on disk whose name is closest to the name of a passed file path.
+
+    .. note::
+       If two files in different directories share the closest name, the one closest to ``directory`` is returned.
+
+    .. seealso::
+       For matching a string against a list of strings, e.g. body-part or classifier names, see :func:`simba.utils.lookups.find_closest_string`.
+
+    :param Union[str, os.PathLike] file_path: Path to the file to find the closest match to. The file does not have to exist.
+    :param Optional[Union[str, os.PathLike]] directory: Directory to search. If None (default), the directory of ``file_path`` is searched, or the current working directory if ``file_path`` holds no directory.
+    :param Optional[Union[List[str], Tuple[str], str]] extensions: If passed, only files with these extensions are compared, e.g. ``['mp4', '.avi']``. If None (default), all files are compared.
+    :param int max_depth: How many directory levels to search. ``1`` (default) searches ``directory`` only, ``2`` also searches its sub-directories, etc.
+    :param bool case_sensitive: If True, file names are compared case-sensitively. Default False.
+    :param bool token_based: If False (default), uses pure Levenshtein distance, which is sensitive to the delimiters and digits that usually separate file names, and returns an interpretable edit distance. If True, uses hybrid token-based and Levenshtein matching, which scores re-ordered name parts as near-identical, e.g. ``CNO_501_MA142`` and ``501_MA142_CNO``.
+    :return: Tuple of (path to the closest file, distance), or None if no files were found. As with :func:`simba.utils.lookups.find_closest_string`, the distance is an integer edit distance when ``token_based=False`` and a float score when ``token_based=True``. Lower is closer for both.
+    :rtype: Optional[Tuple[str, Union[int, float]]]
+
+    :example:
+
+    >>> find_closest_file(file_path='/project_folder/videos/Video_1.mp4')
+    >>> ('/project_folder/videos/Video1.avi', 1)
+    >>> find_closest_file(file_path='/project_folder/videos/Video_1.mp4', extensions=['mp4', 'avi'], max_depth=2)
+    >>> ('/project_folder/videos/additional/Video_11.avi', 2)
+    """
+
+    check_instance(source=f'{find_closest_file.__name__} file_path', instance=file_path, accepted_types=(str, os.PathLike), raise_error=True)
+    check_int(name=f'{find_closest_file.__name__} max_depth', value=max_depth, min_value=1, raise_error=True)
+    check_valid_boolean(value=[case_sensitive, token_based], source=f'{find_closest_file.__name__} case_sensitive, token_based', raise_error=True)
+    _, target_name, _ = get_fn_ext(filepath=file_path, raise_error=True)
+    check_str(name=f'{find_closest_file.__name__} file_path name', value=target_name, allow_blank=False, raise_error=True)
+    if directory is None:
+        directory = os.path.dirname(file_path) if len(os.path.dirname(file_path)) > 0 else os.getcwd()
+    check_if_dir_exists(in_dir=directory, source=f'{find_closest_file.__name__} directory', raise_error=True)
+    if extensions is not None:
+        check_instance(source=f'{find_closest_file.__name__} extensions', instance=extensions, accepted_types=(str, list, tuple), raise_error=True)
+        extensions = [extensions] if isinstance(extensions, str) else list(extensions)
+        check_valid_lst(data=extensions, source=f'{find_closest_file.__name__} extensions', valid_dtypes=(str,), min_len=1, raise_error=True)
+        extensions = set([x.lower().lstrip('.') for x in extensions])
+    target_path = os.path.normcase(os.path.abspath(file_path))
+
+    file_names, file_paths, search_dirs, depth = [], [], [directory], 1
+    while len(search_dirs) > 0 and depth <= max_depth:
+        sub_dirs = []
+        for search_dir in search_dirs:
+            try:
+                dir_entries = list(os.scandir(search_dir))
+            except OSError:
+                continue
+            for entry in dir_entries:
+                if entry.is_dir(follow_symlinks=False):
+                    sub_dirs.append(entry.path)
+                    continue
+                _, entry_name, entry_ext = get_fn_ext(filepath=entry.name, raise_error=False)
+                if entry_name is None or len(entry_name) == 0:
+                    continue
+                if extensions is not None and entry_ext.lower().lstrip('.') not in extensions:
+                    continue
+                if os.path.normcase(os.path.abspath(entry.path)) == target_path:
+                    continue
+                file_names.append(entry_name)
+                file_paths.append(entry.path)
+        search_dirs, depth = sub_dirs, depth + 1
+
+    if len(file_names) == 0:
+        return None
+    closest_name, distance = find_closest_string(target=target_name, string_list=file_names, case_sensitive=case_sensitive, token_based=token_based)
+
+    return file_paths[file_names.index(closest_name)], distance
 
 
 def create_directionality_cords(bp_dict: dict,

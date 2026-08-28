@@ -32,6 +32,21 @@ from simba.video_processors.video_processing import \
 SCHEMATIC_DISPLAY_SIZE = (275, 550)
 """Logical size the pose-configuration schematics are displayed at, in px."""
 
+SCHEMATIC_BG = "white"
+"""Ground behind the schematic. The images themselves carry no frame, so the label supplies
+one -- otherwise a white-ground card floats on the grey panel with no visible edge."""
+
+SCHEMATIC_PAD = 4
+"""Breathing room between the schematic and its border, in px."""
+
+SCHEMATIC_SCREEN_RESERVE = 470
+"""Vertical px the rest of the tab needs (window chrome, the setting frames, the buttons).
+The schematic is capped to whatever is left, so it does not force scrolling on a small
+laptop -- at 275x550 it overflowed a 1366x768 screen by ~240 px."""
+
+SCHEMATIC_MIN_H = 240
+"""Never shrink the schematic below this, however small the screen reports itself."""
+
 
 class ProjectCreatorPopUp():
     """
@@ -104,7 +119,11 @@ class ProjectCreatorPopUp():
         self.three_dim_tracking_options.extend(self.user_defined_options)
 
         self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=Options.CLASSICAL_TRACKING_OPTIONS.value, label='BODY-PART CONFIGURATION: ', img='pose_2', label_width=35, dropdown_width=35, value=self.classical_tracking_options[0], command=self.update_img, tooltip_key='CREATE_PROJECT_BP_CONFIG')
-        self.img_lbl = Label(self.animal_settings_frm, image=self.bp_lu[self.classical_tracking_options[0]]["img"], font=Formats.FONT_REGULAR.value)
+        # Tk ignores a Label's padx/pady when its content is an image, so the border and the
+        # breathing room around the schematic come from a wrapping frame instead.
+        self.img_frm = Frame(self.animal_settings_frm, bd=1, relief=SOLID, background=SCHEMATIC_BG)
+        self.img_lbl = Label(self.img_frm, image=self.bp_lu[self.classical_tracking_options[0]]["img"], font=Formats.FONT_REGULAR.value, bd=0, background=SCHEMATIC_BG)
+        self.img_lbl.pack(padx=SCHEMATIC_PAD, pady=SCHEMATIC_PAD)
         reset_btn = SimbaButton(parent=self.animal_settings_frm, txt="RESET USER DEFINED POSE-CONFIGS", txt_clr='red', img='clean', cmd=PoseResetterPopUp, tooltip_key='CREATE_PROJECT_RESET_POSE_CONFIGS')
 
         run_frm = CreateLabelFrameWithIcon(parent=self.create_project_tab, header="CREATE PROJECT CONFIG", icon_name='create', icon_link=Links.CREATE_PROJECT.value)
@@ -119,7 +138,7 @@ class ProjectCreatorPopUp():
         self.animal_settings_frm.grid(row=2, column=0, sticky=NW, pady=5)
         self.tracking_type_dropdown.grid(row=0, column=0, sticky=NW)
         self.selected_tracking_dropdown.grid(row=1, column=0, sticky=NW)
-        self.img_lbl.grid(row=2, column=0, sticky=NW)
+        self.img_frm.grid(row=2, column=0, sticky=NW, pady=4)
         reset_btn.grid(row=0, column=1, sticky=NW)
         run_frm.grid(row=3, column=0, sticky=NW)
         create_project_btn.grid(row=0, column=0, sticky=NW)
@@ -156,8 +175,13 @@ class ProjectCreatorPopUp():
             ui_scale = max(1.0, self.main_frm.winfo_fpixels("1i") / 96.0)
         except Exception:
             ui_scale = 1.0
-        box = (int(SCHEMATIC_DISPLAY_SIZE[0] * ui_scale), int(SCHEMATIC_DISPLAY_SIZE[1] * ui_scale))
-        img.thumbnail(box, PIL.Image.LANCZOS)
+        try:
+            budget = self.main_frm.winfo_screenheight() - SCHEMATIC_SCREEN_RESERVE
+        except Exception:
+            budget = SCHEMATIC_DISPLAY_SIZE[1]
+        max_h = max(SCHEMATIC_MIN_H, min(int(SCHEMATIC_DISPLAY_SIZE[1] * ui_scale), budget))
+        box = (int(SCHEMATIC_DISPLAY_SIZE[0] * ui_scale), max_h)
+        img.thumbnail(box, PIL.Image.LANCZOS)      # keeps aspect; the height cap binds
         return ImageTk.PhotoImage(image=img)
 
     def update_img(self, selected_value):

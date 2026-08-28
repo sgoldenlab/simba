@@ -24,6 +24,14 @@ class UserDefinedFeatureExtractor(ConfigReader, FeatureExtractionMixin):
     .. note::
        `Feature extraction tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features>`__.
 
+       The MARS pose configuration is featurized through this class:
+       `Expected pose configuration, MARS <https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/8.png>`_
+
+    .. image:: _static/img/pose_configurations/8.png
+       :alt: MARS pose configuration
+       :width: 300
+       :align: center
+
     .. video:: _static/img/higgins_et_al.webm
        :width: 1000
        :autoplay:

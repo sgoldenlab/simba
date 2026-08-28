@@ -176,10 +176,10 @@ class InteractiveVideoPlotterWindow(ConfigReader, PlottingMixin):
         self.preferences_frm.iconphoto(False, self.btn_icons['settings']["img"])
 
         pref_frm_panel = CreateLabelFrameWithIcon(parent=self.preferences_frm, header="PREFERENCES", icon_name='settings', padx=5, pady=5)
-        self.show_names_dd = SimBADropDown(parent=pref_frm_panel, dropdown_options=['TRUE', 'FALSE'], label="SHOW ANIMAL NAMES: ", label_width=35, dropdown_width=35, value='TRUE' if self.show_names else 'FALSE', tooltip_key='ROI_POLYGON_TOLERANCE', img='label')
-        self.show_pose_dd = SimBADropDown(parent=pref_frm_panel, dropdown_options=['TRUE', 'FALSE'], label="SHOW ANIMAL POSE: ", label_width=35, dropdown_width=35, value='TRUE' if self.show_pose else 'FALSE', tooltip_key='ROI_KEYBOARD_SENSITIVITY', img='pose')
-        self.name_bg_clr_dd = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(self.clr_dict.keys()), label="NAME BACKGROUND COLOR: ", label_width=35, dropdown_width=35, value=self.text_bg_clr, tooltip_key='ROI_KEYBOARD_SENSITIVITY', img='paint')
-        self.name_bg_opacity_dd = SimBADropDown(parent=pref_frm_panel, dropdown_options=[f"{x / 10:.1f}" for x in range(0, 11)], label="NAME BACKGROUND OPACITY: ", label_width=35, dropdown_width=35, value=self.name_bg_opacity, tooltip_key='ROI_KEYBOARD_SENSITIVITY', img='opacity')
+        self.show_names_dd = SimBADropDown(parent=pref_frm_panel, dropdown_options=['TRUE', 'FALSE'], label="SHOW ANIMAL NAMES: ", label_width=35, dropdown_width=35, value='TRUE' if self.show_names else 'FALSE', tooltip_key='INTERACTIVE_PROBABILITY_SHOW_ANIMAL_NAMES', img='label')
+        self.show_pose_dd = SimBADropDown(parent=pref_frm_panel, dropdown_options=['TRUE', 'FALSE'], label="SHOW ANIMAL POSE: ", label_width=35, dropdown_width=35, value='TRUE' if self.show_pose else 'FALSE', tooltip_key='INTERACTIVE_PROBABILITY_SHOW_POSE', img='pose')
+        self.name_bg_clr_dd = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(self.clr_dict.keys()), label="NAME BACKGROUND COLOR: ", label_width=35, dropdown_width=35, value=self.text_bg_clr, tooltip_key='INTERACTIVE_PROBABILITY_NAME_BG_COLOR', img='paint')
+        self.name_bg_opacity_dd = SimBADropDown(parent=pref_frm_panel, dropdown_options=[f"{x / 10:.1f}" for x in range(0, 11)], label="NAME BACKGROUND OPACITY: ", label_width=35, dropdown_width=35, value=self.name_bg_opacity, tooltip_key='INTERACTIVE_PROBABILITY_NAME_BG_OPACITY', img='opacity')
 
         pref_save_btn = SimbaButton(parent=pref_frm_panel, txt="SAVE", img='save_large', font=Formats.FONT_REGULAR.value, cmd=self._set_preferences)
         pref_frm_panel.grid(row=0, column=0)

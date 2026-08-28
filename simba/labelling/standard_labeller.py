@@ -13,6 +13,7 @@ import cv2
 import pandas as pd
 from PIL import Image, ImageTk
 from tabulate import tabulate
+import numpy as np
 
 try:
     from typing import Literal
@@ -36,7 +37,8 @@ from simba.utils.errors import (FrameRangeError, NoDataError,
                                 NoFilesFoundError, SimbaError)
 from simba.utils.lookups import (get_current_time, get_img_resize_info,
                                  get_labelling_img_kbd_bindings,
-                                 get_labelling_video_kbd_bindings)
+                                 get_labelling_video_kbd_bindings,
+                                 get_simba_font_name_and_path, get_color_dict)
 from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (find_closest_readable_frame,
                                     get_video_meta_data, read_config_entry,
@@ -81,21 +83,27 @@ class LabellingInterface(ConfigReader):
                  thresholds: Optional[Dict[str, float]] = None,
                  continuing: bool = False):
 
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path,)
         log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         check_file_exist_and_readable(file_path=file_path)
         self.video_meta_data = get_video_meta_data(video_path=file_path)
         check_valid_boolean(value=continuing, source=f'{self.__class__.__name__} continuing')
         if thresholds is not None:
             check_valid_dict(x=thresholds, valid_key_dtypes=(str,), valid_values_dtypes=(float,), min_value=0.0, max_value=1.0, valid_keys=self.clf_names)
-        self.img_idx, self.thresholds, self.video_path = 0, thresholds, file_path
+        self.img_idx, self.thresholds, self.video_path, self.name_bg_opacity = 0, thresholds, file_path, 0.4
+        self.text_bg_clr, self.clr_dict = 'Black', get_color_dict()
         self.video_name = self.video_meta_data['video_name']
         self.features_extracted_file_path = os.path.join(self.features_dir, f"{self.video_name}.{self.file_type}")
         self.targets_inserted_file_path = os.path.join(self.targets_folder, f"{self.video_name}.{self.file_type}")
         self.machine_results_file_path = os.path.join(self.machine_results_dir, f"{self.video_name}.{self.file_type}")
         self.cap = cv2.VideoCapture(self.video_path)
         self.img_greyscale, self.save_verbosity = str_2_bool(input_str=DEFAULT_IMG_GREYSCALE), str_2_bool(input_str=DEFAULT_SAVE_VERBOSITY)
-        self.show_video_timer = False
+        self.show_video_timer, self.show_names, self.show_pose = False, True if self.animal_cnt > 1 else False, False
+        _, self.font_path = get_simba_font_name_and_path(font=TextOptions.DEFAULT_FONT.value)
+        self.animal_bp_cols = {k: list(zip(v['X_bps'], v['Y_bps'])) for k, v in self.animal_bp_dict.items()}
+        self.animal_clrs = {k: [tuple(int(c) for c in clr) for clr in v['colors']] for k, v in self.animal_bp_dict.items()}
+        self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(self.video_meta_data['width'], self.video_meta_data['height']), circle_frame_ratio=100)
+        self.name_font_size, _, _ = PlottingMixin().get_optimal_font_size_ttf(text=list(self.animal_bp_dict.keys()), font_path=self.font_path, accepted_px_width=int(self.video_meta_data['width'] / 10), accepted_px_height=int(self.video_meta_data['height'] / 10))   # NOTE: pose and names are drawn on the full-resolution frame before it is scaled to the display size, so their sizes come from the video resolution and not from img_display_size.
         self.img_kbd_bindings = get_labelling_img_kbd_bindings()
         self.video_kbd_bindings = get_labelling_video_kbd_bindings()
         self.max_frm_id = self.video_meta_data["frame_count"] - 1
@@ -166,7 +174,7 @@ class LabellingInterface(ConfigReader):
         self.img_lbl = Label(self.img_frm, name='img_lbl')
         self.img_frm.grid(row=0, column=0, sticky=NW, padx=10, pady=10, columnspan=3, rowspan=2)
         self.img_lbl.grid(row=0, column=0, sticky=NW)
-        self.font_size, self.space_x, self.spacing_scale = PlottingMixin().get_optimal_font_scales(text='999999', accepted_px_width=int(self.img_display_size[0] / 8), accepted_px_height=int(self.img_display_size[1] / 8))
+        self.font_size, self.space_x, self.spacing_scale = PlottingMixin().get_optimal_font_size_ttf(text='999999', font_path=self.font_path, accepted_px_width=int(self.video_meta_data['width'] / 8), accepted_px_height=int(self.video_meta_data['height'] / 8))   # NOTE: sized from the video resolution, not img_display_size - the timer is drawn on the full-resolution frame before it is scaled to the display size.
 
         self.navigation_frm = CreateLabelFrameWithIcon(parent=self.main_window, header='FRAME NAVIGATION',  icon_name='navigation', relief='solid')
         self.current_frm_eb = Entry_Box(parent=self.navigation_frm, fileDescription='CURRENT FRAME: ', labelwidth=20, validation='numeric', entry_box_width=10, value=self.img_idx, justify='center', label_font=Formats.FONT_HEADER.value, entry_font=Formats.FONT_HEADER.value)
@@ -290,29 +298,59 @@ class LabellingInterface(ConfigReader):
         self.__advance_frame(frm_id=vid_frame_no)
         f.close()
 
+    def _show_names(self, img: np.ndarray, frm_cnt: int) -> np.ndarray:
+        for animal_name, bp_cols in self.animal_bp_cols.items():
+            name_loc = self.data_df.loc[frm_cnt, list(bp_cols[0])].values.astype(np.float32)
+            if np.isnan(name_loc).any():
+                continue
+            img = PlottingMixin().put_text(img=img, text=animal_name, pos=(int(name_loc[0]), int(name_loc[1])), font_size=self.name_font_size, font_path=self.font_path, text_color=self.animal_clrs[animal_name][0], text_bg_alpha=self.name_bg_opacity, text_color_bg=self.clr_dict[self.text_bg_clr])
+        return img
+
+    def _show_pose(self, img: np.ndarray, frm_cnt: int) -> np.ndarray:
+        for animal_name, bp_cols in self.animal_bp_cols.items():
+            animal_pose_data = self.data_df.loc[frm_cnt, [c for bp in bp_cols for c in bp]].values.astype(np.float32).reshape(-1, 2)
+            for bp_idx in range(animal_pose_data.shape[0]):
+                if np.isnan(animal_pose_data[bp_idx]).any():
+                    continue
+                img = cv2.circle(img=img, center=(int(animal_pose_data[bp_idx][0]), int(animal_pose_data[bp_idx][1])), radius=self.circle_size, color=self.animal_clrs[animal_name][bp_idx], thickness=-1)
+        return img
+
     def set_img(self,
                 img_lbl: Label,
                 video_path: Union[str, os.PathLike],
                 img_idx: int,
                 display_size: Optional[Tuple[int, int]] = None,
                 show_timer: bool = False):
-        self.img = read_frm_of_video(video_path=video_path, frame_index=img_idx, size=display_size, raise_error=False, greyscale=self.img_greyscale)
+
+        self.img = read_frm_of_video(video_path=video_path, frame_index=img_idx, raise_error=False, greyscale=self.img_greyscale)
         if self.img is None:
             FrameRangeWarning(msg=f'Frame {img_idx} could not be read in video {video_path}. Attempting to find closest readable frame...')
             img, img_idx = find_closest_readable_frame(video_path=video_path, target_frame=img_idx, max_search_range=50)
             if img_idx is not None:
                 print(f'Showing frame {img_idx} in video {self.video_name}...')
-                self.img = read_frm_of_video(video_path=video_path, frame_index=img_idx, size=display_size, raise_error=True)
+                self.img = read_frm_of_video(video_path=video_path, frame_index=img_idx, raise_error=True)
                 self.img_idx = deepcopy(img_idx)
                 self.current_frm_eb.entry_set(val=str(img_idx))
             else:
                 raise FrameRangeError(msg=f'Could not find a readable frame (± frames of {img_idx}) in video {video_path}. Cannot proceed with annotations in this video.', source=self.__class__.__name__)
+        if self.img_greyscale and (show_timer or self.show_names or self.show_pose):   # NOTE: the PIL text path in put_text and the pose colors are BGR and cannot be written into a single-channel image.
+            self.img = cv2.cvtColor(self.img, cv2.COLOR_GRAY2BGR)
         if show_timer:
             timestamp = seconds_to_timestamp(seconds=self.img_idx / self.video_meta_data['fps'], hh_mm_ss_sss=True)
-            self.img = PlottingMixin().put_text(img=self.img, text=timestamp, pos=(TextOptions.BORDER_BUFFER_X.value, int((self.img.shape[0] - self.spacing_scale * 2))), font_size=self.font_size, font_thickness=TextOptions.TEXT_THICKNESS.value + 1, text_bg_alpha=0.6, text_color=(255, 255, 255))
+            self.img = PlottingMixin().put_text(img=self.img, text=timestamp, pos=(TextOptions.BORDER_BUFFER_X.value, int((self.img.shape[0] - self.spacing_scale * 2))), font_size=self.font_size, font_thickness=TextOptions.TEXT_THICKNESS.value + 1, text_bg_alpha=0.6, text_color=(255, 255, 255), font_path=self.font_path)
+        if self.show_names or self.show_pose:
+            if img_idx in self.data_df.index:
+                if self.show_pose:
+                    self.img = self._show_pose(img=self.img, frm_cnt=img_idx)
+                if self.show_names:
+                    self.img = self._show_names(img=self.img, frm_cnt=img_idx)
+            else:
+                FrameRangeWarning(msg=f'Frame {img_idx} is outside of the data frame range: (0-{len(self.data_df)-1}). Pose and animal names cannot be displayed.', source=self.__class__.__name__)
         grey_img = is_img_greyscale(img=self.img, raise_error=False, source=f'{self.__class__.__name__} img_idx')
         img_rgb = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB) if not grey_img else self.img
         self.pil_image = Image.fromarray(img_rgb)
+        if display_size is not None:
+            self.pil_image.thumbnail(display_size, Image.LANCZOS)
         self.tk_image = ImageTk.PhotoImage(self.pil_image)
         img_lbl.configure(image=self.tk_image)
         img_lbl.image = self.tk_image
@@ -438,26 +476,36 @@ class LabellingInterface(ConfigReader):
         self.preferences_frm.iconphoto(False, self.menu_icons['settings']["img"])
         size_frm_panel = CreateLabelFrameWithIcon(parent=self.preferences_frm, header="IMAGE SIZE", icon_name='size', padx=5, pady=5)
         size_frm_panel.grid(row=0, column=0, sticky="NW")
-        self.max_width_scaler = SimBAScaleBar(parent=size_frm_panel, label="MAX IMAGE WIDTH (%): ", orient=HORIZONTAL, length=200, value=MAX_FRAME_RATI0[0]*100, label_width=25, lbl_img='width', from_=10, to=100)
-        self.max_height_scaler = SimBAScaleBar(parent=size_frm_panel, label="MAX IMAGE HEIGHT (%): ", orient=HORIZONTAL, length=200, value=MAX_FRAME_RATI0[1]*100, label_width=25, lbl_img='height', from_=10, to=100)
+        self.max_width_scaler = SimBAScaleBar(parent=size_frm_panel, label="MAX IMAGE WIDTH (%): ", orient=HORIZONTAL, length=200, value=MAX_FRAME_RATI0[0]*100, label_width=25, lbl_img='width', from_=10, to=100, tooltip_key='ANNOTATION_INTERFACE_MAX_IMAGE_WIDTH')
+        self.max_height_scaler = SimBAScaleBar(parent=size_frm_panel, label="MAX IMAGE HEIGHT (%): ", orient=HORIZONTAL, length=200, value=MAX_FRAME_RATI0[1]*100, label_width=25, lbl_img='height', from_=10, to=100, tooltip_key='ANNOTATION_INTERFACE_MAX_IMAGE_HEIGHT')
         self.max_width_scaler.grid(row=0, column=0, sticky="NW")
         self.max_height_scaler.grid(row=1, column=0, sticky="NW")
 
         img_clr_panel = CreateLabelFrameWithIcon(parent=self.preferences_frm, header="IMAGE COLOR", icon_name='size', padx=5, pady=5)
         img_clr_panel.grid(row=1, column=0, sticky="NW")
-        self.img_grey_dropdown = SimBADropDown(parent=img_clr_panel, dropdown_options=['TRUE', 'FALSE'], label="IMAGE GREYSCALE: ", label_width=20, value='TRUE' if self.img_greyscale else 'FALSE', dropdown_width=10, img='grey')
+        self.img_grey_dropdown = SimBADropDown(parent=img_clr_panel, dropdown_options=['TRUE', 'FALSE'], label="IMAGE GREYSCALE: ", label_width=35, value='TRUE' if self.img_greyscale else 'FALSE', dropdown_width=10, tooltip_key='ANNOTATION_INTERFACE_IMAGE_GREYSCALE', img='grey')
         self.img_grey_dropdown.grid(row=0, column=0, sticky="NW")
 
-        verbosity_panel = CreateLabelFrameWithIcon(parent=self.preferences_frm, header="VEBOSITY", icon_name='verbose', padx=5, pady=5)
+        verbosity_panel = CreateLabelFrameWithIcon(parent=self.preferences_frm, header="VERBOSITY", icon_name='verbose', padx=5, pady=5)
         verbosity_panel.grid(row=2, column=0, sticky="NW")
-        self.verbosity_dropdown = SimBADropDown(parent=verbosity_panel, dropdown_options=['TRUE', 'FALSE'], label="SAVE VERBOSITY: ", label_width=20, value='TRUE' if self.save_verbosity else 'FALSE', dropdown_width=10, img='verbose')
+        self.verbosity_dropdown = SimBADropDown(parent=verbosity_panel, dropdown_options=['TRUE', 'FALSE'], label="SAVE VERBOSITY: ", label_width=35, value='TRUE' if self.save_verbosity else 'FALSE', dropdown_width=10, tooltip_key='ANNOTATION_INTERFACE_SAVE_VERBOSITY', img='verbose')
         self.verbosity_dropdown.grid(row=0, column=0, sticky="NW")
 
         video_timer_panel = CreateLabelFrameWithIcon(parent=self.preferences_frm, header="VIDEO TIMER", icon_name='frame', padx=5, pady=5)
         video_timer_panel.grid(row=3, column=0, sticky="NW")
-        self.video_timer_dropdown = SimBADropDown(parent=video_timer_panel, dropdown_options=['TRUE', 'FALSE'], label="SHOW VIDEO TIMER: ", label_width=20, value='TRUE' if self.show_video_timer else 'FALSE', dropdown_width=10, img='timer')
+        self.video_timer_dropdown = SimBADropDown(parent=video_timer_panel, dropdown_options=['TRUE', 'FALSE'], label="SHOW VIDEO TIMER: ", label_width=35, value='TRUE' if self.show_video_timer else 'FALSE', dropdown_width=10, tooltip_key='ANNOTATION_INTERFACE_SHOW_VIDEO_TIMER', img='timer')
         self.video_timer_dropdown.grid(row=0, column=0, sticky="NW")
 
+        animal_tracking_panel = CreateLabelFrameWithIcon(parent=self.preferences_frm, header="ANIMAL TRACKING", icon_name='pose', padx=5, pady=5)
+        animal_tracking_panel.grid(row=4, column=0, sticky="NW")
+        self.animal_names_dropdown = SimBADropDown(parent=animal_tracking_panel, dropdown_options=['TRUE', 'FALSE'], label="SHOW ANIMAL NAMES: ", label_width=35, value='TRUE' if self.show_names else 'FALSE', dropdown_width=10, tooltip_key='ANNOTATION_INTERFACE_SHOW_ANIMAL_NAMES', img='label')
+        self.animal_names_dropdown.grid(row=0, column=0, sticky="NW")
+        self.animal_pose_dropdown = SimBADropDown(parent=animal_tracking_panel, dropdown_options=['TRUE', 'FALSE'], label="SHOW ANIMAL POSE: ", label_width=35, value='TRUE' if self.show_pose else 'FALSE', dropdown_width=10, tooltip_key='ANNOTATION_INTERFACE_SHOW_ANIMAL_POSE', img='pose')
+        self.animal_pose_dropdown.grid(row=1, column=0, sticky="NW")
+        self.name_bg_clr_dd = SimBADropDown(parent=animal_tracking_panel, dropdown_options=list(self.clr_dict.keys()), label="NAME BACKGROUND COLOR: ", label_width=35, dropdown_width=35, value=self.text_bg_clr, tooltip_key='ANNOTATION_INTERFACE_NAME_BG_COLOR', img='paint')
+        self.name_bg_clr_dd.grid(row=2, column=0, sticky="NW")
+        self.name_bg_opacity_dd = SimBADropDown(parent=animal_tracking_panel, dropdown_options=[f"{x / 10:.1f}" for x in range(0, 11)], label="NAME BACKGROUND OPACITY: ", label_width=35, dropdown_width=35, value=self.name_bg_opacity, tooltip_key='ANNOTATION_INTERFACE_NAME_BG_OPACITY', img='opacity')
+        self.name_bg_opacity_dd.grid(row=3, column=0, sticky="NW")
         pref_save_btn = SimbaButton(parent=self.preferences_frm, txt="SAVE", img='save_large', font=Formats.FONT_REGULAR.value, cmd=self.set_settings)
         pref_save_btn.grid(row=4, column=0, sticky="NW")
 
@@ -465,12 +513,17 @@ class LabellingInterface(ConfigReader):
         max_width, max_height = int(self.max_width_scaler.get_value()) / 100, int(self.max_height_scaler.get_value()) / 100
         scaled_w, scaled_h, _, _ = get_img_resize_info(img_size=(self.video_meta_data['width'], self.video_meta_data['height']), display_resolution=None, max_width_ratio=max_width, max_height_ratio=max_height)
         self.img_display_size = (scaled_w, scaled_h)
-        self.font_size, self.space_x, self.spacing_scale = PlottingMixin().get_optimal_font_scales(text='999999', accepted_px_width=int(self.img_display_size[0] / 8), accepted_px_height=int(self.img_display_size[1] / 8))
         self.img_greyscale = str_2_bool(input_str=self.img_grey_dropdown.get_value())
         self.save_verbosity = str_2_bool(input_str=self.verbosity_dropdown.get_value())
         self.show_video_timer = str_2_bool(input_str=self.video_timer_dropdown.get_value())
+        self.show_names = str_2_bool(self.animal_names_dropdown.get_value())
+        self.show_pose = str_2_bool(self.animal_pose_dropdown.get_value())
+        self.name_bg_opacity = float(self.name_bg_opacity_dd.get_value())
+        self.text_bg_clr = self.name_bg_clr_dd.get_value()
+
+
         self.set_img(img_lbl=self.img_lbl, video_path=self.cap, img_idx=self.img_idx, display_size=self.img_display_size, show_timer=self.show_video_timer)
-        pass
+
 
 # test = LabellingInterface(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                               threshold_dict=None, #threshold_dict={'Attack': 0.4}
@@ -507,6 +560,11 @@ class LabellingInterface(ConfigReader):
 #                        continuing=True)
 #
 
+
+# _ = LabellingInterface(config_path=r"D:\troubleshooting\multi_animal_dlc_two_c57\project_folder\project_config.ini",
+#                        file_path=r"D:\troubleshooting\multi_animal_dlc_two_c57\project_folder\videos\Together_1.avi",
+#                        thresholds=None,
+#                        continuing=False)
 
 
 #

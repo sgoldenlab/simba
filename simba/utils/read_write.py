@@ -3983,7 +3983,7 @@ def extract_audio_from_video(video_path: Union[str, os.PathLike],
     stdout_success(msg=f'Audio track saved at {save_path}', elapsed_time=timer.elapsed_time_str)
 
 
-def find_closest_readable_frame(video_path: Union[str, os.PathLike],
+def find_closest_readable_frame(video_path: Union[str, os.PathLike, cv2.VideoCapture],
                                 target_frame: int,
                                 max_search_range: int = 50) -> Tuple[Optional[np.ndarray], Optional[int]]:
     """
@@ -4006,13 +4006,13 @@ def find_closest_readable_frame(video_path: Union[str, os.PathLike],
     >>>     print(f"Read frame {actual_idx} (target was 10810, offset: {actual_idx - 10810})")
     """
 
-    check_file_exist_and_readable(file_path=video_path)
+    check_instance(source=f'{find_closest_readable_frame.__name__} video_path', instance=video_path, accepted_types=(str, os.PathLike, cv2.VideoCapture), raise_error=True)
+    if isinstance(video_path, (str, os.PathLike)):
+        check_file_exist_and_readable(file_path=video_path)
     check_int(name='target_frame', value=target_frame, min_value=0)
     check_int(name='max_search_range', value=max_search_range, min_value=1)
-
     video_meta = get_video_meta_data(video_path=video_path)
     target_frame = max(0, min(target_frame, video_meta['frame_count'] - 1))
-
     img = read_frm_of_video(video_path=video_path, frame_index=target_frame, raise_error=False)
     if img is not None:
         return img, target_frame

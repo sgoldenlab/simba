@@ -42,7 +42,8 @@ from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning,
 
 
 def check_file_exist_and_readable(file_path: Union[str, os.PathLike],
-                                  raise_error: bool = True) -> bool:
+                                  raise_error: bool = True,
+                                  show_nearest_file: bool = True) -> bool:
     """
     Checks if a path points to a readable file.
 
@@ -51,9 +52,18 @@ def check_file_exist_and_readable(file_path: Union[str, os.PathLike],
     :raise CorruptedFileError: The file can not be read or is zero byte size.
     """
     check_instance(source="FILE PATH", instance=file_path, accepted_types=(str, os.PathLike))
+    check_valid_boolean(value=[show_nearest_file, raise_error], source=f'{check_file_exist_and_readable.__name__} show_nearest_file, raise_error', raise_error=True)
     if not os.path.isfile(file_path):
         if raise_error:
-            raise NoFilesFoundError(msg=f"{file_path} is not a valid file path", source=check_file_exist_and_readable.__name__)
+            msg = f"{file_path} is not a valid file path"
+            file_dir, file_name, _ = get_fn_ext(filepath=file_path)
+            if show_nearest_file and os.path.isdir(file_dir):
+                from simba.utils.lookups import find_closest_file
+                closest_file = find_closest_file(file_path=file_path, directory=file_dir)
+                max_distance = max(2, int(len(file_name) / 3))
+                if closest_file is not None and closest_file[1] <= max_distance:
+                    msg = f"{msg}. Did you mean {closest_file[0]} (name difference: {closest_file[1]})?"
+            raise NoFilesFoundError(msg=msg, source=check_file_exist_and_readable.__name__)
         else:
             return False
     elif not os.access(file_path, os.R_OK):

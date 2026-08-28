@@ -24,6 +24,7 @@ class ExtractFeaturesFrom14bps(ConfigReader, FeatureExtractionMixin):
     .. note::
        * `Feature extraction tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features>`__.
        * `Expected pose configuration <https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/6.png>`_
+       * `Expected pose configuration, multi-animal <https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/10.png>`_
 
     .. image:: _static/img/pose_configurations/6.png
        :alt: 6

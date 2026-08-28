@@ -25,6 +25,7 @@ class ExtractFeaturesFrom8bps2Animals(ConfigReader, FeatureExtractionMixin):
     .. note::
        * `Feature extraction tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features>`__.
        * `Expected pose configuration <https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/5.png>`_
+       * `Expected pose configuration, multi-animal <https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/9.png>`_
 
     .. image:: _static/img/pose_configurations/5.png
        :alt: 5

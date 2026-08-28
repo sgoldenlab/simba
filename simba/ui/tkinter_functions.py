@@ -158,6 +158,44 @@ class DropDownMenu(Frame):
 
 
 class SimBAScaleBar(Frame):
+    """
+    Create a slider widget with an optional label and icon.
+
+    This class creates a tkinter Scale for picking a value within a numeric range, with an optional text label and
+    icon to its left. The selected value is read with :meth:`get_value` (or :meth:`get`) and set with
+    :meth:`set_value`.
+
+    :param parent (Frame | Canvas | LabelFrame | Toplevel | Tk): The parent widget container.
+    :param label (str, optional): Text label displayed next to the slider. If None, no label is created. Default: None.
+    :param label_width (int, optional): Width of the label in characters. Default: None.
+    :param orient (str): Slider orientation, 'horizontal' or 'vertical'. Default: 'horizontal'.
+    :param length (int): Length of the slider in pixels. Default: 200.
+    :param value (int, optional): Initial value of the slider. If None, the slider starts at ``from_``. Default: 95.
+    :param showvalue (bool): If True, the current value is printed next to the slider handle. Default: True.
+    :param label_clr (str): Color of the label text. Default: 'black'.
+    :param lbl_font (tuple): Font tuple for the label. Default: Formats.FONT_REGULAR.value.
+    :param scale_font (tuple): Font tuple for the value and tick text drawn by the slider. Default: Formats.FONT_REGULAR_ITALICS.value.
+    :param lbl_img (str, optional): Name of the icon displayed to the left of the label, e.g. 'width'. For accepted names, see :func:`simba.utils.lookups.get_icons_paths`. Unknown names are ignored. Default: None.
+    :param from_ (int): Lowest selectable value. Default: -1.
+    :param resolution (int): Step size between selectable values. Default: 1.
+    :param to (int): Highest selectable value. Default: 100.
+    :param tickinterval (int, optional): Spacing between the value labels printed along the slider. If None, no values are printed. Default: None.
+    :param troughcolor (str, optional): Color of the trough the slider handle moves in. If None, the tkinter default is used. Default: None.
+    :param activebackground (str, optional): Color of the slider handle while the cursor is over it. If None, the tkinter default is used. Default: None.
+    :param sliderrelief (str): Relief style of the slider handle ('raised', 'sunken', 'flat', 'ridge', 'solid', 'groove'). Default: 'flat'.
+    :param tooltip_txt (str, optional): Tooltip text to display on hover. Takes precedence over ``tooltip_key``. Default: None.
+    :param tooltip_key (str, optional): Key for tooltip lookup in TOOLTIPS dictionary. For dictionary, see `simba.assets.lookups.tooptips.json`. Keys not in the dictionary are ignored. Default: None.
+
+    .. note::
+       The tooltip is attached to the label and the icon - the parts of the widget that describe the setting. If neither is created, it is attached to the slider itself.
+
+    :example:
+
+    >>> scale_bar = SimBAScaleBar(parent=parent_frm, label='MAX IMAGE WIDTH (%): ', from_=10, to=100, value=50, lbl_img='width', tooltip_key='ANNOTATION_INTERFACE_MAX_IMAGE_WIDTH')
+    >>> scale_bar.grid(row=0, column=0, sticky=NW)
+    >>> selected = scale_bar.get_value()
+    """
+
     def __init__(self,
                  parent: Union[Frame, Canvas, LabelFrame, Toplevel, Tk],
                  label: Optional[str] = None,
@@ -176,7 +214,9 @@ class SimBAScaleBar(Frame):
                  tickinterval: Optional[int] = None,
                  troughcolor: Optional[str] = None,
                  activebackground: Optional[str] = None,
-                 sliderrelief: Literal["raised", "sunken", "flat", "ridge", "solid", "groove"] = 'flat'):
+                 sliderrelief: Literal["raised", "sunken", "flat", "ridge", "solid", "groove"] = 'flat',
+                 tooltip_txt: Optional[str] = None,
+                 tooltip_key: Optional[str] = None):
 
         super().__init__(master=parent)
         self.columnconfigure(0, weight=0)
@@ -204,10 +244,19 @@ class SimBAScaleBar(Frame):
         if label is not None:
             self.lbl = SimBALabel(parent=self, txt=label, font=lbl_font, txt_clr=label_clr, width=label_width)
             self.lbl.grid(row=0, column=1, sticky=SW)
+        else:
+            self.lbl = None
 
         self.scale.grid(row=0, column=2, sticky=NW)
         if value is not None:
             self.set_value(value=value)
+        tooltip_txt = tooltip_txt if isinstance(tooltip_txt, str) else TOOLTIPS.get(tooltip_key)
+        if tooltip_txt is not None:
+            tooltip_widgets = [x for x in (self.lbl, self.lbl_lbl) if x is not None]
+            for tooltip_widget in tooltip_widgets:
+                CreateToolTip(widget=tooltip_widget, text=tooltip_txt)
+            if len(tooltip_widgets) == 0:   # NOTE: no label and no image to hover - attach the tooltip to the slider itself.
+                CreateToolTip(widget=self.scale, text=tooltip_txt)
 
     def set_value(self, value: int):
         self.scale.set(value)
