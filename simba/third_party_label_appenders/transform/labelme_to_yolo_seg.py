@@ -9,7 +9,7 @@ from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.image_mixin import ImageMixin
 from simba.third_party_label_appenders.converters import create_yolo_yaml
 from simba.third_party_label_appenders.transform.utils import (
-    b64_to_arr, create_yolo_keypoint_yaml, get_yolo_keypoint_flip_idx)
+    create_yolo_keypoint_yaml, get_yolo_keypoint_flip_idx, labelme_img_to_arr)
 from simba.utils.checks import (check_float, check_if_dir_exists,
                                 check_if_keys_exist_in_dict, check_int,
                                 check_valid_boolean, check_valid_tuple)
@@ -40,7 +40,7 @@ class LabelmeKeypoints2YoloSeg:
 
         .. note::
            For more information on the Labelme annotation tool, see the `Labelme GitHub repository <https://github.com/wkentaro/labelme>`_.
-           The Labelme Json files **has too** contain a `imageData` key holding the image as a b64 string.
+           The Labelme Json files hold the image either in a `imageData` key as a b64 string, or as a path to the image in the `imagePath` key.
            For an expected Labelme json format, see `THIS FILE <https://github.com/sgoldenlab/simba/blob/master/misc/labelme_ex.json>`_.
 
            Only works with one animal (as of 07/25).
@@ -97,7 +97,7 @@ class LabelmeKeypoints2YoloSeg:
             if self.verbose:
                 print(f'Processing image {lbl_file_cnt + 1}/{len(self.lbls.keys())}...')
             img_name = get_fn_ext(filepath=lbl['imagePath'])[1]
-            img = b64_to_arr(lbl['imageData'])
+            img = labelme_img_to_arr(annot_data=lbl, annot_path=lbl_path)
             if img.ndim == 3:
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             if self.greyscale:

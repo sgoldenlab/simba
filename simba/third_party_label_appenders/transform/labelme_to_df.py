@@ -14,7 +14,7 @@ import numpy as np
 
 from simba.mixins.image_mixin import ImageMixin
 from simba.third_party_label_appenders.transform.utils import (
-    arr_to_b64, b64_to_arr, normalize_img_dict, scale_pose_img_sizes)
+    arr_to_b64, labelme_img_to_arr, normalize_img_dict, scale_pose_img_sizes)
 from simba.utils.checks import (check_if_dir_exists,
                                 check_if_keys_exist_in_dict, check_str,
                                 check_valid_boolean, check_valid_tuple)
@@ -99,7 +99,7 @@ class LabelMe2DataFrame:
                 annot_data = json.load(f)
             check_if_keys_exist_in_dict(data=annot_data, key=['shapes', 'imageData'], name=annot_path)
             img_name = annot_data['imagePath']
-            images[img_name] = b64_to_arr(annot_data['imageData'])
+            images[img_name] = labelme_img_to_arr(annot_data=annot_data, annot_path=annot_path)
             if self.greyscale:
                 images[img_name] = ImageMixin.img_to_greyscale(img=images[img_name])
             if self.clahe:

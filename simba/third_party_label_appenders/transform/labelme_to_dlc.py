@@ -14,7 +14,8 @@ except:
 import cv2
 
 from simba.mixins.image_mixin import ImageMixin
-from simba.third_party_label_appenders.transform.utils import b64_to_arr
+from simba.third_party_label_appenders.transform.utils import \
+    labelme_img_to_arr
 from simba.utils.checks import (check_if_dir_exists,
                                 check_if_keys_exist_in_dict, check_str,
                                 check_valid_boolean)
@@ -83,7 +84,7 @@ class Labelme2DLC:
             annot_data = read_json(x=annot_path)
             check_if_keys_exist_in_dict(data=annot_data, key=['shapes', 'imageData', 'imagePath'], name=annot_path)
             img_name = os.path.basename(annot_data['imagePath'])
-            images[img_name] = b64_to_arr(annot_data['imageData'])
+            images[img_name] = labelme_img_to_arr(annot_data=annot_data, annot_path=annot_path)
             if self.greyscale:
                 images[img_name] = ImageMixin.img_to_greyscale(img=images[img_name])
             if self.clahe:

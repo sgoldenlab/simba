@@ -3,6 +3,7 @@ __author__ = "Simon Nilsson; sronilsson@gmail.com"
 import base64
 import configparser
 import functools
+import gc
 import glob
 import io
 import itertools

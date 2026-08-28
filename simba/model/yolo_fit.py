@@ -308,3 +308,15 @@ if __name__ == "__main__":
 #                  device=0,
 #                  imgsz=640)
 # fitter.run()
+
+# if __name__ == '__main__':
+#     fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11m.pt",
+#                      model_yaml=r"G:\netholabs\pellet_yolo_0828\map.yaml",
+#                      save_path=r"G:\netholabs\pellet_yolo_0828\mdl",
+#                      epochs=1500,
+#                      batch=22,
+#                      format=None,
+#                      device=0,
+#                      imgsz=640,
+#                      workers=2)
+#     fitter.run()

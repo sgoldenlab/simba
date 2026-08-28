@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 try:
     from typing import Literal
@@ -26,8 +26,8 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_keys_exist_in_dict,
                                 check_if_valid_img, check_int,
                                 check_valid_array, check_valid_boolean,
-                                check_valid_dict, check_valid_lst,
-                                check_valid_tuple)
+                                check_str, check_valid_dict,
+                                check_valid_lst, check_valid_tuple)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import (FaultyTrainingSetError, InvalidInputError,
                                 NoFilesFoundError)
@@ -54,11 +54,68 @@ def b64_to_arr(img_b64) -> np.ndarray:
     """
     Helper to convert byte string (e.g., created by `labelme <https://github.com/wkentaro/labelme>`__.) to image in numpy array format
 
+    .. seealso::
+       To read the image of a labelme annotation whether or not it holds a byte string, see
+       :func:`simba.third_party_label_appenders.transform.utils.labelme_img_to_arr`.
+
     """
+    check_str(name=f'{b64_to_arr.__name__} img_b64', value=img_b64, allow_blank=False, raise_error=True)
     f = io.BytesIO()
     f.write(base64.b64decode(img_b64))
     img_arr = np.array(Image.open(f))
     return img_arr
+
+
+def labelme_img_to_arr(annot_data: Dict[str, Any],
+                       annot_path: Union[str, os.PathLike]) -> np.ndarray:
+    """
+    Helper to get the image of a `labelme <https://github.com/wkentaro/labelme>`__ annotation in numpy array format.
+
+    The image is decoded from the base64 ``imageData`` entry when it holds the image. Labelme only writes ``imageData``
+    when it is saved with the `Save With Image Data` option enabled, and writes ``null`` otherwise - in which case the
+    image is read from the file that the ``imagePath`` entry points to, either as an absolute path, or relative to the
+    directory holding the annotation file.
+
+    :param Dict[str, Any] annot_data: Labelme json annotation, read into a dictionary.
+    :param Union[str, os.PathLike] annot_path: Path to the labelme json file, used to find a relative ``imagePath`` and for error messaging.
+    :return: The annotated image in RGB format, as returned by :func:`simba.third_party_label_appenders.transform.utils.b64_to_arr`.
+    :rtype: np.ndarray
+
+    :example:
+
+    >>> annot_data = read_json(x='/labelme_annotations/1.json')
+    >>> img = labelme_img_to_arr(annot_data=annot_data, annot_path='/labelme_annotations/1.json')
+    """
+
+    if annot_data.get('imageData') is not None:
+        return b64_to_arr(annot_data['imageData'])
+    img_path = labelme_img_path(annot_data=annot_data, annot_path=annot_path, raise_error=True)
+    return cv2.cvtColor(read_img(img_path=img_path), cv2.COLOR_BGR2RGB)   # NOTE: RGB, to match the images returned by the imageData (b64) path.
+
+
+def labelme_img_path(annot_data: Dict[str, Any],
+                     annot_path: Union[str, os.PathLike],
+                     raise_error: bool = True) -> Union[str, None]:
+    """
+    Helper to find the image file that the ``imagePath`` entry of a `labelme <https://github.com/wkentaro/labelme>`__
+    annotation points to, as an absolute path, relative to the directory holding the annotation file, or by file name
+    inside that directory.
+
+    :param Dict[str, Any] annot_data: Labelme json annotation, read into a dictionary.
+    :param Union[str, os.PathLike] annot_path: Path to the labelme json file, used to find a relative ``imagePath`` and for error messaging.
+    :param bool raise_error: If True, raises an error when the image cannot be found. If False, returns None. Default: True.
+    :return: Path to the image, or None if it could not be found and ``raise_error`` is False.
+    :rtype: Union[str, None]
+    """
+
+    check_if_keys_exist_in_dict(data=annot_data, key=['imagePath'], name=str(annot_path))
+    candidate_paths = [os.path.normpath(annot_data['imagePath']),
+                       os.path.normpath(os.path.join(os.path.dirname(annot_path), annot_data['imagePath'])),
+                       os.path.join(os.path.dirname(annot_path), os.path.basename(annot_data['imagePath']))]
+    img_path = next((x for x in candidate_paths if os.path.isfile(x)), None)
+    if (img_path is None) and raise_error:
+        raise NoFilesFoundError(msg=f'The labelme file {annot_path} holds no imageData, and the image {annot_data["imagePath"]} it points to could not be found. Either re-save the annotations in labelme with `Save With Image Data` enabled, or store the images in {os.path.dirname(annot_path)}.', source=labelme_img_path.__name__)
+    return img_path
 
 
 def scale_pose_img_sizes(pose_data: np.ndarray,
