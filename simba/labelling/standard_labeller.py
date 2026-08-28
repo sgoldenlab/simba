@@ -10,10 +10,10 @@ import matplotlib
 
 matplotlib.use('agg')
 import cv2
+import numpy as np
 import pandas as pd
 from PIL import Image, ImageTk
 from tabulate import tabulate
-import numpy as np
 
 try:
     from typing import Literal
@@ -35,10 +35,11 @@ from simba.utils.checks import (check_file_exist_and_readable, check_int,
 from simba.utils.enums import Formats, TagNames, TextOptions
 from simba.utils.errors import (FrameRangeError, NoDataError,
                                 NoFilesFoundError, SimbaError)
-from simba.utils.lookups import (get_current_time, get_img_resize_info,
+from simba.utils.lookups import (get_color_dict, get_current_time,
+                                 get_img_resize_info,
                                  get_labelling_img_kbd_bindings,
                                  get_labelling_video_kbd_bindings,
-                                 get_simba_font_name_and_path, get_color_dict)
+                                 get_simba_font_name_and_path)
 from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (find_closest_readable_frame,
                                     get_video_meta_data, read_config_entry,
