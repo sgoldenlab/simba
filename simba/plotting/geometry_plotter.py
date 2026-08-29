@@ -59,7 +59,7 @@ def geometry_visualizer(data: Tuple[int, pd.DataFrame],
         cap.set(1, int(frm_id))
         ret, img = cap.read()
         if ret:
-            img_cpy = img.copy()
+            img_cpy, outline_strokes = img.copy(), []
             if bg_opacity != 1.0:
                 opacity = 1 - bg_opacity
                 h, w, clr = img.shape[:3]
@@ -80,32 +80,32 @@ def geometry_visualizer(data: Tuple[int, pd.DataFrame],
                         img_cpy = cv2.fillPoly(img_cpy, [interior], color=(shape_clr[::-1]))
                     if outline_clr is not None:
                         pts_ext = np.array(shape.exterior.coords, dtype=np.int32)
-                        img_cpy = cv2.polylines(img_cpy, [pts_ext], isClosed=True, color=outline_clr, thickness=thickness)
+                        outline_strokes.append((pts_ext, True))
                         for interior in shape.interiors:
                             pts_int = np.array(interior.coords, dtype=np.int32)
-                            img_cpy = cv2.polylines(img_cpy, [pts_int], isClosed=True, color=outline_clr, thickness=thickness)
+                            outline_strokes.append((pts_int, True))
                 elif isinstance(shape, LineString):
                     img_cpy = cv2.fillPoly(img_cpy, [np.array(shape.coords, dtype=np.int32)], color=shape_clr)
                     if outline_clr is not None:
                         pts = np.array(shape.coords, dtype=np.int32)
-                        img_cpy = cv2.polylines(img_cpy, [pts], isClosed=False, color=outline_clr, thickness=thickness)
+                        outline_strokes.append((pts, False))
                 elif isinstance(shape, MultiPolygon):
                     for polygon_cnt, polygon in enumerate(shape.geoms):
                         img_cpy = cv2.fillPoly(img_cpy, [np.array((polygon.convex_hull.exterior.coords), dtype=np.int32)], color=shape_clr)
                     if outline_clr is not None:
                         for polygon in shape.geoms:
                             pts_ext = np.array(polygon.exterior.coords, dtype=np.int32)
-                            img_cpy = cv2.polylines(img_cpy, [pts_ext], isClosed=True, color=outline_clr, thickness=thickness)
+                            outline_strokes.append((pts_ext, True))
                             for interior in polygon.interiors:
                                 pts_int = np.array(interior.coords, dtype=np.int32)
-                                img_cpy = cv2.polylines(img_cpy, [pts_int], isClosed=True, color=outline_clr, thickness=thickness)
+                                outline_strokes.append((pts_int, True))
                 elif isinstance(shape, MultiLineString):
                     for line_cnt, line in enumerate(shape.geoms):
                         img_cpy = cv2.fillPoly(img_cpy,[np.array(shape[line_cnt].coords, dtype=np.int32)], color=shape_clr)
                     if outline_clr is not None:
                         for line in shape.geoms:
                             pts = np.array(line.coords, dtype=np.int32)
-                            img_cpy = cv2.polylines(img_cpy, [pts], isClosed=False, color=outline_clr, thickness=thickness)
+                            outline_strokes.append((pts, False))
                 elif isinstance(shape, Point):
                     arr = np.array(shape.coords)
                     if arr.size >= 2 and np.isfinite(arr).all():
@@ -115,6 +115,8 @@ def geometry_visualizer(data: Tuple[int, pd.DataFrame],
                 img = cv2.addWeighted(img_cpy, shape_opacity, img, 1 - shape_opacity, 0, img)
             else:
                 img = np.copy(img_cpy)
+            for pts, is_closed in outline_strokes:
+                img = cv2.polylines(img, [pts], isClosed=is_closed, color=outline_clr, thickness=thickness)
             video_writer.write(img.astype(np.uint8))
             if verbose:
                 time = seconds_to_timestamp(seconds= frm_id/ video_meta_data['fps'])

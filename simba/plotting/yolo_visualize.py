@@ -18,9 +18,12 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_dataframe)
 from simba.utils.data import (create_color_palettes, get_cpu_pool,
                               terminate_cpu_pool)
-from simba.utils.errors import FrameRangeError
-from simba.utils.read_write import (find_core_cnt, get_fn_ext,
-                                    get_video_meta_data)
+from simba.utils.errors import FrameRangeError, NoFilesFoundError
+from simba.utils.enums import Options
+from simba.utils.read_write import (find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext, get_video_meta_data)
+from simba.utils.warnings import NoDataFoundWarning
 
 EXPECTED_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 FRAME = 'FRAME'
@@ -67,8 +70,8 @@ class YOLOVisualizer():
        :muted:
        :align: center
 
-    :param Union[str, os.PathLike] data_path: Path to YOLO results CSV. Expected columns: ``FRAME, CLASS_ID, CLASS_NAME, CONFIDENCE, X1..Y4``. Multiple rows sharing the same ``FRAME`` and ``CLASS_NAME`` (i.e. several detections of one class per frame, as produced by ``YoloInference`` with ``max_per_class > 1``) are rendered as separate instances, each drawn as its own polygon track and color (ordered by detection confidence).
-    :param Union[str, os.PathLike] video_path: Path to the video from which the data was produced.
+    :param Union[str, os.PathLike] data_path: Path to YOLO results CSV, or a directory of them. Expected columns: ``FRAME, CLASS_ID, CLASS_NAME, CONFIDENCE, X1..Y4``. Multiple rows sharing the same ``FRAME`` and ``CLASS_NAME`` (i.e. several detections of one class per frame, as produced by ``YoloInference`` with ``max_per_class > 1``) are rendered as separate instances, each drawn as its own polygon track and color (ordered by detection confidence).
+    :param Union[str, os.PathLike] video_path: Path to the video from which the data was produced, or a directory of videos. When ``data_path`` and ``video_path`` are both directories, the results files and the videos are paired on file name and each pair is visualized in turn.
     :param Union[str, os.PathLike] save_dir: Directory where to save visualization output.
     :param Optional[str] palette: Matplotlib color palette name for per-class geometry colors (e.g., ``'Set1'``, ``'tab10'``). Default: ``'Set1'``.
     :param Optional[int] core_cnt: CPU core count for parallel processing. Use ``-1`` for all available cores.
@@ -108,10 +111,8 @@ class YOLOVisualizer():
                  color_by: Literal['class', 'instance'] = 'class',
                  verbose: bool = True):
 
-        check_file_exist_and_readable(file_path=data_path)
-        self.video_meta_data = get_video_meta_data(video_path=video_path)
+        self.data_video_map = self._map_data_to_videos(data_path=data_path, video_path=video_path)
         self.data_path, self.video_path = data_path, video_path
-        self.video_name = get_fn_ext(filepath=data_path)[1]
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
         check_int(name=f'{self.__class__.__name__} padding', value=padding, min_value=-1)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
@@ -129,7 +130,65 @@ class YOLOVisualizer():
         self.color_by = color_by
         self.pool_terminate_flag = False if pool is not None else True
 
+    @staticmethod
+    def _map_data_to_videos(data_path: Union[str, os.PathLike],
+                            video_path: Union[str, os.PathLike]) -> dict:
+        """
+        Helper pairing YOLO results CSV file(s) with the video(s) they were produced from, by file name.
+
+        ``data_path`` and ``video_path`` are each either a single file, or a directory holding several. Directories
+        are paired on file name, and files present on only one of the two sides are reported and skipped.
+
+        :param Union[str, os.PathLike] data_path: Path to a YOLO results CSV, or a directory of them.
+        :param Union[str, os.PathLike] video_path: Path to a video, or a directory of videos.
+        :return: Dictionary with the paths of the results CSV files as keys, and the paths of their videos as values.
+        :rtype: dict
+        """
+
+        if os.path.isdir(data_path):
+            data_paths = find_files_of_filetypes_in_directory(directory=data_path, extensions=['.csv'], raise_warning=False, raise_error=True)
+        else:
+            check_file_exist_and_readable(file_path=data_path)
+            data_paths = [data_path]
+        if os.path.isdir(video_path):
+            video_paths = find_files_of_filetypes_in_directory(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_warning=False, raise_error=True)
+        else:
+            check_file_exist_and_readable(file_path=video_path)
+            video_paths = [video_path]
+        video_lk = {get_fn_ext(filepath=x)[1]: x for x in video_paths}
+        if len(data_paths) == 1 and len(video_paths) == 1:   # NOTE: a single explicit pair is honoured as passed, the file names do not have to agree.
+            return {data_paths[0]: video_paths[0]}
+        results, missing = {}, []
+        for file_path in data_paths:
+            data_name = get_fn_ext(filepath=file_path)[1]
+            if data_name in video_lk.keys():
+                results[file_path] = video_lk[data_name]
+            else:
+                missing.append(data_name)
+        if len(missing) > 0:
+            NoDataFoundWarning(msg=f'No video found for {len(missing)} results file(s) in {video_path}: {missing[:10]}. Skipping.', source=YOLOVisualizer.__name__)
+        if len(results) == 0:
+            raise NoFilesFoundError(msg=f'No results file in {data_path} could be paired with a video in {video_path}. The results CSV and its video have to share file name.', source=YOLOVisualizer.__name__)
+        return results
+
     def run(self):
+        own_pool = self.pool is None   # NOTE: one pool for all videos - creating and tearing one down per video costs more than the visualization of a short video.
+        if own_pool:
+            self.pool, self.pool_terminate_flag = get_cpu_pool(core_cnt=self.core_cnt, verbose=self.verbose, source=self.__class__.__name__), False
+        try:
+            for file_cnt, (data_path, video_path) in enumerate(self.data_video_map.items()):
+                if self.verbose and len(self.data_video_map) > 1:
+                    print(f'Visualizing YOLO results {file_cnt+1}/{len(self.data_video_map)} ({get_fn_ext(filepath=data_path)[1]})...')
+                self._run_video(data_path=data_path, video_path=video_path)
+        finally:
+            if own_pool:
+                terminate_cpu_pool(pool=self.pool, force=False, source=self.__class__.__name__)
+                self.pool, self.pool_terminate_flag = None, True
+
+    def _run_video(self, data_path: Union[str, os.PathLike], video_path: Union[str, os.PathLike]):
+        self.data_path, self.video_path = data_path, video_path
+        self.video_meta_data = get_video_meta_data(video_path=video_path)
+        self.video_name = get_fn_ext(filepath=data_path)[1]
         data_df = pd.read_csv(self.data_path, index_col=0)
         check_valid_dataframe(df=data_df, source=self.__class__.__name__, required_fields=EXPECTED_COLS)
         df_frm_cnt = np.unique(data_df[FRAME].values).shape[0]
@@ -227,3 +286,14 @@ class YOLOVisualizer():
 #         clip_video_in_range(file_path=src, start_time="00:00:00", end_time="00:00:10", save_path=clip_save, overwrite=True)
 #         clipped_paths.append(clip_save)
 #     mosaic_concatenator(video_paths=clipped_paths, save_path=os.path.join(COLLECTED_DIR, "mosaic_10s.mp4"), width_idx=0, height_idx=0)
+
+
+# viz = YOLOVisualizer(data_path=r'G:\netholabs\pellet_yolo_0828\results',
+#                        video_path=r"G:\netholabs\batch_0731\6.01.027\2026_07_31\2026_07_31_12_57_00_000\left",
+#                        save_dir=r"G:\netholabs\pellet_yolo_0828\viz",
+#                        threshold=0.10,
+#                        outline_color=(0, 255, 0),
+#                        opacity=0.0,
+#                        thickness=2,
+#                        core_cnt=4)
+# viz.run()

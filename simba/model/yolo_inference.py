@@ -28,11 +28,12 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 is_torch_cuda_available)
 from simba.utils.data import df_smoother, savgol_smoother
 from simba.utils.enums import Formats, Options
-from simba.utils.errors import (InvalidVideoFileError, SimBAGPUError,
-                                SimBAPAckageVersionError)
+from simba.utils.errors import (InvalidFilepathError, InvalidVideoFileError,
+                                SimBAGPUError, SimBAPAckageVersionError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_video_meta_data)
+                                    get_video_meta_data,
+                                    recursive_file_search)
 from simba.utils.warnings import InvalidValueWarning
 from simba.utils.yolo import (_get_undetected_obs, apply_fixed_bbox_size,
                               check_valid_device, load_yolo_model,
@@ -82,6 +83,7 @@ class YoloInference():
     :param Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]] video_path: Input video path, list of paths, or directory containing videos.
     :param Optional[bool] verbose: If True, print progress information.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory to save output CSV files. If None, results are returned in-memory.
+    :param bool recursive_video_search: If True, and ``video_path`` is a directory, videos are also collected from its sub-directories. If False (default), only the videos directly inside ``video_path`` are analysed. Ignored when ``video_path`` is a file or a list of files.
     :param Optional[bool] half_precision: If True, run inference in fp16 where supported.
     :param Union[Literal['cpu'], int] device: Inference device ('cpu' or CUDA index).
     :param Optional[int] batch_size: Number of frames per prediction batch.
@@ -129,7 +131,8 @@ class YoloInference():
                  interpolate: bool = False,
                  imgsz: int = 320,
                  bbox_size: Optional[Tuple[int, int]] = None,
-                 stream: Optional[bool] = True) -> Union[None, Dict[str, pd.DataFrame]]:
+                 stream: Optional[bool] = True,
+                 recursive_video_search: bool = False) -> Union[None, Dict[str, pd.DataFrame]]:
 
         if not is_torch_cuda_available()[0]:
             raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
@@ -141,7 +144,10 @@ class YoloInference():
             check_file_exist_and_readable(file_path=video_path)
             video_path = [video_path]
         elif os.path.isdir(video_path):
-            video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_warning=False, raise_error=True, as_dict=False)
+            if recursive_video_search:
+                video_path = recursive_file_search(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True, as_dict=False)
+            else:
+                video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_warning=False, raise_error=True, as_dict=False)
         else:
             raise InvalidVideoFileError(msg=f'{video_path} is not a valid video path or directory path', source=self.__class__.__name__)
         for i in video_path:
@@ -152,7 +158,7 @@ class YoloInference():
             self.model = load_yolo_model(weights_path=weights, verbose=verbose, device=device)
         else:
             self.model = weights
-        check_valid_boolean(value=[half_precision, verbose, stream, interpolate], source=self.__class__.__name__)
+        check_valid_boolean(value=[half_precision, verbose, stream, interpolate, recursive_video_search], source=self.__class__.__name__)
         check_int(name=f'{self.__class__.__name__} batch_size', value=batch_size, min_value=1)
         check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
         check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
@@ -166,6 +172,13 @@ class YoloInference():
             check_valid_tuple(x=bbox_size, source=f'{self.__class__.__name__} bbox_size', accepted_lengths=(2,), valid_dtypes=Formats.INTEGER_DTYPES.value, min_integer=1, raise_error=True)
         if save_dir is not None:
             check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
+            for video in video_path:   # NOTE: checked before inference rather than after - a results file locked by e.g. an open spreadsheet would otherwise only be discovered once all videos have been processed.
+                csv_path = os.path.join(save_dir, f'{get_fn_ext(filepath=video)[1]}.csv')
+                if os.path.isfile(csv_path):
+                    try:
+                        open(csv_path, 'a').close()
+                    except OSError:
+                        raise InvalidFilepathError(msg=f'The results file {csv_path} exists but cannot be written to. Close it in any program that may be holding it open (e.g. Excel), or delete it, before running inference.', source=self.__class__.__name__)
         if smoothing_method is not None:
             check_str(name=f'{self.__class__.__name__} smoothing', value=smoothing_method, options=SMOOTHING_METHODS)
             check_float(name=f'{self.__class__.__name__} smoothing_time_window', value=smoothing_time_window, min_value=10e-6)
@@ -278,4 +291,21 @@ class YoloInference():
 #                   core_cnt=18,
 #                   imgsz=256,
 #                   batch_size=500)
+# i.run()
+
+
+# VIDEO_PATH = r"G:\netholabs\batch_0731\6.01.027\2026_07_31\2026_07_31_12_57_00_000\left"
+# WEIGHTS_PATH = r"G:\netholabs\pellet_yolo_0828\mdl\train2\weights\last.pt"
+# SAVE_DIR = r'G:\netholabs\pellet_yolo_0828\results'
+# i = YoloInference(weights=WEIGHTS_PATH,
+#                   video_path=VIDEO_PATH,
+#                   save_dir=SAVE_DIR,
+#                   stream=True,
+#                   threshold=0.10,
+#                   verbose=True,
+#                   core_cnt=18,
+#                   imgsz=640,
+#                   bbox_size=None,#(512, 512),
+#                   interpolate=True,
+#                   batch_size=8)
 # i.run()

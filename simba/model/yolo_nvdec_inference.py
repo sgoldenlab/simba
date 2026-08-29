@@ -38,8 +38,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.data import (df_smoother, resample_geometry_vertices,
                               resample_geometry_vertices_numba,
                               savgol_smoother)
-from simba.utils.errors import (InvalidInputError, NoFilesFoundError,
-                                SimBAGPUError)
+from simba.utils.errors import (InvalidFilepathError, InvalidInputError,
+                                NoFilesFoundError, SimBAGPUError)
 from simba.utils.lookups import get_nvdec_count
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (find_all_videos_in_directory,
@@ -428,7 +428,7 @@ class YoloNVDECInference(object):
        :header-rows: 1
 
     :param Union[str, os.PathLike] video_path: Directory containing input video files, or path to a single video file.
-    :param Union[str, os.PathLike] engine_path: Path to TensorRT engine file (.engine). If alternative model file exists, convert it to engine using :func:`simba.utils.yolo.export_yolo_model`. For multi-GPU, place the source ``.pt`` weights alongside the engine — per-GPU engines are auto-exported on first run.
+    :param Union[str, os.PathLike] engine_path: Path to TensorRT engine file (.engine). A ``.pt`` (or any other non-engine) model is rejected: this class calls the model directly and reads NMS:ed rows of ``x1, y1, x2, y2, confidence, class id``, a layout only produced by an exported engine. Raw weights return un-decoded network output, which would be written out as meaningless boxes, confidences and class ids. Convert the model with :func:`simba.utils.yolo.export_yolo_model`. For multi-GPU, place the source ``.pt`` weights alongside the engine — per-GPU engines are auto-exported on first run.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory for per-video CSV output. If None, results kept in memory only. Default None.
     :param Literal['detect', 'pose', 'segment'] task: YOLO task type. Default ``'detect'``.
     :param Optional[int] imsz: Model input image size (square). If None, read from engine metadata. Default None.
@@ -489,6 +489,9 @@ class YoloNVDECInference(object):
         get_pkg_version(pkg='torch', raise_error=True)
         check_nvidea_gpu_available(raise_error=True)
         check_file_exist_and_readable(file_path=engine_path)
+        engine_file_ext = os.path.splitext(str(engine_path))[1].lower()
+        if engine_file_ext != '.engine':   # NOTE: a non-engine model returns raw predictions rather than NMS:ed detections, which this class would otherwise write out as garbage boxes and class ids.
+            raise InvalidFilepathError(msg=f'{self.__class__.__name__} expects an exported TensorRT engine (.engine), got a "{engine_file_ext}" file: {engine_path}. Convert it using simba.utils.yolo.export_yolo_model(weights_path=r"{engine_path}", format="engine").', source=self.__class__.__name__)
         if save_dir is not None: check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
         check_str(name=f'{self.__class__.__name__} task', value=task, options=TASKS)
 
@@ -599,7 +602,7 @@ class YoloNVDECInference(object):
                 if verbose: stdout_information(msg=f'Found {len(self.video_paths)} video(s) recursively in {self.video_dir}.', source=self.__class__.__name__)
             else:
                 self.video_paths = find_all_videos_in_directory(directory=self.video_dir, as_dict=True, raise_error=True)
-        self.results = {}
+        self.results, self.run_saved_cnt = {}, 0
         self.timings = {}
 
     @staticmethod
@@ -703,6 +706,7 @@ class YoloNVDECInference(object):
                 total_frames += video_meta['frame_count']
                 total_rows += row_cnt
                 self.timings[video_name] = timings
+                self.run_saved_cnt += 1
                 if self.verbose: stdout_information(msg=f'Saved {video_name}.csv ({row_cnt} rows)', source=self.__class__.__name__)
             else:
                 rows = rows_or_cnt
@@ -747,13 +751,28 @@ class YoloNVDECInference(object):
             else:
                 stdout_success(msg=f'{video_cnt} video(s), {total_frames} frames, {total_rows} rows{fps_str}{timing_str}', source=self.__class__.__name__, elapsed_time=timer.elapsed_time_str)
 
-    def save(self):
-        if self.save_dir is None:
-            raise InvalidInputError(msg='save_dir is None. Pass a save_dir to __init__ or set self.save_dir before calling save().', source=self.__class__.__name__)
+    def save(self, save_dir: Optional[Union[str, os.PathLike]] = None):
+        """
+        Save the results of :meth:`run` as one CSV per video.
+
+        Only needed when the class was created without a ``save_dir``: with one, :meth:`run` writes each CSV as its
+        video completes and holds no dataframes in memory, and this method has nothing left to do.
+
+        :param Optional[Union[str, os.PathLike]] save_dir: Directory to write the CSV files to. If None, the ``save_dir`` passed to __init__ is used. Default None.
+        """
+
+        if save_dir is not None:
+            check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
+        save_dir = self.save_dir if save_dir is None else str(save_dir)
+        if len(self.results) == 0 and self.run_saved_cnt > 0:   # NOTE: with a save_dir the workers write each CSV inside run() - there is nothing left for save() to do.
+            if self.verbose: stdout_information(msg=f'{self.run_saved_cnt} video(s) already saved in {self.save_dir} during run().', source=self.__class__.__name__)
+            return
         if len(self.results) == 0:
-            raise NoFilesFoundError(msg='No results to save. Call run() first or pass save_dir to __init__ to save during run.', source=self.__class__.__name__)
+            raise NoFilesFoundError(msg='No results to save. Call run() first.', source=self.__class__.__name__)
+        if save_dir is None:
+            raise InvalidInputError(msg='save_dir is None. Pass a save_dir to save() or to __init__.', source=self.__class__.__name__)
         for video_name, df in self.results.items():
-            csv_path = os.path.join(self.save_dir, f'{video_name}.csv')
+            csv_path = os.path.join(save_dir, f'{video_name}.csv')
             write_df(df=df, file_type='csv', save_path=csv_path)
             if self.verbose: stdout_information(msg=f'Saved {csv_path} ({len(df)} rows)', source=self.__class__.__name__)
 
@@ -792,3 +811,12 @@ class YoloNVDECInference(object):
 #                              keypoint_names=('NOSE', 'LEFT_EAR', 'RIGHT_EAR'))
 # detector.run()
 # detector.save()
+
+# if __name__ == "__main__":
+#     detector = YoloNVDECInference(video_path=r"G:\netholabs\batch_0730\6.01.010\2026_07_30\2026_07_30_07_02_00_000\right\2026_07_30_07_02_00_000_cam1.mp4",
+#                                  engine_path=r"G:\netholabs\pellet_yolo_0828\mdl\train2\weights\last.pt",
+#                                  task='detect',
+#                                  imsz=640,
+#                                  save_dir=r'G:\netholabs\pellet_yolo_0828\results')
+#     detector.run()
+#     detector.save()
