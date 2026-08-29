@@ -508,7 +508,7 @@ class LabellingInterface(ConfigReader):
         self.name_bg_opacity_dd = SimBADropDown(parent=animal_tracking_panel, dropdown_options=[f"{x / 10:.1f}" for x in range(0, 11)], label="NAME BACKGROUND OPACITY: ", label_width=35, dropdown_width=35, value=self.name_bg_opacity, tooltip_key='ANNOTATION_INTERFACE_NAME_BG_OPACITY', img='opacity')
         self.name_bg_opacity_dd.grid(row=3, column=0, sticky="NW")
         pref_save_btn = SimbaButton(parent=self.preferences_frm, txt="SAVE", img='save_large', font=Formats.FONT_REGULAR.value, cmd=self.set_settings)
-        pref_save_btn.grid(row=4, column=0, sticky="NW")
+        pref_save_btn.grid(row=5, column=0, sticky="NW")
 
     def set_settings(self):
         max_width, max_height = int(self.max_width_scaler.get_value()) / 100, int(self.max_height_scaler.get_value()) / 100
@@ -560,8 +560,8 @@ class LabellingInterface(ConfigReader):
 #                        thresholds=None,
 #                        continuing=True)
 #
-
-
+#
+#
 # _ = LabellingInterface(config_path=r"D:\troubleshooting\multi_animal_dlc_two_c57\project_folder\project_config.ini",
 #                        file_path=r"D:\troubleshooting\multi_animal_dlc_two_c57\project_folder\videos\Together_1.avi",
 #                        thresholds=None,
