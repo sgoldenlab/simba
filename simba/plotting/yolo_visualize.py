@@ -18,8 +18,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_dataframe)
 from simba.utils.data import (create_color_palettes, get_cpu_pool,
                               terminate_cpu_pool)
-from simba.utils.errors import FrameRangeError, NoFilesFoundError
 from simba.utils.enums import Options
+from simba.utils.errors import FrameRangeError, NoFilesFoundError
 from simba.utils.read_write import (find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data)
