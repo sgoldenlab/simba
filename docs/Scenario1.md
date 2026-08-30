@@ -462,8 +462,14 @@ Before running your classifier on real experimental data, you should check how w
 
    **Keyboard shortcuts (select the line plot window first):** Press the right arrow key to move forward one frame, the left arrow key to move backward, and the Space bar to play or pause.
 
+   **Preferences (File → Preferences in the video window):** **SHOW ANIMAL NAMES** prints each animal's name at their first body-part on the displayed frame. **SHOW ANIMAL POSE** draws a circle at every body-part of every animal. **NAME BACKGROUND COLOR** sets the color of the box drawn behind the animal names, and **NAME BACKGROUND OPACITY** how solid that box is (0.0 = invisible, 1.0 = fully opaque), so the names stay readable on busy frames. Press **SAVE** to apply the settings to the frame on display. Body-part locations are read from the validation file, so names and pose are only drawn for frames the data covers.
+
 <p align="center">
   <img src="images/scenario1/interactive_validation.webp" width="600">
+</p>
+
+<p align="center">
+  <video src="_static/img/interactive_validation_preferences_fps_15.mp4" width="600" controls>Interactive probability plot preferences: showing animal names and pose, and setting the name background color and opacity</video>
 </p>
 
 

@@ -45,6 +45,15 @@ class InteractiveProbabilityGrapher(ConfigReader):
        :width: 450
        :align: center
 
+    Use `File -> Preferences` in the video window to show the animal names and pose on the displayed frame, and to set
+    the color and opacity of the box behind the names:
+
+    .. video:: _static/img/interactive_validation_preferences_fps_15.mp4
+       :width: 700
+       :loop:
+       :muted:
+       :autoplay:
+
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
     :param Union[str, os.PathLike] file_path: Path to CSV file with classification probability data.
     :param Union[str, os.PathLike] model_path: Path to classifier pickle file (.sav) used to generate probabilities.
@@ -228,7 +237,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
             pass
         plt.close('all')
 
-
+#
 # test = InteractiveProbabilityGrapher(config_path=r"D:\troubleshooting\multi_animal_dlc_two_c57\project_folder\project_config.ini",
 #                                      file_path=r"D:\troubleshooting\multi_animal_dlc_two_c57\project_folder\csv\features_extracted\Together_1.csv", #r"D:\troubleshooting\mitra\project_folder\csv\features_extracted\501_MA142_Gi_CNO_0521.csv",
 #                                      model_path=r"D:\troubleshooting\multi_animal_dlc_two_c57\models\generated_models\Attack.sav")
