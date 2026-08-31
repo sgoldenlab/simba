@@ -272,6 +272,39 @@ class SimBAScaleBar(Frame):
 
 
 class Entry_Box(Frame):
+    """
+    Create a text entry field with an optional label and icon.
+
+    This class creates a tkinter Entry with a label and an optional icon to its left. The typed text is read with the
+    :attr:`entry_get` property and set with :meth:`entry_set`.
+
+    :param parent (Frame | Canvas | LabelFrame | Toplevel | Tk): The parent widget container.
+    :param fileDescription (str, optional): Text label displayed next to the entry box. Default: ''.
+    :param labelwidth (int, optional): Width of the label in characters. Default: None.
+    :param label_bg_clr (str, optional): Background color of the label. Default: None.
+    :param status (str): State of the entry box, 'normal', 'disabled' (greyed out, not editable) or 'readonly' (selectable, not editable). Default: 'normal'.
+    :param validation (str, optional): Restricts what can be typed. Only ``'numeric'`` is implemented - it rejects any inserted character that is not a digit. Any other value leaves the entry unvalidated. Default: None.
+    :param trace (Callable, optional): Called every time the content changes, with this Entry_Box instance as its only argument. Use it to react to typing, e.g. to enable another widget. Default: None.
+    :param entry_box_width (int, optional): Width of the entry box in characters. If None, the tkinter default is used. Default: None.
+    :param entry_box_clr (str, optional): Background color of the entry box. Change it later with :meth:`set_bg_clr`. Default: 'white'.
+    :param img (str, optional): Name of the icon displayed to the left of the label, e.g. 'jump'. For accepted names, see :func:`simba.utils.lookups.get_icons_paths`. Unknown names are ignored. Default: None.
+    :param value (Any, optional): Initial content of the entry box. If None, the entry box starts empty. Default: None.
+    :param bg_clr (str, optional): Alternative way of setting the entry box background color, applied after the widget is built. Default: None.
+    :param label_font (tuple): Font tuple for the label. Default: Formats.FONT_REGULAR.value.
+    :param entry_font (tuple): Font tuple for the typed text. Default: Formats.FONT_REGULAR.value.
+    :param tooltip_key (str, optional): Key for tooltip lookup in TOOLTIPS dictionary, shown when hovering the label. For dictionary, see `simba.assets.lookups.tooptips.json`. Keys not in the dictionary are ignored. Default: None.
+    :param justify (str): Alignment of the typed text, 'left', 'center' or 'right'. Default: 'left'.
+    :param cmd (Callable, optional): Called with the stripped entry box content on every key release. Default: None.
+    :param allow_blank (bool): Stored on the widget as ``self.allow_blank`` for callers that validate the entered value - whether an empty entry box is acceptable. Does not restrict typing. Default: False.
+    :param kw: Additional keyword arguments passed to the underlying tkinter Frame.
+
+    :example:
+
+    >>> entry_box = Entry_Box(parent=parent_frm, fileDescription='CURRENT FRAME: ', labelwidth=20, entry_box_width=10, validation='numeric', value=0, justify='center')
+    >>> entry_box.grid(row=0, column=0, sticky=NW)
+    >>> frm_number = entry_box.entry_get
+    """
+
     def __init__(self,
                  parent: Union[Frame, Canvas, LabelFrame, Toplevel, Tk],
                  fileDescription: Optional[str] = "",

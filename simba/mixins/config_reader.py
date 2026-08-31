@@ -635,6 +635,7 @@ class ConfigReader(object):
         data_type: Literal["str", "int", "float", "folder_path"],
         default_value: Optional[Any] = None,
         options: Optional[List[Any]] = None,
+        raise_error: bool = True
     ) -> Union[str, int, float]:
         """
         Helper to read entry from a configparser.ConfigParser object
