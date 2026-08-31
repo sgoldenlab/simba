@@ -100,7 +100,7 @@ class AnnotatorMixin(ConfigReader):
         _, frm = self.cap.read()
         frm = cv2.cvtColor(frm, cv2.COLOR_RGB2BGR)
         frm = Image.fromarray(frm)
-        frm.thumbnail(max_size, Image.ANTIALIAS)
+        frm.thumbnail(max_size, Image.LANCZOS)
         frm = ImageTk.PhotoImage(master=self.main_frm, image=frm)
         video_frame = Label(self.main_frm, image=frm)
         video_frame.image = frm

@@ -119,6 +119,7 @@ from simba.ui.pop_ups.heatmap_clf_pop_up import HeatmapClfPopUp
 from simba.ui.pop_ups.heatmap_location_pop_up import HeatmapLocationPopup
 from simba.ui.pop_ups.initialize_blob_tracking_pop_up import \
     InitializeBlobTrackerPopUp
+from simba.ui.pop_ups.select_video_for_advanced_labelling_popup import SelectAdvancedLabellingVideoPupUp
 from simba.ui.pop_ups.interpolate_pop_up import InterpolatePopUp
 from simba.ui.pop_ups.kleinberg_pop_up import KleinbergPopUp
 from simba.ui.pop_ups.labelme_bbox_to_yolo_bbox_popup import \
@@ -483,8 +484,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         label_adv_note_1 = SimBALabel(parent=label_adv_label, txt="Note: you will have to specify the presence of *both* behavior and non-behavior on your own.", font=Formats.FONT_REGULAR.value, bg_clr=Formats.LABELFRAME_GREY.value)
         label_adv_note_2 = SimBALabel(parent=label_adv_label, txt="Click here more information on how to use the SimBA labelling interface.", txt_clr='blue', cursor='hand2', font=Formats.FONT_REGULAR.value, link=Links.ADVANCED_LBL.value,bg_clr=Formats.LABELFRAME_GREY.value)
 
-        adv_label_btn_new = SimbaButton(parent=label_adv_label, width=Formats.BUTTON_WIDTH_XS.value, txt="Select video (create NEW video annotation)", cmd=select_labelling_video_advanced, cmd_kwargs={'config_path': lambda:self.config_path, 'continuing': lambda:False}, thread=False)
-        adv_label_btn_continue = SimbaButton(parent=label_adv_label, width=Formats.BUTTON_WIDTH_XS.value, txt="Select video (CONTINUE existing video annotation)", cmd=select_labelling_video_advanced, cmd_kwargs={'config_path': lambda:self.config_path, 'continuing': lambda:True}, thread=False)
+        adv_label_btn_new = SimbaButton(parent=label_adv_label, width=Formats.BUTTON_WIDTH_XS.value, txt="Select video (create NEW video annotation)", cmd=SelectAdvancedLabellingVideoPupUp, cmd_kwargs={'config_path': lambda:self.config_path, 'continuing': lambda:False}, thread=False)
+        adv_label_btn_continue = SimbaButton(parent=label_adv_label, width=Formats.BUTTON_WIDTH_XS.value, txt="Select video (CONTINUE existing video annotation)", cmd=SelectAdvancedLabellingVideoPupUp, cmd_kwargs={'config_path': lambda:self.config_path, 'continuing': lambda:True}, thread=False)
 
         targeted_clip_annotator_frm = CreateLabelFrameWithIcon(parent=tab7,header="TARGETED CLIP ANNOTATOR",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.ADVANCED_LBL.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
         targeted_clip_annotator_note = SimBALabel(parent=targeted_clip_annotator_frm, txt="A bout annotator that creates annotated clips from videos associated with ML results.", txt_clr='blue', cursor='hand2', font=Formats.FONT_REGULAR.value, link=Links.ADVANCED_LBL.value, bg_clr=Formats.LABELFRAME_GREY.value)

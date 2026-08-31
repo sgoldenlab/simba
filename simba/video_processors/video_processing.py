@@ -2097,7 +2097,7 @@ class VideoRotator(ConfigReader):
 
     def __insert_img(self, img: np.array):
         current_frm_pil = Image.fromarray(img)
-        current_frm_pil.thumbnail(MAX_FRM_SIZE, Image.ANTIALIAS)
+        current_frm_pil.thumbnail(MAX_FRM_SIZE, Image.LANCZOS)
         current_frm_pil = ImageTk.PhotoImage(
             master=self.main_frm, image=current_frm_pil
         )

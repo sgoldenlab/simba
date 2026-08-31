@@ -302,7 +302,7 @@ class AdvancedLabellingInterface(ConfigReader):
         _, self.current_frm_npy = self.cap.read()
         self.current_frm_npy = cv2.cvtColor(self.current_frm_npy, cv2.COLOR_RGB2BGR)
         self.current_frm_pil = Image.fromarray(self.current_frm_npy)
-        self.current_frm_pil.thumbnail(self.max_frm_size, Image.ANTIALIAS)
+        self.current_frm_pil.thumbnail(self.max_frm_size, Image.LANCZOS)
         self.current_frm_pil = ImageTk.PhotoImage(
             master=self.main_window, image=self.current_frm_pil
         )
@@ -551,19 +551,13 @@ class AdvancedLabellingInterface(ConfigReader):
                     )
 
 
-def select_labelling_video_advanced(
-    config_path: Union[str, os.PathLike], continuing: Optional[bool] = False
-):
-    video_file_path = filedialog.askopenfilename(
-        filetypes=[("Video files", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)]
-    )
+def select_labelling_video_advanced(config_path: Union[str, os.PathLike], continuing: Optional[bool] = False):
+    video_file_path = filedialog.askopenfilename(filetypes=[("Video files", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
     check_file_exist_and_readable(video_file_path)
     video_meta = get_video_meta_data(video_file_path)
     _, video_name, _ = get_fn_ext(video_file_path)
     print(f"ANNOTATING VIDEO {video_name} \n VIDEO INFO: {video_meta}")
-    _ = AdvancedLabellingInterface(
-        config_path=config_path, file_path=video_file_path, continuing=continuing
-    )
+    _ = AdvancedLabellingInterface(config_path=config_path, file_path=video_file_path, continuing=continuing)
 #
 #
 # test = select_labelling_video_advanced(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini",
