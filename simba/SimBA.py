@@ -119,7 +119,6 @@ from simba.ui.pop_ups.heatmap_clf_pop_up import HeatmapClfPopUp
 from simba.ui.pop_ups.heatmap_location_pop_up import HeatmapLocationPopup
 from simba.ui.pop_ups.initialize_blob_tracking_pop_up import \
     InitializeBlobTrackerPopUp
-from simba.ui.pop_ups.select_video_for_advanced_labelling_popup import SelectAdvancedLabellingVideoPupUp
 from simba.ui.pop_ups.interpolate_pop_up import InterpolatePopUp
 from simba.ui.pop_ups.kleinberg_pop_up import KleinbergPopUp
 from simba.ui.pop_ups.labelme_bbox_to_yolo_bbox_popup import \
@@ -154,6 +153,8 @@ from simba.ui.pop_ups.roi_features_plot_pop_up import VisualizeROIFeaturesPopUp
 from simba.ui.pop_ups.roi_tracking_plot_pop_up import VisualizeROITrackingPopUp
 from simba.ui.pop_ups.roi_video_table_pop_up import ROIVideoTable
 from simba.ui.pop_ups.run_machine_models_popup import RunMachineModelsPopUp
+from simba.ui.pop_ups.select_video_for_advanced_labelling_popup import \
+    SelectAdvancedLabellingVideoPupUp
 from simba.ui.pop_ups.select_video_for_labelling_popup import \
     SelectLabellingVideoPupUp
 from simba.ui.pop_ups.select_video_for_pseudo_labelling_popup import \
