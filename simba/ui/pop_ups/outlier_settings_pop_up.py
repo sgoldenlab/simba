@@ -12,7 +12,6 @@ from simba.utils.checks import check_float
 from simba.utils.enums import ConfigKey, Formats, Keys, Links
 from simba.utils.printing import stdout_success
 
-
 VALID_CLR = 'yellowgreen'
 INVALID_CLR = 'lightsalmon'
 
