@@ -2,12 +2,16 @@ import os
 from tkinter import filedialog
 from typing import Union
 
-from simba.utils.checks import (check_file_exist_and_readable, check_valid_boolean)
+from simba.labelling.labelling_advanced_interface import \
+    AdvancedLabellingInterface
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_valid_boolean)
 from simba.utils.enums import ConfigKey, Dtypes, Options
 from simba.utils.errors import NoFilesFoundError
-from simba.utils.read_write import (get_video_meta_data, read_config_entry, read_config_file)
 from simba.utils.printing import stdout_information
-from simba.labelling.labelling_advanced_interface import AdvancedLabellingInterface
+from simba.utils.read_write import (get_video_meta_data, read_config_entry,
+                                    read_config_file)
+
 
 class SelectAdvancedLabellingVideoPupUp():
 
