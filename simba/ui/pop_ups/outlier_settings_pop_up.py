@@ -134,4 +134,4 @@ class OutlierSettingsPopUp(PopUpMixin, ConfigReader):
 
 
 # _ = OutlierSettingsPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
-_ = OutlierSettingsPopUp(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini")
+#_ = OutlierSettingsPopUp(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini")
