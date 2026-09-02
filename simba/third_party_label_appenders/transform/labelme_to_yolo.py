@@ -118,6 +118,7 @@ class LabelmeBoundingBoxes2YoloBoundingBoxes:
     .. seealso::
        To split YOLO data into train, test, and validation sets (expected by e.g., UltraLytics), see :func:`simba.third_party_label_appenders.converters.split_yolo_train_test_val`.
        To convert Labelme points annotations to YOLO keypoint training data, see :func:`simba.third_party_label_appenders.transform.labelme_to_yolo_keypoints.LabelmeKeypoints2YoloKeypoints`.
+       To generate the labelme bounding-box project in the first place - from videos, using SAM3 - see :class:`~simba.third_party_label_appenders.transform.sam3_to_labelme_bbox.SAM3ToLabelmeBBox`.
 
     .. important::
        For YOLO bounding boxes (not YOLO keypoint data!) from labelme keypoints.

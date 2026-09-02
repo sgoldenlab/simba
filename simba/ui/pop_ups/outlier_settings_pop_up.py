@@ -78,7 +78,7 @@ class OutlierSettingsPopUp(PopUpMixin, ConfigReader):
         agg_type_frm.grid(row=2, column=0, sticky=NW)
 
 
-        run_btn = SimbaButton(parent=self.main_frm, txt="CONFIRM", img='tick', txt_clr="red", font=Formats.FONT_REGULAR.value, cmd=self.run)
+        run_btn = SimbaButton(parent=self.main_frm, txt="CONFIRM", img='tick', font=Formats.FONT_REGULAR.value, cmd=self.run)
         run_btn.grid(row=3, column=0, sticky=NW)
 
         self.main_frm.mainloop()

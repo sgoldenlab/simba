@@ -491,9 +491,12 @@ class YoloNVDECInference(object):
         check_file_exist_and_readable(file_path=engine_path)
         engine_file_ext = os.path.splitext(str(engine_path))[1].lower()
         if engine_file_ext != '.engine':   # NOTE: a non-engine model returns raw predictions rather than NMS:ed detections, which this class would otherwise write out as garbage boxes and class ids.
-            raise InvalidFilepathError(msg=f'{self.__class__.__name__} expects an exported TensorRT engine (.engine), got a "{engine_file_ext}" file: {engine_path}. Convert it using simba.utils.yolo.export_yolo_model(weights_path=r"{engine_path}", format="engine").', source=self.__class__.__name__)
+            raise InvalidFilepathError(msg=f'{self.__class__.__name__} expects an exported TensorRT engine (.engine), got a "{engine_file_ext}" file: {engine_path}. Convert it using simba.utils.yolo.export_yolo_model(model_path=r"{engine_path}", export_format="engine", imgsz=<imgsz>, task="{task}").', source=self.__class__.__name__)
         if save_dir is not None: check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
         check_str(name=f'{self.__class__.__name__} task', value=task, options=TASKS)
+
+        from simba.utils.yolo import check_trt_engine_compatibility
+        check_trt_engine_compatibility(engine_path=engine_path, gpu_id=gpu_id if isinstance(gpu_id, int) else gpu_id[0], raise_error=True)
 
         if imsz is None or batch_size is None:
             engine_meta = read_yolo_metadata(model=engine_path)
@@ -512,6 +515,17 @@ class YoloNVDECInference(object):
 
         check_int(name=f'{self.__class__.__name__} imsz', value=imsz, min_value=32)
         check_int(name=f'{self.__class__.__name__} batch_size', value=batch_size, min_value=1)
+
+        engine_meta = read_yolo_metadata(model=engine_path)
+        if not engine_meta.get('dynamic', False):
+            engine_batch = engine_meta.get('batch', None)
+            if engine_batch is not None and int(engine_batch) != int(batch_size):
+                raise InvalidInputError(msg=f'The TensorRT engine {engine_path} was exported with a fixed batch size of {int(engine_batch)}, but batch_size={int(batch_size)} was requested. A non-dynamic engine accepts exactly the batch it was built with. Either pass batch_size={int(engine_batch)} (or batch_size=None to read it from the engine), or re-export the engine with simba.utils.yolo.export_yolo_model(model_path=r"<weights>.pt", export_format="engine", batch={int(batch_size)}, imgsz={int(imsz)}, task="{task}") - or export with dynamic=True to accept any batch.', source=self.__class__.__name__)
+            engine_imsz = engine_meta.get('imgsz', None)
+            if isinstance(engine_imsz, (list, tuple)) and len(engine_imsz) > 0:
+                engine_imsz = engine_imsz[0]
+            if engine_imsz is not None and int(engine_imsz) != int(imsz):
+                raise InvalidInputError(msg=f'The TensorRT engine {engine_path} was exported with a fixed input size of {int(engine_imsz)}, but imsz={int(imsz)} was requested. A non-dynamic engine accepts exactly the input size it was built with. Either pass imsz={int(engine_imsz)} (or imsz=None to read it from the engine), or re-export the engine at imgsz={int(imsz)}.', source=self.__class__.__name__)
         if isinstance(gpu_id, int):
             gpu_ids = (gpu_id,)
         else:
@@ -791,6 +805,22 @@ class YoloNVDECInference(object):
 #                                   vertice_cnt=500)
 #      detector.run()
 #
+
+
+# if __name__ == "__main__":
+#      detector = YoloNVDECInference(video_path=r"I:\netholabs\cage_7\video\cropped\7.01.001_1_2026_09_01_11_51_00_000.mp4",
+#                                   engine_path=r"I:\netholabs\cage_7\production_yolo\weights\best.engine",
+#                                   task='detect',
+#                                   gpu_id=(0,),
+#                                   batch_size=16,
+#                                   conf_threshold=0.5,
+#                                   max_detections=2,
+#                                   recursive=True,
+#                                   save_dir=r'I:\netholabs\cage_7\yolo_results_test',
+#                                   vertice_cnt=500)
+#      detector.run()
+
+
 
 # if __name__ == "__main__":
 #     detector = YoloNVDECInference(video_path=r"E:\open_video\open_field_2\sample\clips",

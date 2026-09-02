@@ -42,6 +42,7 @@ class Yolo2Labelme():
        For the reverse conversion - edited labelme rectangles back into a YOLO bounding-box project - see :class:`simba.third_party_label_appenders.transform.labelme_to_yolo.LabelmeBoundingBoxes2YoloBoundingBoxes`.
        To only inspect YOLO annotations without editing them, see :class:`simba.third_party_label_appenders.transform.yolo_to_imgs.Yolo2Imgs` and :class:`simba.plotting.yolo_annotation_visualizer.YOLOAnnotationVisualizer`.
        For auto-detecting the YOLO project type from a label file, see :func:`simba.utils.yolo.detect_yolo_project_type`.
+       To build a labelme bounding-box project directly from videos with SAM3, without a YOLO project in between, see :class:`~simba.third_party_label_appenders.transform.sam3_to_labelme_bbox.SAM3ToLabelmeBBox`.
 
     .. note::
        Flattening the splits discards the train/val membership of each image. If a file name occurs in more than one split, the later copy is saved with its split appended to the name (e.g. ``frm_1.json`` and ``frm_1_val.json``)

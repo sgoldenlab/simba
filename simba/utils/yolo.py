@@ -529,6 +529,18 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
 
     Wrapper around Ultralytics export that supports common deployment formats (including ONNX and TensorRT engine).
 
+    Why export:
+
+    * ``.pt`` - the training format. Runs anywhere PyTorch and Ultralytics are installed, and accepts any batch size.
+    * ``.onnx`` - one file that many inference engines can load (onnxruntime on CPU, CUDA, DirectML or CoreML), so it moves to machines without PyTorch.
+    * ``.engine`` - compiled by TensorRT for one specific GPU, driver and TensorRT version. Fastest to run, not portable. NOTE: Building an engine costs minutes - export once in a setup step and re-use the artifact, rather than exporting inside an inference loop.
+    * Raspberry Pi and other ARM CPUs - use ``ncnn`` or ``mnn`` (both built for ARM), or ``tflite``. ``.engine`` needs an NVIDIA GPU and is not an option on a Pi. On Jetson boards it is, but the engine has to be built on the device itself, as engines do not transfer between GPUs.
+    * ``openvino`` targets Intel CPUs, iGPUs and NPUs - not ARM, so it is not a Raspberry Pi option.
+    * :class:`~simba.model.yolo_nvdec_inference.YoloNVDECInference` accepts **only** an ``.engine``, so there exporting is a requirement rather than an optimization.
+
+    .. warning::
+       With ``dynamic=False`` the exported model accepts **exactly** ``batch`` frames, and raises on a smaller final batch (e.g. ``Got: 7 Expected: 8`` when 2199 frames are fed in batches of 8). Either export with ``dynamic=True``, export with ``batch=1``, or pad the trailing batch as :class:`~simba.model.yolo_nvdec_inference.YoloNVDECInference` does. ``.pt`` is unaffected, as PyTorch accepts any batch size.
+
     .. note::
        INT8 export is valid for the ``engine``, ``openvino``, and ``tflite`` formats and cannot be combined with ``half=True``.
        For ``openvino`` and ``tflite`` INT8, a calibration dataset (``data`` yaml) is required, as Ultralytics performs
@@ -605,6 +617,178 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
     model = YOLO(model_path) if task is None else YOLO(model_path, task=task)
     out = model.export(format=export_format, imgsz=imgsz, device=device, half=half, int8=int8, dynamic=dynamic, batch=batch, workspace=workspace, data=data, simplify=simplify)
     return out
+
+
+def inspect_yolo_model(model_path: Union[str, os.PathLike],
+                       expected_task: Optional[Literal["detect", "segment", "classify", "pose", "obb"]] = None,
+                       gpu_id: int = 0,
+                       raise_error: bool = True,
+                       verbose: bool = True) -> dict:
+    """
+    Report what a YOLO model file is, and whether it can actually be run on this machine.
+
+    Single entry point for the checks that are otherwise spread across
+    :func:`~simba.utils.yolo.read_yolo_metadata`, :func:`~simba.utils.yolo.get_yolo_imgsz_and_batch_size` and
+    :func:`~simba.utils.yolo.check_trt_engine_compatibility`. Answers, in one call: which format is this, which
+    task was it trained for, which classes does it predict, what input size and batch size does it expect, and
+    - for a TensorRT ``.engine`` - does it deserialize on this GPU rather than failing inside a worker process.
+
+    Intended as a pre-flight step before handing a model to an inference class, where a mismatch otherwise
+    surfaces late and opaquely (a ``.pt`` passed where NMS:ed engine output is expected, a segmentation model
+    passed to a detection pipeline, or an engine copied from another machine).
+
+    .. seealso::
+       To build an engine for the local GPU, see :func:`simba.utils.yolo.export_yolo_model`.
+       For the raw metadata dictionary, see :func:`simba.utils.yolo.read_yolo_metadata`.
+       To detect the task of a YOLO *label file* rather than a model, see :func:`simba.utils.yolo.detect_yolo_project_type`.
+
+    :param Union[str, os.PathLike] model_path: Path to a YOLO model file (``.pt``, ``.engine``, ``.onnx``, ...).
+    :param Optional[Literal["detect", "segment", "classify", "pose", "obb"]] expected_task: If given, the task the caller intends to run. A model trained for a different task raises rather than producing meaningless output. Default None.
+    :param int gpu_id: CUDA device index the model will be run on, used when validating a TensorRT engine. Default 0.
+    :param bool raise_error: If True, raise on an unusable model. If False, problems are reported in the returned ``problems`` list instead. Default True.
+    :param bool verbose: If True, print a summary of the model. Default True.
+    :return: Dictionary with keys ``path``, ``format``, ``task``, ``names``, ``imgsz``, ``batch``, ``fp16``, ``dynamic``, ``size_mb``, ``runnable`` and ``problems``.
+    :rtype: dict
+    :raises InvalidFilepathError: If the file does not exist or does not carry a recognised YOLO extension.
+    :raises InvalidInputError: If ``expected_task`` does not match the task the model was trained for.
+    :raises SimBAGPUError: If a TensorRT engine cannot be deserialized on this machine.
+
+    :example:
+
+    >>> info = inspect_yolo_model(model_path=r'/models/best.engine', expected_task='detect')
+    >>> info['task'], info['batch'], info['runnable']
+    ('detect', 16, True)
+    """
+
+    check_file_exist_and_readable(file_path=model_path)
+    ext = os.path.splitext(str(model_path))[1].lower()
+    if ext not in YOLO_EXTENSIONS:
+        raise InvalidFilepathError(msg=f'{model_path} does not look like a YOLO model: the extension "{ext}" is not one of {", ".join(YOLO_EXTENSIONS)}.', source=inspect_yolo_model.__name__)
+
+    problems = []
+    meta = {}
+    try:
+        meta = read_yolo_metadata(model=str(model_path))
+    except Exception as e:
+        problems.append(f'metadata could not be read ({e})')
+
+    imgsz = meta.get('imgsz', None)
+    if isinstance(imgsz, (list, tuple)) and len(imgsz) > 0:
+        imgsz = int(imgsz[0])
+    elif imgsz is not None:
+        imgsz = int(imgsz)
+    names = meta.get('names', None)
+    task = meta.get('task', None)
+    batch = meta.get('batch', None)
+
+    runnable = True
+    if ext == '.engine':
+        runnable = check_trt_engine_compatibility(engine_path=model_path, gpu_id=gpu_id, raise_error=raise_error)
+        if not runnable:
+            problems.append('the TensorRT engine could not be deserialized on this machine (built for a different GPU, driver or TensorRT version)')
+
+    if expected_task is not None and task is not None and task != expected_task:
+        msg = f'The model {model_path} was trained for the "{task}" task, but "{expected_task}" was requested. Running it would produce meaningless output.'
+        if raise_error:
+            raise InvalidInputError(msg=msg, source=inspect_yolo_model.__name__)
+        problems.append(msg)
+        runnable = False
+
+    out = {'path': str(model_path),
+           'format': ext.lstrip('.'),
+           'task': task,
+           'names': names,
+           'imgsz': imgsz,
+           'batch': int(batch) if batch is not None else None,
+           'fp16': meta.get('fp16', None),
+           'dynamic': meta.get('dynamic', None),
+           'size_mb': round(os.path.getsize(model_path) / 1e6, 1),
+           'runnable': runnable,
+           'problems': problems}
+
+    if verbose:
+        cls_str = ', '.join(str(v) for v in names.values()) if isinstance(names, dict) else str(names)
+        stdout_information(msg=(f'{os.path.basename(str(model_path))}: {out["format"]} | task={task} | imgsz={imgsz} | batch={out["batch"]} | '
+                                f'fp16={out["fp16"]} | dynamic={out["dynamic"]} | {out["size_mb"]} MB | classes: {cls_str}'), source=inspect_yolo_model.__name__)
+        if not runnable:
+            stdout_information(msg=f'NOT RUNNABLE: {"; ".join(problems)}', source=inspect_yolo_model.__name__)
+    return out
+
+
+def check_trt_engine_compatibility(engine_path: Union[str, os.PathLike],
+                                   gpu_id: int = 0,
+                                   raise_error: bool = True) -> bool:
+    """
+    Check that a TensorRT ``.engine`` can be deserialized on this machine, before any worker tries to use it.
+
+    A TensorRT engine is compiled for one specific GPU architecture, TensorRT version and driver, and is not
+    portable: an engine built on another machine (or before a TensorRT upgrade) deserializes to ``None`` rather
+    than raising. Downstream that surfaces as an opaque ``'NoneType' object has no attribute
+    'create_execution_context'`` inside a worker process, which does not say what is actually wrong. This
+    function performs the deserialization up front, in the calling process, and reports the mismatch with the
+    engine's build metadata and the local environment.
+
+    .. seealso::
+       To build an engine for the local GPU, see :func:`simba.utils.yolo.export_yolo_model`.
+       To read the ultralytics metadata header without deserializing, see :func:`simba.utils.yolo.read_yolo_metadata`.
+
+    :param Union[str, os.PathLike] engine_path: Path to the TensorRT ``.engine`` file.
+    :param int gpu_id: CUDA device index the engine will be run on. Used for the diagnostic message. Default 0.
+    :param bool raise_error: If True, raise :class:`~simba.utils.errors.SimBAGPUError` when the engine cannot be deserialized. If False, return False instead. Default True.
+    :return: True if the engine deserializes on this machine, else False (when ``raise_error`` is False).
+    :rtype: bool
+    :raises SimBAGPUError: If the engine cannot be deserialized and ``raise_error`` is True.
+
+    :example:
+
+    >>> check_trt_engine_compatibility(engine_path=r'/models/best.engine')
+    """
+
+    check_file_exist_and_readable(file_path=engine_path)
+    try:
+        import tensorrt as trt
+    except Exception:
+        raise SimBAPAckageVersionError(msg='TensorRT is not installed, a .engine file cannot be validated or run. Install tensorrt, or export the model to a portable format (e.g. onnx) with simba.utils.yolo.export_yolo_model.', source=check_trt_engine_compatibility.__name__)
+
+    with open(engine_path, 'rb') as f:
+        blob = f.read()
+    meta, payload = {}, blob
+    try:
+        meta_len = int.from_bytes(blob[:4], 'little')
+        if 0 < meta_len < len(blob):
+            meta = json.loads(blob[4:4 + meta_len].decode('utf-8'))
+            payload = blob[4 + meta_len:]
+    except Exception:
+        meta, payload = {}, blob
+
+    logger = trt.Logger(trt.Logger.ERROR)
+    try:
+        engine = trt.Runtime(logger).deserialize_cuda_engine(payload)
+    except Exception:
+        engine = None
+    if engine is not None:
+        return True
+    if not raise_error:
+        return False
+
+    built_on = meta.get('date', 'unknown')
+    built_by = meta.get('version', 'unknown')
+    built_batch, built_imgsz = meta.get('batch', 'unknown'), meta.get('imgsz', 'unknown')
+    try:
+        import torch
+        local_gpu = torch.cuda.get_device_name(gpu_id) if torch.cuda.is_available() else 'no CUDA device'
+        local_cc = '.'.join(str(x) for x in torch.cuda.get_device_capability(gpu_id)) if torch.cuda.is_available() else 'n/a'
+    except Exception:
+        local_gpu, local_cc = 'unknown', 'unknown'
+    pt_path = os.path.join(os.path.dirname(str(engine_path)), 'best.pt')
+    src_hint = pt_path if os.path.isfile(pt_path) else '<the .pt the engine was exported from>'
+    raise SimBAGPUError(msg=(f'The TensorRT engine {engine_path} could not be deserialized on this machine and cannot be used. '
+                             f'TensorRT engines are compiled for one specific GPU architecture, TensorRT version and driver, and do not transfer between machines. '
+                             f'ENGINE: built {built_on} with ultralytics {built_by} (batch {built_batch}, imgsz {built_imgsz}). '
+                             f'THIS MACHINE: {local_gpu} (compute capability {local_cc}), TensorRT {trt.__version__}. '
+                             f'If this engine was copied from another machine, or built before a TensorRT/driver upgrade, re-export it here with: '
+                             f'simba.utils.yolo.export_yolo_model(model_path=r"{src_hint}", export_format="engine", imgsz=<imgsz>, batch=<batch>, task="detect").'),
+                        source=check_trt_engine_compatibility.__name__)
 
 
 def read_yolo_metadata(model: Union[str, os.PathLike, YOLO]) -> dict:

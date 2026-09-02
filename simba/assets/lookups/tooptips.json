@@ -521,5 +521,8 @@
   "ROI_DIRECTING_VIS_DIRECTION_COLOR": "Color of the directing line or funnel drawn when the animal is directing towards a ROI.",
   "ROI_DIRECTING_VIS_TIME_SEGMENT": "If checked, only the specified time segment (start to end time in HH:MM:SS format) will be visualized. If unchecked, the entire video is visualized.",
   "ROI_DIRECTING_VIS_CIRCLE_SIZE": "Size of the pose-estimation keypoint circles drawn on the video. AUTO computes an optimal size based on the video resolution.",
-  "ROI_DIRECTING_VIS_LINE_THICKNESS": "Thickness of the directing line drawn from the animal eye to the ROI. AUTO computes an optimal thickness based on the video resolution."
+  "ROI_DIRECTING_VIS_LINE_THICKNESS": "Thickness of the directing line drawn from the animal eye to the ROI. AUTO computes an optimal thickness based on the video resolution.",
+  "POLYGON_CROP_MULTIPLE": "Draw a polygon on the FIRST video in the input directory. The area INSIDE the polygon is the area that is KEPT - everything outside it is replaced with the background color. The same polygon is applied to every video in the directory, so all of them must share the same resolution.",
+  "POLYGON_CROP_CORE_COUNT": "How many videos are cropped at the same time, each in its own FFmpeg process. Speed gains flatten out around 8; higher values mostly add CPU contention. Memory use does not grow with this setting.",
+  "POLYGON_CROP_BACKGROUND_COLOR": "Color used to fill the discarded area: the part that falls inside the crop rectangle but outside the polygon you drew."
 }

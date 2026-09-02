@@ -30,7 +30,7 @@ class MergeCOCOKeypointFilesPopUp(PopUpMixin):
         self.max_y_entry.grid(row=3, column=0, sticky='NW')
 
         run_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="", icon_name='run')
-        run_btn = SimbaButton(parent=run_frm, txt="RUN", img='rocket', txt_clr='red', cmd=self.run)
+        run_btn = SimbaButton(parent=run_frm, txt="RUN", img='rocket', cmd=self.run)
 
         run_frm.grid(row=1, column=0, sticky='NW')
         run_btn.grid(row=0, column=0, sticky='NW')

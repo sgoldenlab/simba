@@ -8,7 +8,9 @@ import os
 import platform
 import shutil
 import subprocess
+import tempfile
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
 from datetime import datetime
 from tkinter import *
@@ -30,13 +32,15 @@ except:
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.image_mixin import ImageMixin
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
                                 check_if_string_value_is_valid_video_timestamp,
-                                check_if_valid_img, check_instance, check_int,
+                                check_if_valid_img, check_if_valid_rgb_tuple,
+                                check_instance, check_int,
                                 check_nvidea_gpu_available, check_str,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_boolean, check_valid_codec,
@@ -2566,54 +2570,198 @@ def crop_single_video_polygon(file_path: Union[str, os.PathLike]) -> None:
 
 #crop_single_video_polygon(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/videos/F1 HAB.mp4')
 
-def crop_multiple_videos_polygons(
-    in_dir: Union[str, os.PathLike], out_dir: Union[str, os.PathLike]
-) -> None:
+def _clean_polygon_vertices(vertices: np.ndarray,
+                            video_width: int,
+                            video_height: int,
+                            source: str) -> np.ndarray:
     """
-    Crop multiple videos based on polygonal regions of interest (ROIs) selected by the user.
+    Validate polygon vertices and clamp them inside the image.
 
-    :param  Union[str, os.PathLike] in_dir: The directory containing input video files.
-    :param  Union[str, os.PathLike] out_dir: The directory to save the cropped video files.
+    Helper for :func:`simba.video_processors.video_processing.crop_multiple_videos_polygons`.
+
+    Accepts any vertex count and any input shape that flattens to (N, 2), so it is agnostic to how the
+    polygon was produced: :class:`~simba.video_processors.roi_selector_polygon.ROISelectorPolygon` returns
+    float coordinates on a closed ring (the first vertex repeated as the last), while hand-passed arrays are
+    typically open and integer. Vertices falling outside the image are clamped to the image bounds and a
+    :func:`~simba.utils.warnings.CropWarning` is raised naming them.
+
+    :param np.ndarray vertices: Polygon vertices in (x, y) pixel coordinates, of any shape flattening to (N, 2).
+    :param int video_width: Width of the video the polygon was drawn on, in pixels.
+    :param int video_height: Height of the video the polygon was drawn on, in pixels.
+    :param str source: Name of the calling function, used in error and warning messages.
+    :return: Integer vertices of shape (N, 2), open (no repeated closing vertex) and inside the image.
+    :rtype: np.ndarray
+    """
+
+    vertices = np.array(vertices)
+    if vertices.size == 0 or vertices.size % 2 != 0:
+        raise InvalidInputError(msg=f'The polygon vertices are not valid (x, y) coordinate pairs: got {vertices.size} value(s).', source=source)
+    vertices = np.rint(vertices.astype(np.float64).reshape(-1, 2)).astype(np.int32)
+    if len(vertices) > 1 and np.array_equal(vertices[0], vertices[-1]):
+        vertices = vertices[:-1]
+    if len(np.unique(vertices, axis=0)) < 3:
+        raise CountError(msg=f'A polygon requires at least 3 unique vertices, got {len(np.unique(vertices, axis=0))}. Please try again.', source=source)
+    clamped = np.stack([np.clip(vertices[:, 0], 0, video_width - 1), np.clip(vertices[:, 1], 0, video_height - 1)], axis=1)
+    oob = np.where(np.any(clamped != vertices, axis=1))[0]
+    if oob.size > 0:
+        CropWarning(msg=f'{oob.size} polygon vertice(s) fell outside the {video_width}x{video_height} image and were moved to the image border: {[tuple(v) for v in vertices[oob]]}.', source=source)
+    return clamped
+
+
+def _polygon_crop_mask(vertices: np.ndarray,
+                       save_path: Union[str, os.PathLike],
+                       source: str) -> Tuple[int, int, int, int]:
+    """
+    Write a greyscale alpha-mask PNG for a polygon and return its crop box.
+
+    Helper for :func:`simba.video_processors.video_processing.crop_multiple_videos_polygons`.
+
+    The mask is the size of the polygon bounding box: 255 inside the polygon, 0 outside, with
+    anti-aliased edges. Both bounding box dimensions are reduced to the nearest even number, as
+    required by yuv420p H.264 encoding.
+
+    :param np.ndarray vertices: Integer vertices of shape (N, 2), inside the image, as returned by :func:`_clean_polygon_vertices`.
+    :param Union[str, os.PathLike] save_path: Path to write the mask PNG to.
+    :param str source: Name of the calling function, used in error messages.
+    :return: The crop box as (x, y, w, h) in pixels.
+    :rtype: Tuple[int, int, int, int]
+    """
+
+    x, y, w, h = cv2.boundingRect(vertices)
+    w, h = w - (w % 2), h - (h % 2)
+    if w < 2 or h < 2:
+        raise CountError(msg=f'The selected polygon is too small to crop: it spans {w}x{h} pixels.', source=source)
+    mask = np.zeros((h, w), dtype=np.uint8)
+    cv2.drawContours(mask, [vertices - (x, y)], -1, 255, -1, cv2.LINE_AA)
+    cv2.imwrite(save_path, mask)
+    return x, y, w, h
+
+
+def crop_multiple_videos_polygons(in_dir: Union[str, os.PathLike],
+                                  out_dir: Union[str, os.PathLike],
+                                  gpu: bool = False,
+                                  core_cnt: int = 1,
+                                  quality: int = 60,
+                                  bg_color: Tuple[int, int, int] = (0, 0, 0),
+                                  verbose: bool = True) -> None:
+    """
+    Crop multiple videos based on a polygonal region of interest (ROI) selected by the user.
+
+    The user draws a polygon manually on the first video in ``in_dir``. The area INSIDE that polygon is the
+    area that is KEPT: each video is cropped to the polygon bounding box, and every pixel falling outside the
+    polygon is replaced by ``bg_color``. The same polygon is applied to all videos in ``in_dir``, which are
+    saved in ``out_dir`` under their original filenames.
 
     .. note::
-       This function crops multiple videos based on polygonal ROIs selected by the user.
-       The user is asked to define a polygon manually in one video within the input directory.
-       The function then crops all the video in the input directory according to the shape defined
-       using the first video and saves the videos in the ``out_dir`` with the same filenames as the original videos..
+       Each video is processed by a single streaming FFmpeg pass, so memory use is constant and
+       independent of video length or resolution.
+
+    .. seealso::
+       To crop one video, see :func:`simba.video_processors.video_processing.crop_single_video_polygon`.
+       To crop to a rectangle, see :func:`simba.video_processors.video_processing.crop_multiple_videos`.
+       For per-frame (moving) shapes, see :func:`simba.data_processors.cuda.image.slice_imgs`.
+
+    :param Union[str, os.PathLike] in_dir: The directory containing input video files.
+    :param Union[str, os.PathLike] out_dir: The directory to save the cropped video files. Cannot be ``in_dir``.
+    :param bool gpu: If True, encode with the NVIDIA h264_nvenc codec, falling back to CPU if it fails. Default False.
+    :param int core_cnt: Number of videos to crop concurrently, each in its own FFmpeg process. Pass -1 for one per logical core. Capped at the number of videos. Default 1.
+    :param int quality: Output video quality percentage (1-100). Higher values = higher quality and larger files. Default 60.
+    :param Tuple[int, int, int] bg_color: RGB color used to fill the discarded area outside the polygon. Default (0, 0, 0) (black).
+    :param bool verbose: If True, print per-video progress. Default True.
+    :return: None. The cropped videos are saved in ``out_dir``.
 
     :example:
 
     >>> crop_multiple_videos_polygons(in_dir='/Users/simon/Desktop/edited/tests', out_dir='/Users/simon/Desktop')
+    >>> crop_multiple_videos_polygons(in_dir=r'I:/netholabs/cage_7/video/cam_1', out_dir=r'I:/netholabs/cage_7/video/cam_1/cropped', gpu=True, core_cnt=8)
     """
 
-    check_if_dir_exists(in_dir=in_dir)
-    check_if_dir_exists(in_dir=out_dir)
-    video_files = find_all_videos_in_directory(directory=in_dir)
-    polygon_selector = ROISelectorPolygon(path=os.path.join(in_dir, video_files[0]))
+    check_ffmpeg_available(raise_error=True)
+    check_if_dir_exists(in_dir=in_dir, source=crop_multiple_videos_polygons.__name__)
+    check_if_dir_exists(in_dir=out_dir, source=crop_multiple_videos_polygons.__name__)
+    check_valid_boolean(value=[gpu, verbose], source=crop_multiple_videos_polygons.__name__, raise_error=True)
+    check_int(name=f'{crop_multiple_videos_polygons.__name__} quality', value=quality, min_value=1, max_value=100, raise_error=True)
+    check_int(name=f'{crop_multiple_videos_polygons.__name__} core_cnt', value=core_cnt, min_value=-1, raise_error=True)
+    if core_cnt == 0:
+        raise InvalidInputError(msg='core_cnt cannot be 0: pass 1 or more to set the number of concurrent FFmpeg processes, or -1 for one per logical core.', source=crop_multiple_videos_polygons.__name__)
+    check_if_valid_rgb_tuple(data=bg_color)
+    if gpu and not check_nvidea_gpu_available():
+        raise FFMPEGCodecGPUError(msg='Cannot crop using GPU. No GPU detected through FFMPEG', source=crop_multiple_videos_polygons.__name__)
+    if os.path.normcase(os.path.abspath(in_dir)) == os.path.normcase(os.path.abspath(out_dir)):
+        raise InvalidInputError(msg=f'The input and output directories cannot be the same ({in_dir}): the cropped videos would overwrite the source videos.', source=crop_multiple_videos_polygons.__name__)
+
+    video_paths = list(find_all_videos_in_directory(directory=in_dir, as_dict=True, raise_error=True).values())
+    ref_meta = get_video_meta_data(video_path=video_paths[0])
+    frame_size = (ref_meta['width'], ref_meta['height'])
+    vertice_size = max(1, PlottingMixin().get_optimal_circle_size(frame_size=frame_size, circle_frame_ratio=100))
+    thickness = max(1, PlottingMixin().get_optimal_circle_size(frame_size=frame_size, circle_frame_ratio=250))
+    polygon_selector = ROISelectorPolygon(path=video_paths[0],
+                                          thickness=thickness,
+                                          vertice_size=vertice_size,
+                                          title=f'DRAW A POLYGON AROUND THE AREA TO KEEP (APPLIED TO ALL {len(video_paths)} VIDEO(S)) - PRESS ESC WHEN DONE')
     polygon_selector.run()
-    vertices = polygon_selector.polygon_vertices
-    polygon = Polygon(vertices)
-    timer = SimbaTimer(start=True)
-    for video_cnt, video_path in enumerate(video_files):
-        print(
-            f"Polygon cropping video {video_path} ({video_cnt+1}/{len(video_files)})..."
-        )
-        video_path = os.path.join(in_dir, video_path)
-        _, video_name, _ = get_fn_ext(filepath=video_path)
-        save_path = os.path.join(out_dir, f"{video_name}.mp4")
+    vertices = _clean_polygon_vertices(vertices=polygon_selector.polygon_vertices, video_width=ref_meta['width'], video_height=ref_meta['height'], source=crop_multiple_videos_polygons.__name__)
+
+    core_cnt = find_core_cnt()[0] if core_cnt == -1 else core_cnt
+    core_cnt = min(core_cnt, len(video_paths))
+    for video_path in video_paths:
         video_meta_data = get_video_meta_data(video_path=video_path)
-        polygons = [polygon for x in range(video_meta_data["frame_count"])]
-        polygons = ImageMixin().slice_shapes_in_imgs(
-            imgs=video_path, shapes=polygons, verbose=False
-        )
-        _ = ImageMixin.img_stack_to_video(
-            imgs=polygons, save_path=save_path, fps=video_meta_data["fps"]
-        )
+        if (video_meta_data['width'], video_meta_data['height']) != (ref_meta['width'], ref_meta['height']):
+            raise InvalidInputError(msg=f'Cannot crop video {get_fn_ext(filepath=video_path)[1]} of size {video_meta_data["resolution_str"]}: the polygon was drawn on a {ref_meta["resolution_str"]} video.', source=crop_multiple_videos_polygons.__name__)
+
+    timer = SimbaTimer(start=True)
+    crf = quality_pct_to_crf(pct=quality)
+    bg_hex = '0x{:02X}{:02X}{:02X}'.format(*bg_color)
+    temp_dir = tempfile.mkdtemp()
+    try:
+        mask_path = os.path.join(temp_dir, 'polygon_mask.png')
+        x, y, w, h = _polygon_crop_mask(vertices=vertices, save_path=mask_path, source=crop_multiple_videos_polygons.__name__)
+        stdout_information(msg=f'Cropping {len(video_paths)} video(s) to a {w}x{h} polygon at x: {x}, y: {y} ({core_cnt} concurrent process(es))...', source=crop_multiple_videos_polygons.__name__)
+        filter_complex = (f'[0:v]crop={w}:{h}:{x}:{y},setsar=1,split[c1][c2];'
+                          f'[c1]format=rgba[fg0];'
+                          f'[1:v]format=gray,setsar=1[m];'
+                          f'[fg0][m]alphamerge=eof_action=repeat:shortest=0:repeatlast=1[fg];'
+                          f'[c2]drawbox=x=0:y=0:w=iw:h=ih:color={bg_hex}@1.0:t=fill,format=rgba,setsar=1[bg];'
+                          f'[bg][fg]overlay=0:0,format=yuv420p[v]')
+
+        def _crop_video(video_path: Union[str, os.PathLike]) -> Tuple[str, str]:
+            """Crop one video in its own FFmpeg process. Returns the video name and its elapsed time."""
+            video_timer = SimbaTimer(start=True)
+            _, video_name, _ = get_fn_ext(filepath=video_path)
+            save_path = os.path.join(out_dir, f'{video_name}.mp4')
+            base_cmd = f'ffmpeg -y -i "{video_path}" -i "{mask_path}" -filter_complex "{filter_complex}" -map "[v]" -an'
+            cpu_cmd = f'{base_cmd} -c:v libx264 -crf {crf} "{save_path}" -hide_banner -loglevel error'
+            gpu_cmd = f'{base_cmd} -c:v h264_nvenc -rc vbr -cq {crf} "{save_path}" -hide_banner -loglevel error'
+            if gpu:
+                try:
+                    subprocess.run(gpu_cmd, check=True, shell=True, capture_output=True)
+                except subprocess.CalledProcessError:
+                    FFMpegCodecWarning(msg=f'GPU polygon cropping of video {video_name} failed, reverting to CPU', source=crop_multiple_videos_polygons.__name__)
+                    subprocess.run(cpu_cmd, check=True, shell=True)
+            else:
+                subprocess.run(cpu_cmd, check=True, shell=True)
+            video_timer.stop_timer()
+            return video_name, video_timer.elapsed_time_str
+
+        if core_cnt == 1:
+            for video_cnt, video_path in enumerate(video_paths):
+                if verbose:
+                    stdout_information(msg=f'Polygon cropping video {get_fn_ext(filepath=video_path)[1]} ({video_cnt+1}/{len(video_paths)})...', source=crop_multiple_videos_polygons.__name__)
+                video_name, elapsed = _crop_video(video_path)
+                if verbose:
+                    stdout_information(msg=f'Video {video_name} cropped (Video {video_cnt+1}/{len(video_paths)}, elapsed time: {elapsed}s)', source=crop_multiple_videos_polygons.__name__)
+        else:
+            with ThreadPoolExecutor(max_workers=core_cnt) as executor:
+                futures = [executor.submit(_crop_video, video_path) for video_path in video_paths]
+                for video_cnt, future in enumerate(as_completed(futures)):
+                    video_name, elapsed = future.result()
+                    if verbose:
+                        stdout_information(msg=f'Video {video_name} cropped (Video {video_cnt+1}/{len(video_paths)}, elapsed time: {elapsed}s)', source=crop_multiple_videos_polygons.__name__)
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
     timer.stop_timer()
-    stdout_success(
-        msg=f"Polygon-based cropped {len(video_files)} files to directory {out_dir}",
-        elapsed_time=timer.elapsed_time_str,
-    )
+    stdout_success(msg=f'Polygon-based cropped {len(video_paths)} files to directory {out_dir}', elapsed_time=timer.elapsed_time_str, source=crop_multiple_videos_polygons.__name__)
 
 
 def resize_videos_by_height(video_paths: List[Union[str, os.PathLike]],
@@ -5600,3 +5748,6 @@ def change_playback_speed_dir(data_dir: Union[str, os.PathLike],
 
 
 #gif_creator(file_path=r"C:\Users\sroni\OneDrive\Desktop\desktop\show_roi_bbox_fps_15.mp4", start_time=5, duration=10,  gpu=False, save_path=r'C:\Users\sroni\OneDrive\Desktop\desktop\Test.gif')
+
+
+#crop_multiple_videos_polygons(in_dir=r'I:\netholabs\cage_7\video\cam_1', out_dir=r'I:\netholabs\cage_7\video\cam_1\cropped', gpu=True, core_cnt=8)

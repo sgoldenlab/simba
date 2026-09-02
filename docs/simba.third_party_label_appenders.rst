@@ -140,6 +140,15 @@ SAM3 -> YOLO bounding-box (detection) project
    :show-inheritance:
 
 
+SAM3 -> Labelme bounding-box project
+----------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.sam3_to_labelme_bbox.SAM3ToLabelmeBBox
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
 Merge multiple YOLO projects
 ---------------------------------------
 

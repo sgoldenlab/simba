@@ -1260,10 +1260,10 @@ class GeometryMixin(object):
                                       (clrs[shape_cnt][0][::-1]), thickness=thickness)
                 elif isinstance(shape, MultiPoint):
                     for point in shape:
-                        cv2.circle(frm_img, (int(np.array(point.centroid)[0]), int(np.array(point.centroid)[1])),
+                        cv2.circle(frm_img, (int(point.centroid.x), int(point.centroid.y)),
                                    circle_size, clrs[shape_cnt][0][::-1], -1)
                 elif isinstance(shape, Point):
-                    cv2.circle(frm_img, (int(np.array(shape.centroid)[0]), int(np.array(shape.centroid)[1])),
+                    cv2.circle(frm_img, (int(shape.centroid.x), int(shape.centroid.y)),
                                circle_size, clrs[shape_cnt][0][::-1], -1)
             video_writer.write(frm_img.astype(np.uint8))
             if verbose:
@@ -3199,10 +3199,10 @@ class GeometryMixin(object):
                 ranking_vals[shp_cnt_1] = np.mean(shape_distances)
         elif method == "left_to_right":
             for shp_cnt, shape in enumerate(shapes):
-                ranking_vals[shp_cnt] = np.array(shape.centroid)[0]
+                ranking_vals[shp_cnt] = shape.centroid.x
         elif method == "top_to_bottom":
             for shp_cnt, shape in enumerate(shapes):
-                ranking_vals[shp_cnt] = np.array(shape.centroid)[1]
+                ranking_vals[shp_cnt] = shape.centroid.y
         if deviation:
             new_ranking_vals, m = {}, sum(ranking_vals.values()) / len(ranking_vals)
             for k, v in ranking_vals.items():

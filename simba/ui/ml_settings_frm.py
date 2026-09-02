@@ -28,8 +28,8 @@ class GetMLSettingsFrame():
         check_instance(source=f'{self.__class__.__name__} parent', instance=parent, accepted_types=(ttk.Frame,), raise_error=True)
         self.ml_settings_frm = CreateLabelFrameWithIcon(parent=parent, header="MACHINE LEARNING SETTINGS", icon_name='forest', icon_link=Links.CREATE_PROJECT.value,font=Formats.FONT_HEADER.value, padx=5, pady=5, relief='solid')
         self.lbl_width, self.bx_width = lbl_width, bx_width
-        self.add_btn = SimbaButton(parent=self.ml_settings_frm, txt="", txt_clr='red', img='plus_green_3', cmd=self.add_entry_box)
-        self.remove_btn = SimbaButton(parent=self.ml_settings_frm, txt="", txt_clr='red', img='minus_red_2', cmd=self.remove_entry_box)
+        self.add_btn = SimbaButton(parent=self.ml_settings_frm, txt="", img='plus_green_3', cmd=self.add_entry_box)
+        self.remove_btn = SimbaButton(parent=self.ml_settings_frm, txt="", img='minus_red_2', cmd=self.remove_entry_box)
         self.add_entry_box()
         self.fill_frm()
 

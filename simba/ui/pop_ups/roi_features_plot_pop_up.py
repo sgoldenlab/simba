@@ -98,7 +98,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
         self.single_video_btn.grid(row=1, column=0, sticky=NW)
 
         self.all_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZE ALL VIDEOS", icon_name='video', icon_link=Links.ROI_FEATURES_PLOT.value)
-        self.all_videos_btn = SimbaButton(parent=self.all_videos_frm, txt=f"VISUALIZE ROI FEATURES: ALL {len(self.video_list)} VIDEO(S)", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': True}, width=240, txt_clr='red')
+        self.all_videos_btn = SimbaButton(parent=self.all_videos_frm, txt=f"VISUALIZE ROI FEATURES: ALL {len(self.video_list)} VIDEO(S)", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': True}, width=240)
 
         self.all_videos_frm.grid(row=4, column=0, sticky=NW)
         self.all_videos_btn.grid(row=0, column=0, sticky=NW)

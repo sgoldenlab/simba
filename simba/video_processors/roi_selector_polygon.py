@@ -132,7 +132,7 @@ class ROISelectorPolygon(object):
             self.polygon_area = self.polygon.area
             self.polygon_arr = np.array(self.polygon.exterior.coords).astype(np.int32)[1:]
             self.max_vertice_distance = np.max(cdist(self.polygon_vertices, self.polygon_vertices).astype(np.int32))
-            self.polygon_centroid = np.array(self.polygon.centroid).astype(int)
+            self.polygon_centroid = np.array([self.polygon.centroid.x, self.polygon.centroid.y]).astype(int)
             self.tags = {f'Tag_{cnt}': tuple(y) for cnt, y in enumerate(self.polygon_arr)}
             self.tags['Center_tag'] = tuple(self.polygon_centroid)
             return True

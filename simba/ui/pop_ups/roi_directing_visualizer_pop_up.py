@@ -115,7 +115,7 @@ class DirectingROIVisualizerPopUp(ConfigReader, PopUpMixin):
         self.single_video_btn.grid(row=1, column=0, sticky=NW)
 
         self.all_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZE ALL VIDEOS", icon_name='video', icon_link=Links.DIRECTING_ANIMALS_PLOTS.value)
-        self.all_videos_btn = SimbaButton(parent=self.all_videos_frm, txt=f"CREATE DIRECTING VISUALIZATION: ALL {len(self.video_list)} VIDEO(S)", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': True}, width=380, txt_clr='red')
+        self.all_videos_btn = SimbaButton(parent=self.all_videos_frm, txt=f"CREATE DIRECTING VISUALIZATION: ALL {len(self.video_list)} VIDEO(S)", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': True}, width=380)
         self.all_videos_frm.grid(row=4, column=0, sticky=NW)
         self.all_videos_btn.grid(row=0, column=0, sticky=NW)
 

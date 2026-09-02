@@ -1,7 +1,7 @@
 import os
 import random
 import time
-from typing import Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
@@ -37,8 +37,9 @@ class SAM3ToYoloSeg:
     """
     Sample N random frames from each video in a directory, run SAM3 with a text prompt, and write the resulting masks as a YOLO segmentation project.
 
-    For each sampled frame, every SAM3 mask above ``conf`` has its outline traced as a polygon, optionally resampled
-    to ``vertice_cnt`` vertices, and written as ``class x1 y1 x2 y2 ... xn yn`` normalized to ``[0, 1]`` - one line per mask.
+    For each sampled frame, every SAM3 mask above ``conf`` has its outline traced as a polygon, optionally
+    de-duplicated by ``iou_threshold`` and resampled to ``vertice_cnt`` vertices, and written as
+    ``class x1 y1 x2 y2 ... xn yn`` normalized to ``[0, 1]`` - one line per mask.
 
     .. image:: _static/img/sam3_to_yolo_seg.webp
        :alt: Text-prompted SAM3 segmentation to YOLO polygon labels
@@ -52,6 +53,8 @@ class SAM3ToYoloSeg:
     .. seealso::
 
        * :class:`~simba.third_party_label_appenders.transform.merge_yolo_projects.MergeYoloProjects` — merge several ``map.yaml`` projects (same classes and task) into one dataset.
+       * :class:`~simba.third_party_label_appenders.transform.sam3_to_yolo_bbox.SAM3ToYoloBBox` — SAM3 to YOLO **bounding-box** labels from the same predictor stack.
+       * :class:`~simba.third_party_label_appenders.transform.sam3_to_labelme_bbox.SAM3ToLabelmeBBox` — SAM3 bounding boxes written as a labelme project for hand-correction.
 
     :raises SimBAGPUError: If no NVIDIA GPU is detected (via ``nvidia-smi``).
     :raises SimBAPAckageVersionError: If ``ultralytics`` is not installed, or ``SAM3SemanticPredictor`` cannot be imported.
@@ -68,6 +71,7 @@ class SAM3ToYoloSeg:
     :param bool greyscale: If True, save extracted frames in greyscale. Default False.
     :param Optional[Union[Tuple[int, int, int], bool]] clahe: If True, applies CLAHE with default params. If tuple of (clip_limit, tile_x, tile_y), applies CLAHE with those params. Default False.
     :param Optional[int] vertice_cnt: If not None, resample each mask polygon to this many vertices. Default 40.
+    :param Optional[float] iou_threshold: If provided, an intersection-over-union threshold in ``[0, 1]`` used to treat overlapping masks as a single observation: with masks ordered by confidence descending, any mask whose IoU with an already-kept mask exceeds this value is discarded as a duplicate of that same animal (greedy non-maximum suppression, keeping the higher-confidence mask). IoU is computed between the **rasterized mask polygons**, not their bounding boxes, so two animals that cross - and therefore have heavily overlapping boxes but little shared area - are both retained. It is measured on the traced outline, before ``vertice_cnt`` resampling, so the resampling cannot alter the overlap. Useful when the text prompt returns several near-identical masks for one animal. If None, no de-duplication is performed and masks are written in detector order. Default None.
     :param Optional[int] seed: Random seed for reproducible frame sampling.
     :param bool visualize: If True, saves annotated images with segmentation polygon overlays to a ``visualizations`` subfolder inside ``save_dir``. Useful for verifying SAM3 annotation quality. Default False.
     :param float io_timeout: Seconds to keep retrying file I/O (read/write) when the operation fails (e.g. temporary drive disconnect). Default 30.0.
@@ -92,6 +96,7 @@ class SAM3ToYoloSeg:
                  greyscale: bool = False,
                  clahe: Optional[Union[Tuple[int, int, int], bool]] = False,
                  vertice_cnt: Optional[int] = 40,
+                 iou_threshold: Optional[float] = None,
                  seed: Optional[int] = None,
                  visualize: bool = False,
                  io_timeout: float = 30.0,
@@ -113,12 +118,14 @@ class SAM3ToYoloSeg:
         check_valid_boolean(value=greyscale, source=f'{self.__class__.__name__} greyscale')
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose')
         if vertice_cnt is not None: check_int(name=f'{self.__class__.__name__} vertice_cnt', value=vertice_cnt, min_value=3)
+        if iou_threshold is not None: check_float(name=f'{self.__class__.__name__} iou_threshold', value=iou_threshold, min_value=0.0, max_value=1.0)
         if seed is not None: check_int(name=f'{self.__class__.__name__} seed', value=seed)
         check_valid_boolean(value=visualize, source=f'{self.__class__.__name__} visualize')
         check_float(name=f'{self.__class__.__name__} io_timeout', value=io_timeout, min_value=0.0)
         self.video_dir, self.sam_path, self.save_dir, self.txt_prompt = video_dir, sam_path, save_dir, txt_prompt
         self.n_frames, self.names, self.train_val_split, self.conf, self.imgsz = n_frames, names, train_val_split, conf, sam_imgsz
         self.greyscale, self.clahe, self.vertice_cnt, self.seed, self.verbose, self.visualize, self.io_timeout = greyscale, clahe, vertice_cnt, seed, verbose, visualize, io_timeout
+        self.iou_threshold = iou_threshold
         self.name_map = {name: idx for idx, name in enumerate(names)}
         self.video_paths = find_all_videos_in_directory(directory=video_dir, as_dict=True, raise_error=True)
 
@@ -230,8 +237,37 @@ class SAM3ToYoloSeg:
         timer.stop_timer()
         stdout_success(msg=f'YOLO segmentation project created at {self.save_dir}. ' f'{train_cnt} train, {val_cnt} val samples.', source=self.__class__.__name__, elapsed_time=timer.elapsed_time_str)
 
+    def _mask_iou_suppress(self, candidates: List[Tuple[int, float, np.ndarray]], img_w: int, img_h: int) -> List[Tuple[int, float, np.ndarray]]:
+        """
+        Greedy non-maximum suppression of ``(class_id, confidence, polygon)`` candidates sorted by confidence descending.
+
+        Overlap is the true mask IoU: each traced outline is rasterized with :func:`cv2.fillPoly` and the
+        intersection and union are counted in pixels. A mask whose IoU with an already-kept mask exceeds
+        ``iou_threshold`` is dropped as a duplicate detection of the same observation. Bounding-box IoU is
+        deliberately not used - two animals crossing have heavily overlapping boxes but little shared mask area.
+        """
+        masks = []
+        for _, _, pts in candidates:
+            m = np.zeros((img_h, img_w), dtype=np.uint8)
+            cv2.fillPoly(m, [np.round(pts).astype(np.int32)], 1)
+            masks.append(m.astype(bool))
+        keep = []
+        for cand_idx in range(len(candidates)):
+            is_duplicate = False
+            for kept_idx in keep:
+                intersection = int(np.logical_and(masks[cand_idx], masks[kept_idx]).sum())
+                if intersection == 0:
+                    continue
+                union = int(np.logical_or(masks[cand_idx], masks[kept_idx]).sum())
+                if union > 0 and (intersection / union) > self.iou_threshold:
+                    is_duplicate = True
+                    break
+            if not is_duplicate:
+                keep.append(cand_idx)
+        return [candidates[i] for i in keep]
+
     def _masks_to_yolo_label(self, result, img_w: int, img_h: int) -> str:
-        lines = []
+        candidates = []
         for mask_idx in range(len(result.masks)):
             try:
                 polygon = result.masks.xy[mask_idx].astype(np.float64)
@@ -240,8 +276,10 @@ class SAM3ToYoloSeg:
             if polygon.shape[0] < 3:
                 continue
 
+            conf = 0.0
             if result.boxes is not None and mask_idx < len(result.boxes.conf):
-                if float(result.boxes.conf[mask_idx].cpu()) < self.conf:
+                conf = float(result.boxes.conf[mask_idx].cpu())
+                if conf < self.conf:
                     continue
 
             cls_id = 0
@@ -260,7 +298,14 @@ class SAM3ToYoloSeg:
             pts = polygon[unique_idx]
             if pts.shape[0] < 3:
                 continue
+            candidates.append((cls_id, conf, pts))
 
+        if self.iou_threshold is not None and len(candidates) > 1:
+            candidates = sorted(candidates, key=lambda c: c[1], reverse=True)
+            candidates = self._mask_iou_suppress(candidates=candidates, img_w=img_w, img_h=img_h)
+
+        lines = []
+        for cls_id, _, pts in candidates:
             if self.vertice_cnt is not None:
                 pts = resample_geometry_vertices(vertices=[pts], vertice_cnt=self.vertice_cnt)[0].astype(np.float64)
                 _, unique_idx = np.unique(pts, axis=0, return_index=True)

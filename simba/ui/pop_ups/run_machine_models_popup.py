@@ -61,7 +61,7 @@ class RunMachineModelsPopUp(PopUpMixin, ConfigReader):
             self.clf_data[clf_name][MIN_BOUT].grid(row=clf_cnt + 2, column=3, sticky=NW, padx=padx)
         self.clf_table_frm.grid(row=0, sticky=W, pady=5, padx=5)
         run_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header=f"ANALYZE {len(self.feature_file_paths)} FILES(S)", icon_name='rocket')
-        run_btn = SimbaButton(parent=run_frm, txt="RUN", img='rocket', txt_clr='red', font=Formats.FONT_REGULAR.value, hover_font=Formats.FONT_REGULAR.value, cmd=self.run)
+        run_btn = SimbaButton(parent=run_frm, txt="RUN", img='rocket', font=Formats.FONT_REGULAR.value, hover_font=Formats.FONT_REGULAR.value, cmd=self.run)
         run_frm.grid(row=2, sticky=W, pady=5, padx=5)
         run_btn.grid(row=0, sticky=W, pady=5, padx=5)
         self.main_frm.mainloop()
