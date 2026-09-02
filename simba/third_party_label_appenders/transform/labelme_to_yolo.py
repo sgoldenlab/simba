@@ -198,8 +198,8 @@ class LabelmeBoundingBoxes2YoloBoundingBoxes:
         skipped_str = '' if self.skipped_cnt == 0 else f' {self.skipped_cnt} file(s) skipped, see the warnings above.'
         stdout_success(msg=f'Labelme to YOLO conversion of {len(self.labelme_file_paths) - self.skipped_cnt}/{len(self.labelme_file_paths)} file(s) complete. Data saved in directory {self.save_dir}.{skipped_str}', elapsed_time=timer.elapsed_time_str)
 
-if __name__ == '__main__':
-    LABELME_DIR = r"G:\netholabs\pellet_labelme_0825_0827"
-    SAVE_DIR = r"G:\netholabs\pellet_yolo_0828"
-    runner = LabelmeBoundingBoxes2YoloBoundingBoxes(labelme_dir=LABELME_DIR, save_dir=SAVE_DIR)
-    runner.run()
+#if __name__ == '__main__':
+# LABELME_DIR = r"I:\netholabs\labelme_cage21_22_fixed_sina\labelme_cage21_22"
+# SAVE_DIR = r"I:\netholabs\labelme_yolo_sina_0209"
+# runner = LabelmeBoundingBoxes2YoloBoundingBoxes(labelme_dir=LABELME_DIR, save_dir=SAVE_DIR)
+# runner.run()

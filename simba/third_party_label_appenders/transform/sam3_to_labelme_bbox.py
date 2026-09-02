@@ -70,6 +70,11 @@ class SAM3ToLabelmeBBox:
     is the layout labelme expects when opening a directory. Unlike the YOLO writer there is no train/val split
     and no ``map.yaml``: class names are written into each shape directly.
 
+    .. image:: _static/img/SAM3ToLabelmeBBox.png
+       :alt: The generated project opened in labelme - a SAM3 bounding box around a mouse, ready to be adjusted by hand, with the class listed in the label list and every sampled frame in the file list
+       :width: 700
+       :align: center
+
     .. note::
        To convert the hand-corrected labelme directory into a YOLO training project, see
        :class:`~simba.third_party_label_appenders.transform.labelme_to_yolo.LabelmeBoundingBoxes2YoloBoundingBoxes`.
