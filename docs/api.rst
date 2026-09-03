@@ -133,6 +133,11 @@ Core low-level feature methods — distances, angles, velocities, areas, and bod
 |:pencil:| **Feature extraction wrappers**
 --------------------------------------------------
 
+.. raw:: html
+
+   <img src="_static/img/simba_chocolate_bar.webp" alt="SimBA chocolate bar"
+        style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px;">
+
 Pre-configured "out-of-the-box" feature extraction modules for common pose-estimation schemas, spanning a range of single- and multi-animal body-part layouts. Each wrapper turns raw tracking coordinates into the tabular feature set that SimBA classifiers are trained and run on, so most users never have to write feature code by hand.
 
 .. toctree::
