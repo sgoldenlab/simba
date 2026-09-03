@@ -40,6 +40,13 @@ Track animals in videos using background subtraction and blob detection — an a
 |:package:| **Bounding-box tools**
 --------------------------------------------------
 
+.. raw:: html
+
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/mouse_box_spin_black.webm" type="video/webm">
+   </video>
+
 Build bounding boxes and anchored polygons around animals from pose-estimation data, then quantify how they overlap through time. Useful for detecting proximity-based social interactions — one animal entering another's space, or body parts coming into contact — without training a dedicated classifier. Overlap statistics can be aggregated per-animal and per-frame for downstream analysis.
 
 See tutorial: `Anchored ROI (bounding box) tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md>`_
