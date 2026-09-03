@@ -527,5 +527,6 @@
   "POLYGON_CROP_BACKGROUND_COLOR": "Color used to fill the discarded area: the part that falls inside the crop rectangle but outside the polygon you drew.",
   "CIRCLE_CROP_BACKGROUND_COLOR": "Color used to fill the discarded area: the part that falls inside the crop rectangle but outside the circle you drew.",
   "CIRCLE_CROP_CORE_COUNT": "How many videos are cropped at the same time, each in its own FFmpeg process. Speed gains flatten out around 8; higher values mostly add CPU contention. Memory use does not grow with this setting.",
-  "CIRCLE_CROP_MULTIPLE": "Draw a circle on the FIRST video in the input directory. The area INSIDE the circle is the area that is KEPT - everything outside it is replaced with the background color. The same circle is applied to every video in the directory, so all of them must share the same resolution."
+  "CIRCLE_CROP_MULTIPLE": "Draw a circle on the FIRST video in the input directory. The area INSIDE the circle is the area that is KEPT - everything outside it is replaced with the background color. The same circle is applied to every video in the directory, so all of them must share the same resolution.",
+  "RECTANGLE_CROP_CORE_COUNT": "How many videos are cropped at the same time, each in its own FFmpeg process. Speed gains flatten out around 8; higher values mostly add CPU contention. Memory use does not grow with this setting."
 }

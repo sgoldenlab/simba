@@ -1802,7 +1802,8 @@ def crop_multiple_videos(directory_path: Union[str, os.PathLike],
                          output_path: Union[str, os.PathLike],
                          gpu: Optional[bool] = False,
                          codec: Optional[str] = None,
-                         quality: int = 60) -> None:
+                         quality: int = 60,
+                         core_cnt: int = 1) -> None:
     """
     Crop multiple videos in a folder according to crop-coordinates defined in the **first** video.
 
@@ -1817,6 +1818,7 @@ def crop_multiple_videos(directory_path: Union[str, os.PathLike],
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :param Optional[str] codec: Video codec to use for CPU encoding. If None, automatically selects based on file extension (libvpx-vp9 for .webm, mpeg4 for .avi, libx264 for others). Default None. Ignored if gpu=True.
     :param int quality: Video quality percentage (1-100). Higher values = higher quality. Default 60.
+    :param int core_cnt: Number of videos to crop concurrently, each in its own FFmpeg process. Pass -1 for one per logical core. Capped at the number of videos. Default 1.
     :return: None. Results are stored in passed ``output_path``.
 
     :example:
@@ -1830,7 +1832,10 @@ def crop_multiple_videos(directory_path: Union[str, os.PathLike],
         raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None", source=crop_multiple_videos.__name__)
     check_if_dir_exists(in_dir=directory_path)
     check_if_dir_exists(in_dir=output_path)
-    check_int(name=f'{crop_multiple_videos.__name__} quality', value=quality, min_value=1, max_value=52, raise_error=True)
+    check_int(name=f'{crop_multiple_videos.__name__} quality', value=quality, min_value=1, max_value=100, raise_error=True)
+    check_int(name=f'{crop_multiple_videos.__name__} core_cnt', value=core_cnt, min_value=-1, raise_error=True)
+    if core_cnt == 0:
+        raise InvalidInputError(msg='core_cnt cannot be 0: pass 1 or more to set the number of concurrent FFmpeg processes, or -1 for one per logical core.', source=crop_multiple_videos.__name__)
     check_valid_boolean(value=[gpu], source=crop_multiple_videos.__name__)
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(msg='Cannot crop using GPU. No GPU detected through FFMPEG', source=crop_multiple_videos.__name__)
@@ -1843,20 +1848,35 @@ def crop_multiple_videos(directory_path: Union[str, os.PathLike],
     if ((roi_selector.top_left[0] < 0) or (roi_selector.top_left[1] < 0) or (roi_selector.bottom_right[0] < 0) or (roi_selector.bottom_right[1] < 1)):
         raise CountError(msg=f"CROP FAILED: Cannot use negative crop coordinates. Got top_left: {roi_selector.top_left}, bottom_right: {roi_selector.bottom_right}", source=crop_multiple_videos.__name__)
     timer = SimbaTimer(start=True)
-    if codec is not None: check_valid_codec(codec=codec, raise_error=True, source=change_single_video_fps.__name__)
-
-    for file_cnt, file_path in enumerate(video_paths):
-        video_timer = SimbaTimer(start=True)
-        dir_name, file_name, ext = get_fn_ext(filepath=file_path)
-        video_codec = Formats.BATCH_CODEC.value if codec is None else get_ffmpeg_codec(file_name=file_path)
-        print(f"Cropping video {file_name} ({file_cnt+1}/{len(video_paths)})...")
+    if codec is not None: check_valid_codec(codec=codec, raise_error=True, source=crop_multiple_videos.__name__)
+    core_cnt = find_core_cnt()[0] if core_cnt == -1 else core_cnt
+    core_cnt = min(core_cnt, len(video_paths))
+    for file_path in video_paths:
         video_meta_data = get_video_meta_data(file_path)
         if (roi_selector.bottom_right[0] > video_meta_data["width"]) or (roi_selector.bottom_right[1] > video_meta_data["height"]):
-            raise InvalidInputError(msg=f'Cannot crop video {file_name} of size {video_meta_data["resolution_str"]} at location top left: {roi_selector.top_left}, bottom right: {roi_selector.bottom_right}', source=crop_multiple_videos.__name__)
-        save_path = os.path.join(output_path, f"{file_name}_cropped.mp4")
-        crop_video(video_path=file_path, save_path=save_path, size=(roi_selector.width, roi_selector.height), top_left=(roi_selector.top_left[0], roi_selector.top_left[1]), gpu=gpu, verbose=False, quality=quality, codec=video_codec)
+            raise InvalidInputError(msg=f'Cannot crop video {get_fn_ext(filepath=file_path)[1]} of size {video_meta_data["resolution_str"]} at location top left: {roi_selector.top_left}, bottom right: {roi_selector.bottom_right}', source=crop_multiple_videos.__name__)
+
+    def _crop_video(file_path: Union[str, os.PathLike]) -> Tuple[str, str]:
+        """Crop one video in its own FFmpeg process. Returns the video name and its elapsed time."""
+        video_timer = SimbaTimer(start=True)
+        _, file_name, _ = get_fn_ext(filepath=file_path)
+        video_codec = get_ffmpeg_codec(file_name=file_path) if codec is None else codec
+        crop_video(video_path=file_path, save_path=os.path.join(output_path, f"{file_name}_cropped.mp4"), size=(roi_selector.width, roi_selector.height), top_left=(roi_selector.top_left[0], roi_selector.top_left[1]), gpu=gpu, verbose=False, quality=quality, codec=video_codec)
         video_timer.stop_timer()
-        print(f"Video {file_name} cropped (Video {file_cnt+1}/{len(video_paths)}, elapsed time: {video_timer.elapsed_time_str})")
+        return file_name, video_timer.elapsed_time_str
+
+    stdout_information(msg=f'Cropping {len(video_paths)} video(s) to {roi_selector.width}x{roi_selector.height} at x: {roi_selector.top_left[0]}, y: {roi_selector.top_left[1]} ({core_cnt} concurrent process(es))...', source=crop_multiple_videos.__name__)
+    if core_cnt == 1:
+        for file_cnt, file_path in enumerate(video_paths):
+            stdout_information(msg=f'Cropping video {get_fn_ext(filepath=file_path)[1]} ({file_cnt+1}/{len(video_paths)})...', source=crop_multiple_videos.__name__)
+            file_name, elapsed = _crop_video(file_path)
+            stdout_information(msg=f'Video {file_name} cropped (Video {file_cnt+1}/{len(video_paths)}, elapsed time: {elapsed}s)', source=crop_multiple_videos.__name__)
+    else:
+        with ThreadPoolExecutor(max_workers=core_cnt) as executor:
+            futures = [executor.submit(_crop_video, file_path) for file_path in video_paths]
+            for file_cnt, future in enumerate(as_completed(futures)):
+                file_name, elapsed = future.result()
+                stdout_information(msg=f'Video {file_name} cropped (Video {file_cnt+1}/{len(video_paths)}, elapsed time: {elapsed}s)', source=crop_multiple_videos.__name__)
     timer.stop_timer()
     stdout_success(msg=f"{str(len(video_paths))} videos cropped and saved in {directory_path} directory", elapsed_time=timer.elapsed_time_str, source=crop_multiple_videos.__name__,)
 
@@ -5652,6 +5672,12 @@ def crop_video(video_path: Union[str, os.PathLike],
     :param bool verbose: If True, prints progress messages and the elapsed time. Defaults to True.
     :param int quality: The quality of the output video, on a scale from 1 to 100. Defaults to 60 (balances encoding time vs file size).
     :return: None. The result is saved at `save_path`. If `verbose` is True, prints the elapsed time and success message.
+
+    .. note::
+       The crop region is clipped to the video bounds, and both output dimensions are then reduced to the
+       nearest even number as required by yuv420p H.264 encoding. Reducing (rather than rounding up) keeps the
+       region inside the frame: rounding up can push it past the edge, which FFmpeg silently resolves by
+       shifting the crop offset, returning a differently-positioned or uncropped video.
     """
 
     timer = SimbaTimer(start=True)
@@ -5664,7 +5690,7 @@ def crop_video(video_path: Union[str, os.PathLike],
     video_meta_data = get_video_meta_data(video_path=video_path)
     check_int(name=f'{crop_video.__name__} quality', value=quality, min_value=1, max_value=100)
     quality_code = quality_pct_to_crf(pct=quality)
-    check_if_dir_exists(in_dir=os.path.dirname(save_path))
+    check_if_dir_exists(in_dir=os.path.dirname(os.path.abspath(save_path)))
     check_valid_tuple(x=size, source=f'{crop_video.__name__} size', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=1)
     check_valid_tuple(x=top_left, source=f'{crop_video.__name__} top_left', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=0)
     bottom_right = (int(top_left[0] + size[0]), int(top_left[1] + size[1]))
@@ -5674,19 +5700,22 @@ def crop_video(video_path: Union[str, os.PathLike],
     if bottom_right[1] < 0: bottom_right = (bottom_right[0], 0)
     if bottom_right[0] > video_meta_data['width']: bottom_right = (video_meta_data['width'], bottom_right[1])
     if bottom_right[1] > video_meta_data['height']: bottom_right = (bottom_right[0], video_meta_data['height'])
-    width, height = int(bottom_right[0] - top_left[0]), (bottom_right[1] - top_left[1])
-    width, height = (width + 1) // 2 * 2, (height + 1) // 2 * 2
+    width, height = int(bottom_right[0] - top_left[0]), int(bottom_right[1] - top_left[1])
+    width, height = width - (width % 2), height - (height % 2)
+    if width < 2 or height < 2:
+        raise CountError(msg=f'The requested crop is too small: it spans {width}x{height} pixels inside the {video_meta_data["resolution_str"]} video.', source=crop_video.__name__)
     top_left_x, top_left_y = top_left[0], top_left[1]
-    gpu_cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}, format=yuv420p" -c:v h264_nvenc -rc vbr -cq {quality_code} -c:a copy "{save_path}" -hide_banner -loglevel error -stats -y'
-    cpu_cmd = f'ffmpeg -i "{video_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v {codec} -crf {quality_code} -c:a copy "{save_path}" -hide_banner -loglevel error -stats -y'
+    stats = ' -stats' if verbose else ''
+    gpu_cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}, format=yuv420p" -c:v h264_nvenc -rc vbr -cq {quality_code} -c:a copy "{save_path}" -hide_banner -loglevel error{stats} -y'
+    cpu_cmd = f'ffmpeg -i "{video_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v {codec} -crf {quality_code} -c:a copy "{save_path}" -hide_banner -loglevel error{stats} -y'
     if gpu:
         try:
-            subprocess.run(gpu_cmd, check=True, shell=True)
-        except subprocess.CalledProcessError as e:
-            CropWarning(msg=f'GPU crop for video {video_meta_data["video_name"]} failed, reverting to CPU. Crop dimensions may be to small for GPU codec.', source=crop_video.__name__)
-            subprocess.call(cpu_cmd, shell=True)
+            subprocess.run(gpu_cmd, check=True, shell=True, capture_output=True)
+        except subprocess.CalledProcessError:
+            FFMpegCodecWarning(msg=f'GPU crop of video {video_meta_data["video_name"]} failed, reverting to CPU', source=crop_video.__name__)
+            subprocess.run(cpu_cmd, check=True, shell=True)
     else:
-        subprocess.call(cpu_cmd, shell=True)
+        subprocess.run(cpu_cmd, check=True, shell=True)
     timer.stop_timer()
     if verbose:
         stdout_success(msg=f'Cropped video saved at {save_path}', elapsed_time=timer.elapsed_time_str)

@@ -162,37 +162,41 @@ class CLAHEPopUp(PopUpMixin):
 class CropVideoPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CROP VIDEO(S)", icon='crop')
-        crop_video_lbl_frm = LabelFrame( self.main_frm, text="CROP SINGLE VIDEO", font=Formats.FONT_HEADER.value)
-        gpu_state = NORMAL if check_nvidea_gpu_available() else DISABLED
+        gpu_state = NORMAL if check_nvidea_gpu_available(raise_error=False) else DISABLED
+
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=20, dropdown_width=12, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 101, 1)), label='OUT VIDEO QUALITY:', label_width=20, dropdown_width=12, value=60, img='pct_2', tooltip_key='OUTPUT_VIDEO_QUALITY')
+        get_gpu = lambda: str_2_bool(self.gpu_dropdown.get_value())
+        get_quality = lambda: int(self.quality_dropdown.get_value())
+
+        crop_video_lbl_frm = LabelFrame(self.main_frm, text="CROP SINGLE VIDEO", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         selected_video = FileSelect(crop_video_lbl_frm, "VIDEO PATH: ", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='browse')
-        self.single_video_gpu_dropdown = SimBADropDown(parent=crop_video_lbl_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=20, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
-        self.single_quality_dropdown = SimBADropDown(parent=crop_video_lbl_frm, dropdown_options=list(range(1, 101, 1)), label='OUTPUT VIDEO QUALITY: ',label_width=20, dropdown_width=20, value=60, img='pct_2', tooltip_key="OUPUT_VIDEO_QUALITY")
-        button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_single_video, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'gpu': lambda: str_2_bool(self.single_video_gpu_dropdown.get_value()), 'quality': lambda: int(self.single_quality_dropdown.get_value())})
+        button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_single_video, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'gpu': get_gpu, 'quality': get_quality})
 
         crop_video_lbl_frm_multiple = LabelFrame(self.main_frm, text="CROP MULTIPLE VIDEOS", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         instructions_1 = SimBALabel(parent=crop_video_lbl_frm_multiple, txt="The crop coordinates you draw in the first video,\n will be applied on all videos in directory.", font=Formats.FONT_REGULAR_ITALICS.value)
         instructions_2 = SimBALabel(parent=crop_video_lbl_frm_multiple, txt="To draw crop coordinates on each individual video,\n instead use SimBA batch processing.", font=Formats.FONT_REGULAR_ITALICS.value)
-        input_folder = FolderSelect(crop_video_lbl_frm_multiple, "VIDEO DIRECTORY:", title="Select Folder with videos", lblwidth=20, lbl_icon='browse')
-        output_folder = FolderSelect(crop_video_lbl_frm_multiple,"OUTPUT DIRECTORY:",title="Select a folder for your output videos",lblwidth=20, lbl_icon='browse')
-        self.multiple_video_gpu_dropdown = SimBADropDown(parent=crop_video_lbl_frm_multiple, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=20, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
-        self.multiple_quality_dropdown = SimBADropDown(parent=crop_video_lbl_frm_multiple, dropdown_options=list(range(1, 101, 1)), label='OUTPUT VIDEO QUALITY: ',label_width=20, dropdown_width=20, value=60, img='pct_2', tooltip_key="OUPUT_VIDEO_QUALITY")
+        input_folder = FolderSelect(crop_video_lbl_frm_multiple, "VIDEO DIRECTORY:", title="Select Folder with videos", lblwidth=20, lbl_icon='browse', tooltip_key='MULTICROP_INPUT_FOLDER')
+        output_folder = FolderSelect(crop_video_lbl_frm_multiple,"OUTPUT DIRECTORY:",title="Select a folder for your output videos",lblwidth=20, lbl_icon='browse', tooltip_key='MULTICROP_OUTPUT_FOLDER')
+        self.core_cnt_dropdown = SimBADropDown(parent=crop_video_lbl_frm_multiple, dropdown_options=list(range(1, find_core_cnt()[0] + 1)), label='CPU CORE COUNT:', label_width=20, dropdown_width=12, value=1, img='cpu_small', tooltip_key='RECTANGLE_CROP_CORE_COUNT')
+        button_crop_video_multiple = SimbaButton(parent=crop_video_lbl_frm_multiple, txt="CROP VIDEO DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_multiple_videos, cmd_kwargs={'directory_path': lambda:input_folder.folder_path, 'output_path': lambda:output_folder.folder_path, 'core_cnt': lambda: int(self.core_cnt_dropdown.get_value()), 'gpu': get_gpu, 'quality': get_quality})
 
-        button_crop_video_multiple = SimbaButton(parent=crop_video_lbl_frm_multiple, txt="CROP VIDEO DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_multiple_videos, cmd_kwargs={'directory_path': lambda:input_folder.folder_path, 'output_path': lambda:output_folder.folder_path, 'quality': lambda: int(self.multiple_quality_dropdown.get_value()), 'gpu': str_2_bool(self.multiple_video_gpu_dropdown.get_value())})
+        settings_frm.grid(row=0, sticky=NW)
+        self.gpu_dropdown.grid(row=0, sticky=NW)
+        self.quality_dropdown.grid(row=1, sticky=NW)
 
-        crop_video_lbl_frm.grid(row=0, sticky=NW)
+        crop_video_lbl_frm.grid(row=1, sticky=NW)
         selected_video.grid(row=0, sticky=NW)
-        self.single_video_gpu_dropdown.grid(row=1, column=0, sticky=NW)
-        self.single_quality_dropdown.grid(row=2, column=0, sticky=NW)
-        button_crop_video_single.grid(row=3, sticky=NW)
+        button_crop_video_single.grid(row=1, sticky=NW)
 
-        crop_video_lbl_frm_multiple.grid(row=1, sticky=NW)
+        crop_video_lbl_frm_multiple.grid(row=2, sticky=NW)
         instructions_1.grid(row=0, sticky=NW)
         instructions_2.grid(row=1, sticky=NW)
         input_folder.grid(row=2, sticky=NW)
         output_folder.grid(row=3, sticky=NW)
-        self.multiple_video_gpu_dropdown.grid(row=4, sticky=NW)
-        self.multiple_quality_dropdown.grid(row=5, column=0, sticky=NW)
-        button_crop_video_multiple.grid(row=6, sticky=NW)
+        self.core_cnt_dropdown.grid(row=4, sticky=NW)
+        button_crop_video_multiple.grid(row=5, sticky=NW)
         self.main_frm.mainloop()
 
 #_ = CropVideoPopUp()
