@@ -299,12 +299,12 @@ class YOLOVisualizer():
 # viz.run()
 
 
-viz = YOLOVisualizer(data_path=r'I:\netholabs\cage_7\yolo_results_test',
-                       video_path=r"I:\netholabs\cage_7\video\cropped\7.01.001_1_2026_09_01_11_51_00_000.mp4",
-                       save_dir=r"I:\netholabs\cage_7\yolo_results_test\videos",
-                       threshold=0.10,
-                       outline_color=(0, 255, 0),
-                       opacity=0.0,
-                       thickness=2,
-                       core_cnt=4)
-viz.run()
+# viz = YOLOVisualizer(data_path=r"I:\netholabs\cage_7\yolo_results_test\7.01.001_1_2026_09_01_11_51_00_000.csv",
+#                        video_path=r"I:\netholabs\cage_7\video\cropped\7.01.001_1_2026_09_01_11_51_00_000.mp4",
+#                        save_dir=r"I:\netholabs\cage_7\yolo_results_test\videos",
+#                        threshold=0.0,
+#                        outline_color=(0, 255, 0),
+#                        opacity=0.0,
+#                        thickness=2,
+#                        core_cnt=4)
+# viz.run()

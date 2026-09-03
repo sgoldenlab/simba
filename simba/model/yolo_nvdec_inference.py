@@ -441,7 +441,7 @@ class YoloNVDECInference(object):
     :param int vertice_cnt: Number of resampled polygon vertices, used only when ``task='segment'`` (ignored otherwise). Default 60.
     :param Optional[int] max_detections: Maximum number of detections to keep per frame after NMS (sorted by confidence). If None, keep all. Default None.
     :param Optional[int] segment_smoothing: B-spline smoothing factor for segmentation polygon vertices, used only when ``task='segment'`` (ignored otherwise). Higher values produce smoother contours. If ``None``, no smoothing is applied. Default ``None``.
-    :param bool interpolate: If True, linearly interpolate missing detections across frames, used only when ``task='detect'`` (ignored otherwise). Default True.
+    :param bool interpolate: If True, linearly interpolate the coordinates of missing detections across frames within each class. Rows filled this way get their ``CONFIDENCE`` set to 0 to flag them as not model-derived; the confidences of real detections are left untouched. Default False.
     :param bool recursive: If True and ``video_path`` is a directory, search all subdirectories for video files. Default False.
     :param Optional[Literal['savitzky-golay', 'bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential']] smoothing_method: Smoothing method for detection coordinates, used only when ``task='detect'`` (ignored otherwise). If ``None``, no smoothing is applied. Default ``None``.
     :param Optional[int] smoothing_time_window: Time window (in ms) for coordinate smoothing. Required when ``smoothing_method`` is not None. Default ``None``.
@@ -477,7 +477,7 @@ class YoloNVDECInference(object):
                  vertice_cnt: int = 60,
                  max_detections: Optional[int] = None,
                  segment_smoothing: Optional[int] = None,
-                 interpolate: bool = True,
+                 interpolate: bool = False,
                  recursive: bool = False,
                  smoothing_method: Optional[Literal['savitzky-golay', 'bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential']] = None,
                  smoothing_time_window: Optional[int] = None,
@@ -636,6 +636,8 @@ class YoloNVDECInference(object):
             group_col = ID
         else:
             return df
+        if task in (DETECT, POSE):  # NOTE: undetected observations are written as all -1 rows, capture them before interpolation fills their coordinates in.
+            undetected_idx = df.index[pd.to_numeric(df[CONFIDENCE], errors='coerce') == -1]
         for grp_id in df[group_col].unique():
             if grp_id == -1:
                 continue
@@ -649,8 +651,9 @@ class YoloNVDECInference(object):
                 grp_df[col] = grp_df[col].replace(-1, np.nan)
                 grp_df[col] = (grp_df[col].interpolate(method='linear', axis=0).ffill().bfill().replace([np.inf, -np.inf], np.nan).round().fillna(-1).astype(np.int32))
             df.update(grp_df)
-        if task in (DETECT, POSE):
-            df[CONFIDENCE] = 0
+        if task in (DETECT, POSE) and len(undetected_idx) > 0:  # NOTE: interpolated rows get a 0 confidence to flag them as not model-derived, rows left at -1 had nothing to interpolate from and keep the sentinel.
+            filled = df.loc[undetected_idx, COORD_COLS].apply(pd.to_numeric, errors='coerce').ne(-1).all(axis=1)
+            df.loc[undetected_idx[filled], CONFIDENCE] = 0
         return df
 
     def _build_columns(self):
@@ -813,7 +816,8 @@ class YoloNVDECInference(object):
 #                                   task='detect',
 #                                   gpu_id=(0,),
 #                                   batch_size=16,
-#                                   conf_threshold=0.5,
+#                                   conf_threshold=0.2,
+#                                   interpolate=False,
 #                                   max_detections=2,
 #                                   recursive=True,
 #                                   save_dir=r'I:\netholabs\cage_7\yolo_results_test',

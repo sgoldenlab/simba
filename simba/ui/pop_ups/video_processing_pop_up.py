@@ -66,8 +66,9 @@ from simba.video_processors.video_processing import (
     convert_to_bmp, convert_to_jpeg, convert_to_mov, convert_to_mp4,
     convert_to_png, convert_to_tiff, convert_to_webm, convert_to_webp,
     convert_video_powerpoint_compatible_format, copy_img_folder,
-    create_average_frm, crop_multiple_videos, crop_multiple_videos_polygons,
-    crop_single_video, crop_single_video_circle, crop_single_video_polygon,
+    create_average_frm, crop_multiple_videos, crop_multiple_videos_circles,
+    crop_multiple_videos_polygons, crop_single_video, crop_single_video_circle,
+    crop_single_video_polygon,
     crossfade_two_videos, downsample_video, extract_frame_range,
     extract_frames_single_video, flip_videos, frames_to_movie, gif_creator,
     multi_split_video, remove_beginning_of_video, remove_end_of_video,
@@ -1463,21 +1464,44 @@ class ConvertROIDefinitionsPopUp(PopUpMixin):
 
 class CropVideoCirclesPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CROP SINGLE VIDEO (CIRCLES)", icon='circle_small')
-        crop_video_lbl_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="Crop Video (CIRCLES)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CIRCLE_CROP.value)
+        PopUpMixin.__init__(self, title="CROP VIDEO(S) (CIRCLES)", icon='circle_small')
+        gpu_state = NORMAL if check_nvidea_gpu_available(raise_error=False) else DISABLED
+        clr_dict = get_color_dict()
+
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CIRCLE_CROP.value)
+        gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=20, dropdown_width=12, tooltip_key='USE_GPU', img='gpu_3', state=gpu_state, value='FALSE')
+        quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label='OUT VIDEO QUALITY:', label_width=20, dropdown_width=12, tooltip_key='OUTPUT_VIDEO_QUALITY', img='pct_2', value=60)
+        bg_clr_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(clr_dict.keys()), label='BACKGROUND COLOR:', label_width=20, dropdown_width=12, tooltip_key='CIRCLE_CROP_BACKGROUND_COLOR', img='fill', value='Black')
+        # get_color_dict returns BGR tuples, the crop functions expect RGB.
+        get_gpu = lambda: str(gpu_dropdown.get_value()) == 'TRUE'
+        get_quality = lambda: int(quality_dropdown.get_value())
+        get_bg_clr = lambda: tuple(reversed(clr_dict[bg_clr_dropdown.get_value()]))
+
+        crop_video_lbl_frm = LabelFrame(self.main_frm, text="CIRCLE crop for a single video", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         selected_video = FileSelect(crop_video_lbl_frm, "VIDEO PATH", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='video_2')
-        button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP VIDEO", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=crop_single_video_circle, cmd_kwargs={'file_path': lambda:selected_video.file_path})
+        button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP VIDEO", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=crop_single_video_circle, cmd_kwargs={'file_path': lambda:selected_video.file_path, 'gpu': get_gpu, 'quality': get_quality, 'bg_color': get_bg_clr})
+
         crop_video_lbl_frm_multiple = LabelFrame(self.main_frm, text="Fixed CIRCLE coordinates crop for multiple videos", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        input_folder = FolderSelect(crop_video_lbl_frm_multiple,"VIDEO DIRECTORY:",title="Select Folder with videos",lblwidth=20, lbl_icon='browse')
-        output_folder = FolderSelect(crop_video_lbl_frm_multiple, "OUTPUT DIRECTORY:", title="Select a folder for your output videos", lblwidth=20, lbl_icon='browse')
-        button_crop_video_multiple = SimbaButton(parent=crop_video_lbl_frm_multiple, txt="CROP VIDEOS", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=crop_single_video_circle, cmd_kwargs={'in_dir': lambda:input_folder.folder_path, 'out_dir': lambda:output_folder.folder_path})
-        crop_video_lbl_frm.grid(row=0, sticky=NW)
+        input_folder = FolderSelect(crop_video_lbl_frm_multiple,"VIDEO DIRECTORY:",title="Select Folder with videos",lblwidth=20, lbl_icon='browse', tooltip_key='MULTICROP_INPUT_FOLDER')
+        output_folder = FolderSelect(crop_video_lbl_frm_multiple, "OUTPUT DIRECTORY:", title="Select a folder for your output videos", lblwidth=20, lbl_icon='browse', tooltip_key='MULTICROP_OUTPUT_FOLDER')
+        core_cnt_dropdown = SimBADropDown(parent=crop_video_lbl_frm_multiple, dropdown_options=list(range(1, find_core_cnt()[0] + 1)), label='CPU CORE COUNT:', label_width=20, dropdown_width=12, tooltip_key='CIRCLE_CROP_CORE_COUNT', img='cpu_small', value=1)
+        button_crop_video_multiple = SimbaButton(parent=crop_video_lbl_frm_multiple, txt="CROP VIDEOS", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, tooltip_key='CIRCLE_CROP_MULTIPLE', cmd=crop_multiple_videos_circles, cmd_kwargs={'in_dir': lambda:input_folder.folder_path, 'out_dir': lambda:output_folder.folder_path, 'core_cnt': lambda:int(core_cnt_dropdown.get_value()), 'gpu': get_gpu, 'quality': get_quality, 'bg_color': get_bg_clr})
+
+        settings_frm.grid(row=0, sticky=NW)
+        gpu_dropdown.grid(row=0, sticky=NW)
+        quality_dropdown.grid(row=1, sticky=NW)
+        bg_clr_dropdown.grid(row=2, sticky=NW)
+
+        crop_video_lbl_frm.grid(row=1, sticky=NW)
         selected_video.grid(row=0, sticky=NW)
-        button_crop_video_single.grid(row=3, sticky=NW)
-        crop_video_lbl_frm_multiple.grid(row=1, sticky=NW)
+        button_crop_video_single.grid(row=1, sticky=NW)
+
+        crop_video_lbl_frm_multiple.grid(row=2, sticky=NW)
         input_folder.grid(row=0, sticky=NW)
         output_folder.grid(row=1, sticky=NW)
+        core_cnt_dropdown.grid(row=2, sticky=NW)
         button_crop_video_multiple.grid(row=3, sticky=NW)
+
         self.main_frm.mainloop()
 
 
@@ -1486,34 +1510,43 @@ class CropVideoCirclesPopUp(PopUpMixin):
 
 class CropVideoPolygonsPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CROP SINGLE VIDEO (POLYGONS)", icon='polygon')
-        crop_video_lbl_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="Crop Video (POLYGONS)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CIRCLE_CROP.value)
-        selected_video = FileSelect( crop_video_lbl_frm, "VIDEO PATH", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='video_2')
-
-        button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP VIDEO", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=crop_single_video_polygon, cmd_kwargs={'file_path': lambda:selected_video.file_path})
-        crop_video_lbl_frm_multiple = LabelFrame( self.main_frm, text="Fixed POLYGON coordinates crop for multiple videos", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        PopUpMixin.__init__(self, title="CROP VIDEO(S) (POLYGONS)", icon='polygon')
         gpu_state = NORMAL if check_nvidea_gpu_available(raise_error=False) else DISABLED
         clr_dict = get_color_dict()
+
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CIRCLE_CROP.value)
+        gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=20, dropdown_width=12, tooltip_key='USE_GPU', img='gpu_3', state=gpu_state, value='FALSE')
+        quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label='OUT VIDEO QUALITY:', label_width=20, dropdown_width=12, tooltip_key='OUTPUT_VIDEO_QUALITY', img='pct_2', value=60)
+        bg_clr_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(clr_dict.keys()), label='BACKGROUND COLOR:', label_width=20, dropdown_width=12, tooltip_key='POLYGON_CROP_BACKGROUND_COLOR', img='fill', value='Black')
+        # get_color_dict returns BGR tuples, the crop functions expect RGB.
+        get_gpu = lambda: str(gpu_dropdown.get_value()) == 'TRUE'
+        get_quality = lambda: int(quality_dropdown.get_value())
+        get_bg_clr = lambda: tuple(reversed(clr_dict[bg_clr_dropdown.get_value()]))
+
+        crop_video_lbl_frm = LabelFrame(self.main_frm, text="POLYGON crop for a single video", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        selected_video = FileSelect( crop_video_lbl_frm, "VIDEO PATH", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='video_2')
+        button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP VIDEO", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=crop_single_video_polygon, cmd_kwargs={'file_path': lambda:selected_video.file_path, 'gpu': get_gpu, 'quality': get_quality, 'bg_color': get_bg_clr})
+
+        crop_video_lbl_frm_multiple = LabelFrame( self.main_frm, text="Fixed POLYGON coordinates crop for multiple videos", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         input_folder = FolderSelect( crop_video_lbl_frm_multiple, "VIDEO DIRECTORY:", title="Select Folder with videos", lblwidth=20, lbl_icon='browse', tooltip_key='MULTICROP_INPUT_FOLDER')
         output_folder = FolderSelect( crop_video_lbl_frm_multiple, "OUTPUT DIRECTORY:", title="Select a folder for your output videos", lblwidth=20, lbl_icon='browse', tooltip_key='MULTICROP_OUTPUT_FOLDER')
-        gpu_dropdown = SimBADropDown(parent=crop_video_lbl_frm_multiple, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=20, dropdown_width=12, tooltip_key='USE_GPU', img='gpu_3', state=gpu_state, value='FALSE')
         core_cnt_dropdown = SimBADropDown(parent=crop_video_lbl_frm_multiple, dropdown_options=list(range(1, find_core_cnt()[0] + 1)), label='CPU CORE COUNT:', label_width=20, dropdown_width=12, tooltip_key='POLYGON_CROP_CORE_COUNT', img='cpu_small', value=1)
-        quality_dropdown = SimBADropDown(parent=crop_video_lbl_frm_multiple, dropdown_options=list(range(10, 110, 10)), label='OUT VIDEO QUALITY:', label_width=20, dropdown_width=12, tooltip_key='OUTPUT_VIDEO_QUALITY', img='pct_2', value=60)
-        bg_clr_dropdown = SimBADropDown(parent=crop_video_lbl_frm_multiple, dropdown_options=list(clr_dict.keys()), label='BACKGROUND COLOR:', label_width=20, dropdown_width=12, tooltip_key='POLYGON_CROP_BACKGROUND_COLOR', img='fill', value='Black')
-        # get_color_dict returns BGR tuples, crop_multiple_videos_polygons expects RGB.
-        button_crop_video_multiple = SimbaButton(parent=crop_video_lbl_frm_multiple, txt="CROP VIDEOS", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, tooltip_key='POLYGON_CROP_MULTIPLE', cmd=crop_multiple_videos_polygons, cmd_kwargs={'in_dir': lambda:input_folder.folder_path, 'out_dir': lambda:output_folder.folder_path, 'gpu': lambda:str(gpu_dropdown.get_value()) == 'TRUE', 'core_cnt': lambda:int(core_cnt_dropdown.get_value()), 'quality': lambda:int(quality_dropdown.get_value()), 'bg_color': lambda:tuple(reversed(clr_dict[bg_clr_dropdown.get_value()]))})
+        button_crop_video_multiple = SimbaButton(parent=crop_video_lbl_frm_multiple, txt="CROP VIDEOS", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, tooltip_key='POLYGON_CROP_MULTIPLE', cmd=crop_multiple_videos_polygons, cmd_kwargs={'in_dir': lambda:input_folder.folder_path, 'out_dir': lambda:output_folder.folder_path, 'core_cnt': lambda:int(core_cnt_dropdown.get_value()), 'gpu': get_gpu, 'quality': get_quality, 'bg_color': get_bg_clr})
 
-        crop_video_lbl_frm.grid(row=0, sticky=NW)
+        settings_frm.grid(row=0, sticky=NW)
+        gpu_dropdown.grid(row=0, sticky=NW)
+        quality_dropdown.grid(row=1, sticky=NW)
+        bg_clr_dropdown.grid(row=2, sticky=NW)
+
+        crop_video_lbl_frm.grid(row=1, sticky=NW)
         selected_video.grid(row=0, sticky=NW)
-        button_crop_video_single.grid(row=3, sticky=NW)
-        crop_video_lbl_frm_multiple.grid(row=1, sticky=NW)
+        button_crop_video_single.grid(row=1, sticky=NW)
+
+        crop_video_lbl_frm_multiple.grid(row=2, sticky=NW)
         input_folder.grid(row=0, sticky=NW)
         output_folder.grid(row=1, sticky=NW)
-        gpu_dropdown.grid(row=2, sticky=NW)
-        core_cnt_dropdown.grid(row=3, sticky=NW)
-        quality_dropdown.grid(row=4, sticky=NW)
-        bg_clr_dropdown.grid(row=5, sticky=NW)
-        button_crop_video_multiple.grid(row=6, sticky=NW)
+        core_cnt_dropdown.grid(row=2, sticky=NW)
+        button_crop_video_multiple.grid(row=3, sticky=NW)
 
 
 class ClipSingleVideoByFrameNumbers(PopUpMixin):
