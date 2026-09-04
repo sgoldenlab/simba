@@ -238,10 +238,29 @@ Interactive tools for annotating behavioral events frame by frame. Create and ed
    <img src="_static/img/simba_spray_cans_grid.webp" alt="SimBA mixin spray paint cans"
         style="float:right; width:190px; max-width:30%; margin:0 0 12px 24px;">
 
-Entry point to SimBA's mixin classes — the reusable method libraries (geometry, statistics, circular statistics, feature extraction, time-series, image, network, plotting, model training, unsupervised, config reading, pose import, annotation and GUI pop-ups) that the other topical sections draw on. The overview page maps every mixin class to the section documenting its methods. Grouping shared functionality here keeps it consistent and testable across the package; most user-facing tools are thin wrappers that combine these mixins.
+Entry point to SimBA's mixin classes — the reusable method libraries that the other topical sections draw on. Grouping shared functionality here keeps it consistent and testable across the package; most user-facing tools are thin wrappers that combine these mixins.
+
+Every mixin, and where its methods are documented:
+
+* :doc:`GeometryMixin <simba.geometry_mixin>` — body-parts as polygons, circles and lines
+* :doc:`Statistics <simba.statistics_mixin>` — window statistics, distances, drift and distribution tests
+* :doc:`CircularStatisticsMixin <simba.circular_statistics>` — wraparound-aware angle and heading statistics
+* :doc:`FeatureExtractionMixin <simba.feature_extraction_mixins>` — feature primitives used by the extraction pipelines
+* :doc:`FeatureExtractionSupplemental <simba.feature_extraction_mixins>` — extra features the default extractors don't call
+* :doc:`TimeseriesFeatureMixin <simba.timeseries>` — time-series complexity and windowed descriptors
+* :doc:`ImageMixin <simba.image_transformations>` — frame slicing and visual features
+* :doc:`NetworkMixin <simba.networks>` — graphs from pose time-series
+* :doc:`PlottingMixin <simba.plotting>` — shared plotting helpers
+* :doc:`TrainModelMixin <simba.model_mixin>` — train, grid-search and run classifiers
+* :doc:`UMLMixin <simba.unsupervised>` — UMAP / HDBSCAN definition and fitting
+* :doc:`ConfigReader <simba.config_reader>` — project config and metadata
+* :doc:`PoseImporterMixin <simba.pose_importers>` — locate pose files, pair with videos, multi-animal ID UI
+* :doc:`AnnotatorMixin <simba.labelling>` — frames and callbacks behind the annotation interfaces
+* :doc:`PopUpMixin <simba.ui>` — base class for SimBA's pop-up windows
+* :doc:`AbstractFeatureExtraction <simba.mixins>` — abstract base class for custom feature extractors
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    simba.mixins
 
