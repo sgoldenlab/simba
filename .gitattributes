@@ -1,0 +1,5 @@
+# Git hooks are run by sh. core.autocrlf=true is set on this repo, which would
+# otherwise check these out with CRLF and sh then fails on the shebang with
+# "bad interpreter: /bin/sh^M". Scoped to the hooks only -- no other path is
+# given text/eol attributes here, so nothing else changes normalization.
+misc/hooks/* text eol=lf

@@ -297,6 +297,13 @@ Build and analyze graphs derived from pose-estimation time-series — for exampl
 |:warning:| **Outlier correction**
 --------------------------------------------------
 
+.. raw:: html
+
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/outlier_correction.webm" type="video/webm">
+   </video>
+
 Heuristic filtering of implausible body-part tracking. Location- and movement-based criteria — scaled by a reference inter-body-part distance — flag and correct jitter and sudden, physically impossible jumps before feature extraction, improving the quality of downstream features and classification.
 
 .. toctree::
@@ -379,6 +386,13 @@ Compute statistical features from tracking and classification data — descripti
 
 |:inbox_tray:| **Third-party label appenders**
 --------------------------------------------------
+
+.. raw:: html
+
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
+     <source src="_static/img/retro_crt_simba.webm" type="video/webm">
+   </video>
 
 Import behavioral annotations produced by external tools (e.g. BORIS, Ethovision, Observer, DeepEthogram, SOLOMON) and align them, frame by frame, to SimBA's pose-estimation and feature data. Lets you reuse existing human or third-party labels as classifier training targets without re-annotating.
 

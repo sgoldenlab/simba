@@ -1,0 +1,84 @@
+#!/bin/sh
+#
+# SimBA pre-push hook -- bi-weekly refresh of misc/corpus_stats.json.
+#
+# docs/published_studies.rst embeds docs/_generated/usecase_map.html, which the
+# daily GitHub Action (.github/workflows/usecase_map.yml) rebuilds from the public
+# use-case sheet PLUS the committed misc/corpus_stats.json. That JSON is mined from
+# the paper PDFs, which live locally and cannot be committed, so CI can never
+# regenerate it -- this hook does, from the machine that has them.
+#
+# Cadence: at most once every 14 days (a full mine is ~75 s over ~170 PDFs, so it
+# is deliberately not per-push). Only the rate-limit check consumes the interval;
+# every "cannot run right now" guard below skips WITHOUT stamping, so a push made
+# with the papers drive unplugged does not cost you a two-week window.
+#
+# Install:    python misc/install_hooks.py
+# Skip once:  SIMBA_SKIP_CORPUS_HOOK=1 git push
+# Force now:  rm "$(git rev-parse --git-dir)/corpus_stats.laststamp"
+# Tune:       SIMBA_CORPUS_INTERVAL_DAYS=30, SIMBA_PAPERS_DIR=/d/papers
+
+INTERVAL_DAYS="${SIMBA_CORPUS_INTERVAL_DAYS:-14}"
+PAPERS_DIR="${SIMBA_PAPERS_DIR:-F:/simba_papers}"
+JSON="misc/corpus_stats.json"
+
+GIT_DIR="$(git rev-parse --git-dir 2>/dev/null)" || exit 0
+STAMP="$GIT_DIR/corpus_stats.laststamp"
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+
+[ -n "$SIMBA_SKIP_CORPUS_HOOK" ] && exit 0
+
+# --- rate limit ------------------------------------------------------------
+if [ -f "$STAMP" ]; then
+    now=$(date +%s)
+    last=$(cat "$STAMP" 2>/dev/null || echo 0)
+    case "$last" in ''|*[!0-9]*) last=0 ;; esac
+    if [ $(( (now - last) / 86400 )) -lt "$INTERVAL_DAYS" ]; then
+        exit 0
+    fi
+fi
+
+# --- guards that skip without stamping (so they retry on the next push) ----
+if [ ! -d "$PAPERS_DIR" ]; then
+    echo "[corpus] papers dir not available ($PAPERS_DIR); skipping refresh." >&2
+    exit 0
+fi
+if ! command -v pdftotext >/dev/null 2>&1; then
+    echo "[corpus] pdftotext not on PATH; skipping refresh." >&2
+    exit 0
+fi
+if ! git -C "$ROOT" symbolic-ref -q HEAD >/dev/null 2>&1; then
+    echo "[corpus] detached HEAD; skipping refresh." >&2
+    exit 0
+fi
+if [ -d "$GIT_DIR/rebase-merge" ] || [ -d "$GIT_DIR/rebase-apply" ] \
+   || [ -f "$GIT_DIR/MERGE_HEAD" ] || [ -f "$GIT_DIR/CHERRY_PICK_HEAD" ]; then
+    echo "[corpus] mid rebase/merge; skipping refresh." >&2
+    exit 0
+fi
+
+echo "[corpus] bi-weekly corpus refresh (~75 s over the papers in $PAPERS_DIR)..." >&2
+if ! ( cd "$ROOT" && python misc/extract_corpus_stats.py "$PAPERS_DIR" >&2 ); then
+    echo "[corpus] mine failed or aborted; $JSON left untouched, will retry next push." >&2
+    exit 0
+fi
+
+date +%s > "$STAMP"
+
+if git -C "$ROOT" diff --quiet -- "$JSON"; then
+    echo "[corpus] no change; push continuing." >&2
+    exit 0
+fi
+
+git -C "$ROOT" commit -q -m "Refresh use-case corpus stats from paper PDFs" -- "$JSON" || {
+    echo "[corpus] could not commit $JSON; push continuing." >&2
+    exit 0
+}
+
+# The commits to push were resolved before this hook ran, so the new commit is not
+# in the current push. Abort so one re-push ships it -- happens twice a month.
+cat >&2 <<MSG
+[corpus] $JSON refreshed and committed.
+[corpus] Push aborted so that commit is included -- just run your push again.
+MSG
+exit 1

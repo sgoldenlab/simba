@@ -42,6 +42,7 @@ ALIASES = {
     # duplicate / partial names -> canonical
     "The University of Hong Kong": "University of Hong Kong",
     "Washington University": "Washington University in St. Louis",
+    "Washington University St. Louis": "Washington University in St. Louis",
     "St. Louis": "Washington University in St. Louis",
     "Stanford": "Stanford University",
     "Cornell": "Cornell University",
@@ -55,6 +56,7 @@ ALIASES = {
     "Technical University Darmstadt": "Technische Universität Darmstadt",
     "University Darmstadt": "Technische Universität Darmstadt",
     "University of New South Wales": "UNSW Sydney",
+    "University of North Carolina at Chapel Hill": "University of North Carolina",
     "Children's Hospital of Philadelphia": "Children’s Hospital of Philadelphia",
     "The Children's Hospital of Philadelphia Research Institute": "Children’s Hospital of Philadelphia",
     "National Autonomous University of Mexico": "UNAM",
@@ -71,6 +73,7 @@ ALIASES = {
     "KU": "KU Leuven",
     "Max Planck": "Max Planck Institute of Psychiatry",
     "RCSI": "Royal College of Surgeons in Ireland",
+    "Scuola Internazionale Superiore di Studi Avanzati (SISSA)": "SISSA",
     "Salk": "Salk Institute for Biological Studies",
     "UNAM": "UNAM",
     "EPFL": "EPFL",
@@ -99,6 +102,7 @@ MANUAL = {
     "UNAM": [19.3320, -99.1870],                               # Mexico City
     "UNSW Sydney": [-33.9173, 151.2313],
     "Royal College of Surgeons in Ireland": [53.3392, -6.2626],# Dublin
+    "SISSA": [45.6787, 13.775],                            # Trieste, Via Bonomea 265
     "Broad Institute": [42.3626, -71.0866],                    # Cambridge, MA
     "BROAD Institute": [42.3626, -71.0866],
     "Washington University in St. Louis": [38.6488, -90.3108],

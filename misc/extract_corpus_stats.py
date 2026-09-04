@@ -12,10 +12,20 @@ committed JSON is kept untouched -- the build never breaks.
 
 Run:  python misc/extract_corpus_stats.py  [pdf_dir]
 """
-import os, re, sys, json, hashlib, subprocess, collections, itertools
+import os, re, sys, json, shutil, hashlib, tempfile, subprocess, collections, itertools
 from datetime import date
 
 PDF_DIR = sys.argv[1] if len(sys.argv) > 1 else r"F:\simba_papers"
+
+
+def say(msg):
+    """print() that survives a cp1252 console -- journal-exported filenames carry
+    characters like U+2010 that the default Windows encoder refuses."""
+    try:
+        print(msg)
+    except UnicodeEncodeError:
+        enc = sys.stdout.encoding or "ascii"
+        print(msg.encode(enc, "backslashreplace").decode(enc, "replace"))
 OUT = os.path.join("misc", "corpus_stats.json")
 
 # --- lexicons: category label -> regex of surface forms (word-boundary, lowercased) ---
@@ -396,11 +406,36 @@ def behaviours_automated(texts):
 
 
 def full_text(fp):
+    """pdftotext -> lowercased full text, or None if the extraction itself failed.
+
+    None (missing/old pdftotext, timeout, non-zero exit) is kept distinct from a
+    genuinely text-free PDF so main() can refuse to overwrite a good corpus with a
+    degenerate mine. capture_output= is 3.7+, so the pipes are named explicitly.
+    """
+    src, tmp = fp, None
+    if any(ord(c) > 127 for c in fp):
+        # pdftotext (mingw build) opens paths through the ANSI API and returns
+        # "I/O Error: Couldn't open file" on the U+2010 hyphens that journal
+        # exports put in filenames -- mine an ASCII-named copy instead.
+        fd, tmp = tempfile.mkstemp(prefix="corpus_", suffix=".pdf")
+        os.close(fd)
+        shutil.copyfile(fp, tmp)
+        src = tmp
     try:
-        r = subprocess.run(["pdftotext", fp, "-"], capture_output=True, timeout=90)
-        return r.stdout.decode("utf-8", "ignore").lower()
-    except Exception:
-        return ""
+        r = subprocess.run(["pdftotext", src, "-"], stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE, timeout=90)
+    except Exception as e:
+        say("[corpus] pdftotext failed on %s: %r" % (os.path.basename(fp), e))
+        return None
+    finally:
+        if tmp and os.path.exists(tmp):
+            os.remove(tmp)
+    if r.returncode != 0:
+        say("[corpus] pdftotext exit %s on %s: %s"
+            % (r.returncode, os.path.basename(fp),
+               r.stderr.decode("utf-8", "ignore").strip()[:120]))
+        return None
+    return r.stdout.decode("utf-8", "ignore").lower()
 
 
 # Enough of each paper's opening to contain its title once journal furniture
@@ -447,6 +482,20 @@ def main():
         print(f"[corpus] no PDFs in {PDF_DIR}; keeping existing {OUT}."); return
 
     texts = [full_text(fp) for fp in pdfs]
+    # examples/papers are positional indices into texts, so failures are dropped
+    # from pdfs and texts together, before anything is counted.
+    failed = [fp for fp, t in zip(pdfs, texts) if t is None]
+    kept = [(fp, t) for fp, t in zip(pdfs, texts) if t is not None]
+    if failed:
+        say("[corpus] %d/%d PDFs yielded no text (first: %s)"
+            % (len(failed), len(pdfs), os.path.basename(failed[0])))
+    if len(kept) < 0.8 * len(pdfs):
+        say("[corpus] ABORT: only %d/%d PDFs yielded text -- is pdftotext on PATH? "
+            "Keeping existing %s." % (len(kept), len(pdfs), OUT))
+        return 1
+    pdfs = [fp for fp, _ in kept]
+    texts = [t for _, t in kept]
+
     cloud = collections.Counter()      # document frequency over the curated concept gazetteer
     for t in texts:
         for term, pat in CLOUD_TERMS.items():
@@ -487,4 +536,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main() or 0)

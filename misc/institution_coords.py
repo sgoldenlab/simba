@@ -25,6 +25,7 @@ INSTITUTION_ALIASES = {
     'Pontificia UniversidadCatólica del Ecuador': 'Pontificia Universidad Católica del Ecuador',
     'RCSI': 'Royal College of Surgeons in Ireland',
     'Salk': 'Salk Institute for Biological Studies',
+    'Scuola Internazionale Superiore di Studi Avanzati (SISSA)': 'SISSA',
     'St. Louis': 'Washington University in St. Louis',
     'Stanford': 'Stanford University',
     'Technical University Darmstadt': 'Technische Universität Darmstadt',
@@ -38,8 +39,10 @@ INSTITUTION_ALIASES = {
     'University of California San Diego.': 'University of California San Diego',
     'University of Leuven': 'KU Leuven',
     'University of New South Wales': 'UNSW Sydney',
+    'University of North Carolina at Chapel Hill': 'University of North Carolina',
     'University ofWashington': 'University of Washington',
     'Washington University': 'Washington University in St. Louis',
+    'Washington University St. Louis': 'Washington University in St. Louis',
     'Zhengzhou': '',
     'etherlands Institute for Neuroscience': 'Netherlands Institute for Neuroscience',
     'niversity of Pennsylvania': 'University of Pennsylvania',
@@ -149,6 +152,7 @@ INSTITUTION_COORDS = {
     'Rosalind Franklin University': [42.3022, -87.8585],  # 1
     'Royal College of Surgeons in Ireland': [53.3392, -6.2626],  # 1
     'Royal Hospital for Women': [-33.9169, 151.238],  # 1
+    'SISSA': [45.6787, 13.775],  # 1
     'SMART Biomedical Microsystems Laborator Université de Sherbrooke': [45.3785, -71.9245],  # 1
     'Salk Institute for Biological Studies': [32.8872, -117.2454],  # 1
     'Shinshu University': [36.7116, 138.4936],  # 1
