@@ -235,9 +235,9 @@ Interactive tools for annotating behavioral events frame by frame. Create and ed
 
 .. raw:: html
 
-   <div style="text-align:center; margin:4px 0 18px;">
+   <div style="text-align:center; margin:6px 0 20px;">
      <img src="_static/img/simba_spray_cans_grid.webp" alt="SimBA mixin spray paint cans"
-          style="width:min(560px,100%); height:auto;">
+          style="width:min(640px,100%); height:auto;">
    </div>
 
 Entry point to SimBA's mixin classes — the reusable method libraries (geometry, statistics, circular statistics, feature extraction, time-series, image, network, plotting, model training, unsupervised, config reading, pose import, annotation and GUI pop-ups) that the other topical sections draw on. The overview page maps every mixin class to the section documenting its methods. Grouping shared functionality here keeps it consistent and testable across the package; most user-facing tools are thin wrappers that combine these mixins.
