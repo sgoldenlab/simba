@@ -36,3 +36,44 @@
 .simba-table td {
     vertical-align: middle; /* Align text vertically in the center of cells */
 }
+
+/* --- Related Software: type / modality pills and the SimBA-import badge ------
+   Applied via RST substitutions (|oss|, |comm|, |free|, |simba-import|) and, for
+   the home-cage tables, an .. rst-class:: simba-modality on the table itself --
+   CSS cannot select a cell by its text. */
+
+.simba-tag {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 84%;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: nowrap;
+    border: 1px solid transparent;
+}
+
+.simba-tag--oss   { background: #e8f5ec; color: #1e6b3a; border-color: #c6e5d1; }
+.simba-tag--comm  { background: #eef2f7; color: #3d5a75; border-color: #d3dde8; }
+.simba-tag--free  { background: #eaf1fb; color: #2a5599; border-color: #ccdcf3; }
+.simba-tag--simba { background: #fff3e0; color: #8a4b08; border-color: #f6ddb8; }
+
+/* Neutral chip for the home-cage tables' modality column. */
+.simba-modality table td:nth-child(2) {
+    white-space: nowrap;
+}
+.simba-modality table tbody td:nth-child(2)::before { content: ""; }
+.simba-modality table tbody td:nth-child(2) > p {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 84%;
+    font-weight: 600;
+    background: #f4f1ea;
+    color: #6b5a3e;
+    border: 1px solid #e4dcca;
+    margin: 0;
+}
+
+/* The wide description column reads better without centred text. */
+.rst-content table.docutils td { vertical-align: middle; }
