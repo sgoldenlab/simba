@@ -10,6 +10,12 @@ Entries marked |simba-import| produce data SimBA reads directly -- pose formats
 through its pose-import tools, and frame-wise annotations through its
 :doc:`third-party label appenders <simba.third_party_label_appenders>`.
 
+.. seealso::
+
+   `The Behaviour Forum <https://www.thebehaviourforum.org/>`__ is a discussion venue for
+   experimental methods in animal behaviour, and a good place to ask which of these tools
+   suits a given experiment.
+
 
 .. |simba-import| raw:: html
 
@@ -414,6 +420,14 @@ rather than software alone, but they are the most common upstream source of the
 long-duration video and activity data that behaviour-classification pipelines are applied
 to. Grouped by sensing modality, since that determines both what can be measured and
 whether individual animals can be resolved in a socially housed cage.
+
+.. seealso::
+
+   The `Home Cage Monitoring Technologies Catalogue
+   <https://www.thebehaviourdatabase.org/catalogue.php>`__, maintained by COST Action
+   TEATIME, is a considerably more comprehensive index of these systems than the summary
+   below. It is filterable by monitored behaviour, sensing technology, species, cage type,
+   DIY versus commercial, and machine-learning support.
 
 Video-based
 ~~~~~~~~~~~
