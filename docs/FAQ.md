@@ -446,5 +446,6 @@ Author [Simon N](https://github.com/sronilsson)
   <video autoplay loop muted playsinline preload="auto" style="width:300px; max-width:60%;"
          aria-label="SimBA mouse looking up at a spinning question block">
     <source src="_static/img/mouse_question_faq.webm" type="video/webm">
+    <source src="_static/img/mouse_question_faq.mp4" type="video/mp4">
   </video>
 </div>
