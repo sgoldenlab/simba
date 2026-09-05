@@ -3,13 +3,6 @@
 > [!TIP]
 > Please search the [SimBA issues tracker](https://github.com/sgoldenlab/simba/issues), or search the [Gitter chat channel](https://gitter.im/SimBA-Resource/community) for more questions and answers. If that does not help, reach out to us by posting a new issue or write to us on Gitter.
 
-<div style="float:right; width:300px; max-width:42%; margin:0 0 12px 24px;">
-  <video autoplay loop muted playsinline preload="metadata" style="width:100%;"
-         aria-label="SimBA mouse looking up at a spinning question block">
-    <source src="_static/img/mouse_question_faq.webm" type="video/webm">
-  </video>
-</div>
-
 
 ##  1. I get 'TypeError: cannot convert the series to &lt;class 'int'&gt;' or 'TypeError: cannot convert the series to &lt;class 'float'&gt;' when trying to extract features, generate movies/frames, or when extracting outliers
 <details>
@@ -447,3 +440,11 @@ Sorry - I don't have a straightforward installation process for M2's. But [THIS]
 
 
 Author [Simon N](https://github.com/sronilsson)
+
+
+<div class="simba-orbit-foot" style="margin:30px 0 8px; text-align:center;">
+  <video autoplay loop muted playsinline preload="auto" style="width:300px; max-width:60%;"
+         aria-label="SimBA mouse looking up at a spinning question block">
+    <source src="_static/img/mouse_question_faq.webm" type="video/webm">
+  </video>
+</div>
