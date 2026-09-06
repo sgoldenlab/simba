@@ -612,3 +612,16 @@ Metabolic phenotyping cages
    * - `DigiGait <https://mousespecifics.com/digigait/>`__
      - |comm|
      - Treadmill-based gait analysis
+
+
+.. raw:: html
+
+   <div style="text-align:center; margin:34px 0 6px;">
+     <video autoplay loop muted playsinline preload="metadata"
+            poster="_static/img/notebook_simba_poster.jpg"
+            style="width:min(460px,86%); height:auto;"
+            aria-label="A laptop opening to the SimBA splash screen">
+       <source src="_static/img/notebook_simba.webm" type="video/webm">
+       <source src="_static/img/notebook_simba.mp4" type="video/mp4">
+     </video>
+   </div>

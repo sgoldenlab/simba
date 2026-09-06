@@ -6,7 +6,7 @@
    <div style="text-align:center; margin:4px 0 20px;">
      <video autoplay loop muted playsinline preload="metadata"
             poster="_static/img/book_simba_poster.jpg"
-            style="width:min(420px,80%); height:auto;"
+            style="width:min(660px,90%); height:auto;"
             aria-label="A SimBA manual opening to a plate of the subject mouse">
        <source src="_static/img/book_simba.webm" type="video/webm">
        <source src="_static/img/book_simba.mp4" type="video/mp4">
