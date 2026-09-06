@@ -107,7 +107,7 @@ ________________________________________________
 
 .. toctree::
    :maxdepth: 3
-   :caption: API REFERENCE:
+   :caption: API REFERENCE: 📖
 
    api
 
