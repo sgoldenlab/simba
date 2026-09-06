@@ -105,9 +105,19 @@ Everything in one place — code, API, community, publications, and data:
 
 ________________________________________________
 
+.. raw:: html
+
+   <video class="simba-api-book" autoplay loop muted playsinline preload="metadata"
+          poster="_static/img/book_simba_poster.jpg"
+          style="float:right; width:min(300px,42%); height:auto; margin:0 0 12px 24px; border-radius:10px;"
+          aria-label="A SimBA manual opening to a plate of the subject mouse">
+     <source src="_static/img/book_simba.webm" type="video/webm">
+     <source src="_static/img/book_simba.mp4" type="video/mp4">
+   </video>
+
 .. toctree::
    :maxdepth: 3
-   :caption: API REFERENCE: 📖
+   :caption: API REFERENCE:
 
    api
 
