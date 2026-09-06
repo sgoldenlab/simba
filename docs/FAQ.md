@@ -449,3 +449,11 @@ Author [Simon N](https://github.com/sronilsson)
     <source src="_static/img/mouse_question_faq.mp4" type="video/mp4">
   </video>
 </div>
+
+<div class="simba-orbit-foot" style="margin:18px 0 30px; text-align:center;">
+  <video autoplay loop muted playsinline preload="metadata" style="width:300px; max-width:60%;"
+         aria-label="A beating heart reading Thank you, SimBA, Have a nice day">
+    <source src="_static/img/heart_simba_card.webm" type="video/webm">
+    <source src="_static/img/heart_simba_card.mp4" type="video/mp4">
+  </video>
+</div>
