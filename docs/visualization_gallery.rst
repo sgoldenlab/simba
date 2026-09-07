@@ -686,9 +686,14 @@ Video & image tools
 
 .. raw:: html
 
-   <div class="simba-orbit-foot" style="margin:28px 0 8px;">
-     <video autoplay loop muted playsinline preload="auto" aria-label="Running SimBA mouse">
+   <div class="simba-orbit-foot" style="margin:28px 0 8px; gap:26px; flex-wrap:wrap;">
+     <video autoplay loop muted playsinline preload="auto" style="width:min(360px,46vw);"
+            aria-label="Running SimBA mouse">
        <source src="_static/img/mouse_run_simba_grunge.webm" type="video/webm">
+     </video>
+     <video autoplay loop muted playsinline preload="auto" style="width:min(310px,40vw);"
+            aria-label="A camcorder showing the SimBA start-up splash on its screen">
+       <source src="_static/img/camcorder_simba.webm" type="video/webm">
      </video>
    </div>
 
