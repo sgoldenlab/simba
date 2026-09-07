@@ -207,8 +207,8 @@ class MergeYoloProjects:
             stdout_information(msg=f'{display_name}: copied {total}/{total} complete.')
         return total
 
-merger = MergeYoloProjects(yaml_paths=[r"G:\netholabs\batch_0731\food_pellet\map.yaml",
-                                       r"G:\netholabs\batch_0731\food_pellet_2\map.yaml"],
-                           save_dir=r"G:\netholabs\batch_0731\food_pellet_3",
-                           train_val_split=0.75)
-merger.run()
+# merger = MergeYoloProjects(yaml_paths=[r"G:\netholabs\batch_0731\food_pellet\map.yaml",
+#                                        r"G:\netholabs\batch_0731\food_pellet_2\map.yaml"],
+#                            save_dir=r"G:\netholabs\batch_0731\food_pellet_3",
+#                            train_val_split=0.75)
+# merger.run()
