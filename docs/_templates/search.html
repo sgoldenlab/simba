@@ -1,0 +1,62 @@
+{#
+   Standalone search page.
+
+   The theme's own search.html renders only a <noscript> warning plus an empty
+   #search-results div: the "Search Results" heading is behind
+   {% if search_performed %}, which is false on a plain page load. Visiting
+   /search.html without a ?q= query -- from a bookmark, an external link or a
+   search-engine hit -- therefore showed a blank content area, because the theme
+   assumes every visitor arrives through the sidebar box.
+
+   Add a heading and a query field so the page stands on its own, then hand off
+   to the theme for the results markup and for its scripts/footer blocks, which
+   are what load searchtools.js and call Search.loadIndex(). The input is left
+   empty on purpose: searchtools.js fills it from ?q= and runs the search.
+#}
+{%- extends "!search.html" %}
+
+{% block body %}
+  <style>
+    .simba-searchpage-form { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 10px; }
+    .simba-searchpage-form input[type="text"] {
+      flex: 1 1 260px; min-width: 0;               /* min-width:0 so it can shrink on phones */
+      padding: 10px 15px; font-size: 15px;
+      border: 1px solid #d4dee7; border-radius: 24px; color: #2d333b; outline: none;
+      transition: box-shadow .15s ease, border-color .15s ease;
+    }
+    .simba-searchpage-form input[type="text"]:focus {
+      border-color: #38a8d4; box-shadow: 0 0 0 3px rgba(56, 168, 212, 0.35);
+    }
+    .simba-searchpage-form button {
+      padding: 10px 22px; font-size: 14px; font-weight: 600; cursor: pointer;
+      color: #fff; background: #21567a; border: 0; border-radius: 24px;
+      transition: background .15s ease;
+    }
+    .simba-searchpage-form button:hover { background: #19465f; }
+    .simba-searchpage-hint { color: #5b6a77; font-size: 14px; margin: 0 0 22px; }
+    .simba-searchpage-hint kbd {
+      font-size: 12px; background: #fff; border: 1px solid #cfd6dc; border-radius: 5px;
+      padding: 2px 6px; color: #55606b;
+    }
+  </style>
+
+  <h1 id="search-documentation">{{ _('Search') }}</h1>
+
+  <form class="simba-searchpage-form" action="{{ pathto('search') }}" method="get" role="search">
+    <input type="text" name="q" placeholder="{{ _('Search the SimBA docs') }}"
+           aria-labelledby="search-documentation" autocomplete="off" autofocus>
+    <input type="hidden" name="check_keywords" value="yes">
+    <input type="hidden" name="area" value="default">
+    <button type="submit">{{ _('Search') }}</button>
+  </form>
+
+  <p class="simba-searchpage-hint">
+    Searching for several words only returns pages that contain all of them.
+    Press <kbd>Ctrl</kbd>&nbsp;+&nbsp;<kbd>K</kbd> anywhere in the docs for the
+    quick jump palette, or browse the
+    <a href="{{ pathto('py-modindex') }}">Module Index</a> and
+    <a href="{{ pathto('genindex') }}">A&ndash;Z Index</a>.
+  </p>
+
+  {{ super() }}
+{% endblock %}
