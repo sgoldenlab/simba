@@ -504,6 +504,11 @@ Video processing tools built on OpenCV and FFmpeg — clip, crop, concatenate, d
           style="float:right; width:460px; max-width:52%; margin:0 0 12px 24px; border-radius:10px;">
      <source src="_static/img/yolo_mouse_detect.webm" type="video/webm">
    </video>
+   <video autoplay loop muted playsinline preload="metadata"
+          style="float:right; clear:right; width:300px; max-width:36%; margin:0 0 12px 24px; border-radius:10px;"
+          aria-label="Keypoint skeleton orbiting a wireframe mouse, on light and dark grounds">
+     <source src="_static/img/spin_keypoint_mouse_stack.mp4" type="video/mp4">
+   </video>
 
 Methods for training YOLO models, creating training and validation datasets, and converting behavioral neuroscience-specific datasets to YOLO datasets.
 
