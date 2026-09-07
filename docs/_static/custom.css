@@ -1397,3 +1397,83 @@ html.simba-splash-on .wy-grid-for-nav { filter: blur(16px); transform: scale(1.0
   width: min(460px, 80vw); height: auto;
   background: transparent;   /* webm carries its own alpha channel */
 }
+
+/* ================================================================== *
+ * Narrow-screen overflow: keep API pages inside the viewport
+ * ------------------------------------------------------------------
+ * Docstring pages scrolled sideways on phones, which knocks the text
+ * column out of line with the window. Three separate theme rules cause
+ * it, so all three need an override:
+ *
+ *   1. Parameters/Returns blocks are laid out as
+ *      `dl.field-list{grid-template-columns:auto minmax(80%,95%)}`, whose
+ *      second column has a *minimum* of 80% -- added to the auto-width
+ *      field-name column, that always exceeds 100%. Fixed by leaving grid
+ *      (below), not by re-sizing the tracks: see the note there.
+ *   2. `.rst-content code{white-space:nowrap}` — docstrings carry long
+ *      literals (dotted module paths, frame-window expressions) that
+ *      then can't break. Same fix as table.modindextable code.xref above.
+ *   3. Signatures have no overflow-wrap, so long dotted prenames extend
+ *      the line box.
+ *   4. Embedded media (sphinxcontrib-video, the youtube directive) carries
+ *      hard pixel widths and the theme caps images only.
+ * ================================================================== */
+
+/* Parameters/Returns blocks, at EVERY width. Re-sizing the theme's grid tracks
+   is a trap: with `auto minmax(0,1fr)` the auto column takes max-content
+   (measured 367px inside a 257px dl on simba.plotting) and 1fr is left with no
+   free space, so it collapses to 0 and the parameter text lands in a
+   zero-width column -- worse than the original. Dropping out of grid needs no
+   column arithmetic: "Parameters:" simply sits above its own list.
+
+   Not narrow-screen-only, because the field NAME is also its own
+   `display:inline-grid; grid-template-columns:max-content auto` track, sized
+   to content (362px inside a 233px parent) no matter what wrapping it
+   inherits. napoleon leaves these docstrings' `:param <type> <name>:`
+   unparsed, so that whole string *is* the field name, and it overflowed the
+   desktop column too -- simba.plotting measured 1429px in a 1280px window. */
+html.writer-html5 .rst-content dl.field-list { display: block; }
+html.writer-html5 .rst-content dl.field-list > dt { display: block; padding-left: 0; }
+html.writer-html5 .rst-content dl.field-list > dd { margin-left: 0; }
+
+/* sphinxcontrib-video hard-codes a width attribute (450/500/700px) and the
+   theme caps images but never video, so a wide clip sets the page's scroll
+   width. height:auto keeps the aspect ratio once the width is clamped.
+   Scoped to [width] deliberately: the decorative players built in custom.js
+   (.simba-carousel-slide / .simba-wall-tile video) rely on height:100% with
+   object-fit, and a bare `.rst-content video` rule sits later in this file at
+   equal specificity, so it would silently override them. Those are created
+   without a width attribute, so this selector cannot reach them. */
+.rst-content video[width] { max-width: 100%; height: auto; }
+
+/* Same class of bug for embedded players: the youtube directive emits
+   `style="height:510px; width:640px"` inline. 640px fits the desktop column, so
+   only the width cap is needed at every size; the narrow-screen block below
+   reshapes it. */
+.rst-content iframe { max-width: 100%; }
+
+/* Narrow screens. Everything above this point applies at every width. */
+@media (max-width: 768px) {
+  /* Inline literals. The .xref selectors are not redundant: the theme sets
+     `overflow-wrap: normal` on `.rst-content code.xref` at a higher specificity
+     than `.rst-content code`, so cross-reference literals (the long dotted
+     paths in "See also" admonitions) stay unbreakable without them. */
+  .rst-content code, .rst-content tt,
+  .rst-content code.xref, .rst-content tt.xref,
+  .rst-content a code, .rst-content a tt { white-space: normal; overflow-wrap: anywhere; }
+
+  /* Signatures: long dotted prenames + parameter lists. */
+  .rst-content dl[class] > dt { overflow-wrap: anywhere; }
+
+  /* Prose: dotted call expressions in docstring text (`Mixin().method`) carry no
+     break opportunity of their own. break-word, not anywhere, so ordinary words
+     are left alone. */
+  .rst-content p, .rst-content li, .rst-content dd { overflow-wrap: break-word; }
+
+  /* The inline height:510px needs !important to be reached at all. 16/9 rather
+     than the declared 640/510 because the box is a video player -- the authored
+     ratio just letterboxes. */
+  .rst-content iframe[src*="youtube"] {
+    width: 100% !important; height: auto !important; aspect-ratio: 16 / 9;
+  }
+}
