@@ -1,6 +1,17 @@
 Video processing tools
 ======================
 
+.. raw:: html
+
+   <div style="text-align:center; margin:4px 0 22px;">
+     <video autoplay loop muted playsinline preload="auto"
+            style="width:min(430px,82%); height:auto;"
+            aria-label="A camcorder showing the SimBA start-up splash on its flip-out screen">
+       <source src="_static/img/camcorder_simba.webm" type="video/webm">
+       <source src="_static/img/camcorder_simba.mp4" type="video/mp4">
+     </video>
+   </div>
+
 .. contents:: On this page
    :local:
    :depth: 1
