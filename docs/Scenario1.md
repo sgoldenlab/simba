@@ -144,7 +144,7 @@ SimBA needs the pose-estimation data (x,y coordinates of body parts) produced by
 > [!NOTE]
 > Interpolation fills gaps with estimated coordinates, not actual detections. Those estimates can be wrong (e.g. if the animal moved in an unexpected way while occluded), which can distort features and hurt classifier performance. Avoid interpolation where possible; use video clipping to remove problematic segments instead.
 
-3. **Smoothing (optional):** Pose data can be “jittery” with unrealistic jumps between frames. Smoothing averages predictions with neighbouring frames. The options are **Gaussian** or **Savitzky Golay**. When you select **Gaussian** or **Savitzky Golay**, set **Smoothing period (ms)** (e.g. 100–300). See the [before/after smoothing video](https://youtu.be/d9-Bi4_HyfQ), [smoothing example (webm)](../_static/img/smoothing_example_2.webm), or [smoothing example (gif)](../_static/img/smoothing.gif) to compare results. For this tutorial, select **None**.
+3. **Smoothing (optional):** Pose data can be “jittery” with unrealistic jumps between frames. Smoothing averages predictions with neighbouring frames. The options are **Gaussian** or **Savitzky Golay**. When you select **Gaussian** or **Savitzky Golay**, set **Smoothing period (ms)** (e.g. 100–300). See the [before/after smoothing video](https://youtu.be/d9-Bi4_HyfQ), [smoothing example (webm)](_static/img/smoothing_example_2.webm), or [smoothing example (gif)](_static/img/smoothing.gif) to compare results. For this tutorial, select **None**.
 
 <p align="center">
   <img src="images/scenario1/smoothing.png" width="600">

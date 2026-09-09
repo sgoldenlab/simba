@@ -336,7 +336,7 @@ The following conversion tools are available in SimBA for converting pose estima
 <a id="related-documentation"></a>
 ## Related Documentation
 
-- For running inference with trained YOLO pose estimation models, see the [YOLO pose inference documentation](https://github.com/sgoldenlab/simba/blob/master/docs/yolo_pose_inference_popup.md).
+- For running inference with trained YOLO pose estimation models, see the [YOLO pose inference documentation](https://github.com/sgoldenlab/simba/blob/master/docs/yolo_inference.md).
 - For importing YOLO pose estimation results into SimBA, see pose estimation import tools.
 - Example YOLO map files: [Keypoints example](https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model_keypoints.yaml), [General example](https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model.yaml).
 - For programmatic access to conversion functions, see:
