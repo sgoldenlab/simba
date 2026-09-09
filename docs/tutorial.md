@@ -225,7 +225,7 @@ Body parts flagged as movement or location outliers will be re-placed in their l
 
 ### Step 5: Extract Features
 
-Based on the coordinates of body parts in each frame (as well as the frame rate and the pixels per millimeter values) the feature extraction step calculates a larger set of features used for behavioral classification. Features are values such as metric distances between body parts, angles, areas, movement, paths, and their deviations and rank in individual frames and across rolling windows. This set of features will depend on the body-parts tracked during pose-estimation (which is defined when creating the project). Click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv) for an example list of features when tracking 2 mice and 16 body parts. Click [here]([https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv](https://github.com/sgoldenlab/simba/blob/master/misc/features_user_defined_pose_config.csv) for an example list of feature categories when tracking user-defined body-parts in SimBA. 
+Based on the coordinates of body parts in each frame (as well as the frame rate and the pixels per millimeter values) the feature extraction step calculates a larger set of features used for behavioral classification. Features are values such as metric distances between body parts, angles, areas, movement, paths, and their deviations and rank in individual frames and across rolling windows. This set of features will depend on the body-parts tracked during pose-estimation (which is defined when creating the project). Click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv) for an example list of features when tracking 2 mice and 16 body parts. Click [here](https://github.com/sgoldenlab/simba/blob/master/misc/features_user_defined_pose_config.csv) for an example list of feature categories when tracking user-defined body-parts in SimBA. 
 
 1. Click on `Extract Features` under the [Extract features] tab.
 
@@ -299,7 +299,7 @@ To learn more about machine learning hyperparameters, click [HERE] to go to the 
 
 - `Generate Example Decision Tree`: Saves a visualization of a random decision tree in .pdf and .dot formats. Requires [graphviz](https://graphviz.gitlab.io/). For more information, click [here](https://chrisalbon.com/machine_learning/trees_and_forests/visualize_a_decision_tree/). 
 
-- `Generate Classification Report`: Saves a classification report truth table in .png format. Depends on [yellowbrick](www.scikit-yb.org/). For more information, click [here](http://www.scikit-yb.org/zh/latest/api/classifier/classification_report.html).
+- `Generate Classification Report`: Saves a classification report truth table in .png format. Depends on [yellowbrick](https://www.scikit-yb.org/). For more information, click [here](http://www.scikit-yb.org/zh/latest/api/classifier/classification_report.html).
 
 - `Generate Features Importance Log`: Creates a .csv file that lists the importance's [(gini importances)](https://scikit-learn.org/stable/auto_examples/ensemble/plot_forest_importances.html) of all features for the classifier.
 
@@ -348,7 +348,7 @@ The user can validate each model *( saved in .sav format)*. In this validation s
 
 2. Under **[Run machine model]** tab --> **validate Model on Single Video**, select your features file (.csv). It should be located in `project_folder/csv/features_extracted`.
 
-![](/images/validatemodel_graph.PNG)
+![](/images/validatemodel_graph1.PNG)
 
 3. Under `Select model file`, click on `Browse File` to select a model *(.sav file)*.
 

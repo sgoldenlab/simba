@@ -211,8 +211,8 @@ The output format matches the input video format (MP4, AVI, etc.).
 <a id="related-documentation"></a>
 ## Related Documentation
 
-- For running YOLO pose estimation inference to generate the CSV results, see the [YOLO pose inference documentation](https://github.com/sgoldenlab/simba/blob/master/docs/yolo_pose_inference_popup.md).
-- For training YOLO pose estimation models, see the [YOLO pose training documentation](https://github.com/sgoldenlab/simba/blob/master/docs/yolo_pose_train_popup.md).
+- For running YOLO pose estimation inference to generate the CSV results, see the [YOLO pose inference documentation](https://github.com/sgoldenlab/simba/blob/master/docs/yolo_inference.md).
+- For training YOLO pose estimation models, see the [YOLO pose training documentation](https://github.com/sgoldenlab/simba/blob/master/docs/yolo_train.md).
 - For importing YOLO pose estimation results into SimBA, see pose estimation import tools.
 - For programmatic access to visualization functions, see:
   - `simba.plotting.yolo_pose_visualizer.YOLOPoseVisualizer` - Regular pose visualization

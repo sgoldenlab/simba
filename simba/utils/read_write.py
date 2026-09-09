@@ -799,9 +799,9 @@ def find_all_videos_in_directory(directory: Union[str, os.PathLike],
 
     :param str directory: Directory to search for video files.
     :param bool as_dict: If True, returns dictionary with the video name as key and file path as value.
-    :param bool raise_error: If True, raise error if no videos are found. Else, NoFileFoundWarning.
+    :param bool raise_error: If True, raise error if no videos are found. Else, NoFileFoundWarning and an empty result.
     :param Tuple[str] video_formats: Acceptable video formats. Default: '.avi', '.mp4', '.mov', '.flv', '.m4v'.
-    :return Either a list or dictionary of all available video files in the ``directory``.
+    :return Either a list or dictionary of all available video files in the ``directory``. Empty when ``directory`` holds no videos and ``raise_error`` is False.
     :rtype: Union[dict, list]
 
     :raises NoFilesFoundError: If ``raise_error`` and ``directory`` has no files in formats ``video_formats``.
@@ -818,11 +818,10 @@ def find_all_videos_in_directory(directory: Union[str, os.PathLike],
     if not video_lst:
         if raise_error:
             raise NoFilesFoundError(f"No videos found in directory {directory} in formats {video_formats}.")
-        else:
-            video_lst.append("No videos found")
-            NoFileFoundWarning(msg=f"No videos found in directory ({directory})", source=find_all_videos_in_directory.__name__)
+        NoFileFoundWarning(msg=f"No videos found in directory ({directory})", source=find_all_videos_in_directory.__name__)
+        return {} if as_dict else []
 
-    if video_lst and as_dict:
+    if as_dict:
         video_dict = {}
         for video_name in video_lst:
             video_path = os.path.join(directory, video_name)
