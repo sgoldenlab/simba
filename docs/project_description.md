@@ -44,7 +44,7 @@ If you use the code, please cite:
 SimBA is licensed under a modified BSD 3-Clause License, permitting use for academic and research purposes only. For commercial licensing inquiries, contact sronilsson@gmail.com.
 
 ### Contributors
-Contributers on Github https://github.com/sgoldenlab/simba#contributors
+Contributors on GitHub https://github.com/sgoldenlab/simba#contributors
 
 ### Contact
 * [Simon N](https://github.com/sronilsson), [sronilsson@gmail.com](mailto:sronilsson@gmail.com)
