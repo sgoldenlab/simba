@@ -16,8 +16,14 @@ import yaml
 VIDEO_EXTENSIONS = {".avi", ".mp4", ".mov", ".flv", ".m4v", ".webm", ".h264"}
 IMAGE_EXTENSIONS = {".bmp", ".png", ".jpeg", ".jpg", ".webp"}
 PROJECT_YAML = 'project.yaml'
+LABELED_DATA = 'labeled-data'
 KEYPOINT_NAMES_KEY = 'keypoint_names'
 VIEW_NAMES_KEY = 'view_names'
+
+# master_dir / other_dirs accept os.PathLike, so every helper that receives one of
+# them has to accept it too -- annotating these `str` makes type checkers flag each
+# internal call site
+ProjectPath = Union[str, os.PathLike]
 
 
 def _log(msg: str, level: str = 'INFO'):
@@ -35,6 +41,7 @@ class LitPoseMergeProjects:
     :param List[Union[str, os.PathLike]] other_dirs:        Roots of projects to merge in.
     :param Literal['skip', 'raise'] duplicate_method:       How to handle duplicate videos, images, or annotation rows. ``'skip'`` silently ignores them; ``'raise'`` raises an error.
     :param bool skip_videos:                                If True, skip copying video files during merge. Default True.
+    :param bool normalize_layout:                           If True, and the master's own ``CollectedData_*.csv`` paths resolve under a nested copy of the project rather than the project root, lift that nested ``labeled-data`` up into the root before merging. Without it the merged CSVs keep rows whose images are not where the paths say. Default True.
     :param bool verbose:                                    Print per-item progress.
 
     :example:
@@ -44,10 +51,11 @@ class LitPoseMergeProjects:
     """
 
     def __init__(self,
-                 master_dir: Union[str, os.PathLike],
-                 other_dirs: List[Union[str, os.PathLike]],
+                 master_dir: ProjectPath,
+                 other_dirs: List[ProjectPath],
                  duplicate_method: Literal['skip', 'raise'] = 'skip',
                  skip_videos: bool = True,
+                 normalize_layout: bool = True,
                  verbose: bool = True):
 
         if not os.path.isdir(master_dir):
@@ -61,11 +69,17 @@ class LitPoseMergeProjects:
         self.other_dirs = other_dirs
         self.duplicate_method = duplicate_method
         self.skip_videos = skip_videos
+        self.normalize_layout = normalize_layout
         self.verbose = verbose
+        self._img_root = {d: self._resolve_img_root(d) for d in [master_dir] + list(other_dirs)}
+        for d, root in self._img_root.items():
+            if root != d and verbose:
+                _log(f'Image paths in {d} resolve under the nested copy {root}, not the project root.',
+                     level='WARNING')
         self._validate_schemas()
 
     @staticmethod
-    def _read_project_yaml(project_dir: str) -> Dict:
+    def _read_project_yaml(project_dir: ProjectPath) -> Dict:
         yaml_path = os.path.join(project_dir, PROJECT_YAML)
         if not os.path.isfile(yaml_path):
             raise FileNotFoundError(f'project.yaml not found: {yaml_path}')
@@ -99,7 +113,7 @@ class LitPoseMergeProjects:
         return df.iloc[:, 0].values.tolist()
 
     @staticmethod
-    def _check_images_exist(project_dir: str, img_paths: List[str]) -> List[str]:
+    def _check_images_exist(project_dir: ProjectPath, img_paths: List[str]) -> List[str]:
         missing = []
         for img_path in img_paths:
             full_path = os.path.join(project_dir, img_path)
@@ -115,7 +129,7 @@ class LitPoseMergeProjects:
         return (img.shape[1], img.shape[0])
 
     @staticmethod
-    def _find_collected_data_csvs(directory: str) -> Dict[str, str]:
+    def _find_collected_data_csvs(directory: ProjectPath) -> Dict[str, str]:
         """Return dict keyed by camera suffix -> file path. E.g. 'cam1' -> '/.../CollectedData_cam1.csv'.
 
         Only looks at the project root — copies inside ``models/`` or ``outputs/`` are ignored
@@ -128,6 +142,90 @@ class LitPoseMergeProjects:
             suffix = fn.replace('CollectedData_', '').replace('CollectedData', '')
             result[suffix] = p
         return result
+
+    @classmethod
+    def _resolve_img_root(cls, project_dir: ProjectPath, probe: int = 40) -> ProjectPath:
+        """Return the directory the ``CollectedData_*.csv`` image paths are relative to.
+
+        Projects sometimes arrive nested one level down -- an extract that kept the
+        archive's own folder -- so ``labeled-data/x/img.jpg`` resolves under
+        ``<project>/<project>/`` while the CSVs still sit in ``<project>/``. Score the
+        project root and every immediate sub-folder that holds a ``labeled-data`` against
+        a sample of the referenced paths, and take whichever resolves the most.
+        """
+        csvs = cls._find_collected_data_csvs(project_dir)
+        if not csvs:
+            return project_dir
+        sample = cls._get_csv_image_paths(sorted(csvs.values())[0])[:probe]
+        if not sample:
+            return project_dir
+
+        def score(root):
+            return sum(os.path.isfile(os.path.join(root, p.replace('/', os.sep))) for p in sample)
+
+        best, best_n = project_dir, score(project_dir)
+        if best_n == len(sample):
+            return project_dir
+        for entry in sorted(os.listdir(project_dir)):
+            cand = os.path.join(project_dir, entry)
+            if not os.path.isdir(cand) or not os.path.isdir(os.path.join(cand, LABELED_DATA)):
+                continue
+            n = score(cand)
+            if n > best_n:
+                best, best_n = cand, n
+        return best
+
+    def _normalise_master_layout(self):
+        """Lift a nested master ``labeled-data`` up into the master project root.
+
+        The merged CSVs keep the master's own rows verbatim, so unless its images sit
+        where those rows say they do, the merge produces a project full of dangling
+        references. Sessions already present at the root are merged file by file under
+        ``duplicate_method`` rather than replaced.
+        """
+        root = self._img_root[self.master_dir]
+        if root == self.master_dir:
+            return
+        src_dir = os.path.join(root, LABELED_DATA)
+        dst_dir = os.path.join(self.master_dir, LABELED_DATA)
+        if not os.path.isdir(src_dir):
+            return
+        if not os.path.isdir(dst_dir):
+            os.makedirs(dst_dir)
+        moved_sessions, moved_imgs = 0, 0
+        for session_name in sorted(os.listdir(src_dir)):
+            src_session = os.path.join(src_dir, session_name)
+            if not os.path.isdir(src_session):
+                continue
+            dst_session = os.path.join(dst_dir, session_name)
+            if not os.path.isdir(dst_session):
+                os.makedirs(dst_session)
+            existing = set(os.listdir(dst_session))
+            for fname in os.listdir(src_session):
+                if os.path.splitext(fname)[1].lower() not in IMAGE_EXTENSIONS:
+                    continue
+                if fname in existing:
+                    self._handle_duplicate('image', f'{session_name}/{fname}')
+                    continue
+                shutil.move(os.path.join(src_session, fname), os.path.join(dst_session, fname))
+                existing.add(fname)
+                moved_imgs += 1
+            moved_sessions += 1
+        self._img_root[self.master_dir] = self.master_dir
+        if self.verbose:
+            _log(f'Lifted {moved_imgs} image(s) across {moved_sessions} session(s) from {src_dir} '
+                 f'into {dst_dir}', level='COMPLETE')
+
+    def _report_dangling(self):
+        """Warn about merged rows whose image is not on disk where the path says."""
+        for suffix, csv_path in sorted(self._find_collected_data_csvs(self.master_dir).items()):
+            paths = self._get_csv_image_paths(csv_path)
+            missing = self._check_images_exist(self.master_dir, paths)
+            if missing:
+                _log(f'{os.path.basename(csv_path)}: {len(missing)}/{len(paths)} merged row(s) point at '
+                     f'images that are not on disk. First: {missing[0]}', level='WARNING')
+            elif self.verbose:
+                _log(f'{os.path.basename(csv_path)}: all {len(paths)} merged row(s) resolve on disk')
 
     def _validate_schemas(self):
         master_yaml = self._read_project_yaml(self.master_dir)
@@ -176,19 +274,24 @@ class LitPoseMergeProjects:
                     raise ValueError(f'CollectedData_{suffix}.csv in {project_label} has no matching view '
                                      f'in project views: {master_views}')
 
+                img_root = self._img_root[project_dir]
                 img_paths = self._get_csv_image_paths(csv_path)
-                missing_imgs = self._check_images_exist(project_dir, img_paths)
+                missing_imgs = self._check_images_exist(img_root, img_paths)
                 if missing_imgs:
                     if self.verbose:
+                        # master rows are carried through the merge verbatim, so for the master
+                        # these are not skipped -- they survive as dangling references
+                        fate = ('kept as-is, leaving dangling image references'
+                                if project_dir == self.master_dir else 'skipped during merge')
                         _log(f'{len(missing_imgs)} image(s) referenced in {os.path.basename(csv_path)} from {project_label} '
-                             f'not found on disk and will be skipped during merge. First missing: {missing_imgs[0]}',
+                             f'not found on disk and will be {fate}. First missing: {missing_imgs[0]}',
                              level='WARNING')
                 missing_set = set(missing_imgs)
                 present_paths = [p for p in img_paths if p not in missing_set]
 
                 resolutions = set()
                 for img_path in present_paths:
-                    res = self._get_image_resolution(os.path.join(project_dir, img_path))
+                    res = self._get_image_resolution(os.path.join(img_root, img_path))
                     resolutions.add(res)
                 if len(resolutions) > 1:
                     raise ValueError(f'Mixed image resolutions in {os.path.basename(csv_path)} from {project_label}: {sorted(resolutions)}. '
@@ -215,7 +318,7 @@ class LitPoseMergeProjects:
             if self.verbose:
                 _log(f'{msg}. Skipping...', level='WARNING')
 
-    def _merge_videos(self, other_dir: str):
+    def _merge_videos(self, other_dir: ProjectPath):
         master_videos_dir = os.path.join(self.master_dir, 'videos')
         other_videos_dir = os.path.join(other_dir, 'videos')
         if not os.path.isdir(other_videos_dir):
@@ -250,9 +353,9 @@ class LitPoseMergeProjects:
         if self.verbose:
             _log(f'Copied {copied_dirs} video directory(s) and {copied_files} video file(s) from {other_dir}')
 
-    def _merge_labeled_data(self, other_dir: str):
-        master_labeled_dir = os.path.join(self.master_dir, 'labeled-data')
-        other_labeled_dir = os.path.join(other_dir, 'labeled-data')
+    def _merge_labeled_data(self, other_dir: ProjectPath):
+        master_labeled_dir = os.path.join(self.master_dir, LABELED_DATA)
+        other_labeled_dir = os.path.join(self._img_root[other_dir], LABELED_DATA)
         if not os.path.isdir(other_labeled_dir):
             if self.verbose:
                 _log(f'No labeled-data directory found in {other_dir}. Skipping image merge for this project.', level='WARNING')
@@ -280,7 +383,7 @@ class LitPoseMergeProjects:
         if self.verbose:
             _log(f'Copied {copied} labeled image(s) from {other_dir}')
 
-    def _merge_annotations(self, other_dir: str):
+    def _merge_annotations(self, other_dir: ProjectPath):
         master_csvs = self._find_collected_data_csvs(self.master_dir)
         other_csvs = self._find_collected_data_csvs(other_dir)
         if not other_csvs:
@@ -289,7 +392,7 @@ class LitPoseMergeProjects:
             return
         for suffix, other_csv_path in other_csvs.items():
             other_df = pd.read_csv(other_csv_path, header=[0, 1, 2])
-            missing_imgs = self._check_images_exist(other_dir, other_df.iloc[:, 0].values.tolist())
+            missing_imgs = self._check_images_exist(self._img_root[other_dir], other_df.iloc[:, 0].values.tolist())
             if missing_imgs:
                 if self.verbose:
                     _log(f'Skipping {len(missing_imgs)} row(s) in {os.path.basename(other_csv_path)} with missing image files. First: {missing_imgs[0]}', level='WARNING')
@@ -326,7 +429,7 @@ class LitPoseMergeProjects:
                 if self.verbose:
                     _log(f'Copied new annotation file: {os.path.basename(other_csv_path)} ({len(other_df)} rows)')
 
-    def _merge_calibrations(self, other_dir: str):
+    def _merge_calibrations(self, other_dir: ProjectPath):
         master_calib_dir = os.path.join(self.master_dir, 'calibrations')
         other_calib_dir = os.path.join(other_dir, 'calibrations')
         if not os.path.isdir(other_calib_dir):
@@ -359,6 +462,8 @@ class LitPoseMergeProjects:
     def run(self):
         import time
         start = time.time()
+        if self.normalize_layout:
+            self._normalise_master_layout()
         for project_cnt, other_dir in enumerate(self.other_dirs):
             project_start = time.time()
             if self.verbose:
@@ -372,12 +477,13 @@ class LitPoseMergeProjects:
             self._merge_calibrations(other_dir)
             if self.verbose:
                 _log(f'Project {project_cnt + 1}/{len(self.other_dirs)} merged ({time.time() - project_start:.1f}s)', level='COMPLETE')
+        self._report_dangling()
         _log(f'{len(self.other_dirs)} project(s) merged into {self.master_dir} ({time.time() - start:.1f}s)', level='COMPLETE')
 
 
-#
-# merger = LitPoseMergeProjects(master_dir=r'H:\sina\project_0609_5cam\project_0609_5cam',
-#                               other_dirs=[r"H:\sina\project_0609_5cam_0706_2\project_0609_5cam_0706", "Z:\home\simon\LPProjects\simon_cage_4"],
+
+# merger = LitPoseMergeProjects(master_dir=r"I:\sina\project_5cam_cage21_22_0911",
+#                               other_dirs=[r"I:\sina\project_0609_5cam_0823"],
 #                               duplicate_method='skip',
 #                               verbose=True,
 #                               skip_videos=False)
