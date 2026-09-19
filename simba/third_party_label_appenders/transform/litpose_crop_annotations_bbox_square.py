@@ -13,7 +13,62 @@ from simba.utils.checks import (check_if_dir_exists, check_int,
 from simba.utils.errors import InvalidInputError
 from simba.utils.printing import (SimbaTimer, stdout_information,
                                   stdout_success, stdout_warning)
-from simba.utils.read_write import get_fn_ext
+from simba.utils.read_write import find_core_cnt, get_fn_ext
+import multiprocessing
+import functools
+
+
+def _crop_one_frame_worker(task):
+    """
+    Module-level worker: read, crop, resize and write a single labeled image.
+
+    Must stay at module level (not a bound method) so it is picklable for
+    multiprocessing under the Windows 'spawn' start method.
+
+    :return: (row_pos, idx, new_coords, viz_tuple_or_None), or None if the image is unusable.
+    """
+    (row_pos, idx, coords, lp_project_dir, save_dir, crop_size,
+     csv_fn, bbox_pad_frac, want_viz, bp_names) = task
+
+    xs, ys = coords[0::2], coords[1::2]
+    valid = ~np.isnan(xs) & ~np.isnan(ys)
+
+    img_rel = str(idx)
+    img_path = os.path.join(lp_project_dir, img_rel.replace("/", os.sep))
+    if not os.path.isfile(img_path):
+        return ("SKIP", row_pos, f"{csv_fn}: skipped row_pos={row_pos} (image not found)")
+    img = cv2.imread(img_path)
+    if img is None:
+        return ("SKIP", row_pos, f"{csv_fn}: skipped row_pos={row_pos} (cv2.imread returned None)")
+    h, w = img.shape[:2]
+
+    bbox = CropLPAnnotationsBboxSquare._get_bbox_for_image(img_rel=img_rel, img_h=h, img_w=w, xs=xs, ys=ys, valid=valid)
+    crop_x1, crop_y1, crop_x2, crop_y2 = CropLPAnnotationsBboxSquare._bbox_to_square_crop(
+        bbox[0], bbox[1], bbox[2], bbox[3], h, w, bbox_pad_frac)
+
+    cropped = img[crop_y1:crop_y2, crop_x1:crop_x2]
+    crop_h, crop_w = cropped.shape[:2]
+    scale_x = crop_size[0] / crop_w
+    scale_y = crop_size[1] / crop_h
+    resized = cv2.resize(cropped, crop_size, interpolation=cv2.INTER_LINEAR)
+
+    out_img_path = os.path.join(save_dir, img_rel.replace("/", os.sep))
+    os.makedirs(os.path.dirname(out_img_path), exist_ok=True)
+    cv2.imwrite(out_img_path, resized)
+
+    new_coords = coords.copy()
+    new_xs = np.where(np.isnan(xs), np.nan, (xs - crop_x1) * scale_x)
+    new_ys = np.where(np.isnan(ys), np.nan, (ys - crop_y1) * scale_y)
+    new_coords[0::2] = new_xs
+    new_coords[1::2] = new_ys
+
+    viz = None
+    if want_viz:
+        parts = img_rel.replace("/", os.sep).split(os.sep)
+        viz_fn = f"{parts[-2]}_{parts[-1]}" if len(parts) >= 2 else parts[-1]
+        viz = (out_img_path, new_xs.copy(), new_ys.copy(), list(bp_names), viz_fn)
+
+    return ("OK", row_pos, idx, new_coords, viz)
 
 
 class CropLPAnnotationsBboxSquare:
@@ -36,7 +91,8 @@ class CropLPAnnotationsBboxSquare:
     :param Tuple[int, int] crop_size: Output size (width, height), e.g. (512, 512).
     :param float bbox_pad_frac: Fraction to pad the bbox on each side (default 0.15 = 15%).
     :param Optional[Union[bool, int]] visualize: Save annotated overlays for QC.
-    :param bool verbose: If True, print per-frame progress (frame i/N within view j/M) as each image is cropped. Default False.
+    :param bool verbose: If True, print progress as images are cropped. Default False.
+    :param int core_cnt: Number of parallel workers used to read/crop/write images. -1 (default) uses all available cores. 1 runs serially. The work is disk-bound, so threads are used rather than processes.
     """
 
     def __init__(self,
@@ -45,7 +101,8 @@ class CropLPAnnotationsBboxSquare:
                  crop_size: Tuple[int, int] = (512, 512),
                  bbox_pad_frac: float = 0.15,
                  visualize: Optional[Union[bool, int]] = None,
-                 verbose: bool = False):
+                 verbose: bool = False,
+                 core_cnt: int = -1):
 
         check_if_dir_exists(in_dir=lp_project_dir)
         check_int(name="crop_size width", value=crop_size[0], min_value=1)
@@ -57,6 +114,9 @@ class CropLPAnnotationsBboxSquare:
         self.bbox_pad_frac = bbox_pad_frac
         self.visualize = visualize
         self.verbose = verbose
+        max_cores = find_core_cnt()[0]
+        check_int(name=f"{self.__class__.__name__} core_cnt", value=core_cnt, min_value=-1, unaccepted_vals=[0])
+        self.core_cnt = max_cores if core_cnt == -1 else min(core_cnt, max_cores)
         self.csv_paths = sorted([os.path.join(lp_project_dir, f) for f in os.listdir(lp_project_dir) if f.startswith("CollectedData_") and f.endswith(".csv")])
         if len(self.csv_paths) == 0:
             raise InvalidInputError(msg=f"No CollectedData_*.csv files found in {lp_project_dir}.")
@@ -78,11 +138,12 @@ class CropLPAnnotationsBboxSquare:
         half = min(img_w, img_h) // 2
         return (cx - half, cy - half, cx + half, cy + half)
 
-    def _bbox_to_square_crop(self, x1, y1, x2, y2, img_h, img_w):
+    @staticmethod
+    def _bbox_to_square_crop(x1, y1, x2, y2, img_h, img_w, bbox_pad_frac):
         """Pad bbox by bbox_pad_frac, extend shorter side to make square, clamp to image bounds."""
         bw, bh = x2 - x1, y2 - y1
-        px = int(bw * self.bbox_pad_frac)
-        py = int(bh * self.bbox_pad_frac)
+        px = int(bw * bbox_pad_frac)
+        py = int(bh * bbox_pad_frac)
         x1p = x1 - px
         y1p = y1 - py
         x2p = x2 + px
@@ -167,68 +228,63 @@ class CropLPAnnotationsBboxSquare:
         df = pd.read_csv(csv_path, header=[0, 1, 2], index_col=0)
         bp_names = [df.columns[i][1] for i in range(0, len(df.columns), 2)]
         n_frames = len(df)
-        out_rows = []
+        want_viz = bool(self.visualize)
+
+        tasks = []
         for row_pos in range(n_frames):
-            if self.verbose:
-                stdout_information(msg=f"View {view_idx + 1}/{n_views} ({csv_fn}): processing frame {row_pos + 1}/{n_frames}...",
-                                   source=self.__class__.__name__)
             if row_pos in drop_positions:
                 continue
             idx = df.index[row_pos]
             coords = df.loc[idx].values.astype(float)
-            xs = coords[0::2]
-            ys = coords[1::2]
-            valid = ~np.isnan(xs) & ~np.isnan(ys)
+            tasks.append((row_pos, idx, coords, lp_project_dir, save_dir, crop_size,
+                          csv_fn, self.bbox_pad_frac, want_viz, bp_names))
 
-            img_rel = str(idx)
-            img_path = os.path.join(lp_project_dir, img_rel.replace("/", os.sep))
-            if not os.path.isfile(img_path):
-                stdout_warning(msg=f"{csv_fn}: skipped row_pos={row_pos} (image not found)")
-                continue
-            img = cv2.imread(img_path)
-            if img is None:
-                stdout_warning(msg=f"{csv_fn}: skipped row_pos={row_pos} (cv2.imread returned None)")
-                continue
-            h, w = img.shape[:2]
+        if self.verbose:
+            stdout_information(msg=f"View {view_idx + 1}/{n_views} ({csv_fn}): cropping {len(tasks)} frames on {self.core_cnt} core(s)...",
+                               source=self.__class__.__name__)
 
-            bbox = self._get_bbox_for_image(img_rel=img_rel, img_h=h, img_w=w, xs=xs, ys=ys, valid=valid)
-            crop_x1, crop_y1, crop_x2, crop_y2 = self._bbox_to_square_crop(
-                bbox[0], bbox[1], bbox[2], bbox[3], h, w
-            )
+        results = []
+        if self.core_cnt == 1:
+            it = map(_crop_one_frame_worker, tasks)
+            for i, r in enumerate(it):
+                self._collect(r, results)
+                if self.verbose and (i + 1) % 100 == 0:
+                    stdout_information(msg=f"View {view_idx + 1}/{n_views} ({csv_fn}): {i + 1}/{len(tasks)} frames...", source=self.__class__.__name__)
+        else:
+            with multiprocessing.Pool(processes=self.core_cnt, maxtasksperchild=250) as pool:
+                for i, r in enumerate(pool.imap_unordered(_crop_one_frame_worker, tasks, chunksize=16)):
+                    self._collect(r, results)
+                    if self.verbose and (i + 1) % 100 == 0:
+                        stdout_information(msg=f"View {view_idx + 1}/{n_views} ({csv_fn}): {i + 1}/{len(tasks)} frames...", source=self.__class__.__name__)
+                pool.close()
+                pool.join()
 
-            cropped = img[crop_y1:crop_y2, crop_x1:crop_x2]
-            crop_h, crop_w = cropped.shape[:2]
-
-            scale_x = crop_size[0] / crop_w
-            scale_y = crop_size[1] / crop_h
-            resized = cv2.resize(cropped, crop_size, interpolation=cv2.INTER_LINEAR)
-
-            out_img_path = os.path.join(save_dir, img_rel.replace("/", os.sep))
-            os.makedirs(os.path.dirname(out_img_path), exist_ok=True)
-            cv2.imwrite(out_img_path, resized)
-
-            new_coords = coords.copy()
-            new_xs = np.where(np.isnan(xs), np.nan, (xs - crop_x1) * scale_x)
-            new_ys = np.where(np.isnan(ys), np.nan, (ys - crop_y1) * scale_y)
-            new_coords[0::2] = new_xs
-            new_coords[1::2] = new_ys
-            out_rows.append((idx, new_coords))
-
-            if self.visualize:
-                parts = img_rel.replace("/", os.sep).split(os.sep)
-                viz_fn = f"{parts[-2]}_{parts[-1]}" if len(parts) >= 2 else parts[-1]
-                viz_candidates.append((out_img_path, new_xs.copy(), new_ys.copy(), list(bp_names), viz_fn))
-
-        if len(out_rows) == 0:
+        if len(results) == 0:
             stdout_warning(msg=f"No valid rows in {csv_fn}{csv_ext}.")
             return
 
-        indices, data = zip(*out_rows)
+        results.sort(key=lambda r: r[0])
+        indices = [r[1] for r in results]
+        data = [r[2] for r in results]
+        if want_viz:
+            viz_candidates.extend([r[3] for r in results if r[3] is not None])
+
         out_df = pd.DataFrame(np.array(data), index=list(indices), columns=df.columns)
         out_df.index.name = df.index.name
         out_csv_path = os.path.join(save_dir, f"{csv_fn}{csv_ext}")
         out_df.to_csv(out_csv_path)
         stdout_success(msg=f"Saved {out_csv_path} ({len(out_df)} rows).")
+
+    @staticmethod
+    def _collect(r, results):
+        """Unpack a worker result: surface skip warnings in the parent, keep good rows."""
+        if r is None:
+            return
+        if r[0] == "SKIP":
+            stdout_warning(msg=r[2])
+            return
+        _, row_pos, idx, new_coords, viz = r
+        results.append((row_pos, idx, new_coords, viz))
 
     @staticmethod
     def _copy_project_files(lp_project_dir: str, save_dir: str):
@@ -310,10 +366,11 @@ class CropLPAnnotationsBboxSquare:
         return common
 
 
-# #if __name__ == "__main__":
-# cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"H:\sina\project_0609_5cam_0807\project_0609_5cam_0807",
-#                                               save_dir=r"H:\sina\project_0609_5cam_0807_cropped",
-#                                               bbox_pad_frac=0.25,
-#                                               visualize=100,
-#                                               verbose=True)
-# cropper.run()
+# if __name__ == "__main__":
+#     cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"I:\sina\project_5cam_cage21_22_0911",
+#                                           save_dir=r"I:\sina\project_5cam_cage21_22_0911_cropped",
+#                                           bbox_pad_frac=0.25,
+#                                           visualize=100,
+#                                           verbose=True,
+#                                           core_cnt=4)
+#     cropper.run()
