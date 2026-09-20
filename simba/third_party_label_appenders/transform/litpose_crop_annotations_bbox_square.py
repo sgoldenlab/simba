@@ -1,4 +1,6 @@
+import functools
 import glob
+import multiprocessing
 import os
 import random
 import shutil
@@ -14,8 +16,6 @@ from simba.utils.errors import InvalidInputError
 from simba.utils.printing import (SimbaTimer, stdout_information,
                                   stdout_success, stdout_warning)
 from simba.utils.read_write import find_core_cnt, get_fn_ext
-import multiprocessing
-import functools
 
 
 def _crop_one_frame_worker(task):
