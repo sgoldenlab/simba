@@ -161,6 +161,18 @@ through its pose-import tools, and frame-wise annotations through its
    * - `Stytra <https://github.com/portugueslab/stytra>`__
      - |oss|
      - Zebrafish tracking with closed-loop stimulus control
+   * - `OCTRON <https://octron-tracking.github.io/OCTRON-docs/>`__
+     - |oss|
+     - Segment-Anything-based segmentation and tracking in a napari GUI
+   * - `FastTrack <https://www.fasttrack.sh/>`__
+     - |oss|
+     - Fast 2D tracking of multiple objects, with manual correction
+   * - `Tierpsy Tracker <https://github.com/Tierpsy/tierpsy-tracker>`__
+     - |oss|
+     - Multi-worm tracking and phenotyping for C. elegans
+   * - `Argos <https://argos.readthedocs.io/en/latest/>`__
+     - |oss|
+     - Tracking multiple animals in cluttered or visually complex environments
 
 |:label:| **Supervised behavior classification**
 ------------------------------------------------
@@ -187,7 +199,7 @@ through its pose-import tools, and frame-wise annotations through its
    * - `LabGym <https://github.com/umyelab/LabGym>`__
      - |oss|
      - Tracking and behavior classification via Mask R-CNN
-   * - `SIPEC <https://github.com/damaggu/SIPEC>`__
+   * - `SIPEC <https://github.com/SIPEC-Animal-Data-Analysis/SIPEC>`__
      - |oss|
      - End-to-end deep-learning behavioral analysis pipeline
    * - `DeepAction <https://github.com/carlwharris/DeepAction>`__
@@ -202,6 +214,18 @@ through its pose-import tools, and frame-wise annotations through its
    * - `CBAS <https://github.com/jones-lab-tamu/CBAS>`__
      - |oss|
      - Circadian behavioural analysis suite for long recordings
+   * - `JABS <https://github.com/KumarLabJax/JABS-behavior-classifier>`__
+     - |oss|
+     - Pose pipeline and supervised classifier training for mice (JAX)
+   * - `LISBET <https://github.com/BelloneLab/lisbet>`__
+     - |oss|
+     - Transformer-based social behaviour segmentation from pose
+   * - `FERAL <https://github.com/Skovorp/feral>`__
+     - |oss|
+     - Supervised behaviour segmentation from raw video using video-understanding models; no pose required
+   * - `PainFace-Recognition <https://github.com/sofiabroome/painface-recognition>`__
+     - |oss|
+     - Recurrent-network recognition of equine pain expressions from video
 
 |:crystal_ball:| **Unsupervised behavior discovery**
 ----------------------------------------------------
@@ -237,6 +261,41 @@ through its pose-import tools, and frame-wise annotations through its
    * - `MoSeq <https://github.com/dattalab/moseq2-app>`__
      - |oss|
      - Depth-video behavioral syllable segmentation
+
+|:footprints:| **Kinematics and trajectory analysis**
+------------------------------------------------------
+
+Libraries for deriving movement metrics -- speed, turning, path shape, search strategy,
+collective structure -- from pose or centroid tracks, rather than classifying behaviour.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 14 64
+
+   * - Software
+     - Type
+     - Description
+   * - `DLC2Kinematics <https://github.com/AdaptiveMotorControlLab/DLC2Kinematics>`__
+     - |oss|
+     - Kinematic quantities from DeepLabCut pose output
+   * - `traja <https://github.com/traja-team/traja>`__
+     - |oss|
+     - Trajectory analysis and visualisation built on pandas
+   * - `PyRat <https://github.com/pyratlib/pyrat>`__
+     - |oss|
+     - Python library for behavioural and trajectory analysis of pose data
+   * - `animovement <https://animovement.dev/>`__
+     - |oss|
+     - R toolbox for analysing movement across space and time
+   * - `Rtrack <https://rupertoverall.net/Rtrack/index.html>`__
+     - |oss|
+     - Unbiased search-strategy classification for water-maze and related assays
+   * - `ColonyTrack <https://rupertoverall.net/ColonyTrack>`__
+     - |oss|
+     - Analysis of long-term tracking data from group-housed colonies
+   * - `swaRm <https://swarm-lab.github.io/swaRm/>`__
+     - |oss|
+     - R package for individual and collective movement metrics
 
 |:frame_with_picture:| **Object detection**
 -------------------------------------------
@@ -373,6 +432,9 @@ against when behaviour is paired with neural recording.
    * - `AMBER-pipeline <https://github.com/lapphe/AMBER-pipeline>`__
      - |oss|
      - Automated rodent maternal-behavior analysis
+   * - `AmadeusGPT <https://github.com/AdaptiveMotorControlLab/AmadeusGPT>`__
+     - |oss|
+     - Natural-language querying of behaviour from pose data
 
 |:pencil:| **Manual annotation**
 --------------------------------
