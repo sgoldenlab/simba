@@ -55,7 +55,7 @@ def pose_plotter_mp(data: pd.DataFrame,
     cap = cv2.VideoCapture(video_path)
     cap.set(1, start_frm)
 
-    while current_frm < end_frm:
+    while current_frm <= end_frm:
         ret, img = cap.read()
         if ret:
             for animal_cnt, (animal_name, animal_data) in enumerate(bp_dict.items()):

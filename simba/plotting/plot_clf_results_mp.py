@@ -99,7 +99,7 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
         else:
             video_writer = cv2.VideoWriter(video_save_path, fourcc, video_meta_data["fps"], (int(video_meta_data["width"] + final_gantt.shape[1]), video_meta_data["height"]))
     cap.set(1, start_frm)
-    while current_frm < end_frm:
+    while current_frm <= end_frm:
         ret, img = cap.read()
         if ret:
             clr_cnt = 0

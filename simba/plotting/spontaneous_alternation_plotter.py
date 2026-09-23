@@ -53,8 +53,8 @@ def spontaneous_alternator_video_mp(
             video_meta_data["height"],
         ),
     )
-    while current_frm < end_frm:
-        while current_frm < end_frm:
+    while current_frm <= end_frm:
+        while current_frm <= end_frm:
             sequence_lst = event_txt[current_frm]
             border = np.zeros(
                 (int(video_meta_data["height"]), int(video_meta_data["width"] / 2), 3),
