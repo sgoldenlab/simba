@@ -14,11 +14,14 @@ import PIL.Image
 from PIL import ImageTk
 
 from simba.mixins.config_reader import ConfigReader
-from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect, SimbaButton, hxtScrollbar)
-from simba.utils.checks import (check_float, check_instance, check_int, check_str, check_valid_lst)
-from simba.utils.enums import Formats, Options, ENV_VARS
+from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
+                                        SimbaButton, hxtScrollbar)
+from simba.utils.checks import (check_float, check_instance, check_int,
+                                check_str, check_valid_lst)
+from simba.utils.enums import ENV_VARS, Formats, Options
 from simba.utils.errors import CountError, NoFilesFoundError
-from simba.utils.lookups import (get_color_dict, get_icons_paths, get_monitor_info, get_named_colors)
+from simba.utils.lookups import (get_color_dict, get_icons_paths,
+                                 get_monitor_info, get_named_colors)
 from simba.utils.read_write import find_core_cnt, read_sys_env
 
 SHOW_ICONS = read_sys_env()[ENV_VARS.SHOW_ICONS.value]
