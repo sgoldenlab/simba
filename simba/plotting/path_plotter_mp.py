@@ -292,13 +292,13 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
                 frm_numbers = list(range(0, len(self.in_df)))
             self.data_df = self.in_df[self.data_cols]
             video_styles = self.__get_styles(self.style_attr)
-            if self.video_setting:
-                self.video_save_path = os.path.join(self.path_plot_dir, f"{self.video_name}.mp4")
-                self.video_temp_dir = os.path.join(self.path_plot_dir, self.video_name)
-                create_directory(paths=self.video_temp_dir, overwrite=True)
             if self.frame_setting:
                 self.save_frm_dir = os.path.join(self.path_plot_dir, self.video_name)
                 create_directory(paths=self.save_frm_dir, overwrite=True)
+            if self.video_setting:
+                self.video_save_path = os.path.join(self.path_plot_dir, f"{self.video_name}.mp4")
+                self.video_temp_dir = os.path.join(self.path_plot_dir, self.video_name, "temp") if self.frame_setting else os.path.join(self.path_plot_dir, self.video_name)
+                create_directory(paths=self.video_temp_dir, overwrite=True)
             video_rois, video_roi_names = None, None
             if self.roi:
                 video_rois, video_roi_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=self.video_name)
@@ -346,8 +346,9 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
                 stdout_success(msg=f'Last path plot frame saved at {last_frame_save_path}')
             if self.video_setting or self.frame_setting:
                 frm_cnt_range = np.arange(1, line_data[0].shape[0] + 1)
-                frm_cnt_range = np.array_split(frm_cnt_range, self.core_cnt)
-                frm_id_range = np.array_split(frm_numbers, self.core_cnt)
+                split_cnt = min(self.core_cnt, len(frm_numbers))
+                frm_cnt_range = np.array_split(frm_cnt_range, split_cnt)
+                frm_id_range = np.array_split(frm_numbers, split_cnt)
                 frm_range = [(cnt, x, y) for cnt, (x, y) in enumerate(zip(frm_cnt_range, frm_id_range))]
                 plot_clrs = []
                 for cnt, color in enumerate(self.colors):

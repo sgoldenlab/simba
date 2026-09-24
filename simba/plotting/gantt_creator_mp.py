@@ -270,7 +270,7 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
                                      hhmmss=self.hhmmss)
 
             if self.video_setting or self.frame_setting:
-                frame_data = np.array_split(list(range(0, len(self.data_df))), self.core_cnt)
+                frame_data = np.array_split(list(range(0, len(self.data_df))), min(self.core_cnt, len(self.data_df)))
                 frame_data = [(i, x) for i, x in enumerate(frame_data)]
                 stdout_information(msg=f"Creating gantt, multiprocessing (chunksize: {(self.multiprocess_chunksize)}, cores: {self.core_cnt})...")
                 constants = functools.partial(gantt_creator_mp,

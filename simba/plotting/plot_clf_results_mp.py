@@ -502,7 +502,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                 if self.show_confidence: self.clf_p[clf_name] = np.round(self.data_df[f'Probability_{clf_name}'].values.reshape(-1), 4)
 
             self.data_df["index"] = self.data_df.index
-            data = np.array_split(self.data_df, self.core_cnt)
+            data = np.array_split(self.data_df, min(self.core_cnt, len(self.data_df)))
             data = [(cnt, x) for (cnt, x) in enumerate(data)]
 
             constants = functools.partial(_multiprocess_sklearn_video,

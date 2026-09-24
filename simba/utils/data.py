@@ -684,7 +684,7 @@ def find_frame_numbers_from_time_stamp(start_time: str, end_time: str, fps: int)
     :example:
 
     >>> find_frame_numbers_from_time_stamp(start_time='00:00:00', end_time='00:00:01', fps=10)
-    >>> [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    >>> [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     """
     check_if_string_value_is_valid_video_timestamp(value=start_time, name="Start time")
     check_if_string_value_is_valid_video_timestamp(value=start_time, name="End time")
@@ -693,7 +693,7 @@ def find_frame_numbers_from_time_stamp(start_time: str, end_time: str, fps: int)
     end_h, end_m, end_s = end_time.split(":")
     start_in_s = int(start_h) * 3600 + int(start_m) * 60 + float(start_s)
     end_in_s = int(end_h) * 3600 + int(end_m) * 60 + float(end_s)
-    return list(range(int(start_in_s * fps), int(end_in_s * fps) + 2))
+    return list(range(int(start_in_s * fps), int(end_in_s * fps) + 1))
 
 
 # def slp_to_df_convert(file_path: Union[str, os.PathLike],

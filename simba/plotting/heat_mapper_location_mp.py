@@ -142,7 +142,7 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
     :param Union[List[Union[str, os.PathLike]], str, os.PathLike] data_paths: Path(s) to outlier-corrected movement or location CSV file(s). If None, uses all files in project.
     :param str bodypart: Body-part name used for location heatmap (e.g. 'Nose_1'). The heatmap shows where this body-part spends time.
     :param Dict[str, Any] style_attr: Dict with keys 'palette', 'shading', 'bin_size', 'max_scale'. E.g. {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 50, 'max_scale': 'auto'}.
-    :param Optional[int] bg_img: If set, overlay heatmap on video frame. -1 or None = no background. Non-negative int = frame index to use as background.
+    :param Optional[int] bg_img: If set, overlay heatmap on video frame. None = no background. -1 = each frame uses its own video frame as background (final image uses the last video frame). Non-negative int = frame index to use as static background.
     :param Optional[Dict[str, str]] time_slice: If set, restrict analysis to time period. Dict with keys 'start_time' and 'end_time' (HH:MM:SS). Default None.
     :param bool show_keypoint: If True, draw body-part position as dot on each frame. Default False.
     :param bool show_legend: If True, append color bar showing seconds scale. Default True.
@@ -297,7 +297,7 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
                                                 img_size=(self.width, self.height))
             if self.video_setting or self.frame_setting:
                 stdout_information(msg=f"Creating heatmap location video frames for video {self.video_name} ...")
-                frame_arrays = np.array_split(self.cum_sum_squares, self.core_cnt)
+                frame_arrays = np.array_split(self.cum_sum_squares, min(self.core_cnt, len(self.cum_sum_squares)))
                 last_frm_idx = 0
                 for frm_group in range(len(frame_arrays)):
                     split_arr = frame_arrays[frm_group]

@@ -279,10 +279,11 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
                 if self.style_attr["y_max"] == -1:
                     self.style_attr["y_max"] = max([np.max(x) for x in distances])
                 distances = np.stack(distances, axis=1)
+                split_cnt = min(self.core_cnt, distances.shape[0])
                 frm_range = np.arange(0, distances.shape[0])
-                frm_range = np.array_split(frm_range, self.core_cnt)
+                frm_range = np.array_split(frm_range, split_cnt)
 
-                distances = np.array_split(distances, self.core_cnt)
+                distances = np.array_split(distances, split_cnt)
                 distances = [
                     self.__insert_group_idx_column(data=i, group=cnt)
                     for cnt, i in enumerate(distances)

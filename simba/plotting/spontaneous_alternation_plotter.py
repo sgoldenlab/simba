@@ -239,7 +239,7 @@ class SpontaneousAlternationsPlotter(ConfigReader):
         bout_df = bout_df.drop(drop_idx.flatten(), axis=0).reset_index(drop=True)
         bout_df = bout_df[bout_df["Event"] != self.center_name]
         frm_index = np.arange(0, len(sa_computer.data_df))
-        frm_index = np.array_split(frm_index, self.core_cnt)
+        frm_index = np.array_split(frm_index, min(self.core_cnt, len(frm_index)))
         for cnt, i in enumerate(frm_index):
             frm_index[cnt] = np.insert(i, 0, cnt)
         event_txt = []

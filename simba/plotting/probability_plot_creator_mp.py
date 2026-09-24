@@ -226,7 +226,7 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
 
             if self.video_setting or self.frame_setting:
                 frm_nums = np.arange(0, len(data_df))
-                data_split = np.array_split(frm_nums, self.cores)
+                data_split = np.array_split(frm_nums, min(self.cores, len(frm_nums)))
                 frm_range = []
                 for cnt, i in enumerate(data_split): frm_range.append((cnt, i))
                 stdout_information(msg=f"Creating probability images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.cores})...")

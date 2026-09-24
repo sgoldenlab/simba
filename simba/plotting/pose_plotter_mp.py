@@ -209,7 +209,7 @@ class PosePlotterMultiProcess():
                 pose_df = self.config.insert_column_headers_for_outlier_correction(data_df=pose_df, new_headers=self.config.bp_headers, filepath=pose_path)
             self.pose_df = (pose_df.apply(pd.to_numeric, errors="coerce").fillna(0).reset_index(drop=True))
             self.centroid_data = self._get_center_of_mass() if self.center_of_mass is not None else None
-            pose_lst, obs_per_split = PlottingMixin().split_and_group_df(df=pose_df, splits=self.core_cnt)
+            pose_lst, obs_per_split = PlottingMixin().split_and_group_df(df=pose_df, splits=min(self.core_cnt, len(pose_df)))
             if self.verbose: stdout_information(msg=f"Creating pose videos, multiprocessing (chunksize: {self.config.multiprocess_chunksize}, cores: {self.core_cnt})...")
             constants = functools.partial(pose_plotter_mp,
                                           video_meta_data=video_meta_data,
