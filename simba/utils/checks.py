@@ -5,6 +5,7 @@ import glob
 import os
 import re
 import subprocess
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
 
@@ -666,23 +667,48 @@ def check_that_hhmmss_start_is_before_end(
             return False
     return True
 
-def check_nvidea_gpu_available(raise_error: bool = False) -> bool:
-    """
-    Helper to check of NVIDEA GPU is available via ``nvidia-smi``.
-    returns bool: True if nvidia-smi returns not None. Else False.
-    """
+@lru_cache(maxsize=None)
+def _nvidia_smi_available() -> bool:
     try:
         subprocess.check_output("nvidia-smi")
         return True
     except Exception:
-        if raise_error:
-            raise SimBAGPUError(msg='No NVIDIA GPU detected on machine (checked by calling "nvidia-smi")', source=check_nvidea_gpu_available.__name__)
+        return False
+
+
+def check_nvidea_gpu_available(raise_error: bool = False) -> bool:
+    """
+    Helper to check of NVIDEA GPU is available via ``nvidia-smi``.
+
+    .. note::
+       ``nvidia-smi`` is only called on the first check, the result is cached for the rest of the session. Starting
+       a process after the Windows file dialog has been opened can crash Python (heap corruption, GitHub issue #529).
+
+    returns bool: True if nvidia-smi returns not None. Else False.
+    """
+    if _nvidia_smi_available():
+        return True
+    if raise_error:
+        raise SimBAGPUError(msg='No NVIDIA GPU detected on machine (checked by calling "nvidia-smi")', source=check_nvidea_gpu_available.__name__)
+    return False
+
+
+@lru_cache(maxsize=None)
+def _ffmpeg_available() -> bool:
+    try:
+        subprocess.call("ffmpeg", stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+        return True
+    except Exception:
         return False
 
 
 def check_ffmpeg_available(raise_error: Optional[bool] = False) -> Union[bool, None]:
     """
     Helper to check of FFMpeg is available via subprocess ``ffmpeg``.
+
+    .. note::
+       ``ffmpeg`` is only called on the first check, the result is cached for the rest of the session. Starting
+       a process after the Windows file dialog has been opened can crash Python (heap corruption, GitHub issue #529).
 
     .. seealso::
        To check which encoders are available in FFMpeg installation, see :func:`simba.utils.lookups.get_ffmpeg_encoders`
@@ -691,16 +717,11 @@ def check_ffmpeg_available(raise_error: Optional[bool] = False) -> Union[bool, N
     :return bool: True if ``ffmpeg`` returns not None and raise_error is False. Else False.
     """
 
-    try:
-        subprocess.call("ffmpeg", stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+    if _ffmpeg_available():
         return True
-    except Exception:
-        if raise_error:
-            raise FFMPEGNotFoundError(
-                msg="FFMpeg could not be found on the instance (as evaluated via subprocess ffmpeg). Please make sure FFMpeg is installed."
-            )
-        else:
-            return False
+    if raise_error:
+        raise FFMPEGNotFoundError(msg="FFMpeg could not be found on the instance (as evaluated via subprocess ffmpeg). Please make sure FFMpeg is installed.")
+    return False
 
 def check_if_valid_rgb_str(
     input: str,

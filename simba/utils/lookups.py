@@ -11,6 +11,7 @@ import sys
 import tkinter as tk
 from copy import copy
 from datetime import datetime
+from functools import lru_cache
 from itertools import groupby
 from multiprocessing import Lock, Value
 from pathlib import Path
@@ -1050,26 +1051,29 @@ def get_ffmpeg_encoders(raise_error: bool = True, alphabetically_sorted: bool = 
 
     check_ffmpeg_available(raise_error=True)
     try:
-        proc = subprocess.Popen(['ffmpeg', '-encoders'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = proc.communicate()
-        if isinstance(stdout, bytes):
-            stdout = stdout.decode('utf-8')
+        encoders = list(_ffmpeg_encoders())
     except Exception as e:
         if raise_error:
             raise FFMPEGNotFoundError(msg=str(e.args))
         else:
             return []
-    encoders = []
-    lines = stdout.split('\n')
+    return sorted(encoders) if alphabetically_sorted else encoders
 
-    for line in lines:
+
+@lru_cache(maxsize=None)
+def _ffmpeg_encoders() -> Tuple[str, ...]:
+    """ Parse ``ffmpeg -encoders`` once per session. Returns a tuple so callers can't mutate the cached value. Failures raise and are not cached."""
+    proc = subprocess.Popen(['ffmpeg', '-encoders'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = proc.communicate()
+    if isinstance(stdout, bytes):
+        stdout = stdout.decode('utf-8')
+    encoders = []
+    for line in stdout.split('\n'):
         if re.match(r'^\s*[VAS]', line):
             parts = line.split()
             if len(parts) >= 2:
-                encoder_name = parts[1]
-                encoders.append(encoder_name)
-
-    return sorted(encoders) if alphabetically_sorted else encoders
+                encoders.append(parts[1])
+    return tuple(encoders)
 
 
 def find_closest_string(target: str,
@@ -1491,6 +1495,13 @@ def get_ffmpeg_codec(file_name: Union[str, os.PathLike],
         return fallback
 
 
+@lru_cache(maxsize=None)
+def _nvidia_smi_gpu_name() -> str:
+    """ Name of the first GPU as reported by ``nvidia-smi``, queried once per session. Failures raise and are not cached."""
+    stdout = subprocess.check_output(["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"], stderr=subprocess.DEVNULL, universal_newlines=True)
+    return stdout.strip().split("\n")[0]
+
+
 def get_nvdec_count(gpu_name: Optional[str] = None) -> int:
     """
     Return the number of concurrent NVDEC (hardware video decode) sessions typical for the GPU model.
@@ -1562,8 +1573,7 @@ def get_nvdec_count(gpu_name: Optional[str] = None) -> int:
     }
 
     if gpu_name is None:
-        result = subprocess.run(["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"], capture_output=True, text=True)
-        gpu_name = result.stdout.strip().split("\n")[0]
+        gpu_name = _nvidia_smi_gpu_name()
 
     for key in sorted(NVDEC, key=len, reverse=True):
         if key in gpu_name:

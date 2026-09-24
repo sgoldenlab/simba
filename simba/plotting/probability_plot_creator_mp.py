@@ -66,9 +66,8 @@ def _probability_plot_mp(frm_range: Tuple[int, np.ndarray],
         video_save_path = os.path.join(video_dir, f"{group}.mp4")
         video_writer = cv2.VideoWriter(video_save_path, fourcc, fps, size)
 
-    while current_frm < end_frm:
+    while current_frm <= end_frm:
         current_lst = [np.array(clf_data[0 : current_frm + 1])]
-        current_frm += 1
         img = PlottingMixin.make_line_plot(data=current_lst,
                                            colors=[color],
                                            width=size[0],
@@ -226,7 +225,7 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
                                                        show_thresholds=self.show_thresholds)
 
             if self.video_setting or self.frame_setting:
-                frm_nums = np.arange(0, len(data_df)+1)
+                frm_nums = np.arange(0, len(data_df))
                 data_split = np.array_split(frm_nums, self.cores)
                 frm_range = []
                 for cnt, i in enumerate(data_split): frm_range.append((cnt, i))

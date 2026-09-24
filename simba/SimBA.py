@@ -213,7 +213,8 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
 from simba.ui.utils import position_window
 from simba.ui.video_info_ui import VideoInfoTable
 from simba.utils.checks import (check_ffmpeg_available,
-                                check_file_exist_and_readable, check_int)
+                                check_file_exist_and_readable, check_int,
+                                check_nvidea_gpu_available)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
 from simba.utils.enums import (ENV_VARS, OS, ConfigKey, Defaults, Dtypes,
                                Formats, Keys, Links, PackageNames, Paths,
@@ -1112,6 +1113,7 @@ class App(object):
 
         if not check_ffmpeg_available():
             FFMpegNotFoundWarning(msg='SimBA could not find a FFMPEG installation on computer (as evaluated by "ffmpeg" returning None). SimBA works best with FFMPEG and it is recommended to install it on your computer', source=self.__class__.__name__)
+        check_nvidea_gpu_available()  # cache GPU check before any file dialog is opened (GitHub issue #529)
 
 
 

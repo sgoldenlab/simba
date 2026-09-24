@@ -468,7 +468,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                 create_directory(paths=self.video_temp_dir, overwrite=True)
             if self.frame_setting:
                 self.video_frame_dir = os.path.join(self.save_dir, self.video_name)
-                create_directory(paths=self.video_temp_dir, overwrite=True)
+                create_directory(paths=self.video_frame_dir, overwrite=False)
             if self.rotate:
                 self.video_meta_data["height"], self.video_meta_data["width"] = (width, height)
             if self.time_slice is None: check_video_and_data_frm_count_align(video=video_path, data=self.data_df, name=self.video_name, raise_error=False)

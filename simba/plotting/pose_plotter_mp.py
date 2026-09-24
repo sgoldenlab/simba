@@ -72,7 +72,7 @@ def pose_plotter_mp(data: pd.DataFrame,
                     elif bbox == 'animal-aligned':
                         animal_bbox = GeometryMixin().minimum_rotated_rectangle(shape=np.array(animal_bbox).reshape(len(animal_bbox), 2), buffer=None)
                         animal_bbox = np.round(np.array(animal_bbox.exterior.coords)).astype(np.int32)
-                    img = cv2.polylines(img, [animal_bbox], True, colors_dict[animal_cnt][0], thickness=max(1, int(circle_size/1.5)), lineType=-1)
+                    img = cv2.polylines(img, [animal_bbox], True, colors_dict[animal_cnt][0], thickness=max(1, int(circle_size/1.5)), lineType=cv2.LINE_AA)
                 if center_of_mass is not None:
                     center_point = center_of_mass[animal_name][current_frm]
                     center_point_tuple = (int(center_point[0]), int(center_point[1]))

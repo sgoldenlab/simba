@@ -51,7 +51,7 @@ def distance_plotter_mp(
         )
 
     for frm_cnt in frm_cnts:
-        line_data = distances[:frm_cnt, 1:]
+        line_data = distances[:frm_cnt + 1, 1:]
         line_data = np.hsplit(line_data, line_data.shape[1])
 
         img = PlottingMixin.make_line_plot_plotly(
@@ -205,7 +205,7 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
                 data_df.columns = self.bp_headers
             except ValueError:
                 raise CountError(
-                    msg=f"SimBA expects {self.bp_headers} columns but found {len(data_df)} columns in {file_path}",
+                    msg=f"SimBA expects {self.bp_headers} columns but found {len(data_df.columns)} columns in {file_path}",
                     source=self.__class__.__name__,
                 )
             self.video_info, px_per_mm, fps = self.read_video_info(

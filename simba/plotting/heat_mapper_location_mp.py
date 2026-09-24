@@ -63,7 +63,7 @@ def _heatmap_location(data: np.array,
     video_writer = None
     static_bg, kp_size = None, None
     if video_path is not None:
-        if bg_img > -1:
+        if bg_img is not None and bg_img > -1:
             static_bg = read_frm_of_video(video_path=video_path, frame_index=bg_img, greyscale=False)
         kp_size = PlottingMixin().get_optimal_circle_size(frame_size=size, circle_frame_ratio=50)
     for frm_cnt, i in enumerate(range(data.shape[0])):
@@ -302,7 +302,7 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
                 for frm_group in range(len(frame_arrays)):
                     split_arr = frame_arrays[frm_group]
                     frame_arrays[frm_group] = self.__insert_group_idx_column(data=split_arr, group=frm_group, last_frm_idx=last_frm_idx)
-                    last_frm_idx = np.max(frame_arrays[frm_group].reshape((frame_arrays[frm_group].shape[0], -1)))
+                    last_frm_idx = int(frame_arrays[frm_group][-1, 0, 0]) + 1
                 constants = functools.partial(_heatmap_location,
                                               video_setting=self.video_setting,
                                               frame_setting=self.frame_setting,

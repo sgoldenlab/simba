@@ -76,11 +76,11 @@ def val_clip_createror_mp(data: np.ndarray,
     cap = cv2.VideoCapture(video_path)
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
     start_frm, end_frame, save_path, c_frm, bount_cnt = (int(data[1]), int(data[2]), data[3], int(data[1]), int(data[0]))
-    bout_frm_cnt = end_frame - start_frm
+    bout_frm_cnt = end_frame - start_frm + 1
     writer = cv2.VideoWriter(save_path, fourcc, fps, (int(video_meta_data["width"]), int(video_meta_data["height"])))
     __insert_inter_frms()
     frm_cnt = 0
-    while c_frm < end_frame:
+    while c_frm <= end_frame:
         p, clf_val = round(float(p_data.loc[c_frm]), 3), int(clf_data.loc[c_frm])
         cap.set(1, c_frm)
         ret, img = cap.read()
@@ -194,8 +194,8 @@ class ClassifierValidationClipsMultiprocess(ConfigReader):
                 event_start_frm, event_end_frm = bout["Start_frame"], bout["End_frame"]
                 start_window = int(event_start_frm - (int(self.video_info["fps"]) * self.window))
                 end_window = int(event_end_frm + (int(self.video_info["fps"]) * self.window))
-                if end_window > len(self.data_df):
-                    end_window = len(self.data_df)
+                if end_window > len(self.data_df) - 1:
+                    end_window = len(self.data_df) - 1
                 if start_window < 0:
                     start_window = 0
                 self.save_path = os.path.join(self.clf_validation_dir, self.clf_name + f"_{bout_cnt}_{file_name}.mp4")

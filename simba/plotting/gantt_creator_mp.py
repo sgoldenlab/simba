@@ -104,10 +104,10 @@ def gantt_creator_mp(data: np.array,
                                                save_path=None,
                                                palette=palette,
                                                hhmmss=hhmmss)
-        current_frm += 1
         if frame_setting:
             frame_save_path = os.path.join(frame_folder_dir, f"{current_frm}.png")
             cv2.imwrite(frame_save_path, plot)
+        current_frm += 1
         if video_setting:
             video_writer.write(plot)
         del plot

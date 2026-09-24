@@ -282,7 +282,7 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
             check_valid_dataframe(df=self.in_df, source=file_path, valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=self.data_cols)
             if self.clf_attr is not None:
                 check_valid_dataframe(df=self.in_df, source=file_path, valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=self.clf_names)
-            self.save_frm_dir = None
+            self.save_frm_dir, self.video_temp_dir = None, None
             if self.slicing:
                 frm_numbers = find_frame_numbers_from_time_stamp(start_time=self.slicing[START_TIME], end_time=self.slicing[END_TIME], fps=self.fps)
                 if len(set(frm_numbers) - set(self.in_df.index)) > 0:
@@ -345,7 +345,7 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
                 cv2.imwrite(filename=last_frame_save_path, img=last_frm)
                 stdout_success(msg=f'Last path plot frame saved at {last_frame_save_path}')
             if self.video_setting or self.frame_setting:
-                frm_cnt_range = np.arange(1, line_data[0].shape[0])
+                frm_cnt_range = np.arange(1, line_data[0].shape[0] + 1)
                 frm_cnt_range = np.array_split(frm_cnt_range, self.core_cnt)
                 frm_id_range = np.array_split(frm_numbers, self.core_cnt)
                 frm_range = [(cnt, x, y) for cnt, (x, y) in enumerate(zip(frm_cnt_range, frm_id_range))]

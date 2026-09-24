@@ -64,7 +64,7 @@ def spontaneous_alternator_video_mp(
             for shape_cnt, (k, v) in enumerate(roi_geometries.items()):
                 cv2.polylines(
                     img,
-                    [np.array(v.exterior.coords).astype(np.int)],
+                    [np.array(v.exterior.coords).astype(np.int32)],
                     True,
                     (roi_geometry_clrs[k]),
                     thickness=2,
@@ -73,7 +73,7 @@ def spontaneous_alternator_video_mp(
                 img,
                 [
                     np.array(animal_geometries[current_frm].exterior.coords).astype(
-                        np.int
+                        np.int32
                     )
                 ],
                 True,
