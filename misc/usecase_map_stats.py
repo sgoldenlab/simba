@@ -16,7 +16,7 @@ from institution_coords import INSTITUTION_ALIASES, INSTITUTION_COORDS
 
 SHEET_ID = "169enc3Am2KQKifxj1F9KEKKLbftpMhBlw49zjl-egsY"
 CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=0"
-OUT = os.path.join("docs", "_generated", "usecase_map.html")
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "docs", "_generated", "usecase_map.html")
 
 # --- country name -> ISO-2 (covers sheet variants + misspellings) ---------
 NAME2ISO = {
@@ -251,7 +251,7 @@ def main():
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(html)
-    print(f"Wrote {OUT}: {total} studies, {n_countries} countries, "
+    print(f"Wrote {os.path.normpath(OUT)}: {total} studies, {n_countries} countries, "
           f"{n_continents} continents, {n_species} species, {n_journals} journals, "
           f"{n_institutions} institutions pinned")
 

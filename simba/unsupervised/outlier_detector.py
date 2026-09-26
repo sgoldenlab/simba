@@ -16,7 +16,7 @@ from simba.mixins.statistics_mixin import Statistics
 from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.errors import CountError
 from simba.utils.read_write import read_pickle
-from simba.utils.warnings import CountWarning
+from simba.utils.warnings import NotEnoughDataWarning
 
 LOF = "local outlier factor"
 EE = "elliptic envelope"
@@ -47,7 +47,7 @@ class OutlierDetector(ConfigReader):
             ].labels_
             self.unique_labels = [x for x in list(np.unique(self.y)) if x != -1]
             if len(self.unique_labels) <= 1:
-                CountWarning(
+                NotEnoughDataWarning(
                     msg="Too few clusters for performing cluster_sliced, reverting to False",
                     source=self.__class__.__name__,
                 )
