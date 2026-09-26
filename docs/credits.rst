@@ -81,7 +81,7 @@ Notes on development
      <p>SimBA is built and maintained for free, in spare time. If it helps your research, the best ways to say thanks:</p>
      <div class="simba-btn-row" style="justify-content:center;">
        <a href="https://github.com/sgoldenlab/simba" title="Star SimBA on GitHub">⭐&nbsp;&nbsp;Star on GitHub</a>
-       <a href="index.html#how-to-cite-simba" title="How to cite SimBA">📑&nbsp;&nbsp;Cite SimBA</a>
+       <a href="cite.html" title="How to cite SimBA">📑&nbsp;&nbsp;Cite SimBA</a>
      </div>
    </div>
 

@@ -144,6 +144,7 @@ ________________________________________________
 
    👥 Credits <credits>
    links
+   📑 Cite <cite>
 
 .. toctree::
    :maxdepth: 2

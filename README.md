@@ -200,21 +200,27 @@ SimBA is developed and maintained by **[Simon Nilsson](https://github.com/sronil
 ## License 📃
 This project is licensed under the BSD 3-Clause License, modified for academic and research use only (see [LICENSE](LICENSE)). Note that the software is provided 'as is', without warranty of any kind, express or implied. 
 
-If you find **any** part of the code or data useful for your own work, please cite us. You can view and download the citation file by clicking the <kbd>Cite this repository</kbd> button at the top right of this page. Thank you 🙏!
+If you find **any** part of the code or data useful for your own work, please cite us. Thank you 🙏!
 
-	@article{Goodwin2024,
-  		author = {Goodwin, Nastacia L. and Choong, Jia J. and Hwang, Sophia and Pitts, Kayla and Bloom, Liana and Islam, Aasiya and Zhang, Yizhe Y. and Szelenyi, Eric R. and Tong, Xiaoyu and Newman, Emily L. and Miczek, Klaus and Wright, 	Hayden R. and McLaughlin, Ryan J. and Norville, Zane C. and Eshel, Neir and Heshmati, Mitra and Nilsson, Simon R. O. and Golden, Sam A.},
-  		title = {Simple Behavioral Analysis (SimBA) as a platform for explainable machine learning in behavioral neuroscience},
-  		journal = {Nature Neuroscience},
-  		volume = {27},
-  		pages = {1411--1424},
-  		year = {2024},
-  		doi = {10.1038/s41593-024-01649-9},
-  		publisher = {Nature Publishing Group},
-  		URL = {https://simba-uw-tf-dev.readthedocs.io/},
-  		repository = {https://github.com/sgoldenlab/simba},
-    		license = {BSD-3-Clause (Academic/Research Use Only)}
-			}
+> Goodwin, N. L., Choong, J. J., Hwang, S., Pitts, K., Bloom, L., Islam, A., Zhang, Y. Y., Szelenyi, E. R., Tong, X., Newman, E. L., Miczek, K., Wright, H. R., McLaughlin, R. J., Norville, Z. C., Eshel, N., Heshmati, M., Nilsson, S. R. O., & Golden, S. A. (2024). Simple Behavioral Analysis (SimBA) as a platform for explainable machine learning in behavioral neuroscience. *Nature Neuroscience*, 27(7), 1411–1424. https://doi.org/10.1038/s41593-024-01649-9
+
+```bibtex
+@article{Goodwin_2024,
+  title     = {Simple Behavioral Analysis (SimBA) as a platform for explainable machine learning in behavioral neuroscience},
+  author    = {Goodwin, Nastacia L. and Choong, Jia J. and Hwang, Sophia and Pitts, Kayla and Bloom, Liana and Islam, Aasiya and Zhang, Yizhe Y. and Szelenyi, Eric R. and Tong, Xiaoyu and Newman, Emily L. and Miczek, Klaus and Wright, Hayden R. and McLaughlin, Ryan J. and Norville, Zane C. and Eshel, Neir and Heshmati, Mitra and Nilsson, Simon R. O. and Golden, Sam A.},
+  journal   = {Nature Neuroscience},
+  volume    = {27},
+  number    = {7},
+  pages     = {1411--1424},
+  year      = {2024},
+  doi       = {10.1038/s41593-024-01649-9},
+  url       = {https://doi.org/10.1038/s41593-024-01649-9},
+  publisher = {Springer Science and Business Media LLC}
+}
+```
+
+You can also use the <kbd>Cite this repository</kbd> button at the top right of this page. Other formats (APA, MLA, Chicago, Harvard, Vancouver, RIS) and one-click .bib/.ris downloads: [How to cite SimBA](https://simba-uw-tf-dev.readthedocs.io/en/latest/cite.html).
+
 ## References 📜
 
 [![Foo](https://github.com/sgoldenlab/simba/blob/master/images/cos_center_logo_small.original.png)](https://osf.io/d69jt/)

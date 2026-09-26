@@ -157,11 +157,11 @@ download links on each card.
      </div>
 
      <div class="simba-res-card">
-       <a class="simba-res-thumb" href="../index.html#how-to-cite-simba" style="background-image:url('../_static/img/workflow_citation.webp')"></a>
+       <a class="simba-res-thumb" href="../cite.html" style="background-image:url('../_static/img/workflow_citation.webp')"></a>
        <div class="simba-res-body">
          <h3>📑 Cite SimBA</h3>
-         <p>How to cite SimBA &mdash; the <em>Nature Neuroscience</em> reference, DOI, and ready-to-use BibTeX.</p>
-         <div class="simba-res-links"><a href="../index.html#how-to-cite-simba">📑 How to cite</a> <a href="https://doi.org/10.1038/s41593-024-01649-9">🔗 DOI</a></div>
+         <p>How to cite SimBA &mdash; the <em>Nature Neuroscience</em> reference in APA, MLA, Chicago, Harvard, Vancouver, BibTeX or RIS, with one-click copy and .bib/.ris downloads.</p>
+         <div class="simba-res-links"><a href="../cite.html">📑 How to cite</a> <a href="https://doi.org/10.1038/s41593-024-01649-9">🔗 DOI</a></div>
        </div>
      </div>
 
