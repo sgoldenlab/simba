@@ -52,17 +52,18 @@ def quickhull_2d(points: np.ndarray) -> np.ndarray:
     return results
 
 
-points = np.random.randint(1, 50, size=(50000, 5, 2)).astype(float)
-start = time.time()
-results = quickhull_2d(points)
-print(time.time() - start)
-#
-points = points.astype(int)
-start = time.time()
-results = np.full((points.shape[0]), np.nan)
-for i in range(points.shape[0]):
-    results[i] = ConvexHull(points[i], qhull_options="En").area
-print(time.time() - start)
+# if __name__ == "__main__":
+#     points = np.random.randint(1, 50, size=(50000, 5, 2)).astype(float)
+#     start = time.time()
+#     results = quickhull_2d(points)
+#     print(time.time() - start)
+#     #
+#     points = points.astype(int)
+#     start = time.time()
+#     results = np.full((points.shape[0]), np.nan)
+#     for i in range(points.shape[0]):
+#         results[i] = ConvexHull(points[i], qhull_options="En").area
+#     print(time.time() - start)
 # #
 
 

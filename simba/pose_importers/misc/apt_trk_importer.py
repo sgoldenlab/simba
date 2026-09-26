@@ -126,17 +126,18 @@ class APTImporterTRK(ConfigReader, PoseImporterMixin):
     #         self.__insert_all_animal_bps(frame=self.overlay)
 
 
-test = APTImporterTRK(
-    config_path="/Users/simon/Desktop/envs/troubleshooting/trk_test/project_folder/project_config.ini",
-    data_folder="/Users/simon/Desktop/envs/troubleshooting/trk_test/data/",
-    id_lst=["Animal_1", "Animal_2", "Animal_3"],
-    interpolation_settings="Body-parts: Nearest",
-    smoothing_settings={
-        "Method": "Savitzky Golay",
-        "Parameters": {"Time_window": "200"},
-    },
-)
-test.run()
+# if __name__ == "__main__":
+#     test = APTImporterTRK(
+#         config_path="/Users/simon/Desktop/envs/troubleshooting/trk_test/project_folder/project_config.ini",
+#         data_folder="/Users/simon/Desktop/envs/troubleshooting/trk_test/data/",
+#         id_lst=["Animal_1", "Animal_2", "Animal_3"],
+#         interpolation_settings="Body-parts: Nearest",
+#         smoothing_settings={
+#             "Method": "Savitzky Golay",
+#             "Parameters": {"Time_window": "200"},
+#         },
+#     )
+#     test.run()
 
 
 # test = TRKImporter(config_path='/Users/simon/Desktop/envs/troubleshooting/DLC_2_Black_animals/project_folder/project_config.ini',

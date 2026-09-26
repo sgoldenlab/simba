@@ -5,7 +5,7 @@ Resolve a raw sheet token with: COORDS.get(ALIASES.get(tok, tok)).
 
 INSTITUTION_ALIASES = {
     'Brain Mind Institute': 'EPFL',
-    "Children's Hospital of Philadelphia": 'Children’s Hospital of Philadelphia',
+    'Columbia': 'Columbia University',
     'Concordia': 'Concordia University',
     'Cornell': 'Cornell University',
     'Department of Earth and Environmental Sciences': '',
@@ -16,6 +16,7 @@ INSTITUTION_ALIASES = {
     'Laboratory of Synaptic Mechanisms': 'EPFL',
     'Max Planck': 'Max Planck Institute of Psychiatry',
     'McGill': 'McGill University',
+    'Monash': 'Monash University',
     'NIDA': 'National Institute on Drug Abuse',
     'NIH': 'National Institutes of Health',
     'NIHM': 'National Institute of Mental Health',
@@ -30,8 +31,8 @@ INSTITUTION_ALIASES = {
     'Stanford': 'Stanford University',
     'Technical University Darmstadt': 'Technische Universität Darmstadt',
     'Texas A&M': 'Texas A&M University',
-    "The Children's Hospital of Philadelphia Research Institute": 'Children’s Hospital of Philadelphia',
     'The University of Hong Kong': 'University of Hong Kong',
+    'UNSW': 'UNSW Sydney',
     'University': '',
     'University Darmstadt': 'Technische Universität Darmstadt',
     'University of Bordeaux': 'Université de Bordeaux',
@@ -46,6 +47,8 @@ INSTITUTION_ALIASES = {
     'Zhengzhou': '',
     'etherlands Institute for Neuroscience': 'Netherlands Institute for Neuroscience',
     'niversity of Pennsylvania': 'University of Pennsylvania',
+    "The Children's Hospital of Philadelphia Research Institute": 'Children’s Hospital of Philadelphia',
+    "Children's Hospital of Philadelphia": 'Children’s Hospital of Philadelphia',
     'École Polytechnique Fédérale de Lausanne': 'EPFL',
 }
 
@@ -103,12 +106,15 @@ INSTITUTION_COORDS = {
     'Indian Institute of Technology Madras': [12.9942, 80.2367],  # 2
     'Inscopix': [37.4419, -122.143],  # 1
     'Institute of Physiology of the Czech Academy of Sciences': [50.0407, 14.474],  # 1
+    'Instituto Politécnico Nacional': [19.5046, -99.1336],  # 1
     'Instituto de Salud Carlos III': [40.476, -3.6939],  # 1
+    'Jagiellonian University Medical College': [50.0614, 19.9336],  # 1
     'Johannes Gutenberg University': [49.992, 8.2371],  # 1
     'KU Leuven': [50.8779, 4.7005],  # 6
     'Karolinska Institutet': [59.3515, 18.0311],  # 3
     'Kindai University': [34.6517, 135.5913],  # 1
     'Kobe University': [34.6638, 135.0291],  # 1
+    'Korea Advanced Institute of Science and Technology': [36.3721, 127.3604],  # 1
     'Lehigh University': [40.6068, -75.3782],  # 4
     'Linköping University': [58.3978, 15.5755],  # 1
     'MCCI Corporation': [42.443, -76.5019],  # 1
@@ -160,9 +166,9 @@ INSTITUTION_COORDS = {
     'Southern Illinois University-Carbondale': [37.7083, -89.2276],  # 1
     'Srinakharinwirot University': [13.7449, 100.5648],  # 1
     'Stanford University': [37.4313, -122.1694],  # 5
-    "Sydney Children's Hospital Randwick": [-33.9177, 151.2384],  # 1
     'TU Dresden': [51.0283, 13.736],  # 1
     'Technische Universität Darmstadt': [49.8612, 8.6819],  # 2
+    'TensorAnalytics': [38.9757, -77.6414],  # 1
     'Texas A&M University': [30.6109, -96.3521],  # 2
     'The International Brain Laboratory': [51.5246, -0.134],  # 1
     'The Second Affiliated Hospital of Nanjing Medical University': [32.0616, 118.7788],  # 1
@@ -216,4 +222,5 @@ INSTITUTION_COORDS = {
     'Wayne State University': [42.3572, -83.0709],  # 1
     'Weizmann Institute of Science': [31.9078, 34.8133],  # 3
     'Yale School of Medicine': [41.3352, -72.9187],  # 1
+    "Sydney Children's Hospital Randwick": [-33.9177, 151.2384],  # 1
 }

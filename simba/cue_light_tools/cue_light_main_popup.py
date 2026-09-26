@@ -116,5 +116,6 @@ class CueLightMainPopUp(ConfigReader, PopUpMixin):
 
 
 
-test = CueLightMainPopUp(config_path=r"C:\troubleshooting\cue_light\t1\project_folder\project_config.ini")
-test.main_frm.mainloop()
+# if __name__ == "__main__":
+#     test = CueLightMainPopUp(config_path=r"C:\troubleshooting\cue_light\t1\project_folder\project_config.ini")
+#     test.main_frm.mainloop()

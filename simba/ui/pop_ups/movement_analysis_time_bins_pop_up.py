@@ -126,7 +126,7 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
                                                                                 distance=distance,
                                                                                 velocity=velocity,
                                                                                 transpose=transpose,
-                                                                                threshold=body_part_threshold,
+                                                                                threshold=float(body_part_threshold),
                                                                                 include_timestamp=include_timestamps)
 
         time_bin_movement_analyzer.run()

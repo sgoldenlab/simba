@@ -157,8 +157,9 @@ class TrainMultiLabelRandomForestClassifier(ConfigReader, TrainModelMixin):
             )
 
 
-model_trainer = TrainMultiLabelRandomForestClassifier(
-    config_path="/Users/simon/Desktop/envs/troubleshooting/multilabel/project_folder/project_config.ini"
-)
-model_trainer.perform_sampling()
-model_trainer.run()
+# if __name__ == "__main__":
+#     model_trainer = TrainMultiLabelRandomForestClassifier(
+#         config_path="/Users/simon/Desktop/envs/troubleshooting/multilabel/project_folder/project_config.ini"
+#     )
+#     model_trainer.perform_sampling()
+#     model_trainer.run()

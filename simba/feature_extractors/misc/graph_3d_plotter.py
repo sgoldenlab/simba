@@ -56,5 +56,6 @@ class Graph3DPlotter(object):
         self.plotter.show()
 
 
-test = Graph3DPlotter(networks_path="/Users/simon/Desktop/envs/simba_dev/Test.pickle")
-test.plot(video_name="termites_test")
+# if __name__ == "__main__":
+#     test = Graph3DPlotter(networks_path="/Users/simon/Desktop/envs/simba_dev/Test.pickle")
+#     test.plot(video_name="termites_test")

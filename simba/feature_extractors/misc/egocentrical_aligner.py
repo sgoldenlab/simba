@@ -174,7 +174,8 @@ class EgocentricalAlignmentFeaturizer(object):
         self.results = results.fillna(-1)
 
 
-aligner = EgocentricalAlignmentFeaturizer(
-    data_path="/Users/simon/Desktop/envs/simba_dev/simba/features_scripts/misc/test_data_mouse_OF",
-    visualize=False,
-)
+# if __name__ == "__main__":
+#     aligner = EgocentricalAlignmentFeaturizer(
+#         data_path="/Users/simon/Desktop/envs/simba_dev/simba/features_scripts/misc/test_data_mouse_OF",
+#         visualize=False,
+#     )

@@ -54,36 +54,7 @@ ____________________________________
 📑 HOW TO CITE SIMBA
 ------------------------
 
-If you use SimBA in your research, please cite:
-
-.. raw:: html
-
-   <div class="simba-cite">
-     <p class="simba-cite-ref">Goodwin, N. L., Choong, J. J., Hwang, S., <em>et al.</em> (2024).
-        Simple Behavioral Analysis (SimBA) as a platform for explainable machine learning in
-        behavioral neuroscience. <em>Nature Neuroscience</em>, 27, 1411&ndash;1424.</p>
-     <div class="simba-btn-row" style="justify-content:center; margin:8px 0 0;">
-       <a href="https://www.nature.com/articles/s41593-024-01649-9" title="Read the paper in Nature Neuroscience">📄&nbsp;&nbsp;Read the paper</a>
-       <a href="https://doi.org/10.1038/s41593-024-01649-9" title="DOI: 10.1038/s41593-024-01649-9">🔗&nbsp;&nbsp;DOI</a>
-     </div>
-   </div>
-
-**BibTeX**
-
-.. code-block:: bibtex
-
-    @article{Goodwin_2024,
-      title     = {Simple Behavioral Analysis (SimBA) as a platform for explainable machine learning in behavioral neuroscience},
-      author    = {Goodwin, Nastacia L. and Choong, Jia J. and Hwang, Sophia and Pitts, Kayla and Bloom, Liana and Islam, Aasiya and Zhang, Yizhe Y. and Szelenyi, Eric R. and Tong, Xiaoyu and Newman, Emily L. and Miczek, Klaus and Wright, Hayden R. and McLaughlin, Ryan J. and Norville, Zane C. and Eshel, Neir and Heshmati, Mitra and Nilsson, Simon R. O. and Golden, Sam A.},
-      journal   = {Nature Neuroscience},
-      volume    = {27},
-      number    = {7},
-      pages     = {1411--1424},
-      year      = {2024},
-      doi       = {10.1038/s41593-024-01649-9},
-      url       = {https://doi.org/10.1038/s41593-024-01649-9},
-      publisher = {Springer Science and Business Media LLC}
-    }
+.. include:: cite_simba.rst.inc
 
 ____________________________________
 

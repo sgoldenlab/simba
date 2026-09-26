@@ -139,9 +139,10 @@ class VideoRotator(ConfigReader):
         # self.main_frm.mainloop()
 
 
-rotator = VideoRotator(
-    input_path="/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1_downsampled.mp4",
-    config_path="/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini",
-    output_dir="/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/rotated",
-)
-rotator.run()
+# if __name__ == "__main__":
+#     rotator = VideoRotator(
+#         input_path="/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1_downsampled.mp4",
+#         config_path="/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini",
+#         output_dir="/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/rotated",
+#     )
+#     rotator.run()

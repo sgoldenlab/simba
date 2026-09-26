@@ -29,13 +29,14 @@ def count_values_in_range_mp(data: np.array, ranges: np.array):
     return results
 
 
-ranges = np.array([[0.0, 0.1], [0.0, 0.5], [0.0, 0.75]])
-data = np.random.random((1000000, 100))
-
-# start = time.time()
-# results = count_values_in_range(data=data, ranges=ranges)
-# print(time.time() - start)
-
-start = time.time()
-results = count_values_in_range_mp(data=data, ranges=ranges)
-print(time.time() - start)
+# if __name__ == "__main__":
+#     ranges = np.array([[0.0, 0.1], [0.0, 0.5], [0.0, 0.75]])
+#     data = np.random.random((1000000, 100))
+#
+#     # start = time.time()
+#     # results = count_values_in_range(data=data, ranges=ranges)
+#     # print(time.time() - start)
+#
+#     start = time.time()
+#     results = count_values_in_range_mp(data=data, ranges=ranges)
+#     print(time.time() - start)

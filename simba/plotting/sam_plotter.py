@@ -108,8 +108,9 @@ f'Running SAM visualization for {len(list(self.data_paths.keys()))} video(s) (st
             #
 
 
-r = SamVisualizer(
-    data_path=r"D:\cvat_annotations\sam_yolo_data\s34-drinking.csv",
-    video_path=r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4",
-    save_dir='D:\cvat_annotations\sam_videos', color=[(255, 255, 1)])
-r.run()
+# if __name__ == "__main__":
+#     r = SamVisualizer(
+#         data_path=r"D:\cvat_annotations\sam_yolo_data\s34-drinking.csv",
+#         video_path=r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4",
+#         save_dir=r'D:\cvat_annotations\sam_videos', color=[(255, 255, 1)])
+#     r.run()

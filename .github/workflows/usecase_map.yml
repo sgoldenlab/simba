@@ -34,6 +34,9 @@ jobs:
       - name: Regenerate use-case map from the public sheet
         run: python misc/usecase_map_stats.py
 
+      - name: Regenerate searchable studies table from the public sheet
+        run: python misc/usecase_table.py
+
       - name: Configure Git
         run: |
           git config user.email "action@github.com"
@@ -41,6 +44,6 @@ jobs:
 
       - name: Commit updated map (if changed)
         run: |
-          git add docs/_generated/usecase_map.html
+          git add docs/_generated/usecase_map.html docs/_generated/usecase_table.html
           git commit -m "Update SimBA use-case global-reach map" || echo "Nothing to commit"
           git push

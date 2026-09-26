@@ -117,11 +117,12 @@ class OutlierDetector(ConfigReader):
 
 
 # data_path = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/clusters/beautiful_beaver.pickle'
-data_path = "/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters/adoring_hoover.pickle"
-x = OutlierDetector(
-    data_path=data_path,
-    config_path="/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini",
-    algorithm=LOF,
-    cluster_sliced=True,
-)
-x.run()
+# if __name__ == "__main__":
+#     data_path = "/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters/adoring_hoover.pickle"
+#     x = OutlierDetector(
+#         data_path=data_path,
+#         config_path="/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini",
+#         algorithm=LOF,
+#         cluster_sliced=True,
+#     )
+#     x.run()

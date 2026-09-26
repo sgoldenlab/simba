@@ -57,15 +57,16 @@ def impl_convex_hull(data):
     return func
 
 
-data = np.random.randint(1, 10, size=(10, 4, 2))
-
-
-@njit
-def test_find_left(data):
-    return ConvexHull(data)
-
-
-start = time.time()
-test_find_left(data)
-end = time.time()
-print(end - start)
+# if __name__ == "__main__":
+#     data = np.random.randint(1, 10, size=(10, 4, 2))
+#
+#
+#     @njit
+#     def test_find_left(data):
+#         return ConvexHull(data)
+#
+#
+#     start = time.time()
+#     test_find_left(data)
+#     end = time.time()
+#     print(end - start)

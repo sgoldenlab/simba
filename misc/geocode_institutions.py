@@ -48,6 +48,9 @@ ALIASES = {
     "Cornell": "Cornell University",
     "McGill": "McGill University",
     "Concordia": "Concordia University",
+    "Columbia": "Columbia University",
+    "Monash": "Monash University",
+    "UNSW": "UNSW Sydney",
     "Texas A&M": "Texas A&M University",
     "University of Leuven": "KU Leuven",
     "Jaume I University": "Universitat Jaume I",
@@ -154,6 +157,10 @@ MANUAL = {
     "Netholabs": [51.5074, -0.1278],                   # London (per Simon)
     "Boehringer Ingelheim Pharma GmbH & Co.": [49.9764, 8.0917],  # Ingelheim am Rhein, DE
     "Humboldt University": [52.5178, 13.3936],          # Berlin
+    "Korea Advanced Institute of Science and Technology": [36.3721, 127.3604],  # KAIST, Daejeon
+    "Jagiellonian University Medical College": [50.0614, 19.9336],  # Krakow
+    "Instituto Politécnico Nacional": [19.5046, -99.1336],  # Zacatenco, Mexico City
+    "TensorAnalytics": [38.9757, -77.6414],  # Aldie, VA (town-level)
 }
 
 DROP = {k for k, v in ALIASES.items() if v == ""}

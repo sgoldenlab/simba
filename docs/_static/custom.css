@@ -932,15 +932,45 @@ html.simba-landing .rst-content h1 { display: none !important; }
 }
 .simba-side-links a:hover { color: #38a8d4 !important; }
 
-/* --- Citation panel (How to cite) --- */
+/* --- Citation panel (How to cite): paper card + format tabs + copy/download --- */
 .simba-cite {
-    border-left: 4px solid #21567a;
-    background: #f4f8fb;
-    border-radius: 0 8px 8px 0;
-    padding: 14px 18px;
-    margin: 12px 0 16px;
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(33, 86, 122, 0.10);
+    padding: 18px 20px 16px; margin: 12px 0 18px;
 }
-.simba-cite-ref { margin: 0; font-size: 14.5px; line-height: 1.6; color: #2c3e50; }
+.simba-cite-ask { margin: 0 0 12px; font-size: 14px; color: #4b5563; }
+.simba-cite-paper { border-left: 4px solid #21567a; padding: 2px 0 2px 14px; margin: 0 0 16px; }
+.simba-cite-journal { font-size: 12px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: #2f8f9d; }
+.simba-cite-title { font-size: 17px; font-weight: 700; line-height: 1.35; color: #23272e; margin: 4px 0 5px; }
+.simba-cite-authors { font-size: 13.5px; color: #61707b; }
+.simba-cite-tabs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 8px; }
+.simba-cite-tabs button {
+    font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+    padding: 6px 14px; border-radius: 18px; border: 1px solid #cbd5e1;
+    background: #f8fafc; color: #21567a; transition: background .15s ease, color .15s ease;
+}
+.simba-cite-tabs button[aria-selected="true"] { background: #21567a; border-color: #21567a; color: #fff; }
+.simba-cite-tabs .simba-cite-copy { margin-left: auto; background: #fff; }
+.simba-cite-tabs .simba-cite-copy:hover { background: #eef5fa; }
+.simba-cite-tabs .simba-cite-copy.ok { background: #e7f6ec; border-color: #7cc79a; color: #1d6b3a; }
+.simba-cite pre.simba-cite-out {
+    margin: 0; padding: 12px 14px; max-height: 260px; overflow: auto;
+    background: #f4f8fb; border: 1px solid #e2e8f0; border-radius: 10px;
+    font-size: 12.5px; line-height: 1.55; color: #2c3e50;
+    white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.simba-cite pre.simba-cite-out:not([data-fmt="bib"]):not([data-fmt="ris"]) { font-family: inherit; font-size: 13.5px; }
+.simba-cite-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+.simba-cite-actions a {
+    display: inline-flex; align-items: center; text-decoration: none !important;
+    font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 18px;
+    background: #21567a; color: #fff !important; transition: background .15s ease, transform .15s ease;
+}
+.simba-cite-actions a:hover { background: #19465f; transform: translateY(-1px); }
+.simba-cite-actions a[data-dl], .simba-cite-actions a.simba-cite-alt { background: #fff; color: #21567a !important; border: 1px solid #cbd5e1; }
+.simba-cite-actions a[data-dl]:hover, .simba-cite-actions a.simba-cite-alt:hover { background: #eef5fa; }
+.simba-cite-hint { margin: 10px 0 0; font-size: 12.5px; color: #6b7280; line-height: 1.5; }
+.simba-cite-hint code { font-size: 12px; background: #f4f8fb; padding: 1px 5px; border-radius: 4px; }
 
 /* --- Resource pill-row (lighter, secondary links) --- */
 .simba-pill-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 16px 0 6px; }

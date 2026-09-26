@@ -119,15 +119,16 @@ class GraphCreator(object):
             network_graph.save_graph("nx.html")
 
 
-test = GraphCreator(
-    data_path="/Users/simon/Desktop/envs/simba_dev/tests/test_data/misc_test_files/termite_rois.csv",
-    animals=["Animal_1", "Animal_2", "Animal_3", "Animal_4", "Animal_5"],
-    edge_weight_settings={"Variable": "Time", "Aggregation_method": "Sum"},
-    filter_settings={"Time_threshold": 1.0, "Count_threshold": None},
-)
-
-test.run()
-test.save(save_path="Test.pickle")
+# if __name__ == "__main__":
+#     test = GraphCreator(
+#         data_path="/Users/simon/Desktop/envs/simba_dev/tests/test_data/misc_test_files/termite_rois.csv",
+#         animals=["Animal_1", "Animal_2", "Animal_3", "Animal_4", "Animal_5"],
+#         edge_weight_settings={"Variable": "Time", "Aggregation_method": "Sum"},
+#         filter_settings={"Time_threshold": 1.0, "Count_threshold": None},
+#     )
+#
+#     test.run()
+#     test.save(save_path="Test.pickle")
 
 
 #
