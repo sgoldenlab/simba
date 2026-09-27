@@ -970,6 +970,7 @@ html.simba-landing .rst-content h1 { display: none !important; }
 .simba-cite-actions a[data-dl], .simba-cite-actions a.simba-cite-alt { background: #fff; color: #21567a !important; border: 1px solid #cbd5e1; }
 .simba-cite-actions a[data-dl]:hover, .simba-cite-actions a.simba-cite-alt:hover { background: #eef5fa; }
 .simba-cite-hint { margin: 10px 0 0; font-size: 12.5px; color: #6b7280; line-height: 1.5; }
+.simba-cite-hint + .simba-cite-hint { margin-top: 4px; }
 .simba-cite-hint code { font-size: 12px; background: #f4f8fb; padding: 1px 5px; border-radius: 4px; }
 
 /* --- Resource pill-row (lighter, secondary links) --- */

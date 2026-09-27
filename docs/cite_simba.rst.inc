@@ -73,6 +73,7 @@
        <a href="https://scholar.google.com/scholar?q=%22Simple+Behavioral+Analysis+%28SimBA%29+as+a+platform+for+explainable+machine+learning+in+behavioral+neuroscience%22" target="_blank" rel="noopener" class="simba-cite-alt">🎓&nbsp;Google Scholar</a>
      </div>
      <p class="simba-cite-hint">The <b>.ris</b> file imports into Mendeley, EndNote, Zotero and most other reference managers. You can also paste the DOI (<code>10.1038/s41593-024-01649-9</code>) into your manager's &ldquo;add by identifier&rdquo; option.</p>
+     <p class="simba-cite-hint">SimBA works alongside other open-source tools. Please also cite the pose-estimation software and any other packages your analysis used.</p>
    </div>
    <script>
    (function () {

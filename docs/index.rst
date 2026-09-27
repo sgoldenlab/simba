@@ -137,6 +137,7 @@ ________________________________________________
    qr_gallery
    download_stats
    published_studies
+   🗂️ Example Datasets <example_datasets>
 
 .. toctree::
    :maxdepth: 2
@@ -144,6 +145,7 @@ ________________________________________________
 
    👥 Credits <credits>
    links
+   🛟 Getting Help <getting_help>
    📑 Cite <cite>
 
 .. toctree::
