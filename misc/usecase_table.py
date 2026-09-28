@@ -13,7 +13,7 @@ from datetime import date
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from institution_coords import INSTITUTION_ALIASES
-from usecase_map_stats import SHEET_ID, SPECIES_NORM, fetch_rows
+from usecase_map_stats import NAME2ISO, SHEET_ID, SPECIES_NORM, fetch_rows
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "..", "docs", "_generated", "usecase_table.html")
@@ -56,6 +56,8 @@ def main():
             "sa": cell(r, "SENIOR AUTHOR"),
             "i": institutions(cell(r, "AUTHOR INSTITUTIONS")),
             "c": cell(r, "COUNTRIES"),
+            # ISO-2 codes, split the same way as the map, so "#country=US" filters exactly
+            "cc": sorted({NAME2ISO.get(c.strip().lower()) for c in re.split(r"[,;]|\.\s+", cell(r, "COUNTRIES"))} - {None}),
             "s": SPECIES_NORM.get(sp.lower(), sp),
             "url": url if url.lower().startswith("http") else "",
         })
@@ -87,6 +89,8 @@ TEMPLATE = """<style>
 .simba-ut-bar select{{flex:0 1 auto;min-width:0;max-width:170px;}}
 .simba-ut-bar button{{font:inherit;padding:7px 12px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#21567a;cursor:pointer;}}
 .simba-ut-count{{font-size:12.5px;color:#6b7280;margin:0 0 8px;}}
+.simba-ut-chip{{display:inline-flex;align-items:center;gap:6px;margin-left:8px;font-size:12px;font-weight:600;color:#21567a;background:#e8f4fb;border:1px solid #cfe3f1;border-radius:14px;padding:2px 4px 2px 10px;}}
+.simba-ut-chip button{{font:inherit;border:0;background:none;color:#21567a;cursor:pointer;padding:0 5px;font-size:14px;line-height:1;}}
 .simba-ut-wrap{{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);overflow:hidden;}}
 .simba-ut table{{width:100%;table-layout:fixed;border-collapse:collapse;margin:0 !important;border:0 !important;}}
 .simba-ut th{{text-align:left;font-size:12px;font-weight:700;color:#21567a;background:#f4f9fd;padding:9px 12px !important;border:0 !important;border-bottom:1px solid #e2e8f0 !important;cursor:pointer;user-select:none;white-space:nowrap;}}
@@ -142,6 +146,7 @@ TEMPLATE = """<style>
     d.hay = [d.t, d.u, d.j, d.fa, d.sa, d.i.join(" "), d.c, d.s, d.y].join(" ").toLowerCase();
   }});
   let key = "date", dir = -1;
+  let pin = null;   // exact filter from a link: {{kind: "inst"|"country", value, label}}, via #studies= / #country=
   const open = new Set();
 
   function el(tag, cls, text) {{
@@ -157,6 +162,7 @@ TEMPLATE = """<style>
       (!sp.value || d.s === sp.value) &&
       (!yr.value || String(d.y) === yr.value) &&
       (!ty.value || (ty.value === "pre") === d.p) &&
+      (!pin || (pin.kind === "inst" ? d.i.includes(pin.value) : d.cc.includes(pin.value))) &&
       words.every(w => d.hay.includes(w)));
     rows.sort((a, b) => {{
       const x = a[key], y = b[key];
@@ -202,7 +208,14 @@ TEMPLATE = """<style>
       const tr = el("tr"), c = el("td", "empty", "No studies match these filters.");
       c.colSpan = 4; tr.appendChild(c); body.appendChild(tr);
     }}
-    $("utCount").textContent = "Showing " + rows.length + " of " + D.length + " studies";
+    const cnt = $("utCount");
+    cnt.textContent = "Showing " + rows.length + " of " + D.length + " studies";
+    if (pin) {{
+      const chip = el("span", "simba-ut-chip", (pin.kind === "inst" ? "Institution: " : "Country: ") + pin.label), x = el("button", null, "×");
+      x.type = "button"; x.setAttribute("aria-label", "Clear filter");
+      x.addEventListener("click", () => {{ pin = null; history.replaceState(null, "", location.pathname + location.search); render(); }});
+      chip.appendChild(x); cnt.appendChild(chip);
+    }}
   }}
 
   document.querySelectorAll(".simba-ut th[data-k]").forEach(th => th.addEventListener("click", () => {{
@@ -214,8 +227,22 @@ TEMPLATE = """<style>
     render();
   }}));
   [q, sp, yr, ty].forEach(e => e.addEventListener("input", render));
-  $("utReset").addEventListener("click", () => {{ q.value = sp.value = yr.value = ty.value = ""; render(); }});
+  $("utReset").addEventListener("click", () => {{ q.value = sp.value = yr.value = ty.value = ""; pin = null; render(); }});
+  // Links from the globe open the table pre-filtered:
+  //   #studies=<institution>            exact institution
+  //   #country=<ISO-2>&label=<name>     every study listing that country
+  function fromHash() {{
+    const h = new URLSearchParams(location.hash.slice(1));
+    if (h.has("studies")) pin = {{ kind: "inst", value: h.get("studies"), label: h.get("studies") }};
+    else if (h.has("country")) pin = {{ kind: "country", value: h.get("country"), label: h.get("label") || h.get("country") }};
+    else return false;
+    q.value = sp.value = yr.value = ty.value = "";
+    return true;
+  }}
+  const hashed = fromHash();
   render();
+  if (hashed) document.querySelector(".simba-ut").scrollIntoView();
+  window.addEventListener("hashchange", () => {{ if (fromHash()) {{ render(); document.querySelector(".simba-ut").scrollIntoView({{ behavior: "smooth" }}); }} }});
 }})();
 </script>
 """

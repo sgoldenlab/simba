@@ -7,6 +7,9 @@ from the public use-case spreadsheet and the full text of the collected papers.
 To search and filter the individual studies, see :ref:`browse all studies <browse-all-studies>` below.
 
 .. raw:: html
+   :file: _generated/usecase_globe.html
+
+.. raw:: html
    :file: _generated/usecase_map.html
 
 .. _browse-all-studies:

@@ -3,8 +3,9 @@
 Generate docs/_generated/usecase_map.html — a "Global Reach" panel of published
 SimBA use-cases, built from the public Google Sheet of citing studies.
 
-Reuses the same vendored libraries as the download-stats page (jsvectormap +
-Chart.js), so the styling matches. Reads the sheet as public CSV — no credentials.
+Reuses the same vendored Chart.js as the download-stats page, so the styling
+matches. The country and institution maps are the globe above it on the page
+(misc/usecase_globe.py). Reads the sheet as public CSV — no credentials.
 
 Run:  python misc/usecase_map_stats.py
 """
@@ -66,8 +67,10 @@ SPECIES_NORM = {
 # one hue, monotone light->dark, visible steps, light end clears the map surface).
 # Orange because the country choropleth already uses blue -- two sequential
 # contexts on one view => second takes the next hue as its own one-hue ramp.
-INST_RAMP = ["#ee8a4a", "#df6a2b", "#c14d1b", "#983412", "#712509"]
-INST_BUCKETS = ["1", "2", "3–4", "5–7", "8+"]  # legend labels, index-aligned to ramp
+# Every bar on the page is one orange from the globe's ramp (misc/usecase_globe.py): bar length
+# carries the value, so colour needs no second meaning. Checked on the white panels as an
+# ordinal step: BAR 3.29:1, BAR_PARTIAL (the current, to-date year) 2.29:1.
+BAR, BAR_PARTIAL, BAR_HOVER = "#e5692a", "#f59352", "#c2461a"
 
 
 def inst_bucket(c):
@@ -139,7 +142,6 @@ def main():
     unmapped = collections.Counter()
     per_institution = collections.Counter()  # canonical name -> studies (deduped/study)
     unmapped_inst = collections.Counter()     # canonical names lacking coords
-    inst_studies = collections.defaultdict(list)  # canonical -> [(year, title, journal)]
 
     for r in rows:
         seen_iso = set()
@@ -177,7 +179,6 @@ def main():
         for canon in seen_inst:
             if canon in INSTITUTION_COORDS:
                 per_institution[canon] += 1
-                inst_studies[canon].append((y, cell(r, "TITLE"), j))
             else:
                 unmapped_inst[canon] += 1
 
@@ -195,7 +196,6 @@ def main():
     ISO_NAME.update({"US": "United States", "GB": "United Kingdom", "KR": "South Korea",
                      "HK": "Hong Kong", "CZ": "Czech Republic", "AE": "UAE"})
 
-    country_map = dict(per_country)
     cont_labels = [c for c, _ in per_continent.most_common() if c != "Other"]
     cont_vals = [per_continent[c] for c in cont_labels]
     top_labels = [ISO_NAME.get(iso, iso) for iso, _ in top_country]
@@ -204,22 +204,12 @@ def main():
     sp_labels = [s for s, _ in sp_top]
     sp_vals = [n for _, n in sp_top]
 
-    # --- institutions: map pins (sized by study count) + top-institutions bar ---
+    # --- institutions: the full institution list ---
     n_institutions = len(per_institution)
-    markers, mark_tips = [], []
-    for name, c in sorted(per_institution.items(), key=lambda kv: (-kv[1], kv[0])):
-        lat, lon = INSTITUTION_COORDS[name]
-        markers.append({"name": name, "coords": [lat, lon],
-                        "style": {"initial": {"r": round(4 + 2.2 * c ** 0.5, 1),
-                                              "fill": INST_RAMP[inst_bucket(c)]}}})
-        mark_tips.append(tooltip_html(name, c, inst_studies[name]))
     top_inst = per_institution.most_common()   # every institution, including single-study ones
     inst_labels = [n for n, _ in top_inst]
     inst_vals = [c for _, c in top_inst]
-    inst_colors = [INST_RAMP[inst_bucket(c)] for c in inst_vals]
-    # graduated color+size legend: [color, diameter_px, label] per bucket
-    legend_dots = [[INST_RAMP[i], round(2 * (4 + 2.2 * rc ** 0.5), 1), INST_BUCKETS[i]]
-                   for i, rc in enumerate((1, 2, 4, 7, 11))]
+    inst_colors = [BAR] * len(inst_vals)
 
     if unmapped:
         print("Unmapped country strings (add to NAME2ISO):", dict(unmapped))
@@ -244,35 +234,16 @@ def main():
 
     pull_date = date.today().strftime("%B %d, %Y")
     html = _render(total, n_countries, n_continents, n_species, n_journals,
-                   years, country_map, yr_labels, yr_counts, cont_labels,
+                   years, yr_labels, yr_counts, cont_labels,
                    cont_vals, top_labels, top_vals, ISO_NAME, pull_date,
-                   n_institutions, markers, mark_tips, inst_labels, inst_vals,
-                   sp_labels, sp_vals, inst_colors, legend_dots, corpus)
+                   n_institutions, inst_labels, inst_vals,
+                   sp_labels, sp_vals, inst_colors, corpus)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"Wrote {os.path.normpath(OUT)}: {total} studies, {n_countries} countries, "
           f"{n_continents} continents, {n_species} species, {n_journals} journals, "
-          f"{n_institutions} institutions pinned")
-
-
-# Magma, matching the word cloud lower down the page, but truncated at both ends:
-# the pale steps (#f7705c, #fb8761, #fcfdbf) only reach 2.4-2.8:1 on a white panel,
-# so a 1-study bar would all but vanish. This span keeps the light end at 3.99:1 and
-# validates as an ordinal ramp (monotone lightness, visible steps).
-MAGMA_BARS = ["#160b39", "#3b0f70", "#641a80", "#8c2981", "#b73779", "#de4968"]
-
-
-def magma(t):
-    """t in 0..1 -> hex along MAGMA_BARS. 0 = deep purple, 1 = light warm end."""
-    t = 0.0 if t < 0 else (1.0 if t > 1 else t)
-    pos = t * (len(MAGMA_BARS) - 1)
-    i = min(int(pos), len(MAGMA_BARS) - 2)
-    f = pos - i
-    a, b = MAGMA_BARS[i].lstrip("#"), MAGMA_BARS[i + 1].lstrip("#")
-    rgb = (round(int(a[k:k + 2], 16) + f * (int(b[k:k + 2], 16) - int(a[k:k + 2], 16)))
-           for k in (0, 2, 4))
-    return "#%02x%02x%02x" % tuple(rgb)
+          f"{n_institutions} institutions")
 
 
 def _paper_titles(corpus, sheet_rows, cols):
@@ -313,7 +284,7 @@ def _paper_titles(corpus, sheet_rows, cols):
 
 
 def _examples_for(corpus, titles, key, labels, counts, unit="papers"):
-    """Per-bar tooltip markup, built with the same tooltip_html() the map pins use."""
+    """Per-bar tooltip markup, built with tooltip_html()."""
     ex = ((corpus or {}).get("examples") or {}).get(key) or {}
     out = []
     for lab, total in zip(labels, counts):
@@ -327,8 +298,8 @@ def _bar_helper():
     """Emitted once; every corpus-derived horizontal bar chart on the page calls it,
     so the Chart.js config exists in one place rather than per panel."""
     return """<script>
-// One reused tooltip node, styled by the same .jvm-tooltip rules as the map pins,
-// so a bar hover and a pin hover are visually identical. Chart.js draws its own
+// One reused tooltip node, styled by the .jvm-tooltip rules, so every bar hover on
+// the page looks the same. Chart.js draws its own
 // tooltips on canvas and cannot render HTML, hence the external handler.
 window.__ucTip = function (ctx, d) {
   let el = document.getElementById("ucBarTip");
@@ -362,31 +333,28 @@ window.__ucBar = function (id, d) {
   const el = document.getElementById(id);
   if (!el) return;
   new Chart(el, {
-    type: "bar", plugins: window.__ucTrack ? [window.__ucTrack] : [],
-    data: {labels: d.labels, datasets: [{data: d.vals, backgroundColor: d.col,
-      hoverBackgroundColor: "#f0c44a", borderRadius: 4, maxBarThickness: 18}]},
-    options: {indexAxis: "y", responsive: true, maintainAspectRatio: false,
+    type: "bar", plugins: window.__ucValues ? [window.__ucValues] : [],
+    data: {labels: d.labels, datasets: [{data: d.vals, backgroundColor: "__BAR__",
+      hoverBackgroundColor: "__BAR_HOVER__", borderRadius: 4, borderSkipped: "start", maxBarThickness: 18}]},
+    options: {indexAxis: "y", responsive: true, maintainAspectRatio: false, layout: {padding: {right: 30}},
       plugins: {legend: {display: false}, tooltip: d.html
         ? {enabled: false, external: (ctx) => window.__ucTip(ctx, d)}
         : {displayColors: false, callbacks: {
             label: (c) => " " + c.parsed.x + " " + (c.parsed.x === 1 ? d.unit1 : d.unit)}}},
-      scales: {x: {beginAtZero: true, grid: {display: false}, ticks: {color: "#6b7280"},
-                 title: {display: true, text: d.unit, color: "#6b7280"}},
-               y: {grid: {display: false}, ticks: {color: "#23272e",
+      scales: {x: {display: false, beginAtZero: true},
+               y: {grid: {display: false}, border: {display: false}, ticks: {color: "#23272e",
                    font: {weight: "600"}, autoSkip: false}}}}
   });
 };
-</script>"""
+</script>""".replace("__BAR_HOVER__", BAR_HOVER).replace("__BAR__", BAR)
 
 
 def _bar_panel(pid, title, caption, rows, unit="papers", unit1="paper", height=None,
                examples=None):
-    """(panel_html, script) for one magma horizontal bar panel built from
+    """(panel_html, script) for one horizontal bar panel built from
     [[label, count], ...] rows. examples adds named papers to each hover tooltip."""
     labels = [r[0] for r in rows]
     vals = [r[1] for r in rows]
-    lo, hi = min(vals), max(vals)
-    cols = [magma((v - lo) / (hi - lo) if hi > lo else 1.0) for v in vals]
     h = height or (90 + 24 * len(rows))
     html = (f'<h3 class="simba-uc-h3">{title}</h3>'
             f'<p class="simba-uc-cap">{caption}</p>'
@@ -395,7 +363,7 @@ def _bar_panel(pid, title, caption, rows, unit="papers", unit1="paper", height=N
     j = json.dumps
     ex = f', html: {j(examples)}' if examples else ""
     js = (f'<script>window.__ucBar({j(pid)}, {{labels: {j(labels)}, vals: {j(vals)}, '
-          f'col: {j(cols)}, unit: {j(unit)}, unit1: {j(unit1)}{ex}}});</script>')
+          f'unit: {j(unit)}, unit1: {j(unit1)}{ex}}});</script>')
     return html, js
 
 
@@ -409,11 +377,8 @@ def _build_behaviours(c):
         return "", ""
     labels = [r[0] for r in rows]
     vals = [r[1] for r in rows]
-    # Colour follows the study count along magma (a sequential ramp), not the behaviour
-    # family: the families cannot be told apart under colour-vision deficiency, and the
-    # family is kept in corpus_stats.json rather than surfaced on the chart.
-    lo, hi = min(vals), max(vals)
-    cols = [magma((v - lo) / (hi - lo) if hi > lo else 1.0) for v in vals]
+    # One colour, not one per behaviour family: the families cannot be told apart under
+    # colour-vision deficiency, and the family is kept in corpus_stats.json instead.
     height = 90 + 24 * len(rows)
     panel = (f'<h3 class="simba-uc-h3">Behaviours automated</h3>'
              f'<p class="simba-uc-cap"><b>INDICATIVE, NOT EXHAUSTIVE.</b> What SimBA was '
@@ -426,7 +391,7 @@ def _build_behaviours(c):
     ex = _examples_for(c, titles, "behaviours_automated", labels, vals, unit="studies")
     j = json.dumps
     script = (f'<script>window.__ucBar("ucBehav", {{labels: {j(labels)}, vals: {j(vals)}, '
-              f'col: {j(cols)}, unit: "studies", unit1: "study", html: {j(ex)}}});</script>')
+              f'unit: "studies", unit1: "study", html: {j(ex)}}});</script>')
     return panel, script
 
 
@@ -495,10 +460,10 @@ def _build_corpus(c):
 
 
 def _render(total, n_countries, n_continents, n_species, n_journals, years,
-            country_map, yr_labels, yr_counts, cont_labels, cont_vals,
+            yr_labels, yr_counts, cont_labels, cont_vals,
             top_labels, top_vals, iso_name, pull_date,
-            n_institutions, markers, mark_tips, inst_labels, inst_vals,
-            sp_labels, sp_vals, inst_colors, legend_dots, corpus):
+            n_institutions, inst_labels, inst_vals,
+            sp_labels, sp_vals, inst_colors, corpus):
     yr_range = f"{years[0]}–{years[-1]}" if years else ""
     j = json.dumps
     corpus_panels, corpus_script = _build_corpus(corpus)
@@ -523,11 +488,6 @@ def _render(total, n_countries, n_continents, n_species, n_journals, years,
         "institutions": _svg.format('<path d="M3 21h18M4 10h16M5 6l7-3 7 3M5 10v11M19 10v11'
             'M9 14v3M12 14v3M15 14v3"/>'),
     }
-    # graduated color+size key for the institution pins (built from legend_dots)
-    dots_html = "".join(
-        f'<span style="width:{d}px;height:{d}px;border-radius:50%;background:{col};'
-        f'opacity:.85;display:inline-block;border:1px solid #fff"></span><span>{lab}</span>'
-        for col, d, lab in legend_dots)
     # institutions as a multi-column list (name + mini-bar + count) -> readable names, several columns
     _maxv = max(inst_vals) if inst_vals else 1
     inst_rows = "".join(
@@ -547,10 +507,6 @@ def _render(total, n_countries, n_continents, n_species, n_journals, years,
 .simba-uc-card .ic{{display:block;width:22px;height:22px;margin:0 auto 7px;color:#21567a;opacity:.85;}}
 .simba-uc-h3{{font-size:15px;color:#23272e;font-weight:700;margin:24px 0 10px;}}
 .simba-uc-cap{{font-size:11.5px;color:#8b95a1;margin:-4px 0 10px;line-height:1.35;}}
-.simba-uc-map{{position:relative;height:520px;background:radial-gradient(120% 120% at 50% 0%,#f4f9fd,#e8f1f8);border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);padding:10px;box-sizing:border-box;}}
-.simba-uc-legend{{display:flex;align-items:center;gap:8px;justify-content:flex-end;font-size:11px;color:#6b7280;margin:8px 4px 0;}}
-.simba-uc-legend i{{width:140px;height:10px;border-radius:5px;display:inline-block;background:linear-gradient(90deg,#e8f4fb,#7fc1e3,#2a7fb8,#143a5e);}}
-.simba-uc-legend .sw{{width:13px;height:13px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.06);}}
 .simba-uc-grid{{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;margin-top:18px;}}
 .simba-uc-panel{{position:relative;height:320px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);padding:14px 16px 10px;box-sizing:border-box;}}
 .simba-uc .si-list{{column-width:240px;column-gap:24px;}}
@@ -574,14 +530,6 @@ def _render(total, n_countries, n_continents, n_species, n_journals, years,
     <div class="simba-uc-card">{ic['journals']}<span class="v">{n_journals}</span><span class="l">journals</span></div>
     <div class="simba-uc-card">{ic['institutions']}<span class="v">{n_institutions}</span><span class="l">institutions</span></div>
   </div>
-  <h3 class="simba-uc-h3">Studies by country</h3>
-  <p class="simba-uc-cap">Darker = more studies. Each study is counted once per country; multi-country studies count in each. Hover a country for its total.</p>
-  <div class="simba-uc-map" id="ucMapCountries"></div>
-  <div class="simba-uc-legend"><span style="color:#9aa0a8">fewer</span><i></i><span>more</span><span class="sw" style="background:#dce4ee;margin-left:6px"></span><span>none</span></div>
-  <h3 class="simba-uc-h3">Institutions &amp; locations</h3>
-  <p class="simba-uc-cap">One pin per institution; size &amp; colour scale with the number of studies. Hover a pin for its study list.</p>
-  <div class="simba-uc-map" id="ucMapPins"></div>
-  <div class="simba-uc-legend"><span style="color:#9aa0a8">studies per institution:</span>{dots_html}</div>
   <div class="simba-uc-grid">
     <div><h3 class="simba-uc-h3">Studies per year</h3><p class="simba-uc-cap">Publications by calendar year; the current year is to-date.</p><div class="simba-uc-panel"><canvas id="ucYears"></canvas></div></div>
     <div><h3 class="simba-uc-h3">By continent</h3><p class="simba-uc-cap">Studies grouped by the continent of each contributing country.</p><div class="simba-uc-panel"><canvas id="ucCont"></canvas></div></div>
@@ -600,50 +548,6 @@ def _render(total, n_countries, n_continents, n_species, n_journals, years,
   <p class="simba-uc-foot"><a href="https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">Full list of studies (spreadsheet) &rarr;</a> &middot; one entry per study &middot; multi-country studies counted in each country</p>
 </div>
 <script>window.__odef2 = window.define; try {{ window.define = undefined; }} catch (e) {{}}</script>
-<link rel="stylesheet" href="_static/css/jsvectormap.min.css">
-<script src="_static/js/jsvectormap.min.js"></script>
-<script src="_static/js/jsvectormap-world.js"></script>
-<script>
-(function(){{
-  if (typeof jsVectorMap === "undefined") return;
-  const MAP = {j(country_map)};
-  const MARKERS = {j(markers)};
-  const MTIP = {j(mark_tips)};
-  const SCALE = ["#e8f4fb", "#cfe6f5", "#9bcde9", "#5aa7d4", "#3a86c0", "#2a6299", "#143a5e"];
-  const NB = SCALE.length - 1;
-  const counts = Object.keys(MAP).map((k) => MAP[k] || 0);
-  const maxLog = Math.log10(Math.max.apply(null, counts.concat([1])) + 1) || 1;
-  const BUCK = {{}};
-  for (const k in MAP) {{ let b = Math.ceil(Math.log10((MAP[k] || 0) + 1) / maxLog * NB); BUCK[k] = b < 1 ? 1 : (b > NB ? NB : b); }}
-  // Map 1 -- countries shaded (choropleth only)
-  if (document.getElementById("ucMapCountries")) new jsVectorMap({{
-    selector: "#ucMapCountries", map: "world",
-    zoomButtons: true, zoomOnScroll: true, backgroundColor: "transparent",
-    regionStyle: {{initial: {{fill: "#dce4ee", stroke: "#ffffff", "stroke-width": 0.5}},
-      hover: {{fill: "#f0c44a", "fill-opacity": 1}}}},
-    series: {{regions: [{{attribute: "fill", values: BUCK, scale: SCALE}}]}},
-    onRegionTooltipShow(event, tooltip, code) {{
-      const v = MAP[code] || 0;
-      tooltip.text(tooltip.text() + (v ? ": " + v + (v === 1 ? " study" : " studies") : ": no studies yet"), true);
-    }}
-  }});
-  // Map 2 -- institution / location pins (neutral land, no shading)
-  if (document.getElementById("ucMapPins")) new jsVectorMap({{
-    selector: "#ucMapPins", map: "world",
-    zoomButtons: true, zoomOnScroll: true, backgroundColor: "transparent",
-    regionStyle: {{initial: {{fill: "#dce4ee", stroke: "#ffffff", "stroke-width": 0.5}},
-      hover: {{fill: "#dce4ee"}}}},
-    markers: MARKERS,
-    markerStyle: {{
-      initial: {{fill: "#c14d1b", stroke: "#ffffff", "stroke-width": 1.3, fillOpacity: 0.85, r: 5}},
-      hover: {{fill: "#f0c44a", cursor: "pointer", fillOpacity: 1}}
-    }},
-    onMarkerTooltipShow(event, tooltip, code) {{
-      if (MTIP[code]) tooltip.text(MTIP[code], true);
-    }}
-  }});
-}})();
-</script>
 <script src="_static/js/chart.umd.min.js"></script>
 <script>
 (function(){{
@@ -654,55 +558,51 @@ def _render(total, n_countries, n_continents, n_species, n_journals, years,
   const INST = {{labels: {j(inst_labels)}, vals: {j(inst_vals)}, col: {j(inst_colors)}}};
   const SP = {{labels: {j(sp_labels)}, vals: {j(sp_vals)}}};
   const C = (id) => document.getElementById(id);
-  const GRID = "#eef2f7", INK = "#23272e", MUT = "#6b7280";
-  const PAL = ["#21567a","#2a7fb8","#38a8d4","#5cc6b3","#e0a33a","#e0653a","#b9c0c9"];
-  // Unfilled-remainder track behind each horizontal bar. Shared on window so the
-  // corpus-derived panels below reuse this one definition instead of copying it.
-  const track = {{id: "track", beforeDatasetsDraw(chart) {{
-    const ctx = chart.ctx, right = chart.chartArea.right, x0 = chart.scales.x.getPixelForValue(0);
-    ctx.save(); ctx.fillStyle = GRID;
-    chart.getDatasetMeta(0).data.forEach(function(b) {{
-      const h = b.height, y = b.y - h / 2, w = right - x0, r = Math.min(6, h / 2);
-      if (ctx.roundRect) {{ ctx.beginPath(); ctx.roundRect(x0, y, w, h, r); ctx.fill(); }} else {{ ctx.fillRect(x0, y, w, h); }}
-    }}); ctx.restore();
+  const INK = "#23272e";
+  const BAR = {j(BAR)}, BAR_PARTIAL = {j(BAR_PARTIAL)}, BAR_HOVER = {j(BAR_HOVER)};
+  // Value printed at the end of every bar, so the numbers read without hovering and the value
+  // axis and gridlines can go. Shared on window so the corpus panels below reuse it.
+  const values = {{id: "values", afterDatasetsDraw(chart) {{
+    const ctx = chart.ctx, horiz = chart.options.indexAxis === "y";
+    ctx.save();
+    ctx.font = "600 11.5px " + Chart.defaults.font.family;
+    ctx.fillStyle = INK;
+    chart.getDatasetMeta(0).data.forEach(function(b, i) {{
+      const t = String(chart.data.datasets[0].data[i]);
+      if (horiz) {{ ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(t, b.x + 6, b.y); }}
+      else {{ ctx.textAlign = "center"; ctx.textBaseline = "bottom"; ctx.fillText(t, b.x, b.y - 5); }}
+    }});
+    ctx.restore();
   }}}};
-  window.__ucTrack = track;
+  window.__ucValues = values;
+  const hbar = (labels, vals, thick) => ({{
+    type: "bar", plugins: [values],
+    data: {{labels: labels, datasets: [{{label: "Studies", data: vals, backgroundColor: BAR, hoverBackgroundColor: BAR_HOVER,
+      borderRadius: 4, borderSkipped: "start", maxBarThickness: thick}}]}},
+    options: {{indexAxis: "y", responsive: true, maintainAspectRatio: false, layout: {{padding: {{right: 30}}}},
+      plugins: {{legend: {{display: false}}, tooltip: {{displayColors: false, callbacks: {{label: (c) => " " + c.parsed.x + (c.parsed.x === 1 ? " study" : " studies")}}}}}},
+      scales: {{x: {{display: false, beginAtZero: true}},
+               y: {{grid: {{display: false}}, border: {{display: false}}, ticks: {{color: INK, font: {{weight: "600"}}}}}}}}}}
+  }});
   const cur = String(new Date().getFullYear());
   if (C("ucYears")) new Chart(C("ucYears"), {{
-    type: "bar",
-    data: {{labels: YR.labels, datasets: [{{label: "Studies", data: YR.vals,
-      backgroundColor: YR.labels.map((y) => y === cur ? "#9ec9e6" : "#2a7fb8"), borderRadius: 4, maxBarThickness: 54}}]}},
-    options: {{responsive: true, maintainAspectRatio: false,
-      plugins: {{legend: {{display: false}}, tooltip: {{displayColors: false, callbacks: {{
-        title: (i) => i[0].label + (i[0].label === cur ? " (to date)" : ""),
-        label: (c) => " " + c.parsed.y + " studies"}}}}}},
-      scales: {{y: {{beginAtZero: true, grid: {{color: GRID}}, ticks: {{color: MUT}}, title: {{display: true, text: "studies", color: MUT}}}},
-               x: {{grid: {{display: false}}, ticks: {{color: INK, font: {{weight: "600"}}}}}}}}}}
+    type: "bar", plugins: [values],
+    // the current, partial year is marked on the axis ("to date") and drawn in the lighter step
+    data: {{labels: YR.labels.map((y) => y === cur ? [y, "to date"] : y), datasets: [{{label: "Studies", data: YR.vals,
+      backgroundColor: YR.labels.map((y) => y === cur ? BAR_PARTIAL : BAR),
+      hoverBackgroundColor: YR.labels.map((y) => y === cur ? BAR : BAR_HOVER),
+      borderRadius: 4, borderSkipped: "start", maxBarThickness: 54}}]}},
+    options: {{responsive: true, maintainAspectRatio: false, layout: {{padding: {{top: 20}}}},
+      plugins: {{legend: {{display: false}},
+        tooltip: {{displayColors: false, callbacks: {{
+          title: (i) => YR.labels[i[0].dataIndex] + (YR.labels[i[0].dataIndex] === cur ? " (to date)" : ""),
+          label: (c) => " " + c.parsed.y + " studies"}}}}}},
+      scales: {{y: {{display: false, beginAtZero: true}},
+               x: {{grid: {{display: false}}, border: {{display: false}}, ticks: {{color: INK, font: {{weight: "600"}}}}}}}}}}
   }});
-  if (C("ucCont")) new Chart(C("ucCont"), {{
-    type: "bar", plugins: [track],
-    data: {{labels: CONT.labels, datasets: [{{label: "Studies", data: CONT.vals,
-      backgroundColor: PAL, hoverBackgroundColor: PAL, borderRadius: 4, maxBarThickness: 26}}]}},
-    options: {{indexAxis: "y", responsive: true, maintainAspectRatio: false,
-      plugins: {{legend: {{display: false}}, tooltip: {{callbacks: {{label: (c) => " " + c.parsed.x + " studies"}}}}}},
-      scales: {{x: {{beginAtZero: true, grid: {{display: false}}, ticks: {{color: MUT}}}}, y: {{grid: {{display: false}}, ticks: {{color: INK, font: {{weight: "600"}}}}}}}}}}
-  }});
-  if (C("ucSpecies")) new Chart(C("ucSpecies"), {{
-    type: "bar", plugins: [track],
-    data: {{labels: SP.labels, datasets: [{{label: "Studies", data: SP.vals,
-      backgroundColor: PAL, hoverBackgroundColor: PAL, borderRadius: 4, maxBarThickness: 26}}]}},
-    options: {{indexAxis: "y", responsive: true, maintainAspectRatio: false,
-      plugins: {{legend: {{display: false}}, tooltip: {{callbacks: {{label: (c) => " " + c.parsed.x + " studies"}}}}}},
-      scales: {{x: {{beginAtZero: true, grid: {{display: false}}, ticks: {{color: MUT}}}}, y: {{grid: {{display: false}}, ticks: {{color: INK, font: {{weight: "600"}}}}}}}}}}
-  }});
-  if (C("ucCountries")) new Chart(C("ucCountries"), {{
-    type: "bar", plugins: [track],
-    data: {{labels: TOP.labels, datasets: [{{label: "Studies", data: TOP.vals,
-      backgroundColor: "#2a7fb8", hoverBackgroundColor: "#2a7fb8", borderRadius: 4, maxBarThickness: 22}}]}},
-    options: {{indexAxis: "y", responsive: true, maintainAspectRatio: false,
-      plugins: {{legend: {{display: false}}, tooltip: {{callbacks: {{label: (c) => " " + c.parsed.x + " studies"}}}}}},
-      scales: {{x: {{beginAtZero: true, grid: {{display: false}}, ticks: {{color: MUT}}}}, y: {{grid: {{display: false}}, ticks: {{color: INK, font: {{weight: "600"}}}}}}}}}}
-  }});
+  if (C("ucCont")) new Chart(C("ucCont"), hbar(CONT.labels, CONT.vals, 26));
+  if (C("ucSpecies")) new Chart(C("ucSpecies"), hbar(SP.labels, SP.vals, 26));
+  if (C("ucCountries")) new Chart(C("ucCountries"), hbar(TOP.labels, TOP.vals, 22));
   /* institutions are rendered as a static multi-column HTML list (see .ilist) */
 }})();
 </script>
