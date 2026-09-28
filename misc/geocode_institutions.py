@@ -161,6 +161,7 @@ MANUAL = {
     "Jagiellonian University Medical College": [50.0614, 19.9336],  # Krakow
     "Instituto Politécnico Nacional": [19.5046, -99.1336],  # Zacatenco, Mexico City
     "TensorAnalytics": [38.9757, -77.6414],  # Aldie, VA (town-level)
+    "Nencki-EMBL Center of Excellence for Neural Plasticity and Brain Disorders": [52.256, 21.03],  # at the Nencki Institute, Warsaw
 }
 
 DROP = {k for k, v in ALIASES.items() if v == ""}
@@ -211,18 +212,22 @@ def nominatim(name, cache):
         data = json.loads(urllib.request.urlopen(req, timeout=30).read().decode("utf-8"))
     except Exception as e:
         data = {"__error__": str(e)}
-    cache[name] = data
-    with open(CACHE, "w", encoding="utf-8") as f:
-        json.dump(cache, f, ensure_ascii=False, indent=1)
+    if not (isinstance(data, dict) and "__error__" in data):   # a network error is retried next run
+        cache[name] = data
+        with open(CACHE, "w", encoding="utf-8") as f:
+            json.dump(cache, f, ensure_ascii=False, indent=1)
     time.sleep(1.1)  # policy: <=1 req/sec
     return data
 
 
-def main():
+def main(fill=None):
+    """Returns {"added": [(name, [lat, lon])], "failed": [(name, why)], "low_conf": [(name, place)]}
+    so misc/resolve_new_places.py can report what the daily run changed."""
     # --fill-missing: reuse coords already in institution_coords.py and only
     # geocode canonical names not yet present (fast incremental top-up when the
     # sheet gains a study). Default (no flag): full regeneration from scratch.
-    fill = "--fill-missing" in sys.argv
+    if fill is None:
+        fill = "--fill-missing" in sys.argv
     existing = load_existing() if fill else {}
 
     rows = fetch_rows()
@@ -297,6 +302,7 @@ def main():
     for n, dn in low_conf:
         print(f"   ? {n}  ->  {dn}")
     print(f"\nwrote {OUT}")
+    return {"added": [(n, coords[n]) for n in added], "failed": failed, "low_conf": low_conf}
 
 
 if __name__ == "__main__":

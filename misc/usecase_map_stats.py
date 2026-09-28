@@ -14,6 +14,7 @@ from datetime import date
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from institution_coords import INSTITUTION_ALIASES, INSTITUTION_COORDS
+from country_names import COUNTRY_CONTINENT, COUNTRY_NAMES
 
 SHEET_ID = "169enc3Am2KQKifxj1F9KEKKLbftpMhBlw49zjl-egsY"
 CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=0"
@@ -41,22 +42,30 @@ NAME2ISO = {
     "montenegro": "ME", "lithuania": "LT", "estonia": "EE", "sri lanka": "LK",
     "nepal": "NP", "luxembourg": "LU",
 }
-ISO2CONT = {
-    "US": "North America", "CA": "North America", "MX": "North America",
-    "DE": "Europe", "ES": "Europe", "IT": "Europe", "CH": "Europe", "PL": "Europe",
-    "NL": "Europe", "GB": "Europe", "SE": "Europe", "FR": "Europe", "IE": "Europe",
-    "BE": "Europe", "AT": "Europe", "CZ": "Europe", "HU": "Europe", "PT": "Europe",
-    "NO": "Europe", "FI": "Europe", "DK": "Europe", "RU": "Europe", "SI": "Europe",
-    "RO": "Europe", "UA": "Europe", "GR": "Europe", "MD": "Europe", "ME": "Europe",
-    "LT": "Europe", "EE": "Europe", "LU": "Europe", "TR": "Europe",
-    "CN": "Asia", "IL": "Asia", "IN": "Asia", "JP": "Asia", "TH": "Asia",
-    "HK": "Asia", "SG": "Asia", "KR": "Asia", "TW": "Asia", "IR": "Asia",
-    "ID": "Asia", "PH": "Asia", "SA": "Asia", "LK": "Asia", "NP": "Asia",
-    "MA": "Africa", "ZA": "Africa", "EG": "Africa",
-    "BR": "South America", "AR": "South America", "CL": "South America",
-    "CO": "South America", "EC": "South America",
-    "AU": "Oceania", "NZ": "Oceania",
-}
+# Spellings resolved automatically by misc/resolve_new_places.py (the daily job looks up any
+# country string none of the lists above recognise); "spelling in lower case" -> ISO-2.
+COUNTRY_AUTO_JSON = os.path.join(os.path.dirname(os.path.abspath(__file__)), "country_auto.json")
+try:
+    with open(COUNTRY_AUTO_JSON, encoding="utf-8") as _f:
+        COUNTRY_AUTO = json.load(_f)
+except (OSError, ValueError):
+    COUNTRY_AUTO = {}
+_NAME_ISO = {n.lower(): iso for iso, n in COUNTRY_NAMES.items()}
+
+
+def split_countries(text):
+    """Country strings from one COUNTRIES cell: split on comma/semicolon, or a period FOLLOWED
+    BY a space (a typo separator, e.g. "Sweden. Israel") -- but not bare dots inside "U.S."."""
+    return [c.strip() for c in re.split(r"[,;]|\.\s+", text or "") if c.strip()]
+
+
+def country_iso(name):
+    """ISO-2 for a country string, or None: the sheet variants above, then the standard names
+    (misc/country_names.py, the sheet dropdown's list), then the auto-resolved spellings."""
+    key = name.strip().lower()
+    return NAME2ISO.get(key) or _NAME_ISO.get(key) or COUNTRY_AUTO.get(key)
+
+
 SPECIES_NORM = {
     "mouse": "Mouse", "mice": "Mouse", "rat": "Rat", "rats": "Rat",
     "rodent": "Rodent", "rodents": "Rodent", "zebrafish": "Zebrafish",
@@ -145,20 +154,15 @@ def main():
 
     for r in rows:
         seen_iso = set()
-        # split on comma/semicolon, or a period FOLLOWED BY space (a typo separator,
-        # e.g. "Sweden. Israel") -- but not bare dots inside "U.S."/"U.K."
-        for c in re.split(r"[,;]|\.\s+", cell(r, "COUNTRIES")):
-            key = c.strip().lower()
-            if not key:
-                continue
-            iso = NAME2ISO.get(key)
+        for c in split_countries(cell(r, "COUNTRIES")):
+            iso = country_iso(c)
             if not iso:
-                unmapped[c.strip()] += 1
+                unmapped[c] += 1
                 continue
             seen_iso.add(iso)
         for iso in seen_iso:
             per_country[iso] += 1
-            per_continent[ISO2CONT.get(iso, "Other")] += 1
+            per_continent[COUNTRY_CONTINENT.get(iso, "Other")] += 1
         y = cell(r, "YEAR")
         if y.isdigit():
             per_year[int(y)] += 1
@@ -191,10 +195,7 @@ def main():
     yr_labels = [str(y) for y in years]
     yr_counts = [per_year[y] for y in years]
     top_country = per_country.most_common(20)
-    # ISO-3166 alpha-2 -> display names for tooltips/bars
-    ISO_NAME = {v: k.title() for k, v in NAME2ISO.items()}
-    ISO_NAME.update({"US": "United States", "GB": "United Kingdom", "KR": "South Korea",
-                     "HK": "Hong Kong", "CZ": "Czech Republic", "AE": "UAE"})
+    ISO_NAME = COUNTRY_NAMES   # ISO-2 -> display name for tooltips/bars
 
     cont_labels = [c for c, _ in per_continent.most_common() if c != "Other"]
     cont_vals = [per_continent[c] for c in cont_labels]
@@ -212,7 +213,7 @@ def main():
     inst_colors = [BAR] * len(inst_vals)
 
     if unmapped:
-        print("Unmapped country strings (add to NAME2ISO):", dict(unmapped))
+        print("Unmapped country strings (misc/resolve_new_places.py looks these up):", dict(unmapped))
     if unmapped_inst:
         print("Institutions without coords (add to institution_coords.py):", dict(unmapped_inst))
 

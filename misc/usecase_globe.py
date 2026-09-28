@@ -21,7 +21,7 @@ from itertools import combinations
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from institution_coords import INSTITUTION_ALIASES, INSTITUTION_COORDS
-from usecase_map_stats import NAME2ISO, fetch_rows, inst_bucket
+from usecase_map_stats import country_iso, fetch_rows, inst_bucket, split_countries
 
 OUT = os.path.join(HERE, "..", "docs", "_generated", "usecase_globe.html")
 # One-hue ramp shared by all three views: pale peach = few, deep red-orange = many.
@@ -49,8 +49,7 @@ def main():
         label = f"{cell(r, 'YEAR')} · {cell(r, 'TITLE')}"
         for i in insts:
             studies[i].append(label)
-        # same country split as the flat map (comma/semicolon, or a typo'd ". ")
-        for iso in {NAME2ISO.get(c.strip().lower()) for c in re.split(r"[,;]|\.\s+", cell(r, "COUNTRIES"))} - {None}:
+        for iso in {country_iso(c) for c in split_countries(cell(r, "COUNTRIES"))} - {None}:
             country_studies[iso].append(label)
         for a, b in combinations(sorted(insts), 2):
             if INSTITUTION_COORDS[a] != INSTITUTION_COORDS[b]:

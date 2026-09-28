@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write           # needed to commit the regenerated HTML
+  issues: write             # opens/updates the "new places to review" issue
 
 jobs:
   build:
@@ -31,6 +32,12 @@ jobs:
       # locally and cannot be committed, so this job never regenerates them. That
       # refresh runs from the machine holding the PDFs, via the bi-weekly
       # misc/hooks/pre-push hook (install: python misc/install_hooks.py).
+      # Institutions new to the sheet are geocoded, and country spellings no list recognises
+      # are looked up once (OpenStreetMap Nominatim), so they show up on the pages today.
+      # Anything placed or left unresolved goes in a report for the review issue below.
+      - name: Resolve new institutions and country spellings
+        run: python misc/resolve_new_places.py --report "$RUNNER_TEMP/places.md"
+
       - name: Regenerate use-case map from the public sheet
         run: python misc/usecase_map_stats.py
 
@@ -48,5 +55,19 @@ jobs:
       - name: Commit updated map (if changed)
         run: |
           git add docs/_generated/usecase_map.html docs/_generated/usecase_table.html docs/_generated/usecase_globe.html
+          git add misc/institution_coords.py misc/geocode_cache.json misc/country_auto.json misc/places_reported.json
           git commit -m "Update SimBA use-case global-reach map" || echo "Nothing to commit"
           git push
+
+      # After the commit, and never failing the job: the page update must not wait on this.
+      - name: Open or update the places-to-review issue
+        if: always()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [ -s "$RUNNER_TEMP/places.md" ] || { echo "No new places to review"; exit 0; }
+          title="Use-case pages: new places to review"
+          n=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$n" ]; then gh issue comment "$n" --body-file "$RUNNER_TEMP/places.md"
+          else gh issue create --title "$title" --body-file "$RUNNER_TEMP/places.md"; fi

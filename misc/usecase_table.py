@@ -13,7 +13,7 @@ from datetime import date
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from institution_coords import INSTITUTION_ALIASES
-from usecase_map_stats import NAME2ISO, SHEET_ID, SPECIES_NORM, fetch_rows
+from usecase_map_stats import SHEET_ID, SPECIES_NORM, country_iso, fetch_rows, split_countries
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "..", "docs", "_generated", "usecase_table.html")
@@ -57,7 +57,7 @@ def main():
             "i": institutions(cell(r, "AUTHOR INSTITUTIONS")),
             "c": cell(r, "COUNTRIES"),
             # ISO-2 codes, split the same way as the map, so "#country=US" filters exactly
-            "cc": sorted({NAME2ISO.get(c.strip().lower()) for c in re.split(r"[,;]|\.\s+", cell(r, "COUNTRIES"))} - {None}),
+            "cc": sorted({country_iso(c) for c in split_countries(cell(r, "COUNTRIES"))} - {None}),
             "s": SPECIES_NORM.get(sp.lower(), sp),
             "url": url if url.lower().startswith("http") else "",
         })

@@ -5,6 +5,7 @@ Resolve a raw sheet token with: COORDS.get(ALIASES.get(tok, tok)).
 
 INSTITUTION_ALIASES = {
     'Brain Mind Institute': 'EPFL',
+    "Children's Hospital of Philadelphia": 'Children’s Hospital of Philadelphia',
     'Columbia': 'Columbia University',
     'Concordia': 'Concordia University',
     'Cornell': 'Cornell University',
@@ -31,6 +32,7 @@ INSTITUTION_ALIASES = {
     'Stanford': 'Stanford University',
     'Technical University Darmstadt': 'Technische Universität Darmstadt',
     'Texas A&M': 'Texas A&M University',
+    "The Children's Hospital of Philadelphia Research Institute": 'Children’s Hospital of Philadelphia',
     'The University of Hong Kong': 'University of Hong Kong',
     'UNSW': 'UNSW Sydney',
     'University': '',
@@ -47,8 +49,6 @@ INSTITUTION_ALIASES = {
     'Zhengzhou': '',
     'etherlands Institute for Neuroscience': 'Netherlands Institute for Neuroscience',
     'niversity of Pennsylvania': 'University of Pennsylvania',
-    "The Children's Hospital of Philadelphia Research Institute": 'Children’s Hospital of Philadelphia',
-    "Children's Hospital of Philadelphia": 'Children’s Hospital of Philadelphia',
     'École Polytechnique Fédérale de Lausanne': 'EPFL',
 }
 
@@ -70,7 +70,7 @@ INSTITUTION_COORDS = {
     'Children’s Hospital of Philadelphia': [39.9477, -75.195],  # 3
     'Christian-Albrechts-Universität zu Kiel': [54.3458, 10.1131],  # 1
     'City University of Hong Kong': [22.34, 114.1697],  # 2
-    'Columbia University': [40.8078, -73.9625],  # 2
+    'Columbia University': [40.8078, -73.9625],  # 3
     'Columbia University Irving Medical Center': [40.842, -73.9437],  # 2
     'Concordia University': [45.4583, -73.6394],  # 2
     'Cornell University': [42.4529, -76.4801],  # 3
@@ -80,7 +80,7 @@ INSTITUTION_COORDS = {
     'Donders Institute': [51.8199, 5.8637],  # 1
     'Duke University': [36.0002, -78.9442],  # 1
     'ELTE Eötvös Loránd University': [47.4935, 19.0619],  # 1
-    'EMBL Rome': [42.0842, 12.5935],  # 4
+    'EMBL Rome': [42.0842, 12.5935],  # 5
     'EPFL': [46.5191, 6.5668],  # 4
     'Emory University': [33.8005, -84.3172],  # 1
     'Federal University of Paraíba': [-7.1386, -34.8452],  # 1
@@ -125,9 +125,9 @@ INSTITUTION_COORDS = {
     'McGill University': [45.5048, -73.5772],  # 2
     'McLean Hospital': [42.3933, -71.1902],  # 1
     'Medical College of Wisconsin': [43.0439, -88.0225],  # 2
-    'Medical Research Council Harwell': [51.5745, -1.311],  # 1
+    'Medical Research Council Harwell': [51.5745, -1.311],  # 2
     'Michigan State University': [42.7024, -84.4804],  # 2
-    'Monash University': [-37.784, 144.9587],  # 1
+    'Monash University': [-37.784, 144.9587],  # 2
     'Nagoya University': [35.1533, 136.9678],  # 1
     'Nanjing Medical University': [31.9858, 118.703],  # 1
     'Nanjing University of Chinese Medicine': [32.103, 118.9389],  # 1
@@ -135,9 +135,10 @@ INSTITUTION_COORDS = {
     'National Institute of Mental Health': [39.0003, -77.1029],  # 3
     'National Institute on Deafness and other Communication Disorders': [39.0003, -77.1029],  # 1
     'National Institute on Drug Abuse': [39.2946, -76.5836],  # 5
-    'National Institutes of Health': [39.0003, -77.1029],  # 3
+    'National Institutes of Health': [39.0003, -77.1029],  # 4
     'National Research Council of Italy': [41.9033, 12.5147],  # 1
     'Nencki Institute of Experimental Biology of the Polish Academy of Sciences': [52.256, 21.03],  # 1
+    'Nencki-EMBL Center of Excellence for Neural Plasticity and Brain Disorders': [52.256, 21.03],  # 1
     'Netherlands Institute for Neuroscience': [52.3593, 4.9531],  # 1
     'Netholabs': [51.5074, -0.1278],  # 1
     'New York State Psychiatric Institute': [40.8425, -73.9446],  # 1
@@ -151,7 +152,7 @@ INSTITUTION_COORDS = {
     'Penn State University': [40.8129, -77.8711],  # 1
     'Philipps-University Marburg': [50.8125, 8.7722],  # 1
     'Platea Biosciences': [42.2626, -71.8023],  # 3
-    'Polish Academy of Sciences': [52.2378, 21.0182],  # 4
+    'Polish Academy of Sciences': [52.2378, 21.0182],  # 5
     'Pontificia Universidad Católica del Ecuador': [-0.21, -78.4917],  # 1
     'Qingdao University': [35.9817, 120.1623],  # 1
     'Roche': [47.558, 7.602],  # 1
@@ -165,7 +166,8 @@ INSTITUTION_COORDS = {
     'Southeast University': [31.8892, 118.8156],  # 1
     'Southern Illinois University-Carbondale': [37.7083, -89.2276],  # 1
     'Srinakharinwirot University': [13.7449, 100.5648],  # 1
-    'Stanford University': [37.4313, -122.1694],  # 5
+    'Stanford University': [37.4313, -122.1694],  # 6
+    "Sydney Children's Hospital Randwick": [-33.9177, 151.2384],  # 1
     'TU Dresden': [51.0283, 13.736],  # 1
     'Technische Universität Darmstadt': [49.8612, 8.6819],  # 2
     'TensorAnalytics': [38.9757, -77.6414],  # 1
@@ -173,11 +175,11 @@ INSTITUTION_COORDS = {
     'The International Brain Laboratory': [51.5246, -0.134],  # 1
     'The Second Affiliated Hospital of Nanjing Medical University': [32.0616, 118.7788],  # 1
     'UNAM': [19.332, -99.187],  # 2
-    'UNSW Sydney': [-33.9173, 151.2313],  # 2
+    'UNSW Sydney': [-33.9173, 151.2313],  # 3
     'Universidade de Lisboa': [38.7528, -9.157],  # 2
     'Universitat Jaume I': [39.9943, -0.0714],  # 5
     'University College Cork': [51.8947, -8.4903],  # 2
-    'University College London': [51.5242, -0.133],  # 1
+    'University College London': [51.5242, -0.133],  # 3
     'University Miguel Hernández': [38.277, -0.6899],  # 1
     'University of Amsterdam': [52.3681, 4.8898],  # 3
     'University of Arizona': [32.2357, -110.9517],  # 1
@@ -195,7 +197,7 @@ INSTITUTION_COORDS = {
     'University of Melbourne': [-37.8241, 144.9171],  # 1
     'University of Milan': [45.4757, 9.2283],  # 1
     'University of Nebraska': [40.8206, -96.7056],  # 1
-    'University of North Carolina': [35.9049, -79.0469],  # 5
+    'University of North Carolina': [35.9049, -79.0469],  # 7
     'University of Oxford': [51.7548, -1.2544],  # 1
     'University of Pennsylvania': [39.9522, -75.1956],  # 2
     'University of Pennsylvania School of Veterinary Medicine': [39.9509, -75.2],  # 1
@@ -208,8 +210,8 @@ INSTITUTION_COORDS = {
     'University of Toronto': [43.6608, -79.396],  # 2
     'University of Tsukuba': [36.1071, 140.1007],  # 1
     'University of Veterinary Medicine Vienna': [48.2548, 16.4304],  # 2
-    'University of Warsaw': [52.2216, 21.0074],  # 1
-    'University of Washington': [47.6553, -122.3035],  # 11
+    'University of Warsaw': [52.2216, 21.0074],  # 2
+    'University of Washington': [47.6553, -122.3035],  # 12
     'University of Wisconsin-Madison': [43.0803, -89.431],  # 1
     'University of the Basque Country': [43.3092, -2.0108],  # 3
     'Université Côte d’Azur': [43.717, 7.2676],  # 1
@@ -218,9 +220,8 @@ INSTITUTION_COORDS = {
     'VA Boston': [42.2977, -71.1449],  # 1
     'Vanderbilt University': [36.1438, -86.8028],  # 1
     'Washington State University': [46.7338, -117.1498],  # 2
-    'Washington University in St. Louis': [38.6488, -90.3108],  # 8
+    'Washington University in St. Louis': [38.6488, -90.3108],  # 9
     'Wayne State University': [42.3572, -83.0709],  # 1
     'Weizmann Institute of Science': [31.9078, 34.8133],  # 3
     'Yale School of Medicine': [41.3352, -72.9187],  # 1
-    "Sydney Children's Hospital Randwick": [-33.9177, 151.2384],  # 1
 }
