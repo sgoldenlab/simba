@@ -941,7 +941,7 @@ def _generate_download_stats(app):
             + globe_html(globe_countries, unit=('download', 'downloads'), headline=f'{total:,} downloads',
                          stats=f'{len(globe_countries)} countries &middot; last 30 days',
                          country_sub='Raised countries: height &amp; colour show downloads in the last 30 days',
-                         none_text='no downloads in the last 30 days', share_total=total) +
+                         none_text='no downloads in the last 30 days', share_total=total, tiles=True) +
             '</div>\n'
             '    <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Downloads by continent</h3>\n'
             '      <div class="simba-dl-panel" style="height:300px"><canvas id="dlContinents"></canvas></div></div>\n'
