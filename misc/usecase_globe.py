@@ -13,6 +13,9 @@ message replaces the globe if the browser has no WebGL or the CDN is unreachable
 
 Reads the same public sheet and institution coordinates as misc/usecase_map_stats.py.
 
+globe_html() is the reusable part: docs/conf.py calls it for the countries-only globe of PyPI
+downloads on the download-statistics page.
+
 Run:  python misc/usecase_globe.py
 """
 import collections, json, os, re, sys
@@ -62,22 +65,55 @@ def main():
              "sLat": INSTITUTION_COORDS[a][0], "sLng": INSTITUTION_COORDS[a][1],
              "eLat": INSTITUTION_COORDS[b][0], "eLng": INSTITUTION_COORDS[b][1]}
             for (a, b), n in pairs.items()]
-    countries = {iso: sorted(v, reverse=True) for iso, v in country_studies.items()}
+    countries = {iso: {"n": len(v), "items": sorted(v, reverse=True)} for iso, v in country_studies.items()}
 
-    j = lambda o: json.dumps(o, ensure_ascii=False).replace("</", "<\\/")
-    subs = {"__POINTS__": j(points), "__ARCS__": j(arcs), "__COUNTRIES__": j(countries),
-            "__N_STUDIES__": str(len(rows)), "__N_INST__": str(len(points)), "__N_LINKS__": str(len(arcs)),
-            "__N_COUNTRIES__": str(len(countries)), "__C_MAX__": str(max(map(len, countries.values()))),
-            "__RAMP__": j(RAMP), "__RAMP_CSS__": ",".join(RAMP)}
-    subs.update({f"__R{i}__": c for i, c in enumerate(RAMP)})
-    html = TEMPLATE
-    for k, v in subs.items():
-        html = html.replace(k, v)
+    html = globe_html(
+        countries, points, arcs, unit=("study", "studies"),
+        headline=f"{len(rows)} studies",
+        stats=f"{len(countries)} countries &middot; {len(points)} institutions &middot; {len(arcs)} collaboration links",
+        country_sub="Raised countries: height &amp; colour show the number of studies &middot; "
+                    "multi-country studies count in each",
+        none_text="no studies yet", table_links=True)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"Wrote {os.path.normpath(OUT)}: {len(countries)} countries, {len(points)} institutions, "
           f"{len(arcs)} collaboration arcs")
+
+
+def globe_html(countries, points=(), arcs=(), *, unit, headline, stats, country_sub, none_text,
+               modes=None, table_links=False, share_total=None):
+    """HTML for one interactive globe.
+
+    countries   {ISO-2: {"n": count, "items": [text, ...]}}; items (optional) are listed when a
+                country is clicked.
+    points/arcs institutions and collaboration pairs (as built in main()); with none of them the
+                globe shows only its Countries view and no view buttons.
+    unit        ("study", "studies") -- singular/plural of what is counted.
+    headline, stats  the two lines at the top left; country_sub the Countries-view caption;
+                none_text the tooltip for a country with nothing.
+    table_links link panels to the published-studies table.
+    share_total if given, a clicked country also shows its share of this total.
+    """
+    if modes is None:
+        modes = ("country", "inst", "collab") if points else ("country",)
+    names = {"country": "Countries", "inst": "Institutions", "collab": "Collaborations"}
+    buttons = "" if len(modes) < 2 else (
+        '<div class="sg-modes" role="group" aria-label="Globe view">' + "".join(
+            f'<button type="button" data-mode="{m}" aria-pressed="{str(i == 0).lower()}">{names[m]}</button>'
+            for i, m in enumerate(modes)) + "</div>")
+    j = lambda o: json.dumps(o, ensure_ascii=False).replace("</", "<\\/")
+    subs = {"__POINTS__": j(list(points)), "__ARCS__": j(list(arcs)), "__COUNTRIES__": j(countries),
+            "__HEADLINE__": headline, "__STATS__": stats, "__MODE_BUTTONS__": buttons,
+            "__UNIT__": j(list(unit)), "__UNITS__": unit[1], "__COUNTRY_SUB__": j(country_sub),
+            "__NONE_TEXT__": j(none_text), "__LINKS__": j(bool(table_links)), "__SHARE_TOTAL__": j(share_total),
+            "__C_MAX__": f"{max(c['n'] for c in countries.values()):,}" if countries else "0",
+            "__RAMP__": j(RAMP), "__RAMP_CSS__": ",".join(RAMP)}
+    subs.update({f"__R{i}__": c for i, c in enumerate(RAMP)})
+    html = TEMPLATE
+    for k, v in subs.items():
+        html = html.replace(k, v)
+    return html
 
 
 TEMPLATE = r"""<style>
@@ -134,11 +170,9 @@ TEMPLATE = r"""<style>
   .simba-globe .sg-panel{left:10px;right:10px;top:auto;bottom:10px;width:auto;max-height:55%;}}
 </style>
 <div class="simba-globe m-country" id="simbaGlobeBox">
-  <div class="sg-hud"><b>__N_STUDIES__ studies</b>__N_COUNTRIES__ countries &middot; __N_INST__ institutions &middot; __N_LINKS__ collaboration links<br><span id="simbaGlobeSub"></span></div>
-  <div class="sg-modes" role="group" aria-label="Globe view">
-    <button type="button" data-mode="country" aria-pressed="true">Countries</button><button type="button" data-mode="inst" aria-pressed="false">Institutions</button><button type="button" data-mode="collab" aria-pressed="false">Collaborations</button>
-  </div>
-  <div class="sg-legend country"><span><i style="background:#2a3440;border:1px solid #5a6b7d"></i>none</span><span style="margin-left:6px">1</span><i class="ramp"></i><span>__C_MAX__ studies (log scale)</span></div>
+  <div class="sg-hud"><b>__HEADLINE__</b>__STATS__<br><span id="simbaGlobeSub"></span></div>
+  __MODE_BUTTONS__
+  <div class="sg-legend country"><span><i style="background:#2a3440;border:1px solid #5a6b7d"></i>none</span><span style="margin-left:6px">1</span><i class="ramp"></i><span>__C_MAX__ __UNITS__ (log scale)</span></div>
   <div class="sg-legend inst"><span style="color:#8fb3cf">studies:</span><span><i style="background:__R0__"></i>1</span><span><i style="background:__R1__"></i>2</span><span><i style="background:__R2__"></i>3&ndash;4</span><span><i style="background:__R3__"></i>5&ndash;7</span><span><i style="background:__R4__"></i>8+</span></div>
   <div class="sg-legend collab"><span>partners: few</span><i class="ramp"></i><span>many (bigger dot = more)</span><span style="margin-left:8px"><i class="arc"></i>co-authored study</span></div>
   <div class="sg-hint" id="simbaGlobeHint"></div>
@@ -151,12 +185,13 @@ TEMPLATE = r"""<style>
   var LIB = "https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/dist/globe.gl.min.js";
   var GEO = "https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/example/datasets/ne_110m_admin_0_countries.geojson";
   var POINTS = __POINTS__, ARCS = __ARCS__, COUNTRIES = __COUNTRIES__, RAMP = __RAMP__;
+  var UNIT = __UNIT__, NONE_TEXT = __NONE_TEXT__, LINKS = __LINKS__, SHARE_TOTAL = __SHARE_TOTAL__;
   var rampAt = function (t) { return RAMP[Math.min(RAMP.length - 1, Math.floor(RAMP.length * t))]; };
   var box = document.getElementById("simbaGlobeBox"), el = document.getElementById("simbaGlobe");
   var panel = document.getElementById("simbaGlobePanel"), msg = document.getElementById("simbaGlobeMsg");
   if (!box) return;
   var TEXT = {
-    country: ["Raised countries: height &amp; colour show the number of studies &middot; multi-country studies count in each", "a country"],
+    country: [__COUNTRY_SUB__, "a country"],
     inst: ["Bars: studies per institution &middot; taller &amp; darker = more studies", "a bar"],
     collab: ["Arcs: institutions that published a study together &middot; hover or tap a dot to see its partners", "a dot"]
   };
@@ -200,7 +235,7 @@ TEMPLATE = r"""<style>
   function init() {
     var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]; }); };
-    var plural = function (n, one, many) { return n + " " + (n === 1 ? one : many); };
+    var plural = function (n, one, many) { return n.toLocaleString() + " " + (n === 1 ? one : many); };
     var mode = "country", hoverInst = null, hoverArc = null, hoverC = null, pinned = null, geo = null, ctl;
 
     // ---------- institutions & collaborations ----------
@@ -238,11 +273,11 @@ TEMPLATE = r"""<style>
     // ---------- countries ----------
     var CRAMP = RAMP;   // shared ramp (see RAMP in the Python above)
     var LAND = "#2a3440";
-    var cMax = Math.max.apply(null, Object.keys(COUNTRIES).map(function (k) { return COUNTRIES[k].length; }));
+    var cMax = Math.max.apply(null, Object.keys(COUNTRIES).map(function (k) { return COUNTRIES[k].n; }));
     var NE_FIX = { France: "FR", Norway: "NO" };   // Natural Earth 110m tags these ISO_A2 = -99
     var iso = function (f) { var c = f.properties.ISO_A2; return c === "-99" ? NE_FIX[f.properties.NAME] : c; };
-    var cn = function (f) { var v = COUNTRIES[iso(f)]; return v ? v.length : 0; };
-    // log scale: the US (80+) would otherwise flatten every other country into the bottom colour
+    var cn = function (f) { var v = COUNTRIES[iso(f)]; return v ? v.n : 0; };
+    // log scale: the US would otherwise flatten every other country into the bottom colour
     var cT = function (n) { return cMax > 1 ? Math.log(n) / Math.log(cMax) : 1; };
     var cCol = function (n) { return CRAMP[Math.min(CRAMP.length - 1, Math.floor(CRAMP.length * cT(n)))]; };
     var polyAlt = function (f) { var n = cn(f); return mode === "country" && n ? 0.012 + 0.06 * cT(n) + (f === hoverC ? 0.03 : 0) : 0.004; };
@@ -274,14 +309,16 @@ TEMPLATE = r"""<style>
         ? '<span class="c">' + plural(partners[p.name].length, "collaborating institution", "collaborating institutions") + '</span>' +
           list(partners[p.name].slice().sort(function (a, b) { return b.n - a.n; }).map(function (q) { return esc(q.name) + " <b>&times;" + q.n + "</b>"; }))
         : '<span class="c">' + plural(p.n, "study", "studies") + '</span>' + list(p.studies.map(esc));
-      showPanel("<h4>" + esc(p.name) + "</h4>" + body +
-        '<a class="go" href="published_studies.html#studies=' + encodeURIComponent(p.name) + '">See its studies in the table &rarr;</a>', p.lat, p.lng);
+      showPanel("<h4>" + esc(p.name) + "</h4>" + body + (LINKS ?
+        '<a class="go" href="published_studies.html#studies=' + encodeURIComponent(p.name) + '">See its studies in the table &rarr;</a>' : ""), p.lat, p.lng);
     }
     function pinCountry(f) {
-      var ctr = centre(f), studies = COUNTRIES[iso(f)] || [];
-      showPanel("<h4>" + esc(f.properties.NAME) + '</h4><span class="c">' + plural(studies.length, "study", "studies") + "</span>" + list(studies.map(esc)) +
+      var ctr = centre(f), c = COUNTRIES[iso(f)] || {n: 0}, items = c.items || [];
+      var share = SHARE_TOTAL ? '<br><span style="color:#c3d3e2">' + (100 * c.n / SHARE_TOTAL).toFixed(1) + "% of all " + UNIT[1] + "</span>" : "";
+      showPanel("<h4>" + esc(f.properties.NAME) + '</h4><span class="c">' + plural(c.n, UNIT[0], UNIT[1]) + "</span>" + share +
+        (items.length ? list(items.map(esc)) : "<br><br>") + (LINKS ?
         '<a class="go" href="published_studies.html#country=' + encodeURIComponent(iso(f)) + "&label=" + encodeURIComponent(f.properties.NAME) +
-        '">See these studies in the table &rarr;</a>', ctr[1], ctr[0]);
+        '">See these studies in the table &rarr;</a>' : ""), ctr[1], ctr[0]);
     }
 
     // ---------- globe ----------
@@ -313,7 +350,7 @@ TEMPLATE = r"""<style>
         .polygonsTransitionDuration(600)
         .polygonLabel(function (f) {
           if (mode !== "country") return "";
-          var n = cn(f); return '<div class="simba-globe-tip"><b>' + esc(f.properties.NAME) + '</b><br><span class="c">' + (n ? plural(n, "study", "studies") : "no studies yet") + "</span></div>";
+          var n = cn(f); return '<div class="simba-globe-tip"><b>' + esc(f.properties.NAME) + '</b><br><span class="c">' + (n ? plural(n, UNIT[0], UNIT[1]) : NONE_TEXT) + "</span></div>";
         })
         .onPolygonHover(function (f) { if (mode === "country") { hoverC = f; refreshPolys(); } })
         .onPolygonClick(function (f) { if (mode === "country" && cn(f)) pinCountry(f); else closePanel(); });

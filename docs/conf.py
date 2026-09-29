@@ -709,8 +709,13 @@ def _generate_download_stats(app):
     colors = ['#%02x%02x%02x' % (round(r0 + (r1 - r0) * t), round(g0 + (g1 - g0) * t), round(b0 + (b1 - b0) * t))
               for t in ([i / (n - 1) for i in range(n)] if n > 1 else [0.0])]
     data_json = json.dumps({'labels': labels, 'vals': vals, 'colors': colors})
-    # full per-country totals (alpha-2 keyed) for the world map (used for the boolean fill + tooltip)
-    map_json = json.dumps({str(c): int(v) for c, v in by_country.items()})
+    # per-country totals for the downloads globe: the published-studies globe component
+    # (misc/usecase_globe.py), in its countries-only form
+    import sys as _sys
+    _sys.path.insert(0, os.path.join(here, '..', 'misc'))
+    from usecase_globe import globe_html
+    globe_countries = {str(c): {'n': int(v)} for c, v in by_country.items()
+                       if isinstance(c, str) and len(c) == 2 and int(v) > 0}
 
     # ---- continent rollup (ISO alpha-2 -> continent); unmapped codes fall into "Other" ----
     _CONT_CODES = {
@@ -752,6 +757,33 @@ def _generate_download_stats(app):
     date_labels = [pd.to_datetime(str(d)).strftime('%b %d') for d in daily_sorted.index]
     daily_vals = [int(v) for v in daily_sorted.values]
     cumulative_vals = [int(v) for v in daily_sorted.cumsum().values]
+    # trailing 7-day mean; the first six days have no full week behind them, so they stay empty
+    avg7_vals = [None if pd.isna(v) else int(round(v)) for v in daily_sorted.rolling(7, min_periods=7).mean().values]
+    day_ts = [pd.to_datetime(str(d)) for d in daily_sorted.index]
+    week_ticks = [i for i, d in enumerate(day_ts) if d.dayofweek == 0]   # label Mondays only
+    # a "release" = a version first downloaded on a day AND newer than every version seen before that
+    # day (mirrors fetching an old release mid-window must not count); the window's first day is skipped
+    try:
+        from packaging.version import Version, InvalidVersion
+    except ImportError:
+        Version = None
+    releases = {}
+    if Version is not None:
+        def _v(x):
+            try:
+                return Version(str(x))
+            except InvalidVersion:
+                return None
+        first_seen = df.groupby('package_version')['download_date'].min()
+        newest = None
+        for d in daily_sorted.index:
+            vs = [v for v in (_v(x) for x in first_seen[first_seen == d].index) if v is not None]
+            if newest is not None:
+                new = sorted(v for v in vs if v > newest)
+                if new:
+                    releases[daily_sorted.index.get_loc(d)] = [str(v) for v in new]
+            if vs:
+                newest = max(vs + ([newest] if newest is not None else []))
     ver = df.groupby('package_version')['download_count'].sum().sort_values(ascending=False)
     ver_top = ver.head(15)
     ver_labels = [str(v) for v in ver_top.index]
@@ -769,6 +801,7 @@ def _generate_download_stats(app):
     dow_tot = df.groupby(dow_series)['download_count'].sum()
     dow_vals = [int(dow_tot.get(i, 0)) for i in range(7)]
     dash_json = json.dumps({'date_labels': date_labels, 'daily': daily_vals, 'cumulative': cumulative_vals,
+                            'avg7': avg7_vals, 'week_ticks': week_ticks, 'releases': releases,
                             'dow': dow_vals, 'ver_labels': ver_labels, 'ver': ver_vals,
                             'adopt_dates': adopt_dates, 'adopt': adopt})
 
@@ -819,16 +852,42 @@ def _generate_download_stats(app):
 
     try:
         MUT = '#8a9099'
+        # Tabler-style line icons (MIT), matching the stat cards on the published-studies page
+        _dl_icons = {
+            'download': '<path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/><path d="M7 11l5 5l5 -5"/><path d="M12 4l0 12"/>',
+            'calendar': '<path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"/>'
+                        '<path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/>',
+            'bolt': '<path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"/>',
+            'tag': '<path d="M7.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M3 6v5.172a2 2 0 0 0 .586 1.414'
+                   'l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592 -5.592a2.41 2.41 0 0 0 0 -3.408l-7.71 -7.71'
+                   'a2 2 0 0 0 -1.414 -.586h-5.172a3 3 0 0 0 -3 3z"/>',
+            'world': '<path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/><path d="M3.6 9h16.8"/><path d="M3.6 15h16.8"/>'
+                     '<path d="M11.5 3a17 17 0 0 0 0 18"/><path d="M12.5 3a17 17 0 0 1 0 18"/>',
+        }
+
+        def _dl_card(icon, value, label, sub, tip):
+            svg = ('<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
+                   f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{_dl_icons[icon]}</svg>')
+            return (f'    <div class="simba-dl-card" title="{tip}">{svg}<span class="v">{value}</span>'
+                    f'<span class="l">{label}</span><span class="s">{sub}</span></div>\n')
+
         style = (
             "<style>\n"
             ".simba-dl{max-width:860px;margin:14px auto 6px;}\n"
-            ".simba-dl-sub{font-size:13px;color:#6b7280;margin:0 0 14px;}\n"
+            ".simba-dl-sub{font-size:13px;color:#6b7280;margin:0 0 18px;}\n"
             ".simba-dl-sub b{color:#23272e;}\n"
-            ".simba-dl-cards{display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 8px;}\n"
-            ".simba-dl-card{flex:1 1 120px;min-width:104px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;"
-            "box-shadow:0 4px 14px rgba(33,86,122,.08);padding:13px 8px;text-align:center;overflow-wrap:anywhere;}\n"
-            ".simba-dl-card .v{display:block;font-size:clamp(16px,5vw,22px);font-weight:800;color:#21567a;line-height:1.1;}\n"
-            ".simba-dl-card .l{display:block;font-size:10.5px;color:#6b7280;margin-top:4px;}\n"
+            # stat cards: orange accent + icon (the page's chart colour), dark-blue number,
+            # a readable label with a quieter context line, and a hover lift + tooltip
+            ".simba-dl-cards{display:flex;flex-wrap:wrap;gap:14px;margin:4px 0 30px;}\n"
+            ".simba-dl-card{flex:1 1 130px;min-width:112px;background:#fff;border:1px solid #e2e8f0;"
+            "border-top:3px solid #e5692a;border-radius:12px;box-shadow:0 4px 14px rgba(33,86,122,.08);"
+            "padding:14px 10px 13px;text-align:center;overflow-wrap:anywhere;cursor:help;"
+            "transition:transform .15s ease,box-shadow .15s ease;}\n"
+            ".simba-dl-card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(33,86,122,.16);}\n"
+            ".simba-dl-card .ic{display:block;width:22px;height:22px;margin:0 auto 8px;color:#e5692a;}\n"
+            ".simba-dl-card .v{display:block;font-size:clamp(17px,5vw,23px);font-weight:800;color:#21567a;line-height:1.1;}\n"
+            ".simba-dl-card .l{display:block;font-size:12.5px;font-weight:600;color:#374151;margin-top:6px;}\n"
+            ".simba-dl-card .s{display:block;font-size:11px;color:#8a9099;margin-top:2px;}\n"
             ".simba-dl-h3{font-size:15px;color:#23272e;font-weight:700;margin:24px 0 10px;}\n"
             ".simba-dl-badge{display:inline-block;font-size:11px;font-weight:700;color:#8a5a00;background:#fdf1d6;"
             "border:1px solid #f0d68f;border-radius:999px;padding:2px 9px;margin-left:8px;vertical-align:middle;white-space:nowrap;cursor:help;}\n"
@@ -839,13 +898,6 @@ def _generate_download_stats(app):
             "@media (max-width:680px){.simba-dl-grid{grid-template-columns:1fr;}}\n"
             ".simba-dl-panel{position:relative;height:340px;box-sizing:border-box;background:#fff;border:1px solid #e2e8f0;"
             "border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);padding:14px 16px 10px;}\n"
-            ".simba-dl-map{position:relative;height:680px;background:radial-gradient(120% 120% at 50% 0%,#f4f9fd,#e8f1f8);"
-            "border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);padding:10px;box-sizing:border-box;}\n"
-            ".simba-dl-legend{display:flex;align-items:center;gap:8px;justify-content:flex-end;font-size:11px;color:#6b7280;margin:8px 4px 0;}\n"
-            ".simba-dl-legend i{width:140px;height:10px;border-radius:5px;display:inline-block;"
-            "background:linear-gradient(90deg,#e8f4fb,#7fc1e3,#2a7fb8,#1a3f6b);}\n"
-            ".simba-dl-legend .dot{width:11px;height:11px;border-radius:50%;background:#e0433a;display:inline-block;margin-left:14px;}\n"
-            ".simba-dl-legend .sw{width:13px;height:13px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.06);}\n"
             ".simba-dl-more{text-align:center;margin:26px 0 6px;}\n"
             ".simba-dl-more a{display:inline-flex;align-items:center;gap:8px;text-decoration:none !important;background:#21567a;"
             "color:#fff !important;font-weight:600;font-size:14px;padding:11px 20px;border-radius:24px;box-shadow:0 2px 10px rgba(33,86,122,.25);}\n"
@@ -858,11 +910,18 @@ def _generate_download_stats(app):
             '<div class="simba-dl">\n'
             f'  <p class="simba-dl-sub">PyPI downloads of <b>simba-uw-tf-dev</b> &middot; last 30 days &middot; {dmin} &ndash; {dmax}</p>\n'
             '  <div class="simba-dl-cards">\n'
-            f'    <div class="simba-dl-card"><span class="v">{total:,}</span><span class="l">downloads &middot; 30 days</span></div>\n'
-            f'    <div class="simba-dl-card"><span class="v">{daily_avg:,}</span><span class="l">avg / day</span></div>\n'
-            f'    <div class="simba-dl-card"><span class="v">{peak_val:,}</span><span class="l">peak day ({peak_date})</span></div>\n'
-            f'    <div class="simba-dl-card"><span class="v">{n_version:,}</span><span class="l">versions</span></div>\n'
-            f'    <div class="simba-dl-card"><span class="v">{n_country}</span><span class="l">countries</span></div>\n'
+            + ''.join(_dl_card(*c) for c in (
+                ('download', f'{total:,}', 'downloads', 'last 30 days',
+                 'All PyPI downloads of simba-uw-tf-dev in the last 30 days, including mirrors and CI.'),
+                ('calendar', f'{daily_avg:,}', 'average per day', 'over 30 days',
+                 'Total downloads in the last 30 days divided by 30.'),
+                ('bolt', f'{peak_val:,}', 'peak day', peak_date,
+                 'The busiest single day in the last 30 days.'),
+                ('tag', f'{n_version:,}', 'versions', 'distinct, downloaded',
+                 'Distinct SimBA versions downloaded in the last 30 days (mirrors fetch every release).'),
+                ('world', f'{n_country}', 'countries', 'downloading SimBA',
+                 'Countries PyPI recorded downloads from in the last 30 days.'))) +
+
             '  </div>\n'
             '  <div class="simba-dl-grid">\n'
             '    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Downloads over time</h3>\n'
@@ -878,10 +937,12 @@ def _generate_download_stats(app):
             f'    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Paper citations per year &middot; {cite_total:,} total'
             f'      <span class="simba-dl-badge" title="NIH iCite Relative Citation Ratio: field- and time-normalised citation impact, where 1.0 = the median NIH-funded paper.">NIH RCR {rcr:g} &middot; ~{round(rcr)}&times; median</span></h3>\n'
             '      <div class="simba-dl-panel"><canvas id="dlCitations"></canvas></div></div>\n'
-            '    <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Downloads by country &mdash; world map</h3>\n'
-            '      <div class="simba-dl-map" id="dlMap"></div>\n'
-            '      <div class="simba-dl-legend"><span>fewer</span><i></i><span>more</span>'
-            '<span class="sw" style="background:#dce4ee;margin-left:14px"></span><span>none</span></div></div>\n'
+            '    <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Downloads by country</h3>\n'
+            + globe_html(globe_countries, unit=('download', 'downloads'), headline=f'{total:,} downloads',
+                         stats=f'{len(globe_countries)} countries &middot; last 30 days',
+                         country_sub='Raised countries: height &amp; colour show downloads in the last 30 days',
+                         none_text='no downloads in the last 30 days', share_total=total) +
+            '</div>\n'
             '    <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Downloads by continent</h3>\n'
             '      <div class="simba-dl-panel" style="height:300px"><canvas id="dlContinents"></canvas></div></div>\n'
             f'    <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Top {TOP} countries</h3>\n'
@@ -896,35 +957,8 @@ def _generate_download_stats(app):
             '</div>\n')
         script = (
             # RTD theme loads RequireJS; disable AMD while the UMD libs load so they set
-            # window.Chart / window.jsVectorMap globals instead of registering as AMD modules
+            # the window.Chart global instead of registering as an AMD module
             '<script>window.__odef = window.define; try { window.define = undefined; } catch (e) {}</script>\n'
-            '<link rel="stylesheet" href="_static/css/jsvectormap.min.css">\n'
-            '<script src="_static/js/jsvectormap.min.js"></script>\n'
-            '<script src="_static/js/jsvectormap-world.js"></script>\n'
-            '<script>\n(function(){\n'
-            f'  const MAP = {map_json};\n'
-            '  const el = document.getElementById("dlMap");\n'
-            '  if (!el || typeof jsVectorMap === "undefined") return;\n'
-            '  // graduated choropleth. The jsVectorMap series scale is an ordinal lookup (value -> scale[value]),\n'
-            '  // NOT a gradient, so we bucket each country into 1..N by log of its (highly skewed) count and\n'
-            '  // index a colour ramp with that bucket. (Bucket 0 is skipped by the lib, so buckets start at 1.)\n'
-            '  const SCALE = ["#e8f4fb", "#cfe6f5", "#9bcde9", "#5aa7d4", "#3a86c0", "#2a6299", "#143a5e"];\n'
-            '  const NB = SCALE.length - 1;\n'
-            '  const _counts = Object.keys(MAP).map((k) => MAP[k] || 0);\n'
-            '  const _maxLog = Math.log10(Math.max.apply(null, _counts.concat([1])) + 1) || 1;\n'
-            '  const BUCK = {};\n'
-            '  for (const k in MAP) { let b = Math.ceil(Math.log10((MAP[k] || 0) + 1) / _maxLog * NB); BUCK[k] = b < 1 ? 1 : (b > NB ? NB : b); }\n'
-            '  new jsVectorMap({\n'
-            '    selector: "#dlMap", map: "world",\n'
-            '    zoomButtons: true, zoomOnScroll: true, backgroundColor: "transparent",\n'
-            '    regionStyle: {initial: {fill: "#dce4ee", stroke: "#ffffff", "stroke-width": 0.5},\n'
-            '      hover: {fill: "#f0c44a", "fill-opacity": 1}},\n'
-            '    series: {regions: [{attribute: "fill", values: BUCK, scale: SCALE}]},\n'
-            '    onRegionTooltipShow(event, tooltip, code) {\n'
-            '      const v = MAP[code] || 0;\n'
-            '      tooltip.text(tooltip.text() + (v ? ": " + v.toLocaleString() + " downloads" : ": no downloads"), true);\n'
-            '    }\n'
-            '  });\n})();\n</script>\n'
             '<script src="_static/js/chart.umd.min.js"></script>\n'
             '<script>\n(function(){\n'
             '  if (!window.Chart) return;\n'
@@ -961,25 +995,71 @@ def _generate_download_stats(app):
             '        return " " + c.parsed.x.toLocaleString() + " downloads (" + p + "%)"; }}}},\n'
             '      scales: {x: {beginAtZero: true, grid: {display: false}, ticks: {color: MUT}}, y: {grid: {display: false}, ticks: {color: INK, font: {weight: "600"}}}}}\n'
             '  });\n'
+            # daily bars (the page's orange) + a 7-day average line on the same axis, a small marker
+            # under each day a new SimBA version appeared, and one horizontal date label per week
+            '  const REL = DASH.releases || {}, WEEK = new Set(DASH.week_ticks || []);\n'
+            '  const relMarks = {id: "relMarks", afterDatasetsDraw(chart) {\n'
+            '    const ctx = chart.ctx, x = chart.scales.x, y0 = chart.chartArea.bottom;\n'
+            '    ctx.save(); ctx.fillStyle = "#21567a";\n'
+            '    Object.keys(REL).forEach(function (i) {\n'
+            '      const px = x.getPixelForValue(+i);\n'
+            '      ctx.beginPath(); ctx.moveTo(px, y0 - 9); ctx.lineTo(px - 5, y0 - 1); ctx.lineTo(px + 5, y0 - 1); ctx.closePath(); ctx.fill();\n'
+            '    });\n'
+            '    ctx.restore();\n'
+            '  }};\n'
             '  if (C("dlOverTime")) new Chart(C("dlOverTime"), {\n'
-            '    type: "bar",\n'
+            '    type: "bar", plugins: [relMarks],\n'
             '    data: {labels: DASH.date_labels, datasets: [\n'
-            '      {label: "Daily", data: DASH.daily, backgroundColor: "#7fc1e3", borderRadius: 3}]},\n'
-            '    options: {responsive: true, maintainAspectRatio: false,\n'
-            '      plugins: {legend: {display: false}},\n'
-            '      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "daily", color: MUT}},\n'
-            '               x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 10}}}}\n'
-            '  });\n'
-            '  if (C("dlCumulative")) new Chart(C("dlCumulative"), {\n'
-            '    type: "line",\n'
-            '    data: {labels: DASH.date_labels, datasets: [\n'
-            '      {label: "Cumulative", data: DASH.cumulative, borderColor: "#21567a", backgroundColor: "rgba(33,86,122,.10)", fill: true, tension: .3, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: "#21567a", pointHoverBorderColor: "#fff", pointHoverBorderWidth: 2, borderWidth: 2.5}]},\n'
+            '      {type: "line", label: "7-day average", data: DASH.avg7, borderColor: "#21567a", borderWidth: 2, tension: .3,\n'
+            '       pointRadius: 0, pointHoverRadius: 4, pointHoverBackgroundColor: "#21567a", pointStyle: "line", spanGaps: false, order: 0},\n'
+            '      {label: "Downloads per day", data: DASH.daily, backgroundColor: "#e5692a", hoverBackgroundColor: "#c2461a",\n'
+            '       borderRadius: 3, borderSkipped: "start", pointStyle: "rect", order: 1}]},\n'
             '    options: {responsive: true, maintainAspectRatio: false, interaction: {intersect: false, mode: "index"},\n'
-            '      plugins: {legend: {display: false}, tooltip: {displayColors: false,\n'
-            '        callbacks: {title: (items) => "Through " + items[0].label,\n'
-            '                    label: (c) => " " + c.parsed.y.toLocaleString() + " downloads total"}}},\n'
-            '      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "cumulative \\u00b7 30 days", color: MUT}},\n'
-            '               x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 10}}}}\n'
+            '      plugins: {legend: {display: true, position: "top", align: "end",\n'
+            '          labels: {usePointStyle: true, boxWidth: 12, boxHeight: 8, color: MUT, font: {size: 11},\n'
+            '            generateLabels: function (chart) {\n'
+            '              const items = Chart.defaults.plugins.legend.labels.generateLabels(chart);\n'
+            '              if (Object.keys(REL).length) items.push({text: "new version", fillStyle: "#21567a", strokeStyle: "#21567a",\n'
+            '                pointStyle: "triangle", lineWidth: 0, hidden: false, datasetIndex: -1});\n'
+            '              return items; }},\n'
+            '          onClick: function () {}},\n'
+            '        tooltip: {callbacks: {\n'
+            '          label: (c) => " " + c.dataset.label + ": " + (c.parsed.y == null ? "\u2013" : c.parsed.y.toLocaleString()),\n'
+            '          afterBody: (items) => { const v = REL[items[0].dataIndex]; return v ? ["", "New version: " + v.join(", ")] : []; }}}},\n'
+            '      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "downloads per day", color: MUT}},\n'
+            '               x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 0, autoSkip: false,\n'
+            '                  callback: function (v, i) { return WEEK.has(i) ? this.getLabelForValue(v) : ""; }}}}}\n'
+            '  });\n'
+            # running total in the page's orange, the same release markers as the daily chart, one date
+            # label per week, and the 30-day total written at the end of the line
+            '  const endLabel = {id: "endLabel", afterDatasetsDraw(chart) {\n'
+            '    const pts = chart.getDatasetMeta(0).data, last = pts[pts.length - 1];\n'
+            '    if (!last) return;\n'
+            '    const ctx = chart.ctx, v = chart.data.datasets[0].data[pts.length - 1];\n'
+            '    ctx.save(); ctx.font = "700 12px " + Chart.defaults.font.family; ctx.fillStyle = INK;\n'
+            '    ctx.textAlign = "right"; ctx.textBaseline = "bottom"; ctx.fillText(v.toLocaleString(), last.x - 4, last.y - 8);\n'
+            '    ctx.restore();\n'
+            '  }};\n'
+            '  if (C("dlCumulative")) new Chart(C("dlCumulative"), {\n'
+            '    type: "line", plugins: [relMarks, endLabel],\n'
+            '    data: {labels: DASH.date_labels, datasets: [\n'
+            '      {label: "Downloads so far", data: DASH.cumulative, borderColor: "#e5692a", backgroundColor: "rgba(229,105,42,.12)",\n'
+            '       fill: true, tension: .3, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: "#e5692a",\n'
+            '       pointHoverBorderColor: "#fff", pointHoverBorderWidth: 2, borderWidth: 2.5}]},\n'
+            '    options: {responsive: true, maintainAspectRatio: false, interaction: {intersect: false, mode: "index"},\n'
+            '      layout: {padding: {top: 18}},\n'
+            '      plugins: {legend: {display: Object.keys(REL).length > 0, position: "top", align: "end",\n'
+            '          labels: {usePointStyle: true, boxWidth: 12, boxHeight: 8, color: MUT, font: {size: 11},\n'
+            '            generateLabels: () => [{text: "new version", fillStyle: "#21567a", strokeStyle: "#21567a",\n'
+            '              pointStyle: "triangle", lineWidth: 0, hidden: false, datasetIndex: -1}]},\n'
+            '          onClick: function () {}},\n'
+            '        tooltip: {displayColors: false, callbacks: {\n'
+            '          title: (items) => "Through " + items[0].label,\n'
+            '          label: (c) => " " + c.parsed.y.toLocaleString() + " downloads in total",\n'
+            '          afterBody: (items) => { const v = REL[items[0].dataIndex]; return v ? ["New version: " + v.join(", ")] : []; }}}},\n'
+            '      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "downloads so far (30 days)", color: MUT}},\n'
+            '               x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 0, autoSkip: false,\n'
+            '                  callback: function (v, i) { return WEEK.has(i) ? this.getLabelForValue(v) : ""; }}}}}\n'
             '  });\n'
             '  if (C("dlDow")) new Chart(C("dlDow"), {\n'
             '    type: "bar",\n'

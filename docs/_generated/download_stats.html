@@ -1,11 +1,14 @@
 <style>
 .simba-dl{max-width:860px;margin:14px auto 6px;}
-.simba-dl-sub{font-size:13px;color:#6b7280;margin:0 0 14px;}
+.simba-dl-sub{font-size:13px;color:#6b7280;margin:0 0 18px;}
 .simba-dl-sub b{color:#23272e;}
-.simba-dl-cards{display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 8px;}
-.simba-dl-card{flex:1 1 120px;min-width:104px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 4px 14px rgba(33,86,122,.08);padding:13px 8px;text-align:center;overflow-wrap:anywhere;}
-.simba-dl-card .v{display:block;font-size:clamp(16px,5vw,22px);font-weight:800;color:#21567a;line-height:1.1;}
-.simba-dl-card .l{display:block;font-size:10.5px;color:#6b7280;margin-top:4px;}
+.simba-dl-cards{display:flex;flex-wrap:wrap;gap:14px;margin:4px 0 30px;}
+.simba-dl-card{flex:1 1 130px;min-width:112px;background:#fff;border:1px solid #e2e8f0;border-top:3px solid #e5692a;border-radius:12px;box-shadow:0 4px 14px rgba(33,86,122,.08);padding:14px 10px 13px;text-align:center;overflow-wrap:anywhere;cursor:help;transition:transform .15s ease,box-shadow .15s ease;}
+.simba-dl-card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(33,86,122,.16);}
+.simba-dl-card .ic{display:block;width:22px;height:22px;margin:0 auto 8px;color:#e5692a;}
+.simba-dl-card .v{display:block;font-size:clamp(17px,5vw,23px);font-weight:800;color:#21567a;line-height:1.1;}
+.simba-dl-card .l{display:block;font-size:12.5px;font-weight:600;color:#374151;margin-top:6px;}
+.simba-dl-card .s{display:block;font-size:11px;color:#8a9099;margin-top:2px;}
 .simba-dl-h3{font-size:15px;color:#23272e;font-weight:700;margin:24px 0 10px;}
 .simba-dl-badge{display:inline-block;font-size:11px;font-weight:700;color:#8a5a00;background:#fdf1d6;border:1px solid #f0d68f;border-radius:999px;padding:2px 9px;margin-left:8px;vertical-align:middle;white-space:nowrap;cursor:help;}
 .simba-dl-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;margin-top:8px;}
@@ -14,11 +17,6 @@
 .simba-dl-cell--wide{grid-column:1 / -1;}
 @media (max-width:680px){.simba-dl-grid{grid-template-columns:1fr;}}
 .simba-dl-panel{position:relative;height:340px;box-sizing:border-box;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);padding:14px 16px 10px;}
-.simba-dl-map{position:relative;height:680px;background:radial-gradient(120% 120% at 50% 0%,#f4f9fd,#e8f1f8);border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);padding:10px;box-sizing:border-box;}
-.simba-dl-legend{display:flex;align-items:center;gap:8px;justify-content:flex-end;font-size:11px;color:#6b7280;margin:8px 4px 0;}
-.simba-dl-legend i{width:140px;height:10px;border-radius:5px;display:inline-block;background:linear-gradient(90deg,#e8f4fb,#7fc1e3,#2a7fb8,#1a3f6b);}
-.simba-dl-legend .dot{width:11px;height:11px;border-radius:50%;background:#e0433a;display:inline-block;margin-left:14px;}
-.simba-dl-legend .sw{width:13px;height:13px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.06);}
 .simba-dl-more{text-align:center;margin:26px 0 6px;}
 .simba-dl-more a{display:inline-flex;align-items:center;gap:8px;text-decoration:none !important;background:#21567a;color:#fff !important;font-weight:600;font-size:14px;padding:11px 20px;border-radius:24px;box-shadow:0 2px 10px rgba(33,86,122,.25);}
 .simba-dl-more a:hover{background:#19465f;}
@@ -26,13 +24,13 @@
 .simba-dl-foot{text-align:right;font-size:11px;color:#8a9099;font-style:italic;margin:12px 4px 0;}
 </style>
 <div class="simba-dl">
-  <p class="simba-dl-sub">PyPI downloads of <b>simba-uw-tf-dev</b> &middot; last 30 days &middot; 2026-08-27 &ndash; 2026-09-26</p>
+  <p class="simba-dl-sub">PyPI downloads of <b>simba-uw-tf-dev</b> &middot; last 30 days &middot; 2026-08-29 &ndash; 2026-09-28</p>
   <div class="simba-dl-cards">
-    <div class="simba-dl-card"><span class="v">20,784</span><span class="l">downloads &middot; 30 days</span></div>
-    <div class="simba-dl-card"><span class="v">670</span><span class="l">avg / day</span></div>
-    <div class="simba-dl-card"><span class="v">2,957</span><span class="l">peak day (Sep 08)</span></div>
-    <div class="simba-dl-card"><span class="v">962</span><span class="l">versions</span></div>
-    <div class="simba-dl-card"><span class="v">46</span><span class="l">countries</span></div>
+    <div class="simba-dl-card" title="All PyPI downloads of simba-uw-tf-dev in the last 30 days, including mirrors and CI."><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/><path d="M7 11l5 5l5 -5"/><path d="M12 4l0 12"/></svg><span class="v">21,288</span><span class="l">downloads</span><span class="s">last 30 days</span></div>
+    <div class="simba-dl-card" title="Total downloads in the last 30 days divided by 30."><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/></svg><span class="v">687</span><span class="l">average per day</span><span class="s">over 30 days</span></div>
+    <div class="simba-dl-card" title="The busiest single day in the last 30 days."><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"/></svg><span class="v">2,957</span><span class="l">peak day</span><span class="s">Sep 08</span></div>
+    <div class="simba-dl-card" title="Distinct SimBA versions downloaded in the last 30 days (mirrors fetch every release)."><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592 -5.592a2.41 2.41 0 0 0 0 -3.408l-7.71 -7.71a2 2 0 0 0 -1.414 -.586h-5.172a3 3 0 0 0 -3 3z"/></svg><span class="v">958</span><span class="l">versions</span><span class="s">distinct, downloaded</span></div>
+    <div class="simba-dl-card" title="Countries PyPI recorded downloads from in the last 30 days."><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/><path d="M3.6 9h16.8"/><path d="M3.6 15h16.8"/><path d="M11.5 3a17 17 0 0 0 0 18"/><path d="M12.5 3a17 17 0 0 1 0 18"/></svg><span class="v">46</span><span class="l">countries</span><span class="s">downloading SimBA</span></div>
   </div>
   <div class="simba-dl-grid">
     <div class="simba-dl-cell"><h3 class="simba-dl-h3">Downloads over time</h3>
@@ -45,59 +43,295 @@
       <div class="simba-dl-panel"><canvas id="dlVersions"></canvas></div></div>
     <div class="simba-dl-cell"><h3 class="simba-dl-h3">Version adoption over time</h3>
       <div class="simba-dl-panel"><canvas id="dlAdoption"></canvas></div></div>
-    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Paper citations per year &middot; 460 total      <span class="simba-dl-badge" title="NIH iCite Relative Citation Ratio: field- and time-normalised citation impact, where 1.0 = the median NIH-funded paper.">NIH RCR 25.6 &middot; ~26&times; median</span></h3>
+    <div class="simba-dl-cell"><h3 class="simba-dl-h3">Paper citations per year &middot; 460 total      <span class="simba-dl-badge" title="NIH iCite Relative Citation Ratio: field- and time-normalised citation impact, where 1.0 = the median NIH-funded paper.">NIH RCR 25.2 &middot; ~25&times; median</span></h3>
       <div class="simba-dl-panel"><canvas id="dlCitations"></canvas></div></div>
-    <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Downloads by country &mdash; world map</h3>
-      <div class="simba-dl-map" id="dlMap"></div>
-      <div class="simba-dl-legend"><span>fewer</span><i></i><span>more</span><span class="sw" style="background:#dce4ee;margin-left:14px"></span><span>none</span></div></div>
+    <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Downloads by country</h3>
+<style>
+.simba-globe{position:relative;max-width:980px;margin:14px auto 10px;height:560px;border-radius:16px;overflow:hidden;
+  /* backlight: a bright glow centred behind the globe, over the dark panel gradient */
+  background:radial-gradient(circle at 50% 50%,rgba(190,225,255,.75) 0,rgba(120,180,250,.45) 28%,rgba(60,120,210,.2) 44%,rgba(0,0,0,0) 64%),
+             radial-gradient(120% 90% at 50% 40%,#16344f 0%,#0b1a2a 60%,#07111c 100%);box-shadow:0 10px 30px rgba(10,30,50,.35);}
+.simba-globe #simbaGlobe{position:absolute;inset:0;}
+.simba-globe .sg-hud{position:absolute;left:18px;top:14px;z-index:2;color:#dbe8f3;pointer-events:none;font-size:12.5px;line-height:1.45;}
+.simba-globe .sg-hud b{display:block;font-size:19px;color:#fff;letter-spacing:.01em;margin-bottom:2px;}
+.simba-globe .sg-hud span{color:#8fb3cf;}
+.simba-globe.pinned .sg-hud span{display:none;}
+/* view switch: a vertical stack of large buttons so the three views are easy to find */
+.simba-globe .sg-modes{position:absolute;left:18px;top:96px;z-index:3;display:flex;flex-direction:column;gap:6px;
+  background:rgba(12,24,38,.82);border:1px solid #2b4a66;border-radius:14px;padding:6px;}
+.simba-globe .sg-modes button{font:600 14px system-ui,sans-serif;border:1px solid #2b4a66;border-radius:10px;padding:10px 18px;
+  min-width:160px;text-align:left;cursor:pointer;background:rgba(255,255,255,.06);color:#dbe8f3;transition:background .15s ease,color .15s ease;}
+.simba-globe .sg-modes button:hover{background:rgba(255,255,255,.14);color:#fff;}
+.simba-globe .sg-modes button[aria-pressed="true"]{background:#e5692a;border-color:#e5692a;color:#fff;}
+.simba-globe .sg-legend{position:absolute;right:16px;bottom:12px;z-index:2;gap:10px;align-items:center;
+  font-size:11px;color:#a9c3d8;pointer-events:none;flex-wrap:wrap;justify-content:flex-end;display:none;}
+.simba-globe.m-country .sg-legend.country,.simba-globe.m-inst .sg-legend.inst,.simba-globe.m-collab .sg-legend.collab{display:flex;}
+.simba-globe .sg-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px;}
+.simba-globe .sg-legend .ramp{width:110px;height:9px;border-radius:5px;background:linear-gradient(90deg,#fee3c8,#fbbd8c,#f59352,#e5692a,#c2461a);}
+.simba-globe .sg-legend .arc{width:22px;height:2px;border-radius:1px;background:#f59352;}
+.simba-globe .sg-hint{position:absolute;left:18px;bottom:12px;z-index:2;font-size:11px;color:#7f9bb3;pointer-events:none;}
+.simba-globe .sg-msg{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;text-align:center;
+  padding:0 40px;color:#c3d3e2;font:14px/1.5 system-ui,sans-serif;}
+.simba-globe .sg-msg[hidden]{display:none;}
+.simba-globe.failed .sg-modes,.simba-globe.failed .sg-legend,.simba-globe.failed .sg-hint,.simba-globe.failed .sg-hud span{display:none !important;}
+.simba-globe .sg-panel{position:absolute;right:14px;top:14px;z-index:3;width:290px;max-height:calc(100% - 60px);overflow:auto;
+  background:rgba(12,24,38,.94);border:1px solid #2b4a66;border-radius:12px;padding:12px 14px;color:#e6eef5;
+  font:12.5px/1.45 system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.45);}
+.simba-globe .sg-panel[hidden]{display:none;}
+.simba-globe .sg-panel h4{margin:0 22px 2px 0 !important;font-size:14px;color:#fff !important;line-height:1.3;}
+.simba-globe .sg-panel .c{color:#f0a36b;font-weight:700;font-size:12px;}
+.simba-globe .sg-panel ul{margin:8px 0 10px !important;padding-left:16px;}
+.simba-globe .sg-panel li{margin:0 0 4px;color:#c3d3e2;list-style:disc;}
+.simba-globe .sg-panel li b{color:#fbbd8c;font-weight:600;}
+.simba-globe .sg-panel .x{position:absolute;right:8px;top:6px;background:none;border:0;color:#8fb3cf;font-size:18px;cursor:pointer;line-height:1;}
+.simba-globe .sg-panel a.go{display:inline-block;text-decoration:none !important;font-weight:600;font-size:12.5px;padding:6px 12px;
+  border-radius:16px;background:#2f8f9d;color:#fff !important;}
+.simba-globe .sg-panel a.go:hover{background:#277a86;}
+.simba-globe-tip{background:rgba(15,28,43,.96);color:#e6eef5;border:1px solid #2b4a66;border-radius:9px;padding:9px 11px;
+  max-width:300px;font:12px/1.4 system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.simba-globe-tip b{color:#fff;font-size:12.5px;}
+.simba-globe-tip .c{color:#f0a36b;font-weight:700;}
+.simba-globe-tip ul{margin:5px 0 0;padding-left:14px;}
+.simba-globe-tip li{margin:0 0 2px;color:#b9cadb;}
+@media (max-width:680px){.simba-globe{height:440px;}
+  .simba-globe .sg-modes{flex-direction:row;top:auto;bottom:34px;left:10px;right:10px;justify-content:center;}
+  .simba-globe .sg-modes button{min-width:0;flex:1;text-align:center;padding:8px 6px;font-size:12.5px;}
+  .simba-globe .sg-hint,.simba-globe .sg-hud span{display:none;}.simba-globe .sg-legend{display:none !important;}
+  .simba-globe .sg-panel{left:10px;right:10px;top:auto;bottom:10px;width:auto;max-height:55%;}}
+</style>
+<div class="simba-globe m-country" id="simbaGlobeBox">
+  <div class="sg-hud"><b>21,288 downloads</b>46 countries &middot; last 30 days<br><span id="simbaGlobeSub"></span></div>
+  
+  <div class="sg-legend country"><span><i style="background:#2a3440;border:1px solid #5a6b7d"></i>none</span><span style="margin-left:6px">1</span><i class="ramp"></i><span>8,474 downloads (log scale)</span></div>
+  <div class="sg-legend inst"><span style="color:#8fb3cf">studies:</span><span><i style="background:#fee3c8"></i>1</span><span><i style="background:#fbbd8c"></i>2</span><span><i style="background:#f59352"></i>3&ndash;4</span><span><i style="background:#e5692a"></i>5&ndash;7</span><span><i style="background:#c2461a"></i>8+</span></div>
+  <div class="sg-legend collab"><span>partners: few</span><i class="ramp"></i><span>many (bigger dot = more)</span><span style="margin-left:8px"><i class="arc"></i>co-authored study</span></div>
+  <div class="sg-hint" id="simbaGlobeHint"></div>
+  <div class="sg-panel" id="simbaGlobePanel" hidden></div>
+  <div class="sg-msg" id="simbaGlobeMsg" hidden></div>
+  <div id="simbaGlobe"></div>
+</div>
+<script>
+(function () {
+  var LIB = "https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/dist/globe.gl.min.js";
+  var GEO = "https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/example/datasets/ne_110m_admin_0_countries.geojson";
+  var POINTS = [], ARCS = [], COUNTRIES = {"HK": {"n": 8474}, "US": {"n": 6869}, "CN": {"n": 3180}, "TW": {"n": 1457}, "DE": {"n": 221}, "AT": {"n": 190}, "SG": {"n": 156}, "FR": {"n": 120}, "JP": {"n": 92}, "KR": {"n": 76}, "NL": {"n": 57}, "GB": {"n": 53}, "RU": {"n": 45}, "CA": {"n": 43}, "AU": {"n": 34}, "SE": {"n": 32}, "NO": {"n": 30}, "DK": {"n": 25}, "IE": {"n": 21}, "IN": {"n": 15}, "CH": {"n": 14}, "ES": {"n": 11}, "LV": {"n": 10}, "VN": {"n": 7}, "AE": {"n": 7}, "IT": {"n": 7}, "LT": {"n": 6}, "IR": {"n": 4}, "NP": {"n": 4}, "IL": {"n": 3}, "ID": {"n": 3}, "PL": {"n": 3}, "HU": {"n": 2}, "PH": {"n": 2}, "GR": {"n": 2}, "EC": {"n": 2}, "MX": {"n": 2}, "EE": {"n": 1}, "MD": {"n": 1}, "PT": {"n": 1}, "SK": {"n": 1}, "BS": {"n": 1}, "BR": {"n": 1}, "TN": {"n": 1}, "UA": {"n": 1}, "CZ": {"n": 1}}, RAMP = ["#fee3c8", "#fbbd8c", "#f59352", "#e5692a", "#c2461a"];
+  var UNIT = ["download", "downloads"], NONE_TEXT = "no downloads in the last 30 days", LINKS = false, SHARE_TOTAL = 21288;
+  var rampAt = function (t) { return RAMP[Math.min(RAMP.length - 1, Math.floor(RAMP.length * t))]; };
+  var box = document.getElementById("simbaGlobeBox"), el = document.getElementById("simbaGlobe");
+  var panel = document.getElementById("simbaGlobePanel"), msg = document.getElementById("simbaGlobeMsg");
+  if (!box) return;
+  var TEXT = {
+    country: ["Raised countries: height &amp; colour show downloads in the last 30 days", "a country"],
+    inst: ["Bars: studies per institution &middot; taller &amp; darker = more studies", "a bar"],
+    collab: ["Arcs: institutions that published a study together &middot; hover or tap a dot to see its partners", "a dot"]
+  };
+
+  function fail(text) {
+    msg.innerHTML = "<div>" + text + '<br><span style="color:#8fb3cf;font-size:12.5px">The charts below show the same data.</span></div>';
+    msg.hidden = false; box.classList.add("failed");
+  }
+  function webgl() {
+    try { var c = document.createElement("canvas"); return !!(window.WebGLRenderingContext && (c.getContext("webgl") || c.getContext("experimental-webgl"))); }
+    catch (e) { return false; }
+  }
+  function start() {
+    if (!webgl()) return fail("Your browser can&rsquo;t display the 3D globe (WebGL is unavailable).");
+    msg.innerHTML = "Loading globe&hellip;"; msg.hidden = false;
+    // The docs pages load require.js: hide its `define` while the UMD bundle runs, or globe.gl
+    // registers as an AMD module instead of window.Globe (same trick as the Chart.js panels).
+    var amd = window.define, restore = function () { try { window.define = amd; } catch (e) {} };
+    try { window.define = undefined; } catch (e) {}
+    var s = document.createElement("script");
+    s.src = LIB; s.async = true;
+    s.onload = function () { restore(); msg.hidden = true; try { init(); } catch (e) { fail("The 3D globe couldn&rsquo;t start."); } };
+    s.onerror = function () { restore(); fail("The 3D globe couldn&rsquo;t load (the globe library is unreachable)."); };
+    document.head.appendChild(s);
+  }
+  // Wait until the page's scripts have all run before touching `define`: other panels toggle it
+  // while the page parses, and a restore landing mid-download would capture globe.gl into
+  // require.js. DOMContentLoaded (not "load") so images, videos and analytics don't delay it.
+  function whenLoaded() {
+    if (document.readyState !== "loading") start();
+    else document.addEventListener("DOMContentLoaded", start, { once: true });
+  }
+  // Lazy-load: only fetch the ~1.9 MB library once the globe is close to the viewport.
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (es) {
+      if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); whenLoaded(); }
+    }, { rootMargin: "300px" });
+    io.observe(box);
+  } else { whenLoaded(); }
+
+  function init() {
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]; }); };
+    var plural = function (n, one, many) { return n.toLocaleString() + " " + (n === 1 ? one : many); };
+    var mode = "country", hoverInst = null, hoverArc = null, hoverC = null, pinned = null, geo = null, ctl;
+
+    // ---------- institutions & collaborations ----------
+    var maxN = Math.max.apply(null, POINTS.map(function (p) { return p.n; }));
+    var partners = {};
+    ARCS.forEach(function (a) {
+      (partners[a.a] = partners[a.a] || []).push({ name: a.b, n: a.n });
+      (partners[a.b] = partners[a.b] || []).push({ name: a.a, n: a.n });
+    });
+    var COLLAB_POINTS = POINTS.filter(function (p) { return partners[p.name]; });
+    var deg = function (p) { return partners[p.name] ? partners[p.name].length : 0; };
+    var maxDeg = Math.max.apply(null, COLLAB_POINTS.map(deg));
+    var touches = function (a, name) { return a.a === name || a.b === name; };
+    var focus = function () { return hoverInst || pinned; };
+    var lit = function (a) { var f = focus(); return a === hoverArc || (f && touches(a, f)); };
+    var arcColor = function (a) {
+      if (lit(a)) return [RAMP[0], RAMP[1]];
+      return (focus() || hoverArc) ? "rgba(245,147,82,0.06)" : "rgba(245,147,82,0.4)";
+    };
+    var refreshArcs = function () { g.arcColor(arcColor).arcStroke(g.arcStroke()); refreshPoints(); };
+    var pAlt = function (p) { return mode === "inst" ? 0.02 + 0.28 * Math.sqrt(p.n / maxN) : 0.006; };
+    var pRad = function (p) {
+      if (mode === "inst") return 0.35 + 0.25 * Math.sqrt(p.n / maxN);
+      return 0.45 + 1.3 * Math.sqrt(deg(p) / maxDeg) + (focus() === p.name ? 0.2 : 0);   // flat disc sized by partners
+    };
+    var pCol = function (p) {
+      if (mode === "inst") return p.col;
+      var f = focus();
+      if (f === p.name) return "#ffffff";
+      if (f && !partners[f].some(function (q) { return q.name === p.name; })) return "rgba(254,227,200,0.18)";
+      return rampAt(maxDeg > 1 ? Math.log(deg(p)) / Math.log(maxDeg) : 1);   // colour = number of partners
+    };
+    var refreshPoints = function () { g.pointAltitude(pAlt).pointRadius(pRad).pointColor(pCol); };
+
+    // ---------- countries ----------
+    var CRAMP = RAMP;   // shared ramp (see RAMP in the Python above)
+    var LAND = "#2a3440";
+    var cMax = Math.max.apply(null, Object.keys(COUNTRIES).map(function (k) { return COUNTRIES[k].n; }));
+    var NE_FIX = { France: "FR", Norway: "NO" };   // Natural Earth 110m tags these ISO_A2 = -99
+    var iso = function (f) { var c = f.properties.ISO_A2; return c === "-99" ? NE_FIX[f.properties.NAME] : c; };
+    var cn = function (f) { var v = COUNTRIES[iso(f)]; return v ? v.n : 0; };
+    // log scale: the US would otherwise flatten every other country into the bottom colour
+    var cT = function (n) { return cMax > 1 ? Math.log(n) / Math.log(cMax) : 1; };
+    var cCol = function (n) { return CRAMP[Math.min(CRAMP.length - 1, Math.floor(CRAMP.length * cT(n)))]; };
+    var polyAlt = function (f) { var n = cn(f); return mode === "country" && n ? 0.012 + 0.06 * cT(n) + (f === hoverC ? 0.03 : 0) : 0.004; };
+    var polyCap = function (f) { var n = cn(f); return mode === "country" && n ? cCol(n) : LAND; };
+    // hover keeps the country's own colour (so it still reads correctly on the scale): it lifts and gets a white outline
+    var polyStroke = function (f) { return f === hoverC ? "#ffffff" : "rgba(140,170,200,0.35)"; };
+    var refreshPolys = function () { g.polygonAltitude(polyAlt).polygonCapColor(polyCap).polygonStrokeColor(polyStroke); };
+    // camera target: mean vertex of the country's largest ring (this dataset has no label points)
+    function centre(f) {
+      var gm = f.geometry, polys = gm.type === "Polygon" ? [gm.coordinates] : gm.coordinates, best = polys[0][0];
+      polys.forEach(function (p) { if (p[0].length > best.length) best = p[0]; });
+      var x = 0, y = 0; best.forEach(function (pt) { x += pt[0]; y += pt[1]; });
+      return [x / best.length, y / best.length];
+    }
+
+    // ---------- side panel ----------
+    function showPanel(html, lat, lng) {
+      ctl.autoRotate = false;
+      g.pointOfView({ lat: lat, lng: lng, altitude: 1.5 }, 900);
+      panel.innerHTML = '<button class="x" type="button" aria-label="Close">&times;</button>' + html;
+      panel.querySelector(".x").addEventListener("click", closePanel);
+      panel.hidden = false; box.classList.add("pinned");
+    }
+    function closePanel() { pinned = null; panel.hidden = true; box.classList.remove("pinned"); refreshArcs(); }
+    var list = function (items) { return "<ul>" + items.map(function (s) { return "<li>" + s + "</li>"; }).join("") + "</ul>"; };
+    function pinInst(p) {
+      pinned = p.name; refreshArcs();
+      var body = mode === "collab"
+        ? '<span class="c">' + plural(partners[p.name].length, "collaborating institution", "collaborating institutions") + '</span>' +
+          list(partners[p.name].slice().sort(function (a, b) { return b.n - a.n; }).map(function (q) { return esc(q.name) + " <b>&times;" + q.n + "</b>"; }))
+        : '<span class="c">' + plural(p.n, "study", "studies") + '</span>' + list(p.studies.map(esc));
+      showPanel("<h4>" + esc(p.name) + "</h4>" + body + (LINKS ?
+        '<a class="go" href="published_studies.html#studies=' + encodeURIComponent(p.name) + '">See its studies in the table &rarr;</a>' : ""), p.lat, p.lng);
+    }
+    function pinCountry(f) {
+      var ctr = centre(f), c = COUNTRIES[iso(f)] || {n: 0}, items = c.items || [];
+      var share = SHARE_TOTAL ? '<br><span style="color:#c3d3e2">' + (100 * c.n / SHARE_TOTAL).toFixed(1) + "% of all " + UNIT[1] + "</span>" : "";
+      showPanel("<h4>" + esc(f.properties.NAME) + '</h4><span class="c">' + plural(c.n, UNIT[0], UNIT[1]) + "</span>" + share +
+        (items.length ? list(items.map(esc)) : "<br><br>") + (LINKS ?
+        '<a class="go" href="published_studies.html#country=' + encodeURIComponent(iso(f)) + "&label=" + encodeURIComponent(f.properties.NAME) +
+        '">See these studies in the table &rarr;</a>' : ""), ctr[1], ctr[0]);
+    }
+
+    // ---------- globe ----------
+    var g = Globe()(el)
+      .backgroundColor("rgba(0,0,0,0)")
+      .showAtmosphere(true).atmosphereColor("#c4e4ff").atmosphereAltitude(0.38)
+      .pointLat("lat").pointLng("lng").pointsMerge(false)
+      .pointAltitude(pAlt).pointRadius(pRad).pointColor(pCol)
+      .pointLabel(function (p) {
+        if (mode === "collab") return '<div class="simba-globe-tip"><b>' + esc(p.name) + '</b><br><span class="c">' + plural(partners[p.name].length, "collaborating institution", "collaborating institutions") + "</span></div>";
+        return '<div class="simba-globe-tip"><b>' + esc(p.name) + '</b><br><span class="c">' + plural(p.n, "study", "studies") + "</span>" +
+          list(p.studies.slice(0, 6).map(function (s) { return esc(s.length > 90 ? s.slice(0, 88) + "…" : s); }).concat(p.n > 6 ? ["…and " + (p.n - 6) + " more (click for all)"] : [])) + "</div>";
+      })
+      .onPointHover(function (p) { hoverInst = p ? p.name : null; if (mode === "collab") refreshArcs(); })
+      .onPointClick(pinInst)
+      .arcStartLat("sLat").arcStartLng("sLng").arcEndLat("eLat").arcEndLng("eLng")
+      .arcColor(arcColor).arcAltitudeAutoScale(0.45)
+      .arcStroke(function (a) { return (lit(a) ? 0.45 : 0.15) + 0.15 * Math.min(a.n, 4); })
+      .arcLabel(function (a) { return '<div class="simba-globe-tip"><b>' + esc(a.a) + "</b> &harr; <b>" + esc(a.b) + '</b><br><span class="c">' + plural(a.n, "shared study", "shared studies") + "</span></div>"; })
+      .onArcHover(function (a) { hoverArc = a || null; refreshArcs(); })
+      .onGlobeClick(closePanel);
+    var mat = g.globeMaterial(); mat.color.set("#070f19"); mat.shininess = 4;   // choropleth-style dark ocean
+
+    fetch(GEO).then(function (r) { return r.json(); }).then(function (d) {
+      geo = d.features.filter(function (f) { return f.properties.ISO_A2 !== "AQ"; });
+      g.polygonsData(geo).polygonAltitude(polyAlt).polygonCapColor(polyCap)
+        .polygonSideColor(function (f) { return mode === "country" && cn(f) ? "rgba(0,0,0,0.25)" : "rgba(0,0,0,0)"; })
+        .polygonStrokeColor(polyStroke)   // light borders keep coastlines readable on the dark land
+        .polygonsTransitionDuration(600)
+        .polygonLabel(function (f) {
+          if (mode !== "country") return "";
+          var n = cn(f); return '<div class="simba-globe-tip"><b>' + esc(f.properties.NAME) + '</b><br><span class="c">' + (n ? plural(n, UNIT[0], UNIT[1]) : NONE_TEXT) + "</span></div>";
+        })
+        .onPolygonHover(function (f) { if (mode === "country") { hoverC = f; refreshPolys(); } })
+        .onPolygonClick(function (f) { if (mode === "country" && cn(f)) pinCountry(f); else closePanel(); });
+    }).catch(function () { if (mode === "country") fail("The country outlines couldn&rsquo;t load."); });
+
+    function setMode(m) {
+      mode = m; hoverC = hoverInst = hoverArc = null;
+      ["country", "inst", "collab"].forEach(function (k) { box.classList.toggle("m-" + k, k === m); });
+      box.querySelectorAll(".sg-modes button").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.mode === m ? "true" : "false"); });
+      closePanel();
+      document.getElementById("simbaGlobeSub").innerHTML = TEXT[m][0];
+      document.getElementById("simbaGlobeHint").innerHTML = "Drag to rotate &middot; scroll to zoom &middot; click " + TEXT[m][1] + " for details";
+      g.pointsData(m === "inst" ? POINTS : m === "collab" ? COLLAB_POINTS : []).arcsData(m === "collab" ? ARCS : []);
+      refreshPoints(); if (geo) refreshPolys();
+    }
+    box.querySelectorAll(".sg-modes button").forEach(function (b) {
+      b.addEventListener("click", function () { if (b.dataset.mode !== mode) setMode(b.dataset.mode); });
+    });
+    setMode("country");
+
+    g.pointOfView({ lat: 30, lng: -40, altitude: 2.3 }, 0);
+    ctl = g.controls();
+    ctl.autoRotate = !reduce; ctl.autoRotateSpeed = 1.1; ctl.enableZoom = true; ctl.minDistance = 180; ctl.maxDistance = 520;
+    el.addEventListener("mouseenter", function () { ctl.autoRotate = false; });
+    el.addEventListener("mouseleave", function () { ctl.autoRotate = !reduce && !pinned && panel.hidden; });
+    function size() { g.width(el.clientWidth).height(el.clientHeight); }
+    size(); window.addEventListener("resize", size);
+    // pause rendering while off-screen (saves battery on long docs pages)
+    new IntersectionObserver(function (es) { es.forEach(function (e) { e.isIntersecting ? g.resumeAnimation() : g.pauseAnimation(); }); }).observe(el);
+  }
+})();
+</script>
+</div>
     <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Downloads by continent</h3>
       <div class="simba-dl-panel" style="height:300px"><canvas id="dlContinents"></canvas></div></div>
     <div class="simba-dl-cell simba-dl-cell--wide"><h3 class="simba-dl-h3">Top 20 countries</h3>
       <div class="simba-dl-chart"><canvas id="dlCountries"></canvas></div></div>
   </div>
   <p class="simba-dl-more"><a href="https://sronilsson.github.io/download_stats/" target="_blank" rel="noopener">📊  Full interactive download dashboard &rarr;</a></p>
-  <p class="simba-dl-foot">Sources: download metrics from PyPI via Google BigQuery &middot; published studies / validations (below) compiled from a <a href="https://docs.google.com/spreadsheets/d/169enc3Am2KQKifxj1F9KEKKLbftpMhBlw49zjl-egsY/edit" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">community-maintained Google Sheet</a> &middot; updated September 26, 2026</p>
+  <p class="simba-dl-foot">Sources: download metrics from PyPI via Google BigQuery &middot; published studies / validations (below) compiled from a <a href="https://docs.google.com/spreadsheets/d/169enc3Am2KQKifxj1F9KEKKLbftpMhBlw49zjl-egsY/edit" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">community-maintained Google Sheet</a> &middot; updated September 29, 2026</p>
   <p class="simba-dl-foot">Citation counts from <a href="https://openalex.org" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">OpenAlex</a> &middot; SimBA journal (10.1038/s41593-024-01649-9) + preprint (10.1101/2020.04.19.049452) DOIs &middot; current year to date &middot; RCR from <a href="https://icite.od.nih.gov" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">NIH iCite</a></p>
 </div>
 <script>window.__odef = window.define; try { window.define = undefined; } catch (e) {}</script>
-<link rel="stylesheet" href="_static/css/jsvectormap.min.css">
-<script src="_static/js/jsvectormap.min.js"></script>
-<script src="_static/js/jsvectormap-world.js"></script>
-<script>
-(function(){
-  const MAP = {"US": 7668, "HK": 7096, "CN": 3177, "TW": 1457, "DE": 234, "AT": 190, "SG": 162, "FR": 130, "JP": 96, "KR": 80, "GB": 65, "NL": 61, "RU": 55, "CA": 41, "SE": 35, "AU": 35, "DK": 29, "NO": 28, "IE": 25, "IN": 15, "CH": 14, "ES": 11, "LV": 10, "IT": 9, "VN": 7, "AE": 7, "LT": 6, "NP": 4, "RO": 4, "IL": 3, "PL": 3, "ID": 3, "PH": 3, "GR": 3, "HU": 3, "IR": 3, "MX": 2, "EC": 2, "EE": 1, "MD": 1, "CZ": 1, "PT": 1, "SK": 1, "BS": 1, "TN": 1, "UA": 1};
-  const el = document.getElementById("dlMap");
-  if (!el || typeof jsVectorMap === "undefined") return;
-  // graduated choropleth. The jsVectorMap series scale is an ordinal lookup (value -> scale[value]),
-  // NOT a gradient, so we bucket each country into 1..N by log of its (highly skewed) count and
-  // index a colour ramp with that bucket. (Bucket 0 is skipped by the lib, so buckets start at 1.)
-  const SCALE = ["#e8f4fb", "#cfe6f5", "#9bcde9", "#5aa7d4", "#3a86c0", "#2a6299", "#143a5e"];
-  const NB = SCALE.length - 1;
-  const _counts = Object.keys(MAP).map((k) => MAP[k] || 0);
-  const _maxLog = Math.log10(Math.max.apply(null, _counts.concat([1])) + 1) || 1;
-  const BUCK = {};
-  for (const k in MAP) { let b = Math.ceil(Math.log10((MAP[k] || 0) + 1) / _maxLog * NB); BUCK[k] = b < 1 ? 1 : (b > NB ? NB : b); }
-  new jsVectorMap({
-    selector: "#dlMap", map: "world",
-    zoomButtons: true, zoomOnScroll: true, backgroundColor: "transparent",
-    regionStyle: {initial: {fill: "#dce4ee", stroke: "#ffffff", "stroke-width": 0.5},
-      hover: {fill: "#f0c44a", "fill-opacity": 1}},
-    series: {regions: [{attribute: "fill", values: BUCK, scale: SCALE}]},
-    onRegionTooltipShow(event, tooltip, code) {
-      const v = MAP[code] || 0;
-      tooltip.text(tooltip.text() + (v ? ": " + v.toLocaleString() + " downloads" : ": no downloads"), true);
-    }
-  });
-})();
-</script>
 <script src="_static/js/chart.umd.min.js"></script>
 <script>
 (function(){
   if (!window.Chart) return;
-  const DL = {"labels": ["US", "HK", "CN", "TW", "DE", "AT", "SG", "FR", "JP", "KR", "GB", "NL", "RU", "CA", "SE", "AU", "DK", "NO", "IE", "IN"], "vals": [7668, 7096, 3177, 1457, 234, 190, 162, 130, 96, 80, 65, 61, 55, 41, 35, 35, 29, 28, 25, 15], "colors": ["#d6453b", "#cd4842", "#c44b49", "#bc4e50", "#b35157", "#aa545e", "#a15765", "#985a6c", "#905d73", "#87607a", "#7e6481", "#756788", "#6d6a8f", "#646d96", "#5b709d", "#5273a4", "#4976ab", "#4179b2", "#387cb9", "#2f7fc0"]};
-  const DASH = {"date_labels": ["Aug 27", "Aug 28", "Aug 29", "Aug 30", "Aug 31", "Sep 01", "Sep 02", "Sep 03", "Sep 04", "Sep 05", "Sep 06", "Sep 07", "Sep 08", "Sep 09", "Sep 10", "Sep 11", "Sep 12", "Sep 13", "Sep 14", "Sep 15", "Sep 16", "Sep 17", "Sep 18", "Sep 19", "Sep 20", "Sep 21", "Sep 22", "Sep 23", "Sep 24", "Sep 25", "Sep 26"], "daily": [1525, 1164, 368, 92, 129, 75, 1708, 1078, 818, 156, 66, 263, 2957, 1709, 47, 1444, 153, 1545, 1411, 55, 79, 1467, 47, 45, 49, 74, 33, 284, 259, 1631, 53], "cumulative": [1525, 2689, 3057, 3149, 3278, 3353, 5061, 6139, 6957, 7113, 7179, 7442, 10399, 12108, 12155, 13599, 13752, 15297, 16708, 16763, 16842, 18309, 18356, 18401, 18450, 18524, 18557, 18841, 19100, 20731, 20784], "dow": [1877, 3120, 3780, 4376, 5104, 775, 1752], "ver_labels": ["5.5.6", "5.5.4", "5.5.5", "5.5.7", "5.5.3", "5.5.8", "5.5.2", "5.5.1", "5.4.9", "5.4.8", "1.60.7", "1.87.5", "1.88.2", "5.4.5", "1.81.7"], "ver": [641, 507, 415, 296, 291, 253, 217, 67, 52, 51, 38, 38, 33, 33, 32], "adopt_dates": ["Aug 27", "Aug 28", "Aug 29", "Aug 30", "Aug 31", "Sep 01", "Sep 02", "Sep 03", "Sep 04", "Sep 05", "Sep 06", "Sep 07", "Sep 08", "Sep 09", "Sep 10", "Sep 11", "Sep 12", "Sep 13", "Sep 14", "Sep 15", "Sep 16", "Sep 17", "Sep 18", "Sep 19", "Sep 20", "Sep 21", "Sep 22", "Sep 23", "Sep 24", "Sep 25", "Sep 26"], "adopt": [{"label": "5.5.6", "data": [0, 0, 0, 0, 0, 0, 0, 244, 78, 40, 18, 28, 25, 22, 17, 11, 11, 19, 17, 13, 20, 10, 12, 4, 11, 9, 9, 20, 1, 2, 0]}, {"label": "5.5.4", "data": [0, 0, 272, 46, 39, 33, 30, 10, 7, 8, 12, 4, 10, 7, 2, 1, 2, 4, 6, 2, 2, 3, 2, 0, 0, 0, 0, 3, 0, 2, 0]}, {"label": "5.5.5", "data": [0, 0, 0, 0, 0, 0, 215, 77, 24, 21, 6, 6, 14, 10, 2, 4, 3, 7, 2, 2, 4, 3, 4, 0, 2, 0, 0, 5, 2, 2, 0]}, {"label": "5.5.7", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 199, 52, 26, 19]}, {"label": "5.5.3", "data": [54, 60, 61, 8, 13, 8, 13, 12, 6, 4, 4, 2, 9, 7, 2, 0, 2, 4, 3, 3, 1, 3, 2, 0, 0, 0, 1, 2, 5, 2, 0]}, {"label": "5.5.8", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 175, 56, 22]}, {"label": "other", "data": [1471, 1104, 35, 38, 77, 34, 1450, 735, 703, 83, 26, 223, 2899, 1663, 24, 1428, 135, 1511, 1383, 35, 52, 1448, 27, 41, 36, 65, 23, 55, 24, 1541, 12]}]};
+  const DL = {"labels": ["HK", "US", "CN", "TW", "DE", "AT", "SG", "FR", "JP", "KR", "NL", "GB", "RU", "CA", "AU", "SE", "NO", "DK", "IE", "IN"], "vals": [8474, 6869, 3180, 1457, 221, 190, 156, 120, 92, 76, 57, 53, 45, 43, 34, 32, 30, 25, 21, 15], "colors": ["#d6453b", "#cd4842", "#c44b49", "#bc4e50", "#b35157", "#aa545e", "#a15765", "#985a6c", "#905d73", "#87607a", "#7e6481", "#756788", "#6d6a8f", "#646d96", "#5b709d", "#5273a4", "#4976ab", "#4179b2", "#387cb9", "#2f7fc0"]};
+  const DASH = {"date_labels": ["Aug 29", "Aug 30", "Aug 31", "Sep 01", "Sep 02", "Sep 03", "Sep 04", "Sep 05", "Sep 06", "Sep 07", "Sep 08", "Sep 09", "Sep 10", "Sep 11", "Sep 12", "Sep 13", "Sep 14", "Sep 15", "Sep 16", "Sep 17", "Sep 18", "Sep 19", "Sep 20", "Sep 21", "Sep 22", "Sep 23", "Sep 24", "Sep 25", "Sep 26", "Sep 27", "Sep 28"], "daily": [368, 92, 129, 75, 1708, 1078, 818, 156, 66, 263, 2957, 1709, 47, 1444, 153, 1545, 1411, 55, 79, 1467, 47, 45, 49, 74, 33, 284, 259, 1631, 1763, 256, 1227], "cumulative": [368, 460, 589, 664, 2372, 3450, 4268, 4424, 4490, 4753, 7710, 9419, 9466, 10910, 11063, 12608, 14019, 14074, 14153, 15620, 15667, 15712, 15761, 15835, 15868, 16152, 16411, 18042, 19805, 20061, 21288], "avg7": [null, null, null, null, null, null, 610, 579, 576, 595, 1007, 1007, 859, 949, 948, 1160, 1324, 909, 676, 879, 680, 664, 450, 259, 256, 286, 113, 339, 585, 614, 779], "week_ticks": [2, 9, 16, 23, 30], "releases": {"4": ["5.5.5"], "5": ["5.5.6"], "25": ["5.5.7"], "26": ["5.5.8"]}, "dow": [3104, 3120, 3780, 2851, 3940, 2485, 2008], "ver_labels": ["5.5.6", "5.5.4", "5.5.5", "5.5.7", "5.5.8", "5.5.3", "5.5.2", "5.5.1", "5.4.9", "5.4.8", "1.87.5", "1.88.2", "1.60.7", "1.81.7", "2.4.8"], "ver": [647, 512, 421, 319, 311, 184, 145, 56, 45, 44, 41, 36, 36, 34, 32], "adopt_dates": ["Aug 29", "Aug 30", "Aug 31", "Sep 01", "Sep 02", "Sep 03", "Sep 04", "Sep 05", "Sep 06", "Sep 07", "Sep 08", "Sep 09", "Sep 10", "Sep 11", "Sep 12", "Sep 13", "Sep 14", "Sep 15", "Sep 16", "Sep 17", "Sep 18", "Sep 19", "Sep 20", "Sep 21", "Sep 22", "Sep 23", "Sep 24", "Sep 25", "Sep 26", "Sep 27", "Sep 28"], "adopt": [{"label": "5.5.6", "data": [0, 0, 0, 0, 0, 244, 78, 40, 18, 28, 25, 22, 17, 11, 11, 19, 17, 13, 20, 10, 12, 4, 11, 9, 9, 20, 1, 2, 6, 0, 0]}, {"label": "5.5.4", "data": [272, 46, 39, 33, 30, 10, 7, 8, 12, 4, 10, 7, 2, 1, 2, 4, 6, 2, 2, 3, 2, 0, 0, 0, 0, 3, 0, 2, 4, 1, 0]}, {"label": "5.5.5", "data": [0, 0, 0, 0, 215, 77, 24, 21, 6, 6, 14, 10, 2, 4, 3, 7, 2, 2, 4, 3, 4, 0, 2, 0, 0, 5, 2, 2, 6, 0, 0]}, {"label": "5.5.7", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 199, 52, 26, 31, 7, 4]}, {"label": "5.5.8", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 175, 56, 46, 19, 15]}, {"label": "5.5.3", "data": [61, 8, 13, 8, 13, 12, 6, 4, 4, 2, 9, 7, 2, 0, 2, 4, 3, 3, 1, 3, 2, 0, 0, 0, 1, 2, 5, 2, 6, 1, 0]}, {"label": "other", "data": [35, 38, 77, 34, 1450, 735, 703, 83, 26, 223, 2899, 1663, 24, 1428, 135, 1511, 1383, 35, 52, 1448, 27, 41, 36, 65, 23, 55, 24, 1541, 1664, 228, 1208]}]};
   const CITES = {"years": ["2020", "2021", "2022", "2023", "2024", "2025", "2026"], "counts": [21, 39, 56, 69, 89, 108, 77], "total": 460, "partial": 6};
-  const CONT = {"labels": ["Asia", "North America", "Europe", "Oceania", "South America", "Africa"], "vals": [12113, 7712, 921, 35, 2, 1]};
+  const CONT = {"labels": ["Asia", "North America", "Europe", "Oceania", "South America", "Africa"], "vals": [13480, 6915, 855, 34, 3, 1]};
   const C = (id) => document.getElementById(id);
   const GRID = "#eef2f7", INK = "#23272e", MUT = "#6b7280";
   const PAL = ["#21567a","#2a7fb8","#38a8d4","#5cc6b3","#e0a33a","#e0653a","#b9c0c9"];
@@ -127,25 +361,67 @@
         return " " + c.parsed.x.toLocaleString() + " downloads (" + p + "%)"; }}}},
       scales: {x: {beginAtZero: true, grid: {display: false}, ticks: {color: MUT}}, y: {grid: {display: false}, ticks: {color: INK, font: {weight: "600"}}}}}
   });
+  const REL = DASH.releases || {}, WEEK = new Set(DASH.week_ticks || []);
+  const relMarks = {id: "relMarks", afterDatasetsDraw(chart) {
+    const ctx = chart.ctx, x = chart.scales.x, y0 = chart.chartArea.bottom;
+    ctx.save(); ctx.fillStyle = "#21567a";
+    Object.keys(REL).forEach(function (i) {
+      const px = x.getPixelForValue(+i);
+      ctx.beginPath(); ctx.moveTo(px, y0 - 9); ctx.lineTo(px - 5, y0 - 1); ctx.lineTo(px + 5, y0 - 1); ctx.closePath(); ctx.fill();
+    });
+    ctx.restore();
+  }};
   if (C("dlOverTime")) new Chart(C("dlOverTime"), {
-    type: "bar",
+    type: "bar", plugins: [relMarks],
     data: {labels: DASH.date_labels, datasets: [
-      {label: "Daily", data: DASH.daily, backgroundColor: "#7fc1e3", borderRadius: 3}]},
-    options: {responsive: true, maintainAspectRatio: false,
-      plugins: {legend: {display: false}},
-      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "daily", color: MUT}},
-               x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 10}}}}
-  });
-  if (C("dlCumulative")) new Chart(C("dlCumulative"), {
-    type: "line",
-    data: {labels: DASH.date_labels, datasets: [
-      {label: "Cumulative", data: DASH.cumulative, borderColor: "#21567a", backgroundColor: "rgba(33,86,122,.10)", fill: true, tension: .3, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: "#21567a", pointHoverBorderColor: "#fff", pointHoverBorderWidth: 2, borderWidth: 2.5}]},
+      {type: "line", label: "7-day average", data: DASH.avg7, borderColor: "#21567a", borderWidth: 2, tension: .3,
+       pointRadius: 0, pointHoverRadius: 4, pointHoverBackgroundColor: "#21567a", pointStyle: "line", spanGaps: false, order: 0},
+      {label: "Downloads per day", data: DASH.daily, backgroundColor: "#e5692a", hoverBackgroundColor: "#c2461a",
+       borderRadius: 3, borderSkipped: "start", pointStyle: "rect", order: 1}]},
     options: {responsive: true, maintainAspectRatio: false, interaction: {intersect: false, mode: "index"},
-      plugins: {legend: {display: false}, tooltip: {displayColors: false,
-        callbacks: {title: (items) => "Through " + items[0].label,
-                    label: (c) => " " + c.parsed.y.toLocaleString() + " downloads total"}}},
-      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "cumulative \u00b7 30 days", color: MUT}},
-               x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 10}}}}
+      plugins: {legend: {display: true, position: "top", align: "end",
+          labels: {usePointStyle: true, boxWidth: 12, boxHeight: 8, color: MUT, font: {size: 11},
+            generateLabels: function (chart) {
+              const items = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+              if (Object.keys(REL).length) items.push({text: "new version", fillStyle: "#21567a", strokeStyle: "#21567a",
+                pointStyle: "triangle", lineWidth: 0, hidden: false, datasetIndex: -1});
+              return items; }},
+          onClick: function () {}},
+        tooltip: {callbacks: {
+          label: (c) => " " + c.dataset.label + ": " + (c.parsed.y == null ? "–" : c.parsed.y.toLocaleString()),
+          afterBody: (items) => { const v = REL[items[0].dataIndex]; return v ? ["", "New version: " + v.join(", ")] : []; }}}},
+      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "downloads per day", color: MUT}},
+               x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 0, autoSkip: false,
+                  callback: function (v, i) { return WEEK.has(i) ? this.getLabelForValue(v) : ""; }}}}}
+  });
+  const endLabel = {id: "endLabel", afterDatasetsDraw(chart) {
+    const pts = chart.getDatasetMeta(0).data, last = pts[pts.length - 1];
+    if (!last) return;
+    const ctx = chart.ctx, v = chart.data.datasets[0].data[pts.length - 1];
+    ctx.save(); ctx.font = "700 12px " + Chart.defaults.font.family; ctx.fillStyle = INK;
+    ctx.textAlign = "right"; ctx.textBaseline = "bottom"; ctx.fillText(v.toLocaleString(), last.x - 4, last.y - 8);
+    ctx.restore();
+  }};
+  if (C("dlCumulative")) new Chart(C("dlCumulative"), {
+    type: "line", plugins: [relMarks, endLabel],
+    data: {labels: DASH.date_labels, datasets: [
+      {label: "Downloads so far", data: DASH.cumulative, borderColor: "#e5692a", backgroundColor: "rgba(229,105,42,.12)",
+       fill: true, tension: .3, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: "#e5692a",
+       pointHoverBorderColor: "#fff", pointHoverBorderWidth: 2, borderWidth: 2.5}]},
+    options: {responsive: true, maintainAspectRatio: false, interaction: {intersect: false, mode: "index"},
+      layout: {padding: {top: 18}},
+      plugins: {legend: {display: Object.keys(REL).length > 0, position: "top", align: "end",
+          labels: {usePointStyle: true, boxWidth: 12, boxHeight: 8, color: MUT, font: {size: 11},
+            generateLabels: () => [{text: "new version", fillStyle: "#21567a", strokeStyle: "#21567a",
+              pointStyle: "triangle", lineWidth: 0, hidden: false, datasetIndex: -1}]},
+          onClick: function () {}},
+        tooltip: {displayColors: false, callbacks: {
+          title: (items) => "Through " + items[0].label,
+          label: (c) => " " + c.parsed.y.toLocaleString() + " downloads in total",
+          afterBody: (items) => { const v = REL[items[0].dataIndex]; return v ? ["New version: " + v.join(", ")] : []; }}}},
+      scales: {y: {beginAtZero: true, grid: {color: GRID}, ticks: {color: MUT}, title: {display: true, text: "downloads so far (30 days)", color: MUT}},
+               x: {grid: {display: false}, ticks: {color: MUT, maxRotation: 0, autoSkip: false,
+                  callback: function (v, i) { return WEEK.has(i) ? this.getLabelForValue(v) : ""; }}}}}
   });
   if (C("dlDow")) new Chart(C("dlDow"), {
     type: "bar",
