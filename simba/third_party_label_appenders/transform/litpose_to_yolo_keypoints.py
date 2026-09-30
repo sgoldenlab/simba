@@ -21,7 +21,8 @@ from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import (create_directory, find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     get_fn_ext, read_img)
-from simba.utils.yolo import (create_yolo_sample_visualizations, keypoint_array_to_yolo_annotation_str)
+from simba.utils.yolo import (create_yolo_sample_visualizations,
+                              keypoint_array_to_yolo_annotation_str)
 
 
 def _litpose_to_yolo_worker(task):
