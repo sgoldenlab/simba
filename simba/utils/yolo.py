@@ -428,13 +428,14 @@ def create_yolo_sample_visualizations(samples: List[Tuple[str, np.ndarray, str]]
                                       seg_opacity: float = 0.5,
                                       draw_labels: bool = True,
                                       verbose: bool = True,
-                                      source: str = '') -> None:
+                                      source: str = '',
+                                      kpt_shape: Optional[Tuple[int, int]] = None) -> None:
     """
     Create annotated visualizations from YOLO-format (image, label_str) samples.
 
-    Auto-detects annotation type (bounding-box or segmentation) from the label string format and draws the appropriate overlays. Images are saved as PNG files in ``save_dir``.
+    Auto-detects annotation type (bounding-box or segmentation) from the label string format and draws the appropriate overlays. Keypoint (pose) labels cannot be told apart from segmentation polygons by their length, so pass ``kpt_shape`` to draw them. Images are saved as PNG files in ``save_dir``.
 
-    :param List[Tuple[str, np.ndarray, str]] samples: List of ``(sample_name, image, label_str)`` tuples produced by a SAM3-to-YOLO converter.
+    :param List[Tuple[str, np.ndarray, str]] samples: List of ``(sample_name, image, label_str)`` tuples produced by a YOLO converter.
     :param Union[str, os.PathLike] save_dir: Directory where annotated images are saved. Created if it does not exist.
     :param Optional[Tuple[str, ...]] names: Class names in index order. Required when ``draw_labels=True``; otherwise optional and only used to size the color palette. Default ``None``.
     :param str palette: Color palette name. Default ``'Set1'``.
@@ -442,6 +443,7 @@ def create_yolo_sample_visualizations(samples: List[Tuple[str, np.ndarray, str]]
     :param bool draw_labels: If True, draw the class name text alongside each box/polygon. Default ``True``.
     :param bool verbose: Print progress messages. Default ``True``.
     :param str source: Caller class name for log messages.
+    :param Optional[Tuple[int, int]] kpt_shape: YOLO keypoint shape ``(n_keypoints, n_dims)`` (``n_dims`` 2 or 3, as in the dataset YAML). If given, every label line is parsed as ``cls xc yc w h`` followed by the keypoints, and the box plus each keypoint with visibility > 0 is drawn, each keypoint index in its own distinct color (independent of ``palette``). Default ``None`` (bounding-box / segmentation labels).
     """
 
     import cv2
@@ -467,9 +469,21 @@ def create_yolo_sample_visualizations(samples: List[Tuple[str, np.ndarray, str]]
     check_float(name=f'{source} seg_opacity', value=seg_opacity, min_value=0.0, max_value=1.0)
     check_valid_boolean(value=[draw_labels], source=f'{source} draw_labels', raise_error=True)
     check_valid_boolean(value=[verbose], source=f'{source} verbose', raise_error=True)
+    if kpt_shape is not None:
+        check_valid_tuple(x=kpt_shape, source=f'{source} kpt_shape', accepted_lengths=(2,), valid_dtypes=(int,))
+        check_int(name=f'{source} kpt_shape n_keypoints', value=kpt_shape[0], min_value=1)
+        check_int(name=f'{source} kpt_shape n_dims', value=kpt_shape[1], min_value=2, max_value=3)
 
     create_directory(paths=[save_dir], overwrite=False)
     class_colors = create_color_palette(pallete_name=palette, increments=max(len(names) if names is not None else 0, 10))
+    kpt_colors = None
+    if kpt_shape is not None:
+        # One distinct color per keypoint index: tab20's 10 dark hues then its 10 light hues (so the first 10 keypoints all differ in hue); evenly spaced hsv hues beyond 20.
+        if kpt_shape[0] <= 20:
+            tab20 = create_color_palette(pallete_name='tab20', increments=19)
+            kpt_colors = [tab20[i] for i in list(range(0, 20, 2)) + list(range(1, 20, 2))]
+        else:
+            kpt_colors = create_color_palette(pallete_name='hsv', increments=kpt_shape[0])[:kpt_shape[0]]
     if verbose:
         stdout_information(msg=f'Creating {len(samples)} annotation visualizations in {save_dir}...', source=source)
 
@@ -485,7 +499,20 @@ def create_yolo_sample_visualizations(samples: List[Tuple[str, np.ndarray, str]]
             color = tuple(int(c) for c in class_colors[cls_id % len(class_colors)])
             label = names[cls_id] if (names is not None and cls_id < len(names)) else str(cls_id)
             n_values = len(parts) - 1
-            if n_values == 4:
+            if kpt_shape is not None:
+                xc, yc, w, h = float(parts[1]), float(parts[2]), float(parts[3]), float(parts[4])
+                x1, y1 = int((xc - w / 2) * img_w), int((yc - h / 2) * img_h)
+                x2, y2 = int((xc + w / 2) * img_w), int((yc + h / 2) * img_h)
+                cv2.rectangle(vis_img, (x1, y1), (x2, y2), color, thickness, lineType=cv2.LINE_AA)
+                kpts = np.array(parts[5:5 + kpt_shape[0] * kpt_shape[1]], dtype=np.float64).reshape(-1, kpt_shape[1])
+                for kpt_idx, kpt in enumerate(kpts):
+                    if kpt_shape[1] == 3 and kpt[2] <= 0:
+                        continue
+                    kpt_color = tuple(int(c) for c in kpt_colors[kpt_idx % len(kpt_colors)])
+                    cv2.circle(vis_img, (int(kpt[0] * img_w), int(kpt[1] * img_h)), max(2, thickness), kpt_color, -1, lineType=cv2.LINE_AA)
+                if draw_labels:
+                    cv2.putText(vis_img, label, (x1, max(y1 - 5, 0)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, max(1, thickness // 2), cv2.LINE_AA)
+            elif n_values == 4:
                 xc, yc, w, h = float(parts[1]), float(parts[2]), float(parts[3]), float(parts[4])
                 x1 = int((xc - w / 2) * img_w)
                 y1 = int((yc - h / 2) * img_h)

@@ -10,6 +10,7 @@ import io
 import math
 import os
 import random
+import re
 from collections import Counter
 from copy import deepcopy
 from pathlib import Path
@@ -37,7 +38,7 @@ from simba.utils.read_write import (copy_files_in_directory, create_directory,
                                     find_files_of_filetypes_in_directory,
                                     get_fn_ext, read_img, read_json,
                                     recursive_file_search, save_json)
-from simba.utils.warnings import DuplicateNamesWarning
+from simba.utils.warnings import DuplicateNamesWarning, InvalidValueWarning
 
 
 def arr_to_b64(x: np.ndarray) -> str:
@@ -315,37 +316,43 @@ def get_yolo_keypoint_flip_idx(x: List[str]) -> Tuple[int, ...]:
     """
     Given a list of body-parts, create a ``flip_index`` YOLO yaml entry.
 
-    .. important::
-       Only works if the left and right bosy-parts have the substrings ``left`` and ``right`` (case-insensitive).
-
+    Left/right partners are matched (case-insensitive) by either the words ``left`` / ``right`` (e.g., ``left_ear`` / ``right_ear``), or a
+    single-letter ``L`` / ``R`` side marker at the end or start of the name (e.g., ``EarL`` / ``EarR``, ``ear_l`` / ``ear_r``, ``L_ear`` / ``R_ear``).
+    A body-part is only swapped if its partner exists. Body-parts that look sided but have no partner (e.g., a typo such as ``ForShdL`` / ``ForeShdR``)
+    are left unswapped and reported in a warning, since YOLO's horizontal-flip augmentation would then teach mirrored left/right labels.
 
     :param List[str] x: List of the names of the body-parts. If several animals, then just a list of names for the body-parts for one animal.
     :return: The flip_idx required by the YOLO model yaml file. E.g., [1, 0, 2, 3, 4]
     :rtype: Tuple[int, ...]
+
+    :example:
+    >>> get_yolo_keypoint_flip_idx(x=['Snout', 'EarL', 'EarR', 'Tailbase'])
+    >>> (0, 2, 1, 3)
     """
 
     LEFT, RIGHT = 'left', 'right'
     check_valid_lst(data=x, source=f'{get_yolo_keypoint_flip_idx.__name__} x', valid_dtypes=(str,), min_len=1)
-    x = [i.lower().strip() for i in x]
-    x_left_idx = [i for i, val in enumerate(x) if LEFT in val]
-    x_right_idx = [i for i, val in enumerate(x) if RIGHT in val]
-    results = []
-    for idx in range(len(x)):
-        if idx in x_left_idx:
-            target_str = x[idx].replace(LEFT, RIGHT)
-            if target_str in x:
-                target_idx = x.index(target_str)
-            else:
-                target_idx = idx
-        elif idx in x_right_idx:
-            target_str = x[idx].replace(RIGHT, LEFT)
-            if target_str in x:
-                target_idx = x.index(target_str)
-            else:
-                target_idx = idx
+    original_names = [i.strip() for i in x]
+    x = [i.lower() for i in original_names]
+    results, unpaired = [], []
+    for idx, name in enumerate(x):
+        if LEFT in name:
+            candidates = [name.replace(LEFT, RIGHT)]
+        elif RIGHT in name:
+            candidates = [name.replace(RIGHT, LEFT)]
         else:
-            target_idx = idx
+            candidates = []
+            if len(name) > 1 and name[-1] in 'lr':
+                candidates.append(name[:-1] + ('r' if name[-1] == 'l' else 'l'))
+            if len(name) > 2 and name[0] in 'lr' and name[1] in '_- .':
+                candidates.append(('r' if name[0] == 'l' else 'l') + name[1:])
+        target_idx = next((x.index(c) for c in candidates if c in x and x.index(c) != idx), idx)
+        looks_sided = LEFT in name or RIGHT in name or re.search(r'([a-z0-9][LR]|[_\- .][lLrR])$|^[lLrR][_\- .]', original_names[idx]) is not None
+        if target_idx == idx and looks_sided:
+            unpaired.append(original_names[idx])
         results.append(target_idx)
+    if len(unpaired) > 0:
+        InvalidValueWarning(msg=f'Body-part(s) {unpaired} look left/right-sided but have no matching partner, so they will NOT be swapped when YOLO flips images horizontally. Check for naming mismatches, or pass flip_idx explicitly.', source=get_yolo_keypoint_flip_idx.__name__)
     return tuple(results)
 
 def get_yolo_keypoint_bp_id_idx(animal_bp_dict: Dict[str, Dict[str, List[str]]]) -> Dict[int, List[int]]:
