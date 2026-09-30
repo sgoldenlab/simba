@@ -46,7 +46,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_array, check_valid_boolean,
                                 check_valid_cpu_pool, check_valid_dataframe,
-                                check_valid_lst, check_valid_tuple, is_wsl)
+                                check_valid_lst, check_valid_tuple)
 from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Formats, Keys,
                                Options)
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
@@ -2111,10 +2111,8 @@ def get_cpu_pool(core_cnt: int = -1,
     if verbose: print(f'[{get_current_time()}] {core_cnt} core SimBA CPU pool {"" if source is None else source} started.')
     if context is not None:
         check_str(name=f'{get_cpu_pool.__name__} context', value=context, options=('fork', 'spawn', 'forkserver'), raise_error=True)
-    elif context is None and is_wsl():
-        multiprocessing.set_start_method(OS.SPAWN.value, force=True)
     else:
-        existing_method = multiprocessing.get_start_method(allow_none=True)
+        existing_method = multiprocessing.get_start_method(allow_none=True)  # set in simba/__init__.py from MP_START_METHOD, or 'spawn' on WSL
         if existing_method is not None:
             context = existing_method
         else:
@@ -2123,7 +2121,7 @@ def get_cpu_pool(core_cnt: int = -1,
             elif system == OS.MAC.value: context = OS.SPAWN.value
             else: context = OS.FORK.value
 
-    if context is not None and not is_wsl():
+    if context is not None:
         try:
             ctx = multiprocessing.get_context(context)
         except ValueError:
