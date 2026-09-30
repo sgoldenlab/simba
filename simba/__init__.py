@@ -8,6 +8,7 @@ matplotlib.use("Agg")
 
 import multiprocessing
 import os
+
 from simba.utils.checks import is_wsl
 from simba.utils.enums import ENV_VARS, OS
 from simba.utils.warnings import InvalidValueWarning
