@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 
@@ -550,7 +550,8 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
                       task: Optional[Literal["detect", "segment", "classify", "pose", "obb"]] = None,
                       dynamic: bool = False,
                       simplify: bool = True,
-                      half: bool = False) -> Union[str, os.PathLike]:
+                      half: bool = False,
+                      nms: bool = False) -> Union[str, os.PathLike]:
     """
     Export a YOLO model using Ultralytics ``model.export``.
 
@@ -590,6 +591,7 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
     :param Optional[Literal["detect", "segment", "classify", "pose", "obb"]] task: Optional explicit YOLO task. Set this to avoid backend task auto-guessing warnings.
     :param bool dynamic: If True, build with dynamic input profiles.
     :param bool half: If True, request FP16 export where supported.
+    :param bool nms: If True, build non-maximum suppression into the exported model, so that it outputs final detections ``(batch, 300, values)`` rather than raw predictions. Required for :class:`~simba.model.yolo_nvdec_inference.YoloNVDECInference` with models that are not end-to-end (e.g. YOLO11). Default False.
     :return: Path-like export artifact returned by Ultralytics.
     :rtype: Union[str, os.PathLike]
     :raises SimBAPAckageVersionError: If Ultralytics is unavailable.
@@ -628,7 +630,7 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
     check_int(name=f"{export_yolo_model.__name__} batch", value=batch, min_value=1)
     if workspace is not None: check_int(name=f"{export_yolo_model.__name__} workspace", value=workspace, min_value=1)
     check_valid_device(device=device)
-    check_valid_boolean(value=[half, int8, dynamic, simplify], source=export_yolo_model.__name__, raise_error=True)
+    check_valid_boolean(value=[half, int8, dynamic, simplify, nms], source=export_yolo_model.__name__, raise_error=True)
     if task is not None:
         check_str(name=f"{export_yolo_model.__name__} task", value=task, options=("detect", "segment", "classify", "pose", "obb"), raise_error=True)
     export_format = str(export_format).lower()
@@ -642,7 +644,7 @@ def export_yolo_model(model_path: Union[str, os.PathLike],
     if int8 and half:
         raise InvalidInputError(msg="Choose one precision mode: INT8 or FP16 (half).", source=export_yolo_model.__name__)
     model = YOLO(model_path) if task is None else YOLO(model_path, task=task)
-    out = model.export(format=export_format, imgsz=imgsz, device=device, half=half, int8=int8, dynamic=dynamic, batch=batch, workspace=workspace, data=data, simplify=simplify)
+    out = model.export(format=export_format, imgsz=imgsz, device=device, half=half, int8=int8, dynamic=dynamic, batch=batch, workspace=workspace, data=data, simplify=simplify, nms=nms)
     return out
 
 
@@ -771,32 +773,13 @@ def check_trt_engine_compatibility(engine_path: Union[str, os.PathLike],
     >>> check_trt_engine_compatibility(engine_path=r'/models/best.engine')
     """
 
-    check_file_exist_and_readable(file_path=engine_path)
-    try:
-        import tensorrt as trt
-    except Exception:
-        raise SimBAPAckageVersionError(msg='TensorRT is not installed, a .engine file cannot be validated or run. Install tensorrt, or export the model to a portable format (e.g. onnx) with simba.utils.yolo.export_yolo_model.', source=check_trt_engine_compatibility.__name__)
-
-    with open(engine_path, 'rb') as f:
-        blob = f.read()
-    meta, payload = {}, blob
-    try:
-        meta_len = int.from_bytes(blob[:4], 'little')
-        if 0 < meta_len < len(blob):
-            meta = json.loads(blob[4:4 + meta_len].decode('utf-8'))
-            payload = blob[4 + meta_len:]
-    except Exception:
-        meta, payload = {}, blob
-
-    logger = trt.Logger(trt.Logger.ERROR)
-    try:
-        engine = trt.Runtime(logger).deserialize_cuda_engine(payload)
-    except Exception:
-        engine = None
+    engine, meta = _deserialize_trt_engine(engine_path=engine_path, source=check_trt_engine_compatibility.__name__)
     if engine is not None:
         return True
     if not raise_error:
         return False
+
+    import tensorrt as trt
 
     built_on = meta.get('date', 'unknown')
     built_by = meta.get('version', 'unknown')
@@ -814,8 +797,64 @@ def check_trt_engine_compatibility(engine_path: Union[str, os.PathLike],
                              f'ENGINE: built {built_on} with ultralytics {built_by} (batch {built_batch}, imgsz {built_imgsz}). '
                              f'THIS MACHINE: {local_gpu} (compute capability {local_cc}), TensorRT {trt.__version__}. '
                              f'If this engine was copied from another machine, or built before a TensorRT/driver upgrade, re-export it here with: '
-                             f'simba.utils.yolo.export_yolo_model(model_path=r"{src_hint}", export_format="engine", imgsz=<imgsz>, batch=<batch>, task="detect").'),
+                             f'simba.utils.yolo.export_yolo_model(model_path=r"{src_hint}", export_format="engine", imgsz=<imgsz>, batch=<batch>, task="{meta.get("task", "<task>")}").'),
                         source=check_trt_engine_compatibility.__name__)
+
+
+def _deserialize_trt_engine(engine_path: Union[str, os.PathLike], source: str) -> Tuple[Any, dict]:
+    """Read an ultralytics TensorRT ``.engine`` file, returning the deserialized engine (None if it cannot be deserialized on this machine) and the ultralytics metadata header (empty dict if absent)."""
+    check_file_exist_and_readable(file_path=engine_path)
+    try:
+        import tensorrt as trt
+    except Exception:
+        raise SimBAPAckageVersionError(msg='TensorRT is not installed, a .engine file cannot be validated or run. Install tensorrt, or export the model to a portable format (e.g. onnx) with simba.utils.yolo.export_yolo_model.', source=source)
+    with open(engine_path, 'rb') as f:
+        blob = f.read()
+    meta, payload = {}, blob
+    try:
+        meta_len = int.from_bytes(blob[:4], 'little')
+        if 0 < meta_len < len(blob):
+            meta = json.loads(blob[4:4 + meta_len].decode('utf-8'))
+            payload = blob[4 + meta_len:]
+    except Exception:
+        meta, payload = {}, blob
+    try:
+        engine = trt.Runtime(trt.Logger(trt.Logger.ERROR)).deserialize_cuda_engine(payload)
+    except Exception:
+        engine = None
+    return engine, meta
+
+
+def get_trt_engine_output_shapes(engine_path: Union[str, os.PathLike]) -> List[Tuple[int, ...]]:
+    """
+    Return the shapes of the output tensors of a TensorRT ``.engine``, without running it.
+
+    Used to tell an end-to-end engine, whose output is final detections ``(batch, detections, values)``, from an engine
+    that outputs raw, un-decoded predictions ``(batch, channels, anchors)`` which still need box decoding and NMS.
+
+    :param Union[str, os.PathLike] engine_path: Path to the TensorRT ``.engine`` file.
+    :return: One shape tuple per output tensor, in engine order.
+    :rtype: List[Tuple[int, ...]]
+    :raises SimBAGPUError: If the engine cannot be deserialized on this machine.
+
+    :example:
+    >>> get_trt_engine_output_shapes(engine_path=r'/models/best.engine')
+    [(10, 300, 6)]
+    """
+    check_trt_engine_compatibility(engine_path=engine_path, raise_error=True)
+    engine, _ = _deserialize_trt_engine(engine_path=engine_path, source=get_trt_engine_output_shapes.__name__)
+    import tensorrt as trt
+    shapes = []
+    if hasattr(engine, 'num_io_tensors'):  # TensorRT >= 8.5
+        for i in range(engine.num_io_tensors):
+            name = engine.get_tensor_name(i)
+            if engine.get_tensor_mode(name) == trt.TensorIOMode.OUTPUT:
+                shapes.append(tuple(engine.get_tensor_shape(name)))
+    else:
+        for i in range(engine.num_bindings):
+            if not engine.binding_is_input(i):
+                shapes.append(tuple(engine.get_binding_shape(i)))
+    return shapes
 
 
 def read_yolo_metadata(model: Union[str, os.PathLike, YOLO]) -> dict:

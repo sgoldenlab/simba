@@ -64,20 +64,6 @@ class YoloInference():
        :align: center
        :header-rows: 1
 
-    .. video:: _static/img/YoloInference_1.webm
-       :width: 500
-       :loop:
-       :autoplay:
-       :muted:
-       :align: center
-
-    .. video:: _static/img/YoloInference_2.webm
-       :width: 500
-       :loop:
-       :autoplay:
-       :muted:
-       :align: center
-
     :param Union[str, os.PathLike, YOLO] weights: Path to YOLO model weights or a preloaded ``ultralytics.YOLO`` model instance.
     :param Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]] video_path: Input video path, list of paths, or directory containing videos.
     :param Optional[bool] verbose: If True, print progress information.

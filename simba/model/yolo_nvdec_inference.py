@@ -316,6 +316,11 @@ def _process_one_video(video_path, trt_model, batch_buf, batch_size, imsz,
                     if task == DETECT:
                         row = [frm_idx, cls_id, cls_name, conf] + _xyxy_to_corners(x1, y1, x2, y2)
                         all_rows.append(row)
+                    elif task == POSE and keypoint_names is not None:
+                        kp_vals = []
+                        for kx, ky, kp_conf in vals[6:6 + len(keypoint_names) * 3].reshape(-1, 3).tolist():
+                            kp_vals.extend([int(round((kx - lb_pad_left) / lb_scale)), int(round((ky - lb_pad_top) / lb_scale)), kp_conf])
+                        all_rows.append([frm_idx, cls_id, cls_name, conf] + _xyxy_to_corners(x1, y1, x2, y2) + kp_vals)
 
             for cls_id, cls_name in class_names.items():
                 if cls_id not in detected_class_ids:
@@ -403,6 +408,13 @@ class YoloNVDECInference(object):
 
     Decodes video frames on GPU via NVDEC (PyNvVideoCodec), runs YOLO detection, pose-estimation, or segmentation through a TensorRT engine with GPU-side letterboxing and NMS, and stores per-frame results as DataFrames.
 
+    .. video:: _static/img/T1.webm
+       :width: 500
+       :loop:
+       :autoplay:
+       :muted:
+       :align: center
+
     .. important::
        The number of parallel NVDEC hardware decode engines varies by GPU (e.g., 1 on RTX 4070, 3 on RTX 4090, 7 on H100) and directly controls how many videos can be decoded simultaneously. More NVDEC engines means higher throughput when processing multiple videos. The count is auto-detected via
        :func:`~simba.utils.lookups.get_nvdec_count`. If your GPU is not listed or the count is incorrect, pass ``max_workers`` explicitly.
@@ -427,8 +439,15 @@ class YoloNVDECInference(object):
        :align: center
        :header-rows: 1
 
+    .. csv-table::
+       :header: EXPECTED RUNTIMES KEYPOINTS
+       :file: ../../docs/tables/NVDECYoloPoseInference.csv
+       :widths: 10, 10, 40, 40
+       :align: center
+       :header-rows: 1
+
     :param Union[str, os.PathLike] video_path: Directory containing input video files, or path to a single video file.
-    :param Union[str, os.PathLike] engine_path: Path to TensorRT engine file (.engine). A ``.pt`` (or any other non-engine) model is rejected: this class calls the model directly and reads NMS:ed rows of ``x1, y1, x2, y2, confidence, class id``, a layout only produced by an exported engine. Raw weights return un-decoded network output, which would be written out as meaningless boxes, confidences and class ids. Convert the model with :func:`simba.utils.yolo.export_yolo_model`. For multi-GPU, place the source ``.pt`` weights alongside the engine — per-GPU engines are auto-exported on first run.
+    :param Union[str, os.PathLike] engine_path: Path to TensorRT engine file (.engine). The engine must output final detections, i.e. rows of ``x1, y1, x2, y2, confidence, class id`` (followed by ``x, y, confidence`` per keypoint for pose): either an end-to-end model (e.g. YOLO26), or a model exported with NMS built in, using :func:`simba.utils.yolo.export_yolo_model` with ``nms=True`` (e.g. YOLO11). Engines that output raw predictions, and ``.pt`` weights, are rejected, as they would be written out as meaningless boxes, confidences and class ids. For multi-GPU, place the source ``.pt`` weights alongside the engine — per-GPU engines are auto-exported on first run.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory for per-video CSV output. If None, results kept in memory only. Default None.
     :param Literal['detect', 'pose', 'segment'] task: YOLO task type. Default ``'detect'``.
     :param Optional[int] imsz: Model input image size (square). If None, read from engine metadata. Default None.
@@ -495,8 +514,12 @@ class YoloNVDECInference(object):
         if save_dir is not None: check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
         check_str(name=f'{self.__class__.__name__} task', value=task, options=TASKS)
 
-        from simba.utils.yolo import check_trt_engine_compatibility
+        from simba.utils.yolo import (check_trt_engine_compatibility,
+                                      get_trt_engine_output_shapes)
         check_trt_engine_compatibility(engine_path=engine_path, gpu_id=gpu_id if isinstance(gpu_id, int) else gpu_id[0], raise_error=True)
+        pred_shapes = [s for s in get_trt_engine_output_shapes(engine_path=engine_path) if len(s) == 3]
+        if len(pred_shapes) == 0 or any(s[2] == -1 or (s[1] != -1 and s[1] < s[2]) for s in pred_shapes):  # NOTE: raw output is (batch, channels, anchors), e.g. (10, 5, 1344), or (-1, 5, -1) for a dynamic engine. End-to-end output has a fixed number of values per detection. Reading raw output as rows of detections silently produces garbage boxes, confidences and class ids.
+            raise InvalidInputError(msg=f'The TensorRT engine {engine_path} outputs raw predictions with shape {pred_shapes} (batch, channels, anchors), which still need box decoding and NMS. {self.__class__.__name__} requires an engine that outputs final detections (batch, detections, values). Re-export the model with non-maximum suppression built in: simba.utils.yolo.export_yolo_model(model_path=r"<weights>.pt", export_format="engine", imgsz=<imgsz>, batch=<batch>, task="{task}", nms=True).', source=self.__class__.__name__)
 
         if imsz is None or batch_size is None:
             engine_meta = read_yolo_metadata(model=engine_path)
@@ -550,6 +573,9 @@ class YoloNVDECInference(object):
             if keypoint_names is None:
                 raise InvalidInputError(msg='keypoint_names is required when task is "pose".', source=self.__class__.__name__)
             check_valid_tuple(x=keypoint_names, source=f'{self.__class__.__name__} keypoint_names', minimum_length=1, valid_dtypes=(str,))
+            engine_kp_cnt = (pred_shapes[0][2] - 6) / 3   # NOTE: end-to-end pose rows are x1, y1, x2, y2, confidence, class id, then x, y, confidence per keypoint.
+            if engine_kp_cnt != len(keypoint_names):
+                raise InvalidInputError(msg=f'The pose engine {engine_path} outputs {pred_shapes[0][2]} values per detection ({engine_kp_cnt:g} keypoints), but {len(keypoint_names)} keypoint_names were passed. Pass one name per engine keypoint, in index order.', source=self.__class__.__name__)
         if task == SEGMENT:
             check_int(name=f'{self.__class__.__name__} vertice_cnt', value=vertice_cnt, min_value=3)
         if max_detections is not None:
@@ -581,10 +607,11 @@ class YoloNVDECInference(object):
                 if verbose: stdout_information(msg=f'Building TensorRT engine for GPU {gid} from {pt_path}...', source=self.__class__.__name__)
                 engine_meta = read_yolo_metadata(model=str(engine_path))
                 half = engine_meta.get('fp16', False)
+                nms = not engine_meta.get('end2end', False)  # NOTE: the primary engine outputs final detections (checked above), so unless the model is end-to-end, it was exported with NMS and the per-GPU engines must be too.
                 with tempfile.TemporaryDirectory() as tmp_dir:
                     tmp_pt = os.path.join(tmp_dir, os.path.basename(pt_path))
                     shutil.copy2(pt_path, tmp_pt)
-                    export_yolo_model(model_path=tmp_pt, export_format='engine', imgsz=imsz, device=gid, batch=batch_size, half=half, task=task)
+                    export_yolo_model(model_path=tmp_pt, export_format='engine', imgsz=imsz, device=gid, batch=batch_size, half=half, task=task, nms=nms)
                     tmp_engine = os.path.join(tmp_dir, f'{os.path.splitext(os.path.basename(pt_path))[0]}.engine')
                     shutil.move(tmp_engine, gpu_engine)
                 if verbose: stdout_information(msg=f'Engine for GPU {gid} saved to {gpu_engine}.', source=self.__class__.__name__)

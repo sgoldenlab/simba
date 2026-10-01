@@ -61,7 +61,7 @@ This typically happens with remote or virtual displays, such as HPC desktops (e.
     export MP_START_METHOD=spawn
     simba
 
-On a shared system, such as an HPC, the ``export`` line can be added to the SimBA module file or environment, so that users only need to run ``simba``.
+On a shared system, such as an HPC cluster, the administrator can set this once for all users, e.g. with ``setenv("MP_START_METHOD", "spawn")`` in the SimBA module file, or with ``export MP_START_METHOD=spawn`` in an Open OnDemand app's launch script. Users then only need to run ``simba``.
 
 For background, see the GitHub issues `#512 <https://github.com/sgoldenlab/simba/issues/512>`_ (WSL2) and `#532 <https://github.com/sgoldenlab/simba/issues/532>`_ (HPC desktop).
 

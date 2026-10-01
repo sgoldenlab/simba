@@ -49,27 +49,6 @@ class YOLOVisualizer():
       :muted:
       :align: center
 
-    .. video:: _static/img/YoloInference_1.webm
-       :width: 500
-       :loop:
-       :autoplay:
-       :muted:
-       :align: center
-
-    .. video:: _static/img/YoloInference_2.webm
-       :width: 500
-       :loop:
-       :autoplay:
-       :muted:
-       :align: center
-
-    .. video:: _static/img/YoloInference_3.mp4
-       :width: 500
-       :loop:
-       :autoplay:
-       :muted:
-       :align: center
-
     :param Union[str, os.PathLike] data_path: Path to YOLO results CSV, or a directory of them. Expected columns: ``FRAME, CLASS_ID, CLASS_NAME, CONFIDENCE, X1..Y4``. Multiple rows sharing the same ``FRAME`` and ``CLASS_NAME`` (i.e. several detections of one class per frame, as produced by ``YoloInference`` with ``max_per_class > 1``) are rendered as separate instances, each drawn as its own polygon track and color (ordered by detection confidence).
     :param Union[str, os.PathLike] video_path: Path to the video from which the data was produced, or a directory of videos. When ``data_path`` and ``video_path`` are both directories, the results files and the videos are paired on file name and each pair is visualized in turn.
     :param Union[str, os.PathLike] save_dir: Directory where to save visualization output.
