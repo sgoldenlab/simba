@@ -156,6 +156,7 @@ INSTITUTION_COORDS = {
     'Pontificia Universidad Católica del Ecuador': [-0.21, -78.4917],  # 1
     'Qingdao University': [35.9817, 120.1623],  # 1
     'Roche': [47.558, 7.602],  # 1
+    'Rockefeller University': [40.7624, -73.9558],  # 1
     'Rosalind Franklin University': [42.3022, -87.8585],  # 1
     'Royal College of Surgeons in Ireland': [53.3392, -6.2626],  # 1
     'Royal Hospital for Women': [-33.9169, 151.238],  # 1
