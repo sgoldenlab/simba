@@ -3,7 +3,7 @@ Global Configuration Options
 
 SimBA has a few runtime configuration options which change the global behavior of SimBA.
 
-These are managed by `python-dotenv` and are stored in the `simba/assets/.env <https://github.com/sgoldenlab/simba/blob/master/simba/assets/.env>`_ file of your python installation.
+These are set as environment variables, in the same terminal, before launching SimBA. If a variable is not set, SimBA uses its default value. The values in use are printed when SimBA starts (``SimBA environment variables: {...}``).
 
 Sometimes, we may want to tweak these global settings - to unlock a few extra functionalities - or, to make sure that SimBA runs more reliably in specific hardware and operating system.
 
@@ -63,7 +63,9 @@ This typically happens with remote or virtual displays, such as HPC desktops (e.
 
 On a shared system, such as an HPC, the ``export`` line can be added to the SimBA module file or environment, so that users only need to run ``simba``.
 
-``MP_START_METHOD`` accepts ``fork``, ``spawn`` and ``forkserver`` (on Windows, only ``spawn`` is available). If not set, SimBA uses the operating system default (``spawn`` on Windows, macOS and WSL; ``fork`` on other Linux systems). With ``spawn``, the workers take slightly longer to start, as each worker loads SimBA.
+For background, see the GitHub issues `#512 <https://github.com/sgoldenlab/simba/issues/512>`_ (WSL2) and `#532 <https://github.com/sgoldenlab/simba/issues/532>`_ (HPC desktop).
+
+``MP_START_METHOD`` accepts ``fork``, ``spawn`` and ``forkserver`` (on Windows, only ``spawn`` is available). If not set, SimBA uses the operating system default (``spawn`` on Windows, macOS and WSL; ``fork`` on other Linux systems). On macOS, SimBA visualizations always use ``spawn``. With ``spawn``, the workers take slightly longer to start, as each worker loads SimBA.
 
 
 

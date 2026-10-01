@@ -5,7 +5,7 @@ from simba.utils.warnings import VersionWarning
 
 ENV = read_sys_env()
 
-### IMPORT CURF IF SET BY simba/assets/.env
+### IMPORT CURF IF THE CUML ENVIRONMENT VARIABLE IS SET
 use_cuml = ENV.get(ENV_VARS.CUML.value, False)  # Avoid KeyError, default to False
 #use_cuml = True
 if use_cuml:
