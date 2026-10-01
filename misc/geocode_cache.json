@@ -2716,5 +2716,28 @@
    ]
   }
  ],
- "Nencki-EMBL Center of Excellence for Neural Plasticity and Brain Disorders": []
+ "Nencki-EMBL Center of Excellence for Neural Plasticity and Brain Disorders": [],
+ "Rockefeller University": [
+  {
+   "place_id": 355567084,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 108158013,
+   "lat": "40.7624395",
+   "lon": "-73.9557565",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5586543507546606,
+   "addresstype": "amenity",
+   "name": "Rockefeller University",
+   "display_name": "Rockefeller University, 1230, York Avenue, Roosevelt Island, Manhattan Community Board 8, Manhattan, New York County, New York, 10065, United States",
+   "boundingbox": [
+    "40.7603422",
+    "40.7642057",
+    "-73.9581436",
+    "-73.9537599"
+   ]
+  }
+ ]
 }
