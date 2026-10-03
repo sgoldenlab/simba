@@ -1,15 +1,15 @@
 {
- "generated": "September 19, 2026",
- "n_pdfs": 176,
+ "generated": "October 03, 2026",
+ "n_pdfs": 183,
  "behaviours_automated": [
   [
    "Locomotion / distance travelled",
-   44,
+   46,
    "Locomotion / motor"
   ],
   [
    "Zone / ROI occupancy",
-   33,
+   34,
    "Exploration"
   ],
   [
@@ -19,17 +19,17 @@
   ],
   [
    "Rearing",
-   30,
+   32,
    "Self-directed"
   ],
   [
    "Social interaction / approach",
-   28,
+   31,
    "Social"
   ],
   [
    "Anogenital / body sniffing",
-   27,
+   29,
    "Social"
   ],
   [
@@ -48,29 +48,34 @@
    "Fear / defence"
   ],
   [
+   "Feeding / licking / drinking",
+   12,
+   "Feeding / reward"
+  ],
+  [
+   "Operant / self-administration",
+   11,
+   "Feeding / reward"
+  ],
+  [
    "Defensive posture / risk assessment",
    11,
    "Fear / defence"
   ],
   [
-   "Operant / self-administration",
-   10,
-   "Feeding / reward"
-  ],
-  [
-   "Feeding / licking / drinking",
-   10,
-   "Feeding / reward"
-  ],
-  [
    "Mating / mounting",
-   8,
+   9,
    "Social"
   ],
   [
    "Climbing / jumping",
    8,
    "Locomotion / motor"
+  ],
+  [
+   "Object exploration / novel object",
+   8,
+   "Exploration"
   ],
   [
    "Pup retrieval / maternal care",
@@ -83,9 +88,9 @@
    "Self-directed"
   ],
   [
-   "Object exploration / novel object",
+   "Head-twitch response",
    7,
-   "Exploration"
+   "Self-directed"
   ],
   [
    "Immobility / motionless",
@@ -108,11 +113,6 @@
    "Self-directed"
   ],
   [
-   "Head-twitch response",
-   6,
-   "Self-directed"
-  ],
-  [
    "Darting",
    5,
    "Fear / defence"
@@ -123,14 +123,14 @@
    "Locomotion / motor"
   ],
   [
+   "Gait / balance beam",
+   5,
+   "Locomotion / motor"
+  ],
+  [
    "Maze arm entries / spatial task",
    4,
    "Exploration"
-  ],
-  [
-   "Gait / balance beam",
-   4,
-   "Locomotion / motor"
   ],
   [
    "Foraging / food handling",
@@ -158,43 +158,43 @@
    "Exploration"
   ]
  ],
- "n_behaviour_studies": 142,
+ "n_behaviour_studies": 149,
  "behaviors": [
   [
    "Social interaction",
-   128
+   132
   ],
   [
    "Aggression / attack",
-   124
+   130
   ],
   [
    "Locomotion / open field",
-   123
+   130
   ],
   [
    "Feeding / consumption",
-   95
-  ],
-  [
-   "Grooming",
-   74
+   99
   ],
   [
    "Avoidance",
-   74
+   77
+  ],
+  [
+   "Grooming",
+   76
   ],
   [
    "Rearing",
-   72
+   75
   ],
   [
    "Gait / balance",
-   70
+   75
   ],
   [
    "Sniffing",
-   56
+   57
   ],
   [
    "Freezing",
@@ -202,7 +202,7 @@
   ],
   [
    "Pup retrieval / maternal",
-   52
+   53
   ],
   [
    "Immobility (FST/TST)",
@@ -210,65 +210,65 @@
   ],
   [
    "Mating / sexual",
-   41
+   44
   ],
   [
    "Head-twitch (HTR)",
-   11
+   12
   ]
  ],
  "regions": [
   [
    "Prefrontal cortex",
-   88
-  ],
-  [
-   "Amygdala",
-   86
+   90
   ],
   [
    "Hippocampus",
-   86
+   90
+  ],
+  [
+   "Amygdala",
+   89
   ],
   [
    "Hypothalamus",
-   64
+   67
   ],
   [
    "Striatum",
-   62
+   66
   ],
   [
    "Nucleus accumbens",
-   52
+   54
   ],
   [
    "VTA",
-   39
+   41
   ],
   [
    "Thalamus",
-   33
+   35
   ],
   [
    "BNST",
-   29
+   30
   ],
   [
    "Cerebellum",
-   29
-  ],
-  [
-   "Periaqueductal gray",
-   22
+   30
   ],
   [
    "Cingulate cortex",
-   22
+   24
   ],
   [
    "Insula",
-   21
+   23
+  ],
+  [
+   "Periaqueductal gray",
+   23
   ],
   [
    "Habenula",
@@ -278,34 +278,38 @@
  "methods": [
   [
    "DeepLabCut",
-   158
+   165
   ],
   [
    "Electrophysiology",
-   58
+   60
   ],
   [
    "Optogenetics",
-   52
+   56
   ],
   [
    "Viral tracing (AAV)",
-   44
+   47
   ],
   [
    "Transcriptomics",
-   38
+   41
   ],
   [
    "EthoVision",
-   37
-  ],
-  [
-   "SLEAP",
-   36
+   39
   ],
   [
    "Fiber photometry",
+   38
+  ],
+  [
+   "SLEAP",
+   38
+  ],
+  [
+   "c-Fos mapping",
    35
   ],
   [
@@ -313,12 +317,8 @@
    35
   ],
   [
-   "c-Fos mapping",
-   34
-  ],
-  [
    "Immunohistochemistry",
-   33
+   34
   ],
   [
    "Chemogenetics (DREADD)",
@@ -326,23 +326,23 @@
   ],
   [
    "Calcium imaging",
-   22
+   25
   ],
   [
    "AnyMaze",
-   19
+   20
   ],
   [
    "Ultrasonic vocalisation",
-   17
+   20
   ],
   [
    "B-SOiD",
-   16
+   17
   ],
   [
    "Keypoint-MoSeq",
-   16
+   17
   ],
   [
    "SHAP explainability",
@@ -361,19 +361,19 @@
    11
   ],
   [
+   "VAME",
+   10
+  ],
+  [
    "A-SOiD",
    10
   ],
   [
-   "VAME",
-   8
+   "UMAP / t-SNE",
+   9
   ],
   [
    "Western blot",
-   7
-  ],
-  [
-   "UMAP / t-SNE",
    7
   ],
   [
@@ -404,70 +404,70 @@
  "diseases": [
   [
    "Addiction / substance use",
-   129
+   135
   ],
   [
    "Anxiety",
-   98
+   103
   ],
   [
    "Stress / depression",
-   88
+   91
   ],
   [
    "Pain / analgesia",
-   76
+   80
   ],
   [
    "Psychedelics",
-   57
+   61
   ],
   [
    "Autism (ASD)",
-   43
+   45
   ],
   [
    "Schizophrenia",
-   36
+   37
   ],
   [
    "Ageing",
-   34
+   36
   ],
   [
    "Fear conditioning",
-   33
+   34
+  ],
+  [
+   "Epilepsy / seizure",
+   28
+  ],
+  [
+   "Parkinson's",
+   27
   ],
   [
    "Sleep / circadian",
    27
   ],
   [
-   "Epilepsy / seizure",
-   27
+   "Early-life stress",
+   25
   ],
   [
    "Social defeat",
    25
   ],
   [
-   "Early-life stress",
-   24
-  ],
-  [
-   "Parkinson's",
-   24
-  ],
-  [
-   "Alzheimer's / dementia",
-   21
-  ],
-  [
    "Obesity / diet",
-   21
+   22
   ],
   [
    "PTSD",
+   22
+  ],
+  [
+   "Alzheimer's / dementia",
    21
   ],
   [
@@ -476,19 +476,19 @@
   ],
   [
    "Stroke / ischemia",
-   16
+   17
   ],
   [
    "Prenatal exposure",
-   15
+   17
   ],
   [
    "Neuropathic pain",
-   10
+   11
   ],
   [
    "Huntington's",
-   7
+   8
   ],
   [
    "ADHD",
@@ -517,11 +517,13 @@
   "journal pre proof methods for measuring neural activity during voluntary wheel runningabbreviated title wheel running neural activity ayland c letsinger bryan n ochoa jessica j wu kayen u tang diane youngstrom shaohua wang matt bridge guohong cui jerrel l yakel pii doi reference s0165 0270 26 00169 x https doi org 10 1016 j jneumeth 2026 110839 nsm110839 to appear in journal of neuroscience methods received date 10 april 2026 revised date 3 june 2026 accepted date 23 june 2026 please cite this article as ayland c letsinger bryan n ochoa jessica j wu kayen u tang diane youngstrom shaohua wang matt bridge guohong cui and jerrel l yakel methods for measuring neural activity during voluntary whe",
   "progress in neuropsychopharmacology biological psychiatry 140 2025 111418 contents lists available at sciencedirect progress in neuropsychopharmacology biological psychiatry journal homepage www elsevier com locate pnp gpr55 in the bed nucleus of stria terminalis modulates anxiety like behavior amphetamine self administration and inflammatory response rodolfo sanchez zavaleta a b andrea herrera sols c lorena alline becerril melendez a aline ostos valverde a m migliaro a alejandra e ruiz contreras d monica mendez daz e miguel perez de la mora f oscar e prospero garca a a laboratorio de cannabinoides departamento de fisiologa facultad de medicina unam mexico b division of research and translat",
   "progress in neuropsychopharmacology biological psychiatry 144 2026 111586 contents lists available at sciencedirect progress in neuropsychopharmacology biological psychiatry journal homepage www elsevier com locate pnp differential effects of chronic restraint stress on two active avoidance tasks in rats alba lopez moraga a b 1 mirte de ceuninck a b 1 yana van der heyden a laura vercammen b c rupert palme d bram vervliet b c tom beckers a b laura luyten a b a centre for the psychology of learning and experimental psychopathology faculty of psychology and educational sciences ku leuven leuven belgium b leuven brain institute ku leuven leuven belgium c laboratory of biological psychology facul",
+  "journal pre proof serotonergic psychedelics and amphetamine shift male rat ultrasonic vocalizations toward call patterns associated with positively valenced states ewelina cyrano joanna golbiowska piotr popik pawel zajdel agnieszka potasiewicz pii doi reference s0278 5846 26 00338 6 https doi org 10 1016 j pnpbp 2026 111940 pnp 111940 to appear in progress in neuropsychopharmacology biological psychiatry received date revised date accepted date 7 june 2026 5 september 2026 18 september 2026 please cite this article as e cyrano j golbiowska p popik et al serotonergic psychedelics and amphetamine shift male rat ultrasonic vocalizations toward call patterns associated with positively valenced s",
   "journal pre proofs comparative analysis of boris ethovision deeplabcut and simba for quantifying autism spectrum disorder like behaviors in the valproic acid mouse model zineb bouargane francisco e olucha bordonau mohammed bennis saadia ba m hamed fatima zahra lamghari moubarrad pii doi reference s0304 3940 26 00040 6 https doi org 10 1016 j neulet 2026 138542 nsl 138542 to appear in neuroscience letters received date revised date accepted date 16 december 2025 2 february 2026 9 february 2026 please cite this article as z bouargane f e olucha bordonau m bennis s ba m hamed f z lamgharimoubarrad comparative analysis of boris ethovision deeplabcut and simba for quantifying autism spectrum diso",
   "neuroscience 562 2024 7589 contents lists available at sciencedirect neuroscience journal homepage www elsevier com locate nsc s mecamylamine increases the firing rate of serotonin neurons and diminishes depressive like behaviors in an animal model of stress a mondragon garca a b e ramrez sanchez a d francia ramrez a o hernandez gonzalez a y rojano posada a s ortega tinoco a j gardun o a l verdugo daz a s hernandez lopez a a departamento de fisiologa facultad de medicina universidad nacional autonoma de mexico unam po box 70250 ciudad de mexico 04510 mexico b posgrado en ciencias biologicas universidad nacional autonoma de mexico mexico article info keywords 5 ht neurons s mecamylamine gluta",
   "neuroscience 577 2025 343356 contents lists available at sciencedirect neuroscience journal homepage www elsevier com locate nsc yolov11 based quantification and temporal analysis of repetitive behaviors in deer mice farhan augustine a b shawn m doss b ryan m lee a harvey s singer b c a university of maryland baltimore county department of biological sciences baltimore md usa b johns hopkins university school of medicine department of neurology baltimore md usa c kennedy krieger institute baltimore md usa article info keywords deer mice automated behavior analysis yolov11 repetitive behaviors machine learning abstract detailed temporal dynamics of deer mouse peromyscus maniculatus bairdii be",
   "behavioural processes 230 2025 105230 contents lists available at sciencedirect behavioural processes journal homepage www elsevier com locate behavproc review article understanding and appreciating behavioral complexity of zebrafish novel tank assays nikita i golushko a b daniil matrynov a b david s galstyan a b kirill v apukhtin c murilo s de abreu d longen yang e f adam michael stewart e allan v kalueff f g a institute of experimental medicine almazov national medical research centre ministry of healthcare of russian federation st petersburg russia b institute of translational biomedicine st petersburg state university st petersburg russia c neurobiology program sirius university of scien",
   "neurobiology of learning and memory 213 2024 107952 contents lists available at sciencedirect neurobiology of learning and memory journal homepage www elsevier com locate ynlme neural correlates of learning and memory are altered by early life stress jeniffer sanguino gomez stefan huijgens maxine den hartog inim j m schenk wenya kluck tamara d versluis harm j krugers brain plasticity group sils cns university of amsterdam amsterdam the netherlands article info keywords early life stress fear memory arc c fos glucocorticoid receptor abstract the ability to learn and remember which is fundamental for behavioral adaptation is susceptible to stressful experiences during the early postnatal perio",
+  "article an amygdaloreticular pathway promotes motor programs of ingestion graphical abstract authors danielle s lafferty joelyz s wolcott jeremiah isaac amy phan lily reck andrew lutas correspondence andrew lutas nih gov in brief lafferty et al show that a collateralized amygdala projection to the hindbrain can drive context dependent consummatory motor states activity in this pathway correlates with the motor action of licking and stimulating this pathway promotes ingestion related behaviors toward food and non food objects providing a potential mechanism for ingestion beyond homeostatic need highlights cea neurons collateralize across pontine and medullary premotor fields the activity of c",
   "neurobiology of stress 31 2024 100636 contents lists available at sciencedirect neurobiology of stress journal homepage www elsevier com locate ynstr early life stress impairs acquisition and retrieval of fear memories sex effects corticosterone modulation and partial prevention by targeting glucocorticoid receptors at adolescent age jeniffer sanguino gomez harm j krugers brain plasticity group sils cns university of amsterdam amsterdam the netherlands article info keywords early life stress fear memory corticosterone glucocorticoid antagonist abstract the early postnatal period is a sensitive time window that is characterized by several neurodevelopmental processes that define neuronal arch",
   "ll open access protocol protocol for the integration of fiber photometry and social behavior in rodent models fiber photometry offers insight into cell type specific activity underlying social interactions we provide a protocol for the integration of fiber photometry recordings into the analysis of social behavior in rodent models this includes considerations during surgery notes on synchronizing fiber photometry with behavioral recordings advice on using multi animal behavioral tracking software and scripts for the analysis of fiber photometry recordings publisher s note undertaking any experimental protocol requires adherence to local institutional guidelines for laboratory safety and ethi",
   "research paper acta neurobiol exp 2025 85 187195 doi 10 55782 0vv4n928 the role of prefrontal somatostatin interneurons in emotional contagion tomasz nikolaev1 emilia goszczynska2 natalia roszkowska1 ewelina knapska1 ksenia meyza1 1 laboratory of emotions neurobiology nencki institute of experimental biology polish academy of sciences warsaw poland 2 max planck research school for neuroscience gottingen germany email k meyza nencki edu pl the role of prefrontal somatostatin interneurons in emotion recognition is well characterized here for the first time we investigated the role of these neurons during remote transfer of emotional information in the safe environment of the home cage to do th",
@@ -562,6 +564,7 @@
   "biorxiv preprint doi https doi org 10 1101 2025 09 11 675563 this version posted september 11 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license a low cost and open source olfactometer to precisely deliver single odours and odour mixtures connor doyle1 jieni wang1 2 elisa galliano1 chloe guillaume1 1 department of physiology development and neuroscience university of cambridge united kingdom 2 department of engineering university of cambridge cambridge united kingdom correspondence to be addressed to eli",
   "biorxiv preprint doi https doi org 10 1101 2025 09 12 675815 this version posted september 17 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc 4 0 international license manuscript title reducing ventral hippocampal ca1 subiculum hyperexcitability restores social memory and alleviates anxiety related behavior in a mouse model of temporal lobe epilepsy anthoni goodman1 emily schellinger1 julia kahn1 2 hajime takano1 2 douglas coulter1 2 srdjan joksimovic1 2 1 division of neurology department of pediatrics children s hospital of phil",
   "biorxiv preprint doi https doi org 10 1101 2025 09 27 678941 this version posted september 28 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license dlc2action a deep learning based toolbox for automated behavior segmentation elizaveta kozlova1 2 andy bonnetto1 2 and alexander mathis1 1brain mind institute school of life sciences cole polytechnique fdrale de lausanne epfl lausanne switzerland 2these authors contributed equally to this work current address for l k adaptyvbio in lausanne ch alexander mathis ep",
+  "biorxiv preprint doi https doi org 10 1101 2025 10 07 680927 this version posted october 2 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by nc nd 4 0 international license neuropathic pain drives time dependent reorganization of naturalistic movement and corticostriatal circuits arlene j george1 2 ivan linares garcia1 alex j yonk1 xinyi c zhang1 justin burdge1 2 ammar danish1 2 mark gradwell1 2 victoria e abraira1 2 david j margolis1 1 cell biology and neuroscience department rutgers the state university of new jersey new brunswick ",
   "biorxiv preprint doi https doi org 10 1101 2025 10 27 684580 this version posted october 27 2025 the copyright holder for this preprint which was not certified by peer review is the author funder all rights reserved no reuse allowed without permission the intermediate ca1 and ca3 subfields of the hippocampus differen ally encode social recogni on benjamin dykstra1 2 paul kim2 aidan lin2 gordon j berman2 and malavika murugan2 author affilia ons 1 emory neuroscience graduate program emory university atlanta ga 30322 usa 2 department of biology emory university atlanta ga 30322 usa corresponding authors malavika murugan gordon berman corresponding authors email mmurug5 emory edu gordon berman e",
   "biorxiv preprint doi https doi org 10 1101 2025 10 31 685692 this version posted october 31 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by 4 0 international license 1 zmynd11 restrains kmt2a to enable a neuronal developmental program 2 alexander w greben1 2 xiaoli s wu1 josephine e robb1 ian r vogel1 lisa traunmller1 3 sebastian krttner3 kara a fulton1 migue van louis darcera1 eric c griffith1 michael e 4 greenberg1 5 6 author affiliations 7 1 department of neurobiology harvard medical school boston ma usa 8 2 program in neuroscien",
   "biorxiv preprint doi https doi org 10 1101 2025 11 26 690732 this version posted november 27 2025 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nc nd 4 0 international license serotonin modulates nucleus accumbens circuits to suppress aggression zihui zhang gavin c touponse pia j alderman teema yassine matthew b pomrenze troy w harris amei n shank robert c malenka neir eshel nancy pritzker laboratory department of psychiatry and behavioral sciences stanford university school of medicine stanford ca usa corresponding authors email malen",
@@ -582,6 +585,7 @@
   "biorxiv preprint doi https doi org 10 64898 2026 07 30 741940 this version posted august 5 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by 4 0 international license reciprocal feedback inhibition and divergent intrinsic firing properties between behaviorally defined classes of neurons in the mouse ventromedial hypothalamus sukrita deb1 sofia torchia1 emily welponer1 luca spagnoletti1 selin karaglle1 sofia aravantis1 maria esteban masferrer1 yerassyl zhalgasbayev1 hiroki asari1 2 cornelius t gross1 1 epigenetics and neurobiology uni",
   "biorxiv preprint doi https doi org 10 64898 2026 08 10 744052 this version posted august 16 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by 4 0 international license jones et al sema trap manuscript semaglutide induced satiation nausea and food reward suppression are mediated by glp 1 receptors in the area postrema authors lauren a jones1 ella cross1 yuqi song1 phoebe claxton1 nicholas monaco1 yuan yu1 stefan trapp1 alice adriaenssens1 daniel i brierley1 affiliations 1 ucl centre for cardiovascular and metabolic neuroscience depart",
   "biorxiv preprint doi https doi org 10 64898 2026 08 30 748115 this version posted september 3 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by 4 0 international license 1 abel an active learning behavior estimation and labeling platform 2 3 jobe l ritchie1 brianna e george1 alison v roland1 2 caroline g krieman1 brooke n bender1 maya r 4 eberle1 william c der1 lili s kooyman1 adriane m lawes1 rajon t scott1 todd k o buckley1 marissa 5 m r mclean1 chloe j gallagher1 joyce besheer1 2 thomas l kash1 3 6 7 1bowles center for alcohol stu",
+  "biorxiv preprint doi https doi org 10 64898 2026 09 18 752544 this version posted september 21 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by nc nd 4 0 international license 1 developmental dynamics of naturalistic social behavior revealed by longitudinal multi2 animal tracking 3 4 short title longitudinal tracking of social development 5 6 authors 7 sunjin kim1 yejin jeong1 hein lin thant1 haeri choi1 ain chung1 8 9 affiliations 10 department of bio and brain engineering korea advanced institute of science and technology 11 kaist",
   "self supervised pretraining of vision transformers for animal behavioral analysis and neural encoding arxiv 2507 09513v1 q bio nc 13 jul 2025 yanchen wang columbia university new york yw4503 columbia edu han yu columbia university new york hy2562 columbia edu ari blau columbia university new york bsb2144 columbia edu yizi zhang columbia university new york yz4123 columbia edu the international brain laboratory the international brain laboratory liam paninski columbia university new york lmp2107 columbia edu cole hurwitz columbia university new york ch3676 columbia edu matthew r whiteway columbia university new york m whiteway columbia edu abstract the brain can only be fully understood throu",
   "4036 the journal of neuroscience may 5 2021 41 18 40364059 systems circuits dissociable roles of pallidal neuron subtypes in regulating motor patterns qiaoling cui 1p arin pamukcu 1p suraj cherian 1p isaac y m chang 1p brianna l berceau 1 harry s xenias 1 matthew h higgs 2 shivakumar rajamanickam 3 4 yi chen 5 xixun du 1 yu zhang 1 hayley mcmorrow 1 zachary a abecassis 1 simina m boca 6 nicholas j justice 3 4 charles j wilson 2 and c savio chan1 1department of physiology feinberg school of medicine northwestern university chicago 60611 illinois 2department of biology university of texas at san antonio san antonio 78249 texas 3center for metabolic and degenerative disease institute of molecul",
   "physiol res 75 149 166 2026 https doi org 10 33549 physiolres 935715 task specific effects of mglu2 3 receptor agonist ly379268 on mk 801 induced behavioral and neural dysfunctions in rats karolina hruza1 2 daniela cernotova1 2 kristyna maleninska1 3 jan svoboda1 david levcik1 ales stuchlik1 1laboratory of the neurophysiology of memory institute of physiology of the czech academy of sciences prague czech republic 2third faculty of medicine charles university prague czech republic 3national institute of mental health klecany czech republic received october 6 2025 accepted december 12 2025 summary nmda receptor hypofunction can lead to behavioral and cognitive disturbances including hyperlocom",
@@ -621,6 +625,7 @@
   "received 18 january 2023 doi 10 1111 gbb 12853 revised 25 may 2023 accepted 15 june 2023 original article extensive characterization of a williams syndrome murine model shows gtf2ird1 mediated rescue of select sensorimotor tasks but no effect on enhanced social behavior kayla r nygaard 1 2 susan e maloney 2 3 raylynn g swift 1 2 katherine b mccullough 1 2 rachael e wagner 2 stuart b fass 1 2 krassimira garbett4 karoly mirnics 5 jeremy veenstra vanderweele 6 joseph d dougherty 1 2 3 1department of genetics washington university school of medicine st louis missouri usa 2department of psychiatry washington university school of medicine st louis missouri usa 3intellectual developmental disabilit",
   "nature neuroscience technical report https doi org 10 1038 s41593 024 01649 9 simple behavioral analysis simba as a platform for explainable machine learning in behavioral neuroscience received 26 june 2023 accepted 12 april 2024 published online xx xx xxxx check for updates nastacia l goodwin 1 2 3 jia j choong1 4 sophia hwang1 kayla pitts 1 liana bloom1 aasiya islam 1 yizhe y zhang1 2 3 eric r szelenyi 1 3 xiaoyu tong 5 emily l newman 6 klaus miczek7 hayden r wright8 9 ryan j mclaughlin8 9 zane c norville10 neir eshel 11 mitra heshmati 1 2 3 12 simon r o nilsson 1 13 sam a golden 1 2 3 13 the study of complex behaviors is often challenging when using manual annotation due to the absence of",
   "nature neuroscience technical report https doi org 10 1038 s41593 024 01649 9 simple behavioral analysis simba as a platform for explainable machine learning in behavioral neuroscience received 26 june 2023 accepted 12 april 2024 published online 22 may 2024 check for updates nastacia l goodwin 1 2 3 jia j choong1 4 sophia hwang1 kayla pitts 1 liana bloom1 aasiya islam 1 yizhe y zhang1 2 3 eric r szelenyi 1 3 xiaoyu tong 5 emily l newman 6 klaus miczek7 hayden r wright8 9 ryan j mclaughlin8 9 zane c norville10 neir eshel 11 mitra heshmati 1 2 3 12 simon r o nilsson 1 13 sam a golden 1 2 3 13 the study of complex behaviors is often challenging when using manual annotation due to the absence o",
+  "downloaded from academic oup com genetics advance article doi 10 1093 genetics iyag256 8841132 by sussex university user on 03 october 2026 1 parent of origin dependent allelic regulation of social behaviors in mice by noncanonically 2 imprinted monoamine synthesis genes 3 4 erin m o leary1 rachel l eggleston2 daryl d meling2 anne farah usman2 samuel j 5 rahman2 andrei l tamas2 tony huang2 mia sands4 joseph irudayaraj4 paul j bonthuis1 2 3 6 1neuroscience program college of liberal arts and sciences university of illinois urbana7 champaign urbana il 61801 usa 8 2 department of comparative biosciences college of veterinary medicine university of illinois 9 urbana champaign urbana il 61802 usa",
   "journal of experimental zoology part b molecular and developmental evolution research article automated behavioral profiling using neural networks reveals differences in stress like behavior between cave and surface dwelling astyanax mexicanus naresh padmanaban1 rianna ambosie2 stefan choy2 shoshanah marcus1 simon r o nilsson3 alex c keene4 johanna e kowalko2 erik r dubou1 1wilkes honors college florida atlantic university jupiter florida usa 2department of biological sciences lehigh university allentown pennsylvania usa 3platea biosciences seattle washington usa 4texas a m university college station texas usa correspondence erik r dubou eduboue fau edu received 7 february 2025 revised 10 ju",
   "received 24 september 2021 revised 12 november 2021 accepted 15 december 2021 doi 10 1111 jne 13083 original article knockdown of sexually differentiated vasopressin expression in the bed nucleus of the stria terminalis reduces social and sexual behaviour in male but not female mice nicole rigney adam zbib geert j de vries aras petrulis center for behavioral neuroscience neuroscience institute georgia state university atlanta georgia usa correspondence nicole rigney center for behavioral neuroscience neuroscience institute georgia state university atlanta ga usa email nrigney1 student gsu edu funding information this work was supported by the national institutes of health r01 mh121603 to ap ",
   "journal of neuroscience research research article open access sex and strain differences in analgesic and hyperlocomotor effects of morphine and opioid receptor expression in mice damien c boorman1 simran k rehal2 maryam fazili1 loren j martin1 2 1department of psychology the university of toronto mississauga mississauga ontario canada 2department of cell and systems biology university of toronto toronto ontario canada correspondence loren j martin lj martin utoronto ca received 2 january 2025 revised 5 march 2025 accepted 1 april 2025 edited by lawrence s sherman and tuan trang reviewed by william birdsong anna taylor and kim juhani blomqvist funding this work was supported by natural scien",
@@ -635,6 +640,7 @@
   "contact free measurement of behavioural readouts in the lizard anolis carolinensis n rhrdanz1 a menon1 and p wulff1 1 institute of physiology christian albrechts universitt zu kiel kiel germany n roehrdanz physiologie unikiel de abstract the green anole lizard anolis carolinensis is an interesting model organism to study in cognitive neuroscience it shows a brain of reduced complexity compared to mammals some brain structures like the hippocampus are already present in the lizards brain while other brain structures like the neocortex seem to be missing in this study we aimed to establish a contact free method to measure different behavioural readouts in the lizards respiratory rate head dire",
   "supplementary material behavioral model training and coding to code the play behavior observations social preference social memory and resident intruder behaviors the deeplabcut program 2 3 0 behavioral observation research interactive software boris 7 13 and the simulated behavioral analysis simba 1 55 program were used deeplabcut first body parts were tracked using deeplabcut 1 2 videos of the three chamber task social preference and memory were captured from above the rat and apparatus eight body parts were labeled for social preference and social memory including left ear right ear nose middle of back left side right side tail base and tail tip videos of the play behavior observations an",
   "article hypocretin orexin neurons encode social discrimination and exhibit a sex dependent necessity for social interaction graphical abstract authors matthew dawson dylan j terstege naila jamani jonathan r epp gina m leinninger derya sargin correspondence derya sargin ucalgary ca in brief dawson et al show that hypocretin neurons regulate social interaction hypocretin neuron activity levels differ based on the nature of social encounters and correlate with social engagement reduced hypocretin activity or signaling disrupts social interaction only in males highlighting the sexually dimorphic role of this neuron population in social behavior highlights d hypocretin neurons respond to social i",
+  "resource a head mounted open source light field microscope for large volumetric ca2 imaging during exploratory and social behavior in mice graphical abstract authors hao li tobias no bauer hossein sarafraz alipasha vaziri correspondence vaziri rockefeller edu in brief li et al present minilfmv2 a lightweight open source head mounted light field microscope that records volumetric the three dimensional activity of hundreds of cortical neurons in freely moving mice the system captures volumetric calcium signals during natural exploratory and social behaviors enabling cellularresolution population recording without restraining the animal highlights mini light field microscope records volumetric ",
   "biorxiv preprint doi https doi org 10 1101 2023 12 04 569809 this version posted december 6 2023 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under acc by nd 4 0 international license impact of 9 tetrahydrocannabinol and oxycodone co administration on measures of antinociception dependence circadian activity and reward in mice richard a slivicki1 justin g wang1 2 vy trinh tran nhat1 alexxai v kravitz1 3 4 meaghan c creed1 4 and robert w gereau iv1 4 5 1washington university pain center and department of anesthesiology 2neuroscience graduate progra",
   "biorxiv preprint doi https doi org 10 1101 2025 04 28 650242 this version posted july 16 2025 the copyright holder for this preprint which was not certified by peer review is the author funder this article is a us government work it is not subject to copyright under 17 usc 105 and is also made available for use under a cc0 license rapid open source and automated quantification of the head twitch response in c57bl 6j mice using deeplabcut and simple behavioral analysis alexander d maitland1 nicholas r gonzalez1 donna walther1 francisco pereira2 michael h baumann1 and grant c glatfelter1 1designer drug research unit national institute on drug abuse intramural research program baltimore marylan",
   "topic drug discovery and development abstract id 168992 board number 081 rapid open source and automated quantification of the mouse head twitch response using deeplabcut and simba abstract id 168992 alexander d maitland 1 grant c glatfelter 1 nicholas r gonzalez 1 donna walther 1 francisco pereira 2 michael h baumann 1 1 national institute on drug abuse intramural research program 2 national institute of mental health intramural research program psychedelic drugs induce the head twitch response htr in mice which is a behavioral proxy for hallucinogenic effects in humans existing methods for detecting htrs require time consuming visual scoring or invasive magnetometer based approaches here w",
@@ -654,6 +660,7 @@
   "www nature com mp molecular psychiatry 1234567890 article open impaired emotion recognition in cntnap2 deficient mice is associated with hyper synchronous prefrontal cortex neuronal activity alok nath mohapatra 1 2 renad jabarin1 2 natali ray1 shai netser1 and shlomo wagner 1 the author s 2024 individuals diagnosed with autism spectrum disorder asd show difficulty in recognizing emotions in others a process termed emotion recognition while human fmri studies linked multiple brain areas to emotion recognition the specific mechanisms underlying impaired emotion recognition in asd are not clear here we employed an emotional state preference esp task to show that cntnap2 knockout ko mice an esta",
   "www nature com npp 1234567890 article serotonin modulates an inhibitory input to the central amygdala from the ventral periaqueductal gray olivia j hon1 jeffrey f diberto1 christopher m mazzone1 jonathan sugam1 daniel w bloodgood1 j andrew hardaway1 mariya husain1 alexis kendra1 nora m mccall1 alberto j lopez1 thomas l kash1 2 and emily g lowery gionta1 this is a u s government work and not under copyright protection in the us foreign copyright protection may apply 2022 fear is an adaptive state that drives defensive behavioral responses to specific and imminent threats the central nucleus of the amygdala cea is a critical site of adaptations that are required for the acquisition and express",
   "www nature com npp 1234567890 article selective dysregulation of serotonin dynamics in the anterior cingulate cortex and central amygdala following binge alcohol consumption jobe l ritchie 1 maya r eberle1 alison v roland1 lisa r taxier1 madison r campeau1 brianna e george1 lili s kooyman1 and thomas l kash 1 2 the author s under exclusive licence to american college of neuropsychopharmacology 2026 serotonin 5ht is a critical modulator of brain function and behavior that is dysregulated in alcohol use disorder aud the anterior cingulate cortex acc and central nucleus of the amygdala cea play distinct roles in aud and undergo functional changes in 5ht signaling following binge drinking but ou",
+  "translational psychiatry www nature com tp 1234567890 article open drd1 and drd2 dopamine sensitive neurons in the central amygdala respond differently to rewarding and aversive stimuli lukasz bijoch 1 justyna winiewska radek lapkiewicz2 and anna beroun 1 1 pawel szczypkowski 2 monika pawlowska2 3 karolina hajdukiewicz1 the author s 2026 the ability to differentiate between rewarding and aversive stimuli is crucial for survival yet the underlying neural mechanisms allowing animals to make such a distinction remain elusive here using in vivo two photon calcium imaging we uncovered how the activity of dopamine sensitive neurons in the medial nucleus of the central amygdala cem is associated wi",
   "translational psychiatry article article in press sodium butyrate rescues long term neurodevelopmental deficits following perinatal methadone exposure isobel a r williams josie van dorst sarah jane leigh sarah j baracz b l d uthpala pushpakumara abigail marcus delyse mccaffrey adam k walker chee y ooi meredith c ward ju lee oei kelly j clemens received 8 march 2026 revised 3 august 2026 accepted 1 september 2026 the author s 2026 abstract background prenatal opioid exposure poe induces long term neurodevelopmental behavioral and cognitive deficits for which no targeted treatments are available the mechanisms underlying poe deficits are poorly understood but have been linked to a range of cen",
   "1234567890 article https doi org 10 1038 s41467 021 22138 8 open wireless battery free fully implantable multimodal recording and neuromodulation tools for songbirds jokubas ausra 1 stephanie j munger2 amirhossein azami1 alex burton1 roberto peralta 3 julie e miller 2 4 philipp gutruf 1 5 wireless battery free and fully implantable tools for the interrogation of the central and peripheral nervous system have quantitatively expanded the capabilities to study mechanistic and circuit level behavior in freely moving rodents the light weight and small footprint of such devices enables full subdermal implantation that results in the capability to perform studies with minimal impact on subject beha",
   "article https doi org 10 1038 s41467 022 35353 8 a signal like role for floral humidity in a nocturnal pollination system 1234567890 1234567890 received 17 april 2022 accepted 29 november 2022 check for updates ajinkya dahake 1 piyush jain2 caleb c vogt 1 william kandalaft 1 abraham d stroock3 robert a raguso1 previous studies have considered floral humidity to be an inadvertent consequence of nectar evaporation which could be exploited as a cue by nectarseeking pollinators by contrast our interdisciplinary study of a nightblooming flower datura wrightii and its hawkmoth pollinator manduca sexta reveals that floral relative humidity acts as a mutually beneficial signal in this system the dis",
@@ -688,216 +695,216 @@
  "examples": {
   "behaviours_automated": {
    "Locomotion / distance travelled": [
-    140,
+    36,
     175,
-    6,
-    81
+    79,
+    30
    ],
    "Zone / ROI occupancy": [
     30,
-    64,
-    79,
+    138,
+    11,
     1
    ],
    "Grooming": [
     0,
     73,
-    70,
-    95
+    89,
+    10
    ],
    "Rearing": [
+    95,
+    42,
     40,
-    18,
-    76,
-    0
+    18
    ],
    "Social interaction / approach": [
-    165,
+    55,
     125,
-    154,
-    86
+    117,
+    43
    ],
    "Anogenital / body sniffing": [
-    56,
+    95,
+    166,
     132,
-    154,
-    70
+    20
    ],
    "Attack / fighting / biting": [
-    151,
-    153,
-    152,
-    107
+    99,
+    130,
+    114,
+    101
    ],
    "Avoidance / escape / flight": [
-    29,
-    53,
-    107,
-    30
+    55,
+    31,
+    111,
+    0
    ],
    "Freezing": [
-    29,
-    131,
-    13,
-    8
-   ],
-   "Defensive posture / risk assessment": [
-    60,
-    30,
-    97,
-    168
-   ],
-   "Operant / self-administration": [
-    97,
-    102,
-    154,
-    58
+    37,
+    16,
+    52,
+    28
    ],
    "Feeding / licking / drinking": [
-    102,
-    31,
-    58,
-    135
+    106,
+    33,
+    141,
+    61
+   ],
+   "Operant / self-administration": [
+    101,
+    15,
+    161,
+    61
+   ],
+   "Defensive posture / risk assessment": [
+    20,
+    61,
+    115,
+    175
    ],
    "Mating / mounting": [
-    107,
-    18,
-    27,
-    153
+    55,
+    29,
+    77,
+    0
    ],
    "Climbing / jumping": [
-    82,
-    123,
     0,
-    4
-   ],
-   "Pup retrieval / maternal care": [
-    102,
-    156,
-    39,
-    107
-   ],
-   "Digging / burrowing": [
-    58,
-    155,
-    0,
-    73
+    99,
+    4,
+    128
    ],
    "Object exploration / novel object": [
     2,
-    9,
-    63,
-    64
+    68,
+    132,
+    67
+   ],
+   "Pup retrieval / maternal care": [
+    162,
+    123,
+    170,
+    106
+   ],
+   "Digging / burrowing": [
+    18,
+    89,
+    61,
+    0
+   ],
+   "Head-twitch response": [
+    84,
+    69,
+    170,
+    85
    ],
    "Immobility / motionless": [
     79,
-    107,
-    35,
-    175
+    83,
+    37,
+    51
    ],
    "Tail rattling / dominance display": [
-    53,
     0,
     111,
-    18
+    90,
+    115
    ],
    "Following / chasing / pursuit": [
+    20,
     111,
-    107,
-    91,
-    53
+    95,
+    49
    ],
    "Stereotypy (circling / pacing / Straub tail)": [
-    47,
+    90,
+    21,
     82,
-    86,
-    95
-   ],
-   "Head-twitch response": [
-    129,
-    163,
-    66,
-    80
+    86
    ],
    "Darting": [
-    39,
-    168,
-    30,
-    103
-   ],
-   "Swimming / rheotaxis / hovering": [
-    79,
-    170,
-    89,
+    32,
+    107,
+    175,
     41
    ],
-   "Maze arm entries / spatial task": [
-    73,
-    102,
-    2,
-    53
+   "Swimming / rheotaxis / hovering": [
+    93,
+    177,
+    83,
+    43
    ],
    "Gait / balance beam": [
-    49,
-    99,
-    63,
-    157
+    164,
+    103,
+    56,
+    66
+   ],
+   "Maze arm entries / spatial task": [
+    106,
+    55,
+    76,
+    2
    ],
    "Foraging / food handling": [
     1,
-    139,
-    79
+    145,
+    83
    ],
    "Cleaning interaction / jolts (fish)": [
-    139,
-    48
+    145,
+    50
    ],
    "Wheel running": [
     6
    ],
    "Hind-limb clasping": [
-    63
+    66
    ],
    "Whisking / head scanning": [
-    102
+    106
    ]
   },
   "behaviors": {
    "Social interaction": [
+    145,
     34,
     117,
-    88,
-    127
+    88
    ],
    "Aggression / attack": [
     162,
     71,
-    151,
+    40,
     102
    ],
    "Locomotion / open field": [
+    123,
     116,
-    166,
-    157,
-    138
+    9,
+    166
    ],
    "Feeding / consumption": [
-    20,
-    93,
-    73,
-    159
+    159,
+    115,
+    97,
+    158
+   ],
+   "Avoidance": [
+    75,
+    80,
+    7,
+    20
    ],
    "Grooming": [
     0,
-    175,
+    151,
     5,
-    66
-   ],
-   "Avoidance": [
-    155,
-    7,
-    12,
-    20
+    59
    ],
    "Rearing": [
     6,
@@ -906,666 +913,678 @@
     134
    ],
    "Gait / balance": [
-    173,
-    142,
-    71,
-    137
+    180,
+    62,
+    165,
+    74
    ],
    "Sniffing": [
-    167,
-    62,
-    133,
-    50
+    34,
+    30,
+    161,
+    65
    ],
    "Freezing": [
-    135,
-    61,
-    29,
-    71
+    71,
+    51,
+    37,
+    167
    ],
    "Pup retrieval / maternal": [
-    62,
+    105,
+    106,
     121,
-    133,
     65
    ],
    "Immobility (FST/TST)": [
-    114,
-    133,
-    71,
-    153
+    64,
+    74,
+    76,
+    138
    ],
    "Mating / sexual": [
-    50,
-    112,
-    77,
-    12
+    115,
+    160,
+    124,
+    24
    ],
    "Head-twitch (HTR)": [
-    46,
-    80,
-    149,
-    39
+    171,
+    85,
+    135,
+    48
    ]
   },
   "regions": {
    "Prefrontal cortex": [
+    153,
+    39,
     26,
-    127,
-    175,
-    23
+    32
+   ],
+   "Hippocampus": [
+    117,
+    112,
+    169,
+    21
    ],
    "Amygdala": [
     42,
-    150,
-    118,
-    98
-   ],
-   "Hippocampus": [
-    22,
-    105,
-    63,
-    159
+    158,
+    80,
+    150
    ],
    "Hypothalamus": [
-    156,
+    59,
+    89,
     143,
-    135,
-    85
+    88
    ],
    "Striatum": [
-    142,
     26,
-    94,
+    105,
+    79,
     160
    ],
    "Nucleus accumbens": [
+    176,
     6,
     52,
-    68,
-    115
+    72
    ],
    "VTA": [
+    86,
+    102,
     98,
-    94,
-    29,
-    20
+    29
    ],
    "Thalamus": [
-    19,
-    10,
-    102,
-    74
+    44,
+    40,
+    121,
+    53
    ],
    "BNST": [
-    114,
-    137,
-    111,
-    116
-   ],
-   "Cerebellum": [
-    125,
-    42,
-    39,
-    68
-   ],
-   "Periaqueductal gray": [
-    37,
     116,
-    151,
+    131,
+    174,
     98
    ],
+   "Cerebellum": [
+    93,
+    79,
+    66,
+    39
+   ],
    "Cingulate cortex": [
-    84,
-    67,
-    109,
-    57
+    132,
+    101,
+    94,
+    40
    ],
    "Insula": [
-    12,
-    58,
-    159,
-    126
+    101,
+    40,
+    179,
+    119
+   ],
+   "Periaqueductal gray": [
+    63,
+    116,
+    158,
+    72
    ],
    "Habenula": [
-    75,
-    104,
-    37,
+    61,
+    71,
+    72,
     59
    ]
   },
   "methods": {
    "DeepLabCut": [
     26,
+    148,
     147,
-    156,
     77
    ],
    "Electrophysiology": [
-    172,
+    66,
     94,
-    144,
-    13
+    131,
+    155
    ],
    "Optogenetics": [
-    16,
+    179,
     150,
-    113,
-    52
+    79,
+    120
    ],
    "Viral tracing (AAV)": [
     27,
-    25,
-    6,
-    29
+    149,
+    137,
+    63
    ],
    "Transcriptomics": [
-    38,
-    32,
-    41,
-    118
+    182,
+    174,
+    43,
+    68
    ],
    "EthoVision": [
-    27,
-    9,
-    107,
-    101
-   ],
-   "SLEAP": [
-    131,
-    18,
-    28,
-    137
+    182,
+    15,
+    16,
+    89
    ],
    "Fiber photometry": [
-    11,
-    131,
-    147,
-    15
+    24,
+    61,
+    67,
+    131
    ],
-   "BORIS annotation": [
-    154,
-    117,
-    118,
-    42
+   "SLEAP": [
+    143,
+    137,
+    178,
+    49
    ],
    "c-Fos mapping": [
-    98,
-    68,
-    150,
-    56
+    160,
+    25,
+    157,
+    102
+   ],
+   "BORIS annotation": [
+    89,
+    118,
+    143,
+    44
    ],
    "Immunohistochemistry": [
-    77,
-    166,
-    144,
-    170
+    158,
+    56,
+    154,
+    11
    ],
    "Chemogenetics (DREADD)": [
-    97,
-    52,
-    26,
-    150
+    150,
+    182,
+    61,
+    161
    ],
    "Calcium imaging": [
-    24,
     26,
-    27,
-    71
+    59,
+    57,
+    33
    ],
    "AnyMaze": [
+    68,
     10,
-    9,
-    15,
-    37
+    143,
+    11
    ],
    "Ultrasonic vocalisation": [
-    110,
-    22,
-    40,
-    114
+    38,
+    24,
+    114,
+    9
    ],
    "B-SOiD": [
-    11,
-    124,
-    138,
-    123
+    181,
+    129,
+    55,
+    73
    ],
    "Keypoint-MoSeq": [
-    53,
-    84,
-    33,
-    60
+    35,
+    55,
+    60,
+    76
    ],
    "SHAP explainability": [
-    128,
+    162,
     6,
-    134,
-    111
+    116,
+    140
    ],
    "EEG / LFP recording": [
+    39,
     2,
-    76,
-    143,
-    4
+    94,
+    70
    ],
    "Microdialysis": [
-    169,
+    84,
     80,
-    144,
-    121
+    131,
+    127
    ],
    "qPCR": [
-    22,
-    171,
-    126,
-    110
-   ],
-   "A-SOiD": [
-    73,
-    112,
-    134,
-    152
+    68,
+    138,
+    92,
+    131
    ],
    "VAME": [
-    101,
-    11,
-    112,
-    78
+    12,
+    56,
+    77,
+    116
    ],
-   "Western blot": [
-    7,
-    2,
-    115,
+   "A-SOiD": [
+    110,
+    73,
+    116,
     55
    ],
    "UMAP / t-SNE": [
-    106,
     159,
-    73,
-    75
+    9,
+    110,
+    166
+   ],
+   "Western blot": [
+    94,
+    7,
+    2,
+    114
    ],
    "TopScan / CleverSys": [
-    101,
+    105,
     134,
-    128,
-    40
+    42,
+    140
    ],
    "Telemetry": [
-    121,
-    122,
-    40,
-    120
+    127,
+    126,
+    42,
+    125
    ],
    "XGBoost": [
-    73,
-    125,
-    50
+    76,
+    130,
+    52
    ],
    "Lightning Pose": [
-    74,
-    171
+    178,
+    78
    ],
    "DANNCE": [
-    111,
-    112
+    116,
+    115
    ],
    "ezTrack": [
-    155
+    162
    ]
   },
   "diseases": {
    "Addiction / substance use": [
+    117,
     85,
-    77,
-    123,
-    105
+    59,
+    77
    ],
    "Anxiety": [
     6,
     0,
-    159,
-    75
+    14,
+    151
    ],
    "Stress / depression": [
     131,
-    155,
-    83,
-    53
+    56,
+    27,
+    38
    ],
    "Pain / analgesia": [
-    113,
+    118,
     60,
-    115,
-    168
+    80,
+    115
    ],
    "Psychedelics": [
-    37,
-    46,
+    170,
+    85,
     88,
-    22
+    75
    ],
    "Autism (ASD)": [
-    155,
-    17,
-    55,
-    64
+    136,
+    124,
+    131,
+    67
    ],
    "Schizophrenia": [
+    112,
     108,
-    164,
-    109,
-    44
+    180,
+    69
    ],
    "Ageing": [
     169,
-    162,
-    170,
-    2
+    94,
+    161,
+    15
    ],
    "Fear conditioning": [
-    109,
-    161,
-    55,
-    36
-   ],
-   "Sleep / circadian": [
-    82,
-    12,
-    38,
-    126
+    150,
+    113,
+    168,
+    140
    ],
    "Epilepsy / seizure": [
-    10,
-    70,
-    63,
-    91
+    149,
+    11,
+    58,
+    73
    ],
-   "Social defeat": [
-    61,
-    144,
-    25,
-    23
+   "Parkinson's": [
+    79,
+    67,
+    9,
+    164
+   ],
+   "Sleep / circadian": [
+    133,
+    30,
+    12,
+    125
    ],
    "Early-life stress": [
     0,
-    156,
-    166,
-    103
+    88,
+    182,
+    104
    ],
-   "Parkinson's": [
+   "Social defeat": [
+    25,
     63,
-    29,
-    12,
-    75
-   ],
-   "Alzheimer's / dementia": [
-    154,
-    2,
-    14,
-    108
+    143,
+    150
    ],
    "Obesity / diet": [
-    97,
-    144,
-    32,
-    72
+    69,
+    101,
+    150,
+    160
    ],
    "PTSD": [
-    102,
-    144,
-    18,
-    26
+    28,
+    60,
+    64,
+    38
+   ],
+   "Alzheimer's / dementia": [
+    2,
+    14,
+    52,
+    16
    ],
    "Neuroinflammation": [
     2,
-    167,
-    7,
-    45
+    164,
+    69,
+    175
    ],
    "Stroke / ischemia": [
-    45,
-    79,
-    2,
-    6
+    67,
+    95,
+    103,
+    144
    ],
    "Prenatal exposure": [
-    118,
-    155,
-    99,
-    100
+    123,
+    153,
+    10,
+    47
    ],
    "Neuropathic pain": [
-    115,
-    149,
-    168,
-    57
+    120,
+    39,
+    72,
+    60
    ],
    "Huntington's": [
-    64,
-    63,
-    101,
-    109
+    67,
+    113,
+    66,
+    51
    ],
    "ADHD": [
-    76,
-    32,
-    91,
-    63
+    19,
+    95,
+    34,
+    80
    ],
    "Rett syndrome": [
-    32,
-    155,
-    99,
-    63
+    162,
+    34,
+    103,
+    66
    ],
    "Traumatic brain injury": [
-    99,
-    45,
-    125,
-    42
+    44,
+    130,
+    47,
+    103
    ],
    "Fragile X": [
-    51,
-    32
+    53,
+    34
    ]
   }
  },
  "wordcloud": [
   [
    "DeepLabCut",
-   158
+   165
   ],
   [
    "Pose estimation",
-   158
+   165
   ],
   [
    "Machine learning",
-   139
+   145
   ],
   [
    "Locomotion",
-   103
+   109
   ],
   [
    "C57BL/6",
-   101
+   107
   ],
   [
    "Ethanol / alcohol",
-   98
+   104
   ],
   [
    "Anxiety",
-   96
+   101
   ],
   [
    "Dopamine",
-   91
-  ],
-  [
-   "Prefrontal cortex",
-   87
+   96
   ],
   [
    "Hippocampus",
-   86
+   90
+  ],
+  [
+   "Prefrontal cortex",
+   89
   ],
   [
    "Amygdala",
-   85
+   88
   ],
   [
    "Aggression",
-   80
+   83
   ],
   [
    "Social interaction",
-   78
+   81
   ],
   [
    "Depression",
-   78
-  ],
-  [
-   "Grooming",
-   74
+   81
   ],
   [
    "Avoidance",
-   74
+   77
+  ],
+  [
+   "Grooming",
+   76
   ],
   [
    "Rearing",
-   72
+   75
   ],
   [
    "Random forest",
-   69
-  ],
-  [
-   "Glutamate",
-   68
+   73
   ],
   [
    "Open field",
-   67
+   71
+  ],
+  [
+   "Glutamate",
+   70
   ],
   [
    "Hypothalamus",
-   64
+   67
   ],
   [
    "CNN / ResNet",
-   64
+   66
   ],
   [
    "Striatum",
-   62
+   66
   ],
   [
    "Feeding",
-   60
+   62
   ],
   [
    "Electrophysiology",
-   58
+   60
   ],
   [
    "Serotonin",
-   57
+   59
   ],
   [
    "Sniffing",
-   56
+   57
   ],
   [
    "Freezing",
    54
   ],
   [
-   "Sleep / circadian",
-   52
+   "Aging",
+   54
+  ],
+  [
+   "Optogenetics",
+   53
   ],
   [
    "Nucleus accumbens",
-   51
-  ],
-  [
-   "Aging",
-   50
+   53
   ],
   [
    "Keypoint tracking",
-   50
+   53
+  ],
+  [
+   "Sleep / circadian",
+   52
   ],
   [
    "Immobility",
    49
   ],
   [
-   "Optogenetics",
+   "Transgenic",
    49
   ],
   [
-   "Transgenic",
-   46
-  ],
-  [
    "Operant task",
-   45
+   47
   ],
   [
    "Autism",
-   43
+   45
   ],
   [
    "Mating",
-   41
+   44
   ],
   [
    "Addiction",
-   41
+   42
   ],
   [
    "Stereotypy",
-   40
+   42
   ],
   [
    "VTA",
-   39
+   41
   ],
   [
    "RNA-seq",
-   38
+   41
   ],
   [
    "EthoVision",
-   37
-  ],
-  [
-   "Schizophrenia",
-   36
-  ],
-  [
-   "Opioid",
-   36
+   39
   ],
   [
    "SLEAP",
+   38
+  ],
+  [
+   "Schizophrenia",
+   37
+  ],
+  [
+   "Opioid",
+   37
+  ],
+  [
+   "Self-administration",
+   37
+  ],
+  [
+   "Oxytocin",
    36
   ],
   [
    "GABA",
-   35
+   36
   ],
   [
    "Sprague-Dawley",
-   35
+   36
   ],
   [
    "Primate",
+   36
+  ],
+  [
+   "c-Fos",
    35
   ],
   [
@@ -1573,76 +1592,80 @@
    35
   ],
   [
-   "Oxytocin",
-   34
+   "Unsupervised",
+   35
+  ],
+  [
+   "Thalamus",
+   35
   ],
   [
    "Jumping / escape",
    34
   ],
   [
-   "c-Fos",
-   34
-  ],
-  [
-   "Self-administration",
+   "Licking",
    34
   ],
   [
    "Immunohistochemistry",
-   33
+   34
   ],
   [
    "Fear conditioning",
-   33
-  ],
-  [
-   "Thalamus",
-   33
+   34
   ],
   [
    "Resident-intruder",
-   32
+   33
   ],
   [
    "Novel object",
-   32
+   33
+  ],
+  [
+   "Cocaine",
+   33
   ],
   [
    "Knockout",
-   32
+   33
+  ],
+  [
+   "Ketamine",
+   33
+  ],
+  [
+   "Basolateral amygdala",
+   33
   ],
   [
    "Spatial memory",
    32
   ],
   [
-   "Licking",
+   "Place preference",
    31
-  ],
-  [
-   "Ketamine",
-   31
-  ],
-  [
-   "Basolateral amygdala",
-   31
-  ],
-  [
-   "Unsupervised",
-   31
-  ],
-  [
-   "Cocaine",
-   30
   ],
   [
    "Extinction",
-   30
+   31
+  ],
+  [
+   "Amphetamine",
+   31
   ],
   [
    "BNST",
-   29
+   30
+  ],
+  [
+   "Fiber photometry",
+   30
+  ],
+  [
+   "Cerebellum",
+   30
   ],
   [
    "DREADD",
@@ -1653,39 +1676,31 @@
    29
   ],
   [
-   "Place preference",
-   29
-  ],
-  [
    "Elevated plus maze",
    29
   ],
   [
-   "Amphetamine",
-   29
-  ],
-  [
-   "Cerebellum",
-   29
-  ],
-  [
-   "Fiber photometry",
+   "Epilepsy",
    28
   ],
   [
-   "Epilepsy",
-   27
+   "Estrogen",
+   28
   ],
   [
-   "Estrogen",
-   27
+   "Methamphetamine",
+   26
   ],
   [
    "Nesting",
    26
   ],
   [
-   "Methamphetamine",
+   "Norepinephrine",
+   25
+  ],
+  [
+   "Paraventricular nucleus",
    25
   ],
   [
@@ -1693,11 +1708,43 @@
    25
   ],
   [
-   "Norepinephrine",
+   "Three-chamber",
    24
   ],
   [
    "CRF",
+   24
+  ],
+  [
+   "Cannabinoid",
+   24
+  ],
+  [
+   "Morphine",
+   24
+  ],
+  [
+   "Cingulate",
+   24
+  ],
+  [
+   "Calcium imaging",
+   24
+  ],
+  [
+   "PTSD",
+   24
+  ],
+  [
+   "Zebrafish",
+   24
+  ],
+  [
+   "Parkinson's",
+   23
+  ],
+  [
+   "Insula",
    23
   ],
   [
@@ -1705,7 +1752,11 @@
    23
   ],
   [
-   "Cannabinoid",
+   "Periaqueductal gray",
+   23
+  ],
+  [
+   "Obesity / diet",
    23
   ],
   [
@@ -1713,31 +1764,19 @@
    23
   ],
   [
-   "PTSD",
-   23
-  ],
-  [
-   "Zebrafish",
-   23
-  ],
-  [
-   "Three-chamber",
+   "Object recognition",
    22
   ],
   [
-   "Periaqueductal gray",
+   "Dorsal raphe",
    22
   ],
   [
-   "Morphine",
+   "Prelimbic / infralimbic",
    22
   ],
   [
-   "Obesity / diet",
-   22
-  ],
-  [
-   "Cingulate",
+   "Substantia nigra",
    22
   ],
   [
@@ -1745,32 +1784,16 @@
    22
   ],
   [
-   "Paraventricular nucleus",
-   22
-  ],
-  [
-   "Parkinson's",
-   21
-  ],
-  [
-   "Object recognition",
-   21
-  ],
-  [
-   "Insula",
-   21
-  ],
-  [
-   "Calcium imaging",
-   21
-  ],
-  [
    "Habenula",
    21
   ],
   [
-   "Prelimbic / infralimbic",
+   "Wistar rat",
    21
+  ],
+  [
+   "AnyMaze",
+   20
   ],
   [
    "Alzheimer's",
@@ -1781,32 +1804,24 @@
    20
   ],
   [
-   "Dorsal raphe",
+   "Ultrasonic vocalisation",
    20
-  ],
-  [
-   "Wistar rat",
-   20
-  ],
-  [
-   "AnyMaze",
-   19
   ],
   [
    "Maternal separation",
-   19
+   20
   ],
   [
    "Preoptic area",
-   18
+   19
   ],
   [
    "Corticosterone",
-   18
+   19
   ],
   [
    "Climbing",
-   18
+   19
   ],
   [
    "Startle",
@@ -1817,7 +1832,11 @@
    17
   ],
   [
-   "Ultrasonic vocalisation",
+   "Stroke / ischemia",
+   17
+  ],
+  [
+   "Long-Evans",
    17
   ],
   [
@@ -1825,7 +1844,19 @@
    17
   ],
   [
-   "Substantia nigra",
+   "Orexin",
+   17
+  ],
+  [
+   "Psilocybin",
+   17
+  ],
+  [
+   "B-SOiD",
+   17
+  ],
+  [
+   "MoSeq",
    17
   ],
   [
@@ -1833,11 +1864,7 @@
    17
   ],
   [
-   "Stroke / ischemia",
-   16
-  ],
-  [
-   "Long-Evans",
+   "Lateral septum",
    16
   ],
   [
@@ -1845,15 +1872,7 @@
    16
   ],
   [
-   "Orexin",
-   16
-  ],
-  [
-   "B-SOiD",
-   16
-  ],
-  [
-   "MoSeq",
+   "BALB/c",
    16
   ],
   [
@@ -1861,11 +1880,11 @@
    16
   ],
   [
-   "Psilocybin",
-   16
+   "BDNF",
+   15
   ],
   [
-   "Lateral septum",
+   "Buprenorphine",
    15
   ],
   [
@@ -1877,19 +1896,15 @@
    15
   ],
   [
-   "BALB/c",
-   15
-  ],
-  [
    "Digging",
    14
   ],
   [
-   "BDNF",
+   "Social novelty",
    14
   ],
   [
-   "Buprenorphine",
+   "Somatostatin",
    14
   ],
   [
@@ -1905,6 +1920,14 @@
    14
   ],
   [
+   "Vasopressin",
+   13
+  ],
+  [
+   "LSD",
+   13
+  ],
+  [
    "Fluoxetine / SSRI",
    13
   ],
@@ -1913,15 +1936,11 @@
    13
   ],
   [
-   "Social novelty",
+   "Head-twitch",
    12
   ],
   [
-   "Somatostatin",
-   12
-  ],
-  [
-   "Vasopressin",
+   "Locus coeruleus",
    12
   ],
   [
@@ -1929,7 +1948,11 @@
    12
   ],
   [
-   "LSD",
+   "Reinstatement",
+   12
+  ],
+  [
+   "Social memory",
    12
   ],
   [
@@ -1937,15 +1960,7 @@
    11
   ],
   [
-   "Locus coeruleus",
-   11
-  ],
-  [
-   "Reinstatement",
-   11
-  ],
-  [
-   "Social memory",
+   "Parvalbumin",
    11
   ],
   [
@@ -1953,7 +1968,7 @@
    11
   ],
   [
-   "Head-twitch",
+   "Neuropathic pain",
    11
   ],
   [
@@ -1961,11 +1976,7 @@
    10
   ],
   [
-   "Parvalbumin",
-   10
-  ],
-  [
-   "Neuropathic pain",
+   "VAME",
    10
   ],
   [
@@ -1985,6 +1996,10 @@
    9
   ],
   [
+   "Testosterone",
+   9
+  ],
+  [
    "Fentanyl",
    9
   ],
@@ -1993,7 +2008,15 @@
    9
   ],
   [
-   "VAME",
+   "Two-photon",
+   9
+  ],
+  [
+   "Gait",
+   9
+  ],
+  [
+   "UMAP",
    8
   ],
   [
@@ -2009,11 +2032,15 @@
    8
   ],
   [
+   "Huntington's",
+   8
+  ],
+  [
    "Songbird",
    7
   ],
   [
-   "Testosterone",
+   "Naloxone / naltrexone",
    7
   ],
   [
@@ -2025,23 +2052,7 @@
    7
   ],
   [
-   "Gait",
-   7
-  ],
-  [
-   "Huntington's",
-   7
-  ],
-  [
    "Y-maze",
-   6
-  ],
-  [
-   "Naloxone / naltrexone",
-   6
-  ],
-  [
-   "Two-photon",
    6
   ],
   [
@@ -2050,10 +2061,6 @@
   ],
   [
    "ADHD",
-   6
-  ],
-  [
-   "UMAP",
    6
   ],
   [
