@@ -34,13 +34,15 @@ See **[Scenario 1](docs/Scenario1.md)** for a worked example that takes raw trac
 
 ## Installation ⚙️
 
+- [Installation guide on Read the Docs](https://simba-uw-tf-dev.readthedocs.io/en/latest/installation.html) 📘
+
 - [Install SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md)
 
 - [Install SimBA using Anaconda](https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_2025.md)
 
 ## Scope & inputs
 
-- **Input:** pose-estimation from [DeepLabCut](https://github.com/DeepLabCut/DeepLabCut) (incl. [multi-animal](docs/Multi_animal_pose.md)), [SLEAP](https://sleap.ai), [DeepPoseKit](https://github.com/jgraving/DeepPoseKit), [DANNCE](https://github.com/spoonsso/dannce) (3D), [MARS](https://github.com/neuroethology/MARS), [FaceMap](https://github.com/MouseLand/facemap), [APT](https://github.com/kristinbranson/APT), [SuperAnimal-TopView](docs/superanimal_topview_project.md), [YOLO](https://github.com/ultralytics/ultralytics), or [blob tracking](docs/blob_track.md); user-defined pose schemes supported.
+- **Input:** pose-estimation from [DeepLabCut](https://github.com/DeepLabCut/DeepLabCut) (incl. [multi-animal](docs/Multi_animal_pose.md)), [SLEAP](https://sleap.ai), [DeepPoseKit](https://github.com/jgraving/DeepPoseKit), [DANNCE](https://github.com/spoonsso/dannce) (3D), [MARS](https://github.com/neuroethology/MARS), [FaceMap](https://github.com/MouseLand/facemap), [APT](https://github.com/kristinbranson/APT), [SuperAnimal-TopView](docs/superanimal_topview_project.md), [YOLO](https://github.com/ultralytics/ultralytics), or [blob tracking](docs/blob_track.md); user-defined pose schemes supported. See [related software](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.related_software.html) for the full list.
 - **Output:** per-frame behavior classifiers with standard evaluation (precision/recall, learning curves, permutation importance) and [SHAP-based explainability](docs/SHAP.md).
 - **Validation:** classifier libraries validated in mice and rats; all data, models, and annotations available on [OSF](https://osf.io/tmu6y/).
 - **Analyses** — all produce descriptive statistics, export to CSV, and can be split into time-bins:
@@ -61,7 +63,7 @@ See **[Scenario 1](docs/Scenario1.md)** for a worked example that takes raw trac
 <p align="center">
 <a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html"><img src="images/simba_splash.webp" width="900" alt="SimBA capabilities: 85 methods" /></a>
 <br>
-<a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html"><img src="https://img.shields.io/badge/MORE_INFORMATION_AT-readthedocs-21567a?style=for-the-badge&logo=readthedocs&logoColor=white" alt="More information at Read the Docs" /></a>
+<a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html"><img src="https://img.shields.io/badge/MORE_INFORMATION_AT-readthedocs-21567a?style=for-the-badge&logo=readthedocs&logoColor=white" height="48" alt="More information at Read the Docs" /></a>
 </p>
 
 ##  Documentation: Scenario tutorials
@@ -77,8 +79,12 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 ### Scenario 4: [Analyzing and adding new Experimental data to a previously started project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4_new.md)
 
 ## Tutorial 📚
+- **[Browse all tutorials](https://simba-uw-tf-dev.readthedocs.io/en/latest/tutorials.html)** 📚
+- **[Step-by-step walkthroughs](https://simba-uw-tf-dev.readthedocs.io/en/latest/walkthroughs.html)** 🚶
+- **[Labelling tutorials](https://simba-uw-tf-dev.readthedocs.io/en/latest/labelling.html)** 🏷️
+
 - [Analysing animal directions in SimBA](docs/directionality_between_animals.md) 🧭
-- [API](https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html) 📘
+- [API](https://simba-uw-tf-dev.readthedocs.io/en/latest/api.html) 📘
 - [Batch pre-process video using SimBA](docs/tutorial_process_videos.md) 🏭
 - [Blob (contour) tracking in SimBA](docs/blob_track.md) 🟣
 - [Bounding boxes in SimBA](docs/anchored_rois.md)📦
@@ -93,7 +99,7 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [Reversing the directionality of classifiers in SimBA](docs/reverse_annotations.md) ⏪
 - [SimBA Advanced behavioral annotation interface](docs/advanced_labelling.md) 🏷️
 - [SimBA behavioral annotation interface](docs/label_behavior.md) 🏷️
-- [SimBA friendly asked questions (FAQ)](docs/FAQ.md) 📕
+- [SimBA friendly asked questions (FAQ)](https://simba-uw-tf-dev.readthedocs.io/en/latest/FAQ.html) 📕
 - [SimBA generic tutorial](docs/tutorial.md) 📘
 - [Spike-time correlation coefficients in SimBA](docs/FSTTC.md) 📔
 - [Spontaneous alternation in SimBA](/docs/spontaneous_alternation.md)🌽
@@ -159,6 +165,7 @@ SimBA does not require computer science and programing experience, and SimBA is 
 - Specialized commercial or custom-made equipment is not required
 - Extensive annotations are not required
 - The pipeline is flexible and can be used to create and validate classifiers for different behaviors and environments
+- SimBA is used in a growing list of [published studies](https://simba-uw-tf-dev.readthedocs.io/en/latest/published_studies.html)
 - Currently included behavioral classifiers have been validated in mice and rats
 - SimBA is written on Windows/MacOS and compatible with Linux
 
@@ -181,12 +188,15 @@ SimBA does not require computer science and programing experience, and SimBA is 
 ## Resources 💾
 
 - **Data, pose models & classifiers** — [OSF repository](https://osf.io/tmu6y/) 💾
+- **Example datasets** — [Ready-to-use datasets](https://simba-uw-tf-dev.readthedocs.io/en/latest/example_datasets.html) 🗂️
 - **Trained classifiers** — [Random forest models](https://osf.io/kwge8/) 🌲
 - **Install / package** — [PyPI](https://pypi.org/project/Simba-UW-tf-dev/) 📦
-- **API reference** — [SimBA on ReadTheDocs](https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html) 📘
+- **API reference** — [SimBA on ReadTheDocs](https://simba-uw-tf-dev.readthedocs.io/en/latest/api.html) 📘
+- **Glossary** — [SimBA terms explained](https://simba-uw-tf-dev.readthedocs.io/en/latest/glossary.html) 📖
 - **Example notebooks** — [Run SimBA from code](https://simba-uw-tf-dev.readthedocs.io/en/latest/notebooks.html) 📓
 - **Docker images** — [Docker Hub](https://hub.docker.com/repositories/goldenlab) 🐳
 - **Visualization examples** — [YouTube playlist](https://www.youtube.com/playlist?list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl) 📺
+- **Visualization gallery** — [All SimBA plot and video types](https://simba-uw-tf-dev.readthedocs.io/en/latest/visualization_gallery.html) 🖼️
 - **Labelled images & tracking weights** — [DeepLabCut annotations/weights (OSF)](https://osf.io/sr3ck/) 📷
 - **Community & support** — [Gitter chat](https://gitter.im/SimBA-Resource/community) 💬
 - **Bug reports & feature requests** — [GitHub Issues](https://github.com/sgoldenlab/simba/issues) 🐛
@@ -195,10 +205,10 @@ SimBA does not require computer science and programing experience, and SimBA is 
 
 ## Developer & contact 👨‍💻
 
-SimBA is developed and maintained by **[Simon Nilsson](https://github.com/sronilsson)** ([homepage](https://sronilsson.netlify.app/)). For questions, bug reports, or feature requests, reach out via [GitHub](https://github.com/sronilsson) or [open an issue](https://github.com/sgoldenlab/simba/issues).
+SimBA is developed and maintained by **[Simon Nilsson](https://github.com/sronilsson)** ([homepage](https://sronilsson.netlify.app/)). For questions, bug reports, or feature requests, reach out via [GitHub](https://github.com/sronilsson) or [open an issue](https://github.com/sgoldenlab/simba/issues). See also [getting help](https://simba-uw-tf-dev.readthedocs.io/en/latest/getting_help.html).
 
 ## License 📃
-This project is licensed under the BSD 3-Clause License, modified for academic and research use only (see [LICENSE](LICENSE)). Note that the software is provided 'as is', without warranty of any kind, express or implied. 
+This project is licensed under the BSD 3-Clause License, modified for academic and research use only (see [LICENSE](LICENSE)). Note that the software is provided 'as is', without warranty of any kind, express or implied. See also the [license](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.license.html) and [third-party notices](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.notice.html) pages.
 
 If you find **any** part of the code or data useful for your own work, please cite us. Thank you 🙏!
 
@@ -226,8 +236,4 @@ You can also use the <kbd>Cite this repository</kbd> button at the top right of 
 [![Foo](https://github.com/sgoldenlab/simba/blob/master/images/cos_center_logo_small.original.png)](https://osf.io/d69jt/)
 
 ## Contributors 🤼
-- [Simon Nilsson](https://github.com/sronilsson)
-- [Jia Jie Choong](https://github.com/inoejj)
-- [Sophia Hwang](https://github.com/sophihwang26)
-
-See the [full credits page](https://simba-uw-tf-dev.readthedocs.io/en/latest/credits.html) for everyone who has contributed to SimBA.
+See the [credits page](https://simba-uw-tf-dev.readthedocs.io/en/latest/credits.html) for everyone who has contributed to SimBA.
