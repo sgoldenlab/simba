@@ -20,6 +20,15 @@ SHEET_ID = "169enc3Am2KQKifxj1F9KEKKLbftpMhBlw49zjl-egsY"
 CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=0"
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "docs", "_generated", "usecase_map.html")
 
+# Word-cloud terms to hide: generic ML / plumbing terms -- the cloud is about what SimBA studies, not the algorithms.
+# Shared with misc/brain_cloud_layout.py, which lays out the brain-section cloud.
+CLOUD_EXCLUDE = {"machine learning", "pose estimation", "random forest", "cnn / resnet", "unsupervised",
+                 "svm", "xgboost", "transformer", "umap", "t-sne", "hdbscan", "bounding box", "keypoint tracking"}
+# Brain-section cloud areas: (word color, area fill). Word colors are dark enough to read on the fills.
+BRAIN_AREA_COLORS = {"Cortex": ("#2e7d4f", "#e9f5ee"), "Hippocampus": ("#1f6fb2", "#e6f0fa"),
+                     "Thalamus": ("#c23b55", "#fbe9ed"), "Hypothalamus": ("#c9661a", "#fcefe3"),
+                     "Amygdala": ("#6d45a8", "#f1eaf9")}
+
 # --- country name -> ISO-2 (covers sheet variants + misspellings) ---------
 NAME2ISO = {
     "us": "US", "usa": "US", "united states": "US", "u.s.": "US", "u.s.a.": "US",
@@ -396,14 +405,28 @@ def _build_behaviours(c):
     return panel, script
 
 
+def _brain_cloud_svg(bc, n_pdfs):
+    """Draw the coronal brain-section word cloud laid out by misc/brain_cloud_layout.py (stdlib only)."""
+    layers = [f'<path d="{bc["outline"]}" fill="{BRAIN_AREA_COLORS["Cortex"][1]}" stroke="#c9d3cc" stroke-width="2"/>',
+              '<path d="M500,96L500,190" stroke="#c9d3cc" stroke-width="2"/>']   # longitudinal fissure
+    for name, d in bc["areas"].items():
+        txt, fill = BRAIN_AREA_COLORS[name]
+        layers.append(f'<path d="{d}" fill="{fill}" stroke="{txt}" stroke-opacity=".25" stroke-width="1.5"/>')
+    for word, n, area_idx, size, vertical, ax, ay in bc["words"]:
+        pos = f'transform="translate({ax},{ay}) rotate(-90)"' if vertical else f'x="{ax}" y="{ay}"'
+        layers.append(f'<text {pos} font-size="{size}" fill="{BRAIN_AREA_COLORS[bc["area_names"][area_idx]][0]}">'
+                      f'<title>{esc(word)}: mentioned in {n} of {n_pdfs} papers</title>{esc(word)}</text>')
+    legend = "".join(f'<span><i style="background:{BRAIN_AREA_COLORS[a][0]}"></i>{a}</span>' for a in bc["area_names"])
+    return (f'<svg class="uc-brain" viewBox="{" ".join(map(str, bc["viewbox"]))}" xmlns="http://www.w3.org/2000/svg" role="img" '
+            f'aria-label="Word cloud of concepts in studies using SimBA, shaped like a coronal mouse-brain section">'
+            + "".join(layers) + f'</svg><div class="uc-brain-legend">{legend}</div>')
+
+
 def _build_corpus(c):
     """Corpus panels from corpus_stats.json: brain regions, methods and disease models
     as bar charts, then the concept word cloud as an impressionistic closer.
     Returns (panels_html, script). Empty strings if no corpus data."""
-    # hide generic ML/plumbing terms -- the cloud is about what SimBA studies, not the algorithms
-    EXCLUDE = {"machine learning", "pose estimation", "random forest", "cnn / resnet", "unsupervised",
-               "svm", "xgboost", "transformer", "umap", "t-sne", "hdbscan", "bounding box", "keypoint tracking"}
-    wc = [(w, n) for (w, n) in (c or {}).get("wordcloud", []) if w.lower() not in EXCLUDE]
+    wc = [(w, n) for (w, n) in (c or {}).get("wordcloud", []) if w.lower() not in CLOUD_EXCLUDE]
     if not wc:
         return "", ""
     import hashlib
@@ -450,13 +473,20 @@ def _build_corpus(c):
             cat_html += html
             cat_js += js
 
+    bc = (c or {}).get("brain_cloud")
+    if bc:   # coronal brain-section layout, when the local corpus refresh could compute it
+        cloud_cap = (f'Larger = mentioned in more papers. Brain-region terms sit in their own region; '
+                     f'other colors only show where a word landed. Showing {len(bc["words"])} of {bc["n_words"]} concepts.')
+        cloud_html = f'<div class="uc-cloud">{_brain_cloud_svg(bc, c.get("n_pdfs", "?"))}</div>'
+    else:
+        cloud_cap = 'Larger = mentioned in more papers.'
+        cloud_html = f'<div class="uc-cloud">{spans}</div>'
     panels = (cat_html +
               f'<h3 class="simba-uc-h3">What SimBA has been used for</h3>'
               f'<p class="simba-uc-cap">Concepts appearing across the full text of {c.get("n_pdfs", "?")} '
               f'downloaded studies &mdash; methods, behaviours, brain regions, models and compounds. '
-              f'Larger = mentioned in more papers. Keyword-based overview (indicative, not exhaustive). '
-              f'Updated {c.get("generated", "")}.</p>'
-              f'<div class="uc-cloud">{spans}</div>')
+              f'{cloud_cap} Keyword-based overview (indicative, not exhaustive). '
+              f'Updated {c.get("generated", "")}.</p>' + cloud_html)
     return panels, cat_js
 
 
@@ -521,6 +551,11 @@ def _render(total, n_countries, n_continents, n_species, n_journals, years,
 .simba-uc-foot a{{font-weight:600;}}
 .jvm-tooltip{{background-color:#1f2937 !important;border-radius:9px !important;padding:9px 11px !important;max-width:300px !important;box-shadow:0 8px 24px rgba(15,23,42,.32) !important;}}
 .uc-cloud{{max-width:900px;margin:6px auto 4px;text-align:center;padding:18px 16px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);line-height:1.05;}}
+.uc-brain{{display:block;width:100%;height:auto;}}
+.uc-brain text{{font-family:'Poppins',sans-serif;font-weight:700;dominant-baseline:text-before-edge;}}
+.uc-brain text:hover{{opacity:.55;cursor:default;}}
+.uc-brain-legend{{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;font-size:12.5px;color:#6b7280;margin-top:8px;}}
+.uc-brain-legend i{{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px;}}
 </style>
 <div class="simba-uc">
   <p class="simba-uc-date">Data pulled {pull_date}</p>

@@ -525,6 +525,14 @@ def main():
                      "regions": reg_ex, "methods": met_ex, "diseases": dis_ex},
         "wordcloud": [[term, n] for term, n in cloud.most_common(200) if n >= 5],
     }
+    # Brain-section layout of the word cloud. It needs numpy / scipy / matplotlib / Pillow, unlike the rest of this
+    # script; without them the page falls back to the plain cloud rather than showing a layout with stale counts.
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from brain_cloud_layout import compute_layout
+        data["brain_cloud"] = compute_layout(data["wordcloud"])
+    except ImportError as e:
+        print(f"[corpus] brain-cloud layout skipped ({e}); the page will show the plain word cloud.")
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=1)
