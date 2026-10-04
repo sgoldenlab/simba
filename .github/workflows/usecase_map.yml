@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: write           # needed to commit the regenerated HTML
-  issues: write             # opens/updates the "new places to review" issue
 
 jobs:
   build:
@@ -34,7 +33,7 @@ jobs:
       # misc/hooks/pre-push hook (install: python misc/install_hooks.py).
       # Institutions new to the sheet are geocoded, and country spellings no list recognises
       # are looked up once (OpenStreetMap Nominatim), so they show up on the pages today.
-      # Anything placed or left unresolved goes in a report for the review issue below.
+      # Anything placed or left unresolved goes in a report, shown in the run's job summary below.
       - name: Resolve new institutions and country spellings
         run: python misc/resolve_new_places.py --report "$RUNNER_TEMP/places.md"
 
@@ -59,15 +58,10 @@ jobs:
           git commit -m "Update SimBA use-case global-reach map" || echo "Nothing to commit"
           git push
 
-      # After the commit, and never failing the job: the page update must not wait on this.
-      - name: Open or update the places-to-review issue
+      # Shown on the run's page under the Actions tab. Never opens GitHub issues.
+      - name: Show places to review in the job summary
         if: always()
         continue-on-error: true
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           [ -s "$RUNNER_TEMP/places.md" ] || { echo "No new places to review"; exit 0; }
-          title="Use-case pages: new places to review"
-          n=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
-          if [ -n "$n" ]; then gh issue comment "$n" --body-file "$RUNNER_TEMP/places.md"
-          else gh issue create --title "$title" --body-file "$RUNNER_TEMP/places.md"; fi
+          cat "$RUNNER_TEMP/places.md" >> "$GITHUB_STEP_SUMMARY"
