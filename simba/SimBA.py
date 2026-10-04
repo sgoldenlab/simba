@@ -1059,16 +1059,25 @@ class App(object):
 
         yolo_links = Menu(download_menu)
         for mdl_name, mdl_link in Links.YOLO_11_WEIGHTS.value.items():
-            yolo_links.add_command(label=mdl_name, compound="left", image=self.menu_icons["ultralytics_2"]["img"], command=lambda: webbrowser.open_new(str({mdl_link})), font=Formats.FONT_REGULAR.value)
+            yolo_links.add_command(label=mdl_name, compound="left", image=self.menu_icons["ultralytics_2"]["img"], command=lambda link=mdl_link: webbrowser.open_new(str(link)), font=Formats.FONT_REGULAR.value)
+
+        usage_stats_menu = Menu(links_menu)
+        usage_stats_menu.add_command(label="Published studies using SimBA", compound="left", image=self.menu_icons["location"]["img"], command=lambda: webbrowser.open_new(str(r"https://simba-uw-tf-dev.readthedocs.io/en/latest/published_studies.html")), font=Formats.FONT_REGULAR.value)
+        usage_stats_menu.add_command(label="Download statistics", compound="left", image=self.menu_icons["bar_graph_blue"]["img"], command=lambda: webbrowser.open_new(str(r"https://simba-uw-tf-dev.readthedocs.io/en/latest/download_stats.html")), font=Formats.FONT_REGULAR.value)
+        usage_stats_menu.add_command(label="Live download dashboard", compound="left", image=self.menu_icons["line_chart_blue"]["img"], command=lambda: webbrowser.open_new(str(r"https://sronilsson.github.io/download_stats/")), font=Formats.FONT_REGULAR.value)
 
         download_menu.add_cascade(label="YOLO weights...", compound="left", image=self.menu_icons["ultralytics_2"]["img"], menu=yolo_links, font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="SimBA API", compound="left", image=self.menu_icons["api"]["img"], command=lambda: webbrowser.open_new(str(r"https://simba-uw-tf-dev.readthedocs.io/en/latest/api.html")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="GitHub", compound="left", image=self.menu_icons["github"]["img"], command=lambda: webbrowser.open_new(str(r"https://github.com/sgoldenlab/simba")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="Cite SimBA", compound="left", image=self.menu_icons["edit"]["img"], command=lambda: webbrowser.open_new(str(r"https://simba-uw-tf-dev.readthedocs.io/en/latest/cite.html")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="License", compound="left", image=self.menu_icons["scale_2"]["img"], command=lambda: webbrowser.open_new(str(r"https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.license.html")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="Related software", compound="left", image=self.menu_icons["dependency"]["img"], command=lambda: webbrowser.open_new(str(r"https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.related_software.html")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_separator()
+        links_menu.add_cascade(label="Usage statistics...", compound="left", image=self.menu_icons["line_chart_red"]["img"], menu=usage_stats_menu, font=Formats.FONT_REGULAR.value)
         links_menu.add_cascade(label="Download...", compound="left", image=self.menu_icons["download"]["img"], menu=download_menu, font=Formats.FONT_REGULAR.value)
-        links_menu.add_command(label="SimBA Github", compound="left", image=self.menu_icons["github"]["img"], command=lambda: webbrowser.open_new(str(r"https://github.com/sgoldenlab/simba")), font=Formats.FONT_REGULAR.value)
-        links_menu.add_command(label="SimBA Gitter Support Chatroom", compound="left", image=self.menu_icons["gitter"]["img"], command=lambda: webbrowser.open_new(str(r"https://gitter.im/SimBA-Resource/community")), font=Formats.FONT_REGULAR.value)
         links_menu.add_command(label="Install FFmpeg", compound="left", image=self.menu_icons["ffmpeg"]["img"],  command=lambda: webbrowser.open_new(str(r"https://m.wikihow.com/Install-FFmpeg-on-Windows")), font=Formats.FONT_REGULAR.value)
-        links_menu.add_command(label="SimBA API", compound="left", image=self.menu_icons["api"]["img"], command=lambda: webbrowser.open_new(str(r"https://simba-uw-tf-dev.readthedocs.io/")), font=Formats.FONT_REGULAR.value)
-        links_menu.add_command(label="SimBA usage statistics", compound="left", image=self.menu_icons["line_chart_light_blue"]["img"], command=lambda: webbrowser.open_new(str(r"https://sronilsson.github.io/download_stats/")), font=Formats.FONT_REGULAR.value)
-        links_menu.add_command(label="SimBA developer contact", compound="left", image=self.menu_icons["developer"]["img"], command=lambda: webbrowser.open_new(str(r"https://sronilsson.netlify.app/")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_separator()
+        links_menu.add_command(label="Developer contact", compound="left", image=self.menu_icons["developer"]["img"], command=lambda: webbrowser.open_new(str(r"https://sronilsson.netlify.app/")), font=Formats.FONT_REGULAR.value)
 
         help_menu.add_cascade(label="Links", menu=links_menu, compound="left", image=self.menu_icons["link"]["img"], font=Formats.FONT_REGULAR.value)
         help_menu.add_command(label="Check for updates", compound="left", image=self.menu_icons["download"]["img"], command=check_for_updates, font=Formats.FONT_REGULAR.value)

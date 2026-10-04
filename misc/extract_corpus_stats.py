@@ -497,10 +497,13 @@ def main():
     texts = [t for _, t in kept]
 
     cloud = collections.Counter()      # document frequency over the curated concept gazetteer
-    for t in texts:
+    cloud_hits = collections.defaultdict(list)   # term -> papers mentioning it, for the cloud's hover tooltips
+    for i, t in enumerate(texts):
         for term, pat in CLOUD_TERMS.items():
             if re.search(pat, t):
                 cloud[term] += 1
+                cloud_hits[term].append(i)
+    wordcloud = [[term, n] for term, n in cloud.most_common(200) if n >= 5]
 
     behav_rows, n_behav_studies, behav_ex = behaviours_automated(texts)
     beh, beh_ex = df_counts(texts, BEHAVIORS)
@@ -522,8 +525,9 @@ def main():
         # so their shape stays [label, count(, family)].
         "papers": [paper_head(t) for t in texts],
         "examples": {"behaviours_automated": behav_ex, "behaviors": beh_ex,
-                     "regions": reg_ex, "methods": met_ex, "diseases": dis_ex},
-        "wordcloud": [[term, n] for term, n in cloud.most_common(200) if n >= 5],
+                     "regions": reg_ex, "methods": met_ex, "diseases": dis_ex,
+                     "wordcloud": {term: pick_examples(term, cloud_hits[term]) for term, _ in wordcloud}},
+        "wordcloud": wordcloud,
     }
     # Brain-section layout of the word cloud. It needs numpy / scipy / matplotlib / Pillow, unlike the rest of this
     # script; without them the page falls back to the plain cloud rather than showing a layout with stale counts.

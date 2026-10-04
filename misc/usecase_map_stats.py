@@ -405,17 +405,55 @@ def _build_behaviours(c):
     return panel, script
 
 
-def _brain_cloud_svg(bc, n_pdfs):
-    """Draw the coronal brain-section word cloud laid out by misc/brain_cloud_layout.py (stdlib only)."""
+def _brain_cloud_tips_script(tips):
+    """Hover tooltips for the brain-section cloud: the same node and look as the bar-chart tooltips."""
+    return f"""<script>
+(function () {{
+  const tips = {json.dumps(tips)};
+  const svg = document.querySelector("svg.uc-brain");
+  if (!svg) return;
+  function node() {{
+    let el = document.getElementById("ucBarTip");
+    if (!el) {{
+      el = document.createElement("div");
+      el.id = "ucBarTip";
+      el.className = "jvm-tooltip";
+      el.style.pointerEvents = "none";
+      el.style.zIndex = "9999";
+      document.body.appendChild(el);
+    }}
+    return el;
+  }}
+  svg.addEventListener("mousemove", function (e) {{
+    const t = e.target.closest("text[data-tip]");
+    const el = node();
+    if (!t) {{ el.classList.remove("active"); return; }}
+    el.innerHTML = tips[+t.dataset.tip];
+    el.classList.add("active");
+    let left = e.pageX + 16;
+    // flip to the left of the cursor rather than overflow the viewport
+    if (left + el.offsetWidth > window.scrollX + document.documentElement.clientWidth - 8) left = e.pageX - el.offsetWidth - 16;
+    el.style.left = Math.max(8, left) + "px";
+    el.style.top = (e.pageY - 12) + "px";
+  }});
+  svg.addEventListener("mouseleave", function () {{ node().classList.remove("active"); }});
+}})();
+</script>"""
+
+
+def _brain_cloud_svg(bc, n_pdfs, tips=None):
+    """Draw the coronal brain-section word cloud laid out by misc/brain_cloud_layout.py (stdlib only).
+    tips: per-word tooltip markup, in bc["words"] order; without it, words get a plain native tooltip."""
     layers = [f'<path d="{bc["outline"]}" fill="{BRAIN_AREA_COLORS["Cortex"][1]}" stroke="#c9d3cc" stroke-width="2"/>',
               '<path d="M500,96L500,190" stroke="#c9d3cc" stroke-width="2"/>']   # longitudinal fissure
     for name, d in bc["areas"].items():
         txt, fill = BRAIN_AREA_COLORS[name]
         layers.append(f'<path d="{d}" fill="{fill}" stroke="{txt}" stroke-opacity=".25" stroke-width="1.5"/>')
-    for word, n, area_idx, size, vertical, ax, ay in bc["words"]:
+    for i, (word, n, area_idx, size, vertical, ax, ay) in enumerate(bc["words"]):
         pos = f'transform="translate({ax},{ay}) rotate(-90)"' if vertical else f'x="{ax}" y="{ay}"'
-        layers.append(f'<text {pos} font-size="{size}" fill="{BRAIN_AREA_COLORS[bc["area_names"][area_idx]][0]}">'
-                      f'<title>{esc(word)}: mentioned in {n} of {n_pdfs} papers</title>{esc(word)}</text>')
+        hover = f' data-tip="{i}">' if tips else f'><title>{esc(word)}: mentioned in {n} of {n_pdfs} papers</title>'
+        layers.append(f'<text {pos} font-size="{size}" fill="{BRAIN_AREA_COLORS[bc["area_names"][area_idx]][0]}"'
+                      f'{hover}{esc(word)}</text>')
     legend = "".join(f'<span><i style="background:{BRAIN_AREA_COLORS[a][0]}"></i>{a}</span>' for a in bc["area_names"])
     return (f'<svg class="uc-brain" viewBox="{" ".join(map(str, bc["viewbox"]))}" xmlns="http://www.w3.org/2000/svg" role="img" '
             f'aria-label="Word cloud of concepts in studies using SimBA, shaped like a coronal mouse-brain section">'
@@ -477,7 +515,11 @@ def _build_corpus(c):
     if bc:   # coronal brain-section layout, when the local corpus refresh could compute it
         cloud_cap = (f'Larger = mentioned in more papers. Brain-region terms sit in their own region; '
                      f'other colors only show where a word landed. Showing {len(bc["words"])} of {bc["n_words"]} concepts.')
-        cloud_html = f'<div class="uc-cloud">{_brain_cloud_svg(bc, c.get("n_pdfs", "?"))}</div>'
+        tips = None
+        if ((c or {}).get("examples") or {}).get("wordcloud"):   # papers per term, recorded by the corpus refresh
+            tips = _examples_for(c, titles, "wordcloud", [w[0] for w in bc["words"]], [w[1] for w in bc["words"]])
+            cat_js += _brain_cloud_tips_script(tips)
+        cloud_html = f'<div class="uc-cloud">{_brain_cloud_svg(bc, c.get("n_pdfs", "?"), tips)}</div>'
     else:
         cloud_cap = 'Larger = mentioned in more papers.'
         cloud_html = f'<div class="uc-cloud">{spans}</div>'
@@ -549,6 +591,8 @@ def _render(total, n_countries, n_continents, n_species, n_journals, years,
 .simba-uc-date{{font-size:12.5px;color:#6b7280;margin:0 0 14px;}}
 .simba-uc-foot{{text-align:center;font-size:14.5px;color:#4b5563;margin:18px 4px 0;}}
 .simba-uc-foot a{{font-weight:600;}}
+.jvm-tooltip{{position:absolute;display:none;}}
+.jvm-tooltip.active{{display:block;}}
 .jvm-tooltip{{background-color:#1f2937 !important;border-radius:9px !important;padding:9px 11px !important;max-width:300px !important;box-shadow:0 8px 24px rgba(15,23,42,.32) !important;}}
 .uc-cloud{{max-width:900px;margin:6px auto 4px;text-align:center;padding:18px 16px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);line-height:1.05;}}
 .uc-brain{{display:block;width:100%;height:auto;}}
