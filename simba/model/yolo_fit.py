@@ -60,6 +60,7 @@ class FitYolo():
     :param int workers: Data-loader worker processes. Use ``-1`` for all cores. Default ``8``.
     :param int patience: Early-stopping patience (epochs without improvement). Default ``100``.
     :param Union[bool, Literal['disk']] cache: Image caching strategy. ``True`` caches all dataset images in RAM on the first epoch so subsequent epochs read from memory instead of disk (fastest, requires the dataset to fit in RAM). ``"disk"`` caches decoded images as ``.npy`` files on disk (avoids re-decoding each epoch without needing the dataset to fit in RAM, but uses more disk space). ``False`` disables caching. Default ``False``.
+    :param int seed: Random seed passed to Ultralytics (seeds Python, NumPy and torch/CUDA for weight initialisation, augmentation and data-loader shuffling). Training on GPU is reproducible to within non-deterministic CUDA ops. Does not affect the train/val split, which is fixed when the dataset is created. Default ``0``.
     :raises SimBAGPUError: If no CUDA-capable GPU is detected.
     :raises SimBAPAckageVersionError: If ``ultralytics`` is unavailable in the environment.
     :raises FileNotFoundError: If ``weights_path`` or ``model_yaml`` do not exist.
@@ -94,7 +95,8 @@ class FitYolo():
                  workers: int = 8,
                  patience: int = 500,
                  cache: Union[bool, Literal['disk']] = False,
-                 device_id: Optional[int] = None):
+                 device_id: Optional[int] = None,
+                 seed: int = 0):
 
         os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
         gpu_available, gpus = is_torch_cuda_available()
@@ -127,12 +129,13 @@ class FitYolo():
         check_int(name=f'{__class__.__name__} imgsz', value=imgsz, min_value=1)
         check_int(name=f'{__class__.__name__} workers', value=workers, min_value=-1, unaccepted_vals=[0], max_value=find_core_cnt()[0])
         check_int(name=f'{__class__.__name__} patience', value=patience, min_value=1)
+        check_int(name=f'{__class__.__name__} seed', value=seed, min_value=0)
         if workers == -1: workers = find_core_cnt()[0]
         check_valid_device(device=device)
         self.model_yaml, self.epochs, self.batch  = model_yaml, epochs, batch
         self.imgsz, self.device, self.workers, self.format = imgsz, device, workers, format
         self.plots, self.save_path, self.verbose, self.patience = plots, save_path, verbose, patience
-        self.cache = cache
+        self.cache, self.seed = cache, seed
 
     def _download_start_weights(self, url: str = YOLO_M_PATH, save_path: Union[str, os.PathLike] = "yolo11m-pose.pt"):
         print(f'No start weights provided, downloading {save_path} from {url}...')
@@ -162,7 +165,8 @@ class FitYolo():
                         workers=self.workers,
                         device=self.device,
                         patience=self.patience,
-                        cache=self.cache)
+                        cache=self.cache,
+                        seed=self.seed)
 
 
 if __name__ == "__main__":
@@ -180,6 +184,7 @@ if __name__ == "__main__":
     parser.add_argument('--workers', type=int, default=8, help='Number of data loader workers. Default is 8. Use -1 for max cores')
     parser.add_argument('--patience', type=int, default=100, help='Number of epochs to wait without improvement in validation metrics before early stopping the training. Default is 100')
     parser.add_argument('--cache', type=str, default='False', help='Image caching strategy. Use "True" (RAM), "disk", or "False". Default is "False"')
+    parser.add_argument('--seed', type=int, default=0, help='Random seed for reproducible training. Default is 0')
     args = parser.parse_args()
 
     device = args.device.strip()
@@ -199,7 +204,8 @@ if __name__ == "__main__":
                           verbose=args.verbose,
                           workers=args.workers,
                           patience=args.patience,
-                          cache=cache)
+                          cache=cache,
+                          seed=args.seed)
     yolo_fitter.run()
 
 
