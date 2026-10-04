@@ -160,6 +160,7 @@ INSTITUTION_COORDS = {
     'Rosalind Franklin University': [42.3022, -87.8585],  # 1
     'Royal College of Surgeons in Ireland': [53.3392, -6.2626],  # 1
     'Royal Hospital for Women': [-33.9169, 151.238],  # 1
+    'Rutgers': [40.5204, -74.4645],  # 1
     'SISSA': [45.6787, 13.775],  # 1
     'SMART Biomedical Microsystems Laborator Université de Sherbrooke': [45.3785, -71.9245],  # 1
     'Salk Institute for Biological Studies': [32.8872, -117.2454],  # 1
@@ -193,6 +194,7 @@ INSTITUTION_COORDS = {
     'University of Geneva': [46.1952, 6.1408],  # 3
     'University of Haifa': [32.7609, 35.0205],  # 2
     'University of Hong Kong': [22.283, 114.1371],  # 5
+    'University of Illinois Urbana-Champaign': [40.0762, -88.2233],  # 1
     'University of Illinois at Chicago': [41.8676, -87.6524],  # 1
     'University of Massachusetts Dartmouth': [41.6225, -71.0073],  # 1
     'University of Melbourne': [-37.8241, 144.9171],  # 1
