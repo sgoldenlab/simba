@@ -2739,5 +2739,52 @@
     "-73.9537599"
    ]
   }
+ ],
+ "Rutgers": [
+  {
+   "place_id": 356876040,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 10996237,
+   "lat": "40.5204169",
+   "lon": "-74.4645303",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6358749218550374,
+   "addresstype": "amenity",
+   "name": "Rutgers University",
+   "display_name": "Rutgers University, Emerson Street, Piscataway Township, Middlesex County, New Jersey, 08854, United States",
+   "boundingbox": [
+    "40.4975190",
+    "40.5317260",
+    "-74.4876178",
+    "-74.4282961"
+   ]
+  }
+ ],
+ "The State University of New Jersey": [],
+ "University of Illinois Urbana-Champaign": [
+  {
+   "place_id": 372434770,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 12299045,
+   "lat": "40.0761545",
+   "lon": "-88.2233134",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.6142568970491945,
+   "addresstype": "amenity",
+   "name": "University of Illinois Urbana-Champaign",
+   "display_name": "University of Illinois Urbana-Champaign, Champaign County, Illinois, 61801, United States",
+   "boundingbox": [
+    "40.0261129",
+    "40.1163395",
+    "-88.2909822",
+    "-88.1902577"
+   ]
+  }
  ]
 }
