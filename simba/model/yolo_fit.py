@@ -41,6 +41,7 @@ class FitYolo():
        - Works with any Ultralytics model flavour (bbox, pose, segmentation).
        - Download starter weights from `HuggingFace <https://huggingface.co/Ultralytics>`__.
        - Example dataset YAMLs: `bbox <https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model.yaml>`__, `pose <https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model_keypoints.yaml>`__.
+       - ``seed`` is a reproducibility setting, not a source of model diversity: it makes a re-run give the same model, and deliberately leaves the train/val split unchanged so validation metrics stay comparable between runs. When fine-tuning from pretrained weights on a reasonably sized dataset, different seeds typically give very similar models. To train genuinely different models (e.g., for an ensemble), resample the training data per model (e.g., a different training subset for each) rather than changing the seed.
 
     .. seealso::
        :func:`simba.bounding_box_tools.yolo.utils.fit_yolo` for the functional API.
@@ -58,9 +59,9 @@ class FitYolo():
     :param Union[Literal['cpu'], int] device: Compute device string or CUDA index. Default ``0``.
     :param bool verbose: Emit detailed progress information. Default ``True``.
     :param int workers: Data-loader worker processes. Use ``-1`` for all cores. Default ``8``.
-    :param int patience: Early-stopping patience (epochs without improvement). Default ``100``.
+    :param int patience: Early-stopping patience (epochs without improvement). Default ``500``.
     :param Union[bool, Literal['disk']] cache: Image caching strategy. ``True`` caches all dataset images in RAM on the first epoch so subsequent epochs read from memory instead of disk (fastest, requires the dataset to fit in RAM). ``"disk"`` caches decoded images as ``.npy`` files on disk (avoids re-decoding each epoch without needing the dataset to fit in RAM, but uses more disk space). ``False`` disables caching. Default ``False``.
-    :param int seed: Random seed passed to Ultralytics (seeds Python, NumPy and torch/CUDA for weight initialisation, augmentation and data-loader shuffling). Training on GPU is reproducible to within non-deterministic CUDA ops. Does not affect the train/val split, which is fixed when the dataset is created. Default ``0``.
+    :param int seed: Random seed passed to Ultralytics (seeds Python, NumPy and torch/CUDA for weight initialisation, augmentation and data-loader shuffling). Training on GPU is reproducible to within non-deterministic CUDA ops. Does not affect the train/val split, which is fixed when the dataset is created. Usually changes the trained model very little (see note above). Default ``0``.
     :raises SimBAGPUError: If no CUDA-capable GPU is detected.
     :raises SimBAPAckageVersionError: If ``ultralytics`` is unavailable in the environment.
     :raises FileNotFoundError: If ``weights_path`` or ``model_yaml`` do not exist.
@@ -182,7 +183,7 @@ if __name__ == "__main__":
     parser.add_argument('--device', type=str, default='0', help='Device to train on. Use "cpu" or GPU index (e.g., "0"). Default is "0"')
     parser.add_argument('--verbose', type=lambda x: str(x).lower() == 'true', default=True, help='Print verbose messages. Use "True" or "False". Default is True')
     parser.add_argument('--workers', type=int, default=8, help='Number of data loader workers. Default is 8. Use -1 for max cores')
-    parser.add_argument('--patience', type=int, default=100, help='Number of epochs to wait without improvement in validation metrics before early stopping the training. Default is 100')
+    parser.add_argument('--patience', type=int, default=500, help='Number of epochs to wait without improvement in validation metrics before early stopping the training. Default is 500')
     parser.add_argument('--cache', type=str, default='False', help='Image caching strategy. Use "True" (RAM), "disk", or "False". Default is "False"')
     parser.add_argument('--seed', type=int, default=0, help='Random seed for reproducible training. Default is 0')
     args = parser.parse_args()

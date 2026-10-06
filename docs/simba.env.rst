@@ -1,4 +1,4 @@
-Global Configuration Options
+🎛️ Global Configuration Options
 ====================================
 
 SimBA has a few runtime configuration options which change the global behavior of SimBA.

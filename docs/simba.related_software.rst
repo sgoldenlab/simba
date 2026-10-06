@@ -464,6 +464,9 @@ against when behaviour is paired with neural recording.
    * - `VIA (VGG Image Annotator) <https://www.robots.ox.ac.uk/~vgg/software/via/>`__
      - |oss|
      - Lightweight image, audio, and video annotation tool
+   * - `Labelme <https://github.com/wkentaro/labelme>`__
+     - |oss|
+     - |simba-import| Polygon, bounding-box, and keypoint image annotation; SimBA converts its labels to YOLO and DeepLabCut training data
    * - `ELAN <https://archive.mpi.nl/tla/elan>`__
      - |oss|
      - Time-aligned annotation of video and audio
