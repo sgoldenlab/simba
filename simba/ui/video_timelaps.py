@@ -30,34 +30,42 @@ class TimelapseSlider():
        :width: 600
        :align: center
 
+    .. note::
+       :meth:`run` opens the viewer in a Tkinter ``Toplevel`` window and returns immediately; it does not wait for the
+       user. A Tk root window must already exist. Read the selection with the ``get_*`` methods once the user is done
+       (e.g., after the window is closed); they keep working after :meth:`close`, but raise ``AttributeError`` if
+       called before :meth:`run`.
+
     :param Union[str, os.PathLike] video_path: Path to video file to create timelapse from.
-    :param int frame_cnt: Number of frames to include in timelapse composite. Default 25.
-    :param Optional[int] ruler_width: Width per frame in pixels. If None, calculated to match video width. Default None.
-    :param Optional[int] crop_ratio: Percentage of frame width to keep (0-100). Default 50.
-    :param int padding: Padding in pixels added to timelapse when ruler is shown. Default 60.
-    :param int ruler_divisions: Number of major divisions on time ruler. Default 6.
-    :param bool show_ruler: If True, display time ruler below timelapse. Default True.
-    :param int ruler_height: Height of ruler in pixels. Default 60.
+    :param int frame_cnt: Number of evenly-spaced frames in the timelapse strip. Default 25.
+    :param int crop_ratio: Percentage (1-100) of each frame's width to show in the strip, kept from the left edge of the frame. Default 50.
+    :param int padding: Pixels added to the left and right of the strip when the ruler is shown. Minimum 1. Default 60.
+    :param int ruler_divisions: Number of major divisions on the time ruler. Default 6.
+    :param bool show_ruler: If True, display a time ruler below the timelapse strip. Default True.
+    :param Optional[int] ruler_height: Height of the time ruler in pixels. If None, 5% of the monitor height. Default None.
+    :param Optional[int] ruler_width: Total width of the timelapse strip (and ruler) in pixels, excluding ``padding``. If None, half the monitor width. Default None.
+    :param Optional[int] img_width: Maximum width of the frame preview in pixels; the frame is scaled to fit within ``img_width`` x ``img_height``, keeping its aspect ratio. If None, half the monitor width. Default None.
+    :param Optional[int] img_height: Maximum height of the frame preview in pixels. If None, half the monitor height. Default None.
     :param bool use_timestamps: If True, display timestamps (HH:MM:SS) in labels and ruler. If False, display frame numbers. Default True.
 
     :example:
 
+    >>> from tkinter import BooleanVar, Tk
+    >>> root = Tk(); root.withdraw()
     >>> slider = TimelapseSlider(video_path='path/to/video.mp4', frame_cnt=25, crop_ratio=75)
-    >>> slider.run()
-    >>> # Use sliders to select segment, then access selected times and frames:
-    >>> start_time = slider.get_start_time()  # seconds (float)
-    >>> end_time = slider.get_end_time()  # seconds (float)
-    >>> start_time_str = slider.get_start_time_str()  # "HH:MM:SS" string
-    >>> end_time_str = slider.get_end_time_str()  # "HH:MM:SS" string
-    >>> start_frame = slider.get_start_frame()  # frame number (int)
-    >>> end_frame = slider.get_end_frame()  # frame number (int)
-    >>> slider.close()
+    >>> slider.run()  # opens the viewer window and returns immediately
+    >>> closed = BooleanVar(value=False)
+    >>> slider.img_window.protocol("WM_DELETE_WINDOW", lambda: (slider.close(), closed.set(True)))
+    >>> root.wait_variable(closed)  # the user selects a segment with the sliders, then closes the window
+    >>> start_time, end_time = slider.get_start_time(), slider.get_end_time()  # seconds
+    >>> start_time_str, end_time_str = slider.get_start_time_str(), slider.get_end_time_str()  # "HH:MM:SS"
+    >>> start_frame, end_frame = slider.get_start_frame(), slider.get_end_frame()  # frame numbers
     """
 
     def __init__(self,
                  video_path: Union[str, os.PathLike],
                  frame_cnt: int = 25,
-                 crop_ratio: Optional[int] = 50,
+                 crop_ratio: int = 50,
                  padding: int = 60,
                  ruler_divisions: int = 6,
                  show_ruler: bool = True,
@@ -69,6 +77,7 @@ class TimelapseSlider():
 
         check_file_exist_and_readable(file_path=video_path)
         check_int(name='frame_cnt', value=frame_cnt, min_value=1, raise_error=True)
+        check_int(name='crop_ratio', value=crop_ratio, min_value=1, max_value=100, raise_error=True)
         _, (self.monitor_width, self.monitor_height) = get_monitor_info()
         if ruler_width is not None: check_int(name='size', value=ruler_width, min_value=1, raise_error=True)
         else: ruler_width = int(self.monitor_width * 0.5)
@@ -304,10 +313,11 @@ class TimelapseSlider():
         mask = cv2.merge([mask, mask, mask])
         highlighted = cv2.multiply(highlighted, mask.astype(np.uint8), scale=1/255.0)
         cv2.line(highlighted, (start_x, 0), (start_x, highlighted.shape[0]), (0, 255, 0), 2)
-        cv2.line(highlighted, (end_x, 0), (end_x, highlighted.shape[0]), (0, 255, 0), 2)
+        cv2.line(highlighted, (end_x, 0), (end_x, highlighted.shape[0]), (0, 0, 255), 2)   # BGR red, matching the end slider
         self._draw_img(img=highlighted, lbl=self.img_lbl)
 
     def run(self):
+        """Build the timelapse strip and open the viewer window. Returns immediately; see the class note."""
         self.video_capture = cv2.VideoCapture(self.video_path)
         if not self.video_capture.isOpened():
             raise ValueError(f"Failed to open video file: {self.video_path}")
@@ -409,24 +419,31 @@ class TimelapseSlider():
         self._update_frame_display(slider_type='start')
 
     def get_start_time(self) -> float:
+        """Selected segment start, in seconds."""
         return self.selected_start[0]
-    
+
     def get_end_time(self) -> float:
+        """Selected segment end, in seconds."""
         return self.selected_end[0]
-    
+
     def get_start_time_str(self) -> str:
+        """Selected segment start as an ``HH:MM:SS`` string."""
         return seconds_to_timestamp(self.selected_start[0])
-    
+
     def get_end_time_str(self) -> str:
+        """Selected segment end as an ``HH:MM:SS`` string."""
         return seconds_to_timestamp(self.selected_end[0])
-    
+
     def get_start_frame(self) -> int:
+        """Selected segment start, as a frame number."""
         return self.selected_start_frame[0]
-    
+
     def get_end_frame(self) -> int:
+        """Selected segment end, as a frame number."""
         return self.selected_end_frame[0]
 
     def close(self):
+        """Close the viewer window and release the video. The selection stays readable through the ``get_*`` methods."""
         if self._pending_frame_update is not None:
             if hasattr(self, 'img_window') and self.img_window.winfo_exists():
                 self.img_window.after_cancel(self._pending_frame_update)
