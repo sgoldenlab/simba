@@ -103,6 +103,8 @@ html_theme_options = {
     'sticky_navigation': True,
 }
 html_static_path = ['_static']
+# Files copied as-is to the root of the built site (/en/latest/): the Google Search Console verification file.
+html_extra_path = ['_extra']
 html_show_sphinx = False          # drop the "Built with Sphinx using a theme provided by Read the Docs." footer credit
 html_last_updated_fmt = "%b %d, %Y"  # render "Last updated on <date>." in the footer (see _templates/footer.html)
 
