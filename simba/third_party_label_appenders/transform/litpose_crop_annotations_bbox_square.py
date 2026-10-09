@@ -367,6 +367,17 @@ class CropLPAnnotationsBboxSquare:
 
 
 # if __name__ == "__main__":
+#     cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"I:\sina\project_cage21_22_10_08\project_cage21_22_10_08",
+#                                           save_dir=r"I:\sina\project_cage21_22_10_08\project_cage21_22_10_08_cropped",
+#                                           bbox_pad_frac=0.25,
+#                                           visualize=100,
+#                                           verbose=True,
+#                                           core_cnt=4)
+#     cropper.run()
+
+
+
+# if __name__ == "__main__":
 #     cropper = CropLPAnnotationsBboxSquare(lp_project_dir=r"I:\sina\project_5cam_cage21_22_0911",
 #                                           save_dir=r"I:\sina\project_5cam_cage21_22_0911_cropped",
 #                                           bbox_pad_frac=0.25,

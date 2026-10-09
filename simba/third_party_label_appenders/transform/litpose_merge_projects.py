@@ -2,6 +2,7 @@ import datetime
 import glob
 import os
 import shutil
+import sys
 from typing import Dict, List, Tuple, Union
 
 try:
@@ -28,7 +29,11 @@ ProjectPath = Union[str, os.PathLike]
 
 def _log(msg: str, level: str = 'INFO'):
     ts = datetime.datetime.now().strftime('%H:%M:%S')
-    print(f'[{ts}] {level}: {msg}')
+    line = f'[{ts}] {level}: {msg}'
+    # File names can hold characters the console cannot encode (e.g. U+F03A, Windows' stand-in for a ':' in a
+    # name created on Linux/WSL); print those as escape codes instead of crashing the merge part-way through.
+    encoding = getattr(sys.stdout, 'encoding', None) or 'utf-8'
+    print(line.encode(encoding, errors='backslashreplace').decode(encoding))
 
 
 class LitPoseMergeProjects:
@@ -481,10 +486,11 @@ class LitPoseMergeProjects:
         _log(f'{len(self.other_dirs)} project(s) merged into {self.master_dir} ({time.time() - start:.1f}s)', level='COMPLETE')
 
 
-
-# merger = LitPoseMergeProjects(master_dir=r"I:\sina\project_5cam_cage21_22_0911",
-#                               other_dirs=[r"I:\sina\project_0609_5cam_0823"],
-#                               duplicate_method='skip',
-#                               verbose=True,
-#                               skip_videos=False)
-# merger.run()
+#
+# if __name__ == "__main__":
+#     merger = LitPoseMergeProjects(master_dir=r"I:\sina\project_5cam_cage21_22_0911_cropped",
+#                                   other_dirs=[r"I:\sina\project_cage21_22_10_08\project_cage21_22_10_08_cropped"],
+#                                   duplicate_method='skip',
+#                                   verbose=True,
+#                                   skip_videos=False)
+#     merger.run()

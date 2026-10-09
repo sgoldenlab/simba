@@ -1682,6 +1682,99 @@ def _add_cache_busting(app, exception):
     logger.info('cache-busting: stamped ?v=%s into %d HTML files', ver, changed)
 
 
+# ---- llms.txt and sitemap.xml -------------------------------------------------------------------------------------
+# Written at the end of every HTML build, so they always match the published docs. llms.txt is an index of the docs
+# for AI assistants (https://llmstxt.org): a summary, then links to the plain-text source of every page, grouped into
+# sections. sitemap.xml lists every page for search engines (Read the Docs' own sitemap lists versions only).
+# Generated here rather than with the sphinx-llms-txt / sphinx-sitemap packages: the docs build runs on Python 3.6 on
+# Read the Docs, which sphinx-llms-txt does not support.
+DOCS_URL = 'https://simba-uw-tf-dev.readthedocs.io/en/latest/'
+# Pages not to advertise: error / index pages, untitled scratch notebooks, orphaned duplicate examples, empty pages.
+_LLMS_SKIP = ['404', 'genindex', 'search', 'py-modindex', 'nb/Untitled1', 'nb/Untitled2', 'cli_examples/*', 'rst/*',
+              'tutorials_rst/Example_1', 'simba_live/*', 'modules', 'qr_gallery', 'simba.pose_processors']
+_LLMS_SUMMARY = (
+    'SimBA is an open-source GUI and Python toolkit for supervised machine-learning classification of animal '
+    'behavior (e.g., attack, grooming, sniffing, freezing) from pose-estimation data, with explainability (SHAP), '
+    'region-of-interest, movement, directionality and social analyses, and visualization tools. Input pose data from '
+    'DeepLabCut (incl. multi-animal), SLEAP, YOLO, DeepPoseKit, DANNCE, MARS, FaceMap, APT, SuperAnimal and blob '
+    'tracking. Install: `pip install simba-uw-tf-dev` (Python 3.6 or 3.10), launch the GUI with `simba`. License: '
+    'modified BSD 3-Clause, for academic and research use only. Source: https://github.com/sgoldenlab/simba. '
+    'Cite: Goodwin et al. (2024), Simple Behavioral Analysis (SimBA) as a platform for explainable machine learning in '
+    'behavioral neuroscience, Nature Neuroscience 27, 1411-1424, https://doi.org/10.1038/s41593-024-01649-9.')
+# llms.txt sections in reading order. A page goes in the first section whose rule matches (docname, source suffix);
+# pages matching none go in 'Reference & resources'.
+_LLMS_SECTIONS = [
+    ('Get started', lambda d, ext: d in ('index', 'installation', 'pip_installation', 'anaconda_installation')
+                                   or d.startswith('install_') or d.startswith('overview_video')),
+    ('Walkthroughs & tutorials', lambda d, ext: d in ('walkthroughs', 'tutorials') or d.startswith('Scenario')
+                                                or (ext == '.md' and d not in ('FAQ', 'third_party_annot_new'))),
+    ('Labelling', lambda d, ext: d in ('labelling', 'third_party_annot_new', 'tutorials_rst/standard_label',
+                                       'tutorials_rst/advanced_label', 'tutorials_rst/boris')),
+    ('Notebooks (code examples)', lambda d, ext: d == 'notebooks' or d.startswith('nb/')),
+    ('API reference', lambda d, ext: d in ('api', 'examples', 'simba') or d.startswith('cli_examples/')
+                                     or (d.startswith('simba.') and d not in ('simba.related_software', 'simba.license', 'simba.notice'))),
+]
+_LLMS_FALLBACK_SECTION = 'Reference & resources'
+_LLMS_SECTION_ORDER = ['Get started', 'Walkthroughs & tutorials', 'Labelling', _LLMS_FALLBACK_SECTION, 'Notebooks (code examples)', 'API reference']
+# Pages without a heading of their own; any other untitled page gets a title from its file name.
+_LLMS_TITLES = {'nb/yolo_ex_2': 'YOLO bounding boxes: Example 2', 'tutorials_rst/roi_features': 'ROI feature descriptions'}
+
+
+def _write_llms_txt_and_sitemap(app, exception):
+    if exception is not None or app.builder.name != 'html':
+        return
+    import datetime
+    import fnmatch
+    from urllib.parse import quote
+    from xml.sax.saxutils import escape
+    env = app.env
+    skip = _LLMS_SKIP + list(getattr(app.config, 'redirects', {}) or {})   # redirect stubs are not real pages
+
+    # reading order: follow the table of contents from the root page, then pages that are in no table of contents
+    order, seen = [], set()
+    def _walk(docname):
+        if docname in seen or docname not in env.found_docs:
+            return
+        seen.add(docname)
+        order.append(docname)
+        for child in env.toctree_includes.get(docname, []):
+            _walk(child)
+    _walk(getattr(app.config, 'root_doc', None) or app.config.master_doc)
+    order += sorted(d for d in env.found_docs if d not in seen)
+    pages = [d for d in order if not any(fnmatch.fnmatch(d, p) for p in skip)]
+
+    sections = {name: [] for name in _LLMS_SECTION_ORDER}
+    for docname in pages:
+        ext = os.path.splitext(str(env.doc2path(docname)))[1]
+        title = env.titles[docname].astext().strip() if docname in env.titles else ''
+        if not title or title == '<no title>':
+            title = _LLMS_TITLES.get(docname) or docname.rsplit('/', 1)[-1].replace('_', ' ').replace('.', ' ').strip().capitalize()
+        url = quote(f'{DOCS_URL}_sources/{docname}{ext}{app.config.html_sourcelink_suffix}', safe=':/')
+        section = next((name for name, rule in _LLMS_SECTIONS if rule(docname, ext)), _LLMS_FALLBACK_SECTION)
+        sections[section].append(f'- [{title}]({url})')
+
+    version = ''
+    try:
+        with open(os.path.join(app.srcdir, '..', 'setup.py'), encoding='utf-8') as f:
+            version = _re.search(r'version\s*=\s*["\']([^"\']+)["\']', f.read()).group(1)
+    except (OSError, AttributeError):
+        pass
+    built = f'Docs for SimBA {version}, ' if version else 'Docs '
+    lines = ['# SimBA (Simple Behavioral Analysis)', '', '> ' + _LLMS_SUMMARY, '',
+             f'{built}generated {datetime.date.today().isoformat()}. Each link is the plain-text source of a documentation page.']
+    for name in _LLMS_SECTION_ORDER:
+        if sections[name]:
+            lines += ['', f'## {name}', ''] + sections[name]
+    with open(os.path.join(app.outdir, 'llms.txt'), 'w', encoding='utf-8') as f:
+        f.write('\n'.join(lines) + '\n')
+
+    urls = ''.join(f'<url><loc>{escape(DOCS_URL + app.builder.get_target_uri(d))}</loc></url>' for d in pages)   # target URIs are already URL-encoded
+    with open(os.path.join(app.outdir, 'sitemap.xml'), 'w', encoding='utf-8') as f:
+        f.write('<?xml version="1.0" encoding="UTF-8"?>\n'
+                f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
+    print(f'[llms.txt / sitemap.xml] {len(pages)} pages: ' + ', '.join(f'{n} ({len(sections[n])})' for n in _LLMS_SECTION_ORDER))
+
+
 def setup(app):
     """Build-time hooks for the Markdown tutorials.
 
@@ -1713,3 +1806,4 @@ def setup(app):
     app.connect('build-finished', _add_cache_busting)   # stamp ?v=<hash> so updated CSS/JS beats stale caches
     app.connect('doctree-read', _convert_github_alerts)
     app.connect('doctree-read', _autolink_glossary_terms)
+    app.connect('build-finished', _write_llms_txt_and_sitemap)   # llms.txt (AI assistants) and sitemap.xml (search engines)
