@@ -10,9 +10,9 @@ try:
 except:
     from typing_extensions import Literal
 
-import cv2
 import pandas as pd
 import yaml
+from PIL import Image
 
 VIDEO_EXTENSIONS = {".avi", ".mp4", ".mov", ".flv", ".m4v", ".webm", ".h264"}
 IMAGE_EXTENSIONS = {".bmp", ".png", ".jpeg", ".jpg", ".webp"}
@@ -128,10 +128,12 @@ class LitPoseMergeProjects:
 
     @staticmethod
     def _get_image_resolution(img_path: str) -> Tuple[int, int]:
-        img = cv2.imread(img_path)
-        if img is None:
+        # Image.open reads only the file header, so the size comes back without decoding (and allocating) every pixel
+        try:
+            with Image.open(img_path) as img:
+                return img.size   # (width, height)
+        except OSError:
             return (-1, -1)
-        return (img.shape[1], img.shape[0])
 
     @staticmethod
     def _find_collected_data_csvs(directory: ProjectPath) -> Dict[str, str]:
@@ -488,9 +490,9 @@ class LitPoseMergeProjects:
 
 #
 # if __name__ == "__main__":
-#     merger = LitPoseMergeProjects(master_dir=r"I:\sina\project_5cam_cage21_22_0911_cropped",
-#                                   other_dirs=[r"I:\sina\project_cage21_22_10_08\project_cage21_22_10_08_cropped"],
+# merger = LitPoseMergeProjects(master_dir=r"I:\sina\project_5cam_cage21_22_0911",
+#                                   other_dirs=[r"I:\sina\project_cage21_22_10_08\project_cage21_22_10_08"],
 #                                   duplicate_method='skip',
 #                                   verbose=True,
 #                                   skip_videos=False)
-#     merger.run()
+# merger.run()
