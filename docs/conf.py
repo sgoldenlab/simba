@@ -105,6 +105,8 @@ html_theme_options = {
 html_static_path = ['_static']
 # Files copied as-is to the root of the built site (/en/latest/): the Google Search Console verification file.
 html_extra_path = ['_extra']
+# Gives every page a <link rel="canonical"> to /en/latest/, so Google treats other versions/URLs as duplicates of it.
+html_baseurl = 'https://simba-uw-tf-dev.readthedocs.io/en/latest/'
 html_show_sphinx = False          # drop the "Built with Sphinx using a theme provided by Read the Docs." footer credit
 html_last_updated_fmt = "%b %d, %Y"  # render "Last updated on <date>." in the footer (see _templates/footer.html)
 
