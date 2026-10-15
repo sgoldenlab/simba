@@ -9,6 +9,8 @@ SHORT_TYPE = {'dlc_model': 'DeepLabCut model', 'other_model': 'Other pose model'
 GROUPABLE = {'meta', 'importance', 'scripts', 'training', 'videos', 'other', 'project', 'labelled', 'not_simba'}
 bodyparts = load('archive_bodyparts.json') if os.path.isfile(os.path.join(DATA, 'archive_bodyparts.json')) else {}
 feature_cols = load('feature_columns.json') if os.path.isfile(os.path.join(DATA, 'feature_columns.json')) else {}
+current_cols = load('current_feature_columns.json') if os.path.isfile(os.path.join(DATA, 'current_feature_columns.json')) else {}
+BOOKKEEPING = {'video_no', 'frames'}   # row bookkeeping in older SimBA files, not features
 CRIM13_CREDIT = ('CRIM13 videos come from the Caltech Resident-Intruder Mouse dataset (Burgos-Artizzu, Doll&aacute;r, Lin, Anderson &amp; Perona, '
                  '&ldquo;Social behavior recognition in continuous video&rdquo;, CVPR 2012); please cite it when you use this data.')
 
@@ -77,7 +79,7 @@ def settings_html(it):
 
 # ---------------------------------------------------------------- column lists of the training data
 def column_kinds(cols):
-    """index / pose / feature / behavior for each column of a SimBA targets_inserted CSV.
+    """index / pose / bookkeeping / feature / behavior for each column of a SimBA targets_inserted CSV.
     Pose = <bodypart>_x/_y/_p triplets; behaviors = the columns after the last Low_prob_detections* feature."""
     kinds = []
     last_feat = max((i for i, c in enumerate(cols) if c.startswith('Low_prob_detections')), default=None)
@@ -86,11 +88,45 @@ def column_kinds(cols):
             kinds.append('index')
         elif re.search(r'_(x|y|p)$', c, re.I) and all(f'{c[:-2]}_{s}' in cols or f'{c[:-2]}_{s.upper()}' in cols for s in 'xyp'):
             kinds.append('pose')
+        elif c in BOOKKEEPING:
+            kinds.append('bookkeeping')
         elif last_feat is not None and i > last_feat:
             kinds.append('behavior')
         else:
             kinds.append('feature')
     return kinds
+
+
+def compare_with_current(cols, kinds, n_bp):
+    """Pose + feature columns vs. what this repo's feature extractor writes for the same body-part count.
+    Returns (renamed pairs at the same position, columns current SimBA adds, columns only in this file) or None."""
+    cur = current_cols.get(str(n_bp))
+    if not cur:
+        return None
+    old = [c for c, k in zip(cols, kinds) if k in ('pose', 'feature')]
+    renamed, added, removed = [], [], []
+    for op, i1, i2, j1, j2 in difflib.SequenceMatcher(None, old, cur, autojunk=False).get_opcodes():
+        if op == 'replace' and i2 - i1 == j2 - j1:
+            renamed += list(zip(old[i1:i2], cur[j1:j2]))
+        elif op != 'equal':
+            removed += old[i1:i2]
+            added += cur[j1:j2]
+    return renamed, added, removed
+
+
+def comparison_html(cmp):
+    renamed, added, removed = cmp
+    if not (renamed or added or removed):
+        return 'same feature columns, names and order as current SimBA.'
+    parts = []
+    if renamed:
+        parts.append(f'{len(renamed)} columns have older names but sit in the same positions ('
+                     + ', '.join(f'<code>{e(a)}</code> &rarr; <code>{e(b)}</code>' for a, b in renamed[:2]) + (', ...' if len(renamed) > 2 else '') + ')')
+    if added:
+        parts.append(f'current SimBA adds {len(added)} features this file lacks (' + ', '.join(f'<code>{e(c)}</code>' for c in added[:4]) + (', ...' if len(added) > 4 else '') + ')')
+    if removed:
+        parts.append(f'{len(removed)} columns current SimBA no longer computes (' + ', '.join(f'<code>{e(c)}</code>' for c in removed[:4]) + (', ...' if len(removed) > 4 else '') + ')')
+    return '; '.join(parts) + '.'
 
 
 _fc_written = {}
@@ -127,8 +163,11 @@ def feature_columns_link(u):
     kinds = column_kinds(cols)
     behaviors = [c for c, k in zip(cols, kinds) if k == 'behavior']
     bps = list(dict.fromkeys(c[:-2] for c, k in zip(cols, kinds) if k == 'pose'))
+    keep = [c for c, k in zip(cols, kinds) if k == 'bookkeeping']
     out = (f'<div class="inv-sub"><b>Columns</b> (header of <code>{e(example.rsplit("/", 1)[-1])}</code>): {len(bps)} body parts ({cnt["pose"]} pose columns), '
-           f'<b>{cnt["feature"]} features</b>, behavior column(s): {e(", ".join(behaviors))} &mdash; '
+           f'<b>{cnt["feature"]} features</b>, '
+           + (f'{len(keep)} bookkeeping columns ({e(", ".join(keep))}), ' if keep else '')
+           + f'behavior column(s): {e(", ".join(behaviors))} &mdash; '
            f'<a href="{MANIFEST_URL}/{e(name)}" download>full column list (CSV)</a></div>')
     m = pose_match(bps)
     if m:
@@ -136,6 +175,9 @@ def feature_columns_link(u):
         also = f' (or &ldquo;{e(m[1][0])}&rdquo; for multi-animal trackers)' if len(m) > 1 else ''
         how = 'same names and order' if exact else ('same body parts and order, spelling differs' if same_order else 'same body parts, different order')
         out += f'<div class="inv-sub"><b>SimBA body-part setting:</b> &ldquo;{e(nm)}&rdquo;{also} &mdash; {how}.</div>'
+    cmp = compare_with_current(cols, kinds, len(bps))
+    if cmp:
+        out += f'<div class="inv-sub"><b>Compared with current SimBA feature extraction:</b> {comparison_html(cmp)}</div>'
     return out
 
 
@@ -601,6 +643,10 @@ for key, v in feature_cols.items():
     label = re.search(r'(\d{3}) features', key)
     if label and int(label.group(1)) != n_feat:
         findings.append(('Feature count differs from the folder name', f'<code>{e(key.split(":", 1)[1])}</code> sits in a folder named &ldquo;{label.group(1)} features&rdquo; but its CSVs have {n_feat} feature columns (checked <code>{e(v["example_file"])}</code>).'))
+    cmp = compare_with_current(v['columns'], kinds, len({c[:-2] for c, k in zip(v['columns'], kinds) if k == 'pose'}))
+    if cmp and any(cmp):
+        findings.append(('Feature columns differ from current SimBA', f'<code>{e(key.split(":", 1)[1].rsplit("/", 1)[-1])}</code>: {comparison_html(cmp)} '
+                         'Classifiers read features by position, so renamed columns still predict; training on a mix of old and new files, or picking features by name, does not line up.'))
     behaviors = [c for c, k in zip(v['columns'], kinds) if k == 'behavior']
     if behaviors and all(b.endswith('_prediction') for b in behaviors):
         findings.append(('Behavior columns named *_prediction', f'In <code>{e(key.split(":", 1)[1].rsplit("/", 1)[-1])}</code> all {len(behaviors)} behavior columns end in <code>_prediction</code>, '

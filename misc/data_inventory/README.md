@@ -31,6 +31,7 @@ python crawlers/repo_refs.py                                        # -> data/re
 python crawlers/bodyparts_from_archives.py                          # -> data/archive_bodyparts.json (body parts from CollectedData CSVs)
 python crawlers/feature_columns.py                                  # -> data/feature_columns.json (header of one training CSV per dataset)
 # classifier settings: download the OSF 'SimBA meta files' CSVs + dg385 model_settings.csv into data/meta_files/<node>__<path with __>
+python crawlers/current_feature_columns.py                           # -> data/current_feature_columns.json (columns this SimBA version computes; needs a SimBA env)
 python crawlers/repo_data_files.py                                  # -> data/repo_data_files.json (data files tracked in git)
 python build_data_inventory.py                                      # -> docs/data_inventory.rst + docs/_static/data_inventory/
 ```
@@ -49,5 +50,8 @@ It deletes files in `docs/_static/data_inventory/` that the page no longer links
 - `.sav` loading: `3mc7g/lateral_threat.sav` (490 features) and Drive `Allogroom_vigorous.sav` (498 features) load in py3.6.13/sklearn 0.22.2, fail in py3.10/sklearn 1.4.2.
 - Drive annotation CSVs: 548 cols = index + 48 pose (16 bp) + 498 features + 1 behavior.
 - No config.yaml/pose_cfg.yaml anywhere on OSF, including inside archives.
-- Training CSV columns: Drive mouse 16 bp/498 features; rat + CRIM13 16 bp/492 features (folders say 490), behavior cols named *_prediction; example project + Tutorial Data 14 bp/454 features.
+- Training CSV columns: Drive mouse 16 bp/498 features; rat + CRIM13 16 bp/490 features + `video_no`, `frames` bookkeeping columns, behavior cols named *_prediction; example project + Tutorial Data 14 bp/454 features.
+- vs. current SimBA (`crawlers/current_feature_columns.py`, compared automatically on the page): all sets use old names for the 8 hull features
+  (same positions); rat + CRIM13 lack the 8 nose/centroid-to-lateral distances, hence the 490 vs 498 classifier split.
+  Inference (`clf_predict_proba`) passes features as an array and checks only the count, so renamed columns still predict.
 - 8 of 29 classifier settings files name a different classifier inside; the 11 CRIM13 ones have shifted columns.

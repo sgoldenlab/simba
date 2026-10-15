@@ -9,6 +9,7 @@ Inputs (made by the read-only crawlers in this folder, see ``README.md``):
 """
 import collections
 import csv
+import difflib
 import gzip
 import html
 import io
@@ -360,7 +361,8 @@ for key, group in list(units.items()) + list(models.items()):
 # 4b. two incompatible generations of mouse resident-intruder classifiers (checked by loading one file of each)
 findings.append(('Two generations of mouse resident-intruder classifiers',
                  'The OSF mouse classifiers (Random forest behavioral classifiers › Mouse resident intruder, 3mc7g; tested <code>lateral_threat.sav</code>) expect '
-                 '<b>490</b> features per frame; the Google Drive classifiers (tested <code>Allogroom_vigorous.sav</code>) expect <b>498</b>. Data made for one set will not run through the other.'))
+                 '<b>490</b> features per frame; the Google Drive classifiers (tested <code>Allogroom_vigorous.sav</code>) expect <b>498</b>. Data made for one set will not run through the other. '
+                 'The 8 extra features are the nose-to-lateral and centroid-to-lateral distances of each animal, which current SimBA computes and the older OSF data lacks.'))
 # 5. DeepLabCut weights without config files
 dlc_folders = sorted({(it['node'], it['path'].rsplit('/', 1)[0]) for it in items if is_snapshot(it)})
 has_cfg = any(it['name'].lower() in ('config.yaml', 'pose_cfg.yaml') for it in items)

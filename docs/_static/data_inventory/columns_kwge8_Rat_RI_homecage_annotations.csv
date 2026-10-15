@@ -48,8 +48,8 @@ column_number,column_name,kind
 46,Tail_end_2_x,pose
 47,Tail_end_2_y,pose
 48,Tail_end_2_p,pose
-49,video_no,feature
-50,frames,feature
+49,video_no,bookkeeping
+50,frames,bookkeeping
 51,Mouse_1_poly_area,feature
 52,Mouse_2_poly_area,feature
 53,Mouse_1_nose_to_tail,feature
