@@ -5,6 +5,10 @@ Videos, pose-estimation models, trained classifiers and training data shared by 
 grouped by experimental set-up. Use them to follow the tutorials, test SimBA on real data, or as a
 starting point for your own classifiers.
 
+Looking for something specific? The :ref:`data inventory <data_inventory>` lists every file the SimBA team has shared
+(on OSF, Google Drive and in the GitHub repository), with a search box, what is inside each archive, body parts,
+classifier settings and feature columns.
+
 .. raw:: html
 
    <style>

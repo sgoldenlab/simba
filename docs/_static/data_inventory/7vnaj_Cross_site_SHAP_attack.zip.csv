@@ -1,0 +1,11 @@
+file_in_archive,size_bytes,date
+SHAP_attack_raw_CRIM.csv,77381975,2020-09-16
+SHAP_attack_raw_NYU.csv,70421468,2020-09-23
+SHAP_attack_raw_Rat.csv,77502443,2020-09-15
+SHAP_attack_raw_Stanford.csv,77489943,2020-07-11
+SHAP_attack_raw_UW.csv,76969412,2020-07-11
+SHAP_attack_shap_CRIM.csv,89305843,2020-09-16
+SHAP_attack_shap_NYU.csv,81167395,2020-09-23
+SHAP_attack_shap_Rat.csv,89583089,2020-09-15
+SHAP_attack_shap_Stanford.csv,89300312,2020-07-11
+SHAP_attack_shap_UW.csv,89018863,2020-07-11
