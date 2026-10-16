@@ -1,6 +1,6 @@
 # Page layout for build_data_inventory.py (exec'd at the end of it, so every name defined there is available).
 # One page, ordered for finding things: jump menu -> start here -> one searchable table -> browse by location
-# -> repo files -> maintainer notes -> about.
+# -> repo files -> about. Maintainer notes go to a local, gitignored maintainer_notes.html, not the public page.
 
 SHORT_TYPE = {'dlc_model': 'DeepLabCut model', 'other_model': 'Other pose model', 'labelled': 'Labelled images', 'videos': 'Videos',
               'classifier': 'Classifier', 'training': 'Training data', 'project': 'Example project', 'meta': 'Classifier settings',
@@ -71,9 +71,9 @@ def settings_html(it):
                                  pct, f'min leaf {s["leaf"]}', s['under']] if x)
     flags = ''
     if clf_key(s['name_inside']) != clf_key(it['name']):
-        flags += f' <span class="inv-flag">file names the classifier &ldquo;{e(s["name_inside"])}&rdquo;</span>'
+        flags += f' <span class="inv-sub">(the file itself is labelled &ldquo;{e(s["name_inside"])}&rdquo;)</span>'
     if s['shifted']:
-        flags += ' <span class="inv-flag">columns shifted in file</span>'
+        flags += ' <span class="inv-sub">(this file\'s columns are laid out differently; undersampling read from the neighbouring column)</span>'
     return f'<div class="inv-sub"><b>Training settings</b> ({a(s["url"], s["file"])}): {e(txt)}{flags}</div>'
 
 
@@ -413,7 +413,7 @@ n_archive_files = sum(len([m for m in (archive_members(it) or []) if not m['name
 raw_osf_files = sum(1 for n in nodes for f in n['files'] if f['kind'] == 'file')
 total = sum(it['size'] or 0 for it in items)
 NAV = [('start-here', 'Start here'), ('all-data', 'All data (search)'), ('browse-by-location', 'Browse by location'),
-       ('data-files-in-the-simba-github-repository', 'Files in the GitHub repo'), ('for-maintainers', 'For maintainers'), ('about-this-page', 'About this page')]
+       ('data-files-in-the-simba-github-repository', 'Files in the GitHub repo'), ('about-this-page', 'About this page')]
 L += raw(STYLE.splitlines() + [
     '<div class="inv-intro">',
     f'<p>Every piece of data the SimBA team has shared publicly, and where it is: pose-estimation models, labelled images, videos, '
@@ -546,7 +546,7 @@ def location_rows(node_id, files_records, node_items):
         if folder != '/':
             rec = next(f for f in files_records if f['path'] == folder)
             label = a(osf_file_url(node_id, rec), folder.strip('/').split('/')[-1] + '/')
-            note = '' if any(f['path'].startswith(folder) and f['kind'] == 'file' for f in files_records) else ' <span class="inv-flag">empty</span>'
+            note = '' if any(f['path'].startswith(folder) and f['kind'] == 'file' for f in files_records) else ' <span class="inv-sub">(empty)</span>'
             rows.append(f'<tr class="inv-folder"><td colspan="4" style="padding-left:{0.6 + depth * 1.1:.1f}em">📁 {label}{note}</td></tr>')
         for it in sorted(here, key=lambda i: i['name'].lower()):
             extra = f' <span class="inv-sub">({it["parts"]} parts)</span>' if it['parts'] > 1 else ''
@@ -612,17 +612,19 @@ if repo_files:
             for m in f['mentions']:
                 if m['file'] not in seen:
                     seen.add(m['file']); ment.append(a(f"{GITHUB_BLOB}{m['file']}#L{m['line']}", m['file']))
-            ment_html = ', '.join(ment[:4]) + (f' +{len(ment) - 4} more' if len(ment) > 4 else '') if ment else '<span class="inv-flag">not mentioned</span>'
+            ment_html = ', '.join(ment[:4]) + (f' +{len(ment) - 4} more' if len(ment) > 4 else '') if ment else '<span class="inv-sub">&ndash;</span>'
             body.append(f'<tr><td>{a(GITHUB_BLOB + f["path"], rel)}</td><td class="num">{hsize(f["size"])}</td><td class="num">{e(f["last_changed"])}</td><td>{ment_html}</td></tr>')
-        unref_n = sum(1 for f in fs if not f['n_mentions'])
+        unref = [f['path'] for f in fs if not f['n_mentions']]
+        if unref:
+            findings.append(('Repo data files not mentioned in any doc or code', f'<code>{e(g)}/</code>: {len(unref)} of {len(fs)} files, e.g. '
+                             + ', '.join(f'<code>{e(x)}</code>' for x in unref[:5]) + '.'))
         repo_html += [f'<details class="inv-loc"><summary><b><code>{e(g)}/</code></b> <span class="inv-sub">{len(fs)} files · {hsize(sum(f["size"] or 0 for f in fs))} · '
-                      f'{e(REPO_FOLDERS.get(g, ""))}' + (f' · {unref_n} not mentioned anywhere' if unref_n else '') + '</span></summary>',
+                      f'{e(REPO_FOLDERS.get(g, ""))}</span></summary>',
                       '<div class="inv-wrap"><table class="inv-table"><thead><tr><th>File</th><th>Size</th><th>Last changed</th><th>Mentioned in</th></tr></thead><tbody>']
         repo_html += body + ['</tbody></table></div></details>']
     L += raw(repo_html)
 
-# ---- maintainers
-L += heading('For maintainers', '-')
+# ---- maintainer notes (collected here, written to maintainer_notes.html further down)
 findings.append(('No licence on the data', f'None of the {len(nodes)} OSF projects has a licence set, so the terms for reusing the data are not stated. '
                  'The CRIM13 videos are third-party data (Caltech) and need their own attribution.'))
 for (ds, key), s in sorted(clf_settings.items()):
@@ -664,16 +666,24 @@ with open(os.path.join(MANIFEST_DIR, 'checksums.csv'), 'w', encoding='utf-8', ne
 grouped = collections.OrderedDict()
 for kind, text in findings:
     grouped.setdefault(kind, []).append(text)
-L += raw(['<p>Things found while building this page that make the data harder to find or use. Click a heading to expand it.</p>', '<div class="inv-findings">']
-         + [f'<details class="inv-loc"><summary><b>{e(k)}</b> <span class="inv-sub">({len(v)})</span></summary><ul>' + ''.join(f'<li>{t}</li>' for t in v) + '</ul></details>'
-            for k, v in grouped.items()] + ['</div>'])
+NOTES = os.path.join(HERE, 'maintainer_notes.html')   # gitignored: housekeeping for the data owners, not for the public page
+with open(NOTES, 'w', encoding='utf-8') as fh:
+    fh.write('<!doctype html><meta charset="utf-8"><title>SimBA data: maintainer notes</title>'
+             '<style>body{font:14px/1.5 sans-serif;max-width:1100px;margin:24px auto;padding:0 16px;color:#222}'
+             'summary{cursor:pointer;font-size:15px;margin:10px 0}li{margin-bottom:5px}code{background:#f3f3f3;padding:0 3px}'
+             '.inv-sub{color:#666}.inv-flag{color:#a33;font-weight:600}</style>'
+             f'<h1>SimBA data: maintainer notes</h1><p>Built {SNAPSHOT_DATE} by <code>build_data_inventory.py</code>. Links with <code>#</code> point into '
+             f'<a href="https://simba-uw-tf-dev.readthedocs.io/en/latest/data_inventory.html">the public page</a>.</p>'
+             + ''.join(f'<details><summary><b>{e(k)}</b> <span class="inv-sub">({len(v)})</span></summary><ul>' + ''.join(f'<li>{t}</li>' for t in v) + '</ul></details>'
+                       for k, v in grouped.items())
+             .replace('href="#', 'href="https://simba-uw-tf-dev.readthedocs.io/en/latest/data_inventory.html#'))
+
+# ---- about
+L += heading('About this page', '-')
 if other:
     titles = load('other_osf_titles.json') if os.path.isfile(os.path.join(DATA, 'other_osf_titles.json')) else {}
     L += raw(['<p class="inv-note">OSF projects by other labs that the SimBA docs link to (not SimBA data): '
               + '; '.join(f'{a("https://osf.io/" + k + "/", titles.get(k, "osf.io/" + k))} (linked from {ref_html(v, limit=3)})' for k, v in other.items()) + '.</p>'])
-
-# ---- about
-L += heading('About this page', '-')
 L += [f'Built on {SNAPSHOT_DATE} from read-only crawls: the OSF API (every project, sub-project, wiki and file of the sgoldenlab account, '
       'including each file\'s download counter and SHA-256 checksum), the public Google Drive folder view, and the index at the end of each zip '
       'archive, fetched with HTTP range requests so no archive was downloaded. Body-part lists come from the ``CollectedData`` annotation files '

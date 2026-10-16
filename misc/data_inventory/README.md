@@ -4,7 +4,11 @@ Generates the docs page [`docs/data_inventory.rst`](../../docs/data_inventory.rs
 (<https://simba-uw-tf-dev.readthedocs.io/en/latest/data_inventory.html>, linked from `example_datasets.rst`) and its downloads in
 `docs/_static/data_inventory/`: every public SimBA file on OSF (all 28 projects on the sgoldenlab account), the mouse
 resident-intruder Google Drive folder and the data files tracked in this repo, with archive contents, body parts,
-classifier settings, feature columns, checksums and maintainer notes.
+classifier settings, feature columns and checksums.
+
+Housekeeping found along the way (empty folders, duplicate copies, unlinked projects, no licence, settings files that
+name another classifier, ...) is written to `maintainer_notes.html` in this folder. It is gitignored and kept off the
+public page on purpose; open it locally after a build.
 
 **Both outputs are generated. Do not edit them by hand**; change `build_data_inventory.py` / `page_layout.py` and rebuild.
 The crawlers only read (OSF API, public Drive pages, HTTP range requests into archives); nothing on OSF or Drive is changed.
@@ -42,7 +46,7 @@ It deletes files in `docs/_static/data_inventory/` that the page no longer links
 ## Files
 
 - `build_data_inventory.py`: loads the crawl data, builds rows and checks (duplicates, empty folders, settings mismatches ...), CSS, downloads.
-- `page_layout.py`: the page itself (jump menu, start here, searchable table + filter JS, browse by location, repo files, maintainer notes).
+- `page_layout.py`: the page itself (jump menu, start here, searchable table + filter JS, browse by location, repo files, about) and `maintainer_notes.html`.
 - `crawlers/`: one script per source, see above. The Drive crawler scrapes public folder pages (no API), so it is the one most likely to break.
 
 ## Verified by hand (2026-10-15), not re-checked by a rebuild

@@ -490,9 +490,4 @@ class LitPoseMergeProjects:
 
 #
 # if __name__ == "__main__":
-# merger = LitPoseMergeProjects(master_dir=r"I:\sina\project_5cam_cage21_22_0911",
-#                                   other_dirs=[r"I:\sina\project_cage21_22_10_08\project_cage21_22_10_08"],
-#                                   duplicate_method='skip',
-#                                   verbose=True,
-#                                   skip_videos=False)
-# merger.run()
+# cant understan

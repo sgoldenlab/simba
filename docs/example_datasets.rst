@@ -146,3 +146,15 @@ classifier settings and feature columns.
 All files are hosted on the `SimBA OSF repository <https://osf.io/tmu6y/>`_ unless marked otherwise. Pose-estimation
 models for other tools (YOLO, DeepPoseKit, Mask R-CNN) and their labelled images are in the
 `tracking models <https://osf.io/sr3ck/>`_ project.
+
+.. raw:: html
+
+   <div style="text-align:center; margin:28px 0 12px;">
+     <video autoplay loop muted playsinline preload="metadata"
+            poster="_static/img/simba_hdd_turntable_poster.jpg"
+            style="width:min(720px,100%); height:auto; border-radius:10px;"
+            aria-label="A SimBA-branded hard drive turning on a dark turntable">
+       <source src="_static/img/simba_hdd_turntable.webm" type="video/webm">
+       <source src="_static/img/simba_hdd_turntable.mp4" type="video/mp4">
+     </video>
+   </div>

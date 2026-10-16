@@ -477,7 +477,6 @@ table.inv-table a { color:#21567a; font-weight:600; }
 tr.inv-folder > td { background:#f8fafb; color:#21567a; font-weight:600; }
 .inv-sub { font-size:11.5px; color:#6a7884; font-weight:400; margin-top:2px; }
 .inv-sub a { font-weight:400 !important; }
-.inv-flag { display:inline-block; font-size:10.5px; font-weight:700; padding:1px 7px; border-radius:8px; background:#fdf0e6; color:#983412; margin-left:4px; }
 /* project boxes reuse the docs' own <details> style (custom.css); only spacing is tuned here */
 .rst-content details.inv-loc { margin:0 0 8px; }
 .rst-content details.inv-loc > summary { font-weight:400; font-size:13.5px; }
@@ -494,9 +493,6 @@ table.inv-inner { font-size:11.5px; border:1px solid #eef2f5; }
 table.inv-inner th { position:static; }
 .inv-wikibox { border-left:4px solid #21567a; background:#f4f8fb; border-radius:0 10px 10px 0; padding:8px 14px; margin:8px 0 12px; font-size:13px; }
 .inv-wikibox p { margin:4px 0 !important; }
-.inv-findings h4 { color:#21567a; margin:16px 0 6px; font-size:15px; }
-.inv-findings li { font-size:13px; line-height:1.5; margin-bottom:5px; list-style:disc; }
-.inv-findings ul { margin-left:18px !important; }
 .inv-nav { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 4px; }
 .inv-nav a { font-size:12.5px; font-weight:700; padding:5px 12px; border-radius:16px; background:#e8f4fb; color:#21567a !important; text-decoration:none !important; }
 .inv-nav a:hover { background:#d3e9f6; }
