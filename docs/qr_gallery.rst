@@ -185,4 +185,18 @@ print-ready stills to neon, full-bleed gradients, and animated (looping) version
        <figcaption><span class="qrg-nm">Color cycle</span><span class="qrg-tg">palette shift</span></figcaption>
      </a>
    </div>
+   <div class="qrg-sec">
+     <p class="qrg-eyebrow">On hardware</p>
+     <h2 class="qrg-h2">SimBA SSD</h2>
+     <p class="qrg-blurb">The same code on a drive label, linking to these docs. The label faces the camera at the start of each loop.</p>
+   </div>
+   <div style="text-align:center;">
+     <video autoplay loop muted playsinline preload="metadata"
+            poster="_static/img/simba_ssd_turntable_poster.jpg"
+            style="width:min(720px,100%); height:auto; border-radius:12px;"
+            aria-label="A SimBA-branded SSD with a QR code on its label, turning on a dark turntable">
+       <source src="_static/img/simba_ssd_turntable.webm" type="video/webm">
+       <source src="_static/img/simba_ssd_turntable.mp4" type="video/mp4">
+     </video>
+   </div>
    </div>

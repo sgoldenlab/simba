@@ -1284,3 +1284,15 @@ Built on 2026-10-15 from read-only crawls: the OSF API (every project, sub-proje
 
 **What this page cannot see:** private OSF projects or data under other OSF accounts; Google Drive, Dropbox or other folders that are not linked from the SimBA repository; and whether every file inside an archive extracts cleanly (only the archive indexes were read; checking contents would mean downloading about 300 GB).
 
+.. raw:: html
+
+   <div style="text-align:center; margin:28px 0 12px;">
+     <video autoplay loop muted playsinline preload="metadata"
+            poster="_static/img/simba_m2_standup_poster.jpg"
+            style="width:min(720px,100%); height:auto; border-radius:10px;"
+            aria-label="A SimBA-branded M.2 drive standing up and lying back down">
+       <source src="_static/img/simba_m2_standup.webm" type="video/webm">
+       <source src="_static/img/simba_m2_standup.mp4" type="video/mp4">
+     </video>
+   </div>
+
