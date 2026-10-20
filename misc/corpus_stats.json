@@ -1,6 +1,6 @@
 {
- "generated": "October 04, 2026",
- "n_pdfs": 183,
+ "generated": "October 20, 2026",
+ "n_pdfs": 185,
  "behaviours_automated": [
   [
    "Locomotion / distance travelled",
@@ -49,7 +49,7 @@
   ],
   [
    "Feeding / licking / drinking",
-   12,
+   13,
    "Feeding / reward"
   ],
   [
@@ -158,7 +158,7 @@
    "Exploration"
   ]
  ],
- "n_behaviour_studies": 149,
+ "n_behaviour_studies": 150,
  "behaviors": [
   [
    "Social interaction",
@@ -166,27 +166,27 @@
   ],
   [
    "Aggression / attack",
-   130
+   131
   ],
   [
    "Locomotion / open field",
-   130
+   131
   ],
   [
    "Feeding / consumption",
-   99
+   101
   ],
   [
    "Avoidance",
-   77
+   78
   ],
   [
    "Grooming",
-   76
+   77
   ],
   [
    "Rearing",
-   75
+   76
   ],
   [
    "Gait / balance",
@@ -206,7 +206,7 @@
   ],
   [
    "Immobility (FST/TST)",
-   50
+   52
   ],
   [
    "Mating / sexual",
@@ -219,6 +219,10 @@
  ],
  "regions": [
   [
+   "Amygdala",
+   90
+  ],
+  [
    "Prefrontal cortex",
    90
   ],
@@ -227,12 +231,8 @@
    90
   ],
   [
-   "Amygdala",
-   89
-  ],
-  [
    "Hypothalamus",
-   67
+   69
   ],
   [
    "Striatum",
@@ -240,11 +240,11 @@
   ],
   [
    "Nucleus accumbens",
-   54
+   55
   ],
   [
    "VTA",
-   41
+   43
   ],
   [
    "Thalamus",
@@ -278,7 +278,7 @@
  "methods": [
   [
    "DeepLabCut",
-   165
+   166
   ],
   [
    "Electrophysiology",
@@ -286,18 +286,22 @@
   ],
   [
    "Optogenetics",
-   56
+   57
   ],
   [
    "Viral tracing (AAV)",
-   47
+   48
   ],
   [
    "Transcriptomics",
-   41
+   42
   ],
   [
    "EthoVision",
+   39
+  ],
+  [
+   "SLEAP",
    39
   ],
   [
@@ -305,12 +309,8 @@
    38
   ],
   [
-   "SLEAP",
-   38
-  ],
-  [
    "c-Fos mapping",
-   35
+   36
   ],
   [
    "BORIS annotation",
@@ -322,7 +322,7 @@
   ],
   [
    "Chemogenetics (DREADD)",
-   30
+   32
   ],
   [
    "Calcium imaging",
@@ -337,11 +337,11 @@
    20
   ],
   [
-   "B-SOiD",
-   17
+   "Keypoint-MoSeq",
+   18
   ],
   [
-   "Keypoint-MoSeq",
+   "B-SOiD",
    17
   ],
   [
@@ -349,11 +349,11 @@
    15
   ],
   [
-   "EEG / LFP recording",
-   14
+   "Microdialysis",
+   15
   ],
   [
-   "Microdialysis",
+   "EEG / LFP recording",
    14
   ],
   [
@@ -404,11 +404,11 @@
  "diseases": [
   [
    "Addiction / substance use",
-   135
+   137
   ],
   [
    "Anxiety",
-   103
+   104
   ],
   [
    "Stress / depression",
@@ -416,15 +416,15 @@
   ],
   [
    "Pain / analgesia",
-   80
+   81
   ],
   [
    "Psychedelics",
-   61
+   62
   ],
   [
    "Autism (ASD)",
-   45
+   46
   ],
   [
    "Schizophrenia",
@@ -432,7 +432,7 @@
   ],
   [
    "Ageing",
-   36
+   37
   ],
   [
    "Fear conditioning",
@@ -460,15 +460,15 @@
   ],
   [
    "Obesity / diet",
+   24
+  ],
+  [
+   "Alzheimer's / dementia",
    22
   ],
   [
    "PTSD",
    22
-  ],
-  [
-   "Alzheimer's / dementia",
-   21
   ],
   [
    "Neuroinflammation",
@@ -584,6 +584,7 @@
   "biorxiv preprint doi https doi org 10 64898 2026 07 20 739643 this version posted july 24 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by 4 0 international license comparison of multiple video tracking based behavioral summary approaches for compound discrimination 1 marti ritter1 2 serena deiana2 alina ritter2 carsten t wotjak2 michael brecht1 amarender r 2 bogadhi2 3 1department of biology faculty of life sciences humboldt university berlin germany 4 2neuroscience and mental health discovery research boehringer ingelheim pharma g",
   "biorxiv preprint doi https doi org 10 64898 2026 07 30 741940 this version posted august 5 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by 4 0 international license reciprocal feedback inhibition and divergent intrinsic firing properties between behaviorally defined classes of neurons in the mouse ventromedial hypothalamus sukrita deb1 sofia torchia1 emily welponer1 luca spagnoletti1 selin karaglle1 sofia aravantis1 maria esteban masferrer1 yerassyl zhalgasbayev1 hiroki asari1 2 cornelius t gross1 1 epigenetics and neurobiology uni",
   "biorxiv preprint doi https doi org 10 64898 2026 08 10 744052 this version posted august 16 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by 4 0 international license jones et al sema trap manuscript semaglutide induced satiation nausea and food reward suppression are mediated by glp 1 receptors in the area postrema authors lauren a jones1 ella cross1 yuqi song1 phoebe claxton1 nicholas monaco1 yuan yu1 stefan trapp1 alice adriaenssens1 daniel i brierley1 affiliations 1 ucl centre for cardiovascular and metabolic neuroscience depart",
+  "biorxiv preprint doi https doi org 10 64898 2026 08 10 744052 this version posted october 19 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by 4 0 international license jones et al sema trap manuscript an area postrema glp 1r to nts pathway dissociates semaglutide induced satiation nausea and reduced food motivation from satiety authors lauren a jones ella cross yuqi song nicholas monaco phoebe claxton yuan yu stefan trapp alice adriaenssens daniel i brierley affiliations ucl centre for cardiovascular and metabolic neuroscience depar",
   "biorxiv preprint doi https doi org 10 64898 2026 08 30 748115 this version posted september 3 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by 4 0 international license 1 abel an active learning behavior estimation and labeling platform 2 3 jobe l ritchie1 brianna e george1 alison v roland1 2 caroline g krieman1 brooke n bender1 maya r 4 eberle1 william c der1 lili s kooyman1 adriane m lawes1 rajon t scott1 todd k o buckley1 marissa 5 m r mclean1 chloe j gallagher1 joyce besheer1 2 thomas l kash1 3 6 7 1bowles center for alcohol stu",
   "biorxiv preprint doi https doi org 10 64898 2026 09 18 752544 this version posted september 21 2026 the copyright holder for this preprint which was not certified by peer review is the author funder who has granted biorxiv a license to display the preprint in perpetuity it is made available under a cc by nc nd 4 0 international license 1 developmental dynamics of naturalistic social behavior revealed by longitudinal multi2 animal tracking 3 4 short title longitudinal tracking of social development 5 6 authors 7 sunjin kim1 yejin jeong1 hein lin thant1 haeri choi1 ain chung1 8 9 affiliations 10 department of bio and brain engineering korea advanced institute of science and technology 11 kaist",
   "self supervised pretraining of vision transformers for animal behavioral analysis and neural encoding arxiv 2507 09513v1 q bio nc 13 jul 2025 yanchen wang columbia university new york yw4503 columbia edu han yu columbia university new york hy2562 columbia edu ari blau columbia university new york bsb2144 columbia edu yizi zhang columbia university new york yz4123 columbia edu the international brain laboratory the international brain laboratory liam paninski columbia university new york lmp2107 columbia edu cole hurwitz columbia university new york ch3676 columbia edu matthew r whiteway columbia university new york m whiteway columbia edu abstract the brain can only be fully understood throu",
@@ -600,6 +601,7 @@
   "received 14 march 2022 accepted 29 june 2022 doi 10 1111 acer 14901 original article chronic alcohol consumption alters home cage behaviors and responses to ethologically relevant predator tasks in mice sofia neira1 2 leslie a hassanein1 christina m stanhope1 michelle c buccini1 shannon l d ambrosio1 meghan e flanigan1 harold l haun1 kristen m boyt1 jaideep s bains3 thomas l kash1 2 1department of pharmacology bowles center for alcohol studies school of medicine university of north carolina at chapel hill chapel hill north carolina usa 2curriculum in neuroscience school of medicine university of north carolina at chapel hill chapel hill north carolina usa 3department of physiology and pharma",
   "article a machine learning framework integrating deeplabcut and simba for quantifying aggressive behavior in swimming crab portunus trituberculatus chuanlong ding 1 yuanyuan fu 1 2 zhiqiang zhou 3 ting chen 3 4 wuqiang xia 3 4 weijiang huang 3 bincai zhou 3 jiameng chen 3 cheng zheng 3 4 chunlin wang 1 4 changkao mu 1 4 changjun liu 3 4 and lei liu 1 4 1 school of marine sciences ningbo university ningbo 315832 china 13870316091 163 com c d 2 ningbo institute of oceanography ningbo 315832 china 3 aquatic technology promotion station of xiangshan county ningbo 315709 china 4 experimental base of xiangshan ningbo university aquatic seed industry innovation research institute ningbo 315709 chin",
   "journal of experimental zoology part a ecological and integrative physiology research article automated profiling of social behaviors to assess the genetic basis of evolution of aggressive behaviors in astyanax mexicanus renee mapa stefan choy solomia lapko allison kimmel isabel carino bazan johanna e kowalko department of biological sciences lehigh university bethlehem pennsylvania usa correspondence johanna e kowalko jok421 lehigh edu received 27 june 2025 revised 20 february 2026 accepted 3 march 2026 funding national institutes of health grant award number r35gm138345 abstract across the animal kingdom social behaviors such as aggression are critical for survival and reproductive success",
+  "type brief research report published 20 october 2026 doi 10 3389 fnins 2026 1959447 open access edited by benjamin jurek ludwig maximilian university of munich germany reviewed by marcelo catalan austral university of chile chile johann du hoffmann boehringer ingelheim germany correspondence shinsuke ishigaki shinsuke belle shiga med ac jp these authors have contributed equally to this work received 05 august 2026 revised 16 september 2026 accepted 24 september 2026 published 20 october 2026 citation guo x fujioka y kawai k and ishigaki s 2026 automated temporal analysis reveals stress induced protracted feeding regulated by mesolimbic dopamine in mice front neurosci 20 1959447 doi 10 3389 f",
   "methamphetamine fentanyl polysubstance administration produces social deficits and corticolimbic stress reward circuit adaptations leah m salinsky university of washington joshua l fox university of washington kyra c diaz university of washington bradley c timmons university of washington susan m ferguson university of washington research article keywords methamphetamine fentanyl polysubstance use psilocybin social preference crhr1 oprm1 medial prefrontal cortex nucleus accumbens addiction posted date april 23rd 2026 doi https doi org 10 21203 rs 3 rs 9306429 v1 license this work is licensed under a creative commons attribution 4 0 international license read full license additional declarati",
   "open access published dec 20 2025 station holding during rheotaxis a sensitive assay of lateral line function in larval zebrafish sophie cohen bodns1 elayna i malak1 2 josef g trapani2 matt gaidica3 valentin a militchin1 kyle c newton4 and lavinia sheets1 5 1department of otolaryngology washington university school of medicine st louis mo usa 2department of biology amherst college amherst ma usa 3department of neuroscience neurotech hub washington university school of medicine st louis mo usa 4department of biological sciences florida atlantic university boca raton florida usa 5department of developmental biology washington university school of medicine st louis mo usa for correspondence she",
   "article tarp2 derived peptide enhances early phase long term potentiation and impairs memory retention in male rats dominik mtys 1 2 3 vanda tukacs 1 3 vilmos tth 4 pter baracskay 1 stefnia krisztina pap 1 2 pl strner 5 6 trn minh hin 5 6 va hunyadi gulys 7 zsuzsanna darula 7 8 andrs perczel 5 6 katalin adrienna kkesi 1 2 3 and gbor juhsz 1 3 1 laboratory of proteomics institute of biology elte etvs lornd university pzmny pter stny 1 c h 1117 budapest hungary kakekesi ttk elte hu k a k gjuhasz100 gmail com g j 2 department of physiology and neurobiology institute of biology elte etvs lornd university pzmny pter stny 1 c h 1117 budapest hungary 3 innoscience hungary ltd btori t 9 h 3143 mtran",
@@ -696,167 +698,167 @@
   "behaviours_automated": {
    "Locomotion / distance travelled": [
     36,
-    175,
-    79,
+    103,
+    140,
     30
    ],
    "Zone / ROI occupancy": [
     30,
-    138,
+    102,
     11,
-    1
+    84
    ],
    "Grooming": [
     0,
+    151,
     73,
-    89,
     10
    ],
    "Rearing": [
-    95,
+    134,
+    104,
     42,
-    40,
-    18
+    130
    ],
    "Social interaction / approach": [
     55,
-    125,
     117,
-    43
+    43,
+    134
    ],
    "Anogenital / body sniffing": [
-    95,
     166,
-    132,
-    20
+    20,
+    134,
+    18
    ],
    "Attack / fighting / biting": [
-    99,
-    130,
-    114,
-    101
+    143,
+    150,
+    103,
+    113
    ],
    "Avoidance / escape / flight": [
     55,
-    31,
-    111,
-    0
+    145,
+    117,
+    31
    ],
    "Freezing": [
+    166,
     37,
     16,
-    52,
-    28
+    52
    ],
    "Feeding / licking / drinking": [
-    106,
     33,
-    141,
-    61
+    61,
+    165,
+    108
    ],
    "Operant / self-administration": [
     101,
+    163,
     15,
-    161,
     61
    ],
    "Defensive posture / risk assessment": [
     20,
     61,
-    115,
-    175
+    103,
+    177
    ],
    "Mating / mounting": [
+    113,
     55,
     29,
-    77,
-    0
+    117
    ],
    "Climbing / jumping": [
     0,
-    99,
     4,
-    128
+    41,
+    21
    ],
    "Object exploration / novel object": [
+    88,
     2,
     68,
-    132,
-    67
+    110
    ],
    "Pup retrieval / maternal care": [
-    162,
-    123,
-    170,
-    106
+    102,
+    172,
+    108,
+    165
    ],
    "Digging / burrowing": [
     18,
-    89,
-    61,
-    0
+    90,
+    164,
+    61
    ],
    "Head-twitch response": [
-    84,
+    86,
+    172,
     69,
-    170,
     85
    ],
    "Immobility / motionless": [
-    79,
-    83,
+    84,
     37,
-    51
+    51,
+    41
    ],
    "Tail rattling / dominance display": [
     0,
-    111,
-    90,
-    115
+    91,
+    113,
+    117
    ],
    "Following / chasing / pursuit": [
     20,
-    111,
-    95,
-    49
+    117,
+    49,
+    55
    ],
    "Stereotypy (circling / pacing / Straub tail)": [
-    90,
+    83,
+    101,
     21,
-    82,
-    86
+    91
    ],
    "Darting": [
     32,
-    107,
-    175,
+    109,
+    177,
     41
    ],
    "Swimming / rheotaxis / hovering": [
-    93,
-    177,
-    83,
-    43
+    43,
+    84,
+    179,
+    95
    ],
    "Gait / balance beam": [
-    164,
-    103,
+    166,
     56,
-    66
+    66,
+    105
    ],
    "Maze arm entries / spatial task": [
-    106,
+    77,
+    108,
     55,
-    76,
     2
    ],
    "Foraging / food handling": [
     1,
-    145,
-    83
+    147,
+    84
    ],
    "Cleaning interaction / jolts (fish)": [
-    145,
+    147,
     50
    ],
    "Wheel running": [
@@ -866,7 +868,7 @@
     66
    ],
    "Whisking / head scanning": [
-    106
+    108
    ]
   },
   "behaviors": {
@@ -878,9 +880,9 @@
    ],
    "Aggression / attack": [
     162,
+    129,
     71,
-    40,
-    102
+    151
    ],
    "Locomotion / open field": [
     123,
@@ -889,14 +891,14 @@
     166
    ],
    "Feeding / consumption": [
+    93,
     159,
-    115,
-    97,
-    158
+    99,
+    5
    ],
    "Avoidance": [
     75,
-    80,
+    155,
     7,
     20
    ],
@@ -915,47 +917,53 @@
    "Gait / balance": [
     180,
     62,
-    165,
-    74
+    116,
+    142
    ],
    "Sniffing": [
+    167,
+    176,
     34,
-    30,
-    161,
-    65
+    133
    ],
    "Freezing": [
+    116,
     71,
-    51,
-    37,
-    167
+    166,
+    51
    ],
    "Pup retrieval / maternal": [
+    136,
     105,
     106,
-    121,
-    65
+    133
    ],
    "Immobility (FST/TST)": [
     64,
+    184,
     74,
-    76,
-    138
+    76
    ],
    "Mating / sexual": [
-    115,
     160,
-    124,
+    156,
+    167,
     24
    ],
    "Head-twitch (HTR)": [
-    171,
+    136,
     85,
-    135,
+    172,
     48
    ]
   },
   "regions": {
+   "Amygdala": [
+    181,
+    42,
+    80,
+    150
+   ],
    "Prefrontal cortex": [
     153,
     39,
@@ -963,82 +971,76 @@
     32
    ],
    "Hippocampus": [
+    141,
+    105,
     117,
-    112,
-    169,
-    21
-   ],
-   "Amygdala": [
-    42,
-    158,
-    80,
-    150
+    159
    ],
    "Hypothalamus": [
     59,
     89,
     143,
-    88
+    90
    ],
    "Striatum": [
     26,
-    105,
-    79,
-    160
+    155,
+    160,
+    9
    ],
    "Nucleus accumbens": [
-    176,
+    155,
+    123,
     6,
-    52,
-    72
+    52
    ],
    "VTA": [
-    86,
-    102,
-    98,
-    29
+    76,
+    94,
+    29,
+    22
    ],
    "Thalamus": [
     44,
     40,
-    121,
-    53
+    108,
+    152
    ],
    "BNST": [
-    116,
-    131,
-    174,
-    98
+    162,
+    176,
+    118,
+    100
    ],
    "Cerebellum": [
-    93,
-    79,
+    96,
     66,
-    39
+    39,
+    150
    ],
    "Cingulate cortex": [
-    132,
-    101,
     94,
-    40
+    168,
+    134,
+    153
    ],
    "Insula": [
-    101,
-    40,
-    179,
-    119
+    121,
+    133,
+    96,
+    40
    ],
    "Periaqueductal gray": [
     63,
-    116,
-    158,
-    72
+    72,
+    52,
+    108
    ],
    "Habenula": [
     61,
+    162,
     71,
-    72,
-    59
+    72
    ]
   },
   "methods": {
@@ -1046,179 +1048,179 @@
     26,
     148,
     147,
-    77
+    156
    ],
    "Electrophysiology": [
     66,
-    94,
-    131,
-    155
+    128,
+    151,
+    23
    ],
    "Optogenetics": [
     179,
-    150,
-    79,
+    90,
+    122,
     120
    ],
    "Viral tracing (AAV)": [
     27,
+    133,
     149,
-    137,
-    63
+    184
    ],
    "Transcriptomics": [
-    182,
-    174,
-    43,
-    68
+    159,
+    125,
+    179,
+    43
    ],
    "EthoVision": [
-    182,
+    107,
     15,
-    16,
-    89
-   ],
-   "Fiber photometry": [
-    24,
-    61,
-    67,
-    131
+    119,
+    16
    ],
    "SLEAP": [
-    143,
-    137,
-    178,
+    78,
+    157,
+    97,
     49
+   ],
+   "Fiber photometry": [
+    156,
+    118,
+    24,
+    61
    ],
    "c-Fos mapping": [
     160,
     25,
-    157,
-    102
+    56,
+    40
    ],
    "BORIS annotation": [
-    89,
+    117,
     118,
-    143,
+    158,
     44
    ],
    "Immunohistochemistry": [
-    158,
-    56,
-    154,
-    11
+    152,
+    166,
+    156,
+    56
    ],
    "Chemogenetics (DREADD)": [
-    150,
-    182,
+    184,
     61,
-    161
+    0,
+    6
    ],
    "Calcium imaging": [
     26,
+    181,
     59,
-    57,
-    33
+    57
    ],
    "AnyMaze": [
+    116,
     68,
     10,
-    143,
     11
    ],
    "Ultrasonic vocalisation": [
     38,
     24,
-    114,
+    106,
     9
-   ],
-   "B-SOiD": [
-    181,
-    129,
-    55,
-    73
    ],
    "Keypoint-MoSeq": [
     35,
     55,
     60,
-    76
+    107
+   ],
+   "B-SOiD": [
+    55,
+    183,
+    131,
+    73
    ],
    "SHAP explainability": [
-    162,
+    117,
     6,
-    116,
-    140
-   ],
-   "EEG / LFP recording": [
-    39,
-    2,
-    94,
-    70
+    183,
+    103
    ],
    "Microdialysis": [
-    84,
-    80,
-    131,
-    127
+    162,
+    81,
+    129,
+    128
+   ],
+   "EEG / LFP recording": [
+    135,
+    39,
+    2,
+    81
    ],
    "qPCR": [
+    141,
     68,
-    138,
-    92,
-    131
+    155,
+    94
    ],
    "VAME": [
+    101,
+    112,
     12,
-    56,
-    77,
-    116
+    107
    ],
    "A-SOiD": [
-    110,
     73,
-    116,
-    55
+    55,
+    112,
+    118
    ],
    "UMAP / t-SNE": [
-    159,
+    80,
     9,
-    110,
-    166
+    161,
+    168
    ],
    "Western blot": [
-    94,
+    122,
+    116,
     7,
-    2,
-    114
+    2
    ],
    "TopScan / CleverSys": [
-    105,
-    134,
-    42,
-    140
+    142,
+    136,
+    107,
+    42
    ],
    "Telemetry": [
+    129,
+    128,
     127,
-    126,
-    42,
-    125
+    42
    ],
    "XGBoost": [
-    76,
-    130,
+    77,
+    132,
     52
    ],
    "Lightning Pose": [
-    178,
-    78
+    79,
+    180
    ],
    "DANNCE": [
-    116,
-    115
+    117,
+    118
    ],
    "ezTrack": [
-    162
+    164
    ]
   },
   "diseases": {
@@ -1231,92 +1233,86 @@
    "Anxiety": [
     6,
     0,
-    14,
-    151
+    159,
+    140
    ],
    "Stress / depression": [
-    131,
     56,
-    27,
-    38
+    155,
+    169,
+    27
    ],
    "Pain / analgesia": [
     118,
     60,
-    80,
-    115
+    122,
+    21
    ],
    "Psychedelics": [
-    170,
+    153,
     85,
     88,
     75
    ],
    "Autism (ASD)": [
-    136,
-    124,
-    131,
+    163,
+    155,
+    160,
     67
    ],
    "Schizophrenia": [
-    112,
-    108,
-    180,
-    69
+    81,
+    182,
+    164,
+    109
    ],
    "Ageing": [
     169,
-    94,
-    161,
+    89,
+    163,
     15
    ],
    "Fear conditioning": [
     150,
-    113,
-    168,
-    140
+    109,
+    67,
+    38
    ],
    "Epilepsy / seizure": [
-    149,
-    11,
-    58,
-    73
+    133,
+    161,
+    106,
+    11
    ],
    "Parkinson's": [
-    79,
     67,
+    80,
     9,
-    164
+    160
    ],
    "Sleep / circadian": [
+    171,
     133,
-    30,
-    12,
-    125
+    89,
+    30
    ],
    "Early-life stress": [
     0,
-    88,
-    182,
-    104
+    141,
+    120,
+    103
    ],
    "Social defeat": [
+    103,
     25,
-    63,
-    143,
-    150
+    141,
+    63
    ],
    "Obesity / diet": [
     69,
-    101,
-    150,
-    160
-   ],
-   "PTSD": [
-    28,
-    60,
-    64,
-    38
+    93,
+    176,
+    45
    ],
    "Alzheimer's / dementia": [
     2,
@@ -1324,53 +1320,59 @@
     52,
     16
    ],
+   "PTSD": [
+    28,
+    60,
+    64,
+    38
+   ],
    "Neuroinflammation": [
     2,
-    164,
     69,
-    175
-   ],
-   "Stroke / ischemia": [
-    67,
-    95,
-    103,
-    144
-   ],
-   "Prenatal exposure": [
-    123,
-    153,
-    10,
-    47
-   ],
-   "Neuropathic pain": [
-    120,
-    39,
-    72,
+    150,
     60
    ],
-   "Huntington's": [
+   "Stroke / ischemia": [
+    155,
     67,
-    113,
-    66,
-    51
+    2,
+    44
+   ],
+   "Prenatal exposure": [
+    10,
+    106,
+    47,
+    164
+   ],
+   "Neuropathic pain": [
+    39,
+    158,
+    122,
+    72
+   ],
+   "Huntington's": [
+    115,
+    67,
+    149,
+    66
    ],
    "ADHD": [
     19,
-    95,
     34,
-    80
+    97,
+    81
    ],
    "Rett syndrome": [
-    162,
     34,
-    103,
+    105,
+    164,
     66
    ],
    "Traumatic brain injury": [
     44,
-    130,
     47,
-    103
+    132,
+    105
    ],
    "Fragile X": [
     53,
@@ -1378,17 +1380,17 @@
    ]
   },
   "wordcloud": {
+   "Pose estimation": [
+    90,
+    114,
+    168,
+    51
+   ],
    "DeepLabCut": [
     26,
     148,
     147,
-    77
-   ],
-   "Pose estimation": [
-    90,
-    114,
-    51,
-    106
+    156
    ],
    "Machine learning": [
     58,
@@ -1400,37 +1402,43 @@
     74,
     52,
     4,
-    24
+    179
    ],
    "C57BL/6": [
-    138,
     54,
     69,
-    53
+    53,
+    42
    ],
    "Ethanol / alcohol": [
     52,
-    167,
     152,
-    2
+    2,
+    173
    ],
    "Anxiety": [
     6,
     0,
-    14,
-    151
+    159,
+    140
    ],
    "Dopamine": [
     41,
     100,
     36,
-    22
+    114
    ],
    "Hippocampus": [
+    141,
+    105,
     117,
-    112,
-    169,
-    21
+    159
+   ],
+   "Amygdala": [
+    181,
+    42,
+    80,
+    150
    ],
    "Prefrontal cortex": [
     153,
@@ -1438,16 +1446,10 @@
     26,
     32
    ],
-   "Amygdala": [
-    42,
-    158,
-    80,
-    150
-   ],
    "Aggression": [
     119,
-    112,
     91,
+    82,
     117
    ],
    "Social interaction": [
@@ -1458,13 +1460,13 @@
    ],
    "Depression": [
     46,
-    143,
-    156,
-    87
+    141,
+    169,
+    172
    ],
    "Avoidance": [
     75,
-    80,
+    155,
     7,
     20
    ],
@@ -1482,429 +1484,435 @@
    ],
    "Random forest": [
     55,
-    178,
-    126,
-    49
+    78,
+    49,
+    173
    ],
    "Open field": [
-    148,
-    11,
-    19,
-    9
+    110,
+    125,
+    126,
+    167
    ],
    "Glutamate": [
-    160,
-    123,
     33,
-    124
+    152,
+    14,
+    39
    ],
    "Hypothalamus": [
     59,
     89,
     143,
-    88
+    90
    ],
    "CNN / ResNet": [
     52,
     6,
-    126,
+    121,
     96
    ],
    "Striatum": [
     26,
-    105,
-    79,
-    160
+    155,
+    160,
+    9
    ],
    "Feeding": [
-    139,
-    83,
-    177,
-    86
+    157,
+    141,
+    23,
+    123
    ],
    "Electrophysiology": [
     66,
-    94,
-    131,
-    155
+    128,
+    151,
+    23
    ],
    "Serotonin": [
-    84,
     0,
+    108,
     158,
-    106
+    94
    ],
    "Sniffing": [
+    167,
+    176,
     34,
-    30,
-    161,
-    65
-   ],
-   "Freezing": [
-    71,
-    51,
-    37,
-    167
+    133
    ],
    "Aging": [
+    134,
     22,
     60,
-    170,
-    88
+    96
+   ],
+   "Freezing": [
+    116,
+    71,
+    166,
+    51
    ],
    "Optogenetics": [
-    179,
-    150,
-    79,
-    120
+    90,
+    122,
+    120,
+    159
    ],
    "Nucleus accumbens": [
-    176,
+    155,
+    123,
     6,
-    52,
-    72
+    52
    ],
    "Keypoint tracking": [
-    163,
-    82,
-    85,
-    181
+    112,
+    149,
+    102,
+    153
    ],
    "Sleep / circadian": [
+    82,
+    171,
     14,
-    29,
-    133,
-    30
+    29
    ],
    "Immobility": [
-    155,
-    81,
+    149,
     69,
-    138
+    96,
+    105
    ],
    "Transgenic": [
-    147,
-    157,
-    79,
-    58
+    163,
+    58,
+    154,
+    67
    ],
    "Operant task": [
     42,
+    118,
     38,
-    153,
-    109
+    155
    ],
    "Autism": [
-    112,
-    128,
     114,
-    148
+    130,
+    0,
+    121
    ],
    "Mating": [
     55,
-    154,
+    118,
     117,
     13
    ],
+   "VTA": [
+    76,
+    94,
+    29,
+    22
+   ],
    "Addiction": [
-    89,
-    61,
-    20,
-    84
+    155,
+    107,
+    135,
+    61
    ],
    "Stereotypy": [
-    111,
     62,
-    122,
-    134
-   ],
-   "VTA": [
-    86,
-    102,
-    98,
-    29
+    20,
+    162,
+    55
    ],
    "RNA-seq": [
     60,
-    177,
-    79,
-    68
+    184,
+    171,
+    80
    ],
    "EthoVision": [
-    182,
+    107,
     15,
-    16,
-    89
+    119,
+    16
    ],
    "SLEAP": [
-    143,
-    137,
-    178,
+    78,
+    157,
+    97,
     49
    ],
+   "GABA": [
+    61,
+    110,
+    0,
+    114
+   ],
    "Schizophrenia": [
-    112,
-    108,
-    180,
-    69
+    81,
+    182,
+    164,
+    109
    ],
    "Opioid": [
+    164,
     56,
-    47,
-    48,
-    29
+    113,
+    47
    ],
    "Self-administration": [
     60,
     36,
-    28,
-    157
+    135,
+    28
    ],
    "Oxytocin": [
     24,
-    131,
-    161,
-    166
-   ],
-   "GABA": [
-    98,
-    143,
-    61,
-    0
+    106,
+    151,
+    82
    ],
    "Sprague-Dawley": [
-    174,
     32,
+    142,
     46,
-    125
-   ],
-   "Primate": [
-    149,
-    45,
-    44,
-    116
+    8
    ],
    "c-Fos": [
-    174,
+    104,
+    76,
     33,
-    5,
-    166
+    5
+   ],
+   "Primate": [
+    45,
+    44,
+    52,
+    117
+   ],
+   "Unsupervised": [
+    35,
+    130,
+    20,
+    117
    ],
    "BORIS": [
     44,
     57,
-    49,
-    159
-   ],
-   "Unsupervised": [
-    35,
-    20,
-    152,
-    82
+    117,
+    49
    ],
    "Thalamus": [
     44,
     40,
-    121,
-    53
-   ],
-   "Jumping / escape": [
-    52,
-    101,
-    74,
-    59
-   ],
-   "Licking": [
-    163,
-    3,
-    15,
-    10
-   ],
-   "Immunohistochemistry": [
-    158,
-    56,
-    154,
-    11
-   ],
-   "Fear conditioning": [
-    150,
-    113,
-    168,
-    140
-   ],
-   "Resident-intruder": [
-    59,
-    64,
-    165,
-    101
+    108,
+    152
    ],
    "Novel object": [
     114,
     115,
     176,
-    169
+    2
+   ],
+   "Jumping / escape": [
+    52,
+    74,
+    59,
+    12
+   ],
+   "Licking": [
+    129,
+    3,
+    15,
+    109
    ],
    "Cocaine": [
+    104,
+    135,
     68,
-    13,
-    182,
-    60
+    13
    ],
-   "Knockout": [
-    68,
-    114,
+   "Immunohistochemistry": [
+    152,
     166,
-    103
+    156,
+    56
    ],
    "Ketamine": [
-    87,
+    172,
+    158,
     41,
-    164,
-    166
+    108
+   ],
+   "Fear conditioning": [
+    150,
+    109,
+    67,
+    38
+   ],
+   "Resident-intruder": [
+    167,
+    59,
+    64,
+    159
+   ],
+   "Knockout": [
+    135,
+    142,
+    181,
+    68
    ],
    "Basolateral amygdala": [
-    161,
-    29,
-    152,
-    61
+    104,
+    89,
+    163,
+    29
    ],
    "Spatial memory": [
-    108,
+    114,
     6,
-    169,
-    94
+    115,
+    102
+   ],
+   "DREADD": [
+    100,
+    104,
+    22,
+    71
    ],
    "Place preference": [
-    92,
+    170,
     158,
-    116,
-    157
+    21,
+    123
    ],
    "Extinction": [
     58,
     46,
-    102,
-    7
+    7,
+    139
    ],
    "Amphetamine": [
-    157,
-    117,
-    143,
-    80
+    109,
+    119,
+    7,
+    113
    ],
    "BNST": [
-    116,
-    131,
-    174,
-    98
+    162,
+    176,
+    118,
+    100
    ],
    "Fiber photometry": [
+    156,
+    118,
     24,
-    61,
-    67,
-    131
+    61
    ],
    "Cerebellum": [
-    93,
-    79,
+    96,
     66,
-    39
-   ],
-   "DREADD": [
-    22,
-    182,
-    141,
-    157
+    39,
+    150
    ],
    "CD1": [
+    121,
     2,
     63,
-    74,
-    139
+    74
    ],
    "Elevated plus maze": [
     121,
-    107,
-    38,
-    30
+    177,
+    77,
+    38
    ],
    "Epilepsy": [
-    103,
-    95,
     54,
-    47
+    47,
+    133,
+    102
    ],
    "Estrogen": [
     39,
+    115,
     40,
-    99,
     169
    ],
    "Methamphetamine": [
-    171,
-    126,
-    102,
+    160,
+    88,
+    94,
     7
    ],
    "Nesting": [
-    88,
+    165,
     3,
     103,
     22
    ],
    "Norepinephrine": [
     85,
-    98,
-    138,
-    70
+    70,
+    11,
+    162
+   ],
+   "CRF": [
+    7,
+    90,
+    154,
+    32
+   ],
+   "Obesity / diet": [
+    69,
+    93,
+    176,
+    45
    ],
    "Paraventricular nucleus": [
     34,
-    81,
-    89,
-    61
+    152,
+    61,
+    29
    ],
    "Social defeat": [
+    103,
     25,
-    63,
-    143,
-    150
+    141,
+    63
    ],
    "Three-chamber": [
     65,
     5,
-    157,
-    18
-   ],
-   "CRF": [
-    7,
-    88,
-    32,
-    14
+    121,
+    150
    ],
    "Cannabinoid": [
+    136,
     56,
-    72,
-    16,
-    173
+    142,
+    182
    ],
    "Morphine": [
+    104,
     72,
     47,
-    182,
-    87
+    109
    ],
    "Cingulate": [
     56,
-    132,
+    96,
     72,
     60
    ],
    "Calcium imaging": [
     26,
+    181,
     59,
-    57,
-    33
+    57
    ],
    "PTSD": [
     28,
@@ -1913,561 +1921,555 @@
     38
    ],
    "Zebrafish": [
-    93,
     112,
+    179,
     20,
-    116
+    119
    ],
    "Parkinson's": [
-    79,
     67,
+    80,
     9,
-    164
+    34
+   ],
+   "Object recognition": [
+    68,
+    110,
+    79,
+    66
    ],
    "Insula": [
-    101,
-    40,
-    179,
-    119
+    121,
+    133,
+    96,
+    40
    ],
    "Chronic stress": [
     13,
     46,
-    107,
-    16
+    141,
+    167
    ],
    "Periaqueductal gray": [
     63,
-    116,
-    158,
-    72
-   ],
-   "Obesity / diet": [
-    69,
-    101,
-    150,
-    160
+    72,
+    52,
+    108
    ],
    "Acetylcholine": [
     53,
-    108,
-    176,
-    182
-   ],
-   "Object recognition": [
-    123,
-    68,
-    78,
-    176
+    107,
+    102,
+    30
    ],
    "Dorsal raphe": [
-    158,
-    150,
+    160,
+    176,
     11,
-    29
+    133
    ],
    "Prelimbic / infralimbic": [
-    131,
-    8,
-    27,
-    167
+    133,
+    89,
+    154,
+    8
    ],
    "Substantia nigra": [
     56,
-    147,
-    158,
-    70
+    80,
+    149,
+    156
    ],
    "Drosophila": [
+    164,
     35,
-    177,
-    29,
-    112
+    82,
+    29
+   ],
+   "Alzheimer's": [
+    171,
+    105,
+    68,
+    167
    ],
    "Habenula": [
     61,
+    162,
     71,
-    72,
-    59
+    72
    ],
    "Wistar rat": [
-    136,
+    9,
+    38,
+    172,
+    77
+   ],
+   "Preoptic area": [
+    80,
+    75,
     123,
-    176,
-    171
+    125
    ],
    "AnyMaze": [
+    116,
     68,
     10,
-    143,
     11
-   ],
-   "Alzheimer's": [
-    174,
-    161,
-    68,
-    2
    ],
    "Neuroinflammation": [
     2,
-    164,
     69,
-    175
+    150,
+    60
    ],
    "Ultrasonic vocalisation": [
     38,
     24,
-    114,
+    106,
     9
    ],
    "Maternal separation": [
-    118,
-    102,
+    89,
+    175,
     60,
-    163
-   ],
-   "Preoptic area": [
-    117,
-    75,
-    101,
-    123
+    141
    ],
    "Corticosterone": [
     47,
-    88,
-    174,
-    138
+    119,
+    85,
+    141
    ],
    "Climbing": [
-    125,
-    86,
-    114,
-    44
-   ],
-   "Startle": [
-    177,
-    170,
-    102,
-    173
+    121,
+    105,
+    88,
+    128
    ],
    "Clozapine": [
     40,
+    164,
     54,
-    27,
-    71
+    27
    ],
-   "Stroke / ischemia": [
-    67,
-    95,
-    103,
-    144
-   ],
-   "Long-Evans": [
-    32,
-    115,
-    163,
-    116
-   ],
-   "Endocannabinoid": [
-    133,
-    89,
-    48,
-    46
-   ],
-   "Orexin": [
-    24,
-    17,
-    152,
-    131
-   ],
-   "Psilocybin": [
-    92,
-    111,
-    87,
-    40
-   ],
-   "B-SOiD": [
-    181,
-    129,
-    55,
-    73
+   "Startle": [
+    116,
+    150,
+    173,
+    68
    ],
    "MoSeq": [
+    111,
+    112,
     78,
-    60,
-    76,
-    105
-   ],
-   "Orbitofrontal cortex": [
-    81,
-    29,
-    67,
-    61
+    60
    ],
    "Lateral septum": [
-    77,
+    76,
     5,
     40,
     74
    ],
+   "Stroke / ischemia": [
+    155,
+    67,
+    2,
+    44
+   ],
+   "Long-Evans": [
+    32,
+    117,
+    20,
+    145
+   ],
+   "Endocannabinoid": [
+    48,
+    181,
+    46,
+    20
+   ],
+   "Orexin": [
+    24,
+    17,
+    118,
+    39
+   ],
+   "Psilocybin": [
+    88,
+    113,
+    136,
+    142
+   ],
+   "B-SOiD": [
+    55,
+    183,
+    131,
+    73
+   ],
+   "Orbitofrontal cortex": [
+    82,
+    132,
+    168,
+    126
+   ],
    "Dentate gyrus": [
     54,
-    153,
-    14,
-    67
+    175,
+    168,
+    171
    ],
    "BALB/c": [
-    131,
-    143,
-    116,
-    77
+    133,
+    159,
+    155,
+    145
    ],
    "MDMA": [
-    134,
+    136,
     40,
-    148,
-    157
+    86,
+    34
    ],
    "BDNF": [
-    182,
+    94,
     67,
-    143,
-    0
+    0,
+    11
    ],
    "Buprenorphine": [
+    100,
     0,
     67,
-    175,
     72
    ],
    "Entorhinal cortex": [
     54,
     44,
     30,
-    166
+    123
    ],
    "SHAP": [
-    163,
-    84,
-    172,
-    134
+    165,
+    85,
+    142,
+    136
    ],
    "Digging": [
     22,
     18,
-    81,
+    164,
     82
    ],
    "Social novelty": [
+    164,
+    150,
     24,
-    77,
-    169,
-    162
+    130
    ],
    "Somatostatin": [
-    152,
+    163,
     54,
     5,
     18
    ],
    "Nicotine": [
-    103,
-    92,
-    118,
-    21
+    97,
+    21,
+    120,
+    19
    ],
    "Cortisol": [
+    120,
     43,
-    138,
-    118,
-    13
+    175,
+    90
    ],
    "Crayfish / crustacean": [
-    97,
-    89,
-    144,
-    43
+    43,
+    108,
+    91,
+    99
    ],
    "Vasopressin": [
+    160,
     34,
-    116,
-    57,
-    115
+    171,
+    57
    ],
    "LSD": [
     48,
-    140,
+    158,
     69,
     41
    ],
    "Fluoxetine / SSRI": [
-    157,
-    114,
+    116,
+    133,
     59,
     43
    ],
    "Prepulse inhibition": [
-    171,
-    87,
-    89,
-    170
+    116,
+    126,
+    90,
+    179
    ],
    "Head-twitch": [
-    135,
     9,
+    136,
     85,
     69
    ],
    "Locus coeruleus": [
-    120,
+    133,
     70,
-    124,
-    39
+    39,
+    126
    ],
    "Diazepam": [
-    89,
-    106,
-    37,
-    43
+    145,
+    168,
+    159,
+    108
    ],
    "Reinstatement": [
-    121,
-    107,
-    86,
+    104,
+    85,
+    101,
     21
    ],
    "Social memory": [
-    130,
+    163,
+    132,
     24,
-    169,
-    44
+    123
    ],
    "THC / cannabis": [
-    116,
+    182,
+    135,
     46,
-    100,
-    180
+    40
    ],
    "Parvalbumin": [
     7,
     30,
-    182,
-    77
+    78,
+    184
    ],
    "Rotarod": [
-    164,
-    103,
-    114,
-    58
+    166,
+    116,
+    58,
+    51
    ],
    "Neuropathic pain": [
-    120,
     39,
-    72,
-    60
+    158,
+    122,
+    72
    ],
    "Pup retrieval": [
-    115,
-    81,
+    108,
     34,
-    104
+    118,
+    3
    ],
    "VAME": [
+    101,
+    112,
     12,
-    56,
-    77,
-    116
+    107
    ],
    "DMT": [
     60,
     41,
     48,
-    69
+    89
    ],
    "A-SOiD": [
-    110,
     73,
-    116,
-    55
+    55,
+    112,
+    118
    ],
    "Scratching": [
-    125,
+    129,
     55,
-    162,
-    106
+    108,
+    127
    ],
    "Forced swim": [
-    116,
+    141,
     66,
-    115,
-    11
+    11,
+    69
    ],
    "Testosterone": [
-    117,
     13,
     68,
-    121
+    121,
+    30
    ],
    "Fentanyl": [
-    92,
-    102,
+    88,
+    94,
     4,
     21
    ],
    "Oxycodone": [
-    86,
-    133,
+    177,
     4,
-    175
+    117,
+    87
    ],
    "Two-photon": [
-    78,
+    79,
+    134,
     33,
-    152,
-    62
+    154
    ],
    "Gait": [
-    178,
     56,
-    164,
-    66
+    66,
+    9,
+    150
    ],
    "UMAP": [
-    166,
+    112,
     56,
-    76,
-    110
+    168,
+    161
    ],
    "Circling": [
+    92,
     49,
-    110,
     39,
-    82
+    83
    ],
    "Tremor": [
-    147,
-    86,
+    87,
     21,
-    92
+    94,
+    105
    ],
    "Burrowing": [
-    125,
-    106,
+    167,
+    129,
     30,
-    126
+    108
    ],
    "Huntington's": [
+    115,
     67,
-    113,
-    66,
-    51
+    149,
+    66
    ],
    "Songbird": [
-    115,
-    116,
-    154,
-    112
+    118,
+    121,
+    117,
+    156
    ],
    "Naloxone / naltrexone": [
-    133,
-    86,
+    135,
+    122,
     46,
     4
    ],
    "Transformer": [
     55,
-    146,
-    142,
-    78
+    89,
+    144,
+    148
    ],
    "Haloperidol": [
-    158,
-    111,
-    107,
-    40
+    87,
+    40,
+    160,
+    109
    ],
    "Y-maze": [
     13,
     71,
-    95,
-    168
+    170,
+    19
    ],
    "Bounding box": [
+    83,
     35,
-    116,
-    82,
+    117,
     12
    ],
    "ADHD": [
     19,
-    95,
     34,
-    80
+    97,
+    81
    ],
    "TopScan / CleverSys": [
-    105,
-    134,
-    42,
-    140
+    142,
+    136,
+    107,
+    42
    ],
    "Catalepsy": [
     4,
-    180,
-    166,
-    133
+    135,
+    182,
+    168
    ],
    "MK-801": [
-    82,
-    170,
-    111,
-    80
+    172,
+    113,
+    83,
+    81
    ]
   }
  },
  "wordcloud": [
   [
-   "DeepLabCut",
-   165
+   "Pose estimation",
+   167
   ],
   [
-   "Pose estimation",
-   165
+   "DeepLabCut",
+   166
   ],
   [
    "Machine learning",
-   145
+   147
   ],
   [
    "Locomotion",
-   109
+   110
   ],
   [
    "C57BL/6",
-   107
+   109
   ],
   [
    "Ethanol / alcohol",
-   104
+   105
   ],
   [
    "Anxiety",
-   101
+   102
   ],
   [
    "Dopamine",
-   96
+   98
   ],
   [
    "Hippocampus",
    90
   ],
   [
-   "Prefrontal cortex",
+   "Amygdala",
    89
   ],
   [
-   "Amygdala",
-   88
+   "Prefrontal cortex",
+   89
   ],
   [
    "Aggression",
@@ -2483,15 +2485,15 @@
   ],
   [
    "Avoidance",
-   77
+   78
   ],
   [
    "Grooming",
-   76
+   77
   ],
   [
    "Rearing",
-   75
+   76
   ],
   [
    "Random forest",
@@ -2503,15 +2505,15 @@
   ],
   [
    "Glutamate",
-   70
+   71
   ],
   [
    "Hypothalamus",
-   67
+   69
   ],
   [
    "CNN / ResNet",
-   66
+   67
   ],
   [
    "Striatum",
@@ -2519,7 +2521,7 @@
   ],
   [
    "Feeding",
-   62
+   64
   ],
   [
    "Electrophysiology",
@@ -2534,64 +2536,64 @@
    57
   ],
   [
+   "Aging",
+   55
+  ],
+  [
    "Freezing",
    54
   ],
   [
-   "Aging",
+   "Optogenetics",
    54
   ],
   [
-   "Optogenetics",
-   53
-  ],
-  [
    "Nucleus accumbens",
-   53
+   54
   ],
   [
    "Keypoint tracking",
-   53
+   54
   ],
   [
    "Sleep / circadian",
-   52
+   53
   ],
   [
    "Immobility",
-   49
+   51
   ],
   [
    "Transgenic",
-   49
+   50
   ],
   [
    "Operant task",
-   47
+   48
   ],
   [
    "Autism",
-   45
+   46
   ],
   [
    "Mating",
    44
   ],
   [
+   "VTA",
+   43
+  ],
+  [
    "Addiction",
-   42
+   43
   ],
   [
    "Stereotypy",
    42
   ],
   [
-   "VTA",
-   41
-  ],
-  [
    "RNA-seq",
-   41
+   42
   ],
   [
    "EthoVision",
@@ -2599,7 +2601,11 @@
   ],
   [
    "SLEAP",
-   38
+   39
+  ],
+  [
+   "GABA",
+   37
   ],
   [
    "Schizophrenia",
@@ -2618,11 +2624,11 @@
    36
   ],
   [
-   "GABA",
+   "Sprague-Dawley",
    36
   ],
   [
-   "Sprague-Dawley",
+   "c-Fos",
    36
   ],
   [
@@ -2630,20 +2636,20 @@
    36
   ],
   [
-   "c-Fos",
-   35
+   "Unsupervised",
+   36
   ],
   [
    "BORIS",
    35
   ],
   [
-   "Unsupervised",
+   "Thalamus",
    35
   ],
   [
-   "Thalamus",
-   35
+   "Novel object",
+   34
   ],
   [
    "Jumping / escape",
@@ -2654,7 +2660,15 @@
    34
   ],
   [
+   "Cocaine",
+   34
+  ],
+  [
    "Immunohistochemistry",
+   34
+  ],
+  [
+   "Ketamine",
    34
   ],
   [
@@ -2666,19 +2680,7 @@
    33
   ],
   [
-   "Novel object",
-   33
-  ],
-  [
-   "Cocaine",
-   33
-  ],
-  [
    "Knockout",
-   33
-  ],
-  [
-   "Ketamine",
    33
   ],
   [
@@ -2688,6 +2690,10 @@
   [
    "Spatial memory",
    32
+  ],
+  [
+   "DREADD",
+   31
   ],
   [
    "Place preference",
@@ -2712,10 +2718,6 @@
   [
    "Cerebellum",
    30
-  ],
-  [
-   "DREADD",
-   29
   ],
   [
    "CD1",
@@ -2743,6 +2745,14 @@
   ],
   [
    "Norepinephrine",
+   26
+  ],
+  [
+   "CRF",
+   25
+  ],
+  [
+   "Obesity / diet",
    25
   ],
   [
@@ -2755,10 +2765,6 @@
   ],
   [
    "Three-chamber",
-   24
-  ],
-  [
-   "CRF",
    24
   ],
   [
@@ -2790,6 +2796,10 @@
    23
   ],
   [
+   "Object recognition",
+   23
+  ],
+  [
    "Insula",
    23
   ],
@@ -2802,16 +2812,8 @@
    23
   ],
   [
-   "Obesity / diet",
-   23
-  ],
-  [
    "Acetylcholine",
    23
-  ],
-  [
-   "Object recognition",
-   22
   ],
   [
    "Dorsal raphe",
@@ -2830,6 +2832,10 @@
    22
   ],
   [
+   "Alzheimer's",
+   21
+  ],
+  [
    "Habenula",
    21
   ],
@@ -2838,11 +2844,11 @@
    21
   ],
   [
-   "AnyMaze",
+   "Preoptic area",
    20
   ],
   [
-   "Alzheimer's",
+   "AnyMaze",
    20
   ],
   [
@@ -2858,10 +2864,6 @@
    20
   ],
   [
-   "Preoptic area",
-   19
-  ],
-  [
    "Corticosterone",
    19
   ],
@@ -2870,11 +2872,19 @@
    19
   ],
   [
+   "Clozapine",
+   18
+  ],
+  [
    "Startle",
    18
   ],
   [
-   "Clozapine",
+   "MoSeq",
+   18
+  ],
+  [
+   "Lateral septum",
    17
   ],
   [
@@ -2902,16 +2912,8 @@
    17
   ],
   [
-   "MoSeq",
-   17
-  ],
-  [
    "Orbitofrontal cortex",
    17
-  ],
-  [
-   "Lateral septum",
-   16
   ],
   [
    "Dentate gyrus",
@@ -3148,23 +3150,14 @@
     "Hippocampus",
     90,
     1,
-    17,
+    15,
     0,
-    335.0,
-    227.0
-   ],
-   [
-    "Prefrontal cortex",
-    89,
-    0,
-    29,
-    0,
-    373.0,
-    304.0
+    343.0,
+    230.0
    ],
    [
     "Amygdala",
-    88,
+    89,
     4,
     23,
     0,
@@ -3172,12 +3165,21 @@
     519.0
    ],
    [
+    "Prefrontal cortex",
+    89,
+    0,
+    29,
+    0,
+    371.0,
+    304.0
+   ],
+   [
     "Hypothalamus",
-    67,
+    69,
     3,
     15,
     0,
-    441.0,
+    437.0,
     571.0
    ],
    [
@@ -3186,26 +3188,17 @@
     2,
     20,
     0,
-    379.0,
+    377.0,
     404.0
    ],
    [
     "Basolateral amygdala",
     33,
     4,
-    11,
-    0,
-    707.0,
-    529.0
-   ],
-   [
-    "Paraventricular nucleus",
-    25,
-    3,
     9,
     0,
-    443.0,
-    591.0
+    707.0,
+    530.0
    ],
    [
     "Cingulate",
@@ -3213,7 +3206,7 @@
     0,
     18,
     0,
-    453.0,
+    451.0,
     284.0
    ],
    [
@@ -3231,7 +3224,7 @@
     0,
     17,
     0,
-    401.0,
+    399.0,
     178.0
    ],
    [
@@ -3245,12 +3238,12 @@
    ],
    [
     "Preoptic area",
-    19,
+    20,
     3,
-    15,
+    14,
     0,
-    447.0,
-    552.0
+    445.0,
+    590.0
    ],
    [
     "Orbitofrontal cortex",
@@ -3258,7 +3251,7 @@
     0,
     16,
     0,
-    417.0,
+    411.0,
     269.0
    ],
    [
@@ -3276,12 +3269,12 @@
     0,
     15,
     0,
-    319.0,
+    547.0,
     292.0
    ],
    [
     "DeepLabCut",
-    165,
+    166,
     0,
     38,
     0,
@@ -3290,7 +3283,7 @@
    ],
    [
     "Locomotion",
-    109,
+    110,
     0,
     32,
     0,
@@ -3299,34 +3292,34 @@
    ],
    [
     "C57BL/6",
-    107,
+    109,
     0,
-    31,
+    32,
     0,
     679.0,
-    392.0
+    391.0
    ],
    [
     "Ethanol / alcohol",
-    104,
+    105,
     0,
     31,
     0,
-    365.0,
+    363.0,
     138.0
    ],
    [
     "Anxiety",
-    101,
+    102,
     0,
     31,
     0,
-    197.0,
+    199.0,
     402.0
    ],
    [
     "Dopamine",
-    96,
+    98,
     0,
     30,
     0,
@@ -3339,7 +3332,7 @@
     0,
     28,
     0,
-    159.0,
+    157.0,
     438.0
    ],
    [
@@ -3348,7 +3341,7 @@
     0,
     28,
     0,
-    371.0,
+    369.0,
     108.0
    ],
    [
@@ -3357,30 +3350,30 @@
     0,
     28,
     0,
-    201.0,
+    635.0,
     170.0
    ],
    [
     "Avoidance",
+    78,
+    0,
+    27,
+    0,
+    241.0,
+    175.0
+   ],
+   [
+    "Grooming",
     77,
     0,
     27,
     0,
-    599.0,
-    173.0
-   ],
-   [
-    "Grooming",
-    76,
-    0,
-    27,
-    0,
-    723.0,
-    197.0
+    219.0,
+    145.0
    ],
    [
     "Rearing",
-    75,
+    76,
     2,
     27,
     0,
@@ -3393,12 +3386,12 @@
     0,
     26,
     0,
-    635.0,
-    144.0
+    133.0,
+    200.0
    ],
    [
     "Glutamate",
-    70,
+    71,
     0,
     26,
     0,
@@ -3416,7 +3409,7 @@
    ],
    [
     "Feeding",
-    62,
+    64,
     2,
     25,
     0,
@@ -3429,30 +3422,21 @@
     0,
     18,
     0,
-    195.0,
+    635.0,
     150.0
    ],
    [
     "Serotonin",
     59,
-    0,
+    2,
     25,
     0,
-    547.0,
-    282.0
+    351.0,
+    420.0
    ],
    [
     "Sniffing",
     57,
-    2,
-    24,
-    0,
-    377.0,
-    421.0
-   ],
-   [
-    "Freezing",
-    54,
     2,
     24,
     0,
@@ -3461,25 +3445,34 @@
    ],
    [
     "Aging",
+    55,
+    0,
+    24,
+    0,
+    293.0,
+    309.0
+   ],
+   [
+    "Freezing",
     54,
     0,
     24,
     0,
-    297.0,
-    307.0
+    559.0,
+    499.0
    ],
    [
     "Optogenetics",
-    53,
+    54,
     0,
     19,
     0,
-    551.0,
-    501.0
+    723.0,
+    207.0
    ],
    [
     "Nucleus accumbens",
-    53,
+    54,
     0,
     19,
     0,
@@ -3488,66 +3481,75 @@
    ],
    [
     "Sleep / circadian",
-    52,
+    53,
     0,
     15,
     0,
-    151.0,
-    210.0
+    635.0,
+    132.0
    ],
    [
     "Immobility",
-    49,
+    51,
     0,
     23,
     0,
-    233.0,
-    122.0
+    231.0,
+    120.0
    ],
    [
     "Transgenic",
-    49,
+    50,
     0,
-    23,
+    21,
     0,
-    635.0,
-    118.0
+    297.0,
+    565.0
    ],
    [
     "Operant task",
-    47,
+    48,
     0,
     18,
     0,
-    309.0,
-    523.0
+    321.0,
+    285.0
    ],
    [
     "Autism",
-    45,
+    46,
     0,
     22,
     0,
-    627.0,
+    629.0,
     317.0
    ],
    [
     "Mating",
     44,
+    2,
+    22,
+    0,
+    377.0,
+    443.0
+   ],
+   [
+    "VTA",
+    43,
     0,
     22,
     0,
-    573.0,
-    523.0
+    475.0,
+    247.0
    ],
    [
     "Addiction",
-    42,
+    43,
     0,
     22,
     0,
-    91.0,
-    341.0
+    321.0,
+    523.0
    ],
    [
     "Stereotypy",
@@ -3555,25 +3557,16 @@
     0,
     22,
     0,
-    295.0,
+    579.0,
     565.0
    ],
    [
-    "VTA",
-    41,
-    0,
-    21,
-    0,
-    477.0,
-    247.0
-   ],
-   [
     "RNA-seq",
-    41,
+    42,
     0,
-    21,
+    22,
     0,
-    801.0,
+    99.0,
     335.0
    ],
    [
@@ -3582,26 +3575,35 @@
     0,
     21,
     0,
-    125.0,
-    227.0
+    573.0,
+    529.0
    ],
    [
     "SLEAP",
-    38,
+    39,
     2,
     21,
     0,
-    393.0,
+    379.0,
+    349.0
+   ],
+   [
+    "GABA",
+    37,
+    2,
+    21,
+    0,
+    543.0,
     449.0
    ],
    [
     "Schizophrenia",
     37,
     0,
-    17,
+    21,
     1,
     867.0,
-    492.0
+    427.0
    ],
    [
     "Opioid",
@@ -3609,14 +3611,14 @@
     0,
     21,
     1,
-    163.0,
-    344.0
+    801.0,
+    365.0
    ],
    [
     "Self-administration",
     37,
     0,
-    12,
+    11,
     0,
     751.0,
     232.0
@@ -3624,20 +3626,11 @@
    [
     "Oxytocin",
     36,
-    0,
+    3,
     20,
     0,
-    807.0,
-    314.0
-   ],
-   [
-    "GABA",
-    36,
-    2,
-    20,
-    0,
-    387.0,
-    352.0
+    451.0,
+    544.0
    ],
    [
     "Sprague-Dawley",
@@ -3645,21 +3638,12 @@
     0,
     13,
     1,
-    844.0,
-    510.0
-   ],
-   [
-    "Primate",
-    36,
-    2,
-    20,
-    0,
-    543.0,
-    452.0
+    850.0,
+    519.0
    ],
    [
     "c-Fos",
-    35,
+    36,
     2,
     20,
     0,
@@ -3667,22 +3651,40 @@
     350.0
    ],
    [
+    "Primate",
+    36,
+    0,
+    20,
+    0,
+    457.0,
+    490.0
+   ],
+   [
     "BORIS",
     35,
     0,
     20,
     0,
-    287.0,
+    653.0,
     336.0
+   ],
+   [
+    "Novel object",
+    34,
+    0,
+    16,
+    0,
+    87.0,
+    319.0
    ],
    [
     "Jumping / escape",
     34,
     0,
-    12,
+    11,
     1,
-    126.0,
-    521.0
+    831.0,
+    364.0
    ],
    [
     "Licking",
@@ -3690,8 +3692,17 @@
     0,
     20,
     0,
-    463.0,
-    486.0
+    119.0,
+    294.0
+   ],
+   [
+    "Cocaine",
+    34,
+    0,
+    20,
+    0,
+    147.0,
+    232.0
    ],
    [
     "Immunohistochemistry",
@@ -3699,71 +3710,62 @@
     0,
     10,
     1,
-    899.0,
-    438.0
+    897.0,
+    441.0
+   ],
+   [
+    "Ketamine",
+    34,
+    0,
+    20,
+    0,
+    107.0,
+    254.0
    ],
    [
     "Fear conditioning",
     34,
     0,
-    13,
+    12,
     0,
-    579.0,
-    561.0
+    629.0,
+    114.0
    ],
    [
     "Resident-intruder",
     33,
+    4,
+    12,
     0,
-    14,
-    0,
-    579.0,
-    578.0
-   ],
-   [
-    "Novel object",
-    33,
-    0,
-    16,
-    0,
-    781.0,
-    243.0
-   ],
-   [
-    "Cocaine",
-    33,
-    0,
-    20,
-    0,
-    807.0,
-    296.0
+    713.0,
+    542.0
    ],
    [
     "Knockout",
     33,
     0,
-    18,
-    1,
-    147.0,
-    344.0
-   ],
-   [
-    "Ketamine",
-    33,
-    0,
     20,
-    0,
-    321.0,
-    544.0
+    1,
+    842.0,
+    365.0
    ],
    [
     "Spatial memory",
     32,
     0,
-    13,
+    12,
     0,
-    259.0,
-    109.0
+    311.0,
+    546.0
+   ],
+   [
+    "DREADD",
+    31,
+    1,
+    19,
+    0,
+    271.0,
+    247.0
    ],
    [
     "Place preference",
@@ -3771,8 +3773,8 @@
     0,
     11,
     0,
-    805.0,
-    284.0
+    87.0,
+    406.0
    ],
    [
     "Extinction",
@@ -3780,17 +3782,17 @@
     0,
     19,
     0,
-    799.0,
-    265.0
+    99.0,
+    273.0
    ],
    [
     "Amphetamine",
     31,
-    4,
+    0,
     14,
     0,
-    721.0,
-    544.0
+    579.0,
+    552.0
    ],
    [
     "BNST",
@@ -3799,7 +3801,7 @@
     19,
     1,
     485.0,
-    253.0
+    252.0
    ],
    [
     "Fiber photometry",
@@ -3807,26 +3809,17 @@
     0,
     11,
     0,
-    751.0,
-    188.0
+    87.0,
+    420.0
    ],
    [
     "Cerebellum",
     30,
     0,
-    16,
+    13,
     1,
-    106.0,
-    344.0
-   ],
-   [
-    "DREADD",
-    29,
-    1,
-    19,
-    0,
-    271.0,
-    247.0
+    128.0,
+    521.0
    ],
    [
     "CD1",
@@ -3834,116 +3827,116 @@
     0,
     19,
     0,
-    379.0,
+    589.0,
     273.0
-   ],
-   [
-    "Elevated plus maze",
-    29,
-    0,
-    9,
-    1,
-    138.0,
-    345.0
    ],
    [
     "Epilepsy",
     28,
-    0,
-    17,
     1,
-    101.0,
-    482.0
+    15,
+    1,
+    232.0,
+    345.0
    ],
    [
     "Estrogen",
     28,
     4,
-    19,
+    17,
     0,
-    731.0,
-    505.0
+    727.0,
+    507.0
    ],
    [
     "Methamphetamine",
     26,
     0,
-    10,
+    9,
     0,
-    627.0,
-    109.0
+    261.0,
+    113.0
    ],
    [
     "Nesting",
     26,
-    3,
+    0,
     18,
     0,
-    463.0,
-    598.0
+    165.0,
+    180.0
    ],
    [
     "Norepinephrine",
-    25,
+    26,
     0,
-    11,
+    9,
     1,
-    124.0,
-    344.0
-   ],
-   [
-    "Social defeat",
-    25,
-    0,
-    13,
-    0,
-    627.0,
-    307.0
-   ],
-   [
-    "Three-chamber",
-    24,
-    4,
-    13,
-    0,
-    171.0,
-    548.0
+    867.0,
+    515.0
    ],
    [
     "CRF",
-    24,
+    25,
     2,
     18,
     1,
     636.0,
-    424.0
+    425.0
+   ],
+   [
+    "Obesity / diet",
+    25,
+    1,
+    9,
+    1,
+    745.0,
+    345.0
+   ],
+   [
+    "Social defeat",
+    25,
+    4,
+    13,
+    0,
+    175.0,
+    511.0
+   ],
+   [
+    "Three-chamber",
+    24,
+    0,
+    12,
+    0,
+    287.0,
+    99.0
    ],
    [
     "Cannabinoid",
     24,
-    4,
+    0,
     14,
     0,
-    177.0,
-    510.0
+    601.0,
+    98.0
    ],
    [
     "Morphine",
     24,
-    0,
+    4,
     14,
     0,
-    273.0,
-    476.0
+    195.0,
+    550.0
    ],
    [
     "Calcium imaging",
     24,
     0,
-    9,
+    8,
     1,
-    145.0,
-    490.0
+    120.0,
+    517.0
    ],
    [
     "PTSD",
@@ -3951,62 +3944,53 @@
     0,
     18,
     0,
-    651.0,
-    336.0
+    299.0,
+    338.0
    ],
    [
     "Zebrafish",
     24,
+    3,
+    16,
     0,
-    18,
-    0,
-    309.0,
-    92.0
+    457.0,
+    607.0
    ],
    [
     "Parkinson's",
     23,
+    2,
+    10,
     1,
-    12,
-    1,
-    240.0,
-    345.0
+    625.0,
+    469.0
+   ],
+   [
+    "Object recognition",
+    23,
+    0,
+    8,
+    0,
+    629.0,
+    310.0
    ],
    [
     "Chronic stress",
     23,
-    1,
-    10,
-    1,
-    745.0,
-    344.0
-   ],
-   [
-    "Obesity / diet",
-    23,
-    2,
+    0,
     9,
     1,
-    363.0,
-    468.0
+    843.0,
+    475.0
    ],
    [
     "Acetylcholine",
     23,
     1,
-    9,
+    8,
     1,
-    229.0,
+    758.0,
     347.0
-   ],
-   [
-    "Object recognition",
-    22,
-    1,
-    9,
-    0,
-    541.0,
-    221.0
    ],
    [
     "Dorsal raphe",
@@ -4014,44 +3998,44 @@
     0,
     9,
     1,
-    96.0,
-    345.0
+    142.0,
+    507.0
    ],
    [
     "Drosophila",
     22,
+    0,
+    10,
     1,
-    11,
+    879.0,
+    491.0
+   ],
+   [
+    "Alzheimer's",
+    21,
+    0,
+    10,
     1,
-    756.0,
-    347.0
+    307.0,
+    544.0
    ],
    [
     "Wistar rat",
     21,
     1,
-    15,
+    14,
     0,
-    651.0,
-    250.0
+    541.0,
+    218.0
    ],
    [
     "AnyMaze",
     20,
-    2,
+    1,
     11,
     1,
-    338.0,
-    443.0
-   ],
-   [
-    "Alzheimer's",
-    20,
-    2,
-    9,
-    1,
-    631.0,
-    457.0
+    218.0,
+    345.0
    ],
    [
     "Ultrasonic vocalisation",
@@ -4059,25 +4043,25 @@
     0,
     9,
     0,
-    163.0,
+    181.0,
     477.0
    ],
    [
     "Maternal separation",
     20,
+    1,
+    8,
     0,
-    9,
-    0,
-    601.0,
-    97.0
+    631.0,
+    252.0
    ],
    [
     "Corticosterone",
     19,
     0,
-    12,
+    11,
     0,
-    547.0,
+    355.0,
     84.0
    ],
    [
@@ -4090,40 +4074,40 @@
     485.0
    ],
    [
-    "Startle",
-    18,
-    0,
-    15,
-    1,
-    503.0,
-    253.0
-   ],
-   [
     "Clozapine",
-    17,
+    18,
     0,
     10,
     1,
-    475.0,
+    105.0,
+    494.0
+   ],
+   [
+    "Startle",
+    18,
+    0,
+    13,
+    1,
+    502.0,
     253.0
+   ],
+   [
+    "MoSeq",
+    18,
+    4,
+    16,
+    0,
+    741.0,
+    551.0
    ],
    [
     "Stroke / ischemia",
     17,
-    3,
+    0,
     9,
     0,
-    457.0,
-    541.0
-   ],
-   [
-    "Long-Evans",
-    17,
-    2,
-    9,
-    1,
-    351.0,
-    460.0
+    547.0,
+    85.0
    ],
    [
     "Orexin",
@@ -4131,17 +4115,17 @@
     0,
     16,
     0,
-    145.0,
+    801.0,
     191.0
    ],
    [
     "Psilocybin",
     17,
+    1,
+    10,
     0,
-    12,
-    0,
-    773.0,
-    172.0
+    401.0,
+    217.0
    ],
    [
     "B-SOiD",
@@ -4149,26 +4133,17 @@
     1,
     14,
     0,
-    409.0,
-    214.0
-   ],
-   [
-    "MoSeq",
-    17,
-    0,
-    13,
-    0,
-    673.0,
-    200.0
+    689.0,
+    262.0
    ],
    [
     "BALB/c",
     16,
     0,
-    13,
+    14,
     0,
-    169.0,
-    251.0
+    779.0,
+    245.0
    ],
    [
     "MDMA",
@@ -4177,7 +4152,7 @@
     16,
     0,
     473.0,
-    619.0
+    527.0
    ],
    [
     "BDNF",
@@ -4187,15 +4162,6 @@
     0,
     479.0,
     472.0
-   ],
-   [
-    "Buprenorphine",
-    15,
-    0,
-    9,
-    0,
-    373.0,
-    83.0
    ],
    [
     "SHAP",
@@ -4212,23 +4178,14 @@
     0,
     11,
     0,
-    773.0,
-    158.0
-   ],
-   [
-    "Somatostatin",
-    14,
-    0,
-    9,
-    0,
-    661.0,
-    355.0
+    167.0,
+    168.0
    ],
    [
     "Nicotine",
     14,
     2,
-    12,
+    11,
     0,
     563.0,
     472.0
@@ -4237,10 +4194,10 @@
     "Cortisol",
     14,
     0,
-    13,
+    11,
     1,
-    89.0,
-    461.0
+    476.0,
+    252.0
    ],
    [
     "LSD",
@@ -4248,44 +4205,26 @@
     0,
     15,
     0,
-    485.0,
+    483.0,
     348.0
    ],
    [
     "Head-twitch",
     12,
     0,
-    9,
-    0,
-    577.0,
-    553.0
-   ],
-   [
-    "Locus coeruleus",
-    12,
-    0,
     8,
     0,
-    673.0,
-    593.0
+    277.0,
+    206.0
    ],
    [
     "Diazepam",
     12,
-    1,
+    3,
     9,
     0,
-    257.0,
-    267.0
-   ],
-   [
-    "Parvalbumin",
-    11,
-    4,
-    9,
-    0,
-    199.0,
-    563.0
+    473.0,
+    625.0
    ],
    [
     "Rotarod",
@@ -4293,44 +4232,35 @@
     1,
     11,
     1,
-    217.0,
+    767.0,
     343.0
    ],
    [
     "VAME",
     10,
+    2,
+    13,
     1,
-    14,
-    1,
-    768.0,
-    338.0
+    334.0,
+    439.0
    ],
    [
     "DMT",
     10,
-    0,
-    14,
+    2,
+    13,
     1,
-    280.0,
-    341.0
+    634.0,
+    458.0
    ],
    [
     "A-SOiD",
     10,
-    0,
-    10,
     1,
-    181.0,
-    192.0
-   ],
-   [
-    "Scratching",
-    10,
-    4,
     9,
-    0,
-    747.0,
-    563.0
+    1,
+    257.0,
+    296.0
    ],
    [
     "Testosterone",
@@ -4347,53 +4277,44 @@
     0,
     9,
     0,
-    583.0,
-    274.0
+    247.0,
+    588.0
    ],
    [
     "Gait",
     9,
-    1,
+    0,
     13,
     1,
-    727.0,
-    294.0
+    321.0,
+    501.0
    ],
    [
     "Circling",
     8,
-    1,
-    9,
     0,
-    661.0,
-    239.0
+    10,
+    0,
+    801.0,
+    179.0
    ],
    [
     "Tremor",
     8,
-    3,
+    0,
     11,
     0,
-    477.0,
-    526.0
-   ],
-   [
-    "Burrowing",
-    8,
-    0,
-    8,
-    0,
-    249.0,
-    590.0
+    361.0,
+    276.0
    ],
    [
     "Y-maze",
     6,
-    0,
+    4,
     11,
     0,
-    639.0,
-    550.0
+    201.0,
+    500.0
    ],
    [
     "ADHD",
@@ -4401,7 +4322,7 @@
     0,
     11,
     0,
-    345.0,
+    629.0,
     280.0
    ],
    [
@@ -4410,7 +4331,7 @@
     1,
     10,
     0,
-    689.0,
+    269.0,
     266.0
    ]
   ],
