@@ -164,6 +164,7 @@ INSTITUTION_COORDS = {
     'SISSA': [45.6787, 13.775],  # 1
     'SMART Biomedical Microsystems Laborator Université de Sherbrooke': [45.3785, -71.9245],  # 1
     'Salk Institute for Biological Studies': [32.8872, -117.2454],  # 1
+    'Shiga University': [47.6691, -122.3127],  # 1
     'Shinshu University': [36.7116, 138.4936],  # 1
     'Southeast University': [31.8892, 118.8156],  # 1
     'Southern Illinois University-Carbondale': [37.7083, -89.2276],  # 1

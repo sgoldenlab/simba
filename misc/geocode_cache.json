@@ -2786,5 +2786,30 @@
     "-88.1902577"
    ]
   }
+ ],
+ "Hebei Chest Hospital": [],
+ "National Center for Geriatrics and Gerontology": [],
+ "Shiga University": [
+  {
+   "place_id": 325886205,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 297648155,
+   "lat": "47.6691483",
+   "lon": "-122.3126882",
+   "class": "landuse",
+   "type": "allotments",
+   "place_rank": 24,
+   "importance": 0.08007729839017316,
+   "addresstype": "allotments",
+   "name": "Shiga's Garden",
+   "display_name": "Shiga's Garden, 5522, University Heights, University District, Seattle, King County, Washington, 98105, United States",
+   "boundingbox": [
+    "47.6690390",
+    "47.6692576",
+    "-122.3128720",
+    "-122.3125045"
+   ]
+  }
  ]
 }
