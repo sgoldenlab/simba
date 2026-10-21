@@ -26,7 +26,8 @@ CATEGORIES = {"supervised-classification": "Supervised classification",
               "gait/kinematics": "Gait & kinematics",
               "hardware/acquisition": "Hardware & acquisition",
               "benchmark/dataset": "Benchmarks & datasets",
-              "other-analysis": "Other analysis"}
+              "analysis-platform": "Analysis platforms & toolkits",
+              "other-analysis": "Other"}
 
 
 def main():
@@ -41,8 +42,13 @@ def main():
             "listed": bool(name) and re.search(r"`" + re.escape(name) + r"[\s<]", curated) is not None,
             "y": int(r["year"]) if r["year"].isdigit() else 0,
             "n": r["tool_name"].strip(),
+            "lb": r.get("label", "").strip(),   # short descriptive label for tools the paper does not name
+            "au": r.get("authors", "").strip(),
+            "v": r.get("venue", "").strip(),
+            "p": r.get("preprint") == "1",
+            "cb": int(r.get("cited_by") or 0),
             "t": r["title"].strip(),
-            "c": CATEGORIES.get(r["category"], "Other analysis"),
+            "c": CATEGORIES.get(r["category"], "Other"),
             "s": r["species"].strip(),
             "d": r["one_line"].strip(),
             "code": r["code_url"].strip(),
@@ -83,6 +89,10 @@ TEMPLATE = """<style>
 .simba-rt .yr{{font-variant-numeric:tabular-nums;font-weight:700;color:#21567a;white-space:nowrap !important;}}
 .simba-rt .nm{{font-weight:700;color:#21567a;font-size:14px;margin-bottom:2px;}}
 .simba-rt .ttl{{line-height:1.35;}}
+.simba-rt .nm.lb{{font-weight:600;font-style:italic;color:#4b6a85;}}
+.simba-rt .meta{{font-size:12px;color:#6b7280;margin-top:3px;line-height:1.4;}}
+.simba-rt .cb{{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap !important;}}
+.simba-rt .tag.pre{{background:#fdf0e6;color:#983412;}}
 .simba-rt .tag{{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:9px;margin-left:6px;vertical-align:1px;background:#e8f4fb;color:#21567a;}}
 .simba-rt .ttl a{{color:#1f4e79;}}
 .simba-rt tr.dt td{{border-top:0 !important;padding-top:0 !important;background:#fbfdff !important;}}
@@ -90,7 +100,7 @@ TEMPLATE = """<style>
 .simba-rt .dtb b{{color:#21567a;}}
 .simba-rt .empty{{text-align:center;color:#6b7280;padding:26px !important;}}
 .simba-rt-foot{{text-align:center;font-size:14px;color:#4b5563;margin:16px 4px 0;}}
-@media (max-width:680px){{.simba-rt .c-sp{{display:none;}}.simba-rt-bar select{{flex:1 1 40%;max-width:none;}}.simba-rt th,.simba-rt td{{padding-left:9px !important;padding-right:9px !important;}}}}
+@media (max-width:680px){{.simba-rt .c-sp,.simba-rt .c-cb{{display:none;}}.simba-rt-bar select{{flex:1 1 40%;max-width:none;}}.simba-rt th,.simba-rt td{{padding-left:9px !important;padding-right:9px !important;}}}}
 </style>
 <div class="simba-rt">
   <p class="simba-rt-date">Updated {pull_date} &middot; {total} tools</p>
@@ -105,8 +115,9 @@ TEMPLATE = """<style>
     <thead><tr>
       <th data-k="y" aria-sort="descending" style="width:68px">Year</th>
       <th data-k="key">Tool</th>
-      <th data-k="c" style="width:24%">Category</th>
-      <th data-k="s" class="c-sp" style="width:14%">Species</th>
+      <th data-k="c" style="width:21%">Category</th>
+      <th data-k="s" class="c-sp" style="width:12%">Species</th>
+      <th data-k="cb" class="c-cb" style="width:76px;text-align:right" title="Citations in OpenAlex, summed over preprint and journal versions">Cited by</th>
     </tr></thead>
     <tbody id="rtBody"></tbody>
   </table></div>
@@ -120,8 +131,8 @@ TEMPLATE = """<style>
   CAT.forEach(c => cat.add(new Option(c, c)));
   YR.forEach(y => yr.add(new Option(y, y)));
   D.forEach(d => {{
-    d.key = (d.n || d.t).toLowerCase();
-    d.hay = [d.n, d.t, d.c, d.s, d.d, d.y].join(" ").toLowerCase();
+    d.key = (d.n || d.lb || d.t).toLowerCase();
+    d.hay = [d.n, d.lb, d.t, d.au, d.v, d.c, d.s, d.d, d.y].join(" ").toLowerCase();
   }});
   let key = "y", dir = -1;
   const open = new Set();
@@ -159,18 +170,26 @@ TEMPLATE = """<style>
         const nm = el("div", "nm", d.n);
         if (d.listed) nm.appendChild(el("span", "tag", "Also listed above"));
         td.appendChild(nm);
+      }} else if (d.lb) {{
+        const nm = el("div", "nm lb", d.lb);
+        nm.title = "The paper does not name its tool; this is a short description";
+        td.appendChild(nm);
       }}
       const ttl = el("div", "ttl");
       if (d.url) ttl.appendChild(link(d.t, d.url)); else ttl.textContent = d.t;
       td.appendChild(ttl);
+      const meta = el("div", "meta", [d.au, d.v].filter(Boolean).join(" · "));
+      if (d.p) meta.appendChild(el("span", "tag pre", "Preprint"));
+      if (meta.childNodes.length) td.appendChild(meta);
       tr.appendChild(td);
       tr.appendChild(el("td", null, d.c));
       tr.appendChild(el("td", "c-sp", d.s));
+      tr.appendChild(el("td", "cb c-cb", d.cb));
       tr.addEventListener("click", () => {{ open.has(d) ? open.delete(d) : open.add(d); render(); }});
       body.appendChild(tr);
       if (open.has(d)) {{
         const dt = el("tr", "dt"), c = el("td");
-        c.colSpan = 4;
+        c.colSpan = 5;
         const box = el("div", "dtb");
         box.appendChild(el("b", null, "What it does: "));
         box.appendChild(document.createTextNode(d.d || "\\u2014"));
@@ -189,14 +208,14 @@ TEMPLATE = """<style>
     }});
     if (!rows.length) {{
       const tr = el("tr"), c = el("td", "empty", "No tools match these filters.");
-      c.colSpan = 4; tr.appendChild(c); body.appendChild(tr);
+      c.colSpan = 5; tr.appendChild(c); body.appendChild(tr);
     }}
     $("rtCount").textContent = "Showing " + rows.length + " of " + D.length + " tools";
   }}
 
   document.querySelectorAll(".simba-rt th[data-k]").forEach(th => th.addEventListener("click", () => {{
     const k = th.dataset.k;
-    dir = k === key ? -dir : (k === "y" ? -1 : 1);
+    dir = k === key ? -dir : (k === "y" || k === "cb" ? -1 : 1);
     key = k;
     document.querySelectorAll(".simba-rt th[data-k]").forEach(h => h.removeAttribute("aria-sort"));
     th.setAttribute("aria-sort", dir > 0 ? "ascending" : "descending");

@@ -15,7 +15,11 @@ Two steps, with a human or LLM classification in between:
     python misc/related_tools_update.py apply decisions.json
         decisions.json is a list of {"doi", "verdict": "yes"|"no", "tool_name", "category",
         "species", "one_line", "code_url"}. Every paper is recorded in related_tools_seen.csv,
-        "yes" rows are appended to related_tools.csv, and the HTML table is regenerated.
+        "yes" rows are appended to related_tools.csv, authors / venue / preprint / citation counts
+        are refreshed from OpenAlex for every row, and the HTML table is regenerated.
+
+    python misc/related_tools_update.py enrich
+        Only the OpenAlex refresh of related_tools.csv.
 
     python misc/related_tools_update.py auto
         fetch, then classify the candidates with the keyword rules in rule_decision(), then apply.
@@ -61,7 +65,9 @@ SPECIES_RULES = [("Mouse", r"\b(mouse|mice)\b"), ("Rat", r"\brats?\b"), ("Zebraf
                  ("Drosophila", r"\b(drosophila|flies)\b"), ("Macaque", r"\b(macaque|monkey)s?\b"),
                  ("Marmoset", r"\bmarmosets?\b")]
 SEEN_COLS = ["doi", "verdict", "year", "source", "checked", "title"]
-TOOL_COLS = ["tool_name", "title", "year", "category", "species", "one_line", "code_url", "doi", "other_dois"]
+TOOL_COLS = ["tool_name", "label", "title", "year", "category", "species", "one_line", "code_url", "doi", "other_dois",
+             "authors", "venue", "preprint", "cited_by"]
+PREPRINT_VENUES = ("biorxiv", "medrxiv", "arxiv", "research square", "ssrn", "preprints.org")
 
 
 def get(url):
@@ -183,6 +189,40 @@ def fetch():
     print(f"{len(candidates)} new papers to classify -> {os.path.normpath(CANDIDATES)}; {n_pending} preprints pending")
 
 
+def openalex_work(t):
+    """The OpenAlex record for a table row: by DOI when it has one, else by exact title."""
+    m = re.search(r"10\.\d{4,9}/[^\s?#]+?(?=(v\d+)?(\.abstract|\.full)?$)", norm_doi(t["doi"]))
+    doi = m.group(0) if m else ""
+    try:
+        if doi.startswith("10."):
+            return get("https://api.openalex.org/works/doi:" + urllib.parse.quote(doi))
+        hits = get("https://api.openalex.org/works?per-page=1&filter=title.search:" + urllib.parse.quote(t["title"][:150]))["results"]
+        return hits[0] if hits and norm_title(hits[0].get("title")) == norm_title(t["title"]) else None
+    except Exception:
+        return None
+
+
+def enrich(tools):
+    """Fill authors / venue / preprint from OpenAlex and refresh citation counts (summed over versions)."""
+    for t in tools:
+        w = openalex_work(t)
+        if not w:
+            continue
+        names = [a["author"]["display_name"].split()[-1] for a in w.get("authorships", []) if a.get("author")]
+        t["authors"] = names[0] + (" et al." if len(names) > 2 else " & " + names[1] if len(names) == 2 else "") if names else ""
+        venue = ((w.get("primary_location") or {}).get("source") or {}).get("display_name") or ""
+        venue = re.sub(r"\s*\(.*\)$", "", venue)   # "bioRxiv (Cold Spring Harbor Laboratory)" -> "bioRxiv"
+        if venue in ("PubMed", "PubMed Central", "Europe PMC"):   # indexes, not venues
+            venue = ""
+        t["venue"] = venue
+        t["preprint"] = "1" if w.get("type") == "preprint" or venue.lower().startswith(PREPRINT_VENUES) else "0"
+        cited = int(w.get("cited_by_count") or 0)
+        for other in t.get("other_dois", "").split():
+            ow = openalex_work({"doi": other, "title": ""})
+            cited += int((ow or {}).get("cited_by_count") or 0)
+        t["cited_by"] = str(cited)
+
+
 def apply(path):
     with open(path, encoding="utf-8") as f:
         decisions = json.load(f)
@@ -208,6 +248,7 @@ def apply(path):
                           "doi": "https://doi.org/" + doi if doi.startswith("10.") else doi, "other_dois": ""})
             added.append(d.get("tool_name") or row["title"])
     write_csv(SEEN, seen, SEEN_COLS)
+    enrich(tools)
     tools.sort(key=lambda t: (-int(t["year"] or 0), (t["tool_name"] or t["title"]).lower()))
     write_csv(TOOLS, tools, TOOL_COLS)
     sys.path.insert(0, HERE)
@@ -254,6 +295,10 @@ def auto():
 if __name__ == "__main__":
     if len(sys.argv) >= 2 and sys.argv[1] == "auto":
         auto()
+    elif len(sys.argv) >= 2 and sys.argv[1] == "enrich":
+        rows = read_csv(TOOLS)
+        enrich(rows)
+        write_csv(TOOLS, rows, TOOL_COLS)
     elif len(sys.argv) >= 2 and sys.argv[1] == "fetch":
         fetch()
     elif len(sys.argv) >= 3 and sys.argv[1] == "apply":
