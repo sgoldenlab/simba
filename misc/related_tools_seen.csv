@@ -2,8 +2,8 @@ doi,verdict,year,source,checked,title
 10.1038/s44220-025-00547-8,maybe,2025,openalex,2026-10-21,A multi-dimensional transfer learning framework for studying reward-guided behaviors across species
 ,no,1998,openalex,2026-10-21,PRESENCIA Y REALIDAD DE LA PSICOLOGÍA POLÍTICA FRANCESA
 ,no,2021,openalex,2026-10-21,On the role of parvalbumin interneurons in neuronal network activity in the prefrontal cortex
-10.1002/brb3.71619,no,2026,openalex,2026-10-21,Using Machine Learning to Automate the Analysis of an Olfactory Habituation‐Dishabituation Task in Mice
-10.1002/jez.70082,no,2026,openalex,2026-10-21,Automated Profiling of Social Behaviors to Assess the Genetic Basis of Evolution of Aggressive Behaviors in Astyanax mexicanus
+10.1002/brb3.71619,yes,2026,openalex,2026-10-21,Using Machine Learning to Automate the Analysis of an Olfactory Habituation‐Dishabituation Task in Mice
+10.1002/jez.70082,yes,2026,openalex,2026-10-21,Automated Profiling of Social Behaviors to Assess the Genetic Basis of Evolution of Aggressive Behaviors in Astyanax mexicanus
 10.1002/jez.b.23311,no,2025,openalex,2026-10-21,Automated Behavioral Profiling Using Neural Networks Reveals Differences in Stress‐Like Behavior Between Cave and Surface‐Dwelling Astyanax mexicanus
 10.1007/978-1-0716-2748-8_15,no,2022,openalex,2026-10-21,Rodent Models for Studying the Impact of Variation in Early Life Mother–Infant Interactions on Mood and Anxiety
 10.1007/978-3-030-98711-4_145-1,no,2022,openalex,2026-10-21,Scoring Methods of Aggression in Murine Models of Aggression and Social Defeat
@@ -14,13 +14,13 @@ doi,verdict,year,source,checked,title
 10.1007/s00213-020-05577-x,no,2020,openalex,2026-10-21,Rage Against the Machine: Advancing the study of aggression ethology via machine learning.
 10.1007/s00213-024-06560-6,no,2024,openalex,2026-10-21,Operant social self-administration in male CD1 mice
 10.1007/s00213-026-07101-z,no,2026,openalex,2026-10-21,Improving translational insight using sequential sampling models in drug choice
-10.1007/s00227-025-04777-3,no,2026,openalex,2026-10-21,Applying machine learning tools for automated behaviour classification in invasive lionfish and comparison with human observations
+10.1007/s00227-025-04777-3,yes,2026,openalex,2026-10-21,Applying machine learning tools for automated behaviour classification in invasive lionfish and comparison with human observations
 10.1007/s00338-026-02906-y,no,2026,openalex,2026-10-21,Interspecific variation in cleaning and cheating behaviours among coral reef cleaner fishes
 10.1007/s00424-025-03067-7,no,2025,openalex,2026-10-21,Current methods in explainable artificial intelligence and future prospects for integrative physiology
 10.1007/s10071-022-01691-9,no,2022,openalex,2026-10-21,"Color is necessary for face discrimination in the Northern paper wasp, Polistes fuscatus"
 10.1007/s10211-026-00504-3,no,2026,openalex,2026-10-21,The ocean as a laboratory for animal intelligence
 10.1007/s10571-026-01707-9,no,2026,openalex,2026-10-21,Sex-Dependent Dynamics of Behavioural and Neuropathological Changes in an A53T Alpha-Synuclein Mouse Model of Parkinson’s Disease
-10.1007/s43440-024-00679-1,no,2024,openalex,2026-10-21,Assessing the effects of 5-HT2A and 5-HT5A receptor antagonists on DOI-induced head-twitch response in male rats using marker-less deep learning algorithms
+10.1007/s43440-024-00679-1,yes,2024,openalex,2026-10-21,Assessing the effects of 5-HT2A and 5-HT5A receptor antagonists on DOI-induced head-twitch response in male rats using marker-less deep learning algorithms
 10.1016/b978-0-443-29068-8.00207-5,no,2026,openalex,2026-10-21,"Gaze and behavior tracking in animal research: Granularity, automation, and technological choice"
 10.1016/j.alcohol.2022.02.001,no,2022,openalex,2026-10-21,Assessing negative affect in mice during abstinence from alcohol drinking: Limitations and future challenges
 10.1016/j.anbehav.2025.123085,no,2025,openalex,2026-10-21,Investigating the use of odour and colour foraging cues by rosy-faced lovebirds using deep-learning based analysis
@@ -47,7 +47,7 @@ doi,verdict,year,source,checked,title
 10.1016/j.conb.2022.102549,no,2022,openalex,2026-10-21,"The what, how, and why of naturalistic behavior"
 10.1016/j.conb.2024.102879,no,2024,openalex,2026-10-21,Studying dominance and aggression requires ethologically relevant paradigms
 10.1016/j.conb.2026.103201,no,2026,openalex,2026-10-21,"The behavior biopsy: Interpreting animal behavior as embodied, situated, and hierarchical"
-10.1016/j.crmeth.2025.101144,no,2025,openalex,2026-10-21,Profiling mouse behavior with computational tools to assess age-dependent differences in associative learning
+10.1016/j.crmeth.2025.101144,yes,2025,openalex,2026-10-21,Profiling mouse behavior with computational tools to assess age-dependent differences in associative learning
 10.1016/j.cub.2025.04.006,no,2025,openalex,2026-10-21,Region-specific nucleus accumbens dopamine signals encode distinct aspects of avoidance learning
 10.1016/j.ecoinf.2024.102893,no,2024,openalex,2026-10-21,Beyond observation: Deep learning for animal behavior and ecological conservation
 10.1016/j.energy.2025.135172,no,2025,openalex,2026-10-21,"Identification of the formation temperature field by explainable artificial intelligence: A case study of Songyuan City, China"
@@ -70,7 +70,7 @@ doi,verdict,year,source,checked,title
 10.1016/j.neuroscience.2024.10.043,no,2024,openalex,2026-10-21,S-(+)-mecamylamine increases the firing rate of serotonin neurons and diminishes depressive-like behaviors in an animal model of stress
 10.1016/j.neuroscience.2026.07.014,no,2026,openalex,2026-10-21,Swimming in the future already: the use of AI in zebrafish neurobehavioral research and CNS drug screening
 10.1016/j.nlm.2024.107952,no,2024,openalex,2026-10-21,Neural correlates of learning and memory are altered by early-life stress
-10.1016/j.patter.2025.101237,no,2025,openalex,2026-10-21,Evaluation of unsupervised learning algorithms for the classification of behavior from pose estimation data
+10.1016/j.patter.2025.101237,yes,2025,openalex,2026-10-21,Evaluation of unsupervised learning algorithms for the classification of behavior from pose estimation data
 10.1016/j.pbb.2022.173483,no,2022,openalex,2026-10-21,Dominance status is associated with a variation in cannabinoid receptor 1 expression and amphetamine reward
 10.1016/j.plrev.2024.11.009,no,2024,openalex,2026-10-21,Kinematic coding: Measuring information in naturalistic behaviour
 10.1016/j.pneurobio.2025.102834,no,2025,openalex,2026-10-21,Evidence for the involvement of a fronto-striatal pathway in the processing of social reward
@@ -88,9 +88,9 @@ doi,verdict,year,source,checked,title
 10.1016/j.ynstr.2022.100501,no,2022,openalex,2026-10-21,Prebiotic supplementation modulates selective effects of stress on behavior and brain metabolome in aged mice
 10.1016/j.ynstr.2024.100636,no,2024,openalex,2026-10-21,"Early-life stress impairs acquisition and retrieval of fear memories: sex-effects, corticosterone modulation, and partial prevention by targeting glucocorticoid receptors at adolescent age"
 10.1016/j.ynstr.2025.100712,no,2025,openalex,2026-10-21,Illuminating the impact of stress: In vivo approaches to track stress-related neural adaptations
-10.1016/j.ynstr.2025.100742,no,2025,openalex,2026-10-21,Tracking conditioned fear in pair-housed mice using deep learning and real-time cue delivery
+10.1016/j.ynstr.2025.100742,yes,2025,openalex,2026-10-21,Tracking conditioned fear in pair-housed mice using deep learning and real-time cue delivery
 10.1021/acs.est.6c01412,no,2026,openalex,2026-10-21,Integrating Cascade Mechanistic Insights into Structure–Activity Relationships for Quantitative Mode-of-Action Analysis: A Novel Risk Assessment Framework for OPFRs
-10.1021/acsptsci.5c00305,no,2025,openalex,2026-10-21,"Rapid, Open-Source, and Automated Quantification of the Head Twitch Response in C57BL/6J Mice Using DeepLabCut and Simple Behavioral Analysis"
+10.1021/acsptsci.5c00305,yes,2025,openalex,2026-10-21,"Rapid, Open-Source, and Automated Quantification of the Head Twitch Response in C57BL/6J Mice Using DeepLabCut and Simple Behavioral Analysis"
 10.1021/acssensors.6c01470,no,2026,openalex,2026-10-21,Single-Atom Palladium Functionalized Reduced Graphene Oxide Coupled with a Physics-Data Dual-Driven Deep Learning Framework for Interpretable Discrimination of Volatile Organic Compound Homologues
 10.1021/envhealth.5c00014,no,2025,openalex,2026-10-21,Evaluating the Vascular Risk of PFCs: An Integrated XGBoost-Driven Structure–Activity Prediction and Experimental Validation Study
 10.1038/s41380-022-01762-w,no,2022,openalex,2026-10-21,Introducing a depression-like syndrome for translational neuropsychiatry: a plea for taxonomical validity and improved comparability between humans and mice
@@ -113,34 +113,34 @@ doi,verdict,year,source,checked,title
 10.1038/s41586-021-03962-w,no,2021,openalex,2026-10-21,Neural control of affiliative touch in prosocial interaction
 10.1038/s41586-022-04507-5,no,2022,openalex,2026-10-21,Cortical ensembles orchestrate social competition through hypothalamic outputs
 10.1038/s41586-024-08459-w,no,2025,openalex,2026-10-21,Experience-dependent dopamine modulation of male aggression
-10.1038/s41586-025-10009-x,no,2026,openalex,2026-10-21,Predatory aggression evolved through adaptations to noradrenergic circuits
+10.1038/s41586-025-10009-x,yes,2026,openalex,2026-10-21,Predatory aggression evolved through adaptations to noradrenergic circuits
 10.1038/s41592-025-02653-y,no,2025,openalex,2026-10-21,Computer vision for primate behavior analysis in the wild
 10.1038/s41593-020-00734-z,no,2020,openalex,2026-10-21,Quantifying behavior to understand the brain
 10.1038/s41593-020-0675-x,no,2020,openalex,2026-10-21,Posterior amygdala regulates sexual and aggressive behaviors in male mice
 10.1038/s41593-021-00861-1,no,2021,openalex,2026-10-21,Social mice seeking circuits
 10.1038/s41593-024-01649-9,no,2024,openalex,2026-10-21,Simple Behavioral Analysis (SimBA) as a platform for explainable machine learning in behavioral neuroscience
 10.1038/s41593-026-02292-2,no,2026,openalex,2026-10-21,Individual differences in prosocial learning are represented in the hippocampal dorsal CA1
-10.1038/s41598-022-05641-w,no,2022,openalex,2026-10-21,Automated procedure to assess pup retrieval in laboratory mice
-10.1038/s41598-024-51225-1,no,2024,openalex,2026-10-21,Automated procedure to detect subtle motor alterations in the balance beam test in a mouse model of early Parkinson’s disease
+10.1038/s41598-022-05641-w,yes,2022,openalex,2026-10-21,Automated procedure to assess pup retrieval in laboratory mice
+10.1038/s41598-024-51225-1,yes,2024,openalex,2026-10-21,Automated procedure to detect subtle motor alterations in the balance beam test in a mouse model of early Parkinson’s disease
 10.1038/s41598-024-75545-4,no,2024,openalex,2026-10-21,Induction of territorial dominance and subordination behaviors in laboratory mice
-10.1038/s41598-025-01244-3,no,2025,openalex,2026-10-21,Automatic quantification of disgust reactions in mice using machine learning
-10.1038/s41598-025-94265-x,no,2025,openalex,2026-10-21,Generalization and extinction of platform-mediated avoidance in male and female rats
+10.1038/s41598-025-01244-3,yes,2025,openalex,2026-10-21,Automatic quantification of disgust reactions in mice using machine learning
+10.1038/s41598-025-94265-x,yes,2025,openalex,2026-10-21,Generalization and extinction of platform-mediated avoidance in male and female rats
 10.1038/s42003-023-04449-2,no,2023,openalex,2026-10-21,Lateral line ablation by ototoxic compounds results in distinct rheotaxis profiles in larval zebrafish
 10.1038/s44277-024-00014-9,no,2024,openalex,2026-10-21,Keeping it simple – a Simple Behavioral Analysis (SimBA) primer
-10.1038/s44277-025-00047-8,no,2025,openalex,2026-10-21,Classification of social behavioral responses in stress and non-stress adult male mice with high precision
+10.1038/s44277-025-00047-8,yes,2025,openalex,2026-10-21,Classification of social behavioral responses in stress and non-stress adult male mice with high precision
 10.1039/9781837672059-00031,no,2024,openalex,2026-10-21,Combinatorial Behavioural Phenotyping of Mouse Models of Schizophrenia
 10.1073/pnas.2505378122,no,2025,openalex,2026-10-21,Distinct prelimbic cortex ensembles encode response execution and inhibition
 10.1080/00219266.2026.2628797,no,2026,openalex,2026-10-21,Beyond ChatGPT: a review of the use of AI tools in biological education
 10.1080/10253890.2023.2186141,no,2023,openalex,2026-10-21,Increasing resolution in stress neurobiology: from single cells to complex group behaviors
 10.1080/17460441.2023.2279669,no,2023,openalex,2026-10-21,Artificial intelligence pushes the boundaries of behavioral analysis in drug discovery: a revolution from the deep
-10.1088/1741-2552/ad5702,no,2024,openalex,2026-10-21,Identifying behavioral links to neural dynamics of multifiber photometry recordings in a mouse social behavior network
+10.1088/1741-2552/ad5702,yes,2024,openalex,2026-10-21,Identifying behavioral links to neural dynamics of multifiber photometry recordings in a mouse social behavior network
 10.1093/g3journal/jkag120,no,2026,openalex,2026-10-21,"Automated analysis of C. elegans behavior by LabGym : an open-source, AI-powered platform"
 10.1093/genetics/iyag256,no,2026,openalex,2026-10-21,Parent-of-origin-dependent allelic regulation of social behaviors in mice by noncanonically imprinted monoamine synthesis genes
 10.1093/med/9780197549469.003.0060,no,2024,openalex,2026-10-21,Artificial Intelligence–Guided Behavioral Phenotyping in Epilepsy
 10.1097/j.pain.0000000000002467,no,2021,openalex,2026-10-21,Behavioral outcomes of complete Freund adjuvant–induced inflammatory pain in the rodent hind paw: a systematic review and meta-analysis
 10.1097/j.pain.0000000000003976,no,2026,openalex,2026-10-21,Ethological profiling defines pain behaviors and parses analgesia from drug side effects in a mouse model of complex regional pain syndrome
 10.1097/j.pain.0000000000003977,no,2026,openalex,2026-10-21,Numb or napping? Decoding pain relief from sedation with automated behavioral analysis
-10.1097/j.pain.0000000000004086,no,2026,openalex,2026-10-21,Manual and automated capture of analgesic-responsive facial pain behaviors of unrestrained mice in a trigeminal neuralgia model
+10.1097/j.pain.0000000000004086,yes,2026,openalex,2026-10-21,Manual and automated capture of analgesic-responsive facial pain behaviors of unrestrained mice in a trigeminal neuralgia model
 10.1098/rsif.2023.0367,no,2023,openalex,2026-10-21,Elephants and algorithms: a review of the current and future role of AI in elephant monitoring
 10.1098/rstb.2020.0444,no,2022,openalex,2026-10-21,Neural systems that facilitate the representation of social rank
 10.1101/2020.10.26.355115,no,2020,openalex,2026-10-21,"Deep-learning based identification, tracking, pose estimation, and behavior classification of interacting primates and mice in complex environments"
@@ -164,7 +164,7 @@ doi,verdict,year,source,checked,title
 10.1101/2024.05.03.591825,no,2024,openalex,2026-10-21,Statistical signature of subtle behavioural changes in large-scale behavioural assays
 10.1101/2024.05.13.594023,no,2024,openalex,2026-10-21,SAUSI: an integrative assay for measuring social aversion and motivation
 10.1101/2024.06.13.598948,no,2024,openalex,2026-10-21,Inverse Reinforcement Learning to Study Motivation in Mouse Behavioral Paradigms
-10.1101/2024.06.19.599689,no,2024,openalex,2026-10-21,Induction of territorial behavior and dominance hierarchies in laboratory mice
+10.1101/2024.06.19.599689,yes,2024,openalex,2026-10-21,Induction of territorial behavior and dominance hierarchies in laboratory mice
 10.1101/2024.07.14.603464,no,2024,openalex,2026-10-21,Deep Learning Algorithms Reveal Increased Social Activity of Rats at the Start of Evening Twilight
 10.1101/2024.07.30.605655,no,2024,openalex,2026-10-21,Video Foundation Models for Animal Behavior Analysis
 10.1101/2024.08.30.610159,no,2024,openalex,2026-10-21,High-throughput unsupervised quantification of patterns in the natural behavior of marmosets
@@ -192,17 +192,17 @@ doi,verdict,year,source,checked,title
 10.1101/cshperspect.a039164,no,2021,openalex,2026-10-21,Quantifying Sex Differences in Behavior in the Era of “Big” Data
 10.1101/lm.054065.124,no,2025,openalex,2026-10-21,Behavioral microanalyses refine sign-tracking characterization and uncover different response dynamics during omission and extinction learning
 10.1109/access.2024.3435141,no,2024,openalex,2026-10-21,Advancements in Cerebellar Modeling and Its Practical Applications: A Comprehensive Review
-10.1109/ssci51031.2022.10022203,no,2022,openalex,2026-10-21,Rodent Tracking and Abnormal Behavior Classification in Live Video using Deep Neural Networks
+10.1109/ssci51031.2022.10022203,yes,2022,openalex,2026-10-21,Rodent Tracking and Abnormal Behavior Classification in Live Video using Deep Neural Networks
 10.1111/acer.14901,no,2022,openalex,2026-10-21,Chronic alcohol consumption alters home‐cage behaviors and responses to ethologically relevant predator tasks in mice
 10.1111/adb.13253,no,2022,openalex,2026-10-21,Oral oxycodone self‐administration leads to features of opioid misuse in male and female mice
-10.1111/ejn.15327,no,2021,openalex,2026-10-21,Systematic analysis of goal‐related movement sequences during maternal behaviour in a female mouse model for Rett syndrome
+10.1111/ejn.15327,yes,2021,openalex,2026-10-21,Systematic analysis of goal‐related movement sequences during maternal behaviour in a female mouse model for Rett syndrome
 10.1111/ejn.70292,no,2025,openalex,2026-10-21,Synaptic Plasticity of D1 and D2 Types of Neurons in the Central Amygdala After Sucrose and Cocaine Exposure
 10.1111/gbb.12853,no,2023,openalex,2026-10-21,"Extensive characterization of a Williams syndrome murine model shows Gtf2ird1‐mediated rescue of select sensorimotor tasks, but no effect on enhanced social behavior"
 10.1111/jne.13083,no,2021,openalex,2026-10-21,"Knockdown of sexually differentiated vasopressin expression in the bed nucleus of the stria terminalis reduces social and sexual behaviour in male, but not female, mice"
 10.1111/nyas.15041,no,2023,openalex,2026-10-21,Automated behavioral scoring: Do we even need humans?
 10.1111/nyas.15076,no,2023,openalex,2026-10-21,Shaping the development of complex social behavior
 10.1113/jp286263,no,2024,openalex,2026-10-21,Kif1a and intact microtubules maintain synaptic‐vesicle populations at ribbon synapses in zebrafish hair cells
-10.11159/jbeb.2026.004,no,2026,openalex,2026-10-21,A Pilot Study in Integrated Machine Learning and Kinematic Framework for Automated Behavioral Phenotyping in Mice
+10.11159/jbeb.2026.004,yes,2026,openalex,2026-10-21,A Pilot Study in Integrated Machine Learning and Kinematic Framework for Automated Behavioral Phenotyping in Mice
 10.1134/s0022093025060080,no,2025,openalex,2026-10-21,Using Artificial Intelligence Systems in Modern Neurobehavioral Research
 10.1142/s0129156425404784,no,2025,openalex,2026-10-21,Construction of a Dynamic Prediction Model for Student Management Based on Deep Belief Networks
 10.1146/annurev-neuro-102124-022220,no,2026,openalex,2026-10-21,Neurobiology of Social Touch
@@ -217,7 +217,7 @@ doi,verdict,year,source,checked,title
 10.1371/journal.pone.0332642,no,2025,openalex,2026-10-21,"The effects of Arabian jasmine on zebrafish behavior depends on strain, sex, and personality"
 10.1523/eneuro.0031-24.2024,no,2025,openalex,2026-10-21,Analysis of Operant Self-administration Behaviors with Supervised Machine Learning: Protocol for Video Acquisition and Pose Estimation Analysis Using DeepLabCut and Simple Behavioral Analysis
 10.1523/eneuro.0115-23.2023,no,2023,openalex,2026-10-21,High-THCCannabisSmoke Impairs Incidental Memory Capacity in Spontaneous Tests of Novelty Preference for Objects and Odors in Male Rats
-10.1523/eneuro.0173-24.2024,no,2024,openalex,2026-10-21,Low-Cost Approaches in Neuroscience to Teach Machine Learning Using a Cockroach Model
+10.1523/eneuro.0173-24.2024,yes,2024,openalex,2026-10-21,Low-Cost Approaches in Neuroscience to Teach Machine Learning Using a Cockroach Model
 10.1523/eneuro.0471-25.2026,no,2026,openalex,2026-10-21,Attack Repertoires in Outbred Male CD1-Mice Are Associated with Nucleus Accumbens Neuroligin-2
 10.1523/jneurosci.0023-25.2025,no,2026,openalex,2026-10-21,Neural Bases of Collective Social Behavior and Group Interactions across Species
 10.1523/jneurosci.1078-23.2023,no,2024,openalex,2026-10-21,Multidimensional analysis of a social behavior identifies regression and phenotypic heterogeneity in a female mouse model for Rett syndrome
@@ -241,7 +241,7 @@ doi,verdict,year,source,checked,title
 10.3389/fnbeh.2022.877323,no,2022,openalex,2026-10-21,Measuring Locomotor Activity and Behavioral Aspects of Rodents Living in the Home-Cage
 10.3389/fnbeh.2023.1281494,no,2023,openalex,2026-10-21,Ethorobotic rats for rodent behavioral research: design considerations
 10.3389/fnbeh.2024.1340357,no,2024,openalex,2026-10-21,A comparison of machine learning methods for quantifying self-grooming behavior in mice
-10.3389/fnbeh.2024.1440601,no,2024,openalex,2026-10-21,Comprehensive ethological analysis of fear expression in rats using DeepLabCut and SimBA machine learning model
+10.3389/fnbeh.2024.1440601,yes,2024,openalex,2026-10-21,Comprehensive ethological analysis of fear expression in rats using DeepLabCut and SimBA machine learning model
 10.3389/fnbeh.2025.1617091,no,2025,openalex,2026-10-21,Social context restructures behavioral syntax in mice
 10.3389/fnbeh.2025.1636674,no,2025,openalex,2026-10-21,Adolescent male and female rats show enhanced latent inhibition of conditioned fear compared to adult rats
 10.3389/fnbeh.2025.1663089,no,2025,openalex,2026-10-21,Does advancement in marker-less pose-estimation mean more quality research? A systematic review
@@ -261,7 +261,7 @@ doi,verdict,year,source,checked,title
 10.3390/cells13030275,no,2024,openalex,2026-10-21,Deep-Learning-Based Analysis Reveals a Social Behavior Deficit in Mice Exposed Prenatally to Nicotine
 10.3390/foods13172665,no,2024,openalex,2026-10-21,"A Review of Ganoderma lucidum Polysaccharide: Preparations, Structures, Physicochemical Properties and Application"
 10.34133/2020/7190517,no,2020,openalex,2026-10-21,From Neurons to Cognition: Technologies for Precise Recording of Neural Activity Underlying Behavior
-10.3758/s13428-022-01881-w,no,2022,openalex,2026-10-21,Supervised machine learning aided behavior classification in pigeons
+10.3758/s13428-022-01881-w,yes,2022,openalex,2026-10-21,Supervised machine learning aided behavior classification in pigeons
 10.3791/71394,no,2026,openalex,2026-10-21,Optogenetic Analysis of Behavior in the Mosquito Aedes aegypti
 10.3929/ethz-b-000451918,no,2020,openalex,2026-10-21,SIPEC: the deep-learning Swiss knife for behavioral data analysis
 10.4018/979-8-3373-1325-2.ch006,no,2026,openalex,2026-10-21,Neuroscientific Approach to Artificial Intelligence for Psychopathologies

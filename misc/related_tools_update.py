@@ -14,7 +14,7 @@ Two steps, with a human or LLM classification in between:
 
     python misc/related_tools_update.py apply decisions.json
         decisions.json is a list of {"doi", "verdict": "yes"|"no", "tool_name", "category",
-        "species", "one_line", "code_url"}. Every paper is recorded in related_tools_seen.csv,
+        "species", "one_line", "code_url", "label" (optional short name for unnamed tools)}. Every paper is recorded in related_tools_seen.csv,
         "yes" rows are appended to related_tools.csv, authors / venue / preprint / citation counts
         are refreshed from OpenAlex for every row, and the HTML table is regenerated.
 
@@ -242,7 +242,8 @@ def apply(path):
         key = d.get("tool_name", "").strip().lower() or norm_title(row["title"])
         if d["verdict"] == "yes" and key not in known:
             known.add(key)
-            tools.append({"tool_name": d.get("tool_name", "").strip(), "title": row["title"], "year": row["year"],
+            tools.append({"tool_name": d.get("tool_name", "").strip(), "label": d.get("label", "").strip(),
+                          "title": row["title"], "year": row["year"],
                           "category": d.get("category", ""), "species": d.get("species", ""),
                           "one_line": d.get("one_line", ""), "code_url": d.get("code_url", ""),
                           "doi": "https://doi.org/" + doi if doi.startswith("10.") else doi, "other_dois": ""})
