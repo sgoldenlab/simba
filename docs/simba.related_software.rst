@@ -686,6 +686,7 @@ Metabolic phenotyping cages
 Tools, models, datasets and hardware introduced by published papers and preprints that cite
 SimBA, compiled from the citation record. Search or filter by category, and click a row for a
 short description and code link.
+
 .. raw:: html
    :file: _generated/related_tools_table.html
 
