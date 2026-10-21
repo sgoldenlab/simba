@@ -94,7 +94,8 @@ def read_csv(path):
 
 def write_csv(path, rows, cols):
     with open(path, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")
+        # "\n", not csv's default "\r\n": the Linux runner would otherwise rewrite every line each week
+        w = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore", lineterminator="\n")
         w.writeheader()
         w.writerows(rows)
 
