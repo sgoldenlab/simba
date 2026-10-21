@@ -182,7 +182,7 @@ INSTITUTION_COORDS = {
     'Universidade de Lisboa': [38.7528, -9.157],  # 2
     'Universitat Jaume I': [39.9943, -0.0714],  # 5
     'University College Cork': [51.8947, -8.4903],  # 2
-    'University College London': [51.5242, -0.133],  # 3
+    'University College London': [51.5242, -0.133],  # 4
     'University Miguel Hernández': [38.277, -0.6899],  # 1
     'University of Amsterdam': [52.3681, 4.8898],  # 3
     'University of Arizona': [32.2357, -110.9517],  # 1
