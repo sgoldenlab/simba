@@ -26,9 +26,12 @@ jobs:
       # tool preprints (bioRxiv), keeps those whose title/abstract say they introduce a tool,
       # and adds them to misc/related_tools.csv and the Related Software page table.
       # OPENALEX_API_KEY is optional: without the secret the script pages without a key.
+      # GITHUB_TOKEN (provided by Actions) raises the rate limit for the stars / last-update lookups.
       - name: Find and add new tools
         env:
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash   # -o pipefail, so a failing script is not hidden by tee
         run: python misc/related_tools_update.py auto | tee "$RUNNER_TEMP/related_tools.log"
 
       - name: Configure Git
@@ -41,6 +44,14 @@ jobs:
           git add misc/related_tools.csv misc/related_tools_seen.csv docs/_generated/related_tools_table.html
           git commit -m "Update related tools table" || echo "Nothing to commit"
           git push
+
+      # Fails the run (GitHub emails a failure notice) if the table no longer renders: the RST
+      # directive got broken, or the live Read the Docs page lost the table.
+      - name: Check the table renders on the Related Software page
+        shell: bash
+        run: |
+          pip install --quiet docutils
+          python misc/check_related_tools_page.py | tee -a "$RUNNER_TEMP/related_tools.log"
 
       # Shown on the run's page under the Actions tab. Never opens GitHub issues.
       - name: Show the run's additions in the job summary

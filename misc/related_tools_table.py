@@ -41,6 +41,9 @@ def main():
             "v": r.get("venue", "").strip(),
             "p": r.get("preprint") == "1",
             "cb": int(r.get("cited_by") or 0),
+            "gs": int(r.get("gh_stars") or -1),      # GitHub stars, -1 = no GitHub repo
+            "gp": r.get("gh_pushed", ""),            # last push, YYYY-MM
+            "ga": r.get("gh_archived") == "1",
             "t": r["title"].strip(),
             "c": CATEGORIES.get(r["category"], "Other"),
             "s": r["species"].strip(),
@@ -86,6 +89,8 @@ TEMPLATE = """<style>
 .simba-rt .meta{{font-size:12px;color:#6b7280;margin-top:3px;line-height:1.4;}}
 .simba-rt .cb{{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap !important;}}
 .simba-rt .tag.pre{{background:#fdf0e6;color:#983412;}}
+.simba-rt .tag.arc{{background:#f1f5f9;color:#475569;}}
+.simba-rt .gh{{white-space:nowrap;}}
 .simba-rt .tag{{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:9px;margin-left:6px;vertical-align:1px;background:#e8f4fb;color:#21567a;}}
 .simba-rt .ttl a{{color:#1f4e79;}}
 .simba-rt tr.dt td{{border-top:0 !important;padding-top:0 !important;background:#fbfdff !important;}}
@@ -143,6 +148,10 @@ TEMPLATE = """<style>
     return a;
   }}
 
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const stars = n => n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, "") + "k" : String(n);
+  const month = ym => ym ? MONTHS[+ym.slice(5, 7) - 1] + " " + ym.slice(0, 4) : "";
+
   function render() {{
     const words = q.value.toLowerCase().split(/\\s+/).filter(Boolean);
     const rows = D.filter(d =>
@@ -169,6 +178,12 @@ TEMPLATE = """<style>
       if (d.url) ttl.appendChild(link(d.t, d.url)); else ttl.textContent = d.t;
       td.appendChild(ttl);
       const meta = el("div", "meta", [d.au, d.v].filter(Boolean).join(" · "));
+      if (d.gs >= 0) {{
+        const gh = el("span", "gh", (meta.textContent ? " · " : "") + "★ " + stars(d.gs) + (d.gp ? " · updated " + month(d.gp) : ""));
+        gh.title = "GitHub stars and last code update";
+        meta.appendChild(gh);
+      }}
+      if (d.ga) meta.appendChild(el("span", "tag arc", "Archived"));
       if (d.p) meta.appendChild(el("span", "tag pre", "Preprint"));
       if (meta.childNodes.length) td.appendChild(meta);
       tr.appendChild(td);

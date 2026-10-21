@@ -19,7 +19,7 @@ Two steps, with a human or LLM classification in between:
         are refreshed from OpenAlex for every row, and the HTML table is regenerated.
 
     python misc/related_tools_update.py enrich
-        Only the OpenAlex refresh of related_tools.csv.
+        Only the OpenAlex refresh of related_tools.csv, plus GitHub stars / last push for code links.
 
     python misc/related_tools_update.py auto
         fetch, then classify the candidates with the keyword rules in rule_decision(), then apply.
@@ -66,7 +66,8 @@ SPECIES_RULES = [("Mouse", r"\b(mouse|mice)\b"), ("Rat", r"\brats?\b"), ("Zebraf
                  ("Marmoset", r"\bmarmosets?\b")]
 SEEN_COLS = ["doi", "verdict", "year", "source", "checked", "title"]
 TOOL_COLS = ["tool_name", "label", "title", "year", "category", "species", "one_line", "code_url", "doi", "other_dois",
-             "authors", "venue", "preprint", "cited_by"]
+             "authors", "venue", "preprint", "cited_by", "gh_stars", "gh_pushed", "gh_archived"]
+GITHUB_REPO_RE = re.compile(r"github\.com/([\w.-]+)/([\w.-]+)")
 PREPRINT_VENUES = ("biorxiv", "medrxiv", "arxiv", "research square", "ssrn", "preprints.org")
 
 
@@ -221,6 +222,30 @@ def enrich(tools):
             ow = openalex_work({"doi": other, "title": ""})
             cited += int((ow or {}).get("cited_by_count") or 0)
         t["cited_by"] = str(cited)
+    github_activity(tools)
+
+
+def github_activity(tools):
+    """Stars, last push (YYYY-MM) and archived flag for GitHub code links. Uses GITHUB_TOKEN when set
+    (the Action provides one); without it GitHub allows 60 requests an hour, so some rows may stay stale."""
+    headers = {"Accept": "application/vnd.github+json", "User-Agent": "simba-related-tools"}
+    if os.environ.get("GITHUB_TOKEN"):
+        headers["Authorization"] = "Bearer " + os.environ["GITHUB_TOKEN"]
+    for t in tools:
+        m = GITHUB_REPO_RE.search(t.get("code_url", ""))
+        if not m:
+            t["gh_stars"] = t["gh_pushed"] = t["gh_archived"] = ""
+            continue
+        owner, repo = m.group(1), re.sub(r"\.git$", "", m.group(2))
+        try:
+            req = urllib.request.Request(f"https://api.github.com/repos/{owner}/{repo}", headers=headers)
+            with urllib.request.urlopen(req, timeout=30) as r:
+                g = json.loads(r.read())
+        except Exception:
+            continue   # keep the previous values
+        t["gh_stars"] = str(g.get("stargazers_count", ""))
+        t["gh_pushed"] = (g.get("pushed_at") or "")[:7]
+        t["gh_archived"] = "1" if g.get("archived") else "0"
 
 
 def apply(path):
