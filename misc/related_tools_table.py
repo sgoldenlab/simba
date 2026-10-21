@@ -9,14 +9,12 @@ no libraries), in the same style as the use-case table.
 
 Run:  python misc/related_tools_table.py
 """
-import collections, csv, json, os, re
+import collections, csv, json, os
 from datetime import date
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "related_tools.csv")
 OUT = os.path.join(HERE, "..", "docs", "_generated", "related_tools_table.html")
-# Tools already in the curated tables of this page get an "Also listed above" tag.
-PAGE = os.path.join(HERE, "..", "docs", "simba.related_software.rst")
 
 CATEGORIES = {"supervised-classification": "Supervised classification",
               "unsupervised-behavior": "Unsupervised / self-supervised",
@@ -33,13 +31,9 @@ CATEGORIES = {"supervised-classification": "Supervised classification",
 def main():
     with open(SRC, encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
-    with open(PAGE, encoding="utf-8") as f:
-        curated = "\n".join(l for l in f if l.lstrip().startswith("* - `"))
     tools = []
     for r in rows:
-        name = re.sub(r"\s*\(.*?\)", "", r["tool_name"]).strip()
         tools.append({
-            "listed": bool(name) and re.search(r"`" + re.escape(name) + r"[\s<]", curated) is not None,
             "y": int(r["year"]) if r["year"].isdigit() else 0,
             "n": r["tool_name"].strip(),
             "lb": r.get("label", "").strip(),   # short descriptive label for tools the paper does not name
@@ -65,8 +59,7 @@ def main():
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(html)
-    print(f"Wrote {os.path.normpath(OUT)}: {len(tools)} tools in {len(cats)} categories, "
-          f"{sum(t['listed'] for t in tools)} also in the curated tables")
+    print(f"Wrote {os.path.normpath(OUT)}: {len(tools)} tools in {len(cats)} categories")
 
 
 TEMPLATE = """<style>
@@ -166,11 +159,8 @@ TEMPLATE = """<style>
       const tr = el("tr", "row");
       tr.appendChild(el("td", "yr", d.y || ""));
       const td = el("td");
-      if (d.n) {{
-        const nm = el("div", "nm", d.n);
-        if (d.listed) nm.appendChild(el("span", "tag", "Also listed above"));
-        td.appendChild(nm);
-      }} else if (d.lb) {{
+      if (d.n) td.appendChild(el("div", "nm", d.n));
+      else if (d.lb) {{
         const nm = el("div", "nm lb", d.lb);
         nm.title = "The paper does not name its tool; this is a short description";
         td.appendChild(nm);
