@@ -36,16 +36,16 @@ def check_live():
 
 
 def main():
-    failures = []
+    failures, live = [], "--skip-live" not in sys.argv
     if not check_rst():
         failures.append(f"{os.path.normpath(RST)}: the related tools table is not inside a '.. raw:: html' directive "
                         "(is the blank line before the directive missing?)")
-    if "--skip-live" not in sys.argv and not check_live():
+    if live and not check_live():
         failures.append(f"{LIVE_URL}: the live page does not contain the related tools table")
     for f in failures:
         print("FAIL:", f)
     if not failures:
-        print("OK: the related tools table renders in the RST source and on the live page")
+        print("OK: the related tools table renders in the RST source" + (" and on the live page" if live else " (live page not checked)"))
     sys.exit(1 if failures else 0)
 
 
