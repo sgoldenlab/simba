@@ -678,6 +678,18 @@ Metabolic phenotyping cages
      - |comm|
      - Treadmill-based gait analysis
 
+.. _Tools from papers citing SimBA:
+
+|:books:| **Tools from papers citing SimBA**
+--------------------------------------------
+
+Tools, models, datasets and hardware introduced by published papers and preprints that cite
+SimBA, compiled from the citation record. Search or filter by category, and click a row for a
+short description and code link. Tools also in the tables above are tagged.
+
+.. raw:: html
+   :file: _generated/related_tools_table.html
+
 
 .. raw:: html
 
