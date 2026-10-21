@@ -34,8 +34,7 @@ from simba.utils.read_write import (create_directory,
                                     find_all_videos_in_directory,
                                     get_pkg_version, get_video_meta_data,
                                     read_frm_of_video, recursive_file_search)
-from simba.utils.yolo import (create_yolo_sample_visualizations,
-                              load_yolo_model)
+from simba.utils.yolo import create_yolo_sample_visualizations, load_yolo_model
 
 
 class SAM3ToYoloSeg:
