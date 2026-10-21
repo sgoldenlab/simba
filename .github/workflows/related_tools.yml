@@ -1,0 +1,51 @@
+name: Update Related Tools Table
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'     # Mondays at 08:00 UTC
+  workflow_dispatch:        # "Run workflow" button
+
+permissions:
+  contents: write           # needed to commit the updated table
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # Standard library only. Finds new papers citing SimBA (OpenAlex) and this week's likely
+      # tool preprints (bioRxiv), keeps those whose title/abstract say they introduce a tool,
+      # and adds them to misc/related_tools.csv and the Related Software page table.
+      # OPENALEX_API_KEY is optional: without the secret the script pages without a key.
+      - name: Find and add new tools
+        env:
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+        run: python misc/related_tools_update.py auto | tee "$RUNNER_TEMP/related_tools.log"
+
+      - name: Configure Git
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Actions"
+
+      - name: Commit updated table (if changed)
+        run: |
+          git add misc/related_tools.csv misc/related_tools_seen.csv docs/_generated/related_tools_table.html
+          git commit -m "Update related tools table" || echo "Nothing to commit"
+          git push
+
+      # Shown on the run's page under the Actions tab. Never opens GitHub issues.
+      - name: Show the run's additions in the job summary
+        if: always()
+        continue-on-error: true
+        run: |
+          [ -s "$RUNNER_TEMP/related_tools.log" ] || exit 0
+          { echo '```'; cat "$RUNNER_TEMP/related_tools.log"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

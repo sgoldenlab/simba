@@ -16,6 +16,11 @@ Two steps, with a human or LLM classification in between:
         decisions.json is a list of {"doi", "verdict": "yes"|"no", "tool_name", "category",
         "species", "one_line", "code_url"}. Every paper is recorded in related_tools_seen.csv,
         "yes" rows are appended to related_tools.csv, and the HTML table is regenerated.
+
+    python misc/related_tools_update.py auto
+        fetch, then classify the candidates with the keyword rules in rule_decision(), then apply.
+        Used by .github/workflows/related_tools.yml. On the hand-sorted citing papers the rules
+        were right ~80% of the time when they said "tool" and found ~65% of the tools.
 """
 import csv, json, os, re, sys, urllib.parse, urllib.request
 from datetime import date, timedelta
@@ -33,6 +38,28 @@ PENDING_DAYS = 60
 BIORXIV_CATEGORIES = {"neuroscience", "animal behavior and cognition"}
 BEHAVIOR_RE = re.compile(r"\b(behavio(u)?r(al)?|pose|keypoint|tracking|video)\b", re.I)
 METHOD_RE = re.compile(r"\b(classif\w*|machine learning|deep learning|pose estimation|keypoint|automated|tracking)\b", re.I)
+# Keyword rules for the unattended weekly run. A paper counts as a tool when its title starts
+# with a tool name ("B-REAL: ..."), names an acronym next to a method word ("... classifier (R2C2)"),
+# or its abstract says "we present/introduce/develop ... <tool/pipeline/dataset/...>".
+NAME_RE = re.compile(r"^\s*([A-Za-z][\w\-.+]{1,24}(?:\s[\w\-.+]{1,20}){0,2})\s*[:–—]\s")
+ACRO_RE = re.compile(r"\(([A-Z][A-Za-z0-9\-]{2,15})\)")
+ACRO_CONTEXT_RE = re.compile(r"(classifier|system|pipeline|tool|toolbox|platform|software|model|dataset)", re.I)
+INTRO_RE = re.compile(r"\b(we|here,? we|this (work|paper|study))\s+(present|introduce|develop(ed)?|describe|propose|release|built|created?)\b"
+                      r"[^.]{0,160}\b(tool|toolbox|toolkit|software|package|pipeline|platform|framework|system|dataset|benchmark"
+                      r"|app|application|library|model|method|device|apparatus|setup)\b", re.I)
+EXCLUDE_RE = re.compile(r"\b(review|perspective|primer on|meta-analysis|thesis|commentary)\b", re.I)
+ANIMAL_RE = re.compile(r"\b(behavio(u)?r\w*|pose|keypoint|tracking|ethogram|animal|rodent|mice|mouse|rats?)\b", re.I)
+CATEGORY_RULES = [("benchmark/dataset", r"\b(dataset|benchmark|database)\b"),
+                  ("closed-loop/real-time", r"\b(real-time|closed-loop|online)\b"),
+                  ("pose-estimation", r"\b(pose estimation|keypoint)"),
+                  ("tracking", r"\btrack(ing|er)\b"),
+                  ("unsupervised-behavior", r"\b(unsupervised|self-supervised|clustering|embedding|motif)"),
+                  ("gait/kinematics", r"\b(gait|kinematic|locomotion|walking)"),
+                  ("hardware/acquisition", r"\b(camera|device|hardware|apparatus|microscope|implant|raspberry)"),
+                  ("supervised-classification", r"\b(classif\w*|recogni\w*|detect\w*|scor(e|ing))\b")]
+SPECIES_RULES = [("Mouse", r"\b(mouse|mice)\b"), ("Rat", r"\brats?\b"), ("Zebrafish", r"\bzebrafish\b"),
+                 ("Drosophila", r"\b(drosophila|flies)\b"), ("Macaque", r"\b(macaque|monkey)s?\b"),
+                 ("Marmoset", r"\bmarmosets?\b")]
 SEEN_COLS = ["doi", "verdict", "year", "source", "checked", "title"]
 TOOL_COLS = ["tool_name", "title", "year", "category", "species", "one_line", "code_url", "doi", "other_dois"]
 
@@ -188,8 +215,45 @@ def apply(path):
     print(f"Added {len(added)} tools: {', '.join(added) or '-'}")
 
 
+def rule_decision(c):
+    title, text = c["title"], c["title"] + ". " + c["abstract"]
+    decision = {"doi": c["doi"], "title": title, "year": c["year"], "source": c["source"], "verdict": "no"}
+    if EXCLUDE_RE.search(title) or not ANIMAL_RE.search(text):
+        return decision
+    m, acro = NAME_RE.match(title), ACRO_RE.search(title)
+    named = bool(m) and not m.group(1).lower().startswith(("the ", "a ", "an ")) and \
+        (" " not in m.group(1) or any(ch.isupper() or ch.isdigit() for ch in m.group(1)[1:]))
+    intro = INTRO_RE.search(text)
+    if not (named or (acro and ACRO_CONTEXT_RE.search(title)) or intro):
+        return decision
+    species = [s for s, pat in SPECIES_RULES if re.search(pat, text, re.I)]
+    sentence = intro.group(0) if intro else title.split(":", 1)[-1]
+    decision.update(verdict="yes", tool_name=m.group(1) if named else (acro.group(1) if acro else ""),
+                    category=next((k for k, pat in CATEGORY_RULES if re.search(pat, text, re.I)), "other-analysis"),
+                    species=species[0] if len(species) == 1 else "Multiple" if species else "",
+                    one_line=re.sub(r"\s+", " ", sentence).strip()[:140], code_url="")
+    return decision
+
+
+def auto():
+    fetch()
+    with open(CANDIDATES, encoding="utf-8") as f:
+        candidates = json.load(f)
+    for c in candidates:
+        if not c["abstract"] and c["doi"].startswith(("10.1101/", "10.64898/")):
+            try:
+                c["abstract"] = get("https://api.biorxiv.org/details/biorxiv/" + c["doi"])["collection"][-1]["abstract"]
+            except Exception:
+                pass
+    with open(CANDIDATES, "w", encoding="utf-8") as f:
+        json.dump([rule_decision(c) for c in candidates], f, indent=1, ensure_ascii=False)
+    apply(CANDIDATES)
+
+
 if __name__ == "__main__":
-    if len(sys.argv) >= 2 and sys.argv[1] == "fetch":
+    if len(sys.argv) >= 2 and sys.argv[1] == "auto":
+        auto()
+    elif len(sys.argv) >= 2 and sys.argv[1] == "fetch":
         fetch()
     elif len(sys.argv) >= 3 and sys.argv[1] == "apply":
         apply(sys.argv[2])
