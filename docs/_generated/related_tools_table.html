@@ -30,11 +30,32 @@
 .simba-rt .dtb{font-size:12.5px;line-height:1.5;color:#374151;border-left:3px solid #7fc1e3;padding:6px 10px;margin:0 0 4px;}
 .simba-rt .dtb b{color:#21567a;}
 .simba-rt .empty{text-align:center;color:#6b7280;padding:26px !important;}
+.simba-rt-chart{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);padding:14px 16px 8px;margin:0 0 16px;position:relative;}
+.simba-rt-chart h4{margin:0 0 2px;font-size:13.5px;color:#23272e;font-weight:700;}
+.simba-rt-chart .sub{margin:0 0 6px;font-size:12px;color:#6b7280;}
+.simba-rt-chart svg{display:block;width:100%;height:auto;overflow:visible;}
+.simba-rt-chart .bar{fill:#2f7fb5;}
+.simba-rt-chart .bar.partial{fill:#2f7fb5;fill-opacity:.45;}
+.simba-rt-chart .hit{fill:transparent;cursor:pointer;}
+.simba-rt-chart .hit:hover + .bar,.simba-rt-chart .hit.sel + .bar{fill:#21567a;}
+.simba-rt-chart .val{font-size:12px;font-weight:700;fill:#23272e;text-anchor:middle;font-variant-numeric:tabular-nums;}
+.simba-rt-chart .yrl{font-size:12px;fill:#4b5563;text-anchor:middle;}
+.simba-rt-chart .yrs{font-size:10.5px;fill:#6b7280;text-anchor:middle;}
+.simba-rt-chart .base{stroke:#cbd5e1;stroke-width:1;}
+.simba-rt-chart .bar,.simba-rt-chart text{pointer-events:none;}
+.simba-rt-tip{position:absolute;pointer-events:none;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 14px rgba(15,23,42,.12);padding:8px 10px;font-size:12px;line-height:1.45;color:#23272e;white-space:nowrap;display:none;z-index:2;}
+.simba-rt-tip b{font-size:12.5px;}
+.simba-rt-tip .muted{color:#6b7280;}
 .simba-rt-foot{text-align:center;font-size:14px;color:#4b5563;margin:16px 4px 0;}
 @media (max-width:680px){.simba-rt .c-sp,.simba-rt .c-cb{display:none;}.simba-rt-bar select{flex:1 1 40%;max-width:none;}.simba-rt th,.simba-rt td{padding-left:9px !important;padding-right:9px !important;}}
 </style>
 <div class="simba-rt">
   <p class="simba-rt-date">Updated October 21, 2026 &middot; 126 tools</p>
+  <div class="simba-rt-chart" id="rtChart">
+    <h4>Tools introduced per year</h4>
+    <p class="sub">By publication year of the paper &middot; hover for categories, click a bar to filter the table</p>
+    <div class="simba-rt-tip" id="rtTip" role="status"></div>
+  </div>
   <div class="simba-rt-bar">
     <input id="rtQ" type="search" placeholder="Search tools, titles, species&hellip;" aria-label="Search tools">
     <select id="rtCat" aria-label="Filter by category"><option value="">All categories</option></select>
@@ -159,8 +180,61 @@
     th.setAttribute("aria-sort", dir > 0 ? "ascending" : "descending");
     render();
   }));
-  [q, cat, yr].forEach(e => e.addEventListener("input", render));
-  $("rtReset").addEventListener("click", () => { q.value = cat.value = yr.value = ""; render(); });
+  [q, cat, yr].forEach(e => e.addEventListener("input", () => { render(); markYear(); }));
+  $("rtReset").addEventListener("click", () => { q.value = cat.value = yr.value = ""; render(); markYear(); });
+
+  // Tools per year: one series, so one hue and no legend; the current year is drawn lighter as partial.
+  const NS = "http://www.w3.org/2000/svg", chart = $("rtChart"), tip = $("rtTip");
+  const thisYear = new Date().getFullYear();
+  const years = [...new Set(D.map(d => d.y).filter(Boolean))].sort((a, b) => a - b);
+  const perYear = years.map(y => {
+    const rows = D.filter(d => d.y === y), byCat = {};
+    rows.forEach(d => byCat[d.c] = (byCat[d.c] || 0) + 1);
+    return { y, n: rows.length, cats: Object.entries(byCat).sort((a, b) => b[1] - a[1]) };
+  });
+  const W = 640, H = 170, top = 20, bottom = 34, band = W / years.length, bw = Math.min(24, band * 0.5);
+  const max = Math.max(...perYear.map(p => p.n)), sy = n => (H - top - bottom) * n / max;
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", "Tools introduced per year: " + perYear.map(p => p.y + " " + p.n).join(", "));
+  const mk = (tag, attrs, text) => {
+    const e = document.createElementNS(NS, tag);
+    Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v));
+    if (text != null) e.textContent = text;
+    return e;
+  };
+  const baseY = H - bottom;
+  svg.appendChild(mk("line", { class: "base", x1: 0, x2: W, y1: baseY + .5, y2: baseY + .5 }));
+  const hits = {};
+  perYear.forEach((p, i) => {
+    const cx = band * i + band / 2, h = Math.max(sy(p.n), 2), x = cx - bw / 2, yTop = baseY - h, r = Math.min(4, h);
+    const hit = mk("rect", { class: "hit", x: band * i, y: top - 16, width: band, height: H - top + 16 });
+    // 4px rounded data end, square at the baseline
+    const bar = mk("path", { class: "bar" + (p.y === thisYear ? " partial" : ""),
+      d: `M${x},${baseY}V${yTop + r}Q${x},${yTop} ${x + r},${yTop}H${x + bw - r}Q${x + bw},${yTop} ${x + bw},${yTop + r}V${baseY}Z` });
+    svg.appendChild(hit); svg.appendChild(bar);
+    svg.appendChild(mk("text", { class: "val", x: cx, y: yTop - 6 }, p.n));
+    svg.appendChild(mk("text", { class: "yrl", x: cx, y: baseY + 16 }, p.y));
+    if (p.y === thisYear) svg.appendChild(mk("text", { class: "yrs", x: cx, y: baseY + 29 }, "so far"));
+    hits[p.y] = hit;
+    hit.addEventListener("mousemove", e => {
+      tip.replaceChildren();
+      tip.appendChild(el("b", null, p.y + (p.y === thisYear ? " (so far)" : "") + " · " + p.n + " tools"));
+      p.cats.forEach(([c, n]) => { tip.appendChild(el("br")); tip.appendChild(el("span", "muted", n + "  " + c)); });
+      tip.style.display = "block";
+      const box = chart.getBoundingClientRect(), tw = tip.offsetWidth;
+      tip.style.left = Math.min(Math.max(e.clientX - box.left + 12, 8), box.width - tw - 8) + "px";
+      tip.style.top = (e.clientY - box.top + 12) + "px";
+    });
+    hit.addEventListener("mouseleave", () => tip.style.display = "none");
+    hit.addEventListener("click", () => {
+      yr.value = yr.value === String(p.y) ? "" : String(p.y);
+      render(); markYear();
+    });
+  });
+  function markYear() { Object.entries(hits).forEach(([y, h]) => h.classList.toggle("sel", yr.value === y)); }
+  chart.appendChild(svg);
   render();
 })();
 </script>
