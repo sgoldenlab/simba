@@ -7,6 +7,7 @@ Two steps, with a human or LLM classification in between:
     python misc/related_tools_update.py fetch
         Finds papers citing SimBA that are not yet in misc/related_tools_seen.csv:
           * OpenAlex works citing any SimBA paper (set OPENALEX_API_KEY for cursor paging),
+          * Semantic Scholar and Europe PMC citers that OpenAlex misses (arXiv, conference papers, preprints),
           * the last DAYS of bioRxiv preprints likely to be behavior tools. bioRxiv DOIs get their
             reference lists weeks late, so these wait as "pending" until OpenAlex shows whether
             they cite SimBA. Pending rows with no references after PENDING_DAYS are dropped.
@@ -26,7 +27,7 @@ Two steps, with a human or LLM classification in between:
         Used by .github/workflows/related_tools.yml. On the hand-sorted citing papers the rules
         were right ~80% of the time when they said "tool" and found ~65% of the tools.
 """
-import csv, json, os, re, sys, urllib.parse, urllib.request
+import csv, json, os, re, sys, time, urllib.error, urllib.parse, urllib.request
 from datetime import date, timedelta
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -125,6 +126,50 @@ def openalex_citers():
     return works.values()
 
 
+def semantic_scholar_citers():
+    """(doi, title, year, abstract) of papers citing SimBA in Semantic Scholar (arXiv and conference papers OpenAlex misses)."""
+    out = []
+    for doi in SIMBA_WORKS.values():
+        offset = 0
+        while offset is not None:
+            for attempt in range(5):
+                try:
+                    r = get(f"https://api.semanticscholar.org/graph/v1/paper/DOI:{doi}/citations"
+                            f"?fields=title,externalIds,year,abstract&limit=500&offset={offset}")
+                    break
+                except urllib.error.HTTPError as e:   # keyless access is rate limited (429)
+                    if e.code != 429 or attempt == 4:
+                        raise
+                    time.sleep(10 * (attempt + 1))
+            for c in r.get("data", []):
+                p, ids = c.get("citingPaper") or {}, (c.get("citingPaper") or {}).get("externalIds") or {}
+                d = ids.get("DOI") or (f"10.48550/arxiv.{ids['ArXiv']}" if ids.get("ArXiv") else "")
+                if d and p.get("title"):
+                    out.append((norm_doi(d), p["title"], p.get("year"), p.get("abstract") or ""))
+            offset = r.get("next")
+            time.sleep(3)
+    return out
+
+
+def europepmc_citers():
+    """(doi, title, year, abstract) of papers citing SimBA in Europe PMC (includes Research Square / bioRxiv preprints)."""
+    base, out = "https://www.ebi.ac.uk/europepmc/webservices/rest/search?format=json", []
+    for doi in SIMBA_WORKS.values():
+        for h in get(f"{base}&query=" + urllib.parse.quote(f'DOI:"{doi}"'))["resultList"]["result"]:
+            cursor = "*"
+            while True:
+                r = get(f"{base}&resultType=core&pageSize=1000&cursorMark={urllib.parse.quote(cursor)}"
+                        f"&query=CITES:{h['id']}_{h['source']}")
+                for p in r["resultList"]["result"]:
+                    if p.get("doi") and p.get("title"):
+                        out.append((norm_doi(p["doi"]), re.sub(r"<[^>]+>", "", p["title"]), p.get("pubYear"),
+                                    re.sub(r"<[^>]+>", "", p.get("abstractText") or "")))
+                if not r["resultList"]["result"] or r.get("nextCursorMark") in (None, cursor):
+                    break
+                cursor = r["nextCursorMark"]
+    return out
+
+
 def cites_simba(doi):
     """True / False once OpenAlex has the reference list, None while it is still empty."""
     try:
@@ -154,6 +199,19 @@ def fetch():
                                "abstract": abstract(w.get("abstract_inverted_index"))})
             seen_doi.add(doi)
             seen_title.add(norm_title(title))
+
+    # Citers that only Semantic Scholar or Europe PMC know about. A failing source is skipped this week.
+    for source, citers in (("semantic-scholar", semantic_scholar_citers), ("europepmc", europepmc_citers)):
+        try:
+            found = citers()
+        except Exception as e:
+            print(f"WARNING: {source} skipped ({e})")
+            continue
+        for doi, title, year, abs_ in found:
+            if is_new(doi, title):
+                candidates.append({"doi": doi, "title": title, "year": year, "source": source, "abstract": abs_})
+                seen_doi.add(doi)
+                seen_title.add(norm_title(title))
 
     # Pending preprints: classify once they are confirmed to cite SimBA, drop when they do not.
     for r in seen:

@@ -457,3 +457,65 @@ https://proceedings.iclr.cc/paper_files/paper/2026/hash/bee43378b65ec195a67f2470
 https://www.biorxiv.org/content/10.1101/2025.09.27.678941.abstract,yes,2025,scholar,2026-10-21,DLC2Action: a deep learning-based toolbox for automated behavior segmentation
 https://www.sciencedirect.com/science/article/pii/S0925231226015390,yes,2026,scholar,2026-10-21,Automated behavior analysis in the novel object recognition test
 10.64898/2026.10.15.759424,pending,2026,biorxiv,2026-10-21,Opposing reward-epoch population coding in anterior insular cortex dissociates sign- and goal-tracking despite equivalent conditioned responding
+10.64898/2026.09.18.752544,yes,2026,semantic-scholar,2026-10-23,Developmental Dynamics of Naturalistic Social Behavior Revealed by Longitudinal Multi-Animal Tracking
+10.48550/arxiv.2603.07279,yes,2026,semantic-scholar,2026-10-23,Learning When Visual Context Matters for Mouse Behavior Analysis
+10.1080/18824889.2026.2718619,yes,2026,semantic-scholar,2026-10-23,Multi-scale autoencoder-based unsupervised framework for social behavioral structure discovery and anomaly detection
+10.1016/j.dib.2026.112973,yes,2026,semantic-scholar,2026-10-23,Enhancing wildlife monitoring with computer vision: A dataset for automated detection of barbary macaques
+10.48550/arxiv.2604.07578,yes,2026,semantic-scholar,2026-10-23,MSGL-Transformer: A Multi-Scale Global-Local Transformer for Rodent Social Behavior Recognition
+10.64898/2026.03.29.715170,yes,2026,semantic-scholar,2026-10-23,"Optimizing Intermediate Representations: A Framework for Low-Cost, High-Accuracy Behavior Quantification"
+10.64898/2026.07.31.742042,yes,2026,europepmc,2026-10-23,
+10.1109/wacv61041.2025.00613,yes,2024,semantic-scholar,2026-10-23,Sifting Through the Haystack - Efficiently Finding Rare Animal Behaviors in Large-Scale Datasets
+10.1101/2024.12.26.630112,yes,2024,semantic-scholar,2026-10-23,PrecisionTrack: A Platform for Automated Long-Term Social Behavior Analysis in Naturalized Environments
+10.1101/2024.12.01.625907,yes,2024,europepmc,2026-10-23,
+10.1038/s41467-024-48792-2,yes,2024,semantic-scholar,2026-10-23,SuperAnimal pretrained pose estimation models for behavioral analysis
+10.1038/s41592-024-02319-1,yes,2024,semantic-scholar,2026-10-23,"Lightning Pose: improved animal pose estimation via semi-supervised learning, Bayesian ensembling and cloud-native open-source tools"
+10.48550/arxiv.2307.04858,yes,2023,semantic-scholar,2026-10-23,AmadeusGPT: a natural language interface for interactive animal behavioral analysis
+10.48550/arxiv.2303.08811,yes,2023,semantic-scholar,2026-10-23,"Relax, it doesn't matter how you get there: A new self-supervised approach for multi-timescale behavior analysis"
+10.21203/rs.3.rs-3020951/v1,yes,2023,europepmc,2026-10-23,
+10.1109/cnn56452.2022.9912477,yes,2022,semantic-scholar,2026-10-23,Behavior analysis tool for fear conditioning paradigm
+10.1038/s41398-026-04228-7,no,2026,semantic-scholar,2026-10-23,DRD1 and DRD2 dopamine-sensitive neurons in the central amygdala respond differently to rewarding and aversive stimuli
+10.1101/2025.09.27.678941,no,2026,semantic-scholar,2026-10-23,DLC2Action: A Multimodal Deep Learning-based Toolbox for Automated Behavior Segmentation
+10.18287/jbpe26.12.010306,no,2026,semantic-scholar,2026-10-23,Individual Behavior Recognition in Laboratory Rats: a Comparative Analysis of Computer Vision Methods
+10.1117/12.3106208,no,2026,semantic-scholar,2026-10-23,Research on key technologies for core IP discovery based on association graph based on deep learning
+10.1111/adb.70132,no,2026,semantic-scholar,2026-10-23,"Fentanyl, Methamphetamine and Polysubstance Use Differentially Affect Locomotor Sensitisation and Social Behaviour in Rats: Psychedelic Treatment Reverses Social Deficits"
+10.55782/0vv4n928,no,2025,semantic-scholar,2026-10-23,The role of prefrontal somatostatin interneurons in emotional contagion.
+10.1002/advs.76040,no,2025,semantic-scholar,2026-10-23,Pharmacological Inhibition of FKBP51 Mitigates Early Life Adversity‐Induced Social Deficits in Male Mice
+10.1101/2025.11.26.690732,no,2025,semantic-scholar,2026-10-23,Serotonin modulates nucleus accumbens circuits to suppress aggression
+10.1101/2025.10.07.680927,no,2025,semantic-scholar,2026-10-23,Neuropathic pain drives time-dependent reorganization of corticostriatal circuits
+10.1016/j.inffus.2026.104779,no,2026,semantic-scholar,2026-10-23,"Multimodal Fusion for Precision Livestock Behavior Monitoring: A Systematic Review of Deep Learning, Pose Estimation, and Sensor Integration Strategies"
+10.52202/085713-0295,no,2025,semantic-scholar,2026-10-23,Flexible inference for animal learning rules using neural networks
+10.1371/journal.pbio.3003348,no,2025,semantic-scholar,2026-10-23,Continuous monitoring and machine vision reveals that developing gerbils exhibit structured social behaviors prior to the emergence of autonomy
+10.1101/2024.05.23.590306,no,2024,semantic-scholar,2026-10-23,Classification of psychedelic drugs based on brain-wide imaging of cellular c-Fos expression
+10.1186/s11689-024-09534-z,no,2024,semantic-scholar,2026-10-23,Characterization of early markers of disease in the mouse model of mucopolysaccharidosis IIIB
+10.1038/s41598-024-59187-0,no,2024,semantic-scholar,2026-10-23,Phenotypic analysis of ataxia in spinocerebellar ataxia type 6 mice using DeepLabCut
+10.1101/2023.04.28.538703,yes,2023,semantic-scholar,2026-10-23,"Lightning Pose: improved animal pose estimation via semi-supervised learning, Bayesian ensembling, and cloud-native open-source tools"
+10.48550/arxiv.2301.06187,no,2023,semantic-scholar,2026-10-23,CNN-Based Action Recognition and Pose Estimation for Classifying Animal Behavior from Videos: A Survey
+10.1038/s41598-022-19721-4,no,2022,semantic-scholar,2026-10-23,Estimating genetics of body dimensions and activity levels in pigs using automated pose estimation
+10.48550/arxiv.2206.07041,yes,2022,semantic-scholar,2026-10-23,Learning Behavior Representations Through Multi-Timescale Bootstrapping
+10.1101/2022.04.27.489805,no,2022,semantic-scholar,2026-10-23,Floral humidity as a signal – not a cue – in a nocturnal pollination system
+10.1097/aln.0000000000004148,no,2022,semantic-scholar,2026-10-23,Historical and modern evidence for the role of reward circuitry in emergence
+10.1101/2021.06.20.449150,no,2021,semantic-scholar,2026-10-23,BehaviorDEPOT: a tool for automated behavior classification and analysis in rodents
+10.1101/2020.12.21.423671,no,2020,semantic-scholar,2026-10-23,Systematic analysis of goal-related movement sequences during maternal behavior in a female mouse model for Rett syndrome
+10.21203/rs.3.rs-94115/v1,no,2020,semantic-scholar,2026-10-23,A cortical-hypothalamic circuit decodes social rank and promotes dominance behavior
+10.1101/2020.09.02.273615,no,2020,semantic-scholar,2026-10-23,Parallel Movement-suppressing Striatal Output Pathways
+10.3791/61548,no,2020,semantic-scholar,2026-10-23,Chronic Stress Shifts Effort-Related Choice Behavior in a Y-Maze Barrier Task in Mice
+10.1101/2020.06.11.146746,no,2020,semantic-scholar,2026-10-23,Neuroscience Cloud Analysis As a Service
+10.5220/0013065600003837,no,2024,semantic-scholar,2026-10-23,Leveraging Deep Learning for Approaching Automated Pre-Clinical Rodent Models
+10.48550/arxiv.2204.02842,no,2022,semantic-scholar,2026-10-23,"Open-Source Tools for Behavioral Video Analysis: Setup, Methods, and Development"
+10.3384/9789180758208,no,2024,opencitations,2026-10-23,Epigenetic Mechanisms underlying Alcohol Dependence and Fear Memories
+10.33540/935,no,2021,opencitations,2026-10-23,Differential susceptibility to rearing conditions in mice
+10.37648/ijrst.v14i02.006,no,2024,opencitations,2026-10-23,An Analysis Of The Mathematical Modelling To Understand And Analyze Complex Systems : Fundamentals Concept
+10.3389/fnbeh.2023.1270538,no,2024,opencitations,2026-10-23,IntelliCage: the development and perspectives of a mouse- and user-friendly automated behavioral test system
+10.1093/af/vfae026,no,2024,epmc-mention,2026-10-23,Precision animal husbandry: using artificial intelligence for camera traps to optimize animal production and management decision support systems.
+10.1038/s41684-026-01694-w,no,2026,epmc-mention,2026-10-23,Thinking outside the boxes: analyzing the current landscape of popular behavioral tests for adult zebrafish.
+10.1016/j.heliyon.2024.e36352,no,2024,epmc-mention,2026-10-23,"Deep learning-based scoring method of the three-chamber social behaviour test in a mouse model of alcohol intoxication. A comparative analysis of DeepLabCut, commercial automatic tracking and manual scoring."
+10.1021/acschemneuro.6c00083,no,2026,epmc-mention,2026-10-23,Serotonin Transporter Blockade Reduces the Psychedelic-Like Effects of 4-Methoxy-&lt;i&gt;N&lt;/i&gt;-methyl-&lt;i&gt;N&lt;/i&gt;-isopropyltryptamine and Related Analogs.
+10.26508/lsa.202402754,no,2024,epmc-mention,2026-10-23,Fasting-induced activity changes in MC3R neurons of the paraventricular nucleus of the thalamus.
+10.1016/j.neubiorev.2023.105528,no,2024,epmc-mention,2026-10-23,A new era in quantification of animal social behaviors.
+10.1002/jnr.70039,no,2025,epmc-mention,2026-10-23,Sex and Strain Differences in Analgesic and Hyperlocomotor Effects of Morphine and μ-Opioid Receptor Expression in Mice.
+10.1038/s41467-025-57027-x,no,2025,epmc-mention,2026-10-23,Topological identification and interpretation for single-cell epigenetic regulation elucidation in multi-tasks using scAGDE.
+10.1101/2020.04.19.049452,no,2020,epmc-mention,2026-10-23,Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals
+10.3390/bioengineering11111121,no,2024,epmc-mention,2026-10-23,A Survey on AI-Driven Mouse Behavior Analysis Applications and Solutions.
+10.1038/s41386-022-01484-1,no,2022,epmc-mention,2026-10-23,ACNP 61st Annual Meeting: Poster Abstracts P1 - P270.
+10.64898/2026.08.10.744052,no,2026,semantic-scholar,2026-10-23,"An area postrema GLP-1R to NTS pathway dissociates semaglutide-induced satiation, nausea and reduced food motivation from satiety"
+10.1101/2020.07.26.222299,yes,2020,europepmc,2026-10-23,The Mouse Action Recognition System (MARS): a software pipeline for automated analysis of social behaviors in mice
