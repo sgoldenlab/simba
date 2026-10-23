@@ -72,6 +72,7 @@ TEMPLATE = """<style>
 .simba-rt-bar input,.simba-rt-bar select{{font:inherit;padding:7px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#23272e;}}
 .simba-rt-bar input{{flex:1 1 200px;min-width:0;}}
 .simba-rt-bar select{{flex:0 1 auto;min-width:0;max-width:210px;}}
+.simba-rt-bar label{{display:flex;align-items:center;gap:5px;font-size:12.5px;color:#4b5563;white-space:nowrap;cursor:pointer;}}
 .simba-rt-bar button{{font:inherit;padding:7px 12px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#21567a;cursor:pointer;}}
 .simba-rt-count{{font-size:12.5px;color:#6b7280;margin:0 0 8px;}}
 .simba-rt-wrap{{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);overflow:hidden;}}
@@ -96,10 +97,19 @@ TEMPLATE = """<style>
 .simba-rt .dtb{{font-size:12.5px;line-height:1.5;color:#374151;border-left:3px solid #7fc1e3;padding:6px 10px;margin:0 0 4px;}}
 .simba-rt .dtb b{{color:#21567a;}}
 .simba-rt .empty{{text-align:center;color:#6b7280;padding:26px !important;}}
-.simba-rt-chart{{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px 4px;margin:0 0 12px;position:relative;max-width:420px;box-sizing:border-box;}}
+.simba-rt-charts{{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 12px;}}
+.simba-rt-chart{{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px 4px;position:relative;flex:1 1 300px;min-width:0;box-sizing:border-box;}}
+.simba-rt-cats{{display:grid;grid-template-columns:auto 1fr auto;gap:2px 8px;align-items:center;margin:4px 0 6px;font-size:10.5px;}}
+.simba-rt-cats .cl{{color:#4b5563;white-space:nowrap;cursor:pointer;}}
+.simba-rt-cats .ct{{height:9px;cursor:pointer;}}
+.simba-rt-cats .cb{{height:9px;background:#2f7fb5;border-radius:0 4px 4px 0;min-width:2px;}}
+.simba-rt-cats .cn{{font-weight:700;color:#23272e;font-variant-numeric:tabular-nums;text-align:right;}}
+.simba-rt-cats .row:hover .cb,.simba-rt-cats .row.sel .cb{{background:#21567a;}}
+.simba-rt-cats .row{{display:contents;}}
+.simba-rt-cats .row.sel .cl{{color:#21567a;font-weight:700;}}
 .simba-rt-chart h4{{margin:0;font-size:12.5px;color:#23272e;font-weight:700;}}
 .simba-rt-chart .sub{{margin:0 0 2px;font-size:11px;color:#6b7280;}}
-.simba-rt-chart svg{{display:block;width:100%;height:auto;overflow:visible;}}
+.simba-rt-chart svg{{display:block;width:100%;max-width:396px;height:auto;overflow:visible;margin:0 auto;}}
 .simba-rt-chart .bar{{fill:#2f7fb5;}}
 .simba-rt-chart .bar.partial{{fill:#2f7fb5;fill-opacity:.45;}}
 .simba-rt-chart .hit{{fill:transparent;cursor:pointer;}}
@@ -113,19 +123,29 @@ TEMPLATE = """<style>
 .simba-rt-tip b{{font-size:12.5px;}}
 .simba-rt-tip .muted{{color:#6b7280;}}
 .simba-rt-foot{{text-align:center;font-size:14px;color:#4b5563;margin:16px 4px 0;}}
+.simba-rt-foot a{{color:#21567a;font-weight:700;cursor:pointer;}}
+.simba-rt .unk{{color:#9ca3af;}}
 @media (max-width:680px){{.simba-rt .c-sp{{display:none;}}.simba-rt-bar select{{flex:1 1 40%;max-width:none;}}.simba-rt th,.simba-rt td{{padding-left:9px !important;padding-right:9px !important;}}}}
 </style>
 <div class="simba-rt">
   <p class="simba-rt-date">Updated {pull_date} &middot; {total} tools</p>
-  <div class="simba-rt-chart" id="rtChart">
-    <h4>Tools introduced per year</h4>
-    <p class="sub">Hover for categories, click a bar to filter</p>
-    <div class="simba-rt-tip" id="rtTip" role="status"></div>
+  <div class="simba-rt-charts">
+    <div class="simba-rt-chart" id="rtChart">
+      <h4>Tools introduced per year</h4>
+      <p class="sub">Hover for categories, click a bar to filter</p>
+      <div class="simba-rt-tip" id="rtTip" role="status"></div>
+    </div>
+    <div class="simba-rt-chart">
+      <h4>Tools by category</h4>
+      <p class="sub">Click a bar to filter</p>
+      <div class="simba-rt-cats" id="rtCats" role="list"></div>
+    </div>
   </div>
   <div class="simba-rt-bar">
     <input id="rtQ" type="search" placeholder="Search tools, titles, species&hellip;" aria-label="Search tools">
     <select id="rtCat" aria-label="Filter by category"><option value="">All categories</option></select>
     <select id="rtYr" aria-label="Filter by year"><option value="">All years</option></select>
+    <label title="Only tools with a public code or data link"><input id="rtCode" type="checkbox"> Has code</label>
     <button id="rtReset" type="button">Reset</button>
   </div>
   <p class="simba-rt-count" id="rtCount" aria-live="polite"></p>
@@ -138,13 +158,14 @@ TEMPLATE = """<style>
     </tr></thead>
     <tbody id="rtBody"></tbody>
   </table></div>
-  <p class="simba-rt-foot">Click a row for a short description and code link</p>
+  <p class="simba-rt-foot">Click a row for a short description and code link &middot; <a id="rtCsv" role="button" tabindex="0">Download the shown tools as CSV</a></p>
 </div>
 <script>
 (function(){{
   const D = {data}, CAT = {cats}, YR = {years};
   const $ = id => document.getElementById(id);
-  const q = $("rtQ"), cat = $("rtCat"), yr = $("rtYr"), body = $("rtBody");
+  const q = $("rtQ"), cat = $("rtCat"), yr = $("rtYr"), hasCode = $("rtCode"), body = $("rtBody");
+  let shown = D;
   CAT.forEach(c => cat.add(new Option(c, c)));
   YR.forEach(y => yr.add(new Option(y, y)));
   D.forEach(d => {{
@@ -176,6 +197,7 @@ TEMPLATE = """<style>
     const rows = D.filter(d =>
       (!cat.value || d.c === cat.value) &&
       (!yr.value || String(d.y) === yr.value) &&
+      (!hasCode.checked || d.code) &&
       words.every(w => d.hay.includes(w)));
     rows.sort((a, b) => {{
       const x = a[key], y = b[key];
@@ -202,6 +224,7 @@ TEMPLATE = """<style>
         gh.title = "GitHub stars and last code update";
         meta.appendChild(gh);
       }}
+      if (!d.code) meta.appendChild(el("span", "unk", (meta.textContent ? " · " : "") + "code: unknown"));
       if (d.ga) meta.appendChild(el("span", "tag arc", "Archived"));
       if (d.p) meta.appendChild(el("span", "tag pre", "Preprint"));
       if (meta.childNodes.length) td.appendChild(meta);
@@ -216,11 +239,9 @@ TEMPLATE = """<style>
         const box = el("div", "dtb");
         box.appendChild(el("b", null, "What it does: "));
         box.appendChild(document.createTextNode(d.d || "\\u2014"));
-        if (d.code) {{
-          box.appendChild(el("br"));
-          box.appendChild(el("b", null, "Code: "));
-          box.appendChild(link(d.code, d.code));
-        }}
+        box.appendChild(el("br"));
+        box.appendChild(el("b", null, "Code: "));
+        box.appendChild(d.code ? link(d.code, d.code) : el("span", "unk", "unknown (no public link found)"));
         if (d.alt.length) {{
           box.appendChild(el("br"));
           box.appendChild(el("b", null, "Other versions: "));
@@ -233,6 +254,7 @@ TEMPLATE = """<style>
       const tr = el("tr"), c = el("td", "empty", "No tools match these filters.");
       c.colSpan = 4; tr.appendChild(c); body.appendChild(tr);
     }}
+    shown = rows;
     $("rtCount").textContent = "Showing " + rows.length + " of " + D.length + " tools";
   }}
 
@@ -244,8 +266,44 @@ TEMPLATE = """<style>
     th.setAttribute("aria-sort", dir > 0 ? "ascending" : "descending");
     render();
   }}));
-  [q, cat, yr].forEach(e => e.addEventListener("input", () => {{ render(); markYear(); }}));
-  $("rtReset").addEventListener("click", () => {{ q.value = cat.value = yr.value = ""; render(); markYear(); }});
+  [q, cat, yr, hasCode].forEach(e => e.addEventListener("input", () => {{ render(); markYear(); markCat(); }}));
+  $("rtReset").addEventListener("click", () => {{
+    q.value = cat.value = yr.value = ""; hasCode.checked = false; render(); markYear(); markCat();
+  }});
+
+  // CSV of the rows currently shown (after search and filters), built in the browser.
+  function downloadCsv() {{
+    const cols = [["Year", "y"], ["Tool", "n"], ["Label", "lb"], ["Title", "t"], ["Category", "c"], ["Species", "s"],
+                  ["Description", "d"], ["Code", "code"], ["Paper", "url"], ["Authors", "au"], ["Venue", "v"],
+                  ["Cited by", "cb"]];
+    const esc = v => {{ v = v == null ? "" : String(v); return /[",\\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }};
+    const lines = [cols.map(c => c[0]).join(",")].concat(shown.map(d => cols.map(c => esc(d[c[1]])).join(",")));
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob(["\\ufeff" + lines.join("\\n")], {{ type: "text/csv;charset=utf-8" }}));
+    a.download = "simba_related_tools.csv";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }}
+  $("rtCsv").addEventListener("click", downloadCsv);
+  $("rtCsv").addEventListener("keydown", e => {{ if (e.key === "Enter") downloadCsv(); }});
+
+  // Tools per category: horizontal bars in the same hue, largest first; a click sets the category filter.
+  const catBox = $("rtCats"), catRows = {{}};
+  const catMax = Math.max(...CAT.map(c => D.filter(d => d.c === c).length));
+  CAT.forEach(c => {{
+    const n = D.filter(d => d.c === c).length, row = el("div", "row");
+    row.setAttribute("role", "listitem");
+    row.title = c + ": " + n + " tools";
+    const track = el("div", "ct"), bar = el("div", "cb");
+    bar.style.width = (100 * n / catMax) + "%";
+    track.appendChild(bar);
+    [el("span", "cl", c), track, el("span", "cn", n)].forEach(x => {{
+      x.addEventListener("click", () => {{ cat.value = cat.value === c ? "" : c; render(); markCat(); }});
+      row.appendChild(x);
+    }});
+    catBox.appendChild(row); catRows[c] = row;
+  }});
+  function markCat() {{ Object.entries(catRows).forEach(([c, r]) => r.classList.toggle("sel", cat.value === c)); }}
 
   // Tools per year: one series, so one hue and no legend; the current year is drawn lighter as partial.
   const NS = "http://www.w3.org/2000/svg", chart = $("rtChart"), tip = $("rtTip");
