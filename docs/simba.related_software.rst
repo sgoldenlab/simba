@@ -683,9 +683,13 @@ Metabolic phenotyping cages
 |:books:| **Tools from papers citing SimBA**
 --------------------------------------------
 
-Tools, models, datasets and hardware introduced by published papers and preprints that cite
-SimBA, compiled from the citation record. Search or filter by category, and click a row for a
-short description and code link.
+Alternative and complementary tools for behavioral analysis: tools, models, datasets and hardware
+introduced by published papers and preprints that cite SimBA, compiled from the citation record.
+Many of these tools do some or all of what SimBA does, using a different approach, species or
+setup, so they are worth comparing when choosing a tool for your experiment. Others handle one step
+of the pipeline, such as pose estimation or tracking, and can be used alongside SimBA. The table
+is updated weekly. Search or filter by category, and click a row for a short description and code
+link.
 
 .. raw:: html
    :file: _generated/related_tools_table.html

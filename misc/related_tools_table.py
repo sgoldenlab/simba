@@ -87,7 +87,6 @@ TEMPLATE = """<style>
 .simba-rt .ttl{{line-height:1.35;}}
 .simba-rt .nm.lb{{font-weight:600;font-style:italic;color:#4b6a85;}}
 .simba-rt .meta{{font-size:12px;color:#6b7280;margin-top:3px;line-height:1.4;}}
-.simba-rt .cb{{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap !important;}}
 .simba-rt .tag.pre{{background:#fdf0e6;color:#983412;}}
 .simba-rt .tag.arc{{background:#f1f5f9;color:#475569;}}
 .simba-rt .gh{{white-space:nowrap;}}
@@ -97,30 +96,30 @@ TEMPLATE = """<style>
 .simba-rt .dtb{{font-size:12.5px;line-height:1.5;color:#374151;border-left:3px solid #7fc1e3;padding:6px 10px;margin:0 0 4px;}}
 .simba-rt .dtb b{{color:#21567a;}}
 .simba-rt .empty{{text-align:center;color:#6b7280;padding:26px !important;}}
-.simba-rt-chart{{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(33,86,122,.10);padding:14px 16px 8px;margin:0 0 16px;position:relative;}}
-.simba-rt-chart h4{{margin:0 0 2px;font-size:13.5px;color:#23272e;font-weight:700;}}
-.simba-rt-chart .sub{{margin:0 0 6px;font-size:12px;color:#6b7280;}}
+.simba-rt-chart{{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px 4px;margin:0 0 12px;position:relative;max-width:420px;box-sizing:border-box;}}
+.simba-rt-chart h4{{margin:0;font-size:12.5px;color:#23272e;font-weight:700;}}
+.simba-rt-chart .sub{{margin:0 0 2px;font-size:11px;color:#6b7280;}}
 .simba-rt-chart svg{{display:block;width:100%;height:auto;overflow:visible;}}
 .simba-rt-chart .bar{{fill:#2f7fb5;}}
 .simba-rt-chart .bar.partial{{fill:#2f7fb5;fill-opacity:.45;}}
 .simba-rt-chart .hit{{fill:transparent;cursor:pointer;}}
 .simba-rt-chart .hit:hover + .bar,.simba-rt-chart .hit.sel + .bar{{fill:#21567a;}}
-.simba-rt-chart .val{{font-size:12px;font-weight:700;fill:#23272e;text-anchor:middle;font-variant-numeric:tabular-nums;}}
-.simba-rt-chart .yrl{{font-size:12px;fill:#4b5563;text-anchor:middle;}}
-.simba-rt-chart .yrs{{font-size:10.5px;fill:#6b7280;text-anchor:middle;}}
+.simba-rt-chart .val{{font-size:10.5px;font-weight:700;fill:#23272e;text-anchor:middle;font-variant-numeric:tabular-nums;}}
+.simba-rt-chart .yrl{{font-size:10.5px;fill:#4b5563;text-anchor:middle;}}
+.simba-rt-chart .yrs{{font-size:9px;fill:#6b7280;text-anchor:middle;}}
 .simba-rt-chart .base{{stroke:#cbd5e1;stroke-width:1;}}
 .simba-rt-chart .bar,.simba-rt-chart text{{pointer-events:none;}}
 .simba-rt-tip{{position:absolute;pointer-events:none;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 14px rgba(15,23,42,.12);padding:8px 10px;font-size:12px;line-height:1.45;color:#23272e;white-space:nowrap;display:none;z-index:2;}}
 .simba-rt-tip b{{font-size:12.5px;}}
 .simba-rt-tip .muted{{color:#6b7280;}}
 .simba-rt-foot{{text-align:center;font-size:14px;color:#4b5563;margin:16px 4px 0;}}
-@media (max-width:680px){{.simba-rt .c-sp,.simba-rt .c-cb{{display:none;}}.simba-rt-bar select{{flex:1 1 40%;max-width:none;}}.simba-rt th,.simba-rt td{{padding-left:9px !important;padding-right:9px !important;}}}}
+@media (max-width:680px){{.simba-rt .c-sp{{display:none;}}.simba-rt-bar select{{flex:1 1 40%;max-width:none;}}.simba-rt th,.simba-rt td{{padding-left:9px !important;padding-right:9px !important;}}}}
 </style>
 <div class="simba-rt">
   <p class="simba-rt-date">Updated {pull_date} &middot; {total} tools</p>
   <div class="simba-rt-chart" id="rtChart">
     <h4>Tools introduced per year</h4>
-    <p class="sub">By publication year of the paper &middot; hover for categories, click a bar to filter the table</p>
+    <p class="sub">Hover for categories, click a bar to filter</p>
     <div class="simba-rt-tip" id="rtTip" role="status"></div>
   </div>
   <div class="simba-rt-bar">
@@ -136,7 +135,6 @@ TEMPLATE = """<style>
       <th data-k="key">Tool</th>
       <th data-k="c" style="width:21%">Category</th>
       <th data-k="s" class="c-sp" style="width:12%">Species</th>
-      <th data-k="cb" class="c-cb" style="width:76px;text-align:right" title="Citations in OpenAlex, summed over preprint and journal versions">Cited by</th>
     </tr></thead>
     <tbody id="rtBody"></tbody>
   </table></div>
@@ -198,7 +196,7 @@ TEMPLATE = """<style>
       const ttl = el("div", "ttl");
       if (d.url) ttl.appendChild(link(d.t, d.url)); else ttl.textContent = d.t;
       td.appendChild(ttl);
-      const meta = el("div", "meta", [d.au, d.v].filter(Boolean).join(" · "));
+      const meta = el("div", "meta", [d.au, d.v, d.cb ? "cited by " + d.cb : ""].filter(Boolean).join(" · "));
       if (d.gs >= 0) {{
         const gh = el("span", "gh", (meta.textContent ? " · " : "") + "★ " + stars(d.gs) + (d.gp ? " · updated " + month(d.gp) : ""));
         gh.title = "GitHub stars and last code update";
@@ -210,12 +208,11 @@ TEMPLATE = """<style>
       tr.appendChild(td);
       tr.appendChild(el("td", null, d.c));
       tr.appendChild(el("td", "c-sp", d.s));
-      tr.appendChild(el("td", "cb c-cb", d.cb));
       tr.addEventListener("click", () => {{ open.has(d) ? open.delete(d) : open.add(d); render(); }});
       body.appendChild(tr);
       if (open.has(d)) {{
         const dt = el("tr", "dt"), c = el("td");
-        c.colSpan = 5;
+        c.colSpan = 4;
         const box = el("div", "dtb");
         box.appendChild(el("b", null, "What it does: "));
         box.appendChild(document.createTextNode(d.d || "\\u2014"));
@@ -234,14 +231,14 @@ TEMPLATE = """<style>
     }});
     if (!rows.length) {{
       const tr = el("tr"), c = el("td", "empty", "No tools match these filters.");
-      c.colSpan = 5; tr.appendChild(c); body.appendChild(tr);
+      c.colSpan = 4; tr.appendChild(c); body.appendChild(tr);
     }}
     $("rtCount").textContent = "Showing " + rows.length + " of " + D.length + " tools";
   }}
 
   document.querySelectorAll(".simba-rt th[data-k]").forEach(th => th.addEventListener("click", () => {{
     const k = th.dataset.k;
-    dir = k === key ? -dir : (k === "y" || k === "cb" ? -1 : 1);
+    dir = k === key ? -dir : (k === "y" ? -1 : 1);
     key = k;
     document.querySelectorAll(".simba-rt th[data-k]").forEach(h => h.removeAttribute("aria-sort"));
     th.setAttribute("aria-sort", dir > 0 ? "ascending" : "descending");
@@ -259,7 +256,7 @@ TEMPLATE = """<style>
     rows.forEach(d => byCat[d.c] = (byCat[d.c] || 0) + 1);
     return {{ y, n: rows.length, cats: Object.entries(byCat).sort((a, b) => b[1] - a[1]) }};
   }});
-  const W = 640, H = 170, top = 20, bottom = 34, band = W / years.length, bw = Math.min(24, band * 0.5);
+  const W = 396, H = 96, top = 14, bottom = 28, band = W / years.length, bw = Math.min(16, band * 0.5);
   const max = Math.max(...perYear.map(p => p.n)), sy = n => (H - top - bottom) * n / max;
   const svg = document.createElementNS(NS, "svg");
   svg.setAttribute("viewBox", `0 0 ${{W}} ${{H}}`);
@@ -276,14 +273,14 @@ TEMPLATE = """<style>
   const hits = {{}};
   perYear.forEach((p, i) => {{
     const cx = band * i + band / 2, h = Math.max(sy(p.n), 2), x = cx - bw / 2, yTop = baseY - h, r = Math.min(4, h);
-    const hit = mk("rect", {{ class: "hit", x: band * i, y: top - 16, width: band, height: H - top + 16 }});
+    const hit = mk("rect", {{ class: "hit", x: band * i, y: top - 12, width: band, height: H - top + 12 }});
     // 4px rounded data end, square at the baseline
     const bar = mk("path", {{ class: "bar" + (p.y === thisYear ? " partial" : ""),
       d: `M${{x}},${{baseY}}V${{yTop + r}}Q${{x}},${{yTop}} ${{x + r}},${{yTop}}H${{x + bw - r}}Q${{x + bw}},${{yTop}} ${{x + bw}},${{yTop + r}}V${{baseY}}Z` }});
     svg.appendChild(hit); svg.appendChild(bar);
-    svg.appendChild(mk("text", {{ class: "val", x: cx, y: yTop - 6 }}, p.n));
-    svg.appendChild(mk("text", {{ class: "yrl", x: cx, y: baseY + 16 }}, p.y));
-    if (p.y === thisYear) svg.appendChild(mk("text", {{ class: "yrs", x: cx, y: baseY + 29 }}, "so far"));
+    svg.appendChild(mk("text", {{ class: "val", x: cx, y: yTop - 4 }}, p.n));
+    svg.appendChild(mk("text", {{ class: "yrl", x: cx, y: baseY + 13 }}, p.y));
+    if (p.y === thisYear) svg.appendChild(mk("text", {{ class: "yrs", x: cx, y: baseY + 24 }}, "so far"));
     hits[p.y] = hit;
     hit.addEventListener("mousemove", e => {{
       tip.replaceChildren();
