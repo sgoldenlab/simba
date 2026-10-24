@@ -34,6 +34,13 @@ jobs:
         shell: bash   # -o pipefail, so a failing script is not hidden by tee
         run: python misc/related_tools_update.py auto | tee "$RUNNER_TEMP/related_tools.log"
 
+      # Refreshes the last-update dates behind the "no updates since" tags on the curated tables.
+      - name: Refresh GitHub activity of the curated tools
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: python misc/related_software_activity.py | tee -a "$RUNNER_TEMP/related_tools.log"
+
       - name: Configure Git
         run: |
           git config user.email "action@github.com"
@@ -41,7 +48,8 @@ jobs:
 
       - name: Commit updated table (if changed)
         run: |
-          git add misc/related_tools.csv misc/related_tools_seen.csv docs/_generated/related_tools_table.html
+          git add misc/related_tools.csv misc/related_tools_seen.csv docs/_generated/related_tools_table.html \
+                  docs/_generated/related_software_extras.html
           git commit -m "Update related tools table" || echo "Nothing to commit"
           git push
 

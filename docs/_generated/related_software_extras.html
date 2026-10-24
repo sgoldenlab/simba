@@ -1,0 +1,70 @@
+<style>
+.simba-rs-jump{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:6px;margin:14px 0 22px;}
+.simba-rs-jump a{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 10px;border:1px solid #e5e7eb;border-radius:8px;color:#23272e;text-decoration:none;font-size:13px;line-height:1.25;background:#fff;}
+.simba-rs-jump a:hover{border-color:#2f7fb5;background:#f3f8fc;}
+.simba-rs-jump a.main{grid-column:1/-1;border-color:#2f7fb5;background:#f3f8fc;font-weight:600;}
+.simba-rs-jump .n{color:#6b7280;font-weight:400;font-variant-numeric:tabular-nums;white-space:nowrap;}
+.simba-rs-top{position:fixed;right:18px;bottom:18px;z-index:50;padding:7px 12px;border:1px solid #cbd5e1;border-radius:18px;background:#fff;color:#23272e;font-size:13px;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,.12);opacity:0;pointer-events:none;transition:opacity .2s;}
+.simba-rs-top.on{opacity:1;pointer-events:auto;}
+.simba-rs-top:hover{border-color:#2f7fb5;color:#21567a;}
+.rst-content .wy-table-responsive table.docutils td{white-space:normal;}
+.simba-rs-stale{display:inline-block;margin-left:6px;padding:0 6px;border:1px solid #d1d5db;border-radius:9px;font-size:11px;line-height:16px;color:#6b7280;white-space:nowrap;vertical-align:1px;}
+</style>
+<nav class="simba-rs-jump" id="simba-rs-jump" aria-label="Sections on this page"></nav>
+<a class="simba-rs-top" id="simba-rs-top" href="#simba-rs-jump">&uarr; Back to top</a>
+<script>
+(function () {
+  const ACT = {"https://animovement.dev/": {"a": false, "p": "2026-10"}, "https://argos.readthedocs.io/en/latest/": {"a": false, "p": "2026-06"}, "https://bonsai-rx.org/": {"a": false, "p": "2026-08"}, "https://github.com/AdaptiveMotorControlLab/AmadeusGPT": {"a": false, "p": "2025-06"}, "https://github.com/AdaptiveMotorControlLab/DLC2Kinematics": {"a": false, "p": "2023-12"}, "https://github.com/BelloneLab/lisbet": {"a": false, "p": "2026-10"}, "https://github.com/BioroboticsLab/biotracker_core": {"a": false, "p": "2024-04"}, "https://github.com/CMU-Perceptual-Computing-Lab/openpose": {"a": false, "p": "2024-08"}, "https://github.com/DeNardoLab/BehaviorDEPOT": {"a": false, "p": "2026-10"}, "https://github.com/DeepLabCut/DeepLabCut-live": {"a": false, "p": "2026-10"}, "https://github.com/DeniseCaiLab/ezTrack": {"a": false, "p": "2026-10"}, "https://github.com/DrCoffey/DeepSqueak": {"a": false, "p": "2026-04"}, "https://github.com/ETHZ-INS/DLCAnalyzer": {"a": false, "p": "2023-01"}, "https://github.com/EthoML/VAME": {"a": false, "p": "2026-10"}, "https://github.com/HumanSignal/label-studio": {"a": false, "p": "2026-10"}, "https://github.com/KumarLabJax/JABS-behavior-classifier": {"a": false, "p": "2026-10"}, "https://github.com/LernerLab/GuPPy": {"a": false, "p": "2026-10"}, "https://github.com/MouseLand/facemap": {"a": false, "p": "2026-01"}, "https://github.com/MouseLand/suite2p": {"a": false, "p": "2026-09"}, "https://github.com/NeLy-EPFL/DeepFly3D": {"a": false, "p": "2026-08"}, "https://github.com/SIPEC-Animal-Data-Analysis/SIPEC": {"a": false, "p": "2024-09"}, "https://github.com/SchwarzNeuroconLab/DeepLabStream": {"a": false, "p": "2023-07"}, "https://github.com/Skovorp/feral": {"a": false, "p": "2026-09"}, "https://github.com/Tierpsy/tierpsy-tracker": {"a": false, "p": "2026-08"}, "https://github.com/YttriLab/A-SOID": {"a": false, "p": "2025-06"}, "https://github.com/YttriLab/B-SOID": {"a": false, "p": "2024-02"}, "https://github.com/ZexinChen/AlphaTracker": {"a": false, "p": "2023-09"}, "https://github.com/ahof1704/VocalMat": {"a": false, "p": "2023-06"}, "https://github.com/amathislab/DLC2action": {"a": false, "p": "2026-06"}, "https://github.com/carlwharris/DeepAction": {"a": false, "p": "2023-02"}, "https://github.com/cvat-ai/cvat": {"a": false, "p": "2026-10"}, "https://github.com/danbider/lightning-pose": {"a": false, "p": "2026-10"}, "https://github.com/dattalab/keypoint-moseq": {"a": false, "p": "2026-10"}, "https://github.com/dattalab/moseq2-app": {"a": false, "p": "2026-08"}, "https://github.com/djamesbarker/pMAT": {"a": false, "p": "2021-07"}, "https://github.com/facebookresearch/detectron2": {"a": false, "p": "2026-10"}, "https://github.com/facebookresearch/sam2": {"a": false, "p": "2026-05"}, "https://github.com/flatironinstitute/CaImAn": {"a": false, "p": "2026-10"}, "https://github.com/gordonberman/MotionMapper": {"a": false, "p": "2020-09"}, "https://github.com/janclemenslab/das": {"a": false, "p": "2026-10"}, "https://github.com/jbohnslav/deepethogram": {"a": false, "p": "2026-10"}, "https://github.com/jgraving/deepposekit": {"a": false, "p": "2022-07"}, "https://github.com/jones-lab-tamu/CBAS": {"a": false, "p": "2025-12"}, "https://github.com/kristinbranson/FlyTracker": {"a": false, "p": "2025-11"}, "https://github.com/lambdaloop/anipose": {"a": false, "p": "2026-06"}, "https://github.com/lapphe/AMBER-pipeline": {"a": false, "p": "2024-05"}, "https://github.com/miniscope/minian": {"a": false, "p": "2026-08"}, "https://github.com/mlfpm/deepof": {"a": false, "p": "2026-10"}, "https://github.com/mvansegbroeck-zz/mupet": {"a": false, "p": "2020-06"}, "https://github.com/neuroethology/MARS": {"a": false, "p": "2024-03"}, "https://github.com/neuroethology/TREBA": {"a": false, "p": "2022-09"}, "https://github.com/neuroethology/bentoMAT": {"a": false, "p": "2025-01"}, "https://github.com/neuroinformatics-unit/movement": {"a": false, "p": "2026-10"}, "https://github.com/open-mmlab/mmpose": {"a": false, "p": "2025-08"}, "https://github.com/paninski-lab/deepgraphpose": {"a": false, "p": "2022-11"}, "https://github.com/pearsonlab/autoencoded-vocal-analysis": {"a": false, "p": "2024-03"}, "https://github.com/portugueslab/stytra": {"a": false, "p": "2024-11"}, "https://github.com/pyratlib/pyrat": {"a": false, "p": "2024-04"}, "https://github.com/rjdmoore/fictrac": {"a": false, "p": "2024-05"}, "https://github.com/rly/ndx-pose": {"a": false, "p": "2026-09"}, "https://github.com/rtachi-lab/usvseg": {"a": false, "p": "2024-04"}, "https://github.com/shlizee/OpenLabCluster": {"a": false, "p": "2025-07"}, "https://github.com/sofiabroome/painface-recognition": {"a": false, "p": "2022-07"}, "https://github.com/spoonsso/dannce": {"a": false, "p": "2025-04"}, "https://github.com/traja-team/traja": {"a": false, "p": "2025-10"}, "https://github.com/ultralytics/ultralytics": {"a": false, "p": "2026-10"}, "https://github.com/umyelab/LabGym": {"a": false, "p": "2026-10"}, "https://github.com/vivekhsridhar/tracktor": {"a": false, "p": "2022-09"}, "https://github.com/wkentaro/labelme": {"a": false, "p": "2026-10"}, "https://imagej.net/plugins/trackmate/": {"a": false, "p": "2026-08"}, "https://kristinbranson.github.io/APT/": {"a": false, "p": "2026-10"}, "https://nwb.org/": {"a": false, "p": "2026-10"}, "https://rupertoverall.net/ColonyTrack": {"a": false, "p": "2026-07"}, "https://rupertoverall.net/Rtrack/index.html": {"a": false, "p": "2025-09"}, "https://sleap.ai/": {"a": false, "p": "2026-10"}, "https://swarm-lab.github.io/swaRm/": {"a": false, "p": "2024-02"}, "https://trex.run/": {"a": false, "p": "2026-10"}, "https://www.boris.unito.it/": {"a": false, "p": "2026-10"}, "https://www.deeplabcut.org/": {"a": false, "p": "2026-10"}, "https://www.fasttrack.sh/": {"a": false, "p": "2026-08"}, "https://www.janelia.org/open-science/jaaba": {"a": false, "p": "2026-08"}, "https://zebrazoom.org/": {"a": false, "p": "2026-10"}};
+  const STALE_MONTHS = 24;
+
+  function ready(fn) {
+    if (document.readyState !== "loading") fn(); else document.addEventListener("DOMContentLoaded", fn);
+  }
+
+  ready(function () {
+    const nav = document.getElementById("simba-rs-jump");
+    const page = nav.closest("section, .section");
+
+    // Jump bar: one link per section, with its tool count; the searchable table goes first.
+    const links = [];
+    page.querySelectorAll(":scope > section > h2, :scope > .section > h2").forEach(function (h) {
+      const sec = h.parentElement;
+      const hc = h.cloneNode(true);
+      hc.querySelectorAll(".headerlink").forEach(function (x) { x.remove(); });   // the hidden link icon
+      const name = hc.textContent.trim();
+      const rt = sec.querySelector(".simba-rt");
+      const n = rt ? +rt.dataset.total : sec.querySelectorAll("table.docutils tbody tr").length;
+      const a = document.createElement("a");
+      a.href = "#" + sec.id;
+      a.innerHTML = "<span></span><span class=n></span>";
+      a.firstChild.textContent = rt ? name + " (searchable)" : name;
+      a.lastChild.textContent = n + " tools";
+      if (rt) { a.className = "main"; links.unshift(a); } else links.push(a);
+    });
+    links.forEach(function (a) { nav.appendChild(a); });
+
+    // Back to top: shown once the jump bar has scrolled out of view.
+    const top = document.getElementById("simba-rs-top");
+    function toggle() { top.classList.toggle("on", nav.getBoundingClientRect().bottom < 0); }
+    window.addEventListener("scroll", toggle, {passive: true});
+    toggle();
+
+    // Maintenance tags on curated tools whose GitHub repository has gone quiet.
+    const now = new Date(), nowM = now.getFullYear() * 12 + now.getMonth();
+    page.querySelectorAll("table.docutils td:first-child a.reference.external").forEach(function (a) {
+      const g = ACT[a.getAttribute("href")];
+      if (!g || !g.p) return;
+      const y = +g.p.slice(0, 4), m = +g.p.slice(5, 7) - 1;
+      let txt = "";
+      if (g.a) txt = "archived";
+      else if (nowM - (y * 12 + m) >= STALE_MONTHS) txt = "no updates since " + y;
+      if (!txt) return;
+      const s = document.createElement("span");
+      s.className = "simba-rs-stale";
+      s.textContent = txt;
+      s.title = "Last code update on GitHub: " + g.p + (g.a ? " (repository archived)" : "");
+      a.after(s);
+    });
+  });
+})();
+</script>

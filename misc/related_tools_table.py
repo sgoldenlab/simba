@@ -16,15 +16,16 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "related_tools.csv")
 OUT = os.path.join(HERE, "..", "docs", "_generated", "related_tools_table.html")
 
-CATEGORIES = {"supervised-classification": "Supervised classification",
-              "unsupervised-behavior": "Unsupervised / self-supervised",
+# Display names match the section headings of the curated tables above this table on the page.
+CATEGORIES = {"supervised-classification": "Supervised behavior classification",
+              "unsupervised-behavior": "Unsupervised behavior discovery",
               "pose-estimation": "Pose estimation",
-              "tracking": "Tracking",
-              "closed-loop/real-time": "Real-time / closed-loop",
-              "gait/kinematics": "Gait & kinematics",
-              "hardware/acquisition": "Hardware & acquisition",
-              "benchmark/dataset": "Benchmarks & datasets",
-              "analysis-platform": "Analysis platforms & toolkits",
+              "tracking": "Tracking and identity",
+              "closed-loop/real-time": "Analysis and real-time pipelines",
+              "gait/kinematics": "Kinematics and trajectory analysis",
+              "hardware/acquisition": "Hardware and acquisition",
+              "benchmark/dataset": "Benchmarks and datasets",
+              "analysis-platform": "Analysis and real-time pipelines",
               "other-analysis": "Other"}
 
 
@@ -100,7 +101,7 @@ TEMPLATE = """<style>
 .simba-rt-charts{{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 12px;}}
 .simba-rt-chart{{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px 4px;position:relative;flex:1 1 300px;min-width:0;box-sizing:border-box;}}
 .simba-rt-cats{{display:grid;grid-template-columns:auto 1fr auto;gap:2px 8px;align-items:center;margin:4px 0 6px;font-size:10.5px;}}
-.simba-rt-cats .cl{{color:#4b5563;white-space:nowrap;cursor:pointer;}}
+.simba-rt-cats .cl{{color:#4b5563;max-width:180px;line-height:1.15;cursor:pointer;}}
 .simba-rt-cats .ct{{height:9px;cursor:pointer;}}
 .simba-rt-cats .cb{{height:9px;background:#2f7fb5;border-radius:0 4px 4px 0;min-width:2px;}}
 .simba-rt-cats .cn{{font-weight:700;color:#23272e;font-variant-numeric:tabular-nums;text-align:right;}}
@@ -127,7 +128,7 @@ TEMPLATE = """<style>
 .simba-rt .unk{{color:#9ca3af;}}
 @media (max-width:680px){{.simba-rt .c-sp{{display:none;}}.simba-rt-bar select{{flex:1 1 40%;max-width:none;}}.simba-rt th,.simba-rt td{{padding-left:9px !important;padding-right:9px !important;}}}}
 </style>
-<div class="simba-rt">
+<div class="simba-rt" data-total="{total}">
   <p class="simba-rt-date">Updated {pull_date} &middot; {total} tools</p>
   <div class="simba-rt-charts">
     <div class="simba-rt-chart" id="rtChart">

@@ -16,6 +16,13 @@ through its pose-import tools, and frame-wise annotations through its
    experimental methods in animal behaviour, and a good place to ask which of these tools
    suits a given experiment.
 
+   Other catalogues of behavior tools:
+
+   * `OpenBehavior <https://edspace.american.edu/openbehavior/>`__ -- open-source tools for behavioral
+     neuroscience research, including hardware and software.
+   * `Home Cage Monitoring Technologies Catalog <https://www.thebehaviourdatabase.org/catalogue.php>`__
+     (The Behaviour Database) -- home-cage monitoring systems.
+
 
 .. |simba-import| raw:: html
 
@@ -33,9 +40,12 @@ through its pose-import tools, and frame-wise annotations through its
 
    <span class="simba-tag simba-tag--free">Freeware</span>
 
-.. contents:: Categories
-   :local:
-   :depth: 1
+Each tool links to its paper where one exists. Open-source tools whose GitHub repository has not
+been updated in two years are tagged *no updates since* (or *archived*), so check that they still
+run before relying on them.
+
+.. raw:: html
+   :file: _generated/related_software_extras.html
 
 .. _Pose estimation:
 
@@ -51,22 +61,22 @@ through its pose-import tools, and frame-wise annotations through its
      - Description
    * - `DeepLabCut <https://www.deeplabcut.org/>`__
      - |oss|
-     - |simba-import| Markerless 2D/3D pose estimation
+     - |simba-import| Markerless 2D/3D pose estimation · `paper <https://doi.org/10.1038/s41593-018-0209-y>`__
    * - `SLEAP <https://sleap.ai/>`__
      - |oss|
-     - |simba-import| Multi-animal pose estimation
+     - |simba-import| Multi-animal pose estimation · `paper <https://doi.org/10.1038/s41592-022-01426-1>`__
    * - `DeepPoseKit <https://github.com/jgraving/deepposekit>`__
      - |oss|
-     - |simba-import| Pose estimation toolkit
+     - |simba-import| Pose estimation toolkit · `paper <https://doi.org/10.7554/eLife.47994>`__
    * - `Lightning Pose <https://github.com/danbider/lightning-pose>`__
      - |oss|
-     - Semi-supervised, multi-view pose estimation
+     - Semi-supervised, multi-view pose estimation · `paper <https://doi.org/10.1038/s41592-024-02319-1>`__
    * - `Facemap <https://github.com/MouseLand/facemap>`__
      - |oss|
-     - |simba-import| Mouse orofacial tracking and neural prediction
+     - |simba-import| Mouse orofacial tracking and neural prediction · `paper <https://doi.org/10.1038/s41593-023-01490-6>`__
    * - `OpenPose <https://github.com/CMU-Perceptual-Computing-Lab/openpose>`__
      - |oss|
-     - Real-time multi-person 2D keypoint detection
+     - Real-time multi-person 2D keypoint detection · `paper <https://doi.org/10.1109/TPAMI.2019.2929257>`__
    * - `MMPose <https://github.com/open-mmlab/mmpose>`__
      - |oss|
      - General-purpose pose estimation toolbox (OpenMMLab)
@@ -75,13 +85,13 @@ through its pose-import tools, and frame-wise annotations through its
      - |simba-import| Real-time keypoint/pose estimation; also object detection and segmentation
    * - `SuperAnimal / DLC Model Zoo <https://deeplabcut.github.io/DeepLabCut/docs/ModelZoo.html>`__
      - |oss|
-     - |simba-import| Pretrained cross-species DeepLabCut models, usable without new labelling
+     - |simba-import| Pretrained cross-species DeepLabCut models, usable without new labelling · `paper <https://doi.org/10.1038/s41467-024-48792-2>`__
    * - `APT (Animal Part Tracker) <https://kristinbranson.github.io/APT/>`__
      - |oss|
      - |simba-import| Multi-animal body-part tracking with a labelling GUI; exports .trk (Branson lab)
    * - `DeepGraphPose <https://github.com/paninski-lab/deepgraphpose>`__
      - |oss|
-     - Pose estimation using graph-based spatiotemporal priors
+     - Pose estimation using graph-based spatiotemporal priors · `paper <https://doi.org/10.1101/2020.08.20.259705>`__
 
 |:triangular_ruler:| **3D pose estimation**
 -------------------------------------------
@@ -95,16 +105,16 @@ through its pose-import tools, and frame-wise annotations through its
      - Description
    * - `DeepFly3D <https://github.com/NeLy-EPFL/DeepFly3D>`__
      - |oss|
-     - 3D pose estimation for tethered Drosophila
+     - 3D pose estimation for tethered Drosophila · `paper <https://doi.org/10.7554/eLife.48571>`__
    * - `Anipose <https://github.com/lambdaloop/anipose>`__
      - |oss|
-     - 3D pose estimation from synchronized cameras
+     - 3D pose estimation from synchronized cameras · `paper <https://doi.org/10.1016/j.celrep.2021.109730>`__
    * - `DANNCE <https://github.com/spoonsso/dannce>`__
      - |oss|
-     - |simba-import| 3D landmark detection from multi-view video
+     - |simba-import| 3D landmark detection from multi-view video · `paper <https://doi.org/10.1038/s41592-021-01106-6>`__
    * - `OpenMonkeyStudio <https://github.com/OpenMonkeyStudio>`__
      - |oss|
-     - Markerless 3D pose estimation for freely moving macaques
+     - Markerless 3D pose estimation for freely moving macaques · `paper <https://doi.org/10.1038/s41467-020-18441-5>`__
 
 |:world_map:| **Tracking and identity**
 ---------------------------------------
@@ -118,61 +128,61 @@ through its pose-import tools, and frame-wise annotations through its
      - Description
    * - `TRex <https://trex.run/>`__
      - |oss|
-     - Real-time, identity-preserving tracking
+     - Real-time, identity-preserving tracking · `paper <https://doi.org/10.7554/eLife.64000>`__
    * - `idtracker.ai <https://idtracker.ai/>`__
      - |oss|
-     - Markerless identity tracking for animal groups
+     - Markerless identity tracking for animal groups · `paper <https://doi.org/10.1038/s41592-018-0295-5>`__
    * - `AlphaTracker <https://github.com/ZexinChen/AlphaTracker>`__
      - |oss|
-     - Multi-animal tracking, pose, and behavioral clustering
+     - Multi-animal tracking, pose, and behavioral clustering · `paper <https://doi.org/10.3389/fnbeh.2023.1111908>`__
    * - `Tracktor <https://github.com/vivekhsridhar/tracktor>`__
      - |oss|
-     - OpenCV-based single- and multi-object tracker
+     - OpenCV-based single- and multi-object tracker · `paper <https://doi.org/10.1111/2041-210X.13166>`__
    * - `ToxTrac <https://sourceforge.net/projects/toxtrac/>`__
      - |oss|
-     - Fast tracker for one or several animals
+     - Fast tracker for one or several animals · `paper <https://doi.org/10.1111/2041-210X.12874>`__
    * - `ezTrack <https://github.com/DeniseCaiLab/ezTrack>`__
      - |oss|
-     - Blob-based location and freezing tracking
+     - Blob-based location and freezing tracking · `paper <https://doi.org/10.1038/s41598-019-56408-9>`__
    * - `LiveMouseTracker <https://micecraft.org/lmt>`__
      - |oss|
-     - Long-term mouse tracking via RFID and depth cameras
+     - Long-term mouse tracking via RFID and depth cameras · `paper <https://doi.org/10.1038/s41551-019-0396-1>`__
    * - `TrackMate <https://imagej.net/plugins/trackmate/>`__
      - |oss|
-     - ImageJ/Fiji object-tracking plugin
+     - ImageJ/Fiji object-tracking plugin · `paper <https://doi.org/10.1038/s41592-022-01507-1>`__
    * - `C-Trax <https://ctrax.sourceforge.net/>`__
      - |oss|
-     - Tracking of walking flies in groups
+     - Tracking of walking flies in groups · `paper <https://doi.org/10.1038/nmeth.1328>`__
    * - `AnimalTA <https://vchiara.eu/index.php/animalta>`__
      - |oss|
-     - GUI tracking of multiple animals across varied setups
+     - GUI tracking of multiple animals across varied setups · `paper <https://doi.org/10.1111/2041-210x.14115>`__
    * - `BioTracker <https://github.com/BioroboticsLab/biotracker_core>`__
      - |oss|
-     - Modular video-tracking framework
+     - Modular video-tracking framework · `paper <https://doi.org/10.48550/arxiv.1803.07985>`__
    * - `FlyTracker <https://github.com/kristinbranson/FlyTracker>`__
      - |oss|
-     - Tracking and feature extraction for interacting flies
+     - Tracking and feature extraction for interacting flies · `paper <https://doi.org/10.1007/978-3-319-10605-2_50>`__
    * - `FicTrac <https://github.com/rjdmoore/fictrac>`__
      - |oss|
-     - Spherical-treadmill path tracking for tethered insects
+     - Spherical-treadmill path tracking for tethered insects · `paper <https://doi.org/10.1016/j.jneumeth.2014.01.010>`__
    * - `ZebraZoom <https://zebrazoom.org/>`__
      - |oss|
-     - Zebrafish larva and adult behaviour tracking
+     - Zebrafish larva and adult behaviour tracking · `paper <https://doi.org/10.3389/fncir.2013.00107>`__
    * - `Stytra <https://github.com/portugueslab/stytra>`__
      - |oss|
-     - Zebrafish tracking with closed-loop stimulus control
+     - Zebrafish tracking with closed-loop stimulus control · `paper <https://doi.org/10.1371/journal.pcbi.1006699>`__
    * - `OCTRON <https://octron-tracking.github.io/OCTRON-docs/>`__
      - |oss|
-     - Segment-Anything-based segmentation and tracking in a napari GUI
+     - Segment-Anything-based segmentation and tracking in a napari GUI · `paper <https://doi.org/10.64898/2025.12.20.695663>`__
    * - `FastTrack <https://www.fasttrack.sh/>`__
      - |oss|
-     - Fast 2D tracking of multiple objects, with manual correction
+     - Fast 2D tracking of multiple objects, with manual correction · `paper <https://doi.org/10.1371/journal.pcbi.1008697>`__
    * - `Tierpsy Tracker <https://github.com/Tierpsy/tierpsy-tracker>`__
      - |oss|
-     - Multi-worm tracking and phenotyping for C. elegans
+     - Multi-worm tracking and phenotyping for C. elegans · `paper <https://doi.org/10.1038/s41592-018-0112-1>`__
    * - `Argos <https://argos.readthedocs.io/en/latest/>`__
      - |oss|
-     - Tracking multiple animals in cluttered or visually complex environments
+     - Tracking multiple animals in cluttered or visually complex environments · `paper <https://doi.org/10.1111/2041-210x.13776>`__
 
 |:label:| **Supervised behavior classification**
 ------------------------------------------------
@@ -186,46 +196,46 @@ through its pose-import tools, and frame-wise annotations through its
      - Description
    * - `JAABA <https://www.janelia.org/open-science/jaaba>`__
      - |oss|
-     - Supervised behavior classification from trajectories
+     - Supervised behavior classification from trajectories · `paper <https://doi.org/10.1038/nmeth.2281>`__
    * - `DeepEthogram <https://github.com/jbohnslav/deepethogram>`__
      - |oss|
-     - |simba-import| Supervised behavior classification from raw video
+     - |simba-import| Supervised behavior classification from raw video · `paper <https://doi.org/10.7554/eLife.63377>`__
    * - `MARS <https://github.com/neuroethology/MARS>`__
      - |oss|
-     - |simba-import| Pose estimation and social behavior classification in mice
+     - |simba-import| Pose estimation and social behavior classification in mice · `paper <https://doi.org/10.7554/eLife.63720>`__
    * - `BehaviorDEPOT <https://github.com/DeNardoLab/BehaviorDEPOT>`__
      - |oss|
-     - Pose-guided behavior detection and analysis
+     - Pose-guided behavior detection and analysis · `paper <https://doi.org/10.7554/eLife.74314>`__
    * - `LabGym <https://github.com/umyelab/LabGym>`__
      - |oss|
-     - Tracking and behavior classification via Mask R-CNN
+     - Tracking and behavior classification via Mask R-CNN · `paper <https://doi.org/10.1016/j.crmeth.2023.100415>`__
    * - `SIPEC <https://github.com/SIPEC-Animal-Data-Analysis/SIPEC>`__
      - |oss|
-     - End-to-end deep-learning behavioral analysis pipeline
+     - End-to-end deep-learning behavioral analysis pipeline · `paper <https://doi.org/10.1038/s42256-022-00477-5>`__
    * - `DeepAction <https://github.com/carlwharris/DeepAction>`__
      - |oss|
-     - Video-based behaviour classification with confidence-based review
+     - Video-based behaviour classification with confidence-based review · `paper <https://doi.org/10.1038/s41598-023-29574-0>`__
    * - `DLC2Action <https://github.com/amathislab/DLC2action>`__
      - |oss|
-     - Deep-learning behaviour segmentation from pose
+     - Deep-learning behaviour segmentation from pose · `paper <https://doi.org/10.1101/2025.09.27.678941>`__
    * - `OpenLabCluster <https://github.com/shlizee/OpenLabCluster>`__
      - |oss|
-     - Active-learning clustering and classification from keypoints
+     - Active-learning clustering and classification from keypoints · `paper <https://doi.org/10.3389/fnsys.2025.1630654>`__
    * - `CBAS <https://github.com/jones-lab-tamu/CBAS>`__
      - |oss|
-     - Circadian behavioural analysis suite for long recordings
+     - Circadian behavioural analysis suite for long recordings · `paper <https://doi.org/10.1016/j.crmeth.2025.101050>`__
    * - `JABS <https://github.com/KumarLabJax/JABS-behavior-classifier>`__
      - |oss|
-     - Pose pipeline and supervised classifier training for mice (JAX)
+     - Pose pipeline and supervised classifier training for mice (JAX) · `paper <https://doi.org/10.7554/elife.107259>`__
    * - `LISBET <https://github.com/BelloneLab/lisbet>`__
      - |oss|
-     - Transformer-based social behaviour segmentation from pose
+     - Transformer-based social behaviour segmentation from pose · `paper <https://doi.org/10.48550/arxiv.2311.04069>`__
    * - `FERAL <https://github.com/Skovorp/feral>`__
      - |oss|
-     - Supervised behaviour segmentation from raw video using video-understanding models; no pose required
+     - Supervised behaviour segmentation from raw video using video-understanding models; no pose required · `paper <https://doi.org/10.1101/2025.11.16.688666>`__
    * - `PainFace-Recognition <https://github.com/sofiabroome/painface-recognition>`__
      - |oss|
-     - Recurrent-network recognition of equine pain expressions from video
+     - Recurrent-network recognition of equine pain expressions from video · `paper <https://doi.org/10.1109/cvpr.2019.01295>`__
 
 |:crystal_ball:| **Unsupervised behavior discovery**
 ----------------------------------------------------
@@ -239,28 +249,28 @@ through its pose-import tools, and frame-wise annotations through its
      - Description
    * - `B-SOiD <https://github.com/YttriLab/B-SOID>`__
      - |oss|
-     - Unsupervised behavior discovery from pose
+     - Unsupervised behavior discovery from pose · `paper <https://doi.org/10.1038/s41467-021-25420-x>`__
    * - `A-SOiD <https://github.com/YttriLab/A-SOID>`__
      - |oss|
-     - Active-learning behavior classification from pose
+     - Active-learning behavior classification from pose · `paper <https://doi.org/10.1038/s41592-024-02200-1>`__
    * - `Keypoint-MoSeq <https://github.com/dattalab/keypoint-moseq>`__
      - |oss|
-     - Unsupervised behavioral syllable discovery from keypoints
+     - Unsupervised behavioral syllable discovery from keypoints · `paper <https://doi.org/10.1038/s41592-024-02318-2>`__
    * - `VAME <https://github.com/EthoML/VAME>`__
      - |oss|
-     - Unsupervised behavioral motif discovery from pose
+     - Unsupervised behavioral motif discovery from pose · `paper <https://doi.org/10.1038/s42003-022-04080-7>`__
    * - `DeepOF <https://github.com/mlfpm/deepof>`__
      - |oss|
-     - Behavioral analysis of DeepLabCut/SLEAP tracking
+     - Behavioral analysis of DeepLabCut/SLEAP tracking · `paper <https://doi.org/10.21105/joss.05394>`__
    * - `TREBA <https://github.com/neuroethology/TREBA>`__
      - |oss|
-     - Trajectory embeddings for behavior representation learning
+     - Trajectory embeddings for behavior representation learning · `paper <https://doi.org/10.1109/cvpr46437.2021.00290>`__
    * - `MotionMapper <https://github.com/gordonberman/MotionMapper>`__
      - |oss|
-     - Unsupervised behavioral mapping from postural dynamics
+     - Unsupervised behavioral mapping from postural dynamics · `paper <https://doi.org/10.1098/rsif.2014.0672>`__
    * - `MoSeq <https://github.com/dattalab/moseq2-app>`__
      - |oss|
-     - Depth-video behavioral syllable segmentation
+     - Depth-video behavioral syllable segmentation · `paper <https://doi.org/10.1016/j.neuron.2015.11.031>`__
 
 |:footprints:| **Kinematics and trajectory analysis**
 ------------------------------------------------------
@@ -280,16 +290,16 @@ collective structure -- from pose or centroid tracks, rather than classifying be
      - Kinematic quantities from DeepLabCut pose output
    * - `traja <https://github.com/traja-team/traja>`__
      - |oss|
-     - Trajectory analysis and visualisation built on pandas
+     - Trajectory analysis and visualisation built on pandas · `paper <https://doi.org/10.21105/joss.03202>`__
    * - `PyRat <https://github.com/pyratlib/pyrat>`__
      - |oss|
-     - Python library for behavioural and trajectory analysis of pose data
+     - Python library for behavioural and trajectory analysis of pose data · `paper <https://doi.org/10.3389/fnins.2022.779106>`__
    * - `animovement <https://animovement.dev/>`__
      - |oss|
      - R toolbox for analysing movement across space and time
    * - `Rtrack <https://rupertoverall.net/Rtrack/index.html>`__
      - |oss|
-     - Unbiased search-strategy classification for water-maze and related assays
+     - Unbiased search-strategy classification for water-maze and related assays · `paper <https://doi.org/10.1101/2020.02.27.967372>`__
    * - `ColonyTrack <https://rupertoverall.net/ColonyTrack>`__
      - |oss|
      - Analysis of long-term tracking data from group-housed colonies
@@ -315,7 +325,7 @@ that is the capability SimBA supports directly.
      - Object detection and instance segmentation library
    * - `Segment Anything (SAM 2) <https://github.com/facebookresearch/sam2>`__
      - |oss|
-     - Promptable image and video segmentation
+     - Promptable image and video segmentation · `paper <https://doi.org/10.48550/arxiv.2408.00714>`__
 
 |:microphone:| **Vocalisation and audio**
 -----------------------------------------
@@ -332,22 +342,22 @@ these tools cover the audio half of that pipeline.
      - Description
    * - `DeepSqueak <https://github.com/DrCoffey/DeepSqueak>`__
      - |oss|
-     - Deep-learning detection and classification of USVs
+     - Deep-learning detection and classification of USVs · `paper <https://doi.org/10.1038/s41386-018-0303-6>`__
    * - `DAS (Deep Audio Segmenter) <https://github.com/janclemenslab/das>`__
      - |oss|
-     - Deep-learning annotation of acoustic signals
+     - Deep-learning annotation of acoustic signals · `paper <https://doi.org/10.7554/eLife.68837>`__
    * - `USVSEG <https://github.com/rtachi-lab/usvseg>`__
      - |oss|
-     - Segmentation of rodent ultrasonic vocalisations
+     - Segmentation of rodent ultrasonic vocalisations · `paper <https://doi.org/10.1371/journal.pone.0228907>`__
    * - `MUPET <https://github.com/mvansegbroeck-zz/mupet>`__
      - |oss|
-     - Mouse ultrasonic profile extraction and syllable clustering
+     - Mouse ultrasonic profile extraction and syllable clustering · `paper <https://doi.org/10.1016/j.neuron.2017.04.005>`__
    * - `VocalMat <https://github.com/ahof1704/VocalMat>`__
      - |oss|
-     - Detection and classification of mouse vocalisations
+     - Detection and classification of mouse vocalisations · `paper <https://doi.org/10.7554/elife.59161>`__
    * - `AVA <https://github.com/pearsonlab/autoencoded-vocal-analysis>`__
      - |oss|
-     - Unsupervised latent-space analysis of vocal repertoires
+     - Unsupervised latent-space analysis of vocal repertoires · `paper <https://doi.org/10.7554/eLife.67855>`__
    * - `Avisoft SASLab <https://avisoft.com/>`__
      - |comm|
      - Bioacoustic recording and sound analysis
@@ -373,19 +383,19 @@ against when behaviour is paired with neural recording.
      - Implanted physiological telemetry (blood pressure, ECG) in freely moving animals (DSI)
    * - `GuPPy <https://github.com/LernerLab/GuPPy>`__
      - |oss|
-     - Fiber photometry analysis in Python
+     - Fiber photometry analysis in Python · `paper <https://doi.org/10.1038/s41598-021-03626-9>`__
    * - `pMAT <https://github.com/djamesbarker/pMAT>`__
      - |oss|
-     - Photometry modular analysis tool
+     - Photometry modular analysis tool · `paper <https://doi.org/10.1016/j.pbb.2020.173093>`__
    * - `CaImAn <https://github.com/flatironinstitute/CaImAn>`__
      - |oss|
-     - Calcium imaging motion correction and source extraction
+     - Calcium imaging motion correction and source extraction · `paper <https://doi.org/10.7554/eLife.38173>`__
    * - `suite2p <https://github.com/MouseLand/suite2p>`__
      - |oss|
-     - Calcium imaging processing and cell detection
+     - Calcium imaging processing and cell detection · `paper <https://doi.org/10.1101/061507>`__
    * - `Minian <https://github.com/miniscope/minian>`__
      - |oss|
-     - Miniscope calcium imaging analysis pipeline
+     - Miniscope calcium imaging analysis pipeline · `paper <https://doi.org/10.7554/eLife.70661>`__
 
 |:jigsaw:| **Data standards and interoperability**
 --------------------------------------------------
@@ -402,7 +412,7 @@ against when behaviour is paired with neural recording.
      - Analysis of pose tracks from DeepLabCut, SLEAP, and others
    * - `NWB <https://nwb.org/>`__
      - |oss|
-     - Neurodata Without Borders standard for neurophysiology data
+     - Neurodata Without Borders standard for neurophysiology data · `paper <https://doi.org/10.7554/eLife.78362>`__
    * - `ndx-pose <https://github.com/rly/ndx-pose>`__
      - |oss|
      - NWB extension for storing pose-estimation data
@@ -419,22 +429,22 @@ against when behaviour is paired with neural recording.
      - Description
    * - `DLC-Analyzer <https://github.com/ETHZ-INS/DLCAnalyzer>`__
      - |oss|
-     - Analysis and visualization of DeepLabCut output
+     - Analysis and visualization of DeepLabCut output · `paper <https://doi.org/10.1038/s41386-020-0776-y>`__
    * - `DeepLabCut-Live <https://github.com/DeepLabCut/DeepLabCut-live>`__
      - |oss|
-     - Real-time pose estimation on live video
+     - Real-time pose estimation on live video · `paper <https://doi.org/10.7554/eLife.61909>`__
    * - `DeepLabStream <https://github.com/SchwarzNeuroconLab/DeepLabStream>`__
      - |oss|
-     - Real-time, closed-loop pose-based feedback
+     - Real-time, closed-loop pose-based feedback · `paper <https://doi.org/10.1038/s42003-021-01654-9>`__
    * - `Bonsai <https://bonsai-rx.org/>`__
      - |oss|
-     - Visual reactive programming for experiment pipelines
+     - Visual reactive programming for experiment pipelines · `paper <https://doi.org/10.3389/fninf.2015.00007>`__
    * - `AMBER-pipeline <https://github.com/lapphe/AMBER-pipeline>`__
      - |oss|
-     - Automated rodent maternal-behavior analysis
+     - Automated rodent maternal-behavior analysis · `paper <https://doi.org/10.1038/s41598-023-45495-4>`__
    * - `AmadeusGPT <https://github.com/AdaptiveMotorControlLab/AmadeusGPT>`__
      - |oss|
-     - Natural-language querying of behaviour from pose data
+     - Natural-language querying of behaviour from pose data · `paper <https://doi.org/10.48550/arxiv.2307.04858>`__
 
 |:pencil:| **Manual annotation**
 --------------------------------
@@ -448,7 +458,7 @@ against when behaviour is paired with neural recording.
      - Description
    * - `BORIS <https://www.boris.unito.it/>`__
      - |oss|
-     - |simba-import| Event-logging and manual video annotation
+     - |simba-import| Event-logging and manual video annotation · `paper <https://doi.org/10.1111/2041-210X.12584>`__
    * - `Solomon Coder <https://solomon.andraspeter.com/>`__
      - |free|
      - |simba-import| Manual behavior coding tool
@@ -463,7 +473,7 @@ against when behaviour is paired with neural recording.
      - Multi-type data labeling and annotation platform
    * - `VIA (VGG Image Annotator) <https://www.robots.ox.ac.uk/~vgg/software/via/>`__
      - |oss|
-     - Lightweight image, audio, and video annotation tool
+     - Lightweight image, audio, and video annotation tool · `paper <https://doi.org/10.1145/3343031.3350535>`__
    * - `Labelme <https://github.com/wkentaro/labelme>`__
      - |oss|
      - |simba-import| Polygon, bounding-box, and keypoint image annotation; SimBA converts its labels to YOLO and DeepLabCut training data
