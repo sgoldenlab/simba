@@ -524,7 +524,7 @@ Video-based
      - Camera lid retrofitted to existing racks; computer-vision keypoints, multi-animal via purpose-made ear tags (Olden Labs)
    * - `iMouse <https://imouse.info/>`__
      - Video
-     - Rack-mounted side-view cameras with proprietary ML; retrofits standard cages (iMouse GmbH)
+     - Rack-mounted side-view cameras with proprietary ML; retrofits standard cages (iMouse GmbH) · `paper <https://doi.org/10.1101/2023.08.06.552188>`__
    * - `PhenoTyper <https://noldus.com/phenotyper>`__
      - IR video
      - Instrumented home cage for up to two rodents; pairs with EthoVision XT (Noldus)
@@ -546,6 +546,9 @@ Video-based
    * - `SmartCage System <https://maze.conductscience.com/>`__
      - Video + IR beams
      - All-in-one automated home-cage recording and activity monitoring (MazeEngineers)
+   * - `Vium Digital Vivarium <https://recursion.com/news/recursion-acquires-vium-bolstering-its-efforts-to-industrialize-drug-discovery>`__
+     - Video + sensors
+     - Smart housing with continuous video and computer-vision digital biomarkers; acquired by Recursion in 2020 and no longer sold (Vium)
 
 Individual ID in group housing (RFID)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -579,7 +582,7 @@ Individual ID in group housing (RFID)
      - Continuous non-invasive body temperature via UCT-2112 microchips; single-cage and small-cohort studies (Unified Information Devices)
    * - `HomeLab <https://www.neurocage.com/homelab>`__
      - RFID + IoT
-     - Unique animal IDs tracked across connected cages; mice (NeuroCage)
+     - Unique animal IDs tracked across connected cages; mice (NeuroCage) · `paper <https://doi.org/10.1371/journal.pone.0220751>`__
    * - `UCT-2112 temperature microchip <https://www.uidevices.com/laboratory-animal-temperature/>`__
      - Passive RFID
      - Implantable chip returning ID and body temperature on a single scan; a component rather than a system (Unified Information Devices)
@@ -687,6 +690,9 @@ Metabolic phenotyping cages
    * - `DigiGait <https://mousespecifics.com/digigait/>`__
      - |comm|
      - Treadmill-based gait analysis
+   * - `BehaviorCloud <https://maze.conductscience.com/portfolio/behaviorcloud-subscription/>`__
+     - |comm|
+     - Cloud platform for maze-test video tracking, manual scoring and data sharing (Conduct Science)
 
 .. _Tools from papers citing SimBA:
 
