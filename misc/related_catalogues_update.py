@@ -8,9 +8,10 @@ Watch two external tool catalogues for entries that are not on the Related Softw
   read from the JSON the catalogue page itself loads.
 
 Every entry seen is recorded in misc/related_catalogues_seen.csv, so each one is reported once. Entries
-that are new since the last run and not already on the page (matched by name or link) are written to
+that are new since the last run and not already in the table (matched by name or link
+against misc/related_software.csv and misc/related_tools.csv) are written to
 docs/_generated/related_catalogues_new.html, which the page shows under its list of other catalogues
-until the tool is added to one of the tables (or marked ``skip`` in the CSV).
+until the tool is added to misc/related_software.csv (or marked ``skip`` in the seen CSV).
 
 Run:  python misc/related_catalogues_update.py           (weekly, by .github/workflows/related_tools.yml)
       python misc/related_catalogues_update.py --seed    (record everything as seen without listing it)
@@ -19,7 +20,7 @@ import csv, html, json, os, re, sys, urllib.request
 from datetime import date
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-RST = os.path.join(HERE, "..", "docs", "simba.related_software.rst")
+CURATED = os.path.join(HERE, "related_software.csv")
 CITING = os.path.join(HERE, "related_tools.csv")
 SEEN = os.path.join(HERE, "related_catalogues_seen.csv")
 OUT = os.path.join(HERE, "..", "docs", "_generated", "related_catalogues_new.html")
@@ -81,10 +82,12 @@ def on_page(entry, page_text, page_norm):
 
 def main():
     seed = "--seed" in sys.argv
-    with open(RST, encoding="utf-8") as f:
-        page_text = f.read().lower()
+    with open(CURATED, encoding="utf-8") as f:
+        curated = list(csv.DictReader(f))
     with open(CITING, encoding="utf-8") as f:
-        page_norm = norm(page_text) + " " + " ".join(norm(r["tool_name"]) for r in csv.DictReader(f) if r["tool_name"])
+        citing = [r["tool_name"] for r in csv.DictReader(f) if r["tool_name"]]
+    page_text = " ".join(r["url"] for r in curated).lower()
+    page_norm = " ".join(norm(n) for n in [r["name"] for r in curated] + citing)
     seen = {}
     if os.path.isfile(SEEN):
         with open(SEEN, encoding="utf-8", newline="") as f:
