@@ -41,6 +41,11 @@ jobs:
         shell: bash
         run: python misc/related_software_activity.py | tee -a "$RUNNER_TEMP/related_tools.log"
 
+      # Lists tools newly added to OpenBehavior and the Home Cage Monitoring Catalogue that are not on the page yet.
+      - name: Check other tool catalogues for new entries
+        shell: bash
+        run: python misc/related_catalogues_update.py | tee -a "$RUNNER_TEMP/related_tools.log"
+
       - name: Configure Git
         run: |
           git config user.email "action@github.com"
@@ -49,7 +54,8 @@ jobs:
       - name: Commit updated table (if changed)
         run: |
           git add misc/related_tools.csv misc/related_tools_seen.csv docs/_generated/related_tools_table.html \
-                  docs/_generated/related_software_extras.html
+                  docs/_generated/related_software_extras.html \
+                  misc/related_catalogues_seen.csv docs/_generated/related_catalogues_new.html
           git commit -m "Update related tools table" || echo "Nothing to commit"
           git push
 

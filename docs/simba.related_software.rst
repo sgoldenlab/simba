@@ -23,6 +23,9 @@ through its pose-import tools, and frame-wise annotations through its
    * `Home Cage Monitoring Technologies Catalog <https://www.thebehaviourdatabase.org/catalogue.php>`__
      (The Behaviour Database) -- home-cage monitoring systems.
 
+   .. raw:: html
+      :file: _generated/related_catalogues_new.html
+
 
 .. |simba-import| raw:: html
 
@@ -92,6 +95,12 @@ run before relying on them.
    * - `DeepGraphPose <https://github.com/paninski-lab/deepgraphpose>`__
      - |oss|
      - Pose estimation using graph-based spatiotemporal priors · `paper <https://doi.org/10.1101/2020.08.20.259705>`__
+   * - `STPoseNet <https://github.com/lvrgb777/STPoseNet>`__
+     - |oss|
+     - Spatiotemporal network for real-time, occlusion-robust mouse pose estimation · `paper <https://doi.org/10.1016/j.isci.2024.109772>`__
+   * - `KineWheel-DeepLabCut <https://github.com/WinterLab-Berlin/KineWheelSystem>`__
+     - |oss|
+     - Automated paw labelling for DeepLabCut training using alternating UV and white-light stroboscopy · `paper <https://doi.org/10.1523/ENEURO.0304-23.2024>`__
 
 |:triangular_ruler:| **3D pose estimation**
 -------------------------------------------
@@ -115,6 +124,12 @@ run before relying on them.
    * - `OpenMonkeyStudio <https://github.com/OpenMonkeyStudio>`__
      - |oss|
      - Markerless 3D pose estimation for freely moving macaques · `paper <https://doi.org/10.1038/s41467-020-18441-5>`__
+   * - `JARVIS <https://jarvis-mocap.github.io/jarvis-docs/>`__
+     - |oss|
+     - Multi-camera 3D markerless motion capture: calibration, 3D annotation, training and inference
+   * - `3DTracker-FAB <https://github.com/ThreeD-Tracker-FAB>`__
+     - |oss|
+     - 3D video-based markerless tracking of interacting rodents with depth cameras · `paper <https://doi.org/10.1371/journal.pone.0078460>`__
 
 |:world_map:| **Tracking and identity**
 ---------------------------------------
@@ -183,6 +198,39 @@ run before relying on them.
    * - `Argos <https://argos.readthedocs.io/en/latest/>`__
      - |oss|
      - Tracking multiple animals in cluttered or visually complex environments · `paper <https://doi.org/10.1111/2041-210x.13776>`__
+   * - `Markerless Mouse Tracking (MaSoMoTr) <https://github.com/MaSoMoTr/MaSoMoTr>`__
+     - |oss|
+     - Identity-preserving tracking of interacting mice for social experiments · `paper <https://doi.org/10.1523/ENEURO.0154-22.2023>`__
+   * - `PyMouseTracks <https://github.com/tf4ong/PMT>`__
+     - |oss|
+     - Raspberry Pi video plus RFID tracking of multiple mice · `paper <https://doi.org/10.1523/ENEURO.0127-22.2023>`__
+   * - `CaT-z <https://github.com/CaT-zTools/CaT-z_Software>`__
+     - |oss|
+     - 3D tracking and automated behaviour classification from RGB-D depth cameras · `paper <https://doi.org/10.3758/s13428-020-01381-9>`__
+   * - `DeepBhvTracking <https://github.com/SunGL001/DeepBhvTracking>`__
+     - |oss|
+     - Deep-learning detection combined with background subtraction for rodent tracking · `paper <https://doi.org/10.3389/fnbeh.2021.750894>`__
+   * - `ART (Automated Rodent Tracker) <https://github.com/BrettHewitt/ART>`__
+     - |oss|
+     - Automated tracking of rodent position, body and nose in open-field video · `paper <https://doi.org/10.1016/j.jneumeth.2017.04.006>`__
+   * - `Pixying Behavior <https://doi.org/10.1523/ENEURO.0245-16.2017>`__
+     - |oss|
+     - Real-time and post hoc tracking of colour-marked body parts with Pixy cameras
+   * - `ArUco marker scoring <https://github.com/tomcatsmith19/ArucoDetection>`__
+     - |oss|
+     - Real-time engagement scoring from fiducial ArUco markers worn by rodents · `paper <https://doi.org/10.1523/ENEURO.0500-23.2024>`__
+   * - `Ethoscopes <https://github.com/gilestrolab/ethoscope>`__
+     - |oss|
+     - Raspberry Pi platform for high-throughput real-time tracking of Drosophila · `paper <https://doi.org/10.1371/journal.pbio.2003026>`__
+   * - `BonZeb <https://github.com/ncguilbeault/BonZeb>`__
+     - |oss|
+     - Bonsai modules for high-resolution zebrafish tracking and closed-loop stimulation · `paper <https://doi.org/10.1038/s41598-021-85896-x>`__
+   * - `Argus <https://doi.org/10.3758/s13428-018-1083-y>`__
+     - |oss|
+     - R application for quantifying zebrafish behaviour from tracking data
+   * - `ZebraTrack <https://doi.org/10.1016/j.jneumeth.2016.07.004>`__
+     - |oss|
+     - Low-cost imaging setup with ImageJ tracking of adult zebrafish
 
 |:label:| **Supervised behavior classification**
 ------------------------------------------------
@@ -236,6 +284,9 @@ run before relying on them.
    * - `PainFace-Recognition <https://github.com/sofiabroome/painface-recognition>`__
      - |oss|
      - Recurrent-network recognition of equine pain expressions from video · `paper <https://doi.org/10.1109/cvpr.2019.01295>`__
+   * - `SaLSa <https://github.com/Sakata-Lab/SaLSa>`__
+     - |oss|
+     - Semi-automatic labelling and LSTM classification of behaviours from pose (MATLAB) · `paper <https://doi.org/10.1523/ENEURO.0201-23.2023>`__
 
 |:crystal_ball:| **Unsupervised behavior discovery**
 ----------------------------------------------------
@@ -271,6 +322,9 @@ run before relying on them.
    * - `MoSeq <https://github.com/dattalab/moseq2-app>`__
      - |oss|
      - Depth-video behavioral syllable segmentation · `paper <https://doi.org/10.1016/j.neuron.2015.11.031>`__
+   * - `SEB3R <https://github.com/gchelini87/SEB3R>`__
+     - |oss|
+     - Segmentation of mouse body language into postures linked to stimulus-evoked emotional behaviour · `paper <https://doi.org/10.1523/ENEURO.0514-22.2023>`__
 
 |:footprints:| **Kinematics and trajectory analysis**
 ------------------------------------------------------
@@ -306,6 +360,39 @@ collective structure -- from pose or centroid tracks, rather than classifying be
    * - `swaRm <https://swarm-lab.github.io/swaRm/>`__
      - |oss|
      - R package for individual and collective movement metrics
+   * - `LocoMouse <https://github.com/careylab/LocoMouse>`__
+     - |oss|
+     - Markerless tracking of paws, nose and tail for whole-body locomotor coordination · `paper <https://doi.org/10.7554/eLife.07892>`__
+   * - `LocoWhisk / ARTv2 <https://github.com/AIEMMU/ARTv2>`__
+     - |oss|
+     - Combined whisker movement and locomotion analysis in rodents · `paper <https://doi.org/10.1016/j.jneumeth.2019.108440>`__
+   * - `Whisker Tracker <https://github.com/DepartmentofNeurophysiology/Matlab-Whisker-Tracker>`__
+     - |oss|
+     - Whisker tracking, released with an open high-speed infrared video database of freely moving rodents · `paper <https://doi.org/10.1093/gigascience/giy134>`__
+   * - `KineMouse Wheel <https://hackaday.io/project/160744-kinemouse-wheel>`__
+     - |oss|
+     - Transparent running wheel for 3D head-fixed locomotion tracking with one camera · `paper <https://doi.org/10.7554/eLife.63596>`__
+   * - `ReachOut <https://github.com/BerezhnoyD/Reaching_Task_VAI>`__
+     - |oss|
+     - Hardware and software for recording and analysing mouse reach-to-grasp
+   * - `MouseMove <https://doi.org/10.1038/srep16171>`__
+     - |oss|
+     - Semi-automated movement and cognitive analysis of open-field tracks
+   * - `Pathfinder <https://github.com/MatthewBCooke/Pathfinder>`__
+     - |oss|
+     - Classifies spatial navigation search strategies in water mazes and similar tasks · `paper <https://doi.org/10.1101/715961>`__
+   * - `STL toolbox <https://github.com/cMadan/stl-toolbox>`__
+     - |oss|
+     - Spectral time-lapse summaries of movement from pre-recorded video · `paper <https://doi.org/10.12688/f1000research.3-19.v1>`__
+   * - `DBscorer <https://github.com/swanandlab/DBscorer>`__
+     - |oss|
+     - Automated immobility scoring in forced-swim and tail-suspension tests · `paper <https://doi.org/10.1523/ENEURO.0305-21.2021>`__
+   * - `MOVE <https://doi.org/10.1111/gbb.12040>`__
+     - |oss|
+     - Motion analysis of conditioned fear and other video-recorded tests
+   * - `LMT-toolkit <https://github.com/ntorquet/lmt_toolkit_analysis>`__
+     - |oss|
+     - Web application for analysing Live Mouse Tracker data
 
 |:frame_with_picture:| **Object detection**
 -------------------------------------------
@@ -361,6 +448,9 @@ these tools cover the audio half of that pipeline.
    * - `Avisoft SASLab <https://avisoft.com/>`__
      - |comm|
      - Bioacoustic recording and sound analysis
+   * - `USVCAM <https://github.com/MatsumotoJ/usvcam>`__
+     - |oss|
+     - Acoustic camera that localises ultrasonic vocalizations to individual mice · `paper <https://doi.org/10.1016/j.isci.2022.104812>`__
 
 |:brain:| **Neural data alignment**
 -----------------------------------
@@ -396,6 +486,15 @@ against when behaviour is paired with neural recording.
    * - `Minian <https://github.com/miniscope/minian>`__
      - |oss|
      - Miniscope calcium imaging analysis pipeline · `paper <https://doi.org/10.7554/eLife.70661>`__
+   * - `neurotic <https://github.com/jpgill86/neurotic>`__
+     - |oss|
+     - Synchronised browsing and annotation of neural signals and behaviour video · `paper <https://doi.org/10.1523/ENEURO.0085-20.2020>`__
+   * - `CAVE <https://github.com/mtlippert/CAVE>`__
+     - |oss|
+     - Combined analysis of head-mounted calcium imaging and behaviour video (MATLAB) · `paper <https://doi.org/10.3389/fnins.2018.00958>`__
+   * - `OpenSync <https://github.com/moeinrazavi/OpenSync>`__
+     - |oss|
+     - Synchronises video, physiological and behavioural data streams · `paper <https://doi.org/10.1016/j.jneumeth.2021.109458>`__
 
 |:jigsaw:| **Data standards and interoperability**
 --------------------------------------------------
@@ -445,6 +544,24 @@ against when behaviour is paired with neural recording.
    * - `AmadeusGPT <https://github.com/AdaptiveMotorControlLab/AmadeusGPT>`__
      - |oss|
      - Natural-language querying of behaviour from pose data · `paper <https://doi.org/10.48550/arxiv.2307.04858>`__
+   * - `Pyper <https://github.com/SainsburyWellcomeCentre/Pyper>`__
+     - |oss|
+     - Real-time or offline open-field tracking with TTL output on region entry
+   * - `Oat <https://github.com/jonnew/Oat>`__
+     - |oss|
+     - Modular real-time animal tracking and video processing programs
+   * - `RAT (Rodent Arena Tracker) <https://hackaday.io/project/162481-rodent-arena-tracker-rat>`__
+     - |oss|
+     - Machine-vision camera for closed-loop rodent tracking and task control · `paper <https://doi.org/10.1523/ENEURO.0485-19.2020>`__
+   * - `Open Ephys tracking plugin <https://github.com/CINPLA/tracking-plugin>`__
+     - |oss|
+     - Behavioural tracking and closed-loop stimulation built on Open Ephys · `paper <https://doi.org/10.1101/340141>`__
+   * - `CLARA <https://github.com/wryanw/CLARA_DLC>`__
+     - |oss|
+     - Closed-loop automated reaching apparatus with real-time DeepLabCut · `paper <https://doi.org/10.1088/1741-2552/ac1ed1>`__
+   * - `Phenopy <https://doi.org/10.1038/nprot.2018.031>`__
+     - |oss|
+     - Python platform for home-cage behavioural phenotyping and data sharing
 
 |:pencil:| **Manual annotation**
 --------------------------------
@@ -549,6 +666,18 @@ Video-based
    * - `Vium Digital Vivarium <https://recursion.com/news/recursion-acquires-vium-bolstering-its-efforts-to-industrialize-drug-discovery>`__
      - Video + sensors
      - Smart housing with continuous video and computer-vision digital biomarkers; acquired by Recursion in 2020 and no longer sold (Vium)
+   * - `AVERT <https://doi.org/10.1002/cpmo.80>`__
+     - Video + ultrasonic audio
+     - Continuous home-cage video with 24-hour ultrasonic vocalization recording (MRC Harwell)
+   * - `Raspberry Rat <https://github.com/lapphe/raspberry_rat>`__
+     - Video
+     - Open-source Raspberry Pi platform for scheduled home-cage video recording and cloud upload
+   * - `Dual Cage <https://doi.org/10.3389/fnbeh.2014.00314>`__
+     - Video
+     - Automated home cage for avoidance and risk-assessment testing; no longer sold (Biobserve)
+   * - `Automated Figure-8 Maze <https://doi.org/10.3389/fnbeh.2021.655449>`__
+     - Video
+     - Home-cage-attached delayed-alternation maze for longitudinal working memory; no longer sold (Biobserve)
 
 Individual ID in group housing (RFID)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -586,6 +715,15 @@ Individual ID in group housing (RFID)
    * - `UCT-2112 temperature microchip <https://www.uidevices.com/laboratory-animal-temperature/>`__
      - Passive RFID
      - Implantable chip returning ID and body temperature on a single scan; a component rather than a system (Unified Information Devices)
+   * - `Eco-HAB <https://doi.org/10.7554/eLife.19532>`__
+     - RFID
+     - Four-compartment RFID system for social behaviour and hierarchy in group-housed mice; open source
+   * - `MoPSS <https://doi.org/10.3758/s13428-021-01593-7>`__
+     - RFID
+     - Mouse Position Surveillance System: RFID position tracking in the home cage; open source
+   * - `Automated Visible Burrow System <https://doi.org/10.1016/j.isci.2023.105998>`__
+     - RFID + video
+     - Burrow-style colony cage with RFID and video tracking; open cage design and analysis scripts
 
 Cage-level activity and environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -626,6 +764,79 @@ Cage-level activity and environment
    * - `SmartWaiter <https://www.cibertec.es/en/>`__
      - Automatic feeder
      - Feeding and drinking patterns at cage level (Cibertec)
+   * - `COMPASS <https://doi.org/10.12688/wellcomeopenres.9892.2>`__
+     - Passive IR
+     - Continuous activity and sleep monitoring from passive-infrared sensors; open source
+   * - `Actifield <https://doi.org/10.1016/j.ohx.2018.e00047>`__
+     - IR beams
+     - Open-source automated actimeter for rodents
+   * - `Microwave motion detector <https://doi.org/10.1186/s13036-017-0079-y>`__
+     - Microwave radar
+     - Low-cost radar-based home-cage activity detector; open source
+   * - `Open Face Home Cage Running Wheel <https://github.com/borglandlab/RunningWheel>`__
+     - Running wheel
+     - Open-source home-cage running wheel with logging · `paper <https://doi.org/10.1523/ENEURO.0246-22.2022>`__
+   * - `Low-Profile Wireless Running Wheel <https://med-associates.com/product/low-profile-wireless-running-wheel/>`__
+     - Running wheel
+     - Wireless running wheel that fits standard IVCs (Med Associates)
+   * - `ClockLab <https://actimetrics.com/>`__
+     - Running wheel + IR
+     - Circadian activity monitoring with running wheels and motion sensors (Actimetrics)
+   * - `MyVivarium <https://github.com/myvivarium/MyVivarium>`__
+     - Ambient sensors
+     - Open-source colony management with real-time cage environment sensing · `paper <https://doi.org/10.1016/j.csbj.2025.01.025>`__
+
+Feeding and drinking (open source)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. rst-class:: simba-modality
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 14 64
+
+   * - System
+     - Modality
+     - Description
+   * - `FED3 <https://github.com/KravitzLabDevices/FED3>`__
+     - Pellet dispenser
+     - Home-cage feeding device that measures food intake and runs operant tasks · `paper <https://doi.org/10.7554/eLife.66173>`__
+   * - `Sipper <https://hackaday.io/project/160388-automated-mouse-homecage-two-bottle-choice-test-v2>`__
+     - Lickometer
+     - Home-cage two-bottle-choice lick detection; SipperViz for analysis · `paper <https://doi.org/10.1523/ENEURO.0292-19.2019>`__
+   * - `LIQ HD <https://github.com/nickpetersen93/LIQ_HD>`__
+     - Lickometer
+     - Lick-level drinking measurement across many home cages · `paper <https://doi.org/10.1523/ENEURO.0506-22.2023>`__
+   * - `FARESHARE <https://github.com/jfrie/FARESHARE>`__
+     - Lickometer + RFID
+     - Drinking microstructure of individual socially housed rodents · `paper <https://doi.org/10.1038/s44277-024-00002-z>`__
+   * - `PiDose <https://hackaday.io/project/170032-pidose>`__
+     - RFID + drinking spout
+     - Automated oral drug dosing of individual group-housed mice · `paper <https://doi.org/10.1038/s41598-020-68477-2>`__
+
+
+Automated testing and training in the home cage
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. rst-class:: simba-modality
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 14 64
+
+   * - System
+     - Modality
+     - Description
+   * - `HASRA <https://github.com/SilasiLab/HASRA>`__
+     - RFID + video
+     - Individualised skilled-reaching training of group-housed mice · `paper <https://doi.org/10.1523/ENEURO.0242-20.2020>`__
+   * - `DIY-NAMIC <https://github.com/DIY-NAMICsystem>`__
+     - Nose-poke + lickometer
+     - High-throughput operant phenotyping in the home cage · `paper <https://doi.org/10.1523/ENEURO.0160-20.2020>`__
+   * - `Home-cage mesoscale imaging <https://doi.org/10.7554/eLife.55964>`__
+     - RFID + imaging
+     - Self-initiated head fixation for task training and cortical imaging in the home cage
+
 
 Metabolic phenotyping cages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
