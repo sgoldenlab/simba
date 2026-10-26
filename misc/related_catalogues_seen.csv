@@ -46,6 +46,62 @@ Home Cage Monitoring Catalogue,44,SmartWaiter,https://www.cibertec.es/en/compone
 Home Cage Monitoring Catalogue,45,The Observer XT,https://www.noldus.com/observer-xt,2026-10-25,listed
 Home Cage Monitoring Catalogue,46,Ugo Basile Activity Cage,https://ugobasile.com/products/categories/motory-coordination/activity-cage-spontaneous-activity-for-mice-and-rats,2026-10-25,listed
 Home Cage Monitoring Catalogue,47,UID Mouse Matrix,https://www.uidevices.com/home-cage-monitoring/,2026-10-25,listed
+Open Neuroscience,A_Flexible_Platform_for_Monitoring_Cerebellum_Dependent_Sensory_Associative_Learning,A Flexible Platform for Monitoring Cerebellum-Dependent Sensory Associative Learning,https://github.com/gerardjb/assocLearnRig,2026-10-26,skip
+Open Neuroscience,A_place_to_discuss_experimental_methods_in_animal_behaviour,A place to discuss experimental methods in animal behaviour,https://open-neuroscience.com/en/post/a_place_to_discuss_experimental_methods_in_animal_behaviour/,2026-10-26,skip
+Open Neuroscience,An_artificial_neural_network_for_automated_behavioral_state_classification_in_rats,An artificial neural network for automated behavioral state classification in rats,https://github.com/jellen44/AutomaticSleepScoringTool,2026-10-26,skip
+Open Neuroscience,ArControl_Arduino_Digital_I_O_System,ArControl - Arduino Digital I/O System,https://github.com/chenxinfeng4/ArControl,2026-10-26,skip
+Open Neuroscience,Automated_Operant_Conditioning,Automated Operant Conditioning,https://github.com/raffaelemazziotti/oc_chamber,2026-10-26,skip
+Open Neuroscience,Autopilot,Autopilot,https://docs.auto-pi-lot.com/,2026-10-26,skip
+Open Neuroscience,BORIS,BORIS,https://open-neuroscience.com/en/post/boris/,2026-10-26,listed
+Open Neuroscience,Bonsai,Bonsai,https://bonsai-rx.org/,2026-10-26,listed
+Open Neuroscience,Bonvision,Bonvision,http://bonvision.github.io,2026-10-26,skip
+Open Neuroscience,Bpod,Bpod,https://sanworks.github.io/Bpod_Wiki/,2026-10-26,skip
+Open Neuroscience,COGAIN_Association_COmmunication_by_GAze_INteraction_,COGAIN Association (COmmunication by GAze INteraction),https://www.cogain.org/,2026-10-26,skip
+Open Neuroscience,Chronic_Recoverable_Neuropixels_in_Mice,Chronic Recoverable Neuropixels in Mice,https://open-neuroscience.com/en/post/chronic_recoverable_neuropixels_in_mice/,2026-10-26,skip
+Open Neuroscience,Computer_controlled_dog_treat_dispenser,Computer-controlled dog treat dispenser,https://github.com/unl-cchil/canine_treat_dispenser,2026-10-26,skip
+Open Neuroscience,DANNCE,DANNCE,https://github.com/spoonsso/dannce/,2026-10-26,listed
+Open Neuroscience,DeepLabCut,DeepLabCut,http://deeplabcut.org/,2026-10-26,listed
+Open Neuroscience,DeepLabStream,DeepLabStream,https://github.com/SchwarzNeuroconLab/DeepLabStream,2026-10-26,listed
+Open Neuroscience,Deep_Cinac,Deep Cinac,https://gitlab.com/cossartlab/deepcinac,2026-10-26,skip
+Open Neuroscience,Efficient_training_of_mice_on_the_5_choice_serial_reaction_time_task_in_an_automated_rodent_training_system,Efficient training of mice on the 5-choice serial reaction time task in an automated rodent training system,https://github.com/hangyabalazs/ATS,2026-10-26,skip
+Open Neuroscience,Ethoscopes,Ethoscopes,http://lab.gilest.ro/ethoscope,2026-10-26,listed
+Open Neuroscience,FastTrack,FastTrack,https://github.com/FastTrackOrg/FastTrack,2026-10-26,listed
+Open Neuroscience,Feeding_Experimentation_Device_ver3_FED3_,Feeding Experimentation Device ver3 (FED3),https://github.com/KravitzLabDevices/FED3,2026-10-26,listed
+Open Neuroscience,FishCam,FishCam,https://www.sciencedirect.com/science/article/pii/S2468067220300195,2026-10-26,skip
+Open Neuroscience,GuPPy_a_Python_toolbox_for_the_analysis_of_fiber_photometry_data,"GuPPy, a Python toolbox for the analysis of fiber photometry data",https://github.com/LernerLab/GuPPy,2026-10-26,listed
+Open Neuroscience,Head_Mounted_Mesoscope,Head-Mounted Mesoscope,https://www.biorxiv.org/content/10.1101/2020.05.25.114892v1.full.pdf,2026-10-26,skip
+Open Neuroscience,KineMouse_Wheel,KineMouse Wheel,https://hackaday.io/project/160744-kinemouse-wheel,2026-10-26,listed
+Open Neuroscience,LED_Zappelin_,LED Zappelin,https://github.com/BadenLab/LED-Zappelin,2026-10-26,skip
+Open Neuroscience,Mouse_VR,Mouse VR,https://github.com/HarveyLab/mouseVR,2026-10-26,skip
+Open Neuroscience,NC4Gate_A_modular_gate_system_for_autonomous_control_of_rodent_behavior,NC4Gate: A modular gate system for autonomous control of rodent behavior,https://osf.io/uy7ez,2026-10-26,listed
+Open Neuroscience,Neurodata_Without_Borders,Neurodata Without Borders,https://www.nwb.org/,2026-10-26,skip
+Open Neuroscience,OPETH_Open_Source_Solution_for_Real_Time_Peri_Event_Time_Histogram_Based_on_Open_Ephys,OPETH: Open Source Solution for Real-Time Peri-Event Time Histogram Based on Open Ephys,https://github.com/hangyabalazs/opeth,2026-10-26,skip
+Open Neuroscience,Open_Source_Syringe_Pump_Controller,Open Source Syringe Pump Controller,https://github.com/LaubachLab/OpenSourceSyringePump,2026-10-26,skip
+Open Neuroscience,Open_Source_Tools_for_Temporally_Controlled_Rodent_Behavior_Suitable_for_Electrophysiology_and_Optogenetic_Manipulations,Open Source Tools for Temporally Controlled Rodent Behavior Suitable for Electrophysiology and Optogenetic Manipulations,https://github.com/hangyabalazs/Rodent_behavior_setup,2026-10-26,skip
+Open Neuroscience,Optogenetics_TTL_driver,Optogenetics TTL driver,https://hackaday.io/project/184318-optogenetics-ttl-driver,2026-10-26,skip
+Open Neuroscience,PiDose,PiDose,https://osf.io/rpyfm/,2026-10-26,listed
+Open Neuroscience,PiVR,PiVR,http://www.PiVR.org,2026-10-26,listed
+Open Neuroscience,Pi_USB_Cam_An_Affordable_Simple_Powerful_Versatle_DIY_Video_Recording_Solution_for_Behavioral_Neuroscientists,"Pi USB Cam - An Affordable, Simple, Powerful, & Versatle DIY Video Recording Solution for Behavioral Neuroscientists",https://doi.org/10.1523/ENEURO.0224-22.2022,2026-10-26,listed
+Open Neuroscience,Pirecorder_Controlled_and_automated_image_and_video_recording_with_the_raspberry_pi,Pirecorder: Controlled and automated image and video recording with the raspberry pi,https://github.com/JolleJolles/pirecorder,2026-10-26,listed
+Open Neuroscience,Psygo,Psygo,https://github.com/henry-burgess/psygo,2026-10-26,skip
+Open Neuroscience,Raspberry_Pi_controlled_precise_treat_dispenser,Raspberry Pi controlled precise treat dispenser,https://github.com/unl-cchil/canine_precise_dispenser,2026-10-26,skip
+Open Neuroscience,SLEAP,SLEAP,https://sleap.ai,2026-10-26,listed
+Open Neuroscience,Simple_Behavioral_Analysis_SimBA,Simple Behavioral Analysis (SimBA),https://github.com/sgoldenlab/simba,2026-10-26,skip
+Open Neuroscience,SqueakR_An_Experiment_Interface_for_DeepSqueak_Bioacoustics_Research,SqueakR: An Experiment Interface for 'DeepSqueak' Bioacoustics Research,https://github.com/osimon81/SqueakR,2026-10-26,skip
+Open Neuroscience,Stytra,Stytra,https://github.com/portugueslab/stytra,2026-10-26,listed
+Open Neuroscience,The_Open_Source_UCLA_Miniscope_Project,The Open-Source UCLA Miniscope Project,http://miniscope.org/index.php/Main_Page,2026-10-26,skip
+Open Neuroscience,The_home_cage_automated_skilled_reaching_apparatus_HASRA_individualized_training_of_group_housed_mice_in_a_single_pellet_reaching_task,The home cage automated skilled reaching apparatus HASRA individualized training of group housed mice in a single pellet reaching task,https://github.com/SilasiLab/HASRAv2,2026-10-26,listed
+Open Neuroscience,TopMouseTracker,TopMouseTracker,https://github.com/Tom-top/TopMouseTracker,2026-10-26,listed
+Open Neuroscience,Trackoscope,Trackoscope,https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0306700,2026-10-26,listed
+Open Neuroscience,VocalMat,VocalMat,https://www.dietrich-lab.org/vocalmat,2026-10-26,listed
+Open Neuroscience,Zapit,Zapit,https://github.com/Zapit-Optostim/zapit/,2026-10-26,skip
+Open Neuroscience,autoreward2,Autoreward 2,https://open-neuroscience.com/en/post/autoreward2/,2026-10-26,skip
+Open Neuroscience,jsPsych,jsPsych,https://www.jspsych.org,2026-10-26,skip
+Open Neuroscience,lab_js,lab.js,https://lab.js.org,2026-10-26,skip
+Open Neuroscience,movement,movement,https://movement.neuroinformatics.dev/,2026-10-26,listed
+Open Neuroscience,openEyeTrack_An_open_source_high_speed_eyetracker,openEyeTrack - An open source high-speed eyetracker,https://github.com/chand-lab/openEyeTrack,2026-10-26,skip
+Open Neuroscience,pyControl,PyControl,https://pycontrol.readthedocs.io/en/latest/,2026-10-26,skip
+Open Neuroscience,skinnerbox_rpi_python,Skinner Box with RPi+Python,https://open-neuroscience.com/en/post/skinnerbox_rpi_python/,2026-10-26,skip
 OpenBehavior,926,ROBucket: Rodent Operant Bucket,https://edspace.american.edu/openbehavior/project/robucket/,2026-10-25,listed
 OpenBehavior,955,Feeding Experimentation Device,https://edspace.american.edu/openbehavior/project/feeding-experimentation-device/,2026-10-25,listed
 OpenBehavior,991,JAABA,https://edspace.american.edu/openbehavior/project/jaaba/,2026-10-25,listed

@@ -196,6 +196,7 @@
    * Multi-scale autoencoder for social behavior
    * MUPET
    * MyVivarium
+   * NC4Gate
    * ndx-pose
    * Nematode aggression state model
    * Neonatal mouse withdrawal tracking
@@ -230,9 +231,12 @@
    * PhenoRack
    * PhenoTyper
    * Photometry-behavior state-space framework
+   * Pi USB Cam
    * PiDose
    * Pigeon behavior classifier
    * PiRATeMC
+   * Pirecorder
+   * PiVR
    * Pixying Behavior
    * pMAT
    * PoseR
@@ -291,8 +295,10 @@
    * Territorial behavior assay
    * TIBA
    * Tierpsy Tracker
+   * TopMouseTracker
    * ToxTrac
    * TrackMate
+   * Trackoscope
    * Trackpaw
    * Tracktor
    * traja

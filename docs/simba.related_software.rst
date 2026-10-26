@@ -29,6 +29,8 @@ told apart in a socially housed cage. The table is updated weekly.
      neuroscience research, including hardware and software.
    * `Home Cage Monitoring Technologies Catalog <https://www.thebehaviourdatabase.org/catalogue.php>`__
      (The Behaviour Database) -- home-cage monitoring systems.
+   * `Open Neuroscience <https://open-neuroscience.com/>`__ -- a community-curated list of open-source
+     neuroscience projects, including behavior hardware and software.
 
    .. raw:: html
       :file: _generated/related_catalogues_new.html

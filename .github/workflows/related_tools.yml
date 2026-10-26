@@ -41,7 +41,7 @@ jobs:
         shell: bash
         run: python misc/related_software_activity.py | tee -a "$RUNNER_TEMP/related_tools.log"
 
-      # Lists tools newly added to OpenBehavior and the Home Cage Monitoring Catalogue that are not on the page yet.
+      # Lists tools newly added to OpenBehavior, the Home Cage Monitoring Catalogue and Open Neuroscience that are not on the page yet.
       - name: Check other tool catalogues for new entries
         shell: bash
         run: python misc/related_catalogues_update.py | tee -a "$RUNNER_TEMP/related_tools.log"

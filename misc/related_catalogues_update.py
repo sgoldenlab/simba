@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Watch two external tool catalogues for entries that are not on the Related Software page yet:
+Watch three external tool catalogues for entries that are not on the Related Software page yet:
 
 * OpenBehavior (https://edspace.american.edu/openbehavior/) -- projects in its video-analysis and
   home-cage categories, read from the site's public WordPress API;
 * the Home Cage Monitoring Technologies Catalogue (https://www.thebehaviourdatabase.org/catalogue.php),
-  read from the JSON the catalogue page itself loads.
+  read from the JSON the catalogue page itself loads;
+* Open Neuroscience (https://open-neuroscience.com/) -- projects tagged Behaviour, read from the site's
+  source on GitHub (one markdown file per project).
 
 Every entry seen is recorded in misc/related_catalogues_seen.csv, so each one is reported once. Entries
 that are new since the last run and not already in the table (matched by name or link
@@ -16,7 +18,7 @@ until the tool is added to misc/related_software.csv (or marked ``skip`` in the 
 Run:  python misc/related_catalogues_update.py           (weekly, by .github/workflows/related_tools.yml)
       python misc/related_catalogues_update.py --seed    (record everything as seen without listing it)
 """
-import csv, html, json, os, re, sys, urllib.request
+import csv, html, io, json, os, re, sys, tarfile, urllib.request
 from datetime import date
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -29,6 +31,8 @@ OB_API = "https://edspace.american.edu/openbehavior/wp-json/wp/v2/"
 OB_CATEGORIES = {"1Video Analysis", "Behavior Video Analysis", "Homecage"}
 HCM_DATA = "https://thebehaviourdatabase.org/get_data.php"
 HCM_PAGE = "https://www.thebehaviourdatabase.org/catalogue.php"
+ON_SOURCE = "https://codeload.github.com/open-neuroscience/open-neuroscience.github.io/tar.gz/HEAD"
+ON_POST = "https://open-neuroscience.com/en/post/"
 FIELDS = ["source", "id", "name", "url", "first_seen", "status"]   # status: listed | new | skip
 
 
@@ -66,6 +70,28 @@ def home_cage_catalogue():
             for s in get_json(HCM_DATA)["systems"]]
 
 
+def open_neuroscience():
+    req = urllib.request.Request(ON_SOURCE, headers={"User-Agent": "simba-related-catalogues"})
+    with urllib.request.urlopen(req, timeout=120) as r:
+        tar = tarfile.open(fileobj=io.BytesIO(r.read()), mode="r:gz")
+    out = []
+    for m in tar.getmembers():
+        parts = m.name.split("/")
+        if not (m.isfile() and parts[-1] == "index.md" and parts[-3:-2] == ["post"]):
+            continue
+        text = tar.extractfile(m).read().decode("utf-8", "replace")
+        tags = re.search(r"^tags:\s*\[(.*)\]", text, re.M)
+        title = re.search(r"^title:\s*(.+)$", text, re.M)
+        if not (tags and title and "behaviour" in tags.group(1).lower()):
+            continue
+        link = re.search(r"## Project Links\s+(\S+)", text)
+        url = link.group(1) if link else ""
+        if not url.startswith("http"):
+            url = ON_POST + parts[-2].lower() + "/"
+        out.append({"source": "Open Neuroscience", "id": parts[-2], "name": title.group(1).strip().strip("'\""), "url": url})
+    return out
+
+
 def norm(s):
     return re.sub(r"[^a-z0-9]", "", s.lower())
 
@@ -94,7 +120,8 @@ def main():
             seen = {(r["source"], r["id"]): r for r in csv.DictReader(f)}
 
     entries, failed = [], []
-    for name, fetch in (("OpenBehavior", openbehavior), ("Home Cage Monitoring Catalogue", home_cage_catalogue)):
+    for name, fetch in (("OpenBehavior", openbehavior), ("Home Cage Monitoring Catalogue", home_cage_catalogue),
+                        ("Open Neuroscience", open_neuroscience)):
         try:
             entries += fetch()
         except Exception as e:
