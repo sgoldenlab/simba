@@ -67,7 +67,9 @@ SPECIES_RULES = [("Mouse", r"\b(mouse|mice)\b"), ("Rat", r"\brats?\b"), ("Zebraf
                  ("Marmoset", r"\bmarmosets?\b")]
 SEEN_COLS = ["doi", "verdict", "year", "source", "checked", "title"]
 TOOL_COLS = ["tool_name", "label", "title", "year", "category", "species", "one_line", "code_url", "doi", "other_dois",
-             "authors", "venue", "preprint", "cited_by", "gh_stars", "gh_pushed", "gh_archived", "details"]
+             "authors", "venue", "preprint", "cited_by", "gh_stars", "gh_pushed", "gh_archived", "details",
+             "gh_license", "gh_language", "pypi", "pypi_release",   # filled by related_software_activity.py
+             "shown_species", "behaviors", "setup", "animals", "input", "output", "interface"]   # reviewed by hand
 GITHUB_REPO_RE = re.compile(r"github\.com/([\w.-]+)/([\w.-]+)")
 PREPRINT_VENUES = ("biorxiv", "medrxiv", "arxiv", "research square", "ssrn", "preprints.org")
 

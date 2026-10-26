@@ -8,8 +8,10 @@ SimBA. Many of those do some or all of what SimBA does with a different approach
 so they are worth comparing when choosing a tool; others handle one step of the pipeline, such as
 pose estimation or tracking, and can be used alongside SimBA.
 
-Search the table or filter it by section, type and source, and click a row for a fuller description
-with code and paper links. Tools marked |simba-import| produce data SimBA reads directly -- pose
+Search the table or filter it by section, type, source, species and behavior, and click a row for a
+fuller description with code and paper links. The species, behaviors, setup, animals, input, output and
+interface listed for a tool are what its paper or README states (*shown on* means demonstrated on, not
+limited to); *Unknown* means the source does not say, not that the tool lacks it. Tools marked |simba-import| produce data SimBA reads directly -- pose
 formats through its pose-import tools, and frame-wise annotations through its
 :doc:`third-party label appenders <simba.third_party_label_appenders>`. Open-source tools whose
 GitHub repository has not been updated in two years are tagged *no updates since* (or *archived*),

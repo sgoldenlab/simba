@@ -8,7 +8,8 @@ Generate the Related Software page's tool table and its plain-text index:
 
 Rows come from two CSVs:
 
-* misc/related_software.csv -- the curated list, grouped by section (edit this file by hand);
+* misc/related_software.csv -- the curated list, grouped by section (edit this file by hand; a tool that
+  fits several sections lists the others, separated by ";", in its also_in column);
 * misc/related_tools.csv    -- tools introduced by papers that cite SimBA (maintained by
   misc/related_tools_update.py).
 
@@ -75,6 +76,17 @@ def gh_fields(r):
             "ga": r.get("gh_archived") == "1"}
 
 
+LISTS = {"sp": "shown_species", "bh": "behaviors", "su": "setup", "inp": "input", "outp": "output", "ui": "interface"}
+
+
+def extra_fields(r):
+    """Hand-reviewed descriptors (lists; empty = not reviewed yet) and the GitHub / PyPI facts."""
+    t = {k: [x.strip() for x in r.get(col, "").split(";") if x.strip()] for k, col in LISTS.items()}
+    t.update(an=r.get("animals", "").strip(), gl=r.get("gh_license", "").strip(), lang=r.get("gh_language", "").strip(),
+             pypi=r.get("pypi", "").strip(), pyr=r.get("pypi_release", "").strip())
+    return t
+
+
 def load():
     citing = {norm(r["tool_name"]): r for r in read(SRC) if r["tool_name"].strip()}
     used, tools = set(), []
@@ -84,12 +96,14 @@ def load():
         if "doi.org/" in url:   # the tool's only link is its paper
             url, paper = "", paper or url
         t = {"n": r["name"].strip(), "lb": "", "c": r["section"].strip(), "sub": r["subsection"].strip(),
-             "lic": lic, "mod": r["modality"].strip(), "si": r["simba_import"] == "1", "d": r["description"].strip(),
+             "ca": [x.strip() for x in r.get("also_in", "").split(";") if x.strip()], "lic": lic, "mod": r["modality"].strip(), "si": r["simba_import"] == "1", "d": r["description"].strip(),
              "dl": r.get("details", "").strip(),
              "web": url, "wk": "code" if CODE_HOSTS.search(url) else "website",
              "code": url if (CODE_HOSTS.search(url) or (url and lic == "Open source")) else "", "url": paper,
-             "y": 0, "au": "", "v": "", "p": False, "cb": 0, "t": "", "s": "", "alt": [], "src": "c"}
+             "y": int(r["year"]) if r.get("year", "").isdigit() else 0, "au": r.get("authors", "").strip(),
+             "v": r.get("venue", "").strip(), "p": False, "cb": int(r.get("cited_by") or 0), "t": "", "s": "", "alt": [], "src": "c"}
         t.update(gh_fields(r))
+        t.update(extra_fields(r))
         keys = [norm(t["n"]), norm(t["n"].split("(")[0]), norm(t["n"].split(" / ")[0]), norm(ALIASES.get(t["n"], ""))]
         c = next((citing[k] for k in keys if k in citing), None)
         if c:   # also introduced by a paper citing SimBA: add the paper's metadata
@@ -100,6 +114,7 @@ def load():
             t["url"] = t["url"] or c["doi"].strip()
             if t["gs"] < 0:
                 t.update(gh_fields(c))
+            t.update({k: v for k, v in extra_fields(c).items() if v and not t[k]})
         tools.append(t)
     for k, r in [(norm(r["tool_name"]), r) for r in read(SRC)]:
         if k and k in used:
@@ -110,6 +125,7 @@ def load():
              "web": code, "wk": "code", "code": code, "url": r["doi"].strip(), "src": "s"}
         t.update(citing_fields(r))
         t.update(gh_fields(r))
+        t.update(extra_fields(r))
         tools.append(t)
     return tools
 
@@ -128,14 +144,17 @@ def main():
     tools = load()
     order = {s: i for i, s in enumerate(SECTIONS)}
     tools.sort(key=lambda t: (order.get(t["c"], len(SECTIONS)), (t["n"] or t["lb"] or t["t"]).lower()))
-    present = [s for s in SECTIONS if any(t["c"] == s for t in tools)]
+    present = [s for s in SECTIONS if any(s == t["c"] or s in t.get("ca", []) for t in tools)]
     years = sorted({t["y"] for t in tools if t["y"]}, reverse=True)
+    vocab = lambda k: sorted({v for t in tools for v in t[k] if v not in ("Unknown", "Not applicable")},
+                             key=lambda v: (v.startswith("Any"), v.startswith("Other"), v))
     j = lambda o: json.dumps(o, ensure_ascii=False).replace("</", "<\\/")
     n_cur = sum(t["src"] != "s" for t in tools)
     out = (TEMPLATE.replace("__DATE__", date.today().strftime("%B %d, %Y"))
            .replace("__TOTAL__", str(len(tools))).replace("__NCUR__", str(n_cur))
            .replace("__NCIT__", str(sum(t["src"] != "c" for t in tools)))
-           .replace("__DATA__", j(tools)).replace("__CATS__", j(present)).replace("__YEARS__", j(years)))
+           .replace("__DATA__", j(tools)).replace("__CATS__", j(present)).replace("__YEARS__", j(years))
+           .replace("__SPECIES__", j(vocab("sp"))).replace("__BEHAVIORS__", j(vocab("bh"))))
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(out)
@@ -237,12 +256,16 @@ TEMPLATE = r"""<style>
     <select id="rtLic" aria-label="Filter by type"><option value="">All types</option><option>Open source</option><option>Commercial</option><option>Freeware</option></select>
     <select id="rtSrc" aria-label="Filter by source"><option value="">All sources</option><option value="c">Curated list</option><option value="s">Papers citing SimBA</option></select>
     <select id="rtYr" aria-label="Filter by year"><option value="">All years</option></select>
+    <select id="rtSp" aria-label="Filter by species" title="Species-agnostic tools are included for every species"><option value="">All species</option></select>
+    <select id="rtBh" aria-label="Filter by behavior" title="Tools for user-defined behaviors are included for every behavior"><option value="">All behaviors</option></select>
   </div>
   <div class="simba-rt-bar simba-rt-checks">
     <label title="Produces data SimBA reads directly (pose formats or frame-wise annotations)"><input id="rtSi" type="checkbox"> SimBA import</label>
     <label title="Only tools with a public code or data link"><input id="rtCode" type="checkbox"> Has code</label>
     <label title="Only tools with a linked paper"><input id="rtPaper" type="checkbox"> Has paper</label>
     <label title="Hide tools whose GitHub repository is archived or has not been updated in two years"><input id="rtMaint" type="checkbox"> Hide unmaintained</label>
+    <label title="Tools with a graphical user interface"><input id="rtGui" type="checkbox"> Has GUI</label>
+    <label title="Tools that handle several animals at once"><input id="rtMulti" type="checkbox"> Multiple animals</label>
     <button id="rtReset" type="button">Reset</button>
   </div>
   <p class="simba-rt-count" id="rtCount" aria-live="polite"></p>
@@ -260,18 +283,26 @@ TEMPLATE = r"""<style>
 </div>
 <script>
 (function(){
-  const D = __DATA__, CAT = __CATS__, YR = __YEARS__;
+  const D = __DATA__, CAT = __CATS__, YR = __YEARS__, SP = __SPECIES__, BH = __BEHAVIORS__;
   const $ = id => document.getElementById(id);
   const q = $("rtQ"), cat = $("rtCat"), lic = $("rtLic"), src = $("rtSrc"), yr = $("rtYr"), body = $("rtBody");
   const si = $("rtSi"), hasCode = $("rtCode"), hasPaper = $("rtPaper"), maint = $("rtMaint");
+  const sp = $("rtSp"), bh = $("rtBh"), gui = $("rtGui"), multi = $("rtMulti");
+  const ANY_SP = "Any (species-agnostic)", ANY_BH = "Any (user-defined)";
   const STALE_MONTHS = 24, now = new Date(), nowM = now.getFullYear() * 12 + now.getMonth();
   let shown = D;
   CAT.forEach(c => cat.add(new Option(c, c)));
   YR.forEach(y => yr.add(new Option(y, y)));
+  SP.forEach(v => sp.add(new Option(v, v)));
+  BH.forEach(v => bh.add(new Option(v, v)));
   D.forEach(d => {
     d.key = (d.n || d.lb || d.t).toLowerCase();
     d.ci = CAT.indexOf(d.c);
-    d.hay = [d.n, d.lb, d.t, d.au, d.v, d.c, d.sub, d.s, d.d, d.dl, d.mod, d.lic, d.y].join(" ").toLowerCase();
+    d.ca = d.ca || [];
+    d.cas = d.ca.join("; ");
+    d.hay = [d.n, d.lb, d.t, d.au, d.v, d.c, d.cas, d.sub, d.s, d.d, d.dl, d.mod, d.lic, d.y,
+             d.sp.join(" "), d.bh.join(" "), d.su.join(" "), d.inp.join(" "), d.outp.join(" "), d.lang].join(" ").toLowerCase();
+    ["sp", "bh", "su", "inp", "outp", "ui"].forEach(k => d[k + "s"] = d[k].join("; "));
     d.old = d.ga ? "Archived" : (d.gp && nowM - (+d.gp.slice(0, 4) * 12 + +d.gp.slice(5, 7) - 1) >= STALE_MONTHS ? "No updates since " + d.gp.slice(0, 4) : "");
   });
   let key = "ci", dir = 1;
@@ -302,12 +333,15 @@ TEMPLATE = r"""<style>
   function render() {
     const words = q.value.toLowerCase().split(/\s+/).filter(Boolean);
     const rows = D.filter(d =>
-      (!cat.value || d.c === cat.value) &&
+      (!cat.value || d.c === cat.value || d.ca.includes(cat.value)) &&
       (!lic.value || d.lic === lic.value) &&
       (!src.value || d.src.includes(src.value)) &&
       (!yr.value || String(d.y) === yr.value) &&
       (!si.checked || d.si) && (!hasCode.checked || d.code) && (!hasPaper.checked || d.url) &&
       (!maint.checked || !d.old) &&
+      (!sp.value || d.sp.includes(sp.value) || d.sp.includes(ANY_SP)) &&
+      (!bh.value || d.bh.includes(bh.value) || d.bh.includes(ANY_BH)) &&
+      (!gui.checked || d.ui.includes("GUI")) && (!multi.checked || d.an.startsWith("Multiple")) &&
       words.every(w => d.hay.includes(w)));
     rows.sort((a, b) => {
       const x = a[key], y = b[key];
@@ -339,6 +373,7 @@ TEMPLATE = r"""<style>
       tr.appendChild(td);
       const sc = el("td", "sec", d.c);
       if (d.sub) sc.appendChild(el("span", "sub", d.sub));
+      if (d.ca.length) sc.appendChild(el("span", "sub", "also: " + d.cas));
       tr.appendChild(sc);
       const tc = el("td", "c-ty");
       if (d.lic) tc.appendChild(el("span", "ty " + TY[d.lic], d.lic));
@@ -360,7 +395,18 @@ TEMPLATE = r"""<style>
           d.alt.forEach((u, i) => { if (i) s.appendChild(document.createTextNode(", ")); s.appendChild(link(u.replace(/^https?:\/\/(doi\.org\/)?/, ""), u)); });
           line("Other versions", s);
         }
-        if (d.s) line("Species", d.s);
+        const tags = (label, v) => { if (v.length) line(label, v.join(", ")); };
+        tags("Shown on", d.sp.length ? d.sp : (d.s ? [d.s] : []));
+        tags("Behaviors", d.bh);
+        tags("Setup", d.su);
+        if (d.an) line("Animals", d.an);
+        tags("Input", d.inp);
+        tags("Output", d.outp);
+        tags("Interface", d.ui);
+        const code = [d.lang && "language " + d.lang,
+                      d.gl && "license " + (d.gl === "Not detected" ? "not detected by GitHub (check the repository)" : d.gl),
+                      d.pypi && "pip install " + d.pypi + (d.pyr ? " (latest release " + month(d.pyr) + ")" : "")].filter(Boolean);
+        if (code.length) line("From GitHub / PyPI", code.join(" · "));
         line("Listed", d.src === "c" ? "curated list" : d.src === "s" ? "introduced by a paper citing SimBA" : "curated list; also introduced by a paper citing SimBA");
         c.appendChild(box); dt.appendChild(c); body.appendChild(dt);
       }
@@ -382,18 +428,20 @@ TEMPLATE = r"""<style>
     th.setAttribute("aria-sort", dir > 0 ? "ascending" : "descending");
     render();
   }));
-  [q, cat, lic, src, yr, si, hasCode, hasPaper, maint].forEach(e => e.addEventListener("input", update));
+  [q, cat, lic, src, yr, sp, bh, si, hasCode, hasPaper, maint, gui, multi].forEach(e => e.addEventListener("input", update));
   $("rtReset").addEventListener("click", () => {
-    q.value = cat.value = lic.value = src.value = yr.value = "";
-    si.checked = hasCode.checked = hasPaper.checked = maint.checked = false;
+    q.value = cat.value = lic.value = src.value = yr.value = sp.value = bh.value = "";
+    si.checked = hasCode.checked = hasPaper.checked = maint.checked = gui.checked = multi.checked = false;
     update();
   });
 
   // CSV of the rows currently shown (after search and filters), built in the browser.
   function downloadCsv() {
-    const cols = [["Tool", "n"], ["Label", "lb"], ["Section", "c"], ["Subsection", "sub"], ["Type", "lic"], ["Modality", "mod"],
+    const cols = [["Tool", "n"], ["Label", "lb"], ["Section", "c"], ["Also in", "cas"], ["Subsection", "sub"], ["Type", "lic"], ["Modality", "mod"],
                   ["SimBA import", "si"], ["Description", "d"], ["Details", "dl"], ["Website or code", "web"], ["Paper", "url"], ["Paper title", "t"],
-                  ["Year", "y"], ["Authors", "au"], ["Venue", "v"], ["Cited by", "cb"], ["Species", "s"], ["Last code update", "gp"]];
+                  ["Year", "y"], ["Authors", "au"], ["Venue", "v"], ["Cited by", "cb"], ["Species", "s"], ["Shown on", "sps"], ["Behaviors", "bhs"], ["Setup", "sus"],
+                  ["Animals", "an"], ["Input", "inps"], ["Output", "outps"], ["Interface", "uis"], ["Language", "lang"],
+                  ["License (GitHub)", "gl"], ["PyPI package", "pypi"], ["Last code update", "gp"]];
     const esc = v => { v = v == null || v === false || v === 0 ? "" : v === true ? "yes" : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
     const lines = [cols.map(c => c[0]).join(",")].concat(shown.map(d => cols.map(c => esc(d[c[1]])).join(",")));
     const a = document.createElement("a");
@@ -407,9 +455,10 @@ TEMPLATE = r"""<style>
 
   // Tools per section: horizontal bars in one hue, in section order; a click sets the section filter.
   const catBox = $("rtCats"), catRows = {};
-  const catMax = Math.max(...CAT.map(c => D.filter(d => d.c === c).length));
+  const inCat = (d, c) => d.c === c || d.ca.includes(c);
+  const catMax = Math.max(...CAT.map(c => D.filter(d => inCat(d, c)).length));
   CAT.forEach(c => {
-    const n = D.filter(d => d.c === c).length, row = el("div", "row");
+    const n = D.filter(d => inCat(d, c)).length, row = el("div", "row");
     row.setAttribute("role", "listitem");
     row.title = c + ": " + n + " tools";
     const track = el("div", "ct"), bar = el("div", "cb");
@@ -426,9 +475,10 @@ TEMPLATE = r"""<style>
   // Tools from citing papers per year: one series, so one hue and no legend; the current year is drawn lighter.
   const NS = "http://www.w3.org/2000/svg", chart = $("rtChart"), tip = $("rtTip");
   const thisYear = now.getFullYear();
-  const years = [...new Set(D.map(d => d.y).filter(Boolean))].sort((a, b) => a - b);
+  const CIT = D.filter(d => d.src !== "c");   // the chart counts tools from citing papers only
+  const years = [...new Set(CIT.map(d => d.y).filter(Boolean))].sort((a, b) => a - b);
   const perYear = years.map(y => {
-    const rows = D.filter(d => d.y === y), byCat = {};
+    const rows = CIT.filter(d => d.y === y), byCat = {};
     rows.forEach(d => byCat[d.c] = (byCat[d.c] || 0) + 1);
     return { y, n: rows.length, cats: Object.entries(byCat).sort((a, b) => b[1] - a[1]) };
   });

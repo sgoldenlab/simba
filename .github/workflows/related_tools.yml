@@ -34,10 +34,12 @@ jobs:
         shell: bash   # -o pipefail, so a failing script is not hidden by tee
         run: python misc/related_tools_update.py auto | tee "$RUNNER_TEMP/related_tools.log"
 
-      # Refreshes GitHub stars and last-update dates of the curated tools (the "no updates since" tags).
+      # Refreshes GitHub stars and last-update dates (the "no updates since" tags), GitHub license and
+      # language, PyPI packages, and the curated tools' paper year / venue / citations (OpenAlex).
       - name: Refresh GitHub activity of the curated tools
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
         shell: bash
         run: python misc/related_software_activity.py | tee -a "$RUNNER_TEMP/related_tools.log"
 
