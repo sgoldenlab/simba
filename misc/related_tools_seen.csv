@@ -331,18 +331,18 @@ https://www.sciencedirect.com/science/article/pii/S230718772501017X,no,2025,scho
 10.64898/2026.07.31.740852,pending,2026,biorxiv,2026-10-21,Repeated within-session rule switching in the marmoset: a paradigm for tracking the dynamics of cognitive flexibility
 10.64898/2026.10.09.758070,pending,2026,biorxiv,2026-10-21,Oral Bacterial Translocation Promotes Lung Dysbiosis and Infection Risk after Spinal Cord Injury
 10.64898/2026.10.09.758135,pending,2026,biorxiv,2026-10-21,Nonlinear sensory integration drives configural olfactory representations
-10.64898/2026.10.10.758183,pending,2026,biorxiv,2026-10-21,Adaptive-optics lattice light-sheet microscopy enables correlative single-molecule imaging of endogenous proteins in native environments
-10.64898/2026.10.11.758322,pending,2026,biorxiv,2026-10-21,Pilifers provide rapid mechanosensory feedback during floral tracking in hawkmoths
-10.64898/2026.10.11.758347,pending,2026,biorxiv,2026-10-21,Source-Decomposed Multimodal Graph Connectivity: A Temporal Mixture-Manifold Pipeline for Tracking Ischemic Injury and Treatment
+10.64898/2026.10.10.758183,no,2026,biorxiv,2026-10-21,Adaptive-optics lattice light-sheet microscopy enables correlative single-molecule imaging of endogenous proteins in native environments
+10.64898/2026.10.11.758322,no,2026,biorxiv,2026-10-21,Pilifers provide rapid mechanosensory feedback during floral tracking in hawkmoths
+10.64898/2026.10.11.758347,no,2026,biorxiv,2026-10-21,Source-Decomposed Multimodal Graph Connectivity: A Temporal Mixture-Manifold Pipeline for Tracking Ischemic Injury and Treatment
 10.64898/2026.10.11.758387,pending,2026,biorxiv,2026-10-21,Evidence for a cohesion-related function of alpaca hums: Linking automated call detection with GPS data
 10.64898/2026.10.12.758475,pending,2026,biorxiv,2026-10-21,Expecting the unexpected: Great apes anticipate surprise in others
 10.64898/2026.10.13.758787,pending,2026,biorxiv,2026-10-21,Phasic pupil responses to melanopsin- and cone-directed stimulation remain stable across circadian time
 10.64898/2026.10.14.759086,pending,2026,biorxiv,2026-10-21,Distinct Patterns of Adaptive Decision-Making in Mouse Models of Neurodevelopmental Disorders
 10.64898/2026.10.14.759130,pending,2026,biorxiv,2026-10-21,Reach plans for grasping vs. placing objects evoke different neural dynamics within a shared cortico-cerebellar mechanism.
-10.64898/2026.10.15.759451,pending,2026,biorxiv,2026-10-21,Evaluation and primer for using DeepLabCut to track small animals in large spaces
+10.64898/2026.10.15.759451,no,2026,biorxiv,2026-10-21,Evaluation and primer for using DeepLabCut to track small animals in large spaces
 10.64898/2026.10.15.759510,pending,2026,biorxiv,2026-10-21,Understanding Performance Plateaus and Representation Collapse in 3D MRI Transformers Trained to Classify Brain Disease
 10.64898/2026.10.16.759686,pending,2026,biorxiv,2026-10-21,Oxytocin modulates behavioral economic and dopaminergic measures of motivation to seek intravenous oxycodone in rats
-10.64898/2026.10.18.759043,pending,2026,biorxiv,2026-10-21,NeuroPilot: Longitudinal intravital neural imaging across scales and modalities through an agentic platform
+10.64898/2026.10.18.759043,no,2026,biorxiv,2026-10-21,NeuroPilot: Longitudinal intravital neural imaging across scales and modalities through an agentic platform
 10.64898/2026.10.18.759971,pending,2026,biorxiv,2026-10-21,Can We Really See the World in Three Dimensions? An Exploratory Study with Finger Alignment Task and Ponzo Illusion
 10.64898/2026.10.18.759988,pending,2026,biorxiv,2026-10-21,Entering and Exiting Awareness are Asymmetrical: Evidence from tracking Continuous Flash Suppression
 10.1007/978-3-032-19099-4_18,yes,2026,openalex,2026-10-21,Decoding Self-paced Activity in Mice with ActionFormer
@@ -519,3 +519,18 @@ https://www.sciencedirect.com/science/article/pii/S0925231226015390,yes,2026,sch
 10.1038/s41386-022-01484-1,no,2022,epmc-mention,2026-10-23,ACNP 61st Annual Meeting: Poster Abstracts P1 - P270.
 10.64898/2026.08.10.744052,no,2026,semantic-scholar,2026-10-23,"An area postrema GLP-1R to NTS pathway dissociates semaglutide-induced satiation, nausea and reduced food motivation from satiety"
 10.1101/2020.07.26.222299,yes,2020,europepmc,2026-10-23,The Mouse Action Recognition System (MARS): a software pipeline for automated analysis of social behaviors in mice
+10.64898/2026.10.15.759298,pending,2026,biorxiv,2026-10-26,Testing The Protective Function of Flash Coloration Using Wild Avian Predators
+10.64898/2026.10.15.759344,pending,2026,biorxiv,2026-10-26,The ontogeny of repeatability: measurement choices shape individuality estimates in a clonal fish
+10.64898/2025.12.14.694183,pending,2026,biorxiv,2026-10-26,From labels to latents: revealing state-dependent hippocampal computations and non-spatial replay with Jump Latent Variable Model
+10.64898/2026.10.20.760494,pending,2026,biorxiv,2026-10-26,Activation of basal forebrain cholinergic neurons promotes the attribution of incentive salience to reward cues in male rats
+10.64898/2026.10.16.759420,pending,2026,biorxiv,2026-10-26,Progression of visual-stimulus-evoked blood velocity response timing across the vascular network measured with individual-vessel phase-contrast fMRA
+10.64898/2026.05.20.726653,pending,2026,biorxiv,2026-10-26,Bandpass corticospinal transmission during repetitive TMS revealed by motor unit recordings
+10.64898/2025.12.20.695663,pending,2026,biorxiv,2026-10-26,OCTRON - a general purpose segmentation and tracking pipeline for behavioral experiments
+10.64898/2026.10.22.760936,pending,2026,biorxiv,2026-10-26,Breaking Symmetry in Walking: Drosophila Recruits Task- and Leg-Specific Motor Modules for Curve Walking
+10.64898/2026.10.22.760978,pending,2026,biorxiv,2026-10-26,"Pediatric brain charts reveal ADHD biotypes with distinct developmental, molecular, and therapeutic profiles"
+10.64898/2026.10.23.761367,pending,2026,biorxiv,2026-10-26,COGNITIVE HETEROGENEITY AND AGING: AN AGE-INDEPENDENT CILIARY GENE PROGRAM TRACKS COGNITIVE RESILIENCE IN MICE
+10.64898/2026.10.19.759632,pending,2026,biorxiv,2026-10-26,Predicting alcohol consumption from resting-state functional connectivity: Feature relevance and the potential of meta-matching.
+10.64898/2026.10.19.760247,pending,2026,biorxiv,2026-10-26,Altered Somatosensory Cortical Entrainment in Cerebral Palsy
+10.64898/2026.10.23.761437,pending,2026,biorxiv,2026-10-26,Camus: a video-based framework for continuous behavioral monitoring in the mouse home-cage
+10.1101/2025.07.03.662899,pending,2026,biorxiv,2026-10-26,"Cortex-Wide, Cellular-Resolution Volumetric Imaging with a Modular Two-Photon Imaging Platform"
+10.64898/2026.10.25.761658,pending,2026,biorxiv,2026-10-26,"Temporal Progression of Prior Precision, Surprisal, Model Updating and Tone Adaptation in Human Auditory Cortices"
