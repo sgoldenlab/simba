@@ -1,0 +1,52 @@
+name: Release on Version Bump
+
+# Publishes a GitHub release for the version in setup.py, so the repo sidebar stays current.
+# PyPI uploads are separate and manual: this workflow only reads setup.py and never looks at PyPI.
+
+on:
+  push:
+    branches: [master]
+    paths: [setup.py]       # setup.py edits that keep the same version stop at the "already released" check
+  workflow_dispatch:        # "Run workflow" button
+
+permissions:
+  contents: write           # needed to create the tag and release
+
+concurrency:
+  group: release-on-version-bump
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create the release (if this version has none)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          VERSION=$(sed -n 's/^[[:space:]]*version="\([^"]*\)".*/\1/p' setup.py | head -n 1)
+          if [ -z "$VERSION" ]; then
+            echo "Could not read the version from setup.py" >&2
+            exit 1
+          fi
+          TAG="v$VERSION"
+
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "$TAG is already released; nothing to do." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          PREVIOUS=$(gh release view --json tagName --jq .tagName)
+          NOTES="Install or upgrade: \`pip install --upgrade simba-uw-tf-dev\`
+
+          - [Installation guide](https://simba-uw-tf-dev.readthedocs.io/en/latest/installation.html)
+          - [Tutorials](https://simba-uw-tf-dev.readthedocs.io/en/latest/tutorials.html)
+          - [PyPI](https://pypi.org/project/Simba-UW-tf-dev/)
+          - [Changes since $PREVIOUS](https://github.com/$GITHUB_REPOSITORY/compare/$PREVIOUS...$TAG)"
+
+          gh release create "$TAG" --target "$GITHUB_SHA" --title "SimBA $VERSION" --notes "$NOTES"
+          echo "Published $TAG." | tee -a "$GITHUB_STEP_SUMMARY"
