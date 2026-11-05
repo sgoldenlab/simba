@@ -1,3 +1,6 @@
+.. meta::
+   :description: SimBA is a toolkit for building supervised machine-learning classifiers of animal behavior from pose-estimation data, with a no-code GUI.
+
 SimBA
 =====================================
 

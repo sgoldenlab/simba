@@ -3,6 +3,23 @@ function gtag() { dataLayer.push(arguments); }
 gtag('js', new Date());
 gtag('config', 'G-PEKR9R5J47');
 
+/* GA4 event for clicks through to SimBA's GitHub repo. Other projects' GitHub links (e.g. the related tools
+ * table) don't count. Listens in the capture phase so handlers that stop propagation can't hide a click;
+ * auxclick catches middle-click. */
+(function () {
+  function onClick(e) {
+    if (e.type === 'auxclick' && e.button !== 1) return;   // right-click also fires auxclick
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    var url;
+    try { url = new URL(a.getAttribute('href'), location.href); } catch (err) { return; }
+    if (url.hostname !== 'github.com' || !/^\/sgoldenlab\/simba(\/|$)/i.test(url.pathname)) return;
+    gtag('event', 'github_click', { link_url: url.href, link_text: (a.textContent || '').trim().slice(0, 100) });
+  }
+  document.addEventListener('click', onClick, true);
+  document.addEventListener('auxclick', onClick, true);
+})();
+
 /* Tag the landing page early (runs in <head>) so CSS can hide the
  * redundant page H1 immediately — the hero banner is the splash. */
 (function () {

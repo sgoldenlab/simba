@@ -1,5 +1,11 @@
 {% extends "!layout.html" %}
 
+{# The homepage H1 is just "SimBA", so give its <title> a descriptive one for search results. #}
+{% block htmltitle %}
+  {%- if pagename == master_doc %}<title>SimBA: Behavioral Classifiers from Pose Estimation</title>
+  {%- else %}{{ super() }}{% endif %}
+{% endblock %}
+
 {# Nest the auto-generated alphabetical indexes under the "API REFERENCE"
    sidebar caption. Sphinx toctrees can't contain genindex/modindex, so render
    the normal navigation and splice the links in right after that caption. #}

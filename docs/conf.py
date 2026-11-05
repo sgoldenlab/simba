@@ -107,6 +107,7 @@ html_static_path = ['_static']
 html_extra_path = ['_extra']
 # Gives every page a <link rel="canonical"> to /en/latest/, so Google treats other versions/URLs as duplicates of it.
 html_baseurl = 'https://simba-uw-tf-dev.readthedocs.io/en/latest/'
+html_title = 'SimBA Documentation'   # <title> suffix on every page, replacing the default 'SimBA 0.0.2 documentation'. Keep short: the page title comes first. Homepage: see _templates/layout.html.
 html_show_sphinx = False          # drop the "Built with Sphinx using a theme provided by Read the Docs." footer credit
 html_last_updated_fmt = "%b %d, %Y"  # render "Last updated on <date>." in the footer (see _templates/footer.html)
 
