@@ -328,23 +328,23 @@ https://www.nature.com/articles/s41467-026-69254-x,no,2026,scholar,2026-10-21,Se
 https://www.nature.com/articles/s41598-026-55897-9,no,2026,scholar,2026-10-21,Ideological and political education behavior recognition by artificial intelligence transformers
 https://www.sciencedirect.com/science/article/pii/S1074742725000917,no,2025,scholar,2026-10-21,Towards a multi-dimensional understanding of brain states
 https://www.sciencedirect.com/science/article/pii/S230718772501017X,no,2025,scholar,2026-10-21,Decoding the dynamics of daily total global solar radiation: Computational learning strategies powered by explainable AI
-10.64898/2026.07.31.740852,pending,2026,biorxiv,2026-10-21,Repeated within-session rule switching in the marmoset: a paradigm for tracking the dynamics of cognitive flexibility
-10.64898/2026.10.09.758070,pending,2026,biorxiv,2026-10-21,Oral Bacterial Translocation Promotes Lung Dysbiosis and Infection Risk after Spinal Cord Injury
-10.64898/2026.10.09.758135,pending,2026,biorxiv,2026-10-21,Nonlinear sensory integration drives configural olfactory representations
+10.64898/2026.07.31.740852,no,2026,biorxiv,2026-10-21,Repeated within-session rule switching in the marmoset: a paradigm for tracking the dynamics of cognitive flexibility
+10.64898/2026.10.09.758070,no,2026,biorxiv,2026-10-21,Oral Bacterial Translocation Promotes Lung Dysbiosis and Infection Risk after Spinal Cord Injury
+10.64898/2026.10.09.758135,no,2026,biorxiv,2026-10-21,Nonlinear sensory integration drives configural olfactory representations
 10.64898/2026.10.10.758183,no,2026,biorxiv,2026-10-21,Adaptive-optics lattice light-sheet microscopy enables correlative single-molecule imaging of endogenous proteins in native environments
 10.64898/2026.10.11.758322,no,2026,biorxiv,2026-10-21,Pilifers provide rapid mechanosensory feedback during floral tracking in hawkmoths
 10.64898/2026.10.11.758347,no,2026,biorxiv,2026-10-21,Source-Decomposed Multimodal Graph Connectivity: A Temporal Mixture-Manifold Pipeline for Tracking Ischemic Injury and Treatment
-10.64898/2026.10.11.758387,pending,2026,biorxiv,2026-10-21,Evidence for a cohesion-related function of alpaca hums: Linking automated call detection with GPS data
+10.64898/2026.10.11.758387,no,2026,biorxiv,2026-10-21,Evidence for a cohesion-related function of alpaca hums: Linking automated call detection with GPS data
 10.64898/2026.10.12.758475,pending,2026,biorxiv,2026-10-21,Expecting the unexpected: Great apes anticipate surprise in others
-10.64898/2026.10.13.758787,pending,2026,biorxiv,2026-10-21,Phasic pupil responses to melanopsin- and cone-directed stimulation remain stable across circadian time
-10.64898/2026.10.14.759086,pending,2026,biorxiv,2026-10-21,Distinct Patterns of Adaptive Decision-Making in Mouse Models of Neurodevelopmental Disorders
+10.64898/2026.10.13.758787,no,2026,biorxiv,2026-10-21,Phasic pupil responses to melanopsin- and cone-directed stimulation remain stable across circadian time
+10.64898/2026.10.14.759086,no,2026,biorxiv,2026-10-21,Distinct Patterns of Adaptive Decision-Making in Mouse Models of Neurodevelopmental Disorders
 10.64898/2026.10.14.759130,pending,2026,biorxiv,2026-10-21,Reach plans for grasping vs. placing objects evoke different neural dynamics within a shared cortico-cerebellar mechanism.
 10.64898/2026.10.15.759451,no,2026,biorxiv,2026-10-21,Evaluation and primer for using DeepLabCut to track small animals in large spaces
-10.64898/2026.10.15.759510,pending,2026,biorxiv,2026-10-21,Understanding Performance Plateaus and Representation Collapse in 3D MRI Transformers Trained to Classify Brain Disease
-10.64898/2026.10.16.759686,pending,2026,biorxiv,2026-10-21,Oxytocin modulates behavioral economic and dopaminergic measures of motivation to seek intravenous oxycodone in rats
+10.64898/2026.10.15.759510,no,2026,biorxiv,2026-10-21,Understanding Performance Plateaus and Representation Collapse in 3D MRI Transformers Trained to Classify Brain Disease
+10.64898/2026.10.16.759686,no,2026,biorxiv,2026-10-21,Oxytocin modulates behavioral economic and dopaminergic measures of motivation to seek intravenous oxycodone in rats
 10.64898/2026.10.18.759043,no,2026,biorxiv,2026-10-21,NeuroPilot: Longitudinal intravital neural imaging across scales and modalities through an agentic platform
 10.64898/2026.10.18.759971,pending,2026,biorxiv,2026-10-21,Can We Really See the World in Three Dimensions? An Exploratory Study with Finger Alignment Task and Ponzo Illusion
-10.64898/2026.10.18.759988,pending,2026,biorxiv,2026-10-21,Entering and Exiting Awareness are Asymmetrical: Evidence from tracking Continuous Flash Suppression
+10.64898/2026.10.18.759988,no,2026,biorxiv,2026-10-21,Entering and Exiting Awareness are Asymmetrical: Evidence from tracking Continuous Flash Suppression
 10.1007/978-3-032-19099-4_18,yes,2026,openalex,2026-10-21,Decoding Self-paced Activity in Mice with ActionFormer
 10.1007/978-981-96-4001-0_12,yes,2025,openalex,2026-10-21,BL-BERT: Extracting Body Language from Behavior Sequences in Freely Moving Mice
 10.1007/s11263-024-02072-0,yes,2024,openalex,2026-10-21,SUBTLE: An Unsupervised Platform with Temporal Link Embedding that Maps Animal Behavior
@@ -520,51 +520,87 @@ https://www.sciencedirect.com/science/article/pii/S0925231226015390,yes,2026,sch
 10.64898/2026.08.10.744052,no,2026,semantic-scholar,2026-10-23,"An area postrema GLP-1R to NTS pathway dissociates semaglutide-induced satiation, nausea and reduced food motivation from satiety"
 10.1101/2020.07.26.222299,yes,2020,europepmc,2026-10-23,The Mouse Action Recognition System (MARS): a software pipeline for automated analysis of social behaviors in mice
 10.64898/2026.10.15.759298,no,2026,biorxiv,2026-10-26,Testing The Protective Function of Flash Coloration Using Wild Avian Predators
-10.64898/2026.10.15.759344,pending,2026,biorxiv,2026-10-26,The ontogeny of repeatability: measurement choices shape individuality estimates in a clonal fish
-10.64898/2025.12.14.694183,pending,2026,biorxiv,2026-10-26,From labels to latents: revealing state-dependent hippocampal computations and non-spatial replay with Jump Latent Variable Model
-10.64898/2026.10.20.760494,pending,2026,biorxiv,2026-10-26,Activation of basal forebrain cholinergic neurons promotes the attribution of incentive salience to reward cues in male rats
-10.64898/2026.10.16.759420,pending,2026,biorxiv,2026-10-26,Progression of visual-stimulus-evoked blood velocity response timing across the vascular network measured with individual-vessel phase-contrast fMRA
-10.64898/2026.05.20.726653,pending,2026,biorxiv,2026-10-26,Bandpass corticospinal transmission during repetitive TMS revealed by motor unit recordings
+10.64898/2026.10.15.759344,no,2026,biorxiv,2026-10-26,The ontogeny of repeatability: measurement choices shape individuality estimates in a clonal fish
+10.64898/2025.12.14.694183,no,2026,biorxiv,2026-10-26,From labels to latents: revealing state-dependent hippocampal computations and non-spatial replay with Jump Latent Variable Model
+10.64898/2026.10.20.760494,no,2026,biorxiv,2026-10-26,Activation of basal forebrain cholinergic neurons promotes the attribution of incentive salience to reward cues in male rats
+10.64898/2026.10.16.759420,no,2026,biorxiv,2026-10-26,Progression of visual-stimulus-evoked blood velocity response timing across the vascular network measured with individual-vessel phase-contrast fMRA
+10.64898/2026.05.20.726653,no,2026,biorxiv,2026-10-26,Bandpass corticospinal transmission during repetitive TMS revealed by motor unit recordings
 10.64898/2025.12.20.695663,no,2026,biorxiv,2026-10-26,OCTRON - a general purpose segmentation and tracking pipeline for behavioral experiments
-10.64898/2026.10.22.760936,pending,2026,biorxiv,2026-10-26,Breaking Symmetry in Walking: Drosophila Recruits Task- and Leg-Specific Motor Modules for Curve Walking
+10.64898/2026.10.22.760936,no,2026,biorxiv,2026-10-26,Breaking Symmetry in Walking: Drosophila Recruits Task- and Leg-Specific Motor Modules for Curve Walking
 10.64898/2026.10.22.760978,pending,2026,biorxiv,2026-10-26,"Pediatric brain charts reveal ADHD biotypes with distinct developmental, molecular, and therapeutic profiles"
-10.64898/2026.10.23.761367,pending,2026,biorxiv,2026-10-26,COGNITIVE HETEROGENEITY AND AGING: AN AGE-INDEPENDENT CILIARY GENE PROGRAM TRACKS COGNITIVE RESILIENCE IN MICE
-10.64898/2026.10.19.759632,pending,2026,biorxiv,2026-10-26,Predicting alcohol consumption from resting-state functional connectivity: Feature relevance and the potential of meta-matching.
+10.64898/2026.10.23.761367,no,2026,biorxiv,2026-10-26,COGNITIVE HETEROGENEITY AND AGING: AN AGE-INDEPENDENT CILIARY GENE PROGRAM TRACKS COGNITIVE RESILIENCE IN MICE
+10.64898/2026.10.19.759632,no,2026,biorxiv,2026-10-26,Predicting alcohol consumption from resting-state functional connectivity: Feature relevance and the potential of meta-matching.
 10.64898/2026.10.19.760247,pending,2026,biorxiv,2026-10-26,Altered Somatosensory Cortical Entrainment in Cerebral Palsy
-10.64898/2026.10.23.761437,pending,2026,biorxiv,2026-10-26,Camus: a video-based framework for continuous behavioral monitoring in the mouse home-cage
+10.64898/2026.10.23.761437,no,2026,biorxiv,2026-10-26,Camus: a video-based framework for continuous behavioral monitoring in the mouse home-cage
 10.1101/2025.07.03.662899,no,2026,biorxiv,2026-10-26,"Cortex-Wide, Cellular-Resolution Volumetric Imaging with a Modular Two-Photon Imaging Platform"
-10.64898/2026.10.25.761658,pending,2026,biorxiv,2026-10-26,"Temporal Progression of Prior Precision, Surprisal, Model Updating and Tone Adaptation in Human Auditory Cortices"
-10.64898/2026.09.02.749007,pending,2026,biorxiv,2026-11-02,From pose to behavior: SABER integrates identity-resolved multi-animal pose tracking with large-language-model-based behavioral factor discovery
+10.64898/2026.10.25.761658,no,2026,biorxiv,2026-10-26,"Temporal Progression of Prior Precision, Surprisal, Model Updating and Tone Adaptation in Human Auditory Cortices"
+10.64898/2026.09.02.749007,no,2026,biorxiv,2026-11-02,From pose to behavior: SABER integrates identity-resolved multi-animal pose tracking with large-language-model-based behavioral factor discovery
 10.64898/2026.10.20.760568,pending,2026,biorxiv,2026-11-02,Eye movements enhance stereoscopic 3D vision
 10.64898/2026.10.20.758951,pending,2026,biorxiv,2026-11-02,End-to-end automation of behavioural experiments with a collaborative robot
 10.64898/2026.10.21.760697,pending,2026,biorxiv,2026-11-02,Covert attentional tracking with invisible phase tagging
-10.64898/2026.10.21.760530,pending,2026,biorxiv,2026-11-02,Dissociating Resting-State Networks of Pedohebephilic Preference and Child Sexual Offending Using Network-Based Prediction
-10.64898/2026.07.22.740025,pending,2026,biorxiv,2026-11-02,Role of leg campaniform sensilla proprioceptive feedback in Drosophila melanogaster adaptive walking
-10.64898/2026.10.23.761183,pending,2026,biorxiv,2026-11-02,Linking cross-species hemodynamics with neuronal activity in prefrontal cortex during abstract sequence viewing
-10.64898/2026.10.24.761528,pending,2026,biorxiv,2026-11-02,Collateral-defined prefrontal-striatal circuits partition behavioral vigor during appetitive goal pursuit
+10.64898/2026.10.21.760530,no,2026,biorxiv,2026-11-02,Dissociating Resting-State Networks of Pedohebephilic Preference and Child Sexual Offending Using Network-Based Prediction
+10.64898/2026.07.22.740025,no,2026,biorxiv,2026-11-02,Role of leg campaniform sensilla proprioceptive feedback in Drosophila melanogaster adaptive walking
+10.64898/2026.10.23.761183,no,2026,biorxiv,2026-11-02,Linking cross-species hemodynamics with neuronal activity in prefrontal cortex during abstract sequence viewing
+10.64898/2026.10.24.761528,no,2026,biorxiv,2026-11-02,Collateral-defined prefrontal-striatal circuits partition behavioral vigor during appetitive goal pursuit
 10.64898/2026.10.26.761874,pending,2026,biorxiv,2026-11-02,A canonical input to the head direction compass carries predominantly eye movement signals
-10.64898/2026.10.22.760929,pending,2026,biorxiv,2026-11-02,What do navigating animals see? Reconstructing the visual histories of desert ants
-10.64898/2026.10.26.761970,pending,2026,biorxiv,2026-11-02,High-content imaging of live microglia-containing Alzheimer's disease brain organoids
+10.64898/2026.10.22.760929,no,2026,biorxiv,2026-11-02,What do navigating animals see? Reconstructing the visual histories of desert ants
+10.64898/2026.10.26.761970,no,2026,biorxiv,2026-11-02,High-content imaging of live microglia-containing Alzheimer's disease brain organoids
 10.64898/2026.10.23.761298,pending,2026,biorxiv,2026-11-02,"Auditory tracking magnitude, temporal alignment, and anatomical distribution during wakefulness and propofol-based anesthesia in human sEEG"
 10.64898/2026.10.23.761344,pending,2026,biorxiv,2026-11-02,Lateral-eyed tree shrews combine panoramic vision with an expanded oculomotor repertoire
-10.64898/2026.05.19.726138,pending,2026,biorxiv,2026-11-02,Chronic In Vivo Imaging of a Focal Cortical Dysplasia Mouse Model Reveals Progressive Neuronal Loss with No Senolytic or Antiseizure Efficacy Following Dasatinib-Quercetin Treatment
-10.64898/2026.10.24.761558,pending,2026,biorxiv,2026-11-02,Variability and Landmark Quality in Anatomical Co-Registration in Neuronavigation for Brain Stimulation
-10.64898/2026.10.27.762164,pending,2026,biorxiv,2026-11-02,The interplay between cortical tracking and functional connectivity in musicians and non-musicians listening to speech and music
-10.64898/2026.10.28.762515,pending,2026,biorxiv,2026-11-02,How goals shape naturalistic memories: bias in gaze and narrative recall
-10.64898/2026.10.28.762446,pending,2026,biorxiv,2026-11-02,Associative learning reconfigures colour-guided behaviour in Drosophila larvae
-10.64898/2026.10.28.762438,pending,2026,biorxiv,2026-11-02,Sensitive period for song learning outlasts parent-offspring cohesion in wild zebra finches
-10.64898/2026.10.26.761911,pending,2026,biorxiv,2026-11-02,Lexical surprisal drives pupil dilation during continuous story listening
-10.64898/2026.10.29.762884,pending,2026,biorxiv,2026-11-02,"Measuring conscious tactile perception without report: pupil, blink, and microsaccade signatures of a tactile no-report paradigm"
+10.64898/2026.05.19.726138,no,2026,biorxiv,2026-11-02,Chronic In Vivo Imaging of a Focal Cortical Dysplasia Mouse Model Reveals Progressive Neuronal Loss with No Senolytic or Antiseizure Efficacy Following Dasatinib-Quercetin Treatment
+10.64898/2026.10.24.761558,no,2026,biorxiv,2026-11-02,Variability and Landmark Quality in Anatomical Co-Registration in Neuronavigation for Brain Stimulation
+10.64898/2026.10.27.762164,no,2026,biorxiv,2026-11-02,The interplay between cortical tracking and functional connectivity in musicians and non-musicians listening to speech and music
+10.64898/2026.10.28.762515,no,2026,biorxiv,2026-11-02,How goals shape naturalistic memories: bias in gaze and narrative recall
+10.64898/2026.10.28.762446,no,2026,biorxiv,2026-11-02,Associative learning reconfigures colour-guided behaviour in Drosophila larvae
+10.64898/2026.10.28.762438,no,2026,biorxiv,2026-11-02,Sensitive period for song learning outlasts parent-offspring cohesion in wild zebra finches
+10.64898/2026.10.26.761911,no,2026,biorxiv,2026-11-02,Lexical surprisal drives pupil dilation during continuous story listening
+10.64898/2026.10.29.762884,no,2026,biorxiv,2026-11-02,"Measuring conscious tactile perception without report: pupil, blink, and microsaccade signatures of a tactile no-report paradigm"
 10.64898/2026.08.09.743586,pending,2026,biorxiv,2026-11-02,Torsion in motion: the visual system as a three-axis gimbal
-10.1101/2025.08.18.670974,pending,2026,biorxiv,2026-11-02,EEG decodability of facial expressions and their stereoscopic depth cues in immersive virtual reality
-10.64898/2026.10.29.762880,pending,2026,biorxiv,2026-11-02,Comparative Proteomics Reveals Cell-Type-Specific Heterogeneity of Human Neural Cell-Derived Extracellular Vesicles
-10.64898/2026.09.28.755127,pending,2026,biorxiv,2026-11-02,Asymmetric Adaptation of Catch-up Saccades with Artificial Central Scotomas
-10.64898/2026.10.27.761971,pending,2026,biorxiv,2026-11-02,Coordinated orienting behavior emerges following unilateral optogenetic activation of Superior Colliculus GABAergic neurons
-10.64898/2026.10.26.761897,pending,2026,biorxiv,2026-11-02,Goat Milk-derived Extracellular Vesicles modulate glial responses in vitro and attenuate neuroinflammation in vivo
-10.64898/2026.10.25.761718,pending,2026,biorxiv,2026-11-02,Estrogen remodels large-scale cortical dynamics to promote behavioral persistence
-10.64898/2026.10.25.761729,pending,2026,biorxiv,2026-11-02,Capturing the rhythm: methodological choices shape inference from circadian activity data
-10.64898/2026.06.17.732869,pending,2026,biorxiv,2026-11-02,"ResXR: infrastructure for quality-controlled, reproducible studies of human behavior in Extended Reality"
-10.64898/2026.10.26.761827,pending,2026,biorxiv,2026-11-02,"Concurrent cognitive, behavioral and systemic physiological features mark preclinical Alzheimer's disease"
-10.1101/2023.12.11.571113,pending,2026,biorxiv,2026-11-02,Head movement allocation in freely-moving macaques learning object-context sequences
-10.64898/2026.04.21.719334,pending,2026,biorxiv,2026-11-02,"A multimodal dataset of EEG, eye-tracking, and physiological signals during naturalistic smartphone interactions"
+10.1101/2025.08.18.670974,no,2026,biorxiv,2026-11-02,EEG decodability of facial expressions and their stereoscopic depth cues in immersive virtual reality
+10.64898/2026.10.29.762880,no,2026,biorxiv,2026-11-02,Comparative Proteomics Reveals Cell-Type-Specific Heterogeneity of Human Neural Cell-Derived Extracellular Vesicles
+10.64898/2026.09.28.755127,no,2026,biorxiv,2026-11-02,Asymmetric Adaptation of Catch-up Saccades with Artificial Central Scotomas
+10.64898/2026.10.27.761971,no,2026,biorxiv,2026-11-02,Coordinated orienting behavior emerges following unilateral optogenetic activation of Superior Colliculus GABAergic neurons
+10.64898/2026.10.26.761897,no,2026,biorxiv,2026-11-02,Goat Milk-derived Extracellular Vesicles modulate glial responses in vitro and attenuate neuroinflammation in vivo
+10.64898/2026.10.25.761718,no,2026,biorxiv,2026-11-02,Estrogen remodels large-scale cortical dynamics to promote behavioral persistence
+10.64898/2026.10.25.761729,no,2026,biorxiv,2026-11-02,Capturing the rhythm: methodological choices shape inference from circadian activity data
+10.64898/2026.06.17.732869,no,2026,biorxiv,2026-11-02,"ResXR: infrastructure for quality-controlled, reproducible studies of human behavior in Extended Reality"
+10.64898/2026.10.26.761827,no,2026,biorxiv,2026-11-02,"Concurrent cognitive, behavioral and systemic physiological features mark preclinical Alzheimer's disease"
+10.1101/2023.12.11.571113,no,2026,biorxiv,2026-11-02,Head movement allocation in freely-moving macaques learning object-context sequences
+10.64898/2026.04.21.719334,no,2026,biorxiv,2026-11-02,"A multimodal dataset of EEG, eye-tracking, and physiological signals during naturalistic smartphone interactions"
 10.64898/2026.10.30.763133,pending,2026,biorxiv,2026-11-02,Natural predator-associated chemosignals evoke distinct spatiotemporal patterns of risk assessment and vomeronasal population responses
+10.64898/2026.10.31.763226,pending,2026,biorxiv,2026-11-05,Dissociable norepinephrine and dopamine representations during strategic decision-making and reward learning
+10.1101/2025.11.17.688782,pending,2026,biorxiv,2026-11-05,Active vision modulates early cortical stages of visual processing: Evidence from MEG and eye-tracking
+10.64898/2026.10.28.762141,pending,2026,biorxiv,2026-11-05,How multilevel competition drives cooperation in stigmergic systems
+10.64898/2026.10.29.762878,pending,2026,biorxiv,2026-11-05,Unpredictable chronic stress redistributes novelty-evoked exploratory space use and yields method-dependent identification of resilient-like archetypes in zebrafish
+10.64898/2026.10.29.762753,pending,2026,biorxiv,2026-11-05,Brain-wide representations of olfactory behavior in C. elegans
+10.64898/2026.10.29.762925,pending,2026,biorxiv,2026-11-05,Parkinson Disease vs Aging Features Impairments in Formation and Release of a Power Grip in Real and Pantomimed String-Pulling
+10.64898/2026.10.29.762906,pending,2026,biorxiv,2026-11-05,Self-Other Neural Representational Distinction is Associated with Distorted Social Predictions in Social Anxiety
+10.1101/2024.08.13.607787,pending,2026,biorxiv,2026-11-05,A Biologically Inspired Attention Model for Neural Signal Analysis
+10.64898/2026.03.30.715335,pending,2026,biorxiv,2026-11-05,Predicting Drosophila Body Orientation from a Translational Trajectory using an Artificial Neural Network
+10.64898/2026.10.29.762734,pending,2026,biorxiv,2026-11-05,Detecting deception in event narratives: the analysis of response latencies and error rates to unexpected questions.
+10.64898/2026.10.31.763367,pending,2026,biorxiv,2026-11-05,SafeLens: A Statistically Controlled Nonlinear Machine Learning Framework for Characterizing Hidden Dynamics in Event-Locked Neural Activity
+10.64898/2026.10.31.763331,pending,2026,biorxiv,2026-11-05,Intra-individual changes to peak alpha frequency map to pain perception following high frequency sensitisation of central nociceptive pathways: A test-retest reliability study
+10.64898/2026.11.03.763761,pending,2026,biorxiv,2026-11-05,Disentangling visual and motor contributions to continuous psychophysics
+10.64898/2026.11.03.764108,pending,2026,biorxiv,2026-11-05,"Discovering compositional, interpretable structure in social behavior"
+10.64898/2026.11.02.763849,pending,2026,biorxiv,2026-11-05,An Eyewear-Based EEG Interface for Temporal-Region Monitoring and Emotion Recognition
+10.64898/2026.08.11.744150,pending,2026,biorxiv,2026-11-05,"Kinship, acoustic signaling, and socio-spatial structure shape shared decisions and social influence in white-nosed coatis"
+10.64898/2026.11.04.763058,pending,2026,biorxiv,2026-11-05,An open-access neuroimaging-compatible virtual town task for assessing human spatial navigation
+10.64898/2026.11.04.764239,pending,2026,biorxiv,2026-11-05,A hawkmoth's point of view - Innate symmetry preferences are informed by floral display and foraging function in an insect pollinator
+10.7554/elife.102782.sa1,no,2024,openalex,2026-11-05,Decision letter: Ethograms predict visual fear conditioning status in rats
+10.7554/elife.107259.3.sa0,yes,2026,openalex,2026-11-05,"eLife Assessment: JAX Animal Behavior System (JABS), a genetics-informed, end-to-end advanced behavioral phenotyping platform for the laboratory mouse"
+10.1175/jcli-d-25-0473.1,no,2026,openalex,2026-11-05,Long-Term Evolution of Permafrost across the Qinghai–Tibet Plateau: Perspectives from Multimodel Ensembles and Machine Learning
+10.1038/s42003-026-10690-2,no,2026,openalex,2026-11-05,Temporal transcriptomic and chromatin dynamics underlying class-level recognition in cleaner wrasse
+10.64898/2026.09.19.752787,yes,2026,openalex,2026-11-05,"PixelPaws: a low-cost, open-source integrated platform for automated scoring of mouse behaviors"
+10.1016/j.compbiomed.2023.107416,yes,2023,openalex,2026-11-05,ContrastivePose: A contrastive learning approach for self-supervised feature engineering for pose estimation and behavorial classification of interacting animals
+10.7554/elife.89189.1.sa1,no,2023,openalex,2026-11-05,Reviewer #2 (Public Review): Corticotropin Releasing Factor in the Bed Nucleus of the Stria Terminalis modulates the behavioral consequences of unpredictable threat
+10.7554/elife.89189.1.sa3,yes,2023,openalex,2026-11-05,eLife Assessment: Corticotropin Releasing Factor in the Bed Nucleus of the Stria Terminalis modulates the behavioral consequences of unpredictable threat
+10.7554/elife.90414.1.sa2,no,2023,openalex,2026-11-05,eLife Assessment: Contributions of associative and non-associative learning to the dynamics of defensive ethograms
+10.7554/elife.90414.1.sa1,no,2023,openalex,2026-11-05,Reviewer #1 (Public Review): Contributions of associative and non-associative learning to the dynamics of defensive ethograms
+10.7554/elife.86873.3.sa0,yes,2023,openalex,2026-11-05,"eLife assessment: OpenApePose, a database of annotated ape photographs for pose estimation"
+10.7554/elife.86873.1.sa3,yes,2023,openalex,2026-11-05,Author Response: OpenApePose: a database of annotated ape photographs for pose estimation
+10.7554/elife.91765.2.sa0,no,2025,openalex,2026-11-05,Author response: Post-ejaculatory Inhibition of Female Sexual Drive via Heterogeneous Neuronal Ensembles in the Medial Preoptic Area
+10.7554/elife.89189.3.sa0,no,2025,openalex,2026-11-05,eLife Assessment: Sex differences in BNST signaling and BNST CRF in fear processing
+10.21203/rs.3.rs-8904710/v1,no,2026,openalex,2026-11-05,A Review of the Evolution of Rodent Tracking and Behaviour Analysis
+10.70675/60817e4dzd012z4c1eza527z519c2d5bf260,no,2024,openalex,2026-11-05,The effect of age on spatial working memory and topography of dopamine neurons in the ventral tegmental area in a mouse model of healthy aging
+10.2991/978-94-6239-693-7_82,no,2026,openalex,2026-11-05,An Arena-Aware Motion-Based Deep Learning Framework for Automated Rodent Behavior Analysis in the Open Field Test
+10.64898/2026.07.30.741940,no,2026,openalex,2026-11-05,Reciprocal feedback inhibition and divergent intrinsic firing properties between behaviorally defined classes of neurons in the mouse ventromedial hypothalamus

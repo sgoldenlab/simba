@@ -25,6 +25,7 @@
    * Argus
    * ART (Automated Rodent Tracker)
    * ArUco marker scoring
+   * Author Response
    * Autobehaver
    * AutoGaitA
    * Automated Figure-8 Maze
@@ -112,6 +113,7 @@
    * DVC (Digital Ventilated Cage)
    * Eco-HAB
    * ELAN
+   * eLife Assessment
    * EnVision
    * ethome
    * Ethoscopes
@@ -237,6 +239,7 @@
    * PiRATeMC
    * Pirecorder
    * PiVR
+   * PixelPaws
    * Pixying Behavior
    * pMAT
    * PoseR
