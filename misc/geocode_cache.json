@@ -2811,5 +2811,51 @@
     "-122.3125045"
    ]
   }
+ ],
+ "Universidad de Chile": [
+  {
+   "place_id": 1638599,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "node",
+   "osm_id": 6506316372,
+   "lat": "-33.4438670",
+   "lon": "-70.6506654",
+   "class": "railway",
+   "type": "station",
+   "place_rank": 30,
+   "importance": 0.3922202821662208,
+   "addresstype": "railway",
+   "name": "Universidad de Chile",
+   "display_name": "Universidad de Chile, Ciclovía Alameda, Santiago, Provincia de Santiago, Región Metropolitana de Santiago, 8320000, Chile",
+   "boundingbox": [
+    "-33.4488670",
+    "-33.4388670",
+    "-70.6556654",
+    "-70.6456654"
+   ]
+  }
+ ],
+ "University of Maryland": [
+  {
+   "place_id": 430107073,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 21502193,
+   "lat": "48.0989680",
+   "lon": "11.5820325",
+   "class": "building",
+   "type": "apartments",
+   "place_rank": 30,
+   "importance": 8.462272068355866e-05,
+   "addresstype": "building",
+   "name": "University of Maryland (ehemaliges Gelände der US-Streitkräfte)",
+   "display_name": "University of Maryland (ehemaliges Gelände der US-Streitkräfte), Peter-Auzinger-Straße, Stadelheim, Fasangarten, Obergiesing-Fasangarten, München, Bayern, 81547, Deutschland",
+   "boundingbox": [
+    "48.0986236",
+    "48.0993117",
+    "11.5818563",
+    "11.5828859"
+   ]
+  }
  ]
 }

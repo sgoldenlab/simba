@@ -179,6 +179,7 @@ INSTITUTION_COORDS = {
     'The Second Affiliated Hospital of Nanjing Medical University': [32.0616, 118.7788],  # 1
     'UNAM': [19.332, -99.187],  # 2
     'UNSW Sydney': [-33.9173, 151.2313],  # 3
+    'Universidad de Chile': [-33.4439, -70.6507],  # 1
     'Universidade de Lisboa': [38.7528, -9.157],  # 2
     'Universitat Jaume I': [39.9943, -0.0714],  # 5
     'University College Cork': [51.8947, -8.4903],  # 2
@@ -197,6 +198,7 @@ INSTITUTION_COORDS = {
     'University of Hong Kong': [22.283, 114.1371],  # 5
     'University of Illinois Urbana-Champaign': [40.0762, -88.2233],  # 1
     'University of Illinois at Chicago': [41.8676, -87.6524],  # 1
+    'University of Maryland': [48.099, 11.582],  # 1
     'University of Massachusetts Dartmouth': [41.6225, -71.0073],  # 1
     'University of Melbourne': [-37.8241, 144.9171],  # 1
     'University of Milan': [45.4757, 9.2283],  # 1
