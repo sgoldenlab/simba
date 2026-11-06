@@ -53,6 +53,9 @@ INTRO_RE = re.compile(r"\b(we|here,? we|this (work|paper|study))\s+(present|intr
                       r"[^.]{0,160}\b(tool|toolbox|toolkit|software|package|pipeline|platform|framework|system|dataset|benchmark"
                       r"|app|application|library|model|method|device|apparatus|setup)\b", re.I)
 EXCLUDE_RE = re.compile(r"\b(review|perspective|primer on|meta-analysis|thesis|commentary)\b", re.I)
+# eLife gives each peer-review item its own DOI (suffix .sa0, .sa1, ...), titled "eLife Assessment: <paper title>".
+PEER_REVIEW_DOI_RE = re.compile(r"\.sa\d+$", re.I)
+PEER_REVIEW_TITLE_RE = re.compile(r"^\s*(elife assessment|author response|decision letter|reviewer #\d+)\b", re.I)
 ANIMAL_RE = re.compile(r"\b(behavio(u)?r\w*|pose|keypoint|tracking|ethogram|animal|rodent|mice|mouse|rats?)\b", re.I)
 CATEGORY_RULES = [("benchmark/dataset", r"\b(dataset|benchmark|database)\b"),
                   ("closed-loop/real-time", r"\b(real-time|closed-loop|online)\b"),
@@ -346,6 +349,8 @@ def apply(path):
 def rule_decision(c):
     title, text = c["title"], c["title"] + ". " + c["abstract"]
     decision = {"doi": c["doi"], "title": title, "year": c["year"], "source": c["source"], "verdict": "no"}
+    if PEER_REVIEW_DOI_RE.search(c["doi"]) or PEER_REVIEW_TITLE_RE.match(title):
+        return decision
     if EXCLUDE_RE.search(title) or not ANIMAL_RE.search(text):
         return decision
     m, acro = NAME_RE.match(title), ACRO_RE.search(title)

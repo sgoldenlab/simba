@@ -35,6 +35,7 @@ gtag('config', 'G-PEKR9R5J47');
  * session, so it never delays repeat navigation.
  * ------------------------------------------------------------------ */
 (function () {
+  if (!document.documentElement.classList.contains('simba-landing')) return;   // homepage only: other pages open on their content
   try { if (sessionStorage.getItem('simbaSplashSeen')) return; } catch (e) { /* private mode: still show once */ }
 
   var ROOT = (function () {

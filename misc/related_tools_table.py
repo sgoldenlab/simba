@@ -149,10 +149,13 @@ def main():
     vocab = lambda k: sorted({v for t in tools for v in t[k] if v not in ("Unknown", "Not applicable")},
                              key=lambda v: (v.startswith("Any"), v.startswith("Other"), v))
     j = lambda o: json.dumps(o, ensure_ascii=False).replace("</", "<\\/")
+    for t in tools:
+        t["pin"] = t["n"] == "SimBA"   # always first, as the baseline to compare the other tools against
     n_cur = sum(t["src"] != "s" for t in tools)
+    n_both = sum(t["src"] == "cs" for t in tools)
     out = (TEMPLATE.replace("__DATE__", date.today().strftime("%B %d, %Y"))
-           .replace("__TOTAL__", str(len(tools))).replace("__NCUR__", str(n_cur))
-           .replace("__NCIT__", str(sum(t["src"] != "c" for t in tools)))
+           .replace("__TOTAL__", str(len(tools))).replace("__NCUR__", str(n_cur - n_both))
+           .replace("__NCIT__", str(sum(t["src"] == "s" for t in tools))).replace("__NBOTH__", str(n_both))
            .replace("__DATA__", j(tools)).replace("__CATS__", j(present)).replace("__YEARS__", j(years))
            .replace("__SPECIES__", j(vocab("sp"))).replace("__BEHAVIORS__", j(vocab("bh"))))
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
@@ -237,7 +240,7 @@ TEMPLATE = r"""<style>
 @media (max-width:680px){.simba-rt .c-ty,.simba-rt .c-yr{display:none;}.simba-rt-bar select{flex:1 1 45%;max-width:none;}.simba-rt th,.simba-rt td{padding-left:9px !important;padding-right:9px !important;}}
 </style>
 <div class="simba-rt" id="rtTop" data-total="__TOTAL__">
-  <p class="simba-rt-date">Updated __DATE__ &middot; __TOTAL__ tools: __NCUR__ in the curated list, __NCIT__ introduced by papers citing SimBA</p>
+  <p class="simba-rt-date">Updated __DATE__ &middot; __TOTAL__ tools: __NCUR__ curated, __NCIT__ from papers citing SimBA, __NBOTH__ in both</p>
   <div class="simba-rt-charts">
     <div class="simba-rt-chart">
       <h4>Tools by section</h4>
@@ -346,13 +349,14 @@ TEMPLATE = r"""<style>
     rows.sort((a, b) => {
       const x = a[key], y = b[key];
       const c = typeof x === "number" ? x - y : String(x).localeCompare(String(y));
-      return c * dir || a.ci - b.ci || a.key.localeCompare(b.key);
+      return b.pin - a.pin || c * dir || a.ci - b.ci || a.key.localeCompare(b.key);
     });
     body.replaceChildren();
     rows.forEach(d => {
       const tr = el("tr", "row"), td = el("td");
       const nm = el("div", "nm" + (d.n ? "" : " lb"), d.n || d.lb);
       if (!d.n) nm.title = "The paper does not name its tool; this is a short description";
+      if (d.pin) nm.appendChild(el("span", "tag si", "This project"));
       if (d.si) { const t = el("span", "tag si", "SimBA import"); t.title = "Produces data SimBA reads directly"; nm.appendChild(t); }
       if (d.p) nm.appendChild(el("span", "tag pre", "Preprint"));
       if (d.old) { const t = el("span", "tag old", d.old); t.title = "Last code update on GitHub: " + d.gp; nm.appendChild(t); }

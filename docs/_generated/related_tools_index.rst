@@ -10,6 +10,8 @@
    * Actimeter
    * ActionFormer for mice
    * Activity Cage
+   * ADPT
+   * ALMA
    * AlphaTracker
    * AmadeusGPT
    * AMBER-pipeline
@@ -17,15 +19,16 @@
    * animovement
    * Anipose
    * Annotation-difference analysis
+   * anTraX
    * ANY-maze
    * AnyCage Lite
    * APT (Animal Part Tracker)
    * ARBEL
+   * ARBUR
    * Argos
    * Argus
    * ART (Automated Rodent Tracker)
    * ArUco marker scoring
-   * Author Response
    * Autobehaver
    * AutoGaitA
    * Automated Figure-8 Maze
@@ -45,6 +48,7 @@
    * Barbary macaque detection dataset
    * BAREfoot
    * BEAST
+   * Behatrix
    * BehaveAgent
    * BehaVERT
    * BehaviorCloud
@@ -69,6 +73,8 @@
    * CAVE
    * Cavefish aggression classifier
    * CBAS
+   * CEBRA
+   * Chronotate
    * Circadian behavior suite
    * CLARA
    * CleverSys TopScan
@@ -82,26 +88,32 @@
    * CS-IGANet
    * CVAT
    * DairySocialTwin
+   * DAMM
+   * DANCE
    * DANNCE
    * DAS (Deep Audio Segmenter)
    * Days of our Mice (DooM)
    * DBscorer
+   * Deep-Pose-Tracker
    * DeepAction
    * DeepBhvTracking
    * DeepEthogram
    * DeepFly3D
    * DeepGraphPose
    * DeepLabCut
+   * DeepLabCut-Display
    * DeepLabCut-Live
    * DeepLabSAM
    * DeepLabStream
    * DeepOF
    * DeepPoseKit
    * DeepSqueak
+   * Detect+Track
    * Detectron2
    * DigiGait
    * DIPLOMAT
    * Disgust reaction counter
+   * DISSeCT
    * DiverScan
    * DIY-NAMIC
    * DLC vs commercial benchmark
@@ -111,10 +123,13 @@
    * DOME smart lids
    * Dual Cage
    * DVC (Digital Ventilated Cage)
+   * DVT
+   * EasyFlyTracker
    * Eco-HAB
    * ELAN
-   * eLife Assessment
    * EnVision
+   * EthoClaw
+   * Ethoflow
    * ethome
    * Ethoscopes
    * EthoTrace
@@ -131,9 +146,12 @@
    * FED3
    * FERAL
    * FicTrac
+   * FIMTrack
    * FlyTracker
+   * FlyVISTA
    * Forestwalk
    * Frame-wise CNN classifier
+   * FreiPose
    * GuPPy
    * HASRA
    * HBAF
@@ -163,6 +181,7 @@
    * LabGym
    * LABORAS
    * LASC
+   * LiftPose3D
    * Lightning Pose
    * Lionfish behavior classifier
    * LIQ HD
@@ -172,32 +191,41 @@
    * LocoMouse
    * LocoWhisk / ARTv2
    * Low-Profile Wireless Running Wheel
+   * M-Track
    * M3 MultiMouseMonitor
    * MacqD
    * MAD
    * Mamba-MSQNet
+   * MARGO
    * Marigold
    * Markerless Mouse Tracking (MaSoMoTr)
    * Marmoset behavior dataset
    * MARS
+   * Megabouts
+   * MiceProfiler
    * Microwave motion detector
    * Minian
    * MMPose
    * MoPSS
    * MoSeq
    * MOSHERS
+   * MOTHe
    * MotionMapper
+   * MouBeAT
    * Mouse E-Motion
    * Mouse head-twitch detector
    * MouseMove
+   * MouseVUER
    * MovAl
    * MOVE
    * movement
+   * MoveR
    * MSGL-Transformer
    * Multi-agent keypoint discovery
    * Multi-scale autoencoder for social behavior
    * MUPET
    * MyVivarium
+   * NAPS
    * NC4Gate
    * ndx-pose
    * Nematode aggression state model
@@ -212,14 +240,17 @@
    * Occluded-rat identity tracker
    * OCTRON
    * Olfactory habituation scoring pipeline
+   * OmniTrax
    * Open Ephys tracking plugin
    * Open Face Home Cage Running Wheel
    * Open-source olfactometer
    * OpenApePose
+   * OpenFieldAI
    * OpenLabCluster
    * OpenMonkeyStudio
    * OpenPose
    * OpenSync
+   * OptiMouse
    * Oxymax-CLAMS
    * Pain behavior recognition model
    * PainFace-Recognition
@@ -227,6 +258,7 @@
    * Pallidus MR1
    * Panlab SMART
    * Pathfinder
+   * pathtrackr
    * Pharmacology pose toolkit
    * PhenoMaster NG
    * Phenopy
@@ -235,6 +267,7 @@
    * Photometry-behavior state-space framework
    * Pi USB Cam
    * PiDose
+   * PiE
    * Pigeon behavior classifier
    * PiRATeMC
    * Pirecorder
@@ -242,16 +275,22 @@
    * PixelPaws
    * Pixying Behavior
    * pMAT
+   * PosePAL
    * PoseR
    * PrecisionTrack
    * Promethion
    * Promethion Core
    * PS-VAE
+   * PumpKin
    * Pup retrieval movement dataset
+   * pyControl
+   * PyMiceTracking
    * PyMouseTracks
    * Pyper
+   * pyPhotometry
    * PyRat
    * R2C2
+   * RAINSTORM
    * Rare-behavior search
    * Raspberry Rat
    * RAT (Rodent Arena Tracker)
@@ -261,16 +300,22 @@
    * ReachOut
    * reHMM/reHMM+
    * Residual-guided visual context
+   * Rethomics
+   * RpiBeh
+   * RTFED
    * Rtrack
    * S3LDS (semi-supervised switching LDS)
    * SaLSa
    * SAMPL
+   * SARTAB
    * SAUSI
    * SBeA
+   * Scratch-AID
    * SEB3R
    * Second-order conditioning profiling pipeline
    * Segment Anything (SAM 2)
    * Semi-supervised segmentation model
+   * SimBA
    * SingleBehavior Lab
    * SIPEC
    * Sipper
@@ -284,6 +329,7 @@
    * Space-experiment behavior detector
    * Spatial-temporal window transformer
    * Sphynx
+   * SqueakPose Studio
    * STCS
    * STL toolbox
    * STPoseNet
@@ -303,13 +349,17 @@
    * TrackMate
    * Trackoscope
    * Trackpaw
+   * trackR
    * Tracktor
    * traja
+   * TrAQ
    * TREBA
    * TRex
    * TSE Systems
+   * TST Score Helper
    * UCT-2112 temperature microchip
    * UID Mouse Matrix
+   * UMATracker
    * Unsupervised behavior benchmark
    * USVCAM
    * USVSEG
@@ -320,13 +370,20 @@
    * VeNFLoPi
    * VIA (VGG Image Annotator)
    * ViewPoint (ZebraLab)
+   * Visual Field Analysis
    * Vium Digital Vivarium
    * VocalMat
+   * VocalPy
+   * VQ-MAP
    * Wet-dog shake classifier
    * Whisker Tracker
+   * WhiskEras
+   * X-Tracker
    * YOLO (Ultralytics)
    * YOLO-Behaviour
+   * YOLO-MousePose
    * YOLOv11 repetitive-behavior scorer
    * YORU
+   * Z-LaP Tracker
    * ZebraTrack
    * ZebraZoom
