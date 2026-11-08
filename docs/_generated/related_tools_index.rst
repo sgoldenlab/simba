@@ -2,6 +2,7 @@
    :class: toggle
 
    * 3D-printed mazes + ML tracking
+   * 3d\_tracking\_ik
    * 3DDD Social Mouse Tracker
    * 3DTracker-FAB
    * A-SOiD
@@ -15,6 +16,7 @@
    * AlphaTracker
    * AmadeusGPT
    * AMBER-pipeline
+   * AnimalPoseTracker (AnimalRTPose)
    * AnimalTA
    * animovement
    * Anipose
@@ -48,14 +50,18 @@
    * Barbary macaque detection dataset
    * BAREfoot
    * BEAST
+   * BeeVision
    * Behatrix
    * BehaveAgent
+   * BehaveAI
    * BehaVERT
+   * Behavior Atlas
    * BehaviorCloud
    * BehaviorDEPOT
    * BehaviorFlow
    * BehaviorScope-X
    * BENTO
+   * BeRSTID
    * Bidirectional-segmentation tracker
    * BioSyft
    * BioTracker
@@ -98,6 +104,7 @@
    * DeepAction
    * DeepBhvTracking
    * DeepEthogram
+   * DeepEthoProfile
    * DeepFly3D
    * DeepGraphPose
    * DeepLabCut
@@ -147,6 +154,8 @@
    * FERAL
    * FicTrac
    * FIMTrack
+   * FishSeg
+   * Fly Disco
    * FlyTracker
    * FlyVISTA
    * Forestwalk
@@ -162,6 +171,8 @@
    * HomeCageScan / PhenoCube
    * HomeLab
    * Huntington's microbehavior phenotyping pipeline
+   * HyVL (Hybrid Vocalization Localizer)
+   * I-MuPPET
    * idtracker.ai
    * iMouse
    * Implantable telemetry
@@ -173,6 +184,7 @@
    * JABS
    * JARVIS
    * Keypoint-MoSeq
+   * KiMA
    * KineMouse Wheel
    * KineWheel-DeepLabCut
    * Label Studio
@@ -193,6 +205,8 @@
    * Low-Profile Wireless Running Wheel
    * M-Track
    * M3 MultiMouseMonitor
+   * MacAction (AnimLabel)
+   * macaque3Dpose
    * MacqD
    * MAD
    * Mamba-MSQNet
@@ -210,6 +224,7 @@
    * MoSeq
    * MOSHERS
    * MOTHe
+   * MotionAnalyser
    * MotionMapper
    * MouBeAT
    * Mouse E-Motion
@@ -230,6 +245,7 @@
    * ndx-pose
    * Nematode aggression state model
    * Neonatal mouse withdrawal tracking
+   * Neurokraken
    * NeuroMotive
    * neurotic
    * Noldus DanioVision
@@ -240,6 +256,7 @@
    * Occluded-rat identity tracker
    * OCTRON
    * Olfactory habituation scoring pipeline
+   * Omniroute maze
    * OmniTrax
    * Open Ephys tracking plugin
    * Open Face Home Cage Running Wheel
@@ -278,6 +295,7 @@
    * PosePAL
    * PoseR
    * PrecisionTrack
+   * PrimateFace
    * Promethion
    * Promethion Core
    * PS-VAE
@@ -298,6 +316,7 @@
    * Rat head-twitch detector
    * ratognize / trajognize
    * ReachOut
+   * refineDLC
    * reHMM/reHMM+
    * Residual-guided visual context
    * Rethomics
@@ -311,6 +330,7 @@
    * SAUSI
    * SBeA
    * Scratch-AID
+   * Scratcher
    * SEB3R
    * Second-order conditioning profiling pipeline
    * Segment Anything (SAM 2)
@@ -378,6 +398,7 @@
    * Wet-dog shake classifier
    * Whisker Tracker
    * WhiskEras
+   * WormTracer
    * X-Tracker
    * YOLO (Ultralytics)
    * YOLO-Behaviour
