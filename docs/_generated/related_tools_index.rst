@@ -21,6 +21,7 @@
    * animovement
    * Anipose
    * Annotation-difference analysis
+   * Antnalyzer
    * anTraX
    * ANY-maze
    * AnyCage Lite
@@ -51,6 +52,7 @@
    * BAREfoot
    * BEAST
    * BeeVision
+   * BeeWhere (Bumblebox Annotator)
    * Behatrix
    * BehaveAgent
    * BehaveAI
@@ -65,11 +67,13 @@
    * Bidirectional-segmentation tracker
    * BioSyft
    * BioTracker
+   * BioTraj
    * BL-BERT
    * BlackBox
    * Bonsai
    * BonZeb
    * BORIS
+   * Braid
    * C-Trax
    * CaImAn
    * CalMS21
@@ -128,6 +132,7 @@
    * DLC2Action
    * DLC2Kinematics
    * DOME smart lids
+   * DRIADA
    * Dual Cage
    * DVC (Digital Ventilated Cage)
    * DVT
@@ -138,6 +143,7 @@
    * EthoClaw
    * Ethoflow
    * ethome
+   * EthoPy
    * Ethoscopes
    * EthoTrace
    * Ethovision XT
@@ -161,6 +167,8 @@
    * Forestwalk
    * Frame-wise CNN classifier
    * FreiPose
+   * GESTURE
+   * GrimACE
    * GuPPy
    * HASRA
    * HBAF
@@ -176,9 +184,11 @@
    * idtracker.ai
    * iMouse
    * Implantable telemetry
+   * improv
    * InfraMot
    * IntegraPose
    * IntelliCage
+   * IntelliProfiler
    * Intermediate-representation benchmark
    * JAABA
    * JABS
@@ -214,6 +224,7 @@
    * Marigold
    * Markerless Mouse Tracking (MaSoMoTr)
    * Marmoset behavior dataset
+   * MarmosetGazeEstimation
    * MARS
    * Megabouts
    * MiceProfiler
@@ -295,12 +306,14 @@
    * PosePAL
    * PoseR
    * PrecisionTrack
+   * PriMAT
    * PrimateFace
    * Promethion
    * Promethion Core
    * PS-VAE
    * PumpKin
    * Pup retrieval movement dataset
+   * Pupil-DLC
    * pyControl
    * PyMiceTracking
    * PyMouseTracks
@@ -320,11 +333,13 @@
    * reHMM/reHMM+
    * Residual-guided visual context
    * Rethomics
+   * RMScratcher
    * RpiBeh
    * RTFED
    * Rtrack
    * S3LDS (semi-supervised switching LDS)
    * SaLSa
+   * SAMannot
    * SAMPL
    * SARTAB
    * SAUSI
@@ -371,6 +386,7 @@
    * Trackpaw
    * trackR
    * Tracktor
+   * TracktorLive
    * traja
    * TrAQ
    * TREBA
@@ -398,6 +414,8 @@
    * Wet-dog shake classifier
    * Whisker Tracker
    * WhiskEras
+   * WILD (Wireless, Interactive, Lightweight Datalogger)
+   * WormsPy
    * WormTracer
    * X-Tracker
    * YOLO (Ultralytics)

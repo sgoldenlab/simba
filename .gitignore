@@ -56,3 +56,5 @@ simba/.claude/
 /misc/data_inventory/crawlers/*.json
 /misc/data_inventory/maintainer_notes.html
 misc/_related_tools_candidates.json
+# Java crash logs (e.g. from PyCharm's git helper)
+hs_err_pid*.log
