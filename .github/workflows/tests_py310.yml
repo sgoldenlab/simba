@@ -15,13 +15,18 @@ permissions:
 jobs:
   build:
 
-    runs-on: ubuntu-20.04
+    # ubuntu-20.04 was retired by GitHub: jobs asking for it queue until they are cancelled.
+    runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: FedericoCarboni/setup-ffmpeg@v2
+    - uses: actions/checkout@v4
+    - name: Install ffmpeg
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends ffmpeg
+        ffmpeg -version
     - name: Set up Python 3.10
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: "3.10"
         architecture: "x64"
@@ -31,10 +36,9 @@ jobs:
         pip install --upgrade setuptools
         pip install flake8 pytest black pytest-cov
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        pip install simba-uw-tf-dev --no-deps
-    # - name: Install ffmpeg
-    #   id: setup-ffmpeg
-    #   run: ffmpeg -version
-    # - name: Test with pytest
-    #   run: |
-    #     pytest -cov
+        pip install --no-deps .   # this commit's code, not the release on PyPI
+    - name: Test with pytest
+      # Run from the repository root: the tests use paths such as tests/data/...
+      # -p no:dash: the pinned dash 1.14 registers a pytest plugin that fails to import with current werkzeug.
+      run: |
+        python -m pytest tests -p no:dash

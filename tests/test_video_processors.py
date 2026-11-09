@@ -114,11 +114,6 @@ def test_gif_creator(config_video_path_args, start_time, duration, width):
     copied_file_path = copy_file(file_path=config_video_path_args.param)
     gif_creator(file_path=copied_file_path, width=width, start_time=start_time, duration=duration)
 
-@pytest.mark.parametrize('start_time, duration, width', [[1, 3, 600]])
-def test_gif_creator(config_video_path_args, start_time, duration, width):
-    copied_file_path = copy_file(file_path=config_video_path_args.param)
-    gif_creator(file_path=copied_file_path, width=width, start_time=start_time, duration=duration)
-
 @pytest.mark.parametrize('input_format, output_format', [['avi', 'mp4']])
 def test_batch_convert_video_format(config_video_dir_args, input_format, output_format):
     test_dir_copy_path = os.path.join(os.path.dirname(config_video_dir_args.param), 'test_out')
@@ -134,14 +129,16 @@ def test_batch_create_frames(config_video_dir_args):
     batch_create_frames(directory=test_dir_copy_path)
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="LONG RUNNING TIME.")
-def test_extract_frames_single_video(config_video_path_args):
+def test_extract_frames_single_video(config_video_path_args, tmp_path):
     copied_file_path = copy_file(file_path=config_video_path_args.param)
-    extract_frames_single_video(file_path=copied_file_path)
+    extract_frames_single_video(file_path=copied_file_path, save_dir=str(tmp_path))
+    assert len(glob.glob(os.path.join(str(tmp_path), '*.png'))) > 0
 
 @pytest.mark.parametrize('start_times, end_times', [(['00:00:01', '00:00:03'], ['00:00:04', '00:00:05'])])
-def test_multi_split_video(config_video_path_args, start_times, end_times):
+def test_multi_split_video(config_video_path_args, start_times, end_times, tmp_path):
     copied_file_path = copy_file(file_path=config_video_path_args.param)
-    multi_split_video(file_path=copied_file_path, start_times=start_times, end_times=end_times)
+    multi_split_video(file_path=copied_file_path, start_times=start_times, end_times=end_times, out_dir=str(tmp_path))
+    assert len(glob.glob(os.path.join(str(tmp_path), '*.mp4'))) == len(start_times)
 
 @pytest.mark.parametrize('horizontal', [True, False])
 def test_video_concatenator(config_video_path_args, horizontal):

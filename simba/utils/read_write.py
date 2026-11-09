@@ -40,7 +40,6 @@ from urllib.parse import urlparse
 import cv2
 import numpy as np
 import pandas as pd
-import pkg_resources
 import pyarrow as pa
 from numba import njit, prange
 from pyarrow import csv
@@ -62,7 +61,9 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_valid_lst, check_valid_tuple,
                                 check_valid_url, is_video_color)
 from simba.utils.enums import (ENV_VARS, OS, ConfigKey, Defaults, Dtypes,
-                               Formats, Keys, Links, Options, Paths)
+                               Formats, Keys, Links, Options,
+                               PackageNotFoundError, Paths,
+                               get_distribution_version)
 from simba.utils.errors import (CorruptedFileError, DataHeaderError,
                                 DuplicationError, FFMPEGCodecGPUError,
                                 FFMPEGNotFoundError, FileExistError,
@@ -2297,8 +2298,8 @@ def get_pkg_version(pkg: str, raise_error: Optional[bool] = False):
     check_str(name=get_pkg_version.__name__, value=pkg, allow_blank=False)
     check_valid_boolean(value=raise_error, source=get_pkg_version.__name__, raise_error=True)
     try:
-        return pkg_resources.get_distribution(pkg).version
-    except pkg_resources.DistributionNotFound:
+        return get_distribution_version(pkg)
+    except PackageNotFoundError:
         if raise_error:
             raise SimBAPAckageVersionError(msg=f'Package not found: {pkg}', source=get_pkg_version.__name__)
         else:

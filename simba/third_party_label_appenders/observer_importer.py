@@ -87,9 +87,7 @@ class NoldusObserverImporter(ConfigReader):
         self.annotation = {}
         for file_path in self.observer_files_found:
             try:
-                df = pd.read_excel(
-                    file_path, sheet_name=None, usecols=EXPECTED_FIELDS
-                ).popitem(last=False)[1]
+                df = next(iter(pd.read_excel(file_path, sheet_name=None, usecols=EXPECTED_FIELDS).values()))  # first sheet
             except KeyError:
                 raise ColumnNotFoundError(
                     file_name=file_path, column_name=", ".join(EXPECTED_FIELDS)
@@ -151,9 +149,7 @@ class NoldusObserverImporter(ConfigReader):
                 ].reset_index(
                     drop=True
                 )
-                start_df, stop_df = start_df["FRAME"].rename(
-                    columns={"FRAME": "START"}
-                ), stop_df["FRAME"].rename(columns={"FRAME": "STOP"})
+                start_df, stop_df = start_df["FRAME"].rename("START"), stop_df["FRAME"].rename("STOP")
                 clf_df = pd.concat([start_df, stop_df], axis=1).reset_index(drop=True)
                 clf_df.columns = ["START", "STOP"]
                 if len(clf_df.query("START > STOP")) > 0:

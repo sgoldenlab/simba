@@ -5,13 +5,23 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.read_write import read_config_file, read_df, read_pickle
+from simba.utils.read_write import read_config_file, read_df, read_pickle, write_pickle
 
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 @pytest.fixture(params=['tests/data/test_projects/two_c57/project_folder/project_config.ini'])
 def parsed_config_args(request):
     return read_config_file(config_path=request.param)
+
+@pytest.fixture
+def clf_path(tmp_path):
+    """ A small two-feature random forest, pickled with SimBA's own writer. Trained here rather than read from a
+    committed .sav so that it always matches the installed scikit-learn version. """
+    x, y = np.random.randint(1, 10, size=(100, 2)), np.random.randint(0, 2, size=(100))
+    clf = RandomForestClassifier(n_estimators=10, random_state=0).fit(x, y)
+    save_path = os.path.join(str(tmp_path), 'Attack.sav')
+    write_pickle(data=clf, save_path=save_path)
+    return save_path
 
 
 # @pytest.mark.parametrize("file_paths", [['tests/data/test_projects/two_c57/project_folder/csv/targets_inserted/Together_1.csv']])
@@ -46,8 +56,6 @@ def test_random_undersampler(sample_ratio):
     assert x_train_out.reset_index(drop=True).equals(pd.DataFrame([[1, 2, 3], [1, 2, 3]]))
     assert y_train_out.reset_index(drop=True).equals(pd.Series([1, 0], name='Test'))
 
-@pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
-#@pytest.mark.parametrize("clf_path", [r"C:\projects\simba\simba\tests\data\test_projects\two_c57\models\generated_models\Attack.sav"])
 def test_calc_permutation_importance(clf_path):
     x_test = np.array([[1, 2], [1, 2], [1, 2]])
     y_test = np.array([[1], [1], [0]])
@@ -56,9 +64,9 @@ def test_calc_permutation_importance(clf_path):
     assert os.path.isfile(os.path.join(os.path.dirname(clf_path), 'Attack_permutations_importances.csv'))
 
 
-@pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_calc_learning_curve(clf_path):
-    x, y = np.random.randint(1, 10, size=(10, 2)), np.random.randint(0, 2, size=(10))
+    # The smallest learning-curve step trains on 1% of the data: use enough balanced rows that it holds both classes.
+    x, y = np.random.randint(1, 10, size=(2000, 2)), np.tile([0, 1], 1000)
     data = pd.DataFrame(x)
     data['target'] = y
     clf = read_df(file_path=clf_path, file_type='pickle')
@@ -72,7 +80,6 @@ def test_calc_learning_curve(clf_path):
                                           save_dir=os.path.dirname(clf_path))
     assert os.path.isfile(train_model_mixin.learning_curve_save_path)
 
-@pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_calc_pr_curve(clf_path):
     x, y = pd.DataFrame(np.random.randint(1, 10, size=(10, 2))), pd.DataFrame(np.random.randint(0, 2, size=(10)), columns=['target'])
     clf = read_df(file_path=clf_path, file_type='pickle')
@@ -85,7 +92,6 @@ def test_calc_pr_curve(clf_path):
     assert os.path.isfile(train_model_mixin.pr_save_path)
 
 
-@pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_create_clf_report(clf_path):
     x, y = pd.DataFrame(np.random.randint(1, 10, size=(500, 2))), pd.DataFrame(np.random.randint(0, 2, size=(500)), columns=['target'])
     train_model_mixin = TrainModelMixin()
@@ -96,7 +102,6 @@ def test_create_clf_report(clf_path):
                                         class_names=['not_target', 'target'],
                                         save_dir=os.path.dirname(clf_path))
 
-@pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_create_x_importance_log(clf_path):
     x, y = pd.DataFrame(np.random.randint(1, 10, size=(500, 2))), pd.DataFrame(np.random.randint(0, 2, size=(500)), columns=['target'])
     clf = read_df(file_path=clf_path, file_type='pickle')
@@ -108,9 +113,7 @@ def test_create_x_importance_log(clf_path):
     assert os.path.isfile(train_model_mixin.f_importance_save_path)
 
 
-@pytest.mark.parametrize("config_path, clf_path", [['tests/data/test_projects/two_c57/project_folder/project_config.ini',
-                                                   'tests/data/test_projects/two_c57/models/generated_models/Attack.sav']])
-def test_create_shap_log(config_path, clf_path):
+def test_create_shap_log(clf_path):
     x, y = pd.DataFrame(np.random.randint(1, 10, size=(500, 2))), pd.Series(np.random.randint(0, 2, size=(500)), name='target')
     x.columns = [str(x) for x in list(x.columns)]
     clf = read_df(file_path=clf_path, file_type='pickle')
@@ -150,17 +153,14 @@ def test_check_sampled_dataset_integrity():
     with pytest.raises(Exception):
         _ = TrainModelMixin().check_sampled_dataset_integrity(x_df=x, y_df=y)
 
-@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="updated.")
-@pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_partial_dependence_calculator(clf_path):
-    x = pd.DataFrame(np.random.randint(1, 10, size=(500, 2)))
+    x = pd.DataFrame(np.random.randint(1, 10, size=(500, 2)), columns=['Feature_1', 'Feature_2'])
     clf = read_df(file_path=clf_path, file_type='pickle')
     TrainModelMixin().partial_dependence_calculator(x_df=x,
                                                     clf=clf,
                                                     clf_name='target',
                                                     save_dir=os.path.dirname(clf_path))
 
-@pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_clf_predict_proba(clf_path):
     x = pd.DataFrame(np.random.randint(1, 10, size=(10, 2)))
     clf = read_df(file_path=clf_path, file_type='pickle')

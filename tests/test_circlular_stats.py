@@ -7,7 +7,7 @@ def test_mean_resultant_vector_length():
     results = CircularStatisticsMixin().mean_resultant_vector_length(data=data)
     assert np.allclose(results, 0.9132277170817057)
 
-@pytest.mark.parametrize('data_size, time_windows,', [(100, (1.0)), (200, (1.5, 2.0)), (10, (3.0, 1.0))])
+@pytest.mark.parametrize('data_size, time_windows', [(100, (1.0)), (200, (1.5, 2.0)), (10, (3.0, 1.0))])
 def test_sliding_mean_resultant_vector_length(data_size, time_windows):
     time_windows = np.array([time_windows]).flatten()
     data = np.random.normal(loc=45, scale=1, size=data_size).astype(np.float32)
@@ -22,8 +22,8 @@ def test_circular_mean_1():
     data = np.array([135, 45, 180, 0]).astype(np.float32)
     assert CircularStatisticsMixin().circular_mean(data=data) == 90.0
 
-@pytest.mark.parametrize('data_size,', [(100), (150), (75)])
-def test_circular_mean_1(data_size):
+@pytest.mark.parametrize('data_size', [(100), (150), (75)])
+def test_circular_mean_2(data_size):
     data = np.random.randint(0, 361, size=(data_size,)).astype(np.float32)
     results = CircularStatisticsMixin().circular_mean(data=data)
     assert 0.0 <= results <= 360.0
@@ -82,8 +82,8 @@ def test_circular_correlation_1():
     results = CircularStatisticsMixin().circular_correlation(sample_1=sample_1, sample_2=sample_2)
     assert np.allclose(results, 0.7649115920066833)
 
-@pytest.mark.parametrize('size, ', [(100), (1000), (10000)])
-def test_circular_correlation_1(size):
+@pytest.mark.parametrize('size', [(100), (1000), (10000)])
+def test_circular_correlation_2(size):
     sample_1 = np.random.randint(0, 361, size).astype(np.float32)
     sample_2 = np.random.randint(0, 361, size).astype(np.float32)
     result = CircularStatisticsMixin().circular_correlation(sample_1=sample_1, sample_2=sample_2)
@@ -115,7 +115,7 @@ def test_sliding_angular_diff_1():
     assert np.allclose(results, np.array([[ 0], [0], [0], [1]], dtype=np.int8))
 
 @pytest.mark.parametrize('size, time_windows', [(100, (1.5, 2.0)), (1000, (0.5, 10.0)), (10000, (1.0))])
-def test_sliding_angular_diff_1(size, time_windows):
+def test_sliding_angular_diff_2(size, time_windows):
     data = np.random.randint(0, 361, size).astype(np.float32)
     time_windows = np.array([time_windows]).flatten().astype(np.float64)
     results = CircularStatisticsMixin().sliding_angular_diff(data=data, time_windows=time_windows, fps=5.0)
@@ -125,7 +125,7 @@ def test_sliding_angular_diff_1(size, time_windows):
 
 def test_agg_angular_diff_timebins_1():
     data = np.array([0, 0, 0, 0, 0, 5, 5, 5, 5, 5]).astype(np.float32)
-    expected_output = np.array([[0.], [0.], [0.], [0.], [0.], [5.], [5.], [5.], [5.], [5.]], dtype=np.int)
+    expected_output = np.array([[0.], [0.], [0.], [0.], [0.], [5.], [5.], [5.], [5.], [5.]], dtype=int)
     results = CircularStatisticsMixin().agg_angular_diff_timebins(data=data, time_windows=np.array([1.0]), fps=5)
     assert np.array_equal(expected_output.astype(np.int32), results.astype(np.int32))
 
@@ -169,17 +169,17 @@ def test_sliding_circular_range_2(size, time_windows):
 
 def test_circular_hotspots():
     data = np.array([270, 360, 10, 90, 91, 180, 185, 260]).astype(np.float32)
-    bins = np.array([[270, 90], [91, 268]])
+    bins = np.array([[270, 90], [91, 268]], dtype=np.int64)
     results = CircularStatisticsMixin().circular_hotspots(data=data, bins=bins)
     assert np.array_equal(results, np.array([0.5, 0.5]))
-    bins = np.array([[270, 0], [1, 90], [91, 180], [181, 269]])
+    bins = np.array([[270, 0], [1, 90], [91, 180], [181, 269]], dtype=np.int64)
     results = CircularStatisticsMixin().circular_hotspots(data=data, bins=bins)
     assert np.array_equal(results, np.array([0.25, 0.25, 0.25, 0.25]))
 
 @pytest.mark.parametrize('size, time_windows', [(10, (np.array([[0, 90], [91, 180], [181, 270], [271, 359]]))), (10, (np.array([[0, 45], [46, 90], [91, 135], [136, 180], [181, 225], [225, 270], [271, 315], [316, 359]])))])
 def test_sliding_circular_hotspots(size, time_windows):
     data = np.random.randint(0, 361, size=(size,)).astype(np.float32)
-    results = CircularStatisticsMixin().sliding_circular_hotspots(data=data, bins=time_windows, time_window=1.0, fps=2)
+    results = CircularStatisticsMixin().sliding_circular_hotspots(data=data, bins=time_windows.astype(np.int64), time_window=1.0, fps=2.0)
     assert results.shape[0] == data.shape[0]
     assert results.shape[1] == time_windows.shape[0]
     assert np.all((results >= 0.0) & (results <= 1.0))

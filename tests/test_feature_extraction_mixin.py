@@ -66,7 +66,7 @@ def test_windowed_frequentist_distribution_tests():
     data = np.random.randint(1, 10, size=(10))
     results = FeatureExtractionMixin.windowed_frequentist_distribution_tests(data=data, fps=25, feature_name='Anima_1_velocity')
     assert len(results.columns) == 4; assert len(results) == data.shape[0]
-    assert results._is_numeric_mixed_type
+    assert all(pd.api.types.is_numeric_dtype(dtype) for dtype in results.dtypes)
 
 def test_cdist():
     array_1 = np.array([[3, 9], [5, 1], [2, 5]]).astype('float32')
@@ -79,7 +79,7 @@ def test_create_shifted_df():
     results = FeatureExtractionMixin.create_shifted_df(df=df)
     assert list(results.columns) == ['Feature_1', 'Feature_1_shifted']
     assert len(results) == len(df)
-    assert results._is_numeric_mixed_type
+    assert all(pd.api.types.is_numeric_dtype(dtype) for dtype in results.dtypes)
 
 def test_create_shifted_array():
     data = np.array([[10], [95], [85]])
@@ -117,8 +117,8 @@ def test_dataframe_gaussian_smoother(time_window):
     in_df = pd.DataFrame(data=[10, 95, 85], columns=['Feature_1'])
     out_df = deepcopy(in_df)
     for c in in_df.columns: out_df[c] = out_df[c].rolling(window=int(time_window), win_type='gaussian', center=True).mean(std=5).fillna(out_df[c]).abs().astype(int)
-    if time_window == 1: assert out_df.equals(in_df)
-    else: assert out_df.equals(pd.DataFrame(data=[10, 63, 85], columns=['Feature_1']))
+    if time_window == 1: pd.testing.assert_frame_equal(out_df, in_df, check_dtype=False)
+    else: pd.testing.assert_frame_equal(out_df, pd.DataFrame(data=[10, 63, 85], columns=['Feature_1']), check_dtype=False)
 
 @pytest.mark.parametrize("time_window", [5])
 def test_dataframe_savgol_smoother(time_window):
@@ -126,7 +126,7 @@ def test_dataframe_savgol_smoother(time_window):
     out_df = deepcopy(in_df)
     for c in in_df.columns:
         out_df[c] = savgol_filter(x=in_df[c].to_numpy(), window_length=time_window, polyorder=3, mode='nearest').astype(int)
-    assert out_df.equals(pd.DataFrame(data=[32, 68, 92, 126, 182], columns=['Feature_1']))
+    pd.testing.assert_frame_equal(out_df, pd.DataFrame(data=[32, 68, 92, 126, 182], columns=['Feature_1']), check_dtype=False)
 
 
 

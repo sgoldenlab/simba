@@ -1079,7 +1079,7 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
     :param Union[str, os.PathLike] file_path: Path to video file or directory containing video files.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :param Optional[bool] recursive: If True, processes all video files in ``file_path`` directory found recursively. If False, then grabs just the video in the parent.
-    :param Optional[str] font: The font to use for the frame number. Default 'Arial'.
+    :param Optional[str] font: The font to use for the frame number. Default 'Arial' (or SimBA's bundled 'Poppins Regular' where Arial is not installed).
     :param Optional[str] font_color: The color of frame number text. Default 'black'.
     :param Optional[str] bg_color: The color of the box which the frame number is printed in. Default 'white'.
     :param Optional[str] codec: Video codec to use for CPU encoding. Default 'libx264'. Ignored if gpu=True.
@@ -1103,6 +1103,7 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
     font_color = ''.join(filter(str.isalnum, font_color)).lower()
     bg_color = ''.join(filter(str.isalnum, bg_color)).lower()
     font_dict = {**get_fonts(), **get_named_simba_fonts()}
+    if font == 'Arial' and font not in font_dict: font = 'Poppins Regular'  # the default font is often missing on Linux: use the font bundled with SimBA
     if save_path is not None:
         check_str(name=f'{superimpose_frame_count.__name__} save_path', value=save_path, raise_error=True)
     check_str(name='font', value=font, options=tuple(font_dict.keys()))
@@ -1616,7 +1617,7 @@ def batch_create_frames(directory: Union[str, os.PathLike]) -> None:
 
 
 def extract_frames_single_video(file_path: Union[str, os.PathLike],
-                                save_dir: Optional[Union[str, os.PathLike]]) -> None:
+                                save_dir: Optional[Union[str, os.PathLike]] = None) -> None:
     """
     Extract all frames for a single video.
 
@@ -1683,7 +1684,7 @@ def multi_split_video(file_path: Union[str, os.PathLike],
     dir_name, file_name, ext = get_fn_ext(filepath=file_path)
     quality = 23 if not check_int(name=f'{multi_split_video.__name__} quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     if codec is not None: check_valid_codec(codec=codec, raise_error=True, source=multi_split_video.__name__)
-    codec = get_ffmpeg_codec(file_name=file_name) if codec is None else codec
+    codec = get_ffmpeg_codec(file_name=f'{file_name}.mp4') if codec is None else codec  # clips are always written as .mp4
     if out_dir is not None:
         if not os.path.isdir(out_dir):
             os.makedirs(out_dir)

@@ -234,9 +234,7 @@ def read_observer_files(
     dfs = {}
     for file_path in data_paths:
         try:
-            df = pd.read_excel(
-                file_path, sheet_name=None, usecols=EXPECTED_FIELDS
-            ).popitem(last=False)[1]
+            df = next(iter(pd.read_excel(file_path, sheet_name=None, usecols=EXPECTED_FIELDS).values()))  # first sheet
         except KeyError:
             raise ColumnNotFoundError(
                 file_name=file_path, column_name=", ".join(EXPECTED_FIELDS)

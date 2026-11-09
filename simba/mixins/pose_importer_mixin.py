@@ -487,11 +487,11 @@ class PoseImporterMixin(object):
                 m, n, r = animal.shape
                 out_arr = np.column_stack((np.repeat(np.arange(m), n), animal.reshape(m * n, -1)))
                 animal_df_lst.append(pd.DataFrame(out_arr).T.iloc[1:].reset_index(drop=True))
-                self.data_df = pd.concat(animal_df_lst, axis=1).fillna(0).astype(np.int)
+                self.data_df = pd.concat(animal_df_lst, axis=1).fillna(0).astype(int)
         else:
             m, n, r = data.shape
             out_arr = np.column_stack((np.repeat(np.arange(m), n), data.reshape(m * n, -1)))
-            self.data_df = (pd.DataFrame(out_arr).T.iloc[1:].reset_index(drop=True).astype(np.int))
+            self.data_df = (pd.DataFrame(out_arr).T.iloc[1:].reset_index(drop=True).astype(int))
 
         p_cols = pd.DataFrame(1, index=self.data_df.index, columns=self.data_df.columns[1::2] + 0.5)
         return pd.concat([self.data_df, p_cols], axis=1)  # .sort_index(axis=1)

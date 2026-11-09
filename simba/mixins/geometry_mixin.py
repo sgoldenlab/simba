@@ -3995,7 +3995,7 @@ class GeometryMixin(object):
 
         >>> df = read_df(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/outlier_corrected_movement_location/SI_DAY3_308_CD1_PRESENT.csv', file_type='csv')
         >>> cols = [x for x in df.columns if not x.endswith('_p')]
-        >>> data = df[cols].values.reshape(len(df), -1 , 2).astype(np.int)
+        >>> data = df[cols].values.reshape(len(df), -1 , 2).astype(int)
         >>> geometries = GeometryMixin().multiframe_bodyparts_to_polygon(data=data, pixels_per_mm=1, parallel_offset=1, verbose=False, core_cnt=-1)
         >>> hausdorff_distances = GeometryMixin.multiframe_hausdorff_distance(geometries=geometries)
         """

@@ -94,7 +94,7 @@ class SeverityFrameCalculator(ConfigReader, FeatureExtractionMixin):
                             px_per_mm,
                         ),
                     )
-            self.movements[video_name] = video_movement.astype(np.int)
+            self.movements[video_name] = video_movement.astype(int)
 
     def run(self):
         self.__calculate_movements()

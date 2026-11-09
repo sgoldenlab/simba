@@ -8,7 +8,16 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-import pkg_resources
+
+try:
+    from importlib.metadata import PackageNotFoundError
+    from importlib.metadata import version as get_distribution_version
+except ImportError:  # Python < 3.8 (e.g., 3.6) has no importlib.metadata. Newer setuptools (>= 81) no longer ships pkg_resources.
+    import pkg_resources
+    from pkg_resources import DistributionNotFound as PackageNotFoundError
+
+    def get_distribution_version(distribution_name: str) -> str:
+        return pkg_resources.get_distribution(distribution_name).version
 
 import simba
 
@@ -129,8 +138,8 @@ class OS(Enum):
     FORK = 'fork'
     PYTHON_VER = str(f"{sys.version_info.major}.{sys.version_info.minor}")
     try:
-        SIMBA_VERSION = pkg_resources.get_distribution("simba-uw-tf-dev").version
-    except pkg_resources.DistributionNotFound:
+        SIMBA_VERSION = get_distribution_version("simba-uw-tf-dev")
+    except PackageNotFoundError:
         SIMBA_VERSION = None
 
 class FontPaths(Enum):
@@ -510,8 +519,8 @@ class Defaults(Enum):
     CHUNK_SIZE = 1
     SPLASH_TIME = 2500
     try:
-        WELCOME_MSG = f'Welcome fellow scientists! \n SimBA v.{pkg_resources.get_distribution("simba-uw-tf-dev").version} \n '
-    except pkg_resources.DistributionNotFound:
+        WELCOME_MSG = f'Welcome fellow scientists! \n SimBA v.{get_distribution_version("simba-uw-tf-dev")} \n '
+    except PackageNotFoundError:
         WELCOME_MSG = f'Welcome fellow scientists! \n SimBA v. "dev" \n '
     BROWSE_FOLDER_BTN_TEXT = "Browse Folder"
     BROWSE_FILE_BTN_TEXT = "Browse File"

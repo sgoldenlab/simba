@@ -1991,23 +1991,27 @@ class Statistics(FeatureExtractionMixin):
         >>> sample_1 = np.array([4, 2, 3, 4, 5, 7]).astype(np.float32)
         >>> sample_2 = np.array([1, 2, 3, 4, 5, 7]).astype(np.float32)
         >>> Statistics().kendall_tau(sample_1=sample_1, sample_2=sample_2)
-        >>> (0.7333333333333333, 2.0665401605809928)
+        >>> (0.7142857142857143, 2.0128637927736945)
 
         References
         ----------
         .. [1] `Stephanie Glen, "Kendall’s Tau (Kendall Rank Correlation Coefficient)"  <https://www.statisticshowto.com/kendalls-tau/>`__.
         """
 
-        rnks = np.argsort(sample_1)
-        s1_rnk, s2_rnk = sample_1[rnks], sample_2[rnks]
-        cncrdnt_cnts, dscrdnt_cnts = np.full((s1_rnk.shape[0] - 1), np.nan), np.full(
-            (s1_rnk.shape[0] - 1), np.nan
-        )
-        for i in range(s2_rnk.shape[0] - 1):
-            cncrdnt_cnts[i] = (np.argwhere(s2_rnk[i + 1 :] > s1_rnk[i]).flatten().shape[0])
-            dscrdnt_cnts[i] = (np.argwhere(s2_rnk[i + 1 :] < s1_rnk[i]).flatten().shape[0])
-        t = (np.sum(cncrdnt_cnts) - np.sum(dscrdnt_cnts)) / (np.sum(cncrdnt_cnts) + np.sum(dscrdnt_cnts))
-        z = (3 * t * (np.sqrt(s1_rnk.shape[0] * (s1_rnk.shape[0] - 1))) / np.sqrt(2 * ((2 * s1_rnk.shape[0]) + 5)))
+        n = sample_1.shape[0]
+        cncrdnt_cnt, dscrdnt_cnt = 0.0, 0.0
+        for i in range(n - 1):
+            for j in range(i + 1, n):
+                pair_sign = np.sign(sample_1[i] - sample_1[j]) * np.sign(sample_2[i] - sample_2[j])
+                if pair_sign > 0:
+                    cncrdnt_cnt += 1
+                elif pair_sign < 0:
+                    dscrdnt_cnt += 1
+        if (cncrdnt_cnt + dscrdnt_cnt) == 0:
+            t = 0.0
+        else:
+            t = (cncrdnt_cnt - dscrdnt_cnt) / (cncrdnt_cnt + dscrdnt_cnt)
+        z = (3 * t * (np.sqrt(n * (n - 1))) / np.sqrt(2 * ((2 * n) + 5)))
         return t, z
 
     @staticmethod
