@@ -2046,27 +2046,35 @@ class Statistics(FeatureExtractionMixin):
         :param np.ndarray sample_2: Second sample for comparison.
         :param np.ndarray time_windows: Rolling time windows in seconds.
         :param float fps: Frames per second (FPS) of the recorded video.
-        :return: Array of Kendall's Tau correlation coefficients corresponding to each time window.
+        :return: Array of Kendall's Tau correlation coefficients corresponding to each time window. Each value is stored at the last frame of its window; frames before the first full window are 0, and windows where every pair is tied are -1.
         :rtype: np.ndarray
+
+        :example:
+
+        >>> sample_1 = np.array([4, 2, 3, 4, 5, 7]).astype(np.float32)
+        >>> sample_2 = np.array([1, 2, 3, 4, 5, 7]).astype(np.float32)
+        >>> Statistics().sliding_kendall_tau(sample_1=sample_1, sample_2=sample_2, time_windows=np.array([1.0, 1.5]), fps=2)
         """
 
         results = np.full((sample_1.shape[0], time_windows.shape[0]), 0.0)
         for time_window_cnt in range(time_windows.shape[0]):
             window_size = int(time_windows[time_window_cnt] * fps)
+            if window_size < 1:
+                continue
             for left, right in zip(range(0, sample_1.shape[0] + 1), range(window_size, sample_1.shape[0] + 1)):
-                sliced_sample_1, sliced_sample_2 = (sample_1[left:right], sample_2[left:right])
-                rnks = np.argsort(sliced_sample_1)
-                s1_rnk, s2_rnk = sliced_sample_1[rnks], sliced_sample_2[rnks]
-                cncrdnt_cnts, dscrdnt_cnts = np.full((s1_rnk.shape[0] - 1), np.nan), np.full((s1_rnk.shape[0] - 1), np.nan)
-                for i in range(s2_rnk.shape[0] - 1):
-                    cncrdnt_cnts[i] = (np.argwhere(s2_rnk[i + 1 :] > s1_rnk[i]).flatten().shape[0])
-                    dscrdnt_cnts[i] = (np.argwhere(s2_rnk[i + 1 :] < s1_rnk[i]).flatten().shape[0])
-                n = np.sum(cncrdnt_cnts) - np.sum(dscrdnt_cnts)
-                d = np.sum(cncrdnt_cnts) + np.sum(dscrdnt_cnts)
+                cncrdnt_cnt, dscrdnt_cnt = 0.0, 0.0
+                for i in range(left, right - 1):
+                    for j in range(i + 1, right):
+                        pair_sign = np.sign(sample_1[i] - sample_1[j]) * np.sign(sample_2[i] - sample_2[j])
+                        if pair_sign > 0:
+                            cncrdnt_cnt += 1
+                        elif pair_sign < 0:
+                            dscrdnt_cnt += 1
+                d = cncrdnt_cnt + dscrdnt_cnt
                 if d == 0:
-                    results[right][time_window_cnt] = -1
+                    results[right - 1][time_window_cnt] = -1
                 else:
-                    results[right][time_window_cnt] = n / d
+                    results[right - 1][time_window_cnt] = (cncrdnt_cnt - dscrdnt_cnt) / d
 
         return results
 

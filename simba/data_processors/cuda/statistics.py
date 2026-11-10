@@ -1212,27 +1212,24 @@ def sliding_pearsons_r_cuda(sample_1: np.ndarray,
 
 @cuda.jit()
 def _sliding_kendall_kernel(s1, s2, window_sizes, results):
-    """One thread per (storage-row r, time-window wi). Window = s[r-W : r] (ends at frame r-1, stored at row r)."""
+    """One thread per (storage-row r, time-window wi). Window = s[r-W+1 : r+1] (ends at frame r, stored at row r)."""
     r, wi = cuda.grid(2)
     n = s1.shape[0]
     if r >= n or wi >= window_sizes.shape[0]:
         return
     w = window_sizes[wi]
-    if w < 1 or r < w:
+    if w < 1 or r < w - 1:
         return
-    left = r - w
+    left = r - w + 1
     conc = 0
     disc = 0
-    for p in range(left, r):
+    for p in range(left, r + 1):
         s1p = s1[p]; s2p = s2[p]
-        for q in range(p + 1, r):
-            if s1p <= s1[q]:
-                s1i = s1p; s2j = s2[q]
-            else:
-                s1i = s1[q]; s2j = s2p
-            if s2j > s1i:
+        for q in range(p + 1, r + 1):
+            d1 = s1p - s1[q]; d2 = s2p - s2[q]
+            if (d1 > 0 and d2 > 0) or (d1 < 0 and d2 < 0):
                 conc += 1
-            elif s2j < s1i:
+            elif (d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0):
                 disc += 1
     d = conc + disc
     if d == 0:

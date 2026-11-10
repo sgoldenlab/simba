@@ -102,8 +102,10 @@ def test_get_feature_extraction_headers(pose):
 
 def test_minimum_bounding_rectangle():
     points = np.array([[7, 6], [9, 4], [4, 7], [5,1]])
-    results = FeatureExtractionMixin.minimum_bounding_rectangle(points=points).astype(int)
-    assert np.array_equal(results, np.array([[9, 1], [4, 1], [4, 7], [8, 7]]))
+    results = FeatureExtractionMixin.minimum_bounding_rectangle(points=points)
+    # Compare floats with a tolerance: corners such as (5, 1) come out as 4.999999999999999 on some platforms, so truncating with astype(int) is platform dependent.
+    expected = np.array([[347 / 37, 64 / 37], [5, 1], [4, 7], [310 / 37, 286 / 37]])
+    assert np.allclose(results, expected)
 
 def test_framewise_euclidean_distance():
     loc_1 = np.array([[108, 162]]).astype(np.float32)

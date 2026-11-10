@@ -1,8 +1,7 @@
 name: Daily GitHub Issue Report
 
 on:
-  schedule:
-  workflow_dispatch:  # Allows manual trigger
+  workflow_dispatch:  # Manual trigger only (the daily schedule was switched off; an empty schedule: key is invalid)
 
 jobs:
   report:

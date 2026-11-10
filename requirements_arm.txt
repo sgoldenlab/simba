@@ -20,6 +20,8 @@ kaleido; python_version>="3.9"
 psutil == 5.9.8; python_version=="3.6"
 psutil; python_version>="3.9"
 dash == 1.14.0
+Flask < 2.1
+Werkzeug < 2.1
 dash_color_picker == 0.0.1
 dash_core_components == 1.10.2
 dash_colorscales == 0.0.4

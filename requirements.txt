@@ -1,5 +1,7 @@
 cefpython3 == 66.0
 dash == 1.14.0
+Flask < 2.1
+Werkzeug < 2.1
 dash_color_picker == 0.0.1
 dash_colorscales == 0.0.4
 dash_core_components==1.10.2

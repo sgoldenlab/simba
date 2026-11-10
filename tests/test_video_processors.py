@@ -31,9 +31,9 @@ def config_video_path_args(request):
 def config_video_dir_args(request):
     return request
 
-def copy_file(file_path):
-    test_file_copy_path = os.path.join(os.path.dirname(file_path), 'test.mp4')
-    if os.path.isfile(test_file_copy_path): os.remove(test_file_copy_path)
+def copy_file(file_path, dst_dir):
+    # Copy into pytest's tmp_path so outputs written next to the video never land in (or collide inside) the repo.
+    test_file_copy_path = os.path.join(str(dst_dir), 'test.mp4')
     shutil.copy(file_path, test_file_copy_path)
     return test_file_copy_path
 
@@ -67,13 +67,13 @@ def test_extract_frame_range(config_video_path_args, start_frame, end_frame):
     for i in saved_files: check_file_exist_and_readable(i)
 
 @pytest.mark.parametrize('time',  [1])
-def test_remove_beginning_of_video(config_video_path_args, time):
-    copied_file_path = copy_file(file_path=config_video_path_args.param)
+def test_remove_beginning_of_video(config_video_path_args, time, tmp_path):
+    copied_file_path = copy_file(file_path=config_video_path_args.param, dst_dir=tmp_path)
     #remove_beginning_of_video(file_path=copied_file_path, time=time)
 
 @pytest.mark.parametrize('fps', [10])
-def test_change_single_video_fps(config_video_path_args, fps):
-    copied_file_path = copy_file(file_path=config_video_path_args.param)
+def test_change_single_video_fps(config_video_path_args, fps, tmp_path):
+    copied_file_path = copy_file(file_path=config_video_path_args.param, dst_dir=tmp_path)
     change_single_video_fps(file_path=copied_file_path, fps=fps)
 
 @pytest.mark.parametrize('directory, fps', [['tests/data/test_projects/two_c57/project_folder/videos/', 10]])
@@ -91,8 +91,8 @@ def test_change_fps_of_multiple_videos(directory, fps):
 #     copied_file_path = copy_file(file_path=config_video_path_args.param)
 #     convert_to_mp4(file_path=copied_file_path)
 
-def test_video_to_greyscale(config_video_path_args):
-    copied_file_path = copy_file(file_path=config_video_path_args.param)
+def test_video_to_greyscale(config_video_path_args, tmp_path):
+    copied_file_path = copy_file(file_path=config_video_path_args.param, dst_dir=tmp_path)
     video_to_greyscale(file_path=copied_file_path)
 
 # def test_superimpose_frame_count(config_video_path_args):
@@ -100,18 +100,18 @@ def test_video_to_greyscale(config_video_path_args):
 #     superimpose_frame_count(file_path=copied_file_path)
 
 @pytest.mark.parametrize('start_time, end_time', [['00:00:01', '00:00:05']])
-def test_clip_video_in_range(config_video_path_args, start_time, end_time):
-    copied_file_path = copy_file(file_path=config_video_path_args.param)
+def test_clip_video_in_range(config_video_path_args, start_time, end_time, tmp_path):
+    copied_file_path = copy_file(file_path=config_video_path_args.param, dst_dir=tmp_path)
     clip_video_in_range(file_path=copied_file_path, start_time=start_time, end_time=end_time)
 
 @pytest.mark.parametrize('width, height', [[600, 300]])
-def test_downsample_video(config_video_path_args, width, height):
-    copied_file_path = copy_file(file_path=config_video_path_args.param)
+def test_downsample_video(config_video_path_args, width, height, tmp_path):
+    copied_file_path = copy_file(file_path=config_video_path_args.param, dst_dir=tmp_path)
     downsample_video(file_path=copied_file_path, video_height=height, video_width=width)
 
 @pytest.mark.parametrize('start_time, duration, width', [[1, 3, 600]])
-def test_gif_creator(config_video_path_args, start_time, duration, width):
-    copied_file_path = copy_file(file_path=config_video_path_args.param)
+def test_gif_creator(config_video_path_args, start_time, duration, width, tmp_path):
+    copied_file_path = copy_file(file_path=config_video_path_args.param, dst_dir=tmp_path)
     gif_creator(file_path=copied_file_path, width=width, start_time=start_time, duration=duration)
 
 @pytest.mark.parametrize('input_format, output_format', [['avi', 'mp4']])
@@ -130,19 +130,20 @@ def test_batch_create_frames(config_video_dir_args):
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="LONG RUNNING TIME.")
 def test_extract_frames_single_video(config_video_path_args, tmp_path):
-    copied_file_path = copy_file(file_path=config_video_path_args.param)
+    copied_file_path = copy_file(file_path=config_video_path_args.param, dst_dir=tmp_path)
     extract_frames_single_video(file_path=copied_file_path, save_dir=str(tmp_path))
     assert len(glob.glob(os.path.join(str(tmp_path), '*.png'))) > 0
 
 @pytest.mark.parametrize('start_times, end_times', [(['00:00:01', '00:00:03'], ['00:00:04', '00:00:05'])])
 def test_multi_split_video(config_video_path_args, start_times, end_times, tmp_path):
-    copied_file_path = copy_file(file_path=config_video_path_args.param)
-    multi_split_video(file_path=copied_file_path, start_times=start_times, end_times=end_times, out_dir=str(tmp_path))
-    assert len(glob.glob(os.path.join(str(tmp_path), '*.mp4'))) == len(start_times)
+    copied_file_path = copy_file(file_path=config_video_path_args.param, dst_dir=tmp_path)
+    out_dir = os.path.join(str(tmp_path), 'clips')  # separate from the copied input video, which is also an .mp4
+    multi_split_video(file_path=copied_file_path, start_times=start_times, end_times=end_times, out_dir=out_dir)
+    assert len(glob.glob(os.path.join(out_dir, '*.mp4'))) == len(start_times)
 
 @pytest.mark.parametrize('horizontal', [True, False])
-def test_video_concatenator(config_video_path_args, horizontal):
-    copied_file_path = copy_file(file_path=config_video_path_args.param)
+def test_video_concatenator(config_video_path_args, horizontal, tmp_path):
+    copied_file_path = copy_file(file_path=config_video_path_args.param, dst_dir=tmp_path)
     _, video_name, _ = get_fn_ext(filepath=copied_file_path)
     video_concatenator(video_one_path=copied_file_path, video_two_path=copied_file_path, resolution=video_name, horizontal=horizontal)
     

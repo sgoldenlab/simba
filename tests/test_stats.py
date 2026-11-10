@@ -168,9 +168,21 @@ def test_sliding_kendall_tau():
     sample_1 = np.array([4, 2, 3, 4, 5, 7]).astype(np.float32)
     sample_2 = np.array([1, 2, 3, 4, 5, 7]).astype(np.float32)
     time_windows = np.array([1.0, 1.5])
-    expected_results = np.array([[ 0.        ,  0.        ],[ 0.        ,  0.        ],[-1.        ,  0.        ],[ 1.        , -0.33333333],[ 1.        ,  1.        ],[ 1.        ,  1.        ]])
+    # Windows of 2 and 3 frames; each tau is stored at the last frame of its window.
+    expected_results = np.array([[ 0.        ,  0.        ],[-1.        ,  0.        ],[ 1.        , -0.33333333],[ 1.        ,  1.        ],[ 1.        ,  1.        ],[ 1.        ,  1.        ]])
     results = Statistics().sliding_kendall_tau(sample_1=sample_1, sample_2=sample_2, time_windows=time_windows, fps=2)
     assert np.allclose(expected_results, results)
+
+def test_sliding_kendall_tau_matches_kendall_tau():
+    rng = np.random.default_rng(0)
+    sample_1 = rng.random(40).astype(np.float32)
+    sample_2 = rng.random(40).astype(np.float32)
+    window_size = 10
+    results = Statistics().sliding_kendall_tau(sample_1=sample_1, sample_2=sample_2, time_windows=np.array([1.0]), fps=window_size)
+    assert np.all(results[:window_size - 1, 0] == 0)
+    for end in range(window_size, sample_1.shape[0] + 1):
+        expected = Statistics().kendall_tau(sample_1=sample_1[end - window_size:end].copy(), sample_2=sample_2[end - window_size:end].copy())[0]
+        assert results[end - 1, 0] == pytest.approx(expected)
 
 @pytest.mark.parametrize('sample_data, expected_results', [('8x100_f32.npy', (8, ))])
 def test_local_outlier_factor(sample_data, expected_results, sample_data_dir):

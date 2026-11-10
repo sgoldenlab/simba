@@ -64,11 +64,13 @@ def test_percent_beyond_n_std():
     data = np.array([3.9, 7.5, 4.2, 6.2, 7.5, 3.9, 6.2, 6.5, 7.2, 9.5]).astype(np.float64)
     result = TimeseriesFeatureMixin().percent_beyond_n_std(data=data, n=1)
     assert result == 0.1
-    data = np.random.normal(loc=50.0, scale=1.0, size=10000000).astype(np.float64)
+    # Seeded, and compared with a tolerance: the true normal-distribution values above mean + 1 and + 2 SD are 0.1587 and
+    # 0.0228, and rounding a random estimate to 3 decimals made this test fail at random (e.g. 0.158475 -> 0.158).
+    data = np.random.RandomState(0).normal(loc=50.0, scale=1.0, size=10000000).astype(np.float64)
     result = TimeseriesFeatureMixin().percent_beyond_n_std(data=data, n=1.0)
-    assert np.round(result, 3) == 0.159
+    assert result == pytest.approx(0.1587, abs=0.001)
     result = TimeseriesFeatureMixin().percent_beyond_n_std(data=data, n=2.0)
-    assert np.round(result, 3) == 0.023
+    assert result == pytest.approx(0.0228, abs=0.001)
 
 @pytest.mark.parametrize('data, expected', [(np.array([-100, 10, 10, 10, 10, 10, 10, 10, 10, 100]).astype(np.float32), 0.8)])
 def test_percent_in_percentile_window(data, expected):
