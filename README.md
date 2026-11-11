@@ -5,7 +5,7 @@ SimBA is a toolkit for creating supervised machine-learning classifiers of anima
 [![pypi](https://img.shields.io/pypi/v/simba-uw-tf-dev.svg)](https://pypi.org/project/Simba-UW-tf-dev/)
 [![py3.10 tests](https://github.com/sgoldenlab/simba/actions/workflows/tests_py310.yml/badge.svg)](https://github.com/sgoldenlab/simba/actions/workflows/tests_py310.yml)
 [![py3.6 tests](https://github.com/sgoldenlab/simba/actions/workflows/tests_py36.yml/badge.svg)](https://github.com/sgoldenlab/simba/actions/workflows/tests_py36.yml)
-![Docs](https://readthedocs.org/projects/simba-uw-tf-dev/badge/?version=latest&style=flat)
+[![Docs](https://readthedocs.org/projects/simba-uw-tf-dev/badge/?version=latest&style=flat)](https://simba-uw-tf-dev.readthedocs.io/en/latest/)
 [![License: Modified BSD 3-Clause](https://img.shields.io/badge/License-Modified%20BSD%203--Clause%20(Academic%2FResearch)-blue.svg)](LICENSE)
 [![Gitter chat](https://badges.gitter.im/SimBA-Resource/community.png)](https://gitter.im/SimBA-Resource/community)
 [![Download: Weights](https://img.shields.io/badge/Download-Weights-orange.svg)](https://osf.io/5t4y9/)

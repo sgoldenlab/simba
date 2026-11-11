@@ -1,5 +1,11 @@
 {% extends "!layout.html" %}
 
+{# Google Search Console ownership verification for simba-uw-tf-dev.readthedocs.io (must stay in <head>). #}
+{% block extrahead %}
+  {{ super() }}
+  <meta name="google-site-verification" content="N8zmxgSFYs9XxgHTS5ArHINj1oRsr0wKnfZfyLhd2kE" />
+{% endblock %}
+
 {# The homepage H1 is just "SimBA", so give its <title> a descriptive one for search results. #}
 {% block htmltitle %}
   {%- if pagename == master_doc %}<title>SimBA: Behavioral Classifiers from Pose Estimation</title>
