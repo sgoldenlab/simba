@@ -12,7 +12,7 @@ from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import check_if_filepath_list_is_empty, check_int
 from simba.utils.enums import (ConfigKey, Dtypes, Formats, Links, Methods,
                                MLParamKeys, Options)
-from simba.utils.errors import ParametersFileError
+from simba.utils.errors import MissingProjectConfigEntryError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.read_write import read_config_entry, str_2_bool, write_df
 
@@ -44,7 +44,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         self.bp_config = read_config_entry(config=self.config, section=ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, option=ConfigKey.POSE_SETTING.value, default_value='user_defined', data_type=Dtypes.STR.value)
         stdout_information(msg=f"Reading in {len(self.target_file_paths)} annotated files...")
         if (isinstance(self.clf_name, str)) and self.clf_name.lower() == Dtypes.NONE.value.lower():
-            raise ParametersFileError(msg=f'The single classifier name is names "None". Have you set the model settings for a SINGLE model in SimBA? "None" is the name of a behavior if the behavior has not been set. Please set the hyperparameters and click "SAVE SETTINGS (SPECIFIC MODEL)" before training the model as detailed HERE: {Links.TRAIN_ML_MODEL.value}')
+            raise MissingProjectConfigEntryError(msg=f'The single classifier name is names "None". Have you set the model settings for a SINGLE model in SimBA? "None" is the name of a behavior if the behavior has not been set. Please set the hyperparameters and click "SAVE SETTINGS (SPECIFIC MODEL)" before training the model as detailed HERE: {Links.TRAIN_ML_MODEL.value}')
         self.data_df, self.frm_idx = self.read_all_files_in_folder_mp_futures(self.target_file_paths, self.file_type, [self.clf_name])
         self.frm_idx = pd.DataFrame({"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx})
         self.data_df = self.check_raw_dataset_integrity(df=self.data_df, logs_path=self.logs_path)

@@ -17,7 +17,7 @@ from simba.mixins.statistics_mixin import Statistics
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log, check_if_dir_exists)
-from simba.utils.errors import ParametersFileError
+from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     read_df, write_df)
@@ -60,7 +60,7 @@ class AgressionFeatureExtractor(ConfigReader, AbstractFeatureExtraction):
         check_if_dir_exists(in_dir=self.save_dir, raise_error=True)
         self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions='.csv', raise_error=True, as_dict=True)
         if list(self.animal_bp_dict.keys()) != ANIMAL_NAMES:
-            raise ParametersFileError(msg=f'The animal names in the project has to be {ANIMAL_NAMES}, got: {list(self.animal_bp_dict.keys())}', source=self.__class__.__name__)
+            raise InvalidInputError(msg=f'The animal names in the project has to be {ANIMAL_NAMES}, got: {list(self.animal_bp_dict.keys())}', source=self.__class__.__name__)
         print(f'Analyzing features for {len(list(self.data_paths.keys()))} data file(s)...')
 
     def run(self):

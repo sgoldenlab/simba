@@ -10,7 +10,29 @@ import time
 from datetime import datetime
 from typing import Optional
 
-from simba.utils.enums import Defaults, TagNames
+from simba.utils.enums import SIMBA_DOCS_URL, Defaults, TagNames
+
+
+def tag_docs_url(url: str, medium: str = "docs_icon") -> str:
+    """
+    Tag a Read the Docs link opened from SimBA so the docs analytics (GA4) can count visits that come from the app.
+
+    Visits from a desktop app arrive without a referrer, so without a tag they are lumped in with "direct" traffic.
+    Only Read the Docs URLs are tagged; other URLs, and URLs that already carry a tag, are returned unchanged.
+
+    :param str url: URL to tag.
+    :param str medium: Where in SimBA the link was opened from (``utm_medium``), e.g. ``"docs_icon"`` or ``"error"``.
+    :return: The URL with ``utm_source=simba_gui&utm_medium=<medium>`` added before any ``#anchor``.
+    :rtype: str
+
+    :example:
+    >>> tag_docs_url('https://simba-uw-tf-dev.readthedocs.io/en/latest/Scenario1.html#step-5-extract-features')
+    'https://simba-uw-tf-dev.readthedocs.io/en/latest/Scenario1.html?utm_source=simba_gui&utm_medium=docs_icon#step-5-extract-features'
+    """
+    if not isinstance(url, str) or not url.startswith(SIMBA_DOCS_URL) or "utm_source=" in url:
+        return url
+    page, sep, anchor = url.partition("#")
+    return f"{page}{'&' if '?' in page else '?'}utm_source=simba_gui&utm_medium={medium}{sep}{anchor}"
 
 
 def stdout_success(msg: str, source: Optional[str] = "", elapsed_time: Optional[str] = None) -> None:

@@ -627,95 +627,86 @@ class Methods(Enum):
 
 
 
+# Documentation links opened from the GUI's documentation icons (and error messages). Point at the Read the Docs site
+# (SIMBA_DOCS_URL) wherever a page exists there: it has navigation and search, and visits show up in the docs analytics.
+# Pages that have not been migrated to Read the Docs yet stay on GitHub (SIMBA_GITHUB_DOCS_URL). Every URL and #anchor
+# below was checked against the live docs on 2026-11-11.
+SIMBA_DOCS_URL = "https://simba-uw-tf-dev.readthedocs.io/en/latest/"
+SIMBA_GITHUB_DOCS_URL = "https://github.com/sgoldenlab/simba/blob/master/docs/"
+
+
 class Links(Enum):
-    FEATURE_SUBSETS = (
-        "https://github.com/sgoldenlab/simba/blob/master/docs/feature_subsets.md"
-    )
-    HEATMAP_LOCATION = (
-        "https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#heatmaps"
-    )
-    HEATMAP_CLF = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-classification-heatmaps"
-    DATA_TABLES = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-data-tables"
-    CONCAT_VIDEOS = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#merging-concatenating-videos"
-    DISTANCE_PLOTS = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-distance-plots"
-    PATH_PLOTS = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-path-plots"
-    VISUALIZE_CLF_PROBABILITIES = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-classification-probabilities"
-    GANTT_PLOTS = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-gantt-charts"
-    SKLEARN_PLOTS = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-classifications"
-    ANALYZE_ML_RESULTS = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results"
-    FSTTC = "https://github.com/sgoldenlab/simba/blob/master/docs/FSTTC.md"
-    KLEINBERG = (
-        "https://github.com/sgoldenlab/simba/blob/master/docs/kleinberg_filter.md"
-    )
-    DOWNSAMPLE = "https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#downsample-video"
-    VIDEO_TOOLS = (
-        "https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md"
-    )
-    SET_RUN_ML_PARAMETERS = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data"
-    OULIERS = (
-        "https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf"
-    )
-    REMOVE_CLF = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-2-optional-step--import-more-dlc-tracking-data-or-videos"
-    ROI_FEATURES_PLOT = "https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-5-visualizing-roi-features"
-    ROI_DATA_PLOT = "https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-4-visualizing-roi-data"
-    DIRECTING_ANIMALS_PLOTS = "https://github.com/sgoldenlab/simba/blob/master/docs/directionality_between_animals.md"
-    CLF_VALIDATION = (
-        "https://github.com/sgoldenlab/simba/blob/master/docs/classifier_validation.md"
-    )
-    BATCH_PREPROCESS = "https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md"
-    THIRD_PARTY_ANNOTATION_NEW = (
-        "https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot_new.md"
-    )
-    OUT_OF_SAMPLE_VALIDATION = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-8-evaluating-the-model-on-new-out-of-sample-data"
-    ROI = "https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md"
-    ROI_FEATURES = "https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data"
-    ROI_DATA_ANALYSIS = "https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-2-analyzing-roi-data"
-    DATA_ANALYSIS = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results"
-    ANALYZE_ROI = "https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-2-analyzing-roi-data"
-    EXTRACT_FEATURES = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-5-extract-features"
-    USER_DEFINED_FEATURE_EXTRACTION = (
-        "https://github.com/sgoldenlab/simba/blob/master/docs/extractFeatures.md"
-    )
-    APPEND_ROI_FEATURES = "https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data"
-    LABEL_BEHAVIOR = (
-        "https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md"
-    )
-    THIRD_PARTY_ANNOTATION = (
-        "https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md"
-    )
-    PSEUDO_LBL = "https://github.com/sgoldenlab/simba/blob/master/docs/pseudoLabel.md"
-    ADVANCED_LBL = (
-        "https://github.com/sgoldenlab/simba/blob/master/docs/advanced_labelling.md"
-    )
-    TRAIN_ML_MODEL = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model"
-    VISUALIZATION = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-results"
-    PLOTLY = "https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md"
-    VIDEO_PARAMETERS = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters"
-    OUTLIERS_DOC = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction"
-    CREATE_PROJECT = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-1-generate-project-config"
-    LOAD_PROJECT = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-2-load-project-1"
-    SCENARIO_2 = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md"
-    SCENARIO_4 = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4_new.md"
-    BBOXES = "https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md"
-    CUE_LIGHTS = (
-        "https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md"
-    )
-    ADDITIONAL_IMPORTS = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-2-optional-step--import-more-dlc-tracking-data-or-videos"
-    AGGREGATE_BOOL_STATS = "https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#compute-aggregate-conditional-statistics-from-boolean-fields"
+    FEATURE_SUBSETS = f"{SIMBA_DOCS_URL}feature_subsets.html"
+    HEATMAP_LOCATION = f"{SIMBA_GITHUB_DOCS_URL}ROI_tutorial.md#heatmaps-location"
+    HEATMAP_CLF = f"{SIMBA_DOCS_URL}Scenario2.html#visualize-classification-heatmaps"
+    DATA_TABLES = f"{SIMBA_DOCS_URL}Scenario2.html#visualize-data-tables"
+    CONCAT_VIDEOS = f"{SIMBA_DOCS_URL}Scenario2.html#merge-concatenate-multiple-videos"
+    DISTANCE_PLOTS = f"{SIMBA_DOCS_URL}Scenario2.html#visualize-distance-plots"
+    PATH_PLOTS = f"{SIMBA_DOCS_URL}Scenario2.html#visualize-path-plots"
+    VISUALIZE_CLF_PROBABILITIES = f"{SIMBA_DOCS_URL}Scenario2.html#visualize-probability-plots"
+    GANTT_PLOTS = f"{SIMBA_DOCS_URL}Scenario2.html#visualize-gantt-charts"
+    SKLEARN_PLOTS = f"{SIMBA_DOCS_URL}Scenario2.html#visualize-classifications"
+    ANALYZE_ML_RESULTS = f"{SIMBA_DOCS_URL}Scenario2.html#part-4-analyze-machine-learning-results"
+    FSTTC = f"{SIMBA_DOCS_URL}FSTTC.html"
+    KLEINBERG = f"{SIMBA_DOCS_URL}kleinberg_filter.html"
+    DOWNSAMPLE = f"{SIMBA_DOCS_URL}Tools.html#down-sample-video"
+    VIDEO_TOOLS = f"{SIMBA_DOCS_URL}Tools.html"
+    SET_RUN_ML_PARAMETERS = f"{SIMBA_DOCS_URL}Scenario2.html#part-3-run-the-classifier-on-new-data"
+    OULIERS = "https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf"
+    REMOVE_CLF = f"{SIMBA_DOCS_URL}Scenario1.html#step-2-optional-further-imports"
+    ROI_FEATURES_PLOT = f"{SIMBA_GITHUB_DOCS_URL}ROI_tutorial.md#part-6-visualizing-roi-features"
+    ROI_DATA_PLOT = f"{SIMBA_GITHUB_DOCS_URL}ROI_tutorial.md#part-5-visualizing-roi-tracking"
+    DIRECTING_ANIMALS_PLOTS = f"{SIMBA_DOCS_URL}directionality_between_animals.html"
+    CLF_VALIDATION = f"{SIMBA_DOCS_URL}classifier_validation.html"
+    BATCH_PREPROCESS = f"{SIMBA_DOCS_URL}tutorial_process_videos.html"
+    THIRD_PARTY_ANNOTATION_NEW = f"{SIMBA_DOCS_URL}third_party_annot_new.html"
+    OUT_OF_SAMPLE_VALIDATION = f"{SIMBA_DOCS_URL}Scenario1.html#step-8-validate-model-on-new-data"
+    ROI = f"{SIMBA_DOCS_URL}roi_tutorial_new_2025.html"
+    ROI_FEATURES = f"{SIMBA_GITHUB_DOCS_URL}ROI_tutorial.md#part-4-generating-features-from-roi-data"
+    ROI_DATA_ANALYSIS = f"{SIMBA_GITHUB_DOCS_URL}ROI_tutorial.md#part-2-analyzing-roi-data-aggregates"
+    DATA_ANALYSIS = f"{SIMBA_DOCS_URL}Scenario2.html#part-4-analyze-machine-learning-results"
+    ANALYZE_ROI = f"{SIMBA_GITHUB_DOCS_URL}ROI_tutorial.md#part-2-analyzing-roi-data-aggregates"
+    EXTRACT_FEATURES = f"{SIMBA_DOCS_URL}Scenario1.html#step-5-extract-features"
+    USER_DEFINED_FEATURE_EXTRACTION = f"{SIMBA_DOCS_URL}extractFeatures.html"
+    APPEND_ROI_FEATURES = f"{SIMBA_GITHUB_DOCS_URL}ROI_tutorial.md#part-4-generating-features-from-roi-data"
+    LABEL_BEHAVIOR = f"{SIMBA_DOCS_URL}tutorials_rst/standard_label.html"
+    THIRD_PARTY_ANNOTATION = f"{SIMBA_GITHUB_DOCS_URL}third_party_annot.md"
+    PSEUDO_LBL = f"{SIMBA_GITHUB_DOCS_URL}pseudoLabel.md"
+    ADVANCED_LBL = f"{SIMBA_DOCS_URL}tutorials_rst/advanced_label.html"
+    TRAIN_ML_MODEL = f"{SIMBA_DOCS_URL}Scenario1.html#step-7-train-machine-model"
+    VISUALIZATION = f"{SIMBA_DOCS_URL}Scenario2.html#part-5-visualize-results"
+    PLOTLY = f"{SIMBA_GITHUB_DOCS_URL}plotly_dash.md"
+    VIDEO_PARAMETERS = f"{SIMBA_DOCS_URL}Scenario1.html#step-3-set-video-parameters"
+    OUTLIERS_DOC = f"{SIMBA_DOCS_URL}Scenario1.html#step-4-outlier-correction"
+    CREATE_PROJECT = f"{SIMBA_DOCS_URL}Scenario1.html#step-1-generate-simba-project"
+    LOAD_PROJECT = f"{SIMBA_DOCS_URL}Scenario1.html#step-1-load-project-config"
+    SCENARIO_2 = f"{SIMBA_DOCS_URL}Scenario2.html"
+    SCENARIO_4 = f"{SIMBA_DOCS_URL}Scenario4.html"
+    BBOXES = f"{SIMBA_DOCS_URL}anchored_rois.html"
+    CUE_LIGHTS = f"{SIMBA_DOCS_URL}cue_light_tutorial.html"
+    ADDITIONAL_IMPORTS = f"{SIMBA_DOCS_URL}Scenario1.html#step-2-optional-further-imports"
+    AGGREGATE_BOOL_STATS = f"{SIMBA_GITHUB_DOCS_URL}ROI_tutorial.md#compute-aggregate-conditional-statistics-from-boolean-fields"
     GITHUB_REPO = "https://github.com/sgoldenlab/simba"
     OSF_REPO = "https://osf.io/tmu6y/"
     GITTER = "https://gitter.im/SimBA-Resource/community"
     SIMON_WEBSITE = "https://sronilsson.netlify.app/"
-    COUNT_ANNOTATIONS_IN_PROJECT = "https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md#count-annotations-in-simba-project"
-    COUNT_ANNOTATIONS_OUTSIDE_PROJECT = "https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-project-annotation-counts"
-    CIRCLE_CROP = "https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#circle-crop"
+    COUNT_ANNOTATIONS_IN_PROJECT = f"{SIMBA_GITHUB_DOCS_URL}label_behavior.md#count-annotations-in-simba-project"
+    COUNT_ANNOTATIONS_OUTSIDE_PROJECT = f"{SIMBA_DOCS_URL}Tools.html#extract-project-annotation-counts"
+    CIRCLE_CROP = f"{SIMBA_DOCS_URL}Tools.html#crop-videos-circles"
     SIMBA_PIP_URL = 'https://pypi.org/pypi/simba-uw-tf-dev/json'
     YOLO_11_WEIGHTS = {'yolo11n-pose': "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n-pose.pt",
                        'yolo11s-pose': "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s-pose.pt",
-                       'yolo11m-pose': "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s-pose.pt",
+                       'yolo11m-pose': "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11m-pose.pt",
                        'yolo11l-pose': "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l-pose.pt",
                        'yolo11x-pose': "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11x-pose.pt"}
-    BLOB_TRACKING = "https://github.com/sgoldenlab/simba/blob/master/docs/blob_track.md"
+    BLOB_TRACKING = f"{SIMBA_DOCS_URL}blob_track.html"
+    # Short, permanent help addresses shown under SimBA error messages. Each forwards to a docs section; the targets
+    # are set in HELP_PAGES in docs/conf.py, so they can be changed without a SimBA release.
+    HELP_FFMPEG = f"{SIMBA_DOCS_URL}help/ffmpeg.html"
+    HELP_ROI = f"{SIMBA_DOCS_URL}help/roi.html"
+    HELP_VIDEO_INFO = f"{SIMBA_DOCS_URL}help/video_info.html"
+    HELP_ANNOTATIONS = f"{SIMBA_DOCS_URL}help/annotations.html"
+    HELP_LABELLING = f"{SIMBA_DOCS_URL}help/labelling.html"
 
 class Labelling(Enum):
     PADDING = 5

@@ -2,14 +2,23 @@ __author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 from datetime import datetime
 from tkinter import messagebox as mb
+from typing import Optional
 
-from simba.utils.enums import Defaults, TagNames
+from simba.utils.enums import Defaults, Links, TagNames
 from simba.utils.printing import log_event
 
 WINDOW_TITLE = "SIMBA ERROR"
+HELP_PREFIX = "For help, see:"
 
 
 class SimbaError(Exception):
+    # Help page for this error type, shown under the error as "For help, see: <url>" in the console and in the error
+    # pop-up. Use a short ``Links.HELP_*`` address (its target section is set in HELP_PAGES in docs/conf.py), and set it
+    # only on error types where EVERY place that raises the error relates to that one page: a wrong link confuses users
+    # more than no link. None = no help line. The error message itself (``str(error)``, ``error.msg`` and the log entry)
+    # is never changed.
+    DOCS_LINK: Optional[Links] = None
+
     def __init__(self, msg: str, source: str = " ", show_window: bool = False):
         self.msg, self.source, self.show_window = msg, source, show_window
         self.print_and_log_error()
@@ -17,11 +26,24 @@ class SimbaError(Exception):
     def __str__(self):
         return self.msg
 
+    def help_url(self) -> Optional[str]:
+        """Help page for this error, or None if this error type has none. Shown as-is: the help page adds the analytics tag."""
+        try:
+            if isinstance(self.DOCS_LINK, Links) and isinstance(self.DOCS_LINK.value, str):
+                return self.DOCS_LINK.value
+        except Exception:  # never let the help link get in the way of reporting the actual error
+            pass
+        return None
+
     def print_and_log_error(self):
         log_event(logger_name=f"{self.source}.{self.__class__.__name__}", log_type=TagNames.ERROR.value,msg=self.msg)
         print(f"[{datetime.now().strftime('%H:%M:%S')}] {self.msg}{Defaults.STR_SPLIT_DELIMITER.value}{TagNames.ERROR.value}")
+        help_url = self.help_url()
+        if help_url is not None:
+            print(f"{HELP_PREFIX} {help_url}")  # separate plain line: no tab/tag, so the GUI console shows it as normal text
         if self.show_window:
-            mb.showerror(title=WINDOW_TITLE, message=self.msg)
+            message = self.msg if help_url is None else self.msg + "\n\n" + f"{HELP_PREFIX} {help_url}"
+            mb.showerror(title=WINDOW_TITLE, message=message)
 
 
 class NoSpecifiedOutputError(SimbaError):
@@ -30,8 +52,10 @@ class NoSpecifiedOutputError(SimbaError):
 
 
 class ROICoordinatesNotFoundError(SimbaError):
+    DOCS_LINK = Links.HELP_ROI
+
     def __init__(self, expected_file_path: str, source: str = "", show_window: bool = False):
-        msg = f"[{datetime.now().strftime('%H:%M:%S')}] SIMBA ROI COORDINATES ERROR: No ROI coordinates found. Please use the [ROI] tab to define ROIs. Expected at location {expected_file_path}"
+        msg = f"SIMBA ROI COORDINATES ERROR: No ROI coordinates found. Please use the [ROI] tab to define ROIs. Expected at location {expected_file_path}"
         super().__init__(msg=msg, source=source, show_window=show_window)
 
 
@@ -138,6 +162,8 @@ class FrameRangeError(SimbaError):
 
 
 class AdvancedLabellingError(SimbaError):
+    DOCS_LINK = Links.HELP_LABELLING
+
     def __init__(
         self,
         frame: str,
@@ -240,6 +266,8 @@ class CorruptedFileError(SimbaError):
 
 
 class ParametersFileError(SimbaError):
+    DOCS_LINK = Links.HELP_VIDEO_INFO
+
     def __init__(self, msg: str, source: str = "", show_window: bool = False):
         msg = f"SIMBA VIDEO PARAMETERS FILE ERROR: {msg}"
         super().__init__(msg=msg, source=source, show_window=show_window)
@@ -264,6 +292,8 @@ class BodypartColumnNotFoundError(SimbaError):
 
 
 class AnnotationFileNotFoundError(SimbaError):
+    DOCS_LINK = Links.HELP_ANNOTATIONS
+
     def __init__(self, video_name: str, source: str = "", show_window: bool = False):
         msg = f"SIMBA THIRD-PARTY ANNOTATION ERROR: NO ANNOTATION DATA FOR VIDEO {video_name} FOUND"
         super().__init__(msg=msg, source=source, show_window=show_window)
@@ -279,12 +309,16 @@ class DirectoryNotEmptyError(SimbaError):
 
 
 class ThirdPartyAnnotationFileNotFoundError(SimbaError):
+    DOCS_LINK = Links.HELP_ANNOTATIONS
+
     def __init__(self, video_name: str, source: str = "", show_window: bool = False):
         msg = f"SIMBA ERROR: Could not find file in project_folder/csv/features_extracted directory representing annotations for video {video_name}"
         super().__init__(msg=msg, source=source, show_window=show_window)
 
 
 class ThirdPartyAnnotationsFpsConflictError(SimbaError):
+    DOCS_LINK = Links.HELP_ANNOTATIONS
+
     def __init__(
         self,
         video_name: str,
@@ -298,6 +332,8 @@ class ThirdPartyAnnotationsFpsConflictError(SimbaError):
 
 
 class ThirdPartyAnnotationsMissingAnnotationsError(SimbaError):
+    DOCS_LINK = Links.HELP_ANNOTATIONS
+
     def __init__(
         self,
         video_name: str,
@@ -310,6 +346,8 @@ class ThirdPartyAnnotationsMissingAnnotationsError(SimbaError):
 
 
 class ThirdPartyAnnotationOverlapError(SimbaError):
+    DOCS_LINK = Links.HELP_ANNOTATIONS
+
     def __init__(
         self,
         video_name: str,
@@ -322,6 +360,8 @@ class ThirdPartyAnnotationOverlapError(SimbaError):
 
 
 class ThirdPartyAnnotationsAdditionalClfError(SimbaError):
+    DOCS_LINK = Links.HELP_ANNOTATIONS
+
     def __init__(
         self,
         video_name: str,
@@ -334,6 +374,8 @@ class ThirdPartyAnnotationsAdditionalClfError(SimbaError):
 
 
 class ThirdPartyAnnotationEventCountError(SimbaError):
+    DOCS_LINK = Links.HELP_ANNOTATIONS
+
     def __init__(
         self,
         video_name: str,
@@ -348,6 +390,8 @@ class ThirdPartyAnnotationEventCountError(SimbaError):
 
 
 class ThirdPartyAnnotationsClfMissingError(SimbaError):
+    DOCS_LINK = Links.HELP_ANNOTATIONS
+
     def __init__(
         self,
         video_name: str,
@@ -360,6 +404,8 @@ class ThirdPartyAnnotationsClfMissingError(SimbaError):
 
 
 class ThirdPartyAnnotationsOutsidePoseEstimationDataError(SimbaError):
+    DOCS_LINK = Links.HELP_ANNOTATIONS
+
     def __init__(
         self,
         video_name: str,
@@ -394,6 +440,8 @@ class FFMPEGCodecGPUError(SimbaError):
 
 
 class FFMPEGNotFoundError(SimbaError):
+    DOCS_LINK = Links.HELP_FFMPEG
+
     def __init__(self, msg: str, source: str = "", show_window: bool = False):
         msg = f"SIMBA FFMPEG NOT FOUND ERROR: {msg}"
         super().__init__(msg=msg, source=source, show_window=show_window)

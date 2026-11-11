@@ -24,6 +24,7 @@ from PIL import ImageTk
 from simba.utils.checks import check_if_valid_img
 from simba.utils.enums import Defaults, Formats, TkBinds
 from simba.utils.lookups import get_icons_paths, get_tooltips
+from simba.utils.printing import tag_docs_url
 from simba.utils.read_write import get_fn_ext
 
 MENU_ICONS = get_icons_paths()
@@ -542,7 +543,7 @@ def CreateLabelFrameWithIcon(parent: Union[Toplevel, LabelFrame, Canvas, Frame],
     return lbl_frm
 
 def callback(url):
-    webbrowser.open_new(url)
+    webbrowser.open_new(tag_docs_url(url))
 
 
 def create_scalebar(
