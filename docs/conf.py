@@ -1780,6 +1780,51 @@ def _write_llms_txt_and_sitemap(app, exception):
     print(f'[llms.txt / sitemap.xml] {len(pages)} pages: ' + ', '.join(f'{n} ({len(sections[n])})' for n in _LLMS_SECTION_ORDER))
 
 
+# ---- Help shortcut pages (linked from SimBA error messages) --------------------------------------------------------
+# SimBA error messages link to short, permanent addresses such as <docs>/help/ffmpeg.html (see Links.HELP_* in
+# simba/utils/enums.py), so the help line fits on one line under the error. Each build writes these small pages, which
+# forward the browser straight to the section below. To send an error somewhere else, change its target here and push
+# the docs: installed SimBA versions follow automatically. Targets are relative to the docs root and are checked at
+# build time (a warning is printed if a page or #section no longer exists).
+# The forward adds ?utm_source=simba_gui&utm_medium=error&utm_campaign=help_<name>, so Google Analytics can count
+# visits that came from SimBA error messages without the tag cluttering the message itself.
+HELP_PAGES = {
+    'ffmpeg':      'pip_installation.html#installing-ffmpeg',
+    'roi':         'roi_tutorial_new_2025.html#defining-rois-in-simba',
+    'video_info':  'Scenario1.html#step-3-set-video-parameters',
+    'annotations': 'third_party_annot_new.html#troubleshooting-notes-and-common-errors',
+    'labelling':   'tutorials_rst/advanced_label.html#step-3-using-the-advanced-labelling-behavior-interface',
+}
+
+
+def _write_help_pages(app, exception):
+    if exception is not None or app.builder.name != 'html':
+        return
+    from html import escape
+    help_dir = os.path.join(app.outdir, 'help')
+    os.makedirs(help_dir, exist_ok=True)
+    for name, target in HELP_PAGES.items():
+        page, _, anchor = target.partition('#')
+        page_file = os.path.join(app.outdir, *page.split('/'))
+        if not os.path.isfile(page_file):
+            print(f'[help pages] WARNING: help/{name}.html points to {page}, which is not in the build')
+        elif anchor:
+            with open(page_file, encoding='utf-8') as f:
+                if f'id="{anchor}"' not in f.read():
+                    print(f'[help pages] WARNING: help/{name}.html points to #{anchor}, which is not a section of {page}')
+        tagged = f'../{page}?utm_source=simba_gui&utm_medium=error&utm_campaign=help_{name}' + (f'#{anchor}' if anchor else '')
+        url = escape(tagged, quote=True)
+        with open(os.path.join(help_dir, f'{name}.html'), 'w', encoding='utf-8') as f:
+            f.write('<!DOCTYPE html>\n<html lang="en"><head><meta charset="utf-8">\n'
+                    '<meta name="robots" content="noindex">\n'
+                    f'<link rel="canonical" href="{escape(DOCS_URL + target, quote=True)}">\n'
+                    f'<meta http-equiv="refresh" content="0; url={url}">\n'
+                    f'<script>window.location.replace({_json_vid.dumps(tagged)});</script>\n'
+                    '<title>SimBA help</title></head>\n'
+                    f'<body><p>Opening the SimBA documentation&hellip; <a href="{url}">Continue</a></p></body></html>\n')
+    print(f'[help pages] wrote {len(HELP_PAGES)} pages: ' + ', '.join(f'help/{n}.html' for n in HELP_PAGES))
+
+
 # ---- Link previews & search snippets (ONE place for all social media) ---------------------------------------------
 # What a shared docs link looks like on Slack, X/Twitter, LinkedIn, Facebook, Teams, Discord, WhatsApp, email, etc.,
 # and the snippet Google shows under a search result. Change these settings and every page follows on the next build.
@@ -1793,7 +1838,7 @@ SOCIAL_SITE_NAME = 'SimBA Documentation'
 SOCIAL_HOME_TITLE = 'SimBA: Behavioral Classifiers from Pose Estimation'   # keep in sync with _templates/layout.html <title>
 SOCIAL_DESCRIPTION = ('SimBA (Simple Behavioral Analysis): open-source GUI and Python toolkit for building supervised '
                       'machine-learning classifiers of animal social and non-social behavior from pose-estimation data.')
-SOCIAL_TWITTER_HANDLE = ''   # optional, e.g. '@SimBA_Resource'; empty = no twitter:site tag
+SOCIAL_TWITTER_HANDLE = '@nilssonsro'   # X/Twitter account credited on cards (twitter:site); empty = no tag
 _SOCIAL_DESC_MAX = 200       # characters; longer descriptions get cut by most platforms anyway
 
 
@@ -1873,3 +1918,4 @@ def setup(app):
     app.connect('doctree-read', _autolink_glossary_terms)
     app.connect('build-finished', _write_llms_txt_and_sitemap)   # llms.txt (AI assistants) and sitemap.xml (search engines)
     app.connect('html-page-context', _add_social_meta)   # link previews + search snippets; settings: SOCIAL_* above
+    app.connect('build-finished', _write_help_pages)   # help/<name>.html shortcuts linked from SimBA error messages

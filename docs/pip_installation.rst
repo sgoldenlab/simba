@@ -14,14 +14,57 @@ Requirements
 - `FFmpeg <https://www.ffmpeg.org/>`__
 
 .. note::
-  See e.g., installation instructions for `Windows <https://m.wikihow.com/Install-FFmpeg-on-Windows>`__, `MacOS/Linux <https://www.ffmpeg.org/download.html>`__. FFMpeg is used
-  in SimBA for video pre-processing and video editing, and visualization tools. FFMpeg is not a strict requirement, but is strongly recommended.
+  FFmpeg is used in SimBA for video pre-processing, video editing, and visualization tools. FFmpeg is not a strict
+  requirement, but is strongly recommended. See `Installing FFmpeg`_ below.
 
 .. hint::
 
    - See this video for a visual walkthrough of installation using `conda <install_conda_video.html>`_.
    - See this video for a visual walkthrough of installation using `Anaconda Navigator Installation Video <install_anaconda_navigator_video.html>`_.
    - See this video for a visual walkthrough of installation using `python venv <install_venv_video.html>`_.
+
+Installing FFmpeg
+-----------------
+
+SimBA uses `FFmpeg <https://www.ffmpeg.org/>`__ for its video pre-processing, editing, and visualization tools. Without
+it, those tools stop with a ``SIMBA FFMPEG NOT FOUND ERROR``. SimBA runs FFmpeg as the command ``ffmpeg``, so FFmpeg must
+be installed **and** reachable from a terminal. Pick **one** of the options below.
+
+**Any operating system, if you use conda** (simplest). Activate the conda environment you installed SimBA in, then run:
+
+.. code-block:: bash
+
+   conda install -c conda-forge ffmpeg
+
+**Windows** (Windows 10 and 11 include ``winget``). Open a terminal and run:
+
+.. code-block:: bash
+
+   winget install --id Gyan.FFmpeg -e
+
+Prefer to install by hand? Download a build from `gyan.dev <https://www.gyan.dev/ffmpeg/builds/>`__, unzip it, and add its
+``bin`` folder to your PATH (step-by-step guide: `WikiHow <https://m.wikihow.com/Install-FFmpeg-on-Windows>`__).
+
+**macOS** (with `Homebrew <https://brew.sh/>`__):
+
+.. code-block:: bash
+
+   brew install ffmpeg
+
+**Linux** (Ubuntu / Debian):
+
+.. code-block:: bash
+
+   sudo apt install ffmpeg
+
+**Check that it works.** Close and re-open your terminal (so it picks up the new PATH), then run:
+
+.. code-block:: bash
+
+   ffmpeg -version
+
+If this prints a version number, FFmpeg is ready: restart SimBA. If it says the command is not found, FFmpeg is not on
+your PATH yet (on Windows, try signing out and back in, or use the conda option above).
 
 Install options:
 ----------------
