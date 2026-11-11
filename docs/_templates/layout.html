@@ -27,6 +27,9 @@
   <meta name="twitter:site" content="{{ simba_social.twitter|e }}" />
   {%- endif %}
   {%- endif %}
+  {%- if simba_structured_data %}
+  <script type="application/ld+json">{{ simba_structured_data }}</script>
+  {%- endif %}
 {% endblock %}
 
 {# The homepage H1 is just "SimBA", so give its <title> a descriptive one for search results. #}

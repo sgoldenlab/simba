@@ -1758,12 +1758,7 @@ def _write_llms_txt_and_sitemap(app, exception):
         section = next((name for name, rule in _LLMS_SECTIONS if rule(docname, ext)), _LLMS_FALLBACK_SECTION)
         sections[section].append(f'- [{title}]({url})')
 
-    version = ''
-    try:
-        with open(os.path.join(app.srcdir, '..', 'setup.py'), encoding='utf-8') as f:
-            version = _re.search(r'version\s*=\s*["\']([^"\']+)["\']', f.read()).group(1)
-    except (OSError, AttributeError):
-        pass
+    version = _simba_version(app)
     built = f'Docs for SimBA {version}, ' if version else 'Docs '
     lines = ['# SimBA (Simple Behavioral Analysis)', '', '> ' + _LLMS_SUMMARY, '',
              f'{built}generated {datetime.date.today().isoformat()}. Each link is the plain-text source of a documentation page.']
@@ -1867,10 +1862,51 @@ def _page_description(body):
     return SOCIAL_DESCRIPTION
 
 
+def _simba_version(app):
+    """SimBA version from setup.py ('' if it cannot be read)."""
+    try:
+        with open(os.path.join(app.srcdir, '..', 'setup.py'), encoding='utf-8') as f:
+            return _re.search(r'version\s*=\s*["\']([^"\']+)["\']', f.read()).group(1)
+    except (OSError, AttributeError):
+        return ''
+
+
+def _home_structured_data(app):
+    """schema.org description of SimBA for the docs home page (JSON-LD), so search engines know what SimBA is and can
+    connect the docs, the GitHub repo, PyPI, the RRID and the paper. Values come from the SOCIAL_* settings above."""
+    import json
+    data = {
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        'name': 'SimBA (Simple Behavioral Analysis)',
+        'alternateName': 'SimBA',
+        'description': SOCIAL_DESCRIPTION,
+        'url': DOCS_URL,
+        'image': DOCS_URL + SOCIAL_IMAGE,
+        'applicationCategory': 'ScientificApplication',
+        'operatingSystem': 'Windows, macOS, Linux',
+        'softwareRequirements': 'Python 3.6 or 3.10',
+        'license': 'https://github.com/sgoldenlab/simba/blob/master/LICENSE',
+        'isAccessibleForFree': True,
+        'offers': {'@type': 'Offer', 'price': '0', 'priceCurrency': 'USD'},
+        'author': {'@type': 'Organization', 'name': 'Golden Lab, University of Washington'},
+        'sameAs': ['https://github.com/sgoldenlab/simba', 'https://pypi.org/project/Simba-UW-tf-dev/',
+                   'https://scicrunch.org/resolver/RRID:SCR_021413'],
+        'citation': {'@type': 'ScholarlyArticle',
+                     'name': 'Simple Behavioral Analysis (SimBA) as a platform for explainable machine learning in behavioral neuroscience',
+                     'url': 'https://doi.org/10.1038/s41593-024-01649-9'},
+    }
+    version = _simba_version(app)
+    if version:
+        data['softwareVersion'] = version
+    return json.dumps(data, ensure_ascii=False).replace('</', '<\\/')   # safe inside a <script> tag
+
+
 def _add_social_meta(app, pagename, templatename, context, doctree):
     """Give every page's template a ``simba_social`` dict, rendered as meta tags in _templates/layout.html."""
     import html as _html
     if pagename == app.config.master_doc:
+        context['simba_structured_data'] = _home_structured_data(app)
         title, description = SOCIAL_HOME_TITLE, SOCIAL_DESCRIPTION
     else:
         title = _html.unescape(_re.sub(r'<[^>]+>', '', context.get('title') or '')).strip() or SOCIAL_SITE_NAME

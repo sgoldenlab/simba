@@ -17,14 +17,36 @@ jobs:
 
     # ubuntu-20.04 was retired by GitHub: jobs asking for it queue until they are cancelled.
     runs-on: ubuntu-22.04
+    timeout-minutes: 45       # a hung step fails within minutes instead of GitHub's 6-hour default
 
     steps:
     - uses: actions/checkout@v4
+    # FFmpeg's .deb packages are kept in GitHub's own cache: after the first run they are installed from there in
+    # seconds instead of being downloaded from Ubuntu's mirrors, which sometimes hang for up to an hour.
+    - name: Restore cached ffmpeg packages
+      id: ffmpeg-cache
+      uses: actions/cache@v4
+      with:
+        path: ~/ffmpeg-debs
+        key: ffmpeg-debs-ubuntu-22.04-v1    # bump v1 to refresh the cached packages
     - name: Install ffmpeg
+      timeout-minutes: 10
       run: |
-        sudo apt-get update
-        sudo apt-get install -y --no-install-recommends ffmpeg
-        ffmpeg -version
+        set -o pipefail
+        # Network calls time out and retry instead of hanging; downloaded .debs are kept so they can be cached.
+        APT_OPTS="-o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 -o APT::Keep-Downloaded-Packages=true"
+        if [ "${{ steps.ffmpeg-cache.outputs.cache-hit }}" = "true" ] && sudo dpkg -i ~/ffmpeg-debs/*.deb; then
+          echo "Installed ffmpeg from the cache."
+        else
+          # Not cached yet (or the cached packages no longer fit this runner image): install from Ubuntu's mirrors.
+          # -f also repairs a half-finished install from the cache.
+          sudo apt-get $APT_OPTS update
+          sudo apt-get $APT_OPTS install -y -f --no-install-recommends ffmpeg
+          if ls /var/cache/apt/archives/*.deb > /dev/null 2>&1; then   # save them; the cache is written after the job
+            mkdir -p ~/ffmpeg-debs && cp /var/cache/apt/archives/*.deb ~/ffmpeg-debs/
+          fi
+        fi
+        ffmpeg -version | head -n 1
     - name: Set up Python 3.10
       uses: actions/setup-python@v5
       with:

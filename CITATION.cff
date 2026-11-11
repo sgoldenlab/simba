@@ -56,6 +56,9 @@ identifiers:
   - type: doi
     value: "10.1038/s41593-024-01649-9"
     description: "DOI for the published article"
+  - type: other
+    value: "RRID:SCR_021413"
+    description: "Research Resource Identifier (RRID) for SimBA"
 abstract: >-
   The study of complex behaviors is often challenging when using manual annotation due to the absence of quantifiable behavioral definitions and the subjective nature of behavioral annotation. Integration of supervised machine learning approaches mitigates some of these issues through accessible and explainable model interpretation. To decrease barriers to access, we developed Simple Behavioral Analysis (SimBA) for behavioral neuroscientists. SimBA introduces machine learning interpretability tools, including SHapley Additive exPlanation (SHAP) scores, for explainable classifiers, enabling comparisons across species and providing a sharable framework.
 license-url: "https://github.com/sgoldenlab/simba/blob/master/LICENSE"
@@ -64,3 +67,51 @@ keywords:
   - machine learning
   - animal behavior analysis
   - explainable AI
+preferred-citation:
+  type: article
+  title: "Simple Behavioral Analysis (SimBA) as a platform for explainable machine learning in behavioral neuroscience"
+  authors:
+    - family-names: "Goodwin"
+      given-names: "Nastacia L."
+    - family-names: "Choong"
+      given-names: "Jia J."
+    - family-names: "Hwang"
+      given-names: "Sophia"
+    - family-names: "Pitts"
+      given-names: "Kayla"
+    - family-names: "Bloom"
+      given-names: "Liana"
+    - family-names: "Islam"
+      given-names: "Aasiya"
+    - family-names: "Zhang"
+      given-names: "Yizhe Y."
+    - family-names: "Szelenyi"
+      given-names: "Eric R."
+    - family-names: "Tong"
+      given-names: "Xiaoyu"
+    - family-names: "Newman"
+      given-names: "Emily L."
+    - family-names: "Miczek"
+      given-names: "Klaus"
+    - family-names: "Wright"
+      given-names: "Hayden R."
+    - family-names: "McLaughlin"
+      given-names: "Ryan J."
+    - family-names: "Norville"
+      given-names: "Zane C."
+    - family-names: "Eshel"
+      given-names: "Neir"
+    - family-names: "Heshmati"
+      given-names: "Mitra"
+    - family-names: "Nilsson"
+      given-names: "Simon R. O."
+    - family-names: "Golden"
+      given-names: "Sam A."
+  journal: "Nature Neuroscience"
+  volume: 27
+  issue: 7
+  start: 1411
+  end: 1424
+  year: 2024
+  doi: "10.1038/s41593-024-01649-9"
+  url: "https://doi.org/10.1038/s41593-024-01649-9"

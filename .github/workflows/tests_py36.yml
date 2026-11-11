@@ -19,6 +19,7 @@ jobs:
     # Ubuntu images, so the job runs inside the official Python 3.6 image instead.
     runs-on: ubuntu-latest
     container: python:3.6.15-bullseye
+    timeout-minutes: 45       # a hung step fails within minutes instead of GitHub's 6-hour default
 
     steps:
     - uses: actions/checkout@v4
