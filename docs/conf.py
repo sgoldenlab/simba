@@ -1780,6 +1780,66 @@ def _write_llms_txt_and_sitemap(app, exception):
     print(f'[llms.txt / sitemap.xml] {len(pages)} pages: ' + ', '.join(f'{n} ({len(sections[n])})' for n in _LLMS_SECTION_ORDER))
 
 
+# ---- Link previews & search snippets (ONE place for all social media) ---------------------------------------------
+# What a shared docs link looks like on Slack, X/Twitter, LinkedIn, Facebook, Teams, Discord, WhatsApp, email, etc.,
+# and the snippet Google shows under a search result. Change these settings and every page follows on the next build.
+# Each page gets: <meta name="description">, OpenGraph tags (og:*, read by almost every app) and a Twitter card.
+# The page title comes from the page itself; the description is the page's first paragraph of real text, falling
+# back to SOCIAL_DESCRIPTION. The image is the same file as the GitHub social preview: if you replace it, also
+# upload it on GitHub (repo Settings > General > Social preview) so the GitHub link card matches.
+SOCIAL_IMAGE = '_static/social_preview.png'   # path inside docs/; 1280x640 PNG (2:1 suits every platform)
+SOCIAL_IMAGE_ALT = 'SimBA: supervised machine-learning classifiers of animal behavior from pose-estimation data'
+SOCIAL_SITE_NAME = 'SimBA Documentation'
+SOCIAL_HOME_TITLE = 'SimBA: Behavioral Classifiers from Pose Estimation'   # keep in sync with _templates/layout.html <title>
+SOCIAL_DESCRIPTION = ('SimBA (Simple Behavioral Analysis): open-source GUI and Python toolkit for building supervised '
+                      'machine-learning classifiers of animal social and non-social behavior from pose-estimation data.')
+SOCIAL_TWITTER_HANDLE = ''   # optional, e.g. '@SimBA_Resource'; empty = no twitter:site tag
+_SOCIAL_DESC_MAX = 200       # characters; longer descriptions get cut by most platforms anyway
+
+
+def _png_size(path):
+    """(width, height) from a PNG header, without needing Pillow on the docs build."""
+    import struct
+    try:
+        with open(path, 'rb') as f:
+            head = f.read(24)
+        if head[:8] == b'\x89PNG\r\n\x1a\n':
+            return struct.unpack('>II', head[16:24])
+    except OSError:
+        pass
+    return None
+
+
+def _page_description(body):
+    """First paragraph of real text in a rendered page body, as plain text, trimmed at a word boundary."""
+    import html as _html
+    for para in _re.findall(r'<p\b[^>]*>(.*?)</p>', body or '', flags=_re.S):
+        text = _re.sub(r'\s+', ' ', _html.unescape(_re.sub(r'<[^>]+>', '', para))).strip()
+        if len(text) >= 60 and not text.startswith(('>>>', '$', 'pip ', 'conda ')):
+            if len(text) > _SOCIAL_DESC_MAX:
+                text = text[:_SOCIAL_DESC_MAX].rsplit(' ', 1)[0].rstrip(' ,;:.') + '…'
+            return text
+    return SOCIAL_DESCRIPTION
+
+
+def _add_social_meta(app, pagename, templatename, context, doctree):
+    """Give every page's template a ``simba_social`` dict, rendered as meta tags in _templates/layout.html."""
+    import html as _html
+    if pagename == app.config.master_doc:
+        title, description = SOCIAL_HOME_TITLE, SOCIAL_DESCRIPTION
+    else:
+        title = _html.unescape(_re.sub(r'<[^>]+>', '', context.get('title') or '')).strip() or SOCIAL_SITE_NAME
+        description = _page_description(context.get('body'))
+    size = _png_size(os.path.join(app.srcdir, SOCIAL_IMAGE))
+    context['simba_social'] = {
+        'title': title, 'description': description, 'site_name': SOCIAL_SITE_NAME,
+        'url': DOCS_URL + app.builder.get_target_uri(pagename),
+        'image': DOCS_URL + SOCIAL_IMAGE, 'image_alt': SOCIAL_IMAGE_ALT,
+        'image_width': size[0] if size else '', 'image_height': size[1] if size else '',
+        'twitter': SOCIAL_TWITTER_HANDLE,
+    }
+
+
 def setup(app):
     """Build-time hooks for the Markdown tutorials.
 
@@ -1812,3 +1872,4 @@ def setup(app):
     app.connect('doctree-read', _convert_github_alerts)
     app.connect('doctree-read', _autolink_glossary_terms)
     app.connect('build-finished', _write_llms_txt_and_sitemap)   # llms.txt (AI assistants) and sitemap.xml (search engines)
+    app.connect('html-page-context', _add_social_meta)   # link previews + search snippets; settings: SOCIAL_* above
