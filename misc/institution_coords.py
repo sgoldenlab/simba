@@ -202,6 +202,7 @@ INSTITUTION_COORDS = {
     'University of Massachusetts Dartmouth': [41.6225, -71.0073],  # 1
     'University of Melbourne': [-37.8241, 144.9171],  # 1
     'University of Milan': [45.4757, 9.2283],  # 1
+    'University of Mississippi': [34.3646, -89.5396],  # 1
     'University of Nebraska': [40.8206, -96.7056],  # 1
     'University of North Carolina': [35.9049, -79.0469],  # 7
     'University of Oxford': [51.7548, -1.2544],  # 1
