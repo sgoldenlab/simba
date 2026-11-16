@@ -2857,5 +2857,28 @@
     "11.5828859"
    ]
   }
+ ],
+ "University of Mississippi": [
+  {
+   "place_id": 335626859,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 32945199,
+   "lat": "34.3646125",
+   "lon": "-89.5396349",
+   "class": "amenity",
+   "type": "university",
+   "place_rank": 30,
+   "importance": 0.5665372991419834,
+   "addresstype": "amenity",
+   "name": "University of Mississippi",
+   "display_name": "University of Mississippi, Philip Road, Molly Barr Cove, Oxford, Lafayette County, Mississippi, 38677, United States",
+   "boundingbox": [
+    "34.3572970",
+    "34.3719588",
+    "-89.5629060",
+    "-89.5280820"
+   ]
+  }
  ]
 }
