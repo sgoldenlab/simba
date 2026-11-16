@@ -53,8 +53,12 @@ from typing import Dict, List, Optional, Union
 import numpy as np
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..')))
-from simba.sandbox.overhead_3d.overhead_3d_utils import (LIFTER_MM, backproject, lifter_features, load_lifter, project)
-from simba.utils.checks import (check_file_exist_and_readable, check_float, check_int, check_str, check_valid_boolean)
+from simba.sandbox.overhead_3d.overhead_3d_utils import (LIFTER_MM,
+                                                         backproject,
+                                                         lifter_features,
+                                                         load_lifter, project)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_int, check_str, check_valid_boolean)
 from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
 
@@ -616,7 +620,9 @@ def train_lifter(out_path: Union[str, os.PathLike],
           'kpms_split': KPMS_SPLIT, 'meta': meta}
     torch.save(ck, out_path)
     timer.stop_timer()
-    import h5py, scipy, sklearn
+    import h5py
+    import scipy
+    import sklearn
     side = {**meta, 'checkpoint': os.path.abspath(out_path), 'checkpoint_sha256': file_sha256(out_path),
             'data_sha256': {os.path.basename(p): file_sha256(p) for p in (dannce_path, kpms_path) if p is not None},
             'kpms_split': KPMS_SPLIT, 'n_in': int(X0.shape[1]), 'arch': ARCH, 'feat': FEAT,

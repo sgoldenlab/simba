@@ -13,7 +13,8 @@ os.environ.setdefault('KMP_DUPLICATE_LIB_OK', 'TRUE')
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))   # use the repo, not an installed simba
 
 from simba.sandbox.overhead_3d.overhead_3d_lifter import Overhead3DLifter
-from simba.sandbox.overhead_3d.overhead_3d_visualizer import Overhead3DVisualizer, combine_overhead_pov
+from simba.sandbox.overhead_3d.overhead_3d_visualizer import (
+    Overhead3DVisualizer, combine_overhead_pov)
 
 CONFIG_PATH = r'D:\troubleshooting\maplight_ri\project_folder\project_config.ini'
 OUT_DIR = r'D:\troubleshooting\maplight_ri\project_folder\pose_3d_preview'
