@@ -349,6 +349,20 @@ class Overhead3DVisualizer(ConfigReader):
     from a fixed oblique virtual camera on the image-bottom side (same orientation as the video). Frames are rendered
     in parallel chunks and concatenated.
 
+    .. video:: _static/img/Overhead3DLifter_ressler.webm
+       :width: 800
+       :autoplay:
+       :loop:
+       :muted:
+       :align: center
+
+    .. video:: _static/img/Overhead3DLifter_maplight.webm
+       :width: 800
+       :autoplay:
+       :loop:
+       :muted:
+       :align: center
+
     :param Union[str, os.PathLike] config_path: Path to the SimBA project_config.ini.
     :param Optional[Union[str, os.PathLike]] data_dir: Directory with the lifter output (and its _summary.csv). Default: project ``csv/pose_3d``.
     :param Optional[Union[str, os.PathLike]] save_dir: Output directory. Default: project ``frames/output/pose_3d``.

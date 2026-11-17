@@ -88,6 +88,20 @@ class Overhead3DLifter(ConfigReader):
        Accuracy (height MAE): ~4-5 mm on held-out synthetic and real 3D mouse data for ``method='lifter'``; see the README.
        The 3D is a *trunk/head* reconstruction: no limbs, the tail lies on the floor. Rats are outside the training data.
 
+    .. video:: _static/img/Overhead3DLifter_ressler.webm
+       :width: 800
+       :autoplay:
+       :loop:
+       :muted:
+       :align: center
+
+    .. video:: _static/img/Overhead3DLifter_maplight.webm
+       :width: 800
+       :autoplay:
+       :loop:
+       :muted:
+       :align: center
+
     :param Union[str, os.PathLike] config_path: Path to the SimBA project_config.ini.
     :param Optional[Union[str, os.PathLike]] data_dir: Directory with pose files. Default: project ``csv/outlier_corrected_movement_location``.
     :param Optional[Union[str, os.PathLike]] save_dir: Output directory. Default: project ``csv/pose_3d``.
