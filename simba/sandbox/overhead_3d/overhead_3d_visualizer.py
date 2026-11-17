@@ -9,13 +9,20 @@ import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
-from simba.sandbox.overhead_3d.overhead_3d_utils import EDGES, ROLES, backproject, fit_arena_rect, median_background, project
-from simba.utils.checks import check_float, check_if_dir_exists, check_int, check_str, check_valid_boolean
+from simba.sandbox.overhead_3d.overhead_3d_utils import (EDGES, ROLES,
+                                                         backproject,
+                                                         fit_arena_rect,
+                                                         median_background,
+                                                         project)
+from simba.utils.checks import (check_float, check_if_dir_exists, check_int,
+                                check_str, check_valid_boolean)
 from simba.utils.data import get_cpu_pool, terminate_cpu_pool
 from simba.utils.enums import Formats
 from simba.utils.errors import NoFilesFoundError
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, find_files_of_filetypes_in_directory,
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data, read_df)
 
 ROLE_BGR = [(60, 130, 230), (40, 90, 220), (40, 90, 220), (150, 160, 40), (150, 160, 40), (150, 160, 40), (120, 120, 120), (120, 120, 120), (120, 120, 120)]

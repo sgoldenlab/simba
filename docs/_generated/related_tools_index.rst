@@ -104,6 +104,7 @@
    * DAS (Deep Audio Segmenter)
    * Days of our Mice (DooM)
    * DBscorer
+   * Deconstructing Boldness
    * Deep-Pose-Tracker
    * DeepAction
    * DeepBhvTracking
@@ -121,6 +122,7 @@
    * DeepSqueak
    * Detect+Track
    * Detectron2
+   * Development of EthoGrid, a YOLO-Based Software Package for Automatic Annotation of Behavior in Betta Fish, and Its Application in Testing the Potential Anxiolytic Function of Essential Oils
    * DigiGait
    * DIPLOMAT
    * Disgust reaction counter
@@ -227,6 +229,7 @@
    * MarmosetGazeEstimation
    * MARS
    * Megabouts
+   * MICE
    * MiceProfiler
    * Microwave motion detector
    * Minian
