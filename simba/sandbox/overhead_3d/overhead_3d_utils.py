@@ -529,7 +529,13 @@ def lift_geometry(px: np.ndarray, conf: np.ndarray, calib: dict, fps: float = 30
 LIFTER_CONF_MIN, LIFTER_MM = 0.3, 50.0
 LIFTER_DEFAULT = 'dannce_kpms_wide'
 H_FEAT_OPTIONS = ['lin', 'log']
-_NETS = {}
+_NETS, _WIN = {}, {}
+# Expected |height error| (mm) per keypoint = Z_ERR_A[k] + Z_ERR_B * ensemble SD (both Gaussian-smoothed like z). Least-squares fit
+# of the real error on the default lifter's ensemble SD, pooled over held-out KPMS test recordings (real 3D, ROLES 0,1,2,5,6) and
+# DANNCE markerless_mouse_2 synthetic sequences (all 9), cameras 288-4000 mm. The raw SD is 3-7x smaller than the real error, hence
+# the fit. Predicted vs actual MAE by quintile, KPMS: 1.9/2.4/3.1/4.6/7.8 vs 2.3/2.5/3.3/4.4/8.3 mm; DANNCE: ~1.5 mm too low.
+Z_ERR_A = np.array([3.2, 1.23, 1.92, 1.89, 2.27, 0.9, 1.44, 1.05, 5.27])
+Z_ERR_B = 1.573
 
 
 def lifter_features(px: np.ndarray, conf: np.ndarray, calib: dict, h_feat: str = 'lin') -> np.ndarray:
@@ -561,9 +567,33 @@ def lifter_features(px: np.ndarray, conf: np.ndarray, calib: dict, h_feat: str =
     return np.concatenate([rel.reshape(T, -1) / LIFTER_MM, m, glob], 1).astype(np.float32)
 
 
+def stack_frames(F: np.ndarray, half: int, stride: int, seq: Optional[np.ndarray] = None) -> np.ndarray:
+    """Temporal lifter input: (T, d) per-frame features -> (T, (2 half + 1) d), the features at t + k stride for
+    k = -half..half, clamped to the first / last frame of t's continuous segment (seq: (T,) segment id; None = one segment)."""
+    if half == 0:
+        return F
+    T = len(F)
+    t = np.arange(T)
+    if seq is None:
+        lo, hi = np.zeros(T, int), np.full(T, T - 1)
+    else:
+        b = np.r_[0, np.flatnonzero(np.diff(seq)) + 1, T]
+        idx = np.searchsorted(b, t, side='right') - 1
+        lo, hi = b[idx], b[idx + 1] - 1
+    cols = [F[np.clip(t + k * stride, lo, hi)] for k in range(-half, half + 1)]
+    return np.concatenate(cols, 1)
+
+
+def lifter_window(path: str, device: str = 'cpu') -> Tuple[int, int]:
+    """(half, stride) of a lifter checkpoint: its temporal window in frames at 30 fps; (0, 1) = single-frame."""
+    load_lifter(path, device)
+    return _WIN[path]
+
+
 def load_lifter(path: str, device: str = 'cpu'):
     """5-seed residual-MLP ensemble (Martinez et al. 2017 architecture), cached per (path, device).
-    Returns (nets, h_feat): h_feat is the checkpoint's camera-height feature ('lin' when its 'feat' dict has none)."""
+    Returns (nets, h_feat): h_feat is the checkpoint's camera-height feature ('lin' when its 'feat' dict has none).
+    The temporal window (half, stride) is available from lifter_window()."""
     import torch
     import torch.nn as nn
 
@@ -590,8 +620,10 @@ def load_lifter(path: str, device: str = 'cpu'):
         ck = torch.load(path, map_location='cpu', weights_only=False)
         feat = dict(ck['feat'])
         h_feat = feat.pop('h_feat', 'lin')
-        if feat != {'half': 0, 'stride': 1, 'scale_free': False} or h_feat not in H_FEAT_OPTIONS:
-            raise ValueError(f'{path}: only single-frame lifter weights are supported, got {ck["feat"]}')
+        half, stride = int(feat.pop('half', 0)), int(feat.pop('stride', 1))
+        if feat != {'scale_free': False} or h_feat not in H_FEAT_OPTIONS or half < 0 or stride < 1:
+            raise ValueError(f'{path}: unsupported lifter features {ck["feat"]}')
+        _WIN[path] = (half, stride)
         nets = []
         for st in ck['states']:
             net = Lifter(ck['n_in'], **ck['arch'])
@@ -606,28 +638,39 @@ def lifter_device(gpu: bool = True) -> str:
     return 'cuda' if gpu and torch.cuda.is_available() else 'cpu'
 
 
-def predict_lifter_z(px: np.ndarray, conf: np.ndarray, calib: dict, weights: str = LIFTER_DEFAULT, gpu: bool = True, batch: int = 65536) -> np.ndarray:
-    """(T, 9) ensemble-mean heights (mm), clipped at 0."""
+def predict_lifter_z(px: np.ndarray, conf: np.ndarray, calib: dict, weights: str = LIFTER_DEFAULT, gpu: bool = True, batch: int = 65536,
+                     return_sd: bool = False, fps: float = 30.0) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
+    """(T, 9) ensemble-mean heights (mm), clipped at 0; with return_sd also the (T, 9) ensemble standard deviation (mm).
+    fps: video frame rate; a temporal lifter's window (trained at 30 fps) is rescaled to it."""
     import torch
     device = lifter_device(gpu)
     nets, h_feat = load_lifter(WEIGHTS[weights], device)
-    X = torch.from_numpy(lifter_features(px, conf, calib, h_feat))
-    out = []
+    half, stride = lifter_window(WEIGHTS[weights], device)
+    X = torch.from_numpy(stack_frames(lifter_features(px, conf, calib, h_feat), half, max(1, int(round(stride * fps / 30)))))
+    out, sds = [], []
     with torch.inference_mode(), torch.autocast('cuda', dtype=torch.float16, enabled=device == 'cuda'):   # fp16: ~2x, mean change 0.02 mm
         for i in range(0, len(X), batch):
             xb = X[i:i + batch].to(device, non_blocking=True)
-            out.append(torch.stack([n(xb) for n in nets]).float().mean(0).cpu())
-    return np.clip(torch.cat(out).numpy().astype(np.float64), 0, None)
+            zb = torch.stack([n(xb) for n in nets]).float()
+            out.append(zb.mean(0).cpu())
+            if return_sd:
+                sds.append(zb.std(0).cpu())
+    z = np.clip(torch.cat(out).numpy().astype(np.float64), 0, None)
+    return (z, torch.cat(sds).numpy().astype(np.float64)) if return_sd else z
 
 
 def lift_lifter(px: np.ndarray, conf: np.ndarray, calib: dict, fps: float = 30, smooth_sigma: float = 2.0, weights: str = LIFTER_DEFAULT,
-                gpu: bool = True, px_in: Optional[np.ndarray] = None) -> np.ndarray:
+                gpu: bool = True, px_in: Optional[np.ndarray] = None, return_err: bool = False) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
     """Learned lifter heights, Gaussian-smoothed over time; x, y back-projected from px. px_in: optional (normalised)
-    lifter input, the real px are still used for x, y."""
-    z = predict_lifter_z(px if px_in is None else px_in, conf, calib, weights, gpu)
+    lifter input, the real px are still used for x, y. return_err: also the (T, 9) expected height error (mm) from the
+    ensemble spread (Z_ERR_A, Z_ERR_B; calibrated for the default weights only)."""
+    z, sd = predict_lifter_z(px if px_in is None else px_in, conf, calib, weights, gpu, return_sd=True, fps=fps) if return_err else \
+            (predict_lifter_z(px if px_in is None else px_in, conf, calib, weights, gpu, fps=fps), None)
     if smooth_sigma:
         z = gaussian_filter1d(z, smooth_sigma * fps / 30, axis=0, mode='nearest')
-    return backproject(px, z, calib)
+        sd = None if sd is None else gaussian_filter1d(sd, smooth_sigma * fps / 30, axis=0, mode='nearest')
+    P = backproject(px, z, calib)
+    return (P, Z_ERR_A + Z_ERR_B * sd) if return_err else P
 
 
 # ----------------------------------------------------------------------------------------------- method: fused
@@ -661,12 +704,16 @@ def lift_fused(px: np.ndarray, conf: np.ndarray, calib: dict, fps: float = 30, g
     return backproject(px, np.clip(z, 0, None), calib)
 
 
-def lift(method: str, px: np.ndarray, conf: np.ndarray, calib: dict, fps: float = 30, gpu: bool = True, px_in: Optional[np.ndarray] = None) -> np.ndarray:
-    """Dispatch: (T, 9, 2) px + (T, 9) conf -> (T, 9, 3) world mm."""
+def lift(method: str, px: np.ndarray, conf: np.ndarray, calib: dict, fps: float = 30, gpu: bool = True, px_in: Optional[np.ndarray] = None,
+         return_err: bool = False) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
+    """Dispatch: (T, 9, 2) px + (T, 9) conf -> (T, 9, 3) world mm. return_err (method 'lifter' only): also the (T, 9)
+    expected height error (mm)."""
+    if return_err and method != 'lifter':
+        raise ValueError("return_err is only available for method='lifter'")
     if method == 'geometry':
         return lift_geometry(px, conf, calib, fps)
     if method == 'lifter':
-        return lift_lifter(px, conf, calib, fps, gpu=gpu, px_in=px_in)
+        return lift_lifter(px, conf, calib, fps, gpu=gpu, px_in=px_in, return_err=return_err)
     if method == 'fused':
         return lift_fused(px, conf, calib, fps, gpu=gpu, px_in=px_in)
     raise ValueError(f'method must be one of {METHOD_OPTIONS}')

@@ -101,6 +101,15 @@ class Overhead3DLifter(ConfigReader):
        Accuracy (height MAE): ~4-5 mm on held-out synthetic and real 3D mouse data for ``method='lifter'``; see the README.
        The 3D is a *trunk/head* reconstruction: no limbs, the tail lies on the floor. Rats are outside the training data.
 
+    .. note::
+       Use the 3D as a *measurement* (head/nose height in mm, rear height and duration, head-up time, body pitch), not
+       as a classifier booster. The heights are computed from the same 2D keypoints, so a rich SimBA 2D feature set
+       already holds most of that information. On the mitra project (9 mice, leave-one-mouse-out
+       HistGradientBoosting), adding 3D features changed best F1 from 0.525 to 0.539 for rearing and from 0.538 to 0.529 for
+       grooming, and raised immobility from 0.291 to 0.363 (0.388 with a temporal lifter). Per-video normalisation of the
+       3D features gave no gain. Classifier accuracy there is limited by generalisation to unseen animals (rearing F1 0.78 on
+       random frames vs 0.52 on held-out mice), which no keypoint-derived feature fixes.
+
     .. video:: _static/img/Overhead3DLifter_ressler.webm
        :width: 800
        :autoplay:
@@ -127,6 +136,7 @@ class Overhead3DLifter(ConfigReader):
     :param bool fix_left_right: Swap left/right ears/flanks when labelled the other way round. Default True.
     :param bool normalise: Normalise segment proportions of the lifter input. Default True.
     :param bool size_normalise: Animals > 15% larger/smaller than the lifter's mouse (e.g. rats) are lifted in a world scaled to mouse size and the heights scaled back. Default True.
+    :param bool height_error: Write ``<animal>_<role>_z_err``: the expected height error (mm) of every keypoint and frame, from the disagreement of the lifter's 5 ensemble models, converted to mm with a fit of the real error on held-out 3D data (real mice: predicted 1.9-7.8 vs actual 2.3-8.3 mm MAE from the most to least certain fifth of frames). The ranking (which frames to trust) is reliable; the mm value is approximate and does not include errors from a wrong camera height or wrong 2D keypoints. ``method='lifter'`` only; ignored otherwise. Default True.
     :param bool gpu: Run the lifter on the GPU if available. Default True.
     :param int core_cnt: Worker processes for reading/writing pose files and box calibration. -1 = min(all cores, 8). Default -1.
     :param bool verbose: Print progress. Default True.
@@ -150,6 +160,7 @@ class Overhead3DLifter(ConfigReader):
                  fix_left_right: bool = True,
                  size_normalise: bool = True,
                  normalise: bool = True,
+                 height_error: bool = True,
                  gpu: bool = True,
                  core_cnt: int = -1,
                  verbose: bool = True):
@@ -162,7 +173,7 @@ class Overhead3DLifter(ConfigReader):
         check_float(name=f'{self.__class__.__name__} box_floor_mm', value=box_floor_mm, min_value=10.0)
         if wall_height_mm is not None:
             check_float(name=f'{self.__class__.__name__} wall_height_mm', value=wall_height_mm, min_value=5.0)
-        for v, n in ((fix_left_right, 'fix_left_right'), (normalise, 'normalise'), (gpu, 'gpu'), (verbose, 'verbose')):
+        for v, n in ((fix_left_right, 'fix_left_right'), (normalise, 'normalise'), (height_error, 'height_error'), (gpu, 'gpu'), (verbose, 'verbose')):
             check_valid_boolean(value=v, source=f'{self.__class__.__name__} {n}', raise_error=True)
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
         if bp_map is not None:
@@ -177,6 +188,7 @@ class Overhead3DLifter(ConfigReader):
         self.box_floor_mm, self.wall_height_mm, self.bp_map = box_floor_mm, wall_height_mm, bp_map
         self.fix_left_right, self.normalise, self.gpu, self.verbose = fix_left_right, normalise, gpu, verbose
         self.size_normalise = size_normalise
+        self.height_error = height_error and method == 'lifter'
         self.core_cnt = min(find_core_cnt()[0], 8) if core_cnt == -1 else core_cnt   # IO-bound workers; more mostly costs RAM
         self.files = find_files_of_filetypes_in_directory(directory=self.data_dir, extensions=[f'.{self.file_type}'], raise_error=True, sort_alphabetically=True)
         known = set(self.video_info_df['Video'].astype(str))
@@ -275,9 +287,11 @@ class Overhead3DLifter(ConfigReader):
                 s = 1.0 if not np.isfinite(s) else s
                 c_lift = calib if s == 1.0 else scaled_calib(calib, s)            # e.g. rats: lift at mouse size, scale back
                 px_in = normalise_proportions(px, conf, c_lift['px_per_mm_floor'])[0] if (self.normalise and self.method != 'geometry') else None
-                P = lift(self.method, px, conf, c_lift, fps, gpu=self.gpu, px_in=px_in)
+                P = lift(self.method, px, conf, c_lift, fps, gpu=self.gpu, px_in=px_in, return_err=self.height_error)
+                P, z_err = P if self.height_error else (P, None)
                 if s != 1.0:
                     P = backproject(px, P[..., 2] * s, calib)
+                    z_err = None if z_err is None else z_err * s
                 ok = conf[:, [0, 1, 2, 5, 6]].min(1) >= 0.5
                 for k, role in enumerate(ROLES):
                     if self.roles[a][role] is None and role != 'Center':      # a derived Center is written
@@ -285,10 +299,13 @@ class Overhead3DLifter(ConfigReader):
                     for j, ax in enumerate('xyz'):
                         out[f'{a}_{role}_{ax}'] = P[:, k, j]
                     out[f'{a}_{role}_p'] = conf[:, k]
+                    if z_err is not None:
+                        out[f'{a}_{role}_z_err'] = z_err[:, k]
                 out[f'{a}_quality_ok'] = ok.astype(np.int8)
                 rows.append({'video': n, 'animal': a, 'method': self.method, 'calibration': self.calibration, 'frames': len(P),
                              'quality_ok_pct': round(100 * ok.mean(), 1), 'swapped': '+'.join(swapped), 'size_scale': round(s, 3), 'center_derived': int(self.roles[a]['Center'] is None),
                              'head_z_median_mm': round(float(np.median(P[ok][:, :3, 2])), 1) if ok.any() else np.nan,
+                             'head_z_err_median_mm': round(float(np.median(z_err[ok][:, :3])), 1) if (z_err is not None and ok.any()) else np.nan,
                              'centre_x_px': calib['centre'][0], 'centre_y_px': calib['centre'][1], 'focal_px': calib['focal_px'],
                              'camera_height_mm': calib['camera_height_mm'], 'camera_height_assumed': int(self.calibration == 'camera_height' and self.camera_height_mm is None), 'px_per_mm_floor': calib['px_per_mm_floor'], 'fps': fps,
                              'wall_height_mm': wall if self.calibration == 'box' else np.nan, 'calibration_fallback': int(fallback.get(n, False)),
@@ -319,7 +336,8 @@ if __name__ == '__main__':
     ap.add_argument('--save_dir', default=None)
     ap.add_argument('--bp_map', default=None, help='JSON, e.g. \'{"Nose": "RIGHT_EAR"}\'')
     ap.add_argument('--no_gpu', action='store_true')
+    ap.add_argument('--no_height_error', action='store_true', help='do not write the <animal>_<role>_z_err columns')
     a = ap.parse_args()
     Overhead3DLifter(config_path=a.config_path, save_dir=a.save_dir, method=a.method, calibration=a.calibration,
                      camera_height_mm=a.camera_height_mm, wall_height_mm=a.wall_height_mm, box_floor_mm=a.box_floor_mm,
-                     bp_map=json.loads(a.bp_map) if a.bp_map else None, gpu=not a.no_gpu).run()
+                     bp_map=json.loads(a.bp_map) if a.bp_map else None, height_error=not a.no_height_error, gpu=not a.no_gpu).run()

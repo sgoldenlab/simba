@@ -56,7 +56,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(
 from simba.sandbox.overhead_3d.overhead_3d_utils import (LIFTER_MM,
                                                          backproject,
                                                          lifter_features,
-                                                         load_lifter, project)
+                                                         lifter_window,
+                                                         load_lifter, project,
+                                                         stack_frames)
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_str, check_valid_boolean)
 from simba.utils.errors import InvalidInputError
@@ -331,7 +333,8 @@ def make_batch(src, rng, s, n_seq, per_seq):
         if s['kp_dropout']:
             conf = kpset_dropout(conf, rng)
         sel = rng.choice(len(px), per_seq, replace=False)
-        X.append(lifter_features(px, conf, cam, FEAT['h_feat'])[sel]); Y.append(gt[sel, :, 2])
+        F = stack_frames(lifter_features(px, conf, cam, FEAT['h_feat']), s.get('half', 0), s.get('stride', 1))
+        X.append(F[sel]); Y.append(gt[sel, :, 2])
     return np.concatenate(X), np.concatenate(Y).astype(np.float32)
 
 
@@ -485,8 +488,9 @@ def evaluate_lifter(checkpoints: List[Union[str, os.PathLike]],
     rows = []
     for c in checkpoints:
         nets, h_feat = load_lifter(str(c), device)
+        half, stride = lifter_window(str(c), device)
         for (name, H), d in sets.items():
-            z = predict_z(nets, lifter_features(d['px'], d['conf'], d['calib'], h_feat), device)
+            z = predict_z(nets, stack_frames(lifter_features(d['px'], d['conf'], d['calib'], h_feat), half, stride, d['seq']), device)
             m = height_metrics(backproject(d['px'], z, d['calib']), d)
             if name == 'kpms_test':
                 m['z_MAE9'] = np.nan
@@ -509,6 +513,8 @@ def train_lifter(out_path: Union[str, os.PathLike],
                  px_per_mm_max: float = 1.75,
                  p_near: float = 0.0,
                  kp_dropout: bool = True,
+                 half: int = 0,
+                 stride: int = 1,
                  n_seeds: int = 5,
                  rounds: int = 40,
                  seed: int = 0,
@@ -528,6 +534,8 @@ def train_lifter(out_path: Union[str, os.PathLike],
     :param float px_per_mm_max: highest floor pixels/mm.
     :param float p_near: fraction of sequences whose camera height is drawn from the old 0.8-1.25 x 288 mm range instead (0 = default).
     :param bool kp_dropout: randomly drop the tail centre + tail end (p 0.35) and additionally the flanks (p 0.15) per sequence, so 7- and 5-keypoint projects stay in distribution.
+    :param int half: temporal lifter: the input is the features of frames t + k * stride, k = -half..half (at 30 fps; rescaled to the video fps at inference). 0 (default) = single-frame.
+    :param int stride: frame spacing of the temporal window.
     :param int n_seeds: ensemble size; seeds ``seed`` .. ``seed + n_seeds - 1``.
     :param int rounds: training rounds per network; each round draws 1500 fresh 150-frame sequences (50 frames each) and runs 2 epochs.
     :param int seed: first random seed.
@@ -556,6 +564,8 @@ def train_lifter(out_path: Union[str, os.PathLike],
     check_float(name='px_per_mm_max', value=px_per_mm_max, min_value=px_per_mm_min)
     check_float(name='p_near', value=p_near, min_value=0.0, max_value=1.0)
     check_valid_boolean(value=[kp_dropout, evaluate], source=train_lifter.__name__)
+    check_int(name='half', value=half, min_value=0)
+    check_int(name='stride', value=stride, min_value=1)
     check_int(name='n_seeds', value=n_seeds, min_value=1)
     check_int(name='rounds', value=rounds, min_value=1)
     check_int(name='seed', value=seed, min_value=0)
@@ -564,7 +574,7 @@ def train_lifter(out_path: Union[str, os.PathLike],
     s = dict(dannce_path=None if dannce_path is None else os.path.abspath(dannce_path), kpms_path=None if kpms_path is None else os.path.abspath(kpms_path),
              kpms_fraction=kpms_fraction, camera_h_min_mm=float(camera_h_min_mm), camera_h_max_mm=float(camera_h_max_mm),
              px_per_mm_min=float(px_per_mm_min), px_per_mm_max=float(px_per_mm_max), p_near=float(p_near), kp_dropout=kp_dropout,
-             n_seeds=n_seeds, rounds=rounds, seed=seed, device=device, out_path=os.path.abspath(out_path))
+             half=half, stride=stride, n_seeds=n_seeds, rounds=rounds, seed=seed, device=device, out_path=os.path.abspath(out_path))
     log = []
 
     def say(msg):
@@ -574,7 +584,7 @@ def train_lifter(out_path: Union[str, os.PathLike],
     if kpms_path is not None:
         src['kpms'] = [kpms_raw(kpms_path, r) for r in KPMS_SPLIT['train']]
         val = make_kpms_set([kpms_raw(kpms_path, r) for r in KPMS_SPLIT['val']], BENCH_CAMERA, seed=1, max_frames=20000)
-        X_val = lifter_features(val['px'], val['conf'], val['calib'], FEAT['h_feat'])
+        X_val = stack_frames(lifter_features(val['px'], val['conf'], val['calib'], FEAT['h_feat']), half, stride, val['seq'])
     if dannce_path is not None:
         src['dannce'] = np.stack([canonical(p) for p in dannce_poses(dannce_path)])
     say(f'training {n_seeds} x {rounds} rounds on {device}: ' + ', '.join(f'{k}={v}' for k, v in s.items() if k not in ('dannce_path', 'kpms_path', 'out_path')))
@@ -614,7 +624,7 @@ def train_lifter(out_path: Union[str, os.PathLike],
     os.makedirs(out_dir, exist_ok=True)
     meta = {'settings': s, 'recipe': 'overhead_3d/train_lifter.py (farcam recipe: DANNCE m1 + KPMS, log-uniform camera height, log(H/300) feature)'}
     ck = {'states': [{k: (v.half() if v.is_floating_point() else v).cpu() for k, v in n.state_dict().items()} for n in nets],
-          'n_in': int(X0.shape[1]), 'arch': dict(ARCH), 'feat': dict(FEAT),
+          'n_in': int(X0.shape[1]), 'arch': dict(ARCH), 'feat': dict(FEAT, half=half, stride=stride),
           'cfg': [f'kpms_fraction={kpms_fraction}', 'kp_dropout' if kp_dropout else 'no_kp_dropout',
                   f'H loguniform({camera_h_min_mm:g}, {camera_h_max_mm:g}) mm p_near={p_near:g}', f'px/mm U({px_per_mm_min:g}, {px_per_mm_max:g})'],
           'kpms_split': KPMS_SPLIT, 'meta': meta}
@@ -625,7 +635,7 @@ def train_lifter(out_path: Union[str, os.PathLike],
     import sklearn
     side = {**meta, 'checkpoint': os.path.abspath(out_path), 'checkpoint_sha256': file_sha256(out_path),
             'data_sha256': {os.path.basename(p): file_sha256(p) for p in (dannce_path, kpms_path) if p is not None},
-            'kpms_split': KPMS_SPLIT, 'n_in': int(X0.shape[1]), 'arch': ARCH, 'feat': FEAT,
+            'kpms_split': KPMS_SPLIT, 'n_in': int(X0.shape[1]), 'arch': ARCH, 'feat': dict(FEAT, half=half, stride=stride),
             'environment': {'python': platform.python_version(), 'platform': platform.platform(), 'numpy': np.__version__,
                             'torch': torch.__version__, 'cuda': torch.version.cuda, 'scipy': scipy.__version__, 'h5py': h5py.__version__,
                             'sklearn': sklearn.__version__, 'gpu': torch.cuda.get_device_name(0) if device == 'cuda' else None},
@@ -652,6 +662,8 @@ if __name__ == '__main__':
     ap.add_argument('--ppm_max', type=float, default=1.75, help='highest floor px/mm')
     ap.add_argument('--p_near', type=float, default=0.0, help='fraction of cameras from the old 230-360 mm range')
     ap.add_argument('--no_kp_dropout', action='store_true', help='disable tail / flank keypoint-set dropout')
+    ap.add_argument('--half', type=int, default=0, help='temporal window: frames t + k * stride, k = -half..half (0 = single-frame)')
+    ap.add_argument('--stride', type=int, default=1, help='temporal window frame spacing (at 30 fps)')
     ap.add_argument('--n_seeds', type=int, default=5)
     ap.add_argument('--rounds', type=int, default=40)
     ap.add_argument('--seed', type=int, default=0)
@@ -665,7 +677,7 @@ if __name__ == '__main__':
     elif a.out:
         train_lifter(out_path=a.out, dannce_path=none(a.dannce), kpms_path=none(a.kpms), kpms_fraction=a.kpms_fraction,
                      camera_h_min_mm=a.h_min_mm, camera_h_max_mm=a.h_max_mm, px_per_mm_min=a.ppm_min, px_per_mm_max=a.ppm_max,
-                     p_near=a.p_near, kp_dropout=not a.no_kp_dropout, n_seeds=a.n_seeds, rounds=a.rounds, seed=a.seed,
+                     p_near=a.p_near, kp_dropout=not a.no_kp_dropout, half=a.half, stride=a.stride, n_seeds=a.n_seeds, rounds=a.rounds, seed=a.seed,
                      device=a.device, evaluate=not a.no_eval)
     else:
         ap.error('give --out (train) or --evaluate CKPT [CKPT ...]')
