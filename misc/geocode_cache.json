@@ -2880,5 +2880,28 @@
     "-89.5280820"
    ]
   }
+ ],
+ "Mortimer B. Zuckerman Mind Brain Behavior Institute": [
+  {
+   "place_id": 358688422,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "node",
+   "osm_id": 12093529216,
+   "lat": "40.8168862",
+   "lon": "-73.9582108",
+   "class": "amenity",
+   "type": "research_institute",
+   "place_rank": 30,
+   "importance": 9.175936522464359e-05,
+   "addresstype": "amenity",
+   "name": "Mortimer B. Zuckerman Mind Brain Behavior Institute",
+   "display_name": "Mortimer B. Zuckerman Mind Brain Behavior Institute, 3227, Broadway, Manhattanville, Manhattan Community Board 9, Manhattan, New York County, New York, 10027, United States",
+   "boundingbox": [
+    "40.8168362",
+    "40.8169362",
+    "-73.9582608",
+    "-73.9581608"
+   ]
+  }
  ]
 }

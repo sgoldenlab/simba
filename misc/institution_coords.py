@@ -70,7 +70,7 @@ INSTITUTION_COORDS = {
     'Children’s Hospital of Philadelphia': [39.9477, -75.195],  # 3
     'Christian-Albrechts-Universität zu Kiel': [54.3458, 10.1131],  # 1
     'City University of Hong Kong': [22.34, 114.1697],  # 2
-    'Columbia University': [40.8078, -73.9625],  # 3
+    'Columbia University': [40.8078, -73.9625],  # 4
     'Columbia University Irving Medical Center': [40.842, -73.9437],  # 2
     'Concordia University': [45.4583, -73.6394],  # 2
     'Cornell University': [42.4529, -76.4801],  # 3
@@ -128,6 +128,7 @@ INSTITUTION_COORDS = {
     'Medical Research Council Harwell': [51.5745, -1.311],  # 2
     'Michigan State University': [42.7024, -84.4804],  # 2
     'Monash University': [-37.784, 144.9587],  # 2
+    'Mortimer B. Zuckerman Mind Brain Behavior Institute': [40.8169, -73.9582],  # 1
     'Nagoya University': [35.1533, 136.9678],  # 1
     'Nanjing Medical University': [31.9858, 118.703],  # 1
     'Nanjing University of Chinese Medicine': [32.103, 118.9389],  # 1
