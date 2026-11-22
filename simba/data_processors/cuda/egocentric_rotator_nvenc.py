@@ -197,7 +197,7 @@ class EgocentricRotatorNVENC(object):
         argb_dev = cuda.as_cuda_array(argb_t)[0]
         inv_dev = cuda.to_device(self.inv_m)
         decoder = get_nvc_decoder(video_path=self.video_path, use_device_memory=True, threaded=True, buffer_size=self.buffer_size, start_frame=start)
-        encoder = get_nvc_encoder(width=w, height=h, codec=self.codec, fmt='ARGB')
+        encoder = get_nvc_encoder(width=w, height=h, codec=self.codec, fmt='ARGB', fps=self.video_meta['fps'])
         grid = (math.ceil(w / TPB[0]), math.ceil(h / TPB[1]))
         raw_path = f'{out_path}.raw.{self.codec}'
         i = start

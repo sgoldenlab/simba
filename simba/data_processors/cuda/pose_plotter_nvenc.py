@@ -333,7 +333,10 @@ class PosePlotterNVENC(object):
         yuv_t = torch.empty((3 * self.h, self.w), dtype=torch.uint8, device='cuda:0')
         yuv_dev = cuda.as_cuda_array(yuv_t)
         decoder = get_nvc_decoder(video_path=self.video_path, output_color_type=nvc.OutputColorType.RGB, use_device_memory=True, threaded=True, buffer_size=self.buffer_size, start_frame=start)
-        encoder = nvc.CreateEncoder(self.w, self.h, 'YUV444', False, codec=self.codec, tuning_info='high_quality', rc='constqp', qp=self.qp)
+        # bf=0: the 'high_quality' preset otherwise uses B-frames, and muxing the raw stream then drops the first frames
+        # (mp4 edit list), so every frame shows the video 3-4 frames ahead of its data. fps: written into the stream,
+        # otherwise players read 30 fps.
+        encoder = nvc.CreateEncoder(self.w, self.h, 'YUV444', False, codec=self.codec, tuning_info='high_quality', rc='constqp', qp=self.qp, fps=self.video_meta['fps'], bf=0)
         grid_fill = (math.ceil(self.w / TPB2[0]), math.ceil(self.h / TPB2[1]))
         grid_circle = math.ceil(self.n_bp / TPB1)
         raw_path = f'{out_path}.raw.{self.codec}'

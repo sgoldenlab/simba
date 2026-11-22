@@ -112,7 +112,7 @@ class GreyscaleNVENC(object):
         argb_t = torch.empty((1, h, w, 4), dtype=torch.uint8, device='cuda:0')
         argb_dev = cuda.as_cuda_array(argb_t)[0]
         decoder = get_nvc_decoder(video_path=video_path, use_device_memory=True, threaded=False)  # RGB (H,W,3)
-        encoder = get_nvc_encoder(width=w, height=h, codec=self.codec, fmt='ARGB')
+        encoder = get_nvc_encoder(width=w, height=h, codec=self.codec, fmt='ARGB', fps=video_meta['fps'])
         grid = (math.ceil(w / TPB[0]), math.ceil(h / TPB[1]))
         raw_path = os.path.join(tempfile.gettempdir(), f'_grey_{os.getpid()}.{self.codec}')
         with open(raw_path, 'wb') as raw:

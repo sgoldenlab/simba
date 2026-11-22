@@ -47,7 +47,7 @@ Notes:
 
 import math
 import os
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Dict, Optional, Tuple, Union
 
 import numpy as np
 from numba import cuda, float64
@@ -632,7 +632,8 @@ def get_nvc_encoder(width: int,
                     height: int,
                     codec: str = 'h264',
                     fmt: str = 'ARGB',
-                    use_cpu_input_buffer: bool = False):
+                    use_cpu_input_buffer: bool = False,
+                    fps: Optional[float] = None):
     """
     Create an NVENC hardware video encoder for GPU-accelerated frame encoding.
 
@@ -647,11 +648,13 @@ def get_nvc_encoder(width: int,
     :param str codec: NVENC codec, one of 'h264', 'hevc', 'av1'. Default 'h264'.
     :param str fmt: Input surface format the encoder expects (e.g. 'ARGB', 'NV12'). Default 'ARGB'.
     :param bool use_cpu_input_buffer: If True, frames are supplied from host memory; if False (default), from GPU device memory.
+    :param Optional[float] fps: Frame rate written into the stream. Pass the source video's fps: without it the stream says 30 fps, which overrides ``ffmpeg -framerate`` when muxing. Default None.
     :raises SimBAGPUError: If PyNvVideoCodec is not installed, or if no CUDA GPU is available.
-    :return: A configured ``PyNvVideoCodec`` encoder.
+    :return: A configured ``PyNvVideoCodec`` encoder (B-frames off: with B-frames, muxing the raw stream with ``ffmpeg -c copy`` drops the first 3-4 frames).
     """
 
-    from simba.utils.checks import check_instance, check_int, check_str
+    from simba.utils.checks import (check_float, check_instance, check_int,
+                                    check_str)
     from simba.utils.errors import SimBAGPUError
 
     if nvc is None:
@@ -663,7 +666,10 @@ def get_nvc_encoder(width: int,
     check_str(name=f'{get_nvc_encoder.__name__} codec', value=codec, options=('h264', 'hevc', 'av1'))
     check_str(name=f'{get_nvc_encoder.__name__} fmt', value=fmt)
     check_instance(source=f'{get_nvc_encoder.__name__} use_cpu_input_buffer', instance=use_cpu_input_buffer, accepted_types=(bool,))
-    return nvc.CreateEncoder(width, height, fmt, use_cpu_input_buffer, codec=codec)
+    if fps is None:
+        return nvc.CreateEncoder(width, height, fmt, use_cpu_input_buffer, codec=codec, bf=0)
+    check_float(name=f'{get_nvc_encoder.__name__} fps', value=fps, min_value=10e-6)
+    return nvc.CreateEncoder(width, height, fmt, use_cpu_input_buffer, codec=codec, bf=0, fps=fps)
 
 
 

@@ -423,7 +423,7 @@ class GeometryPlotterNVENC(object):
         clr_dev = cuda.to_device(self.colors)
         outline_dev = cuda.to_device(self.outline_clr)
         decoder = get_nvc_decoder(video_path=self.video_path, use_device_memory=True, threaded=True, buffer_size=self.buffer_size, start_frame=start)
-        encoder = get_nvc_encoder(width=w, height=h, codec=self.codec, fmt='ARGB')
+        encoder = get_nvc_encoder(width=w, height=h, codec=self.codec, fmt='ARGB', fps=self.video_meta['fps'])
         grid = (math.ceil(w / TPB[0]), math.ceil(h / TPB[1]))
         raw_path = f'{out_path}.raw.{self.codec}'
         i = start

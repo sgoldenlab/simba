@@ -279,7 +279,7 @@ class ClaheNVENC(object):
         hist_dev = cuda.device_array((nty, ntx, 256), dtype='int32')
         lut_dev = cuda.device_array((nty, ntx, 256), dtype='uint8')
         decoder = get_nvc_decoder(video_path=video_path, use_device_memory=True, threaded=True, buffer_size=self.buffer_size, start_frame=start)
-        encoder = get_nvc_encoder(width=w, height=h, codec=self.codec, fmt='ARGB')
+        encoder = get_nvc_encoder(width=w, height=h, codec=self.codec, fmt='ARGB', fps=video_meta['fps'])
         grid_px = (math.ceil(w / TPB[0]), math.ceil(h / TPB[1]))
         grid_tile = math.ceil((nty * ntx) / TPB_TILE)
         grid_zero = math.ceil((nty * ntx * 256) / TPB_ZERO)

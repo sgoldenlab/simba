@@ -220,7 +220,7 @@ class YOLOPoseTrackInference():
                                                  persist=False,
                                                  iou=self.iou,
                                                  device=self.device,
-                                                 max_det=self.max_tracks)
+                                                 max_det=self.max_tracks if self.max_tracks is not None else 300)  # YOLO26 end-to-end heads fail on max_det=None
 
             for frm_cnt, video_prediction in enumerate(video_predictions):
                 boxes = video_prediction.obb.data if video_prediction.obb is not None else video_prediction.boxes.data

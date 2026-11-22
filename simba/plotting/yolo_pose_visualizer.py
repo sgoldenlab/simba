@@ -18,9 +18,10 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.data import (create_color_palette, get_cpu_pool,
                               terminate_cpu_pool)
 from simba.utils.enums import Defaults, Options
-from simba.utils.errors import (CountError, DataHeaderError, FrameRangeError,
+from simba.utils.errors import (CountError, DataHeaderError,
                                 InvalidInputError, NoDataError)
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
+from simba.utils.warnings import FrameRangeWarning
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     find_files_of_filetypes_in_directory,
@@ -244,8 +245,9 @@ class YOLOPoseVisualizer():
                 missing = [x for x in required_s_cols if x not in self.data_df.columns]
                 if len(missing) > 0:
                     raise DataHeaderError(msg=f'Columns {missing} missing in file {data_path} as passe by skeleton.', source=self.__class__.__name__)
+            render_frm_cnt = min(self.video_meta_data['frame_count'], self.df_frm_cnt)
             if self.video_meta_data['frame_count'] != self.df_frm_cnt:
-                raise FrameRangeError(msg=f'The bounding boxes contain data for {self.df_frm_cnt} frames, while the video is {self.video_meta_data["frame_count"]} frames ({self.video_meta_data["video_name"]})', source=self.__class__.__name__)
+                FrameRangeWarning(msg=f'The bounding boxes contain data for {self.df_frm_cnt} frames, while the video is {self.video_meta_data["frame_count"]} frames ({self.video_meta_data["video_name"]}). Visualizing the first {render_frm_cnt} frames.', source=self.__class__.__name__)
             if self.circle_size is None:
                 circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(self.video_meta_data['width'], self.video_meta_data['height']), circle_frame_ratio=80)
             else:
@@ -254,7 +256,7 @@ class YOLOPoseVisualizer():
                 thickness = deepcopy(circle_size)
             else:
                 thickness = deepcopy(self.thickness)
-            frm_batches = np.array_split(np.array(list(range(0, self.df_frm_cnt))), self.core_cnt)
+            frm_batches = np.array_split(np.array(list(range(0, render_frm_cnt))), self.core_cnt)
             frm_batches = [(i, j) for i, j in enumerate(frm_batches)]
             if self.verbose: stdout_information(msg=f'Visualizing video {self.video_meta_data["video_name"]} (frame count: {self.video_meta_data["frame_count"]}, video: {video_cnt+1}/{len(list(self.data_paths.keys()))})...')
             constants = functools.partial(_yolo_keypoint_visualizer,

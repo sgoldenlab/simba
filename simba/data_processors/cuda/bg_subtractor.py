@@ -249,7 +249,7 @@ class BackgroundSubtractorCUDA(object):
         argb_t = torch.empty((1, self.h, self.w, 4), dtype=torch.uint8, device='cuda:0')
         argb_dev = cuda.as_cuda_array(argb_t)
         decoder = nvc.SimpleDecoder(str(self.video_path), use_device_memory=True, output_color_type=nvc.OutputColorType.RGB)
-        encoder = nvc.CreateEncoder(self.w, self.h, 'ARGB', False, codec=self.codec)
+        encoder = nvc.CreateEncoder(self.w, self.h, 'ARGB', False, codec=self.codec, fps=self.video_meta['fps'], bf=0)   # bf=0 + fps: else the mux drops the first frames and reads 30 fps
         grid = (math.ceil(self.w / 32), math.ceil(self.h / 32), 1)
         raw_path = os.path.join(tempfile.gettempdir(), f'_bgsub_{os.getpid()}.{self.codec}')
         n_dec = len(decoder)

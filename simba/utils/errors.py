@@ -11,6 +11,15 @@ WINDOW_TITLE = "SIMBA ERROR"
 HELP_PREFIX = "For help, see:"
 
 
+def _rebuild_simba_error(cls, state):
+    """Recreate a pickled SimBA error (e.g. one raised inside a multiprocessing worker) without calling ``__init__``,
+    so it is not printed/logged a second time and subclasses with different ``__init__`` signatures all work."""
+    error = cls.__new__(cls)
+    error.__dict__.update(state)
+    error.args = (state.get('msg', ''),)
+    return error
+
+
 class SimbaError(Exception):
     # Help page for this error type, shown under the error as "For help, see: <url>" in the console and in the error
     # pop-up. Use a short ``Links.HELP_*`` address (its target section is set in HELP_PAGES in docs/conf.py), and set it
@@ -21,10 +30,17 @@ class SimbaError(Exception):
 
     def __init__(self, msg: str, source: str = " ", show_window: bool = False):
         self.msg, self.source, self.show_window = msg, source, show_window
+        self.args = (msg,)
         self.print_and_log_error()
 
     def __str__(self):
         return self.msg
+
+    def __reduce__(self):
+        # Errors are raised with keyword arguments only, so the default pickling (``cls(*self.args)``) fails with
+        # "missing 1 required positional argument: 'msg'". That breaks errors raised inside multiprocessing workers:
+        # the pool's result thread crashes and the pool hangs instead of re-raising the error.
+        return (_rebuild_simba_error, (self.__class__, self.__dict__.copy()))
 
     def help_url(self) -> Optional[str]:
         """Help page for this error, or None if this error type has none. Shown as-is: the help page adds the analytics tag."""

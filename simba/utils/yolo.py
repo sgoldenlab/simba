@@ -229,7 +229,7 @@ def yolo_predict(model: YOLO,
                             stream=stream,
                             device=device,
                             conf=threshold,
-                            max_det=max_detections,
+                            max_det=max_detections if max_detections is not None else 300,  # YOLO26 end-to-end heads fail on max_det=None
                             verbose=verbose,
                             imgsz=imgsz,
                             iou=iou,
