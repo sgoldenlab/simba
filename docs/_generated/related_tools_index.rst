@@ -219,6 +219,7 @@
    * M3 MultiMouseMonitor
    * MacAction (AnimLabel)
    * macaque3Dpose
+   * Machine Learning Framework for Integration of Video and EEG Reveals Distinct Seizure Phenotypes in Mouse Models of Epilepsy
    * MacqD
    * MAD
    * Mamba-MSQNet
@@ -255,6 +256,7 @@
    * MUPET
    * MyVivarium
    * NAPS
+   * Natural predator-associated chemosignals evoke distinct spatiotemporal patterns of risk assessment and vomeronasal population responses
    * NC4Gate
    * ndx-pose
    * Nematode aggression state model
@@ -377,6 +379,7 @@
    * suite2p
    * SuperAnimal / DLC Model Zoo
    * swaRm
+   * SynPanZ
    * Synthetic rodent behavior dataset
    * Task Programming
    * Territorial behavior assay

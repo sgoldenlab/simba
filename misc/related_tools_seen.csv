@@ -567,7 +567,7 @@ https://www.sciencedirect.com/science/article/pii/S0925231226015390,yes,2026,sch
 10.64898/2026.10.26.761827,no,2026,biorxiv,2026-11-02,"Concurrent cognitive, behavioral and systemic physiological features mark preclinical Alzheimer's disease"
 10.1101/2023.12.11.571113,no,2026,biorxiv,2026-11-02,Head movement allocation in freely-moving macaques learning object-context sequences
 10.64898/2026.04.21.719334,no,2026,biorxiv,2026-11-02,"A multimodal dataset of EEG, eye-tracking, and physiological signals during naturalistic smartphone interactions"
-10.64898/2026.10.30.763133,pending,2026,biorxiv,2026-11-02,Natural predator-associated chemosignals evoke distinct spatiotemporal patterns of risk assessment and vomeronasal population responses
+10.64898/2026.10.30.763133,yes,2026,biorxiv,2026-11-23,Natural predator-associated chemosignals evoke distinct spatiotemporal patterns of risk assessment and vomeronasal population responses
 10.64898/2026.10.31.763226,no,2026,biorxiv,2026-11-05,Dissociable norepinephrine and dopamine representations during strategic decision-making and reward learning
 10.1101/2025.11.17.688782,no,2026,biorxiv,2026-11-05,Active vision modulates early cortical stages of visual processing: Evidence from MEG and eye-tracking
 10.64898/2026.10.28.762141,no,2026,biorxiv,2026-11-05,How multilevel competition drives cooperation in stigmergic systems
@@ -611,33 +611,33 @@ https://www.sciencedirect.com/science/article/pii/S0925231226015390,yes,2026,sch
 10.48550/arxiv.2311.04069,yes,2023,openalex,2026-11-08,LISBET: a machine learning model for the automatic segmentation of social behavior motifs
 10.5282/edoc.35588,no,2026,openalex,2026-11-08,Sex-specific outcomes of developmental stress and psilocybin intervention on the brain and behavior
 10.48550/arxiv.2610.32989,yes,2026,openalex,2026-11-08,DairySocialTwin: Auditing the video-to-graph evidence chain in cattle social networks
-10.64898/2026.11.04.764437,pending,2026,biorxiv,2026-11-16,A Common Recognition Architecture Across Memory Scales
-10.64898/2026.11.06.764964,pending,2026,biorxiv,2026-11-16,Ergodic breakdown of brain dynamics under chronnectome complexity across cognitive states and age
-10.64898/2026.11.06.764855,pending,2026,biorxiv,2026-11-16,Identifying a neurochemical signature of the paraventricular nucleus of the thalamus that predicts individual variability in cue-reward learning
-10.64898/2026.02.01.702903,pending,2026,biorxiv,2026-11-16,"I err, therefore I am: Neural signature of error-monitoring predicts self-awareness in infants"
-10.64898/2026.11.07.765039,pending,2026,biorxiv,2026-11-16,Divergence in sleep architecture associated with interspecific shifts in memory investment
-10.64898/2026.10.07.757228,pending,2026,biorxiv,2026-11-16,Shared experimental materials inflate and reorder cross-participant decoding benchmarks
-10.64898/2026.07.17.739137,pending,2026,biorxiv,2026-11-16,Multimodal temporal modeling of behavioral reorganization across threat learning and extinction in rats
-10.64898/2026.11.08.765180,pending,2026,biorxiv,2026-11-16,"Working memory capacity is linked to directed exploration: behavioral, computational, and electrophysiological evidence"
-10.64898/2026.11.09.765311,pending,2026,biorxiv,2026-11-16,The Where and When of Tracking Sound Sources Head-based auditory motion tracking integrates velocity and spatial error within a common delayed frame
-10.64898/2026.11.09.765278,pending,2026,biorxiv,2026-11-16,Beyond Exploration: Heightened Recent Reward Reliance and Midfrontal Sensitivity to Outcome Differences in ADHD
-10.64898/2026.11.08.765166,pending,2026,biorxiv,2026-11-16,Capturing continuous spectrotemporal pupil--brain coupling with simultaneous wearable EEG/Eye tracking
-10.64898/2026.11.08.765193,pending,2026,biorxiv,2026-11-16,Evidence-based re-identification: Leveraging appearance cues to correct tracking mistakes rather than trying to prevent them
-10.64898/2026.11.09.765261,pending,2026,biorxiv,2026-11-16,Temporal Dynamics of Multi-Item Working Memory Maintenance in Human Gaze Patterns and EEG
-10.64898/2026.11.10.765590,pending,2026,biorxiv,2026-11-16,Evidence of silent nociceptor activation during the formalin test in rats
-10.64898/2026.11.09.763563,pending,2026,biorxiv,2026-11-16,"CoReg, tracking-based motion compensation for in vivo calcium imaging"
-10.64898/2026.11.10.765800,pending,2026,biorxiv,2026-11-16,A novel behavioral paradigm for characterizing anticipatory postural adjustments in mice
-10.64898/2026.06.11.731593,pending,2026,biorxiv,2026-11-16,Readout adaptation in simulated arm reaching: learned compensation and performance after updates stop
-10.64898/2026.08.25.747007,pending,2026,biorxiv,2026-11-16,"RhabdoForge: A Modular, Biophysically-Grounded Rendering Framework for Insect Vision Neuroethology"
-10.64898/2026.08.31.747047,pending,2026,biorxiv,2026-11-16,"Mice, marmosets and humans use ambiguous local motion to stabilize gaze"
-10.1101/2025.11.17.688918,pending,2026,biorxiv,2026-11-16,Explainable 3D CNNs Yield Progression-Linked Profiles of Saliency in Early Parkinson's Disease Using T1-Weighted MRI
-10.64898/2026.11.10.765692,pending,2026,biorxiv,2026-11-16,Development of direction selectivity in the Xenopus tadpole optic tectum and midbrain tegmentum
-10.64898/2026.03.06.709780,pending,2026,biorxiv,2026-11-16,Decoding Articulatory and Phonetic Features: Somatotopic and Sensorimotor Representations in Native and Non-native Consonant Perception
-10.64898/2026.03.11.711118,pending,2026,biorxiv,2026-11-16,Trust Modulates Speech Entrainment: Enhanced Cortical Tracking for Low Trust Speakers
-10.64898/2026.03.12.711455,pending,2026,biorxiv,2026-11-16,Biological network topology is a structural prior for data-efficient sparse learning
-10.64898/2025.12.02.691784,pending,2026,biorxiv,2026-11-16,Ventromedial striatal dopamine dynamically integrates motivated action and reward proximity
-10.64898/2026.11.12.765913,pending,2026,biorxiv,2026-11-16,Pose-derived microstructure resolves how hunger and social isolation shape social-food choice in male mice
-10.64898/2026.11.10.765694,pending,2026,biorxiv,2026-11-16,Harmonizing amyloid PET tracers at the local level: evaluation of regional Centiloid equations
+10.64898/2026.11.04.764437,no,2026,biorxiv,2026-11-16,A Common Recognition Architecture Across Memory Scales
+10.64898/2026.11.06.764964,no,2026,biorxiv,2026-11-16,Ergodic breakdown of brain dynamics under chronnectome complexity across cognitive states and age
+10.64898/2026.11.06.764855,no,2026,biorxiv,2026-11-16,Identifying a neurochemical signature of the paraventricular nucleus of the thalamus that predicts individual variability in cue-reward learning
+10.64898/2026.02.01.702903,no,2026,biorxiv,2026-11-16,"I err, therefore I am: Neural signature of error-monitoring predicts self-awareness in infants"
+10.64898/2026.11.07.765039,no,2026,biorxiv,2026-11-16,Divergence in sleep architecture associated with interspecific shifts in memory investment
+10.64898/2026.10.07.757228,no,2026,biorxiv,2026-11-16,Shared experimental materials inflate and reorder cross-participant decoding benchmarks
+10.64898/2026.07.17.739137,no,2026,biorxiv,2026-11-16,Multimodal temporal modeling of behavioral reorganization across threat learning and extinction in rats
+10.64898/2026.11.08.765180,no,2026,biorxiv,2026-11-16,"Working memory capacity is linked to directed exploration: behavioral, computational, and electrophysiological evidence"
+10.64898/2026.11.09.765311,no,2026,biorxiv,2026-11-16,The Where and When of Tracking Sound Sources Head-based auditory motion tracking integrates velocity and spatial error within a common delayed frame
+10.64898/2026.11.09.765278,no,2026,biorxiv,2026-11-16,Beyond Exploration: Heightened Recent Reward Reliance and Midfrontal Sensitivity to Outcome Differences in ADHD
+10.64898/2026.11.08.765166,no,2026,biorxiv,2026-11-16,Capturing continuous spectrotemporal pupil--brain coupling with simultaneous wearable EEG/Eye tracking
+10.64898/2026.11.08.765193,no,2026,biorxiv,2026-11-16,Evidence-based re-identification: Leveraging appearance cues to correct tracking mistakes rather than trying to prevent them
+10.64898/2026.11.09.765261,no,2026,biorxiv,2026-11-16,Temporal Dynamics of Multi-Item Working Memory Maintenance in Human Gaze Patterns and EEG
+10.64898/2026.11.10.765590,no,2026,biorxiv,2026-11-16,Evidence of silent nociceptor activation during the formalin test in rats
+10.64898/2026.11.09.763563,no,2026,biorxiv,2026-11-16,"CoReg, tracking-based motion compensation for in vivo calcium imaging"
+10.64898/2026.11.10.765800,no,2026,biorxiv,2026-11-16,A novel behavioral paradigm for characterizing anticipatory postural adjustments in mice
+10.64898/2026.06.11.731593,no,2026,biorxiv,2026-11-16,Readout adaptation in simulated arm reaching: learned compensation and performance after updates stop
+10.64898/2026.08.25.747007,no,2026,biorxiv,2026-11-16,"RhabdoForge: A Modular, Biophysically-Grounded Rendering Framework for Insect Vision Neuroethology"
+10.64898/2026.08.31.747047,no,2026,biorxiv,2026-11-16,"Mice, marmosets and humans use ambiguous local motion to stabilize gaze"
+10.1101/2025.11.17.688918,no,2026,biorxiv,2026-11-16,Explainable 3D CNNs Yield Progression-Linked Profiles of Saliency in Early Parkinson's Disease Using T1-Weighted MRI
+10.64898/2026.11.10.765692,no,2026,biorxiv,2026-11-16,Development of direction selectivity in the Xenopus tadpole optic tectum and midbrain tegmentum
+10.64898/2026.03.06.709780,no,2026,biorxiv,2026-11-16,Decoding Articulatory and Phonetic Features: Somatotopic and Sensorimotor Representations in Native and Non-native Consonant Perception
+10.64898/2026.03.11.711118,no,2026,biorxiv,2026-11-16,Trust Modulates Speech Entrainment: Enhanced Cortical Tracking for Low Trust Speakers
+10.64898/2026.03.12.711455,no,2026,biorxiv,2026-11-16,Biological network topology is a structural prior for data-efficient sparse learning
+10.64898/2025.12.02.691784,no,2026,biorxiv,2026-11-16,Ventromedial striatal dopamine dynamically integrates motivated action and reward proximity
+10.64898/2026.11.12.765913,no,2026,biorxiv,2026-11-23,Pose-derived microstructure resolves how hunger and social isolation shape social-food choice in male mice
+10.64898/2026.11.10.765694,no,2026,biorxiv,2026-11-16,Harmonizing amyloid PET tracers at the local level: evaluation of regional Centiloid equations
 10.7554/elife.103586.1.sa0,no,2024,openalex,2026-11-16,Author response: High-throughput unsupervised quantification of patterns in the natural behavior of marmosets
 10.64898/2026.11.10.765630,yes,2026,openalex,2026-11-16,"Deconstructing Boldness: Latent behavioural structure across novelty, predation, and exploration in an endangered species translocation program"
 10.1016/j.beproc.2026.105464,no,2026,openalex,2026-11-16,Comparing behavioral outputs across automated tracking software reveals platform-dependent variability in zebrafish neurobehavioral analysis
@@ -647,3 +647,32 @@ https://www.sciencedirect.com/science/article/pii/S0925231226015390,yes,2026,sch
 10.4108/eetel.12221,no,2026,openalex,2026-11-16,Retraction Notice: Artificial Intelligence in Mathematical Modeling of Complex Systems
 10.48550/arxiv.2611.17881,no,2026,semantic-scholar,2026-11-16,Photogrammetric 3D Model-Based Animal Behavior Classification
 10.48550/arxiv.2611.11644,yes,2026,semantic-scholar,2026-11-16,MICE: Multi-animal Interaction Context Encoder - A Hierarchical Foundation Model for Mouse Behavior
+10.64898/2026.05.11.724367,pending,2026,biorxiv,2026-11-23,Attenuated gaze synchrony in autism and its non-additive modification by co-occurring ADHD: a transdiagnostic eye-tracking study of naturalistic viewing
+10.64898/2026.03.03.709383,pending,2026,biorxiv,2026-11-23,Acoustic phenotyping reveals sublethal pesticide effects in bees using BEEhaviourLab
+10.64898/2026.11.15.766749,pending,2026,biorxiv,2026-11-23,Individual variation in emergence behaviour and responses to sound exposure in zebrafish
+10.64898/2026.11.13.766238,pending,2026,biorxiv,2026-11-23,"Automated, high-throughput kinematic analysis of skilled reaching in rodent models of neurological injury"
+10.64898/2026.11.16.764094,pending,2026,biorxiv,2026-11-23,ACC Sulcal Morphology as a Neurodevelopmental Marker of Proactive and Reactive Cognitive Control among Adolescents
+10.64898/2026.11.12.765375,pending,2026,biorxiv,2026-11-23,Neural processing of linguistic speech features and their modulation by selective attention in users of hearing aids and cochlear implants
+10.64898/2026.11.16.767059,pending,2026,biorxiv,2026-11-23,"A plasma proteomic atlas of rare genetic neurodevelopmental disorders reveals convergent molecular signatures, neurodegenerative overlap, and a cross-disorder severity index"
+10.64898/2026.11.17.767188,pending,2026,biorxiv,2026-11-23,LUC3D: Multi-animal 3D pose tracking in the browser
+10.64898/2026.11.17.767420,pending,2026,biorxiv,2026-11-23,Modern speech recognition systems exhibit human-like word recognition but superhuman use of statistical dependencies between words
+10.1101/2025.07.19.665650,pending,2026,biorxiv,2026-11-23,"AutoMorphoTrack: A modular framework for quantitative analysis of organelle morphology, tracking, and image colocalization"
+10.64898/2026.11.17.767357,pending,2026,biorxiv,2026-11-23,"Dissociable patterns of neurophysiological alterations during guided search in schizophrenia and autism: Evidence from fixation-related potentials, alpha modulation, and functional MRI."
+10.64898/2026.10.15.759362,pending,2026,biorxiv,2026-11-23,NED-Net: open-source software for building and refining seizure detectors during rodent EEG experiments
+10.64898/2026.11.18.767692,pending,2026,biorxiv,2026-11-23,Tonic dopamine regulates cell-type-specific PKA activity and motivated behavior
+10.64898/2026.11.18.767650,pending,2026,biorxiv,2026-11-23,Diverging light-responsive behaviors in genetically similar strains of Hydra vulgaris
+10.64898/2026.08.03.742499,pending,2026,biorxiv,2026-11-23,Norm-like vocal behavior in a nonhuman primate
+10.64898/2026.11.19.767794,pending,2026,biorxiv,2026-11-23,Longitudinal computer vision-based behavioural phenotyping of group-housed dogs for translational and welfare research
+10.64898/2026.11.19.767843,pending,2026,biorxiv,2026-11-23,Anthropogenic noise affects Oikopleura dioica behaviour in a life stage- and signal-dependent manner
+10.64898/2026.01.09.698577,pending,2026,biorxiv,2026-11-23,When Velocity Becomes Position: Proprioceptive Contributions to State Estimation
+10.64898/2026.11.20.768042,pending,2026,biorxiv,2026-11-23,Reduced subcortical envelope phase locking in middle age without detectable changes in perceptual discrimination
+10.64898/2026.11.20.767538,pending,2026,biorxiv,2026-11-23,Social information use promotes breeding synchrony but constrains adaptation to rapid environmental changes
+10.54195/9789465150864,no,2025,openalex,2026-11-23,"Machine Learning Strategies, Behavioral Challenges and Practical Solutions"
+10.54254/2755-2721/2025.27390,no,2025,openalex,2026-11-23,Multimodal Neural-Signal-Driven Instant Price Sensitivity Prediction in Virtual Reality Duty-Free Store Scenarios
+10.63028/10067/2191220151162165141,no,2025,openalex,2026-11-23,"The population genomic structure, physiology and behaviour of commercially important Malawi cichlid fishes"
+10.1523/jneurosci.0280-26.2026,yes,2026,openalex,2026-11-23,Machine Learning Framework for Integration of Video and EEG Reveals Distinct Seizure Phenotypes in Mouse Models of Epilepsy
+10.48550/arxiv.2611.18674,yes,2026,openalex,2026-11-23,SynPanZ: A Synthetic Dataset to Improve Multi-Animal Pose Estimation in Chimpanzees (Pan troglodytes)
+10.1002/9781394406845.ch03,no,2026,openalex,2026-11-23,Rethinking Risk—From Probability to Trust and Ethics
+10.48550/arxiv.2611.24792,no,2026,openalex,2026-11-23,Training-free motion statistics match self-supervised behavior encoders
+10.7554/elife.86873.1.sa1,no,2023,openalex,2026-11-23,Reviewer #1 (Public Review): OpenApePose: a database of annotated ape photographs for pose estimation
+10.1038/s41598-026-77720-1,no,2026,openalex,2026-11-23,Establishment of a conditional knock-in mouse model for SARS-CoV-2 RNA-dependent RNA polymerase Nsp12
