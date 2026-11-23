@@ -20,7 +20,7 @@ primitives ``_cuda_is_inside_polygon`` / ``_cuda_is_inside_circle``. GPU-only.
 
 import math
 import os
-import subprocess
+import shutil
 import tempfile
 import threading
 from typing import List, Optional, Tuple, Union
@@ -45,8 +45,7 @@ from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
 
 from simba.data_processors.cuda.image import (_cuda_is_inside_circle,
                                               _cuda_is_inside_polygon)
-from simba.data_processors.cuda.utils import (_cuda_point_to_segment_dist,
-                                              get_nvc_decoder, get_nvc_encoder)
+from simba.data_processors.cuda.utils import (encode_nvc_frame, _cuda_point_to_segment_dist, NVC_SEEK_MARGIN, NVCFrameAlignmentError, get_nvc_decoder, get_nvc_encoder, get_nvc_frame_timing, iter_nvc_frames, mux_nvc_raw_stream, concat_nvc_chunks, check_nvc_frame_size)
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_rgb_tuple,
@@ -59,6 +58,7 @@ from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 SimBAGPUError)
 from simba.utils.lookups import get_color_dict, get_nvdec_count
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
+from simba.utils.warnings import FrameRangeWarning
 from simba.utils.read_write import (get_fn_ext, get_pkg_version,
                                     get_video_meta_data)
 
@@ -237,7 +237,7 @@ class GeometryPlotterNVENC(object):
         if outline_clr is not None:
             check_if_valid_rgb_tuple(data=outline_clr, source=f'{self.__class__.__name__} outline_clr')
             check_int(name=f'{self.__class__.__name__} thickness', value=thickness, min_value=1)
-        self.video_meta = get_video_meta_data(video_path=video_path)
+        self.video_meta = get_video_meta_data(video_path=video_path, fps_as_int=False)
         w, h = self.video_meta['width'], self.video_meta['height']
         if circle_size is None:
             circle_size = max(2, int(max(w, h) / 100))
@@ -411,8 +411,9 @@ class GeometryPlotterNVENC(object):
                     poly_bbox[fi, gi] = (v[:k, 0].min(), v[:k, 1].min(), v[:k, 0].max(), v[:k, 1].max())
         return poly_verts, poly_vcount, poly_bbox, circles
 
-    def _encode_chunk(self, start: int, end: int, out_path: str) -> None:
-        """Decode -> geometry-overlay kernel -> NVENC-encode frames [start, end) and mux to ``out_path``."""
+    def _encode_chunk(self, start: int, end: int, out_path: str, timing: Optional[Tuple[int, float]] = None) -> None:
+        """Decode -> geometry-overlay kernel -> NVENC-encode frames [start, end) and mux to ``out_path``.
+        With ``timing`` (multi-worker) frames are identified by timestamp, see :func:`simba.data_processors.cuda.utils.iter_nvc_frames`."""
         w, h, n = self.video_meta['width'], self.video_meta['height'], self.video_meta['frame_count']
         argb_t = torch.empty((1, h, w, 4), dtype=torch.uint8, device='cuda:0')
         argb_dev = cuda.as_cuda_array(argb_t)[0]
@@ -422,75 +423,72 @@ class GeometryPlotterNVENC(object):
         ci_dev = cuda.to_device(self.circles)
         clr_dev = cuda.to_device(self.colors)
         outline_dev = cuda.to_device(self.outline_clr)
-        decoder = get_nvc_decoder(video_path=self.video_path, use_device_memory=True, threaded=True, buffer_size=self.buffer_size, start_frame=start)
         encoder = get_nvc_encoder(width=w, height=h, codec=self.codec, fmt='ARGB', fps=self.video_meta['fps'])
+        decoder = get_nvc_decoder(video_path=self.video_path, use_device_memory=True, threaded=True, buffer_size=self.buffer_size, start_frame=start if timing is None else max(0, start - NVC_SEEK_MARGIN))
         grid = (math.ceil(w / TPB[0]), math.ceil(h / TPB[1]))
         raw_path = f'{out_path}.raw.{self.codec}'
-        i = start
-        with open(raw_path, 'wb') as raw:
-            while i < end:
-                frames = decoder.get_batch_frames(min(self.buffer_size, end - i))
-                if not frames:
-                    break
-                for f in frames:
-                    if i >= end:
-                        break
+        try:
+            with open(raw_path, 'wb') as raw:
+                for i, f in iter_nvc_frames(decoder=decoder, start=start, end=end, buffer_size=self.buffer_size, timing=timing):
                     rgb = cuda.as_cuda_array(torch.from_dlpack(f))
+                    if i == start:
+                        check_nvc_frame_size(frame=rgb, width=w, height=h, video_path=self.video_path, source=self.__class__.__name__)
                     fi = 0 if self._static else i
                     _geometry_overlay_kernel[grid, TPB](rgb, argb_dev, pv_dev[fi], pc_dev[fi], bb_dev[fi], ci_dev[fi], clr_dev, self.shape_opacity, self.bg_opacity, outline_dev, self.thickness)
-                    bitstream = encoder.Encode(argb_t[0])
-                    if bitstream:
-                        raw.write(bytes(bitstream))
-                    i += 1
-                    if self.verbose and i % 500 == 0:
-                        stdout_information(msg=f'Encoded {i}/{n} frames...', source=self.__class__.__name__)
-            tail = encoder.EndEncode()
-            if tail:
-                raw.write(bytes(tail))
-        decoder.end()
-        subprocess.call(f'ffmpeg -y -loglevel error -framerate {self.video_meta["fps"]} -i "{raw_path}" -c copy "{out_path}"', shell=True)
-        try:
-            os.remove(raw_path)
-        except OSError:
-            pass
+                    raw.write(encode_nvc_frame(encoder=encoder, frame=argb_t[0]))
+                    if self.verbose and (i + 1) % 500 == 0:
+                        stdout_information(msg=f'Encoded {i + 1}/{n} frames...', source=self.__class__.__name__)
+                tail = encoder.EndEncode()
+                if tail:
+                    raw.write(bytes(tail))
+            mux_nvc_raw_stream(raw_path=raw_path, fps=self.video_meta['fps'], save_path=out_path, source=self.__class__.__name__)
+        finally:
+            try:
+                decoder.end()
+            except Exception:
+                pass
+            if os.path.isfile(raw_path):
+                os.remove(raw_path)
 
     def run(self) -> None:
         """Render the geometry-overlay video on the GPU and write it to ``save_path``."""
         timer = SimbaTimer(start=True)
         n = self.video_meta['frame_count']
-        if self.n_workers <= 1:
+        n_workers = max(1, min(self.n_workers, n))
+        timing = get_nvc_frame_timing(video_path=self.video_path) if n_workers > 1 else None
+        if n_workers > 1 and timing is None:
+            FrameRangeWarning(msg=f'Could not read frame timestamps of {self.video_path}; rendering with 1 worker.', source=self.__class__.__name__)
+        if n_workers <= 1 or timing is None:
             self._encode_chunk(0, n, str(self.save_path))
         else:
-            bounds = np.linspace(0, n, self.n_workers + 1).astype(int)
-            tmp = tempfile.gettempdir()
-            chunk_paths = [os.path.join(tmp, f'_geochunk_{os.getpid()}_{k}.mp4') for k in range(self.n_workers)]
+            bounds = np.linspace(0, n, n_workers + 1).astype(int)
+            tmp = tempfile.mkdtemp(prefix='simba_nvenc_')                     # unique per render: no name clashes
+            chunk_paths = [os.path.join(tmp, f'chunk_{k}.mp4') for k in range(n_workers)]
             errors, threads = [], []
 
             def _work(k: int) -> None:
                 try:
-                    self._encode_chunk(int(bounds[k]), int(bounds[k + 1]), chunk_paths[k])
+                    self._encode_chunk(int(bounds[k]), int(bounds[k + 1]), chunk_paths[k], timing)
                 except Exception as e:
                     errors.append((k, e))
 
-            for k in range(self.n_workers):
+            for k in range(n_workers):
                 t = threading.Thread(target=_work, args=(k,), daemon=True)
                 t.start()
                 threads.append(t)
             for t in threads:
                 t.join()
-            if errors:
-                k, exc = errors[0]
-                raise FrameRangeError(msg=f'{self.__class__.__name__} chunk {k} failed: {exc}', source=self.__class__.__name__)
-            list_path = os.path.join(tmp, f'_geolist_{os.getpid()}.txt')
-            with open(list_path, 'w') as fh:
-                for p in chunk_paths:
-                    fh.write(f"file '{p}'\n")
-            subprocess.call(f'ffmpeg -y -loglevel error -f concat -safe 0 -i "{list_path}" -c copy "{self.save_path}"', shell=True)
-            for p in chunk_paths + [list_path]:
-                try:
-                    os.remove(p)
-                except OSError:
-                    pass
+            try:
+                if errors:
+                    real_errors = [(k, e) for k, e in errors if not isinstance(e, NVCFrameAlignmentError)]
+                    if real_errors:
+                        raise FrameRangeError(msg=f'{self.__class__.__name__} chunk {real_errors[0][0]} failed: {real_errors[0][1]}', source=self.__class__.__name__)
+                    FrameRangeWarning(msg=f'Multi-worker rendering of {self.video_path} failed ({errors[0][1]}); rendering with 1 worker.', source=self.__class__.__name__)
+                    self._encode_chunk(0, n, str(self.save_path))
+                else:
+                    concat_nvc_chunks(chunk_paths=chunk_paths, save_path=str(self.save_path), source=self.__class__.__name__)
+            finally:
+                shutil.rmtree(tmp, ignore_errors=True)
         timer.stop_timer()
         if self.verbose:
             stdout_success(msg=f'Geometry overlay video saved at {self.save_path}.', elapsed_time=timer.elapsed_time_str, source=self.__class__.__name__)

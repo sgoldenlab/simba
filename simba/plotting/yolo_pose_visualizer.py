@@ -19,15 +19,16 @@ from simba.utils.data import (create_color_palette, get_cpu_pool,
                               terminate_cpu_pool)
 from simba.utils.enums import Defaults, Options
 from simba.utils.errors import (CountError, DataHeaderError,
-                                InvalidInputError, NoDataError)
+                                FrameRangeError, InvalidInputError,
+                                NoDataError)
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
 from simba.utils.warnings import FrameRangeWarning
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     get_current_time, get_fn_ext,
-                                    get_video_meta_data, read_frm_of_video,
-                                    recursive_file_search, remove_a_folder)
+                                    get_video_meta_data, recursive_file_search,
+                                    remove_a_folder)
 
 FRAME = 'FRAME'
 CLASS_ID = 'CLASS_ID'
@@ -55,6 +56,7 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
     start_frm, end_frm, current_frm = frame_rng[0], frame_rng[-1], frame_rng[0]
     video_meta_data = get_video_meta_data(video_path=video_path, fps_as_int=False)
     cap = cv2.VideoCapture(video_path)
+    cap.set(cv2.CAP_PROP_POS_FRAMES, int(start_frm))  # batches are contiguous: seek once, then read sequentially
     fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_DUPLEX
     video_save_path = os.path.join(save_dir, f'{batch_id}.mp4')
     video_writer = cv2.VideoWriter(video_save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]))
@@ -63,7 +65,9 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
         data = data.drop([TRACK], axis=1)
     while current_frm <= end_frm:
         if verbose: stdout_information(f'Processing frame {current_frm}/{video_meta_data["frame_count"]} (batch: {batch_id}, video: {video_meta_data["video_name"]})...')
-        img = read_frm_of_video(video_path=video_path, frame_index=current_frm)
+        ret, img = cap.read()
+        if not ret:
+            raise FrameRangeError(msg=f'Frame {current_frm} for video {video_path} could not be read.', source=_yolo_keypoint_visualizer.__name__)
         frm_data = data.loc[data[FRAME] == current_frm]
         frm_data = frm_data[frm_data[CONFIDENCE] > threshold]
         for cnt, (row, row_data) in enumerate(frm_data.iterrows()):

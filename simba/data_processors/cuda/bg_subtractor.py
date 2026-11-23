@@ -3,7 +3,6 @@ __author__ = "Simon Nilsson"
 import math
 import os
 import queue
-import subprocess
 import tempfile
 import threading
 from typing import Optional, Tuple, Union
@@ -21,7 +20,8 @@ try:
 except Exception:
     torch = None
 
-from simba.data_processors.cuda.utils import _cuda_luminance_pixel_to_grey
+from simba.data_processors.cuda.utils import (encode_nvc_frame, _cuda_luminance_pixel_to_grey,
+                                              get_nvc_encoder, mux_nvc_raw_stream)
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_if_valid_img,
                                 check_if_valid_rgb_tuple, check_int, check_str,
@@ -54,7 +54,7 @@ def _bg_subtraction_kernel(imgs, avg_img, results, is_clr, fg_clr, threshold, bg
         b_diff = b1 - b2 if b1 > b2 else b2 - b1
         g_diff = g1 - g2 if g1 > g2 else g2 - g1
         r_diff = r1 - r2 if r1 > r2 else r2 - r1
-        grey_diff = _cuda_luminance_pixel_to_grey(b_diff, g_diff, r_diff)
+        grey_diff = _cuda_luminance_pixel_to_grey(r_diff, g_diff, b_diff)
         if grey_diff > threshold[0]:
             if fg_clr[0] != -1:
                 results[n][y][x][0] = fg_clr[0]
@@ -79,9 +79,8 @@ def _bg_subtraction_kernel(imgs, avg_img, results, is_clr, fg_clr, threshold, bg
 
 @cuda.jit()
 def _bg_subtraction_argb_kernel(imgs, avg_img, results, is_clr, fg_clr, threshold, bg_clr):
-    """Device: RGB(NVDEC) in -> ARGB out for NVENC. R/B are swapped in the luminance
-    call so the mask matches the CPU (bgr24) path. NVENC 'ARGB' wants byte order
-    [B, G, R, A] (little-endian ARGB), verified by per-slot calibration."""
+    """Device: RGB(NVDEC) in (average frame converted to RGB by the caller) -> ARGB out for NVENC.
+    NVENC 'ARGB' wants byte order [B, G, R, A] (little-endian ARGB), verified by per-slot calibration."""
     x, y, n = cuda.grid(3)
     if n < 0 or n > (imgs.shape[0] - 1):
         return
@@ -95,7 +94,7 @@ def _bg_subtraction_argb_kernel(imgs, avg_img, results, is_clr, fg_clr, threshol
         r_diff = r1 - r2 if r1 > r2 else r2 - r1
         g_diff = g1 - g2 if g1 > g2 else g2 - g1
         b_diff = b1 - b2 if b1 > b2 else b2 - b1
-        grey_diff = _cuda_luminance_pixel_to_grey(b_diff, g_diff, r_diff)
+        grey_diff = _cuda_luminance_pixel_to_grey(r_diff, g_diff, b_diff)
         if grey_diff > threshold[0]:
             if fg_clr[0] != -1:
                 out_r, out_g, out_b = fg_clr[0], fg_clr[1], fg_clr[2]
@@ -217,7 +216,7 @@ class BackgroundSubtractorCUDA(object):
         self.video_path = video_path
         self.batch_size, self.threshold = batch_size, threshold
         self.use_nvenc, self.codec, self.queue_size, self.verbose = use_nvenc, codec, queue_size, verbose
-        self.video_meta = get_video_meta_data(video_path=video_path)
+        self.video_meta = get_video_meta_data(video_path=video_path, fps_as_int=False)
         self.w, self.h = self.video_meta['width'], self.video_meta['height']
         if save_path is None:
             in_dir, video_name, _ = get_fn_ext(filepath=video_path)
@@ -249,7 +248,7 @@ class BackgroundSubtractorCUDA(object):
         argb_t = torch.empty((1, self.h, self.w, 4), dtype=torch.uint8, device='cuda:0')
         argb_dev = cuda.as_cuda_array(argb_t)
         decoder = nvc.SimpleDecoder(str(self.video_path), use_device_memory=True, output_color_type=nvc.OutputColorType.RGB)
-        encoder = nvc.CreateEncoder(self.w, self.h, 'ARGB', False, codec=self.codec, fps=self.video_meta['fps'], bf=0)   # bf=0 + fps: else the mux drops the first frames and reads 30 fps
+        encoder = get_nvc_encoder(width=self.w, height=self.h, fps=self.video_meta['fps'], codec=self.codec, fmt='ARGB')
         grid = (math.ceil(self.w / 32), math.ceil(self.h / 32), 1)
         raw_path = os.path.join(tempfile.gettempdir(), f'_bgsub_{os.getpid()}.{self.codec}')
         n_dec = len(decoder)
@@ -258,20 +257,17 @@ class BackgroundSubtractorCUDA(object):
                 t = torch.from_dlpack(decoder[i]).unsqueeze(0)
                 x_dev = cuda.as_cuda_array(t)
                 _bg_subtraction_argb_kernel[grid, THREADS_PER_BLOCK](x_dev, self.y_dev, argb_dev, self.is_clr_dev, self.fg_dev, self.thr_dev, self.bg_dev)
-                bitstream = encoder.Encode(argb_t[0])
-                if bitstream:
-                    raw.write(bytes(bitstream))
+                raw.write(encode_nvc_frame(encoder=encoder, frame=argb_t[0]))
                 if self.verbose and (i + 1) % 500 == 0:
                     stdout_information(msg=f'Encoded {i + 1}/{n_dec} frames...', source=self.__class__.__name__)
             tail = encoder.EndEncode()
             if tail:
                 raw.write(bytes(tail))
-        command = f'ffmpeg -y -loglevel error -framerate {self.video_meta["fps"]} -i "{raw_path}" -c copy "{self.save_path}"'
-        subprocess.call(command, shell=True)
         try:
-            os.remove(raw_path)
-        except OSError:
-            pass
+            mux_nvc_raw_stream(raw_path=raw_path, fps=self.video_meta['fps'], save_path=self.save_path, source=self.__class__.__name__)
+        finally:
+            if os.path.isfile(raw_path):
+                os.remove(raw_path)
 
     def _run_cv2(self) -> None:
         """Fallback back-end: ffmpeg GPU decode + CUDA kernel + cv2 encode, with the

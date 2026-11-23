@@ -1225,18 +1225,18 @@ def _bg_subtraction_cuda_kernel(imgs, avg_img, results, is_clr, fg_clr, threshol
     if x < 0 or x > (imgs.shape[2] -1):
         return
     if is_clr[0] == 1:
-        r1, g1, b1 = imgs[n][y][x][0],imgs[n][y][x][1], imgs[n][y][x][2]
-        r2, g2, b2 = avg_img[y][x][0], avg_img[y][x][1], avg_img[y][x][2]
-        r_diff, g_diff, b_diff = abs(r1-r2), abs(g1-g2), abs(b1-b2)
+        b1, g1, r1 = imgs[n][y][x][0], imgs[n][y][x][1], imgs[n][y][x][2]          # frames and average frame are BGR
+        b2, g2, r2 = avg_img[y][x][0], avg_img[y][x][1], avg_img[y][x][2]
+        b_diff, g_diff, r_diff = abs(b1-b2), abs(g1-g2), abs(r1-r2)
         grey_diff = _cuda_luminance_pixel_to_grey(r_diff, g_diff, b_diff)
         if grey_diff > threshold[0]:
             if fg_clr[0] != -1:
-                r_out, g_out, b_out = fg_clr[0], fg_clr[1], fg_clr[2]
+                c0, c1, c2 = fg_clr[0], fg_clr[1], fg_clr[2]
             else:
-                r_out, g_out, b_out = r1, g1, b1
+                c0, c1, c2 = b1, g1, r1
         else:
-            r_out, g_out, b_out = results[n][y][x][0], results[n][y][x][1], results[n][y][x][2]
-        results[n][y][x][0], results[n][y][x][1], results[n][y][x][2] = r_out, g_out, b_out
+            c0, c1, c2 = results[n][y][x][0], results[n][y][x][1], results[n][y][x][2]
+        results[n][y][x][0], results[n][y][x][1], results[n][y][x][2] = c0, c1, c2
 
     else:
         val_1, val_2 = imgs[n][y][x][0], avg_img[y][x][0]

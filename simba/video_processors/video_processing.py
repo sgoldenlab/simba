@@ -50,7 +50,7 @@ from simba.utils.data import (find_frame_numbers_from_time_stamp, get_cpu_pool,
 from simba.utils.enums import OS, ConfigKey, Defaults, Formats, Options, Paths
 from simba.utils.errors import (CountError, DirectoryExistError,
                                 DuplicationError, FFMPEGCodecGPUError,
-                                FFMPEGNotFoundError, FileExistError,
+                                FFMPEGError, FFMPEGNotFoundError, FileExistError,
                                 FrameRangeError, InvalidFileTypeError,
                                 InvalidInputError, InvalidVideoFileError,
                                 NoDataError, NoFilesFoundError,
@@ -1161,7 +1161,9 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
                 cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile={font_path}: text='%{{frame_num}}': start_number=0: x=w-tw-10: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
             else:
                 cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile={font_path}: text='%{{frame_num}}': start_number=0: x=(w-tw)/2: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
-        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+        ret = subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+        if ret != 0:
+            raise FFMPEGError(msg=f'FFmpeg failed (exit code {ret}) for video {file_path}. Command: {cmd}', source=superimpose_frame_count.__name__)
         timer.stop_timer()
         if verbose: stdout_success(msg=f"Superimposed video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str)
 
@@ -4383,7 +4385,9 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
         else:
             cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf "{vf_filter}" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
 
-        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+        ret = subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+        if ret != 0:
+            raise FFMPEGError(msg=f'FFmpeg failed (exit code {ret}) for video {video_path}. Command: {cmd}', source=superimpose_elapsed_time.__name__)
     timer.stop_timer()
     stdout_success(msg=f'Super-imposed time on {len(video_paths)} video(s), saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
 
@@ -5133,7 +5137,9 @@ def superimpose_video_names(video_path: Union[str, os.PathLike],
                 cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -crf {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
             else:
                 cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -rc vbr -cq {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
-        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+        ret = subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+        if ret != 0:
+            raise FFMPEGError(msg=f'FFmpeg failed (exit code {ret}) for video {video_path}. Command: {cmd}', source=superimpose_video_names.__name__)
     timer.stop_timer()
     stdout_success(msg=f'Super-imposed video name on {len(video_paths)} video(s), saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
 
@@ -5216,7 +5222,9 @@ def superimpose_freetext(video_path: Union[str, os.PathLike],
             cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={text}:x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy -crf {quality} "{save_path}" -loglevel error -stats -hide_banner -y'
         else:
             cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={text}:x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy -crf {quality} "{save_path}" -loglevel error -stats -hide_banner -y'
-        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+        ret = subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+        if ret != 0:
+            raise FFMPEGError(msg=f'FFmpeg failed (exit code {ret}) for video {video_path}. Command: {cmd}', source=superimpose_freetext.__name__)
     timer.stop_timer()
     stdout_success(msg=f'Super-imposed free-text on {len(video_paths)} video(s), saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
 

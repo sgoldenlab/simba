@@ -6,11 +6,11 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 import logging
 import math
-import subprocess
+import shutil
 import tempfile
 import threading
 import warnings
-from typing import Optional, Union
+from typing import Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -34,7 +34,7 @@ if nvc is not None:
     except Exception:
         pass
 
-from simba.data_processors.cuda.utils import get_nvc_decoder
+from simba.data_processors.cuda.utils import (encode_nvc_frame, NVC_SEEK_MARGIN, NVCFrameAlignmentError, get_nvc_decoder, get_nvc_encoder, get_nvc_frame_timing, iter_nvc_frames, mux_nvc_raw_stream, concat_nvc_chunks, check_nvc_frame_size, rgb_to_yuv444_kernel)
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int, check_str,
@@ -47,30 +47,15 @@ from simba.utils.errors import (CountError, FrameRangeError,
                                 SimBAPAckageVersionError)
 from simba.utils.lookups import get_nvdec_count
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+from simba.utils.warnings import FrameRangeWarning
+from simba.utils.read_write import (bgr_to_yuv,
+                                    find_files_of_filetypes_in_directory,
                                     find_video_of_file, get_fn_ext,
                                     get_video_meta_data, read_df)
 
 TPB2 = (32, 32, 1)
 TPB1 = 64
 NVENC_CODECS = ('h264', 'hevc', 'av1')
-
-
-@cuda.jit()
-def _rgb_to_yuv444_kernel(rgb: np.ndarray, yuv: np.ndarray, h: int) -> None:
-    """Decoded RGB(H,W,3) -> planar YUV444 (3H, W) buffer [Y; Cb; Cr] for NVENC 'YUV444' input
-    (BT.601 limited range). Full-resolution chroma keeps small/colored overlay circles crisp -
-    the 4:2:0 path subsamples + quantizes chroma and mottles or erases them."""
-    x, y = cuda.grid(2)
-    if y >= rgb.shape[0] or x >= rgb.shape[1]:
-        return
-    r = rgb[y, x, 0]; g = rgb[y, x, 1]; b = rgb[y, x, 2]
-    yy = 16.0 + 0.256788 * r + 0.504129 * g + 0.097906 * b
-    cb = 128.0 - 0.148223 * r - 0.290993 * g + 0.439216 * b
-    cr = 128.0 + 0.439216 * r - 0.367788 * g - 0.071427 * b
-    yuv[y, x] = np.uint8(min(255.0, max(0.0, yy)))
-    yuv[h + y, x] = np.uint8(min(255.0, max(0.0, cb)))
-    yuv[2 * h + y, x] = np.uint8(min(255.0, max(0.0, cr)))
 
 
 @cuda.jit()
@@ -298,7 +283,7 @@ class PosePlotterNVENC(object):
         else:
             arr = data
         arr = np.ascontiguousarray(arr.astype(np.int32))
-        self.video_meta = get_video_meta_data(video_path=video_path)
+        self.video_meta = get_video_meta_data(video_path=video_path, fps_as_int=False)
         self.w, self.h = self.video_meta['width'], self.video_meta['height']
         n_video, n_data = self.video_meta['frame_count'], arr.shape[0]
         if self.sample_time is None:
@@ -316,74 +301,66 @@ class PosePlotterNVENC(object):
         self.n_workers = min(self._n_workers_req, self.n)
         self.n_bp = arr.shape[1]
         colors_bgr = np.array(create_color_palette(pallete_name=self._colors_param, increments=self.n_bp))
-        b, g, r = colors_bgr[:, 0], colors_bgr[:, 1], colors_bgr[:, 2]
-        yy = 16.0 + 0.256788 * r + 0.504129 * g + 0.097906 * b
-        cb = 128.0 - 0.148223 * r - 0.290993 * g + 0.439216 * b
-        cr = 128.0 + 0.439216 * r - 0.367788 * g - 0.071427 * b
-        colors_yuv = np.clip(np.round(np.stack([yy, cb, cr], axis=1)), 0, 255).astype(np.int32)
+        colors_yuv = bgr_to_yuv(bgr=colors_bgr)
         self.cs_dev = cuda.to_device(circle_size)
         self.colors_dev = cuda.to_device(np.ascontiguousarray(colors_yuv))
         self.res_dev = cuda.to_device(np.array([self.w, self.h]))
         self.data_dev = cuda.to_device(arr)
 
-    def _encode_chunk(self, start: int, end: int, out_path: str) -> None:
+    def _encode_chunk(self, start: int, end: int, out_path: str, timing: Optional[Tuple[int, float]] = None) -> None:
         """Decode -> draw -> NVENC-encode frames [start, end) and mux to ``out_path``.
-        Each chunk runs its own ThreadedDecoder (seeked to ``start``) + Encoder, so several
-        chunks execute concurrently across the GPU's NVDEC/NVENC engines."""
+        Each chunk runs its own ThreadedDecoder + Encoder, so several chunks execute concurrently across the GPU's
+        NVDEC/NVENC engines. With ``timing`` (multi-worker) frames are identified by timestamp, see
+        :func:`simba.data_processors.cuda.utils.iter_nvc_frames`."""
         yuv_t = torch.empty((3 * self.h, self.w), dtype=torch.uint8, device='cuda:0')
         yuv_dev = cuda.as_cuda_array(yuv_t)
-        decoder = get_nvc_decoder(video_path=self.video_path, output_color_type=nvc.OutputColorType.RGB, use_device_memory=True, threaded=True, buffer_size=self.buffer_size, start_frame=start)
-        # bf=0: the 'high_quality' preset otherwise uses B-frames, and muxing the raw stream then drops the first frames
-        # (mp4 edit list), so every frame shows the video 3-4 frames ahead of its data. fps: written into the stream,
-        # otherwise players read 30 fps.
-        encoder = nvc.CreateEncoder(self.w, self.h, 'YUV444', False, codec=self.codec, tuning_info='high_quality', rc='constqp', qp=self.qp, fps=self.video_meta['fps'], bf=0)
+        encoder = get_nvc_encoder(width=self.w, height=self.h, fps=self.video_meta['fps'], codec=self.codec, fmt='YUV444', qp=self.qp)
+        decoder = get_nvc_decoder(video_path=self.video_path, output_color_type=nvc.OutputColorType.RGB, use_device_memory=True, threaded=True, buffer_size=self.buffer_size, start_frame=start if timing is None else max(0, start - NVC_SEEK_MARGIN))
         grid_fill = (math.ceil(self.w / TPB2[0]), math.ceil(self.h / TPB2[1]))
         grid_circle = math.ceil(self.n_bp / TPB1)
         raw_path = f'{out_path}.raw.{self.codec}'
-        i = start
-        with open(raw_path, 'wb') as raw:
-            while i < end:
-                frames = decoder.get_batch_frames(min(self.buffer_size, end - i))
-                if not frames:
-                    break
-                for f in frames:
-                    if i >= end:
-                        break
-                    rgb = cuda.as_cuda_array(torch.from_dlpack(f))
-                    _rgb_to_yuv444_kernel[grid_fill, TPB2](rgb, yuv_dev, self.h)
-                    _draw_circles_yuv444_kernel[grid_circle, TPB1](yuv_dev, self.data_dev[i], self.cs_dev, self.res_dev, self.colors_dev, self.h)
-                    bitstream = encoder.Encode(yuv_t)
-                    if bitstream:
-                        raw.write(bytes(bitstream))
-                    i += 1
-                    if self.verbose and i % 500 == 0:
-                        stdout_information(msg=f'Encoded {i}/{self.n} frames...', source=self.__class__.__name__)
-            tail = encoder.EndEncode()
-            if tail:
-                raw.write(bytes(tail))
-        decoder.end()
-        subprocess.call(f'ffmpeg -y -loglevel error -framerate {self.video_meta["fps"]} -i "{raw_path}" -c copy "{out_path}"', shell=True)
         try:
-            os.remove(raw_path)
-        except OSError:
-            pass
+            with open(raw_path, 'wb') as raw:
+                for i, f in iter_nvc_frames(decoder=decoder, start=start, end=end, buffer_size=self.buffer_size, timing=timing):
+                    rgb = cuda.as_cuda_array(torch.from_dlpack(f))
+                    if i == start:
+                        check_nvc_frame_size(frame=rgb, width=self.w, height=self.h, video_path=self.video_path, source=self.__class__.__name__)
+                    rgb_to_yuv444_kernel[grid_fill, TPB2](rgb, yuv_dev, self.h)
+                    _draw_circles_yuv444_kernel[grid_circle, TPB1](yuv_dev, self.data_dev[i], self.cs_dev, self.res_dev, self.colors_dev, self.h)
+                    raw.write(encode_nvc_frame(encoder=encoder, frame=yuv_t))
+                    if self.verbose and (i + 1) % 500 == 0:
+                        stdout_information(msg=f'Encoded {i + 1}/{self.n} frames...', source=self.__class__.__name__)
+                tail = encoder.EndEncode()
+                if tail:
+                    raw.write(bytes(tail))
+            mux_nvc_raw_stream(raw_path=raw_path, fps=self.video_meta['fps'], save_path=out_path, source=self.__class__.__name__)
+        finally:
+            try:
+                decoder.end()
+            except Exception:
+                pass
+            if os.path.isfile(raw_path):
+                os.remove(raw_path)
 
     def _render(self, save_path: Union[str, os.PathLike]) -> None:
         """Render the currently-prepared job to ``save_path``. With multiple NVDEC engines
         (``n_workers`` > 1) the video is split into contiguous chunks processed concurrently,
         then concatenated."""
         timer = SimbaTimer(start=True)
-        if self.n_workers <= 1:
+        timing = get_nvc_frame_timing(video_path=self.video_path) if self.n_workers > 1 else None
+        if self.n_workers > 1 and timing is None:
+            FrameRangeWarning(msg=f'Could not read frame timestamps of {self.video_path}; rendering with 1 worker.', source=self.__class__.__name__)
+        if self.n_workers <= 1 or timing is None:
             self._encode_chunk(0, self.n, str(save_path))
         else:
             bounds = np.linspace(0, self.n, self.n_workers + 1).astype(int)
-            tmp = tempfile.gettempdir()
-            chunk_paths = [os.path.join(tmp, f'_posechunk_{os.getpid()}_{k}.mp4') for k in range(self.n_workers)]
+            tmp = tempfile.mkdtemp(prefix='simba_nvenc_')                     # unique per render: no name clashes
+            chunk_paths = [os.path.join(tmp, f'chunk_{k}.mp4') for k in range(self.n_workers)]
             errors, threads = [], []
 
             def _work(k: int) -> None:
                 try:
-                    self._encode_chunk(int(bounds[k]), int(bounds[k + 1]), chunk_paths[k])
+                    self._encode_chunk(int(bounds[k]), int(bounds[k + 1]), chunk_paths[k], timing)
                 except Exception as e:
                     errors.append((k, e))
 
@@ -393,19 +370,17 @@ class PosePlotterNVENC(object):
                 threads.append(t)
             for t in threads:
                 t.join()
-            if errors:
-                k, exc = errors[0]
-                raise FrameRangeError(msg=f'{self.__class__.__name__} chunk {k} failed: {exc}', source=self.__class__.__name__)
-            list_path = os.path.join(tmp, f'_poselist_{os.getpid()}.txt')
-            with open(list_path, 'w') as fh:
-                for p in chunk_paths:
-                    fh.write(f"file '{p}'\n")
-            subprocess.call(f'ffmpeg -y -loglevel error -f concat -safe 0 -i "{list_path}" -c copy "{save_path}"', shell=True)
-            for p in chunk_paths + [list_path]:
-                try:
-                    os.remove(p)
-                except OSError:
-                    pass
+            try:
+                if errors:
+                    real_errors = [(k, e) for k, e in errors if not isinstance(e, NVCFrameAlignmentError)]
+                    if real_errors:
+                        raise FrameRangeError(msg=f'{self.__class__.__name__} chunk {real_errors[0][0]} failed: {real_errors[0][1]}', source=self.__class__.__name__)
+                    FrameRangeWarning(msg=f'Multi-worker rendering of {self.video_path} failed ({errors[0][1]}); rendering with 1 worker.', source=self.__class__.__name__)
+                    self._encode_chunk(0, self.n, str(save_path))
+                else:
+                    concat_nvc_chunks(chunk_paths=chunk_paths, save_path=str(save_path), source=self.__class__.__name__)
+            finally:
+                shutil.rmtree(tmp, ignore_errors=True)
         timer.stop_timer()
         if self.verbose:
             stdout_success(msg=f'Pose-estimation video saved at {save_path} (workers: {self.n_workers}).', elapsed_time=timer.elapsed_time_str)

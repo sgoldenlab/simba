@@ -463,6 +463,12 @@ class FFMPEGNotFoundError(SimbaError):
         super().__init__(msg=msg, source=source, show_window=show_window)
 
 
+class FFMPEGError(SimbaError):
+    def __init__(self, msg: str, source: str = "", show_window: bool = False):
+        msg = f"SIMBA FFMPEG ERROR: {msg}"
+        super().__init__(msg=msg, source=source, show_window=show_window)
+
+
 class ArrayError(SimbaError):
     def __init__(self, msg: str, source: str = "", show_window: bool = False):
         msg = f"SIMBA ARRAY SIZE ERROR: {msg}"

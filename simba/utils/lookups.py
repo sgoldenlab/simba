@@ -794,19 +794,19 @@ def get_fonts(sort_alphabetically: bool = False):
        For only the fonts bundled with SimBA (in ``simba/assets/fonts``), see :func:`~simba.utils.lookups.get_named_simba_fonts`.
 
     :param bool sort_alphabetically: If True, the returned dictionary is sorted by font name using natural (numeric-aware) ordering. If False, fonts are returned in the order reported by matplotlib's font manager. Default False.
-    :return: Dictionary mapping font name (key) to font file path (value). On Windows the ``C:`` drive prefix is stripped and paths are returned as POSIX-style strings.
+    :return: Dictionary mapping font name (key) to font file path (value). On Windows, paths are returned as POSIX-style strings and keep their drive letter (e.g. ``C:/Windows/Fonts/arial.ttf``).
     :rtype: Dict[str, str]
 
     :example:
 
     >>> get_fonts(sort_alphabetically=True)
-    >>> {'Arial': '/Windows/Fonts/arial.ttf', ...}
+    >>> {'Arial': 'C:/Windows/Fonts/arial.ttf', ...}
     """
     font_dict = {f.name: f.fname for f in matplotlib.font_manager.fontManager.ttflist if not f.name.startswith('.')}
     if len(font_dict) == 0:
         NoDataFoundWarning(msg='No fonts found on disk using matplotlib.font_manager', source=get_fonts.__name__)
     if platform.system() == OS.WINDOWS.value:
-        font_dict = {key: str(Path(value.replace('C:', '')).as_posix()) for key, value in font_dict.items()}
+        font_dict = {key: str(Path(value).as_posix()) for key, value in font_dict.items()}
     if sort_alphabetically:
         font_dict = dict(sorted(font_dict.items(), key=lambda x: [int(t) if t.isdigit() else t.lower() for t in re.split(r'(\d+)', x[0])]))
     return font_dict

@@ -21,7 +21,7 @@ kernels, sharing the ``cuda/utils.py`` NVDEC/NVENC factory functions. GPU-only.
 
 import math
 import os
-import subprocess
+import shutil
 import tempfile
 import threading
 from typing import Optional, Tuple, Union
@@ -40,8 +40,7 @@ try:
 except Exception:
     torch = None
 
-from simba.data_processors.cuda.utils import (_cuda_digital_pixel_to_grey,
-                                              get_nvc_decoder, get_nvc_encoder)
+from simba.data_processors.cuda.utils import (encode_nvc_frame, _cuda_digital_pixel_to_grey, NVC_SEEK_MARGIN, NVCFrameAlignmentError, get_nvc_decoder, get_nvc_encoder, get_nvc_frame_timing, iter_nvc_frames, mux_nvc_raw_stream, concat_nvc_chunks, check_nvc_frame_size)
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_int,
                                 check_nvidea_gpu_available, check_str,
@@ -50,6 +49,7 @@ from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 SimBAGPUError)
 from simba.utils.lookups import get_nvdec_count
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
+from simba.utils.warnings import FrameRangeWarning
 from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
                                     get_pkg_version, get_video_meta_data)
 
@@ -266,10 +266,11 @@ class ClaheNVENC(object):
         self.save_dir, self.clip_limit, self.tile_grid_size = save_dir, clip_limit, tile_grid_size
         self.codec, self.verbose, self.buffer_size, self.n_workers = codec, verbose, buffer_size, n_workers
 
-    def _encode_chunk(self, video_path: Union[str, os.PathLike], start: int, end: int, out_path: str, video_meta: dict) -> None:
+    def _encode_chunk(self, video_path: Union[str, os.PathLike], start: int, end: int, out_path: str, video_meta: dict, timing: Optional[Tuple[int, float]] = None) -> None:
         """Decode -> CLAHE (4 kernels) -> NVENC-encode frames [start, end) of ``video_path`` and mux to
-        ``out_path``. Each chunk owns its own ThreadedDecoder (seeked to ``start``), Encoder and device
-        buffers, so several chunks run concurrently across the GPU's NVDEC/NVENC engines."""
+        ``out_path``. Each chunk owns its own ThreadedDecoder, Encoder and device buffers, so several chunks run
+        concurrently across the GPU's NVDEC/NVENC engines. With ``timing`` (multi-worker) frames are identified by
+        timestamp, see :func:`simba.data_processors.cuda.utils.iter_nvc_frames`."""
         w, h, n = video_meta['width'], video_meta['height'], video_meta['frame_count']
         ntx, nty = self.tile_grid_size
         tile_w, tile_h = math.ceil(w / ntx), math.ceil(h / nty)   # ceil so tiles cover the whole frame
@@ -278,82 +279,79 @@ class ClaheNVENC(object):
         ycc_dev = cuda.device_array((h, w, 3), dtype='uint8')
         hist_dev = cuda.device_array((nty, ntx, 256), dtype='int32')
         lut_dev = cuda.device_array((nty, ntx, 256), dtype='uint8')
-        decoder = get_nvc_decoder(video_path=video_path, use_device_memory=True, threaded=True, buffer_size=self.buffer_size, start_frame=start)
         encoder = get_nvc_encoder(width=w, height=h, codec=self.codec, fmt='ARGB', fps=video_meta['fps'])
+        decoder = get_nvc_decoder(video_path=video_path, use_device_memory=True, threaded=True, buffer_size=self.buffer_size, start_frame=start if timing is None else max(0, start - NVC_SEEK_MARGIN))
         grid_px = (math.ceil(w / TPB[0]), math.ceil(h / TPB[1]))
         grid_tile = math.ceil((nty * ntx) / TPB_TILE)
         grid_zero = math.ceil((nty * ntx * 256) / TPB_ZERO)
         raw_path = f'{out_path}.raw.{self.codec}'
-        i = start
-        with open(raw_path, 'wb') as raw:
-            while i < end:
-                frames = decoder.get_batch_frames(min(self.buffer_size, end - i))
-                if not frames:
-                    break
-                for f in frames:
-                    if i >= end:
-                        break
+        try:
+            with open(raw_path, 'wb') as raw:
+                for i, f in iter_nvc_frames(decoder=decoder, start=start, end=end, buffer_size=self.buffer_size, timing=timing):
                     rgb = cuda.as_cuda_array(torch.from_dlpack(f))
+                    if i == start:
+                        check_nvc_frame_size(frame=rgb, width=w, height=h, video_path=video_path, source=self.__class__.__name__)
                     _zero_i32_kernel[grid_zero, TPB_ZERO](hist_dev)
                     _ycc_hist_kernel[grid_px, TPB](rgb, ycc_dev, hist_dev, tile_h, tile_w)
                     _clahe_lut_kernel[grid_tile, TPB_TILE](hist_dev, lut_dev, self.clip_limit)
                     _clahe_apply_kernel[grid_px, TPB](ycc_dev, lut_dev, argb_dev, tile_h, tile_w)
-                    bitstream = encoder.Encode(argb_t[0])
-                    if bitstream:
-                        raw.write(bytes(bitstream))
-                    i += 1
-                    if self.verbose and i % 500 == 0:
-                        stdout_information(msg=f'Encoded {i}/{n} frames...', source=self.__class__.__name__)
-            tail = encoder.EndEncode()
-            if tail:
-                raw.write(bytes(tail))
-        decoder.end()
-        subprocess.call(f'ffmpeg -y -loglevel error -framerate {video_meta["fps"]} -i "{raw_path}" -c copy "{out_path}"', shell=True)
-        try:
-            os.remove(raw_path)
-        except OSError:
-            pass
+                    raw.write(encode_nvc_frame(encoder=encoder, frame=argb_t[0]))
+                    if self.verbose and (i + 1) % 500 == 0:
+                        stdout_information(msg=f'Encoded {i + 1}/{n} frames...', source=self.__class__.__name__)
+                tail = encoder.EndEncode()
+                if tail:
+                    raw.write(bytes(tail))
+            mux_nvc_raw_stream(raw_path=raw_path, fps=video_meta['fps'], save_path=out_path, source=self.__class__.__name__)
+        finally:
+            try:
+                decoder.end()
+            except Exception:
+                pass
+            if os.path.isfile(raw_path):
+                os.remove(raw_path)
 
     def _run_nvenc(self, video_path: Union[str, os.PathLike], save_path: str, video_meta: dict) -> None:
         """CLAHE-encode ``video_path`` to ``save_path``. With ``n_workers`` > 1 the video is split into
         contiguous frame chunks encoded concurrently (one per NVDEC/NVENC engine), then concatenated."""
         w, h, n = video_meta['width'], video_meta['height'], video_meta['frame_count']
+        n_workers = max(1, min(self.n_workers, n))
         ntx, nty = self.tile_grid_size
         if (ntx > w) or (nty > h):
             raise InvalidInputError(msg=f'tile_grid_size {self.tile_grid_size} is larger than the video ({w}x{h}).', source=self.__class__.__name__)
-        if self.n_workers <= 1:
+        timing = get_nvc_frame_timing(video_path=video_path) if n_workers > 1 else None
+        if n_workers > 1 and timing is None:
+            FrameRangeWarning(msg=f'Could not read frame timestamps of {video_path}; rendering with 1 worker.', source=self.__class__.__name__)
+        if n_workers <= 1 or timing is None:
             self._encode_chunk(video_path, 0, n, str(save_path), video_meta)
             return
-        bounds = np.linspace(0, n, self.n_workers + 1).astype(int)
-        tmp = tempfile.gettempdir()
-        chunk_paths = [os.path.join(tmp, f'_clahechunk_{os.getpid()}_{k}.mp4') for k in range(self.n_workers)]
+        bounds = np.linspace(0, n, n_workers + 1).astype(int)
+        tmp = tempfile.mkdtemp(prefix='simba_nvenc_')                     # unique per render: no name clashes
+        chunk_paths = [os.path.join(tmp, f'chunk_{k}.mp4') for k in range(n_workers)]
         errors, threads = [], []
 
         def _work(k: int) -> None:
             try:
-                self._encode_chunk(video_path, int(bounds[k]), int(bounds[k + 1]), chunk_paths[k], video_meta)
+                self._encode_chunk(video_path, int(bounds[k]), int(bounds[k + 1]), chunk_paths[k], video_meta, timing)
             except Exception as e:
                 errors.append((k, e))
 
-        for k in range(self.n_workers):
+        for k in range(n_workers):
             t = threading.Thread(target=_work, args=(k,), daemon=True)
             t.start()
             threads.append(t)
         for t in threads:
             t.join()
-        if errors:
-            k, exc = errors[0]
-            raise FrameRangeError(msg=f'{self.__class__.__name__} chunk {k} failed: {exc}', source=self.__class__.__name__)
-        list_path = os.path.join(tmp, f'_clahelist_{os.getpid()}.txt')
-        with open(list_path, 'w') as fh:
-            for p in chunk_paths:
-                fh.write(f"file '{p}'\n")
-        subprocess.call(f'ffmpeg -y -loglevel error -f concat -safe 0 -i "{list_path}" -c copy "{save_path}"', shell=True)
-        for p in chunk_paths + [list_path]:
-            try:
-                os.remove(p)
-            except OSError:
-                pass
+        try:
+            if errors:
+                real_errors = [(k, e) for k, e in errors if not isinstance(e, NVCFrameAlignmentError)]
+                if real_errors:
+                    raise FrameRangeError(msg=f'{self.__class__.__name__} chunk {real_errors[0][0]} failed: {real_errors[0][1]}', source=self.__class__.__name__)
+                FrameRangeWarning(msg=f'Multi-worker rendering of {video_path} failed ({errors[0][1]}); rendering with 1 worker.', source=self.__class__.__name__)
+                self._encode_chunk(video_path, 0, n, str(save_path), video_meta)
+            else:
+                concat_nvc_chunks(chunk_paths=chunk_paths, save_path=str(save_path), source=self.__class__.__name__)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
 
     def run(self) -> None:
         """CLAHE-enhance every input video on the GPU and write each to ``save_dir``."""
@@ -365,7 +363,7 @@ class ClaheNVENC(object):
                 raise InvalidInputError(msg=f'Output {save_path} would overwrite the source video - choose a save_dir that is not the source directory.', source=self.__class__.__name__)
             if self.verbose:
                 stdout_information(msg=f'CLAHE-enhancing {name} ({cnt + 1}/{len(self.video_paths)})...', source=self.__class__.__name__)
-            self._run_nvenc(video_path=video_path, save_path=save_path, video_meta=get_video_meta_data(video_path=video_path))
+            self._run_nvenc(video_path=video_path, save_path=save_path, video_meta=get_video_meta_data(video_path=video_path, fps_as_int=False))
         timer.stop_timer()
         if self.verbose:
             stdout_success(msg=f'{len(self.video_paths)} CLAHE video(s) saved in {self.save_dir}.', elapsed_time=timer.elapsed_time_str, source=self.__class__.__name__)

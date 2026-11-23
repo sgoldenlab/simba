@@ -405,6 +405,32 @@ def bgr_to_rgb_tuple(value: Tuple[int, int, int]) -> Tuple[int, int, int]:
     return (value[2], value[1], value[0])
 
 
+def bgr_to_yuv(bgr: np.ndarray) -> np.ndarray:
+    """
+    Convert BGR colours to (Y, Cb, Cr), BT.601 limited range (Y 16-235, Cb/Cr 16-240).
+
+    Used to pre-convert overlay colours for GPU drawing in YUV frame buffers before NVENC encoding, e.g. in
+    :class:`~simba.plotting.yolo_pose_visualizer_nvenc.YOLOPoseVisualizerNVENC` and
+    :class:`~simba.data_processors.cuda.pose_plotter_nvenc.PosePlotterNVENC`.
+
+    :param np.ndarray bgr: Colours of shape (..., 3) in BGR order, values 0-255. E.g. a single colour (3,) or a palette (n, 3).
+    :return: Array of the same shape as ``bgr`` with (Y, Cb, Cr) values, rounded and clipped to 0-255.
+    :rtype: np.ndarray (int32)
+
+    :example:
+    >>> bgr_to_yuv(bgr=np.array([[0, 0, 255], [255, 255, 255]]))
+    array([[ 81,  90, 240], [235, 128, 128]])
+    """
+    check_valid_array(data=bgr, source=bgr_to_yuv.__name__, accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0, max_value=255)
+    if bgr.shape[-1] != 3:
+        raise InvalidInputError(msg=f'The last axis of bgr must hold 3 values (B, G, R); got shape {bgr.shape}.', source=bgr_to_yuv.__name__)
+    b, g, r = bgr[..., 0].astype(np.float64), bgr[..., 1].astype(np.float64), bgr[..., 2].astype(np.float64)
+    yy = 16.0 + 0.256788 * r + 0.504129 * g + 0.097906 * b
+    cb = 128.0 - 0.148223 * r - 0.290993 * g + 0.439216 * b
+    cr = 128.0 + 0.439216 * r - 0.367788 * g - 0.071427 * b
+    return np.clip(np.round(np.stack([yy, cb, cr], axis=-1)), 0, 255).astype(np.int32)
+
+
 
 
 def read_video_info_csv(file_path: Union[str, os.PathLike], raise_error: bool = True) -> pd.DataFrame:
