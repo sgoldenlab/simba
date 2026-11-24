@@ -26,6 +26,14 @@ class ExtractFeaturesFrom14bps(ConfigReader, FeatureExtractionMixin):
        * `Expected pose configuration <https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/6.png>`_
        * `Expected pose configuration, multi-animal <https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/10.png>`_
 
+    .. note::
+       Rolling-window features are computed over a fixed number of **frames**, not a fixed duration: the number at the
+       end of each rolling-window column name is the window length in frames (2, 5, 6, 7.5 -> 7, and 15; trailing windows).
+       Their length in seconds therefore depends on the video frame rate (e.g., 67-500 ms at 30 fps, 33-250 ms at 60 fps),
+       so train and run classifiers on videos with the same frame rate. In projects whose lowest video frame rate is below
+       15, longer windows are capped at that frame rate. Before SimBA's 2023 restructure the windows were frame rate / number
+       frames long, so features (and classifiers) from those versions are not interchangeable with current ones.
+
     .. image:: _static/img/pose_configurations/6.png
        :alt: 6
        :width: 300
