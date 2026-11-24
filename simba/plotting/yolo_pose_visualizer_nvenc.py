@@ -35,10 +35,17 @@ if nvc is not None:
     except Exception:
         pass
 
-from simba.data_processors.cuda.utils import (encode_nvc_frame, end_nvc_encoder, NVC_SEEK_MARGIN, NVCFrameAlignmentError, _cuda_point_to_segment_dist,
-                                              get_nvc_decoder, get_nvc_encoder,
-                                              get_nvc_frame_timing, iter_nvc_frames,
-                                              mux_nvc_raw_stream, concat_nvc_chunks, check_nvc_frame_size,
+from simba.data_processors.cuda.utils import (NVC_SEEK_MARGIN,
+                                              NVCFrameAlignmentError,
+                                              _cuda_point_to_segment_dist,
+                                              check_nvc_frame_size,
+                                              concat_nvc_chunks,
+                                              encode_nvc_frame,
+                                              end_nvc_encoder, get_nvc_decoder,
+                                              get_nvc_encoder,
+                                              get_nvc_frame_timing,
+                                              iter_nvc_frames,
+                                              mux_nvc_raw_stream,
                                               yuv444_to_nv12_kernel)
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
@@ -48,8 +55,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.data import create_color_palette
 from simba.utils.enums import Options
 from simba.utils.errors import (CountError, DataHeaderError, FrameRangeError,
-                                InvalidInputError,
-                                NoDataError, SimBAGPUError,
+                                InvalidInputError, NoDataError, SimBAGPUError,
                                 SimBAPAckageVersionError)
 from simba.utils.lookups import get_nvdec_count
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success

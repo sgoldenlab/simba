@@ -26,7 +26,9 @@ try:
 except Exception:
     torch = None
 
-from simba.data_processors.cuda.utils import (encode_nvc_frame, end_nvc_encoder, get_nvc_decoder, get_nvc_encoder,
+from simba.data_processors.cuda.utils import (encode_nvc_frame,
+                                              end_nvc_encoder, get_nvc_decoder,
+                                              get_nvc_encoder,
                                               mux_nvc_raw_stream,
                                               rgb_to_grey_argb_kernel)
 from simba.utils.checks import (check_file_exist_and_readable,

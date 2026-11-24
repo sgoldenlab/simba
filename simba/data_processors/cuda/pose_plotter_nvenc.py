@@ -34,7 +34,17 @@ if nvc is not None:
     except Exception:
         pass
 
-from simba.data_processors.cuda.utils import (encode_nvc_frame, end_nvc_encoder, NVC_SEEK_MARGIN, NVCFrameAlignmentError, get_nvc_decoder, get_nvc_encoder, get_nvc_frame_timing, iter_nvc_frames, mux_nvc_raw_stream, concat_nvc_chunks, check_nvc_frame_size, rgb_to_yuv444_kernel)
+from simba.data_processors.cuda.utils import (NVC_SEEK_MARGIN,
+                                              NVCFrameAlignmentError,
+                                              check_nvc_frame_size,
+                                              concat_nvc_chunks,
+                                              encode_nvc_frame,
+                                              end_nvc_encoder, get_nvc_decoder,
+                                              get_nvc_encoder,
+                                              get_nvc_frame_timing,
+                                              iter_nvc_frames,
+                                              mux_nvc_raw_stream,
+                                              rgb_to_yuv444_kernel)
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int, check_str,
@@ -47,11 +57,11 @@ from simba.utils.errors import (CountError, FrameRangeError,
                                 SimBAPAckageVersionError)
 from simba.utils.lookups import get_nvdec_count
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
-from simba.utils.warnings import FrameRangeWarning
 from simba.utils.read_write import (bgr_to_yuv,
                                     find_files_of_filetypes_in_directory,
                                     find_video_of_file, get_fn_ext,
                                     get_video_meta_data, read_df)
+from simba.utils.warnings import FrameRangeWarning
 
 TPB2 = (32, 32, 1)
 TPB1 = 64

@@ -50,12 +50,12 @@ from simba.utils.data import (find_frame_numbers_from_time_stamp, get_cpu_pool,
 from simba.utils.enums import OS, ConfigKey, Defaults, Formats, Options, Paths
 from simba.utils.errors import (CountError, DirectoryExistError,
                                 DuplicationError, FFMPEGCodecGPUError,
-                                FFMPEGError, FFMPEGNotFoundError, FileExistError,
-                                FrameRangeError, InvalidFileTypeError,
-                                InvalidInputError, InvalidVideoFileError,
-                                NoDataError, NoFilesFoundError,
-                                NotDirectoryError, ResolutionError,
-                                SimBAGPUError)
+                                FFMPEGError, FFMPEGNotFoundError,
+                                FileExistError, FrameRangeError,
+                                InvalidFileTypeError, InvalidInputError,
+                                InvalidVideoFileError, NoDataError,
+                                NoFilesFoundError, NotDirectoryError,
+                                ResolutionError, SimBAGPUError)
 from simba.utils.lookups import (get_current_time, get_ffmpeg_codec,
                                  get_ffmpeg_crossfade_methods,
                                  get_ffmpeg_encoders, get_fonts,

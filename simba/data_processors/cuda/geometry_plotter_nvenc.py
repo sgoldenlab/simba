@@ -45,7 +45,17 @@ from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
 
 from simba.data_processors.cuda.image import (_cuda_is_inside_circle,
                                               _cuda_is_inside_polygon)
-from simba.data_processors.cuda.utils import (encode_nvc_frame, end_nvc_encoder, _cuda_point_to_segment_dist, NVC_SEEK_MARGIN, NVCFrameAlignmentError, get_nvc_decoder, get_nvc_encoder, get_nvc_frame_timing, iter_nvc_frames, mux_nvc_raw_stream, concat_nvc_chunks, check_nvc_frame_size)
+from simba.data_processors.cuda.utils import (NVC_SEEK_MARGIN,
+                                              NVCFrameAlignmentError,
+                                              _cuda_point_to_segment_dist,
+                                              check_nvc_frame_size,
+                                              concat_nvc_chunks,
+                                              encode_nvc_frame,
+                                              end_nvc_encoder, get_nvc_decoder,
+                                              get_nvc_encoder,
+                                              get_nvc_frame_timing,
+                                              iter_nvc_frames,
+                                              mux_nvc_raw_stream)
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_rgb_tuple,
@@ -58,9 +68,9 @@ from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 SimBAGPUError)
 from simba.utils.lookups import get_color_dict, get_nvdec_count
 from simba.utils.printing import SimbaTimer, stdout_information, stdout_success
-from simba.utils.warnings import FrameRangeWarning
 from simba.utils.read_write import (get_fn_ext, get_pkg_version,
                                     get_video_meta_data)
+from simba.utils.warnings import FrameRangeWarning
 
 NVENC_CODECS = ('h264', 'hevc', 'av1')
 TPB = (16, 16)
