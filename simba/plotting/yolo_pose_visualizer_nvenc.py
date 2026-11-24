@@ -35,7 +35,7 @@ if nvc is not None:
     except Exception:
         pass
 
-from simba.data_processors.cuda.utils import (encode_nvc_frame, NVC_SEEK_MARGIN, NVCFrameAlignmentError, _cuda_point_to_segment_dist,
+from simba.data_processors.cuda.utils import (encode_nvc_frame, end_nvc_encoder, NVC_SEEK_MARGIN, NVCFrameAlignmentError, _cuda_point_to_segment_dist,
                                               get_nvc_decoder, get_nvc_encoder,
                                               get_nvc_frame_timing, iter_nvc_frames,
                                               mux_nvc_raw_stream, concat_nvc_chunks, check_nvc_frame_size,
@@ -444,9 +444,7 @@ class YOLOPoseVisualizerNVENC(object):
                 written += 1
                 if self.verbose and (i + 1) % 1000 == 0:
                     stdout_information(msg=f'Encoded {i + 1}/{self.n} frames ({self.video_name})...', source=self.__class__.__name__)
-            tail = encoder.EndEncode()
-            if tail:
-                raw.write(bytes(tail))
+            raw.write(end_nvc_encoder(encoder=encoder))
         return written
 
     def _render(self, save_path: str) -> int:

@@ -372,7 +372,7 @@ def _is_cuda_available() -> Tuple[bool, Dict[int, Any]]:
     if is_available:
         devices = {}
         for gpu_cnt, gpu in enumerate(cuda.gpus):
-            devices[gpu_cnt] = {'model': gpu.name.decode("utf-8"),
+            devices[gpu_cnt] = {'model': gpu.name.decode("utf-8") if isinstance(gpu.name, bytes) else str(gpu.name),   # bytes in numba's built-in CUDA target, str in the numba-cuda package
                                 'compute_capability': float("{}.{}".format(*gpu.compute_capability)),
                                 'id': gpu.id,
                                 'PCI_device_id': gpu.PCI_DEVICE_ID,
@@ -710,7 +710,10 @@ def get_nvc_decoder(video_path: Union[str, os.PathLike],
     check_instance(source=f'{get_nvc_decoder.__name__} threaded', instance=threaded, accepted_types=(bool,))
     check_nvdec_decodable(video_path=video_path, gpu_id=gpu_id)
     if threaded:
-        return nvc.CreateThreadedDecoder(encSource=str(video_path), bufferSize=buffer_size, gpuid=gpu_id, useDeviceMemory=use_device_memory, outputColorType=output_color_type, startFrame=start_frame)
+        try:
+            return nvc.CreateThreadedDecoder(encSource=str(video_path), bufferSize=buffer_size, gpuid=gpu_id, useDeviceMemory=use_device_memory, outputColorType=output_color_type, startFrame=start_frame)
+        except TypeError:                                                # PyNvVideoCodec 2.0.0 has no startFrame argument
+            raise SimBAGPUError(msg=f'PyNvVideoCodec {getattr(nvc, "__version__", "")} is too old for SimBA GPU video processing. Install pynvvideocodec 2.0.1 or newer (SimBA is tested with 2.1.0).', source=get_nvc_decoder.__name__)
     return nvc.SimpleDecoder(video_path, gpu_id=gpu_id, use_device_memory=use_device_memory, output_color_type=output_color_type)
 
 
@@ -990,7 +993,48 @@ def encode_nvc_frame(encoder, frame) -> bytes:
     cuda.synchronize()                                                   # finish the kernels that drew the frame
     bitstream = encoder.Encode(frame)
     cuda.synchronize()                                                   # finish NVENC's copy of the frame before it is reused
-    return bytes(bitstream) if bitstream else b''
+    return nvc_bitstream_to_bytes(bitstream=bitstream)
+
+
+def end_nvc_encoder(encoder) -> bytes:
+    """
+    Flush an NVENC encoder from :func:`get_nvc_encoder` and return the frames it was still holding.
+
+    Call once after the last :func:`encode_nvc_frame` and write the result to the same raw stream; without it the
+    last frames of the video are lost.
+
+    :param encoder: A ``PyNvVideoCodec`` encoder from :func:`get_nvc_encoder`.
+    :return: Encoded bitstream of the buffered frames (may be empty).
+    :rtype: bytes
+
+    :example:
+    >>> raw.write(end_nvc_encoder(encoder=encoder))
+    """
+    cuda.synchronize()
+    return nvc_bitstream_to_bytes(bitstream=encoder.EndEncode())
+
+
+def nvc_bitstream_to_bytes(bitstream) -> bytes:
+    """
+    Convert what a ``PyNvVideoCodec`` encoder's ``Encode()`` / ``EndEncode()`` returns into one bytes object.
+
+    The return type differs between PyNvVideoCodec versions: 2.1.0 returns the bitstream as ``bytes``, while 2.0.x
+    and 2.2.x return a list of packets, each a dict with the bitstream under ``'data'`` (plus ``'timestamp'`` and
+    ``'picture_type'``). Packets are joined in the order returned.
+
+    :param bitstream: ``Encode()`` / ``EndEncode()`` return value: bytes-like, a list of packet dicts or bytes-like packets, or None.
+    :return: The encoded bitstream (empty if there was none).
+    :rtype: bytes
+
+    :example:
+    >>> nvc_bitstream_to_bytes(bitstream=[{'data': b'\\x00\\x00\\x01', 'timestamp': 0, 'picture_type': 3}])
+    b'\\x00\\x00\\x01'
+    """
+    if not bitstream:
+        return b''
+    if isinstance(bitstream, (list, tuple)):
+        return b''.join(bytes(p['data']) if isinstance(p, dict) else bytes(p) for p in bitstream)
+    return bytes(bitstream)
 
 
 def mux_nvc_raw_stream(raw_path: Union[str, os.PathLike], fps: float, save_path: Union[str, os.PathLike], source: str = '') -> None:

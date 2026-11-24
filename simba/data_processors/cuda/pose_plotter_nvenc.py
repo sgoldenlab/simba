@@ -34,7 +34,7 @@ if nvc is not None:
     except Exception:
         pass
 
-from simba.data_processors.cuda.utils import (encode_nvc_frame, NVC_SEEK_MARGIN, NVCFrameAlignmentError, get_nvc_decoder, get_nvc_encoder, get_nvc_frame_timing, iter_nvc_frames, mux_nvc_raw_stream, concat_nvc_chunks, check_nvc_frame_size, rgb_to_yuv444_kernel)
+from simba.data_processors.cuda.utils import (encode_nvc_frame, end_nvc_encoder, NVC_SEEK_MARGIN, NVCFrameAlignmentError, get_nvc_decoder, get_nvc_encoder, get_nvc_frame_timing, iter_nvc_frames, mux_nvc_raw_stream, concat_nvc_chunks, check_nvc_frame_size, rgb_to_yuv444_kernel)
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int, check_str,
@@ -330,9 +330,7 @@ class PosePlotterNVENC(object):
                     raw.write(encode_nvc_frame(encoder=encoder, frame=yuv_t))
                     if self.verbose and (i + 1) % 500 == 0:
                         stdout_information(msg=f'Encoded {i + 1}/{self.n} frames...', source=self.__class__.__name__)
-                tail = encoder.EndEncode()
-                if tail:
-                    raw.write(bytes(tail))
+                raw.write(end_nvc_encoder(encoder=encoder))
             mux_nvc_raw_stream(raw_path=raw_path, fps=self.video_meta['fps'], save_path=out_path, source=self.__class__.__name__)
         finally:
             try:

@@ -45,7 +45,7 @@ from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
 
 from simba.data_processors.cuda.image import (_cuda_is_inside_circle,
                                               _cuda_is_inside_polygon)
-from simba.data_processors.cuda.utils import (encode_nvc_frame, _cuda_point_to_segment_dist, NVC_SEEK_MARGIN, NVCFrameAlignmentError, get_nvc_decoder, get_nvc_encoder, get_nvc_frame_timing, iter_nvc_frames, mux_nvc_raw_stream, concat_nvc_chunks, check_nvc_frame_size)
+from simba.data_processors.cuda.utils import (encode_nvc_frame, end_nvc_encoder, _cuda_point_to_segment_dist, NVC_SEEK_MARGIN, NVCFrameAlignmentError, get_nvc_decoder, get_nvc_encoder, get_nvc_frame_timing, iter_nvc_frames, mux_nvc_raw_stream, concat_nvc_chunks, check_nvc_frame_size)
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_rgb_tuple,
@@ -438,9 +438,7 @@ class GeometryPlotterNVENC(object):
                     raw.write(encode_nvc_frame(encoder=encoder, frame=argb_t[0]))
                     if self.verbose and (i + 1) % 500 == 0:
                         stdout_information(msg=f'Encoded {i + 1}/{n} frames...', source=self.__class__.__name__)
-                tail = encoder.EndEncode()
-                if tail:
-                    raw.write(bytes(tail))
+                raw.write(end_nvc_encoder(encoder=encoder))
             mux_nvc_raw_stream(raw_path=raw_path, fps=self.video_meta['fps'], save_path=out_path, source=self.__class__.__name__)
         finally:
             try:

@@ -3891,7 +3891,7 @@ def get_env_pose_config_dir(raise_error: Optional[bool] = True):
             return pose_config_dir
     else:
         if raise_error:
-            raise SimBAPAckageVersionError(msg=f'pose_configurations directory could not be found. Expected directory: {pose_config_dir}', source=get_pose_config_dir.__name__)
+            raise SimBAPAckageVersionError(msg=f'pose_configurations directory could not be found. Expected directory: {pose_config_dir}', source=get_env_pose_config_dir.__name__)
         return None
 
 

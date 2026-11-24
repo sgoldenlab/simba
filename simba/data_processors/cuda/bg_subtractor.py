@@ -20,7 +20,7 @@ try:
 except Exception:
     torch = None
 
-from simba.data_processors.cuda.utils import (encode_nvc_frame, _cuda_luminance_pixel_to_grey,
+from simba.data_processors.cuda.utils import (encode_nvc_frame, end_nvc_encoder, _cuda_luminance_pixel_to_grey,
                                               get_nvc_encoder, mux_nvc_raw_stream)
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_if_valid_img,
@@ -260,9 +260,7 @@ class BackgroundSubtractorCUDA(object):
                 raw.write(encode_nvc_frame(encoder=encoder, frame=argb_t[0]))
                 if self.verbose and (i + 1) % 500 == 0:
                     stdout_information(msg=f'Encoded {i + 1}/{n_dec} frames...', source=self.__class__.__name__)
-            tail = encoder.EndEncode()
-            if tail:
-                raw.write(bytes(tail))
+            raw.write(end_nvc_encoder(encoder=encoder))
         try:
             mux_nvc_raw_stream(raw_path=raw_path, fps=self.video_meta['fps'], save_path=self.save_path, source=self.__class__.__name__)
         finally:
