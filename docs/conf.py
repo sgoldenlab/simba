@@ -1834,6 +1834,24 @@ SOCIAL_HOME_TITLE = 'SimBA: Behavioral Classifiers from Pose Estimation'   # kee
 SOCIAL_DESCRIPTION = ('SimBA (Simple Behavioral Analysis): open-source GUI and Python toolkit for building supervised '
                       'machine-learning classifiers of animal social and non-social behavior from pose-estimation data.')
 SOCIAL_TWITTER_HANDLE = '@nilssonsro'   # X/Twitter account credited on cards (twitter:site); empty = no tag
+# Search-result titles and descriptions for selected pages: {page name: (title, description)}. They replace the page's
+# <title>, meta description and link-preview title, so Google can match searches people actually type ("simba windows",
+# "train behavior classifier"); the heading on the page and the sidebar entry are unchanged. Keep titles under ~60
+# characters (Google cuts longer ones) and descriptions under ~160, and keep both true to the page.
+SEARCH_TITLES = {
+    'pip_installation': ('Install SimBA on Windows, macOS and Linux (pip, conda)',
+                         'Install SimBA (Simple Behavioral Analysis) with pip or conda on Windows, macOS and Linux: Python 3.6 or 3.10 environment, FFmpeg, and step-by-step options.'),
+    'installation': ('Download and Install SimBA (Windows, macOS, Linux)',
+                     'How to download and install SimBA, the toolkit for building machine-learning classifiers of animal behavior from pose-estimation data.'),
+    'glossary': ('Glossary of Behavior Analysis and Pose-Estimation Terms',
+                 'Terms used in machine-learning behavior analysis and pose estimation: ROI, FPS, SHAP, DeepLabCut, SLEAP, YOLO, BORIS, Kleinberg smoothing.'),
+    'tutorials': ('SimBA Tutorials: Classify Behavior from Pose Estimation',
+                  'Tutorials for SimBA: import DeepLabCut, SLEAP or YOLO tracking, label behavior, train and validate classifiers, ROI analysis and visualizations.'),
+    'walkthroughs': ('Step-by-Step Walkthroughs: Train a Behavior Classifier',
+                     'Scenario walkthroughs for SimBA, from a new project to a trained, validated machine-learning classifier of animal behavior run on new videos.'),
+    'Scenario1': ('Train a Behavior Classifier from Pose Estimation (SimBA)',
+                  'Step-by-step: create a SimBA project, import DeepLabCut, SLEAP or YOLO pose data, label behavior and train a random-forest behavioral classifier.'),
+}
 _SOCIAL_DESC_MAX = 200       # characters; longer descriptions get cut by most platforms anyway
 
 
@@ -1908,6 +1926,9 @@ def _add_social_meta(app, pagename, templatename, context, doctree):
     if pagename == app.config.master_doc:
         context['simba_structured_data'] = _home_structured_data(app)
         title, description = SOCIAL_HOME_TITLE, SOCIAL_DESCRIPTION
+    elif pagename in SEARCH_TITLES:
+        title, description = SEARCH_TITLES[pagename]
+        context['simba_search_title'] = title   # used as <title> in _templates/layout.html
     else:
         title = _html.unescape(_re.sub(r'<[^>]+>', '', context.get('title') or '')).strip() or SOCIAL_SITE_NAME
         description = _page_description(context.get('body'))

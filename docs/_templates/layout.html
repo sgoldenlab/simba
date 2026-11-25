@@ -32,9 +32,11 @@
   {%- endif %}
 {% endblock %}
 
-{# The homepage H1 is just "SimBA", so give its <title> a descriptive one for search results. #}
+{# The homepage H1 is just "SimBA", so give its <title> a descriptive one for search results. Pages listed in
+   SEARCH_TITLES (docs/conf.py) get their search title; every other page keeps "<page title> - SimBA Documentation". #}
 {% block htmltitle %}
   {%- if pagename == master_doc %}<title>SimBA: Behavioral Classifiers from Pose Estimation</title>
+  {%- elif simba_search_title %}<title>{{ simba_search_title|e }}</title>
   {%- else %}{{ super() }}{% endif %}
 {% endblock %}
 
