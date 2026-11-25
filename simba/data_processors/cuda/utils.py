@@ -47,7 +47,9 @@ Notes:
 
 import math
 import os
+import re
 import subprocess
+import sys
 from fractions import Fraction
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -719,6 +721,63 @@ def get_nvc_decoder(video_path: Union[str, os.PathLike],
 
 _NVDEC_DECODABLE = set()
 NVDEC_CODECS = ('h264', 'hevc', 'av1', 'vp8', 'vp9', 'mpeg1video', 'mpeg2video', 'mpeg4', 'mjpeg', 'vc1')   # ffprobe codec names NVDEC can handle (pixel format permitting)
+NVDEC_MAX_HEADER_FPS = 1000   # PyNvVideoCodec 2.1.0 can divide by zero (process crash) opening H.264 whose header declares >= this frame rate (HandBrake: 90000), depending on the container; 2.0.x, 2.2.x and HEVC are not affected
+_NVDEC_PROBE_CODE = ('import sys\n'
+                     'import PyNvVideoCodec as nvc\n'
+                     'decoder = nvc.SimpleDecoder(sys.argv[1], gpu_id=int(sys.argv[2]), use_device_memory=False, output_color_type=nvc.OutputColorType.RGB)\n'
+                     'print("SIMBA_NVDEC_PROBE_OK" if decoder[0] is not None else "SIMBA_NVDEC_PROBE_NONE")\n')
+
+
+def get_video_header_fps(video_path: Union[str, os.PathLike]) -> Optional[float]:
+    """
+    Read the frame rate declared in the timing fields of a video's H.264 / HEVC sequence header.
+
+    This is not the container frame rate that ffprobe reports. Some encoders write a very high value here: HandBrake
+    writes 90000 fps, i.e. ``time_scale=180000`` with ``num_units_in_tick=1``. The H.264 frame rate is
+    ``time_scale / (2 * num_units_in_tick)``. Read with ffmpeg's ``trace_headers`` bitstream filter from the first packet,
+    without decoding.
+
+    :param Union[str, os.PathLike] video_path: Path to the video.
+    :return: The declared frame rate, or None if the header has no timing fields, the codec is not H.264 / HEVC, or ffmpeg fails.
+    :rtype: Optional[float]
+
+    :example:
+    >>> get_video_header_fps(video_path='project_folder/videos/Video_1.mp4')
+    90000.0
+    """
+    try:
+        out = subprocess.run(['ffmpeg', '-hide_banner', '-nostdin', '-v', 'info', '-i', str(video_path), '-map', '0:v:0', '-c', 'copy', '-bsf:v', 'trace_headers', '-frames:v', '1', '-f', 'null', '-'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    values = {}
+    for line in out.stderr.decode('utf-8', errors='replace').splitlines():
+        match = re.search(r'\]\s+\d+\s+(\w+)\s.*=\s*(\d+)\s*$', line)    # "[trace_headers @ 0x..] 152   time_scale   0101... = 180000"
+        if match and match.group(1) not in values:
+            values[match.group(1)] = int(match.group(2))
+    if values.get('num_units_in_tick') and values.get('time_scale'):          # H.264 SPS: one tick = one field
+        return values['time_scale'] / (2.0 * values['num_units_in_tick'])
+    if values.get('vui_num_units_in_tick') and values.get('vui_time_scale'):  # HEVC SPS: one tick = one frame
+        return values['vui_time_scale'] / float(values['vui_num_units_in_tick'])
+    return None
+
+
+def _nvdec_opens_in_subprocess(video_path: Union[str, os.PathLike], gpu_id: int = 0) -> bool:
+    """
+    Open a video with PyNvVideoCodec's ``SimpleDecoder`` and decode frame 0 in a separate Python process.
+
+    Used by :func:`check_nvdec_decodable` for videos that may crash the decoder with a native error (which no
+    ``try/except`` can catch): a crash then ends only the child process. Takes ~0.2 s.
+
+    :param Union[str, os.PathLike] video_path: Path to the video.
+    :param int gpu_id: Index of the GPU to decode on. Default 0.
+    :return: True if the child process opened the video and decoded frame 0; False if it crashed, failed, timed out, or could not be started.
+    :rtype: bool
+    """
+    try:
+        result = subprocess.run([sys.executable, '-c', _NVDEC_PROBE_CODE, str(video_path), str(gpu_id)], stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=120)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return result.returncode == 0 and b'SIMBA_NVDEC_PROBE_OK' in result.stdout
 
 
 def check_nvdec_decodable(video_path: Union[str, os.PathLike], gpu_id: int = 0) -> None:
@@ -731,9 +790,12 @@ def check_nvdec_decodable(video_path: Union[str, os.PathLike], gpu_id: int = 0) 
     H.264 such as ``ffmpeg -vf format=gray -c:v libx264`` output), HEVC 4:2:2, VP9 4:4:4, and codecs NVDEC has no
     decoder for (raw video, PNG, ProRes, FFV1).
 
-    The check: (i) rejects VP9 that is not 4:2:0 (read with ffprobe, as decoding it can crash even a probe), then
-    (ii) opens the video with a non-threaded ``SimpleDecoder`` and decodes frame 0, which raises a catchable error
-    for unsupported streams. Takes ~0.1 s. The result is cached per file (path, size, modification time).
+    The check: (i) rejects VP9 that is not 4:2:0 (read with ffprobe, as decoding it can crash even a probe), (ii) on
+    PyNvVideoCodec 2.1.0, for H.264 whose sequence header declares a frame rate of ``NVDEC_MAX_HEADER_FPS`` (1000) or more
+    (see :func:`get_video_header_fps`; HandBrake writes 90000), first opens the video in a separate process and rejects it
+    if that crashes (in MP4 such headers make both decoders divide by zero, depending on the container time base), then
+    (iii) opens the video with a non-threaded ``SimpleDecoder`` and decodes frame 0, which raises a catchable error for
+    unsupported streams. Takes ~0.1-0.3 s. The result is cached per file (path, size, modification time).
 
     :param Union[str, os.PathLike] video_path: Path to the video.
     :param int gpu_id: Index of the GPU to decode on. Default 0.
@@ -754,16 +816,25 @@ def check_nvdec_decodable(video_path: Union[str, os.PathLike], gpu_id: int = 0) 
     name = os.path.basename(str(video_path))
     fix = 'Use the CPU option, or re-encode the video to H.264 8-bit 4:2:0 (e.g. ffmpeg -i in.mp4 -c:v libx264 -pix_fmt yuv420p out.mp4).'
     try:
-        probe = subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=codec_name,pix_fmt', '-of', 'csv=p=0', str(video_path)], stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
+        probe = subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=codec_name,pix_fmt,r_frame_rate', '-of', 'csv=p=0', str(video_path)], stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
         fields = probe.stdout.decode('utf-8', errors='replace').strip().split(',')
-        codec, pix_fmt = (fields + ['', ''])[:2]
+        codec, pix_fmt, rate = (fields + ['', '', ''])[:3]
     except (OSError, subprocess.SubprocessError):
-        codec, pix_fmt = '', ''
+        codec, pix_fmt, rate = '', '', ''
     if codec == 'vp9' and pix_fmt and not pix_fmt.startswith('yuv420'):
         raise SimBAGPUError(msg=f'The GPU video decoder (NVDEC) cannot decode {name} (VP9, {pix_fmt}). {fix}', source=check_nvdec_decodable.__name__)
     n_gpus = len(_is_cuda_available()[1] or {})
     if gpu_id >= n_gpus:
         raise SimBAGPUError(msg=f'gpu_id={gpu_id} was requested but {n_gpus} GPU(s) were found (gpu_id counts from 0).', source=check_nvdec_decodable.__name__)
+    if codec == 'h264' and str(getattr(nvc, '__version__', '')) == '2.1.0':
+        header_fps = get_video_header_fps(video_path=video_path)
+        if header_fps is not None and header_fps >= NVDEC_MAX_HEADER_FPS and not _nvdec_opens_in_subprocess(video_path=video_path, gpu_id=gpu_id):
+            try:
+                fps = float(Fraction(rate))
+            except (ValueError, ZeroDivisionError):
+                fps = 30.0
+            ticks = Fraction(2 * fps).limit_denominator(1001)
+            raise SimBAGPUError(msg=f'{name} cannot be read by the GPU video decoder: its H.264 header declares a frame rate of {header_fps:g} fps (written by some encoders, e.g. HandBrake), which crashes PyNvVideoCodec 2.1.0. Use the CPU option, or fix the header without re-encoding: ffmpeg -i "{name}" -c copy -bsf:v h264_metadata=tick_rate={ticks.numerator}/{ticks.denominator} "fixed_{name}"', source=check_nvdec_decodable.__name__)
     try:
         decoder = nvc.SimpleDecoder(str(video_path), gpu_id=gpu_id, use_device_memory=False, output_color_type=nvc.OutputColorType.RGB)
         frame = decoder[0]
