@@ -94,6 +94,14 @@ Pose-estimation plotting
    :undoc-members:
    :show-inheritance:
 
+Pose-estimation plotting - GPU (NVDEC/NVENC)
+-----------------------------------------------------------------------
+
+.. autoclass:: simba.plotting.yolo_pose_visualizer_nvenc.YOLOPoseVisualizerNVENC
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Bounding box plotting
 -----------------------------------------------------------------------
 

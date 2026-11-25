@@ -96,6 +96,15 @@ Geometry overlay (GPU)
    :show-inheritance:
 
 
+YOLO pose plotting (GPU)
+------------------------------
+.. automodule:: simba.plotting.yolo_pose_visualizer_nvenc
+   :noindex:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
 Statistics (GPU)
 ------------------------------
 .. automodule:: simba.data_processors.cuda.statistics

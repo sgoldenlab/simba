@@ -107,6 +107,7 @@ class YOLOPoseVisualizer():
     .. seealso::
        To create YOLO pose data, see :func:`~simba.bounding_box_tools.yolo.yolo_pose_inference.YOLOPoseInference`
        To fit YOLO model, see :func:`~simba.bounding_box_tools.yolo.yolo_fit.FitYolo`
+       For a faster GPU (NVDEC -> CUDA -> NVENC) version, see :class:`~simba.plotting.yolo_pose_visualizer_nvenc.YOLOPoseVisualizerNVENC`.
        For instructions, see `YOLO Pose Estimation Visualization Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/yolo_pose_plot.md>`_.
 
     .. video:: _static/img/YOLOPoseVisualizer.webm
