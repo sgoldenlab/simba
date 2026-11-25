@@ -74,7 +74,7 @@ Background Subtraction: GPU (NVDEC/NVENC)
 Fully on-GPU background subtraction (NVDEC decode -> CUDA kernel -> NVENC encode), with a
 threaded ffmpeg/cv2 fallback when PyNvVideoCodec is unavailable.
 
-.. autoclass:: simba.data_processors.cuda.bg_subtractor.BackgroundSubtractorCUDA
+.. autoclass:: simba.video_processors.bg_subtractor_nvenc.BackgroundSubtractorCUDA
    :members:
    :undoc-members:
    :show-inheritance:

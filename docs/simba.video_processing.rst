@@ -90,7 +90,7 @@ Egocentrically rotate videos
 Egocentrically rotate videos - GPU (NVDEC/NVENC)
 -----------------------------------------------------------------------
 
-.. autoclass:: simba.data_processors.cuda.egocentric_rotator_nvenc.EgocentricRotatorNVENC
+.. autoclass:: simba.video_processors.egocentric_rotator_nvenc.EgocentricRotatorNVENC
    :members:
    :undoc-members:
    :show-inheritance:
@@ -98,7 +98,7 @@ Egocentrically rotate videos - GPU (NVDEC/NVENC)
 Greyscale videos - GPU (NVDEC/NVENC)
 -----------------------------------------------------------------------
 
-.. autoclass:: simba.data_processors.cuda.greyscale_nvenc.GreyscaleNVENC
+.. autoclass:: simba.video_processors.greyscale_nvenc.GreyscaleNVENC
    :members:
    :undoc-members:
    :show-inheritance:
@@ -106,7 +106,7 @@ Greyscale videos - GPU (NVDEC/NVENC)
 CLAHE videos - GPU (NVDEC/NVENC)
 -----------------------------------------------------------------------
 
-.. autoclass:: simba.data_processors.cuda.clahe_nvenc.ClaheNVENC
+.. autoclass:: simba.video_processors.clahe_nvenc.ClaheNVENC
    :members:
    :undoc-members:
    :show-inheritance:

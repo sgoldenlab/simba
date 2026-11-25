@@ -104,7 +104,7 @@ class PosePlotterNVENC(object):
        equivalent but not bit-identical to the CPU path.
 
     .. csv-table:: Expected runtimes by image size
-       :file: ../../../docs/tables/pose_plotter_nvenc.csv
+       :file: ../../docs/tables/pose_plotter_nvenc.csv
        :widths: 40, 30, 30
        :align: center
        :header-rows: 1

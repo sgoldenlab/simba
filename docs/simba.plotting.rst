@@ -250,7 +250,7 @@ Pose-estimation plotter
 Pose-estimation plotter - GPU (NVDEC/NVENC)
 -------------------------------------------
 
-.. autoclass:: simba.data_processors.cuda.pose_plotter_nvenc.PosePlotterNVENC
+.. autoclass:: simba.plotting.pose_plotter_nvenc.PosePlotterNVENC
    :members:
    :undoc-members:
    :show-inheritance:
@@ -314,7 +314,7 @@ Geometry plotter (generic)
 Geometry plotter - GPU (NVDEC/NVENC)
 ---------------------------------------------------------------
 
-.. autoclass:: simba.data_processors.cuda.geometry_plotter_nvenc.GeometryPlotterNVENC
+.. autoclass:: simba.plotting.geometry_plotter_nvenc.GeometryPlotterNVENC
    :members:
    :undoc-members:
    :show-inheritance:

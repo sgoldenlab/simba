@@ -199,7 +199,7 @@ Render the geometric shapes (bounding boxes, polygons, circles, lines) produced 
 Geometry plotter (GPU)
 ------------------------------------------
 
-.. autoclass:: simba.data_processors.cuda.geometry_plotter_nvenc.GeometryPlotterNVENC
+.. autoclass:: simba.plotting.geometry_plotter_nvenc.GeometryPlotterNVENC
    :members:
    :undoc-members:
    :noindex:

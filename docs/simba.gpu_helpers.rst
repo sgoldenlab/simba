@@ -44,7 +44,7 @@ Image (GPU)
 
 Background subtraction (GPU)
 ------------------------------
-.. automodule:: simba.data_processors.cuda.bg_subtractor
+.. automodule:: simba.video_processors.bg_subtractor_nvenc
    :noindex:
    :members:
    :undoc-members:
@@ -53,7 +53,7 @@ Background subtraction (GPU)
 
 Pose plotting (GPU)
 ------------------------------
-.. automodule:: simba.data_processors.cuda.pose_plotter_nvenc
+.. automodule:: simba.plotting.pose_plotter_nvenc
    :noindex:
    :members:
    :undoc-members:
@@ -62,7 +62,7 @@ Pose plotting (GPU)
 
 Greyscale conversion (GPU)
 ------------------------------
-.. automodule:: simba.data_processors.cuda.greyscale_nvenc
+.. automodule:: simba.video_processors.greyscale_nvenc
    :noindex:
    :members:
    :undoc-members:
@@ -71,7 +71,7 @@ Greyscale conversion (GPU)
 
 CLAHE (GPU)
 ------------------------------
-.. automodule:: simba.data_processors.cuda.clahe_nvenc
+.. automodule:: simba.video_processors.clahe_nvenc
    :noindex:
    :members:
    :undoc-members:
@@ -80,7 +80,7 @@ CLAHE (GPU)
 
 Egocentric rotation (GPU)
 ------------------------------
-.. automodule:: simba.data_processors.cuda.egocentric_rotator_nvenc
+.. automodule:: simba.video_processors.egocentric_rotator_nvenc
    :noindex:
    :members:
    :undoc-members:
@@ -89,7 +89,7 @@ Egocentric rotation (GPU)
 
 Geometry overlay (GPU)
 ------------------------------
-.. automodule:: simba.data_processors.cuda.geometry_plotter_nvenc
+.. automodule:: simba.plotting.geometry_plotter_nvenc
    :noindex:
    :members:
    :undoc-members:

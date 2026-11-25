@@ -209,7 +209,7 @@ class ClaheNVENC(object):
     .. seealso::
        CPU reference (greyscale output): :func:`~simba.video_processors.video_processing.clahe_enhance_video`
        and its multicore variant :func:`~simba.video_processors.video_processing.clahe_enhance_video_mp`.
-       For GPU greyscale (no CLAHE), see :class:`~simba.data_processors.cuda.greyscale_nvenc.GreyscaleNVENC`.
+       For GPU greyscale (no CLAHE), see :class:`~simba.video_processors.greyscale_nvenc.GreyscaleNVENC`.
 
     .. csv-table:: Measured runtime (RTX 4070, h264, threaded decode, n_workers=1)
        :header: Resolution, Frames, Source FPS, Time (s), Encode FPS

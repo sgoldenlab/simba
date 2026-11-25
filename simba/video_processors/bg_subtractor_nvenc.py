@@ -149,7 +149,7 @@ class BackgroundSubtractorCUDA(object):
        "original bg_subtraction_cuda", 50.08, 36, 1x
 
     .. csv-table:: NVENC back-end: FPS by image size
-       :file: ../../../docs/tables/bg_subtraction_cuda_nvenc.csv
+       :file: ../../docs/tables/bg_subtraction_cuda_nvenc.csv
        :widths: 40, 30, 30
        :align: center
        :header-rows: 1

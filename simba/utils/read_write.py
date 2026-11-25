@@ -411,7 +411,7 @@ def bgr_to_yuv(bgr: np.ndarray) -> np.ndarray:
 
     Used to pre-convert overlay colours for GPU drawing in YUV frame buffers before NVENC encoding, e.g. in
     :class:`~simba.plotting.yolo_pose_visualizer_nvenc.YOLOPoseVisualizerNVENC` and
-    :class:`~simba.data_processors.cuda.pose_plotter_nvenc.PosePlotterNVENC`.
+    :class:`~simba.plotting.pose_plotter_nvenc.PosePlotterNVENC`.
 
     :param np.ndarray bgr: Colours of shape (..., 3) in BGR order, values 0-255. E.g. a single colour (3,) or a palette (n, 3).
     :return: Array of the same shape as ``bgr`` with (Y, Cb, Cr) values, rounded and clipped to 0-255.

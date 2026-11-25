@@ -161,7 +161,7 @@ class YOLOPoseVisualizerNVENC(object):
     .. seealso::
        For the CPU version, see :class:`~simba.plotting.yolo_pose_visualizer.YOLOPoseVisualizer`.
        To create YOLO pose data, see :class:`~simba.model.yolo_pose_inference.YOLOPoseInference`.
-       For the general pose-on-video GPU plotter, see :class:`~simba.data_processors.cuda.pose_plotter_nvenc.PosePlotterNVENC`.
+       For the general pose-on-video GPU plotter, see :class:`~simba.plotting.pose_plotter_nvenc.PosePlotterNVENC`.
 
     .. note::
        Requires PyNvVideoCodec (NVDEC/NVENC), torch (DLPack decode interop) and a CUDA GPU.

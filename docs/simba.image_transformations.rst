@@ -42,7 +42,7 @@ Rotate and translate frames (and their pose data) into an egocentric reference f
 CLAHE contrast enhancement (GPU)
 ----------------------------------------------
 
-.. autoclass:: simba.data_processors.cuda.clahe_nvenc.ClaheNVENC
+.. autoclass:: simba.video_processors.clahe_nvenc.ClaheNVENC
    :members:
    :undoc-members:
    :noindex:
@@ -51,7 +51,7 @@ CLAHE contrast enhancement (GPU)
 Greyscale conversion (GPU)
 ----------------------------------------------
 
-.. autoclass:: simba.data_processors.cuda.greyscale_nvenc.GreyscaleNVENC
+.. autoclass:: simba.video_processors.greyscale_nvenc.GreyscaleNVENC
    :members:
    :undoc-members:
    :noindex:
@@ -60,7 +60,7 @@ Greyscale conversion (GPU)
 Egocentric rotation (GPU)
 ----------------------------------------------
 
-.. autoclass:: simba.data_processors.cuda.egocentric_rotator_nvenc.EgocentricRotatorNVENC
+.. autoclass:: simba.video_processors.egocentric_rotator_nvenc.EgocentricRotatorNVENC
    :members:
    :undoc-members:
    :noindex:
