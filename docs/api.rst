@@ -187,7 +187,7 @@ Global SimBA settings and environment variables — GPU toggles, default paths, 
      <source src="_static/img/gpu_spin.webm" type="video/webm">
    </video>
 
-CUDA/CuPy-accelerated versions of SimBA's compute-heavy routines — geometry, image, background subtraction, statistics, circular statistics, time-series, and SHAP — consolidated in one place. On a supported NVIDIA GPU they produce the same results as their CPU counterparts but run orders of magnitude faster on large datasets, with per-function expected-runtime tables to help you gauge the speed-up.
+CUDA/CuPy-accelerated versions of SimBA's compute-heavy routines — geometry, image, background subtraction, statistics, circular statistics, time-series, and SHAP — consolidated in one place. On a supported NVIDIA GPU they produce the same results as their CPU counterparts but run orders of magnitude faster on large datasets, with per-function expected-runtime tables to help you gauge the speed-up. Also includes whole-video GPU tools that decode, process and re-encode video entirely on the GPU (NVDEC -> CUDA -> NVENC): background subtraction, greyscale, CLAHE, egocentric rotation, and pose, geometry and YOLO pose overlays.
 
 .. toctree::
    :maxdepth: 2

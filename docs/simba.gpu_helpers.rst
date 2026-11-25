@@ -14,6 +14,10 @@ routines — geometry, image, statistics, circular-statistics, time-series and S
 operations. On a supported NVIDIA GPU these run the same analyses as their CPU
 counterparts, but orders of magnitude faster on large datasets.
 
+SimBA also has whole-video GPU tools (NVDEC decode -> CUDA -> NVENC encode) for background
+subtraction, greyscale, CLAHE, egocentric rotation, and pose, geometry and YOLO pose overlays;
+see `GPU video tools (NVDEC/NVENC)`_.
+
 This page is a single consolidated view of every GPU-accelerated module. Each block
 is also documented in its topical section (e.g. Geometry, Statistics); the canonical,
 cross-referenceable entries live there, so the listings here mirror them for a
@@ -21,7 +25,7 @@ one-stop GPU reference.
 
 .. contents::
    :local:
-   :depth: 1
+   :depth: 2
 
 
 Geometry (GPU)
@@ -36,69 +40,6 @@ Geometry (GPU)
 Image (GPU)
 ------------------------------
 .. automodule:: simba.data_processors.cuda.image
-   :noindex:
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-Background subtraction (GPU)
-------------------------------
-.. automodule:: simba.video_processors.bg_subtractor_nvenc
-   :noindex:
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-Pose plotting (GPU)
-------------------------------
-.. automodule:: simba.plotting.pose_plotter_nvenc
-   :noindex:
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-Greyscale conversion (GPU)
-------------------------------
-.. automodule:: simba.video_processors.greyscale_nvenc
-   :noindex:
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-CLAHE (GPU)
-------------------------------
-.. automodule:: simba.video_processors.clahe_nvenc
-   :noindex:
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-Egocentric rotation (GPU)
-------------------------------
-.. automodule:: simba.video_processors.egocentric_rotator_nvenc
-   :noindex:
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-Geometry overlay (GPU)
-------------------------------
-.. automodule:: simba.plotting.geometry_plotter_nvenc
-   :noindex:
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-YOLO pose plotting (GPU)
-------------------------------
-.. automodule:: simba.plotting.yolo_pose_visualizer_nvenc
    :noindex:
    :members:
    :undoc-members:
@@ -165,10 +106,87 @@ Data transformations (GPU)
    :show-inheritance:
 
 
+GPU video tools (NVDEC/NVENC)
+------------------------------
+Whole-video tools that run every step on the GPU: frames are decoded by the NVDEC engine straight into GPU
+memory, processed by a CUDA kernel, and re-encoded by the NVENC engine, so the video never passes through
+the CPU. Each class has a CPU counterpart (linked from its documentation) and a runtime table.
+
+.. note::
+   These tools need an NVIDIA GPU and `PyNvVideoCodec <https://pypi.org/project/pynvvideocodec/>`_
+   (``pip install pynvvideocodec==2.1.0``, the version SimBA is tested with; also in ``requirements_gpu.txt``).
+   Background subtraction also runs without it, on a slower ffmpeg-decode + CUDA + cv2-encode path; the
+   others raise an error. The GPU functions in the other sections of this page need only CuPy / numba.
+
+
+Background subtraction (GPU)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: simba.video_processors.bg_subtractor_nvenc
+   :noindex:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Pose plotting (GPU)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: simba.plotting.pose_plotter_nvenc
+   :noindex:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Greyscale conversion (GPU)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: simba.video_processors.greyscale_nvenc
+   :noindex:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+CLAHE (GPU)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: simba.video_processors.clahe_nvenc
+   :noindex:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Egocentric rotation (GPU)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: simba.video_processors.egocentric_rotator_nvenc
+   :noindex:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Geometry overlay (GPU)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: simba.plotting.geometry_plotter_nvenc
+   :noindex:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+YOLO pose plotting (GPU)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: simba.plotting.yolo_pose_visualizer_nvenc
+   :noindex:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
 GPU utilities
 ------------------------------
 Low-level CUDA device primitives (``@cuda.jit(device=True)``) that the other GPU
-kernels compose, plus the public NVDEC video-decoder factory.
+kernels compose, plus the shared NVDEC/NVENC helpers (decoder and encoder factories,
+decodability checks, frame timing and muxing) that the GPU video tools are built on.
 
 .. automodule:: simba.data_processors.cuda.utils
    :members:
